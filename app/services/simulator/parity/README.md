@@ -1,7 +1,7 @@
 # Parity Comparison (`FEAT-SIM-18`)
 
 > **Feature:** `FEAT-SIM-18` Parity Comparison
-> **Status:** `Completed` (programme Phase 2)
+> **Status:** `Completed` (programme Phase 2; L5-MT5-Operational published 2026-08-16)
 > **Module:** `app/services/simulator/parity/`
 
 Owns the versioned **Parity Envelope**, the relationship-preserving evidence
@@ -53,6 +53,19 @@ retry safety, and reconciliation requirements; events to their category sequence
 order/deal/position evidence to identifier topology plus causal edges. Empirical quantities,
 prices, profits, timestamps, fills, and latency remain outside v2 while v1 comparison behavior is
 unchanged.
+
+## Published L5-MT5-Operational certificate
+
+Certificate `l5-mt5-operational-btcusd-20260816-04` uses an independently collected MT5 demo
+`BTCUSD` trace to certify only the deterministic request/response, lifecycle/linkage, causal-event,
+gate, ledger-rule, and route-persistence semantics shared by the explicitly configured `demo` and
+`live` credential routes. It was issued at `2026-08-16T09:33:41.210057+00:00` and is valid through
+`2027-08-14T00:00:00Z` unless any registered Envelope v2 invalidation trigger fires. Its secret-safe,
+checksummed, nine-member generated bundle is
+`artifacts/sim_live_parity/mt5-operational/v2/l5-mt5-operational-btcusd-20260816-04` and remains an
+ignored evidence artifact rather than repository source. The certificate excludes every empirical
+spread, latency, fill, liquidity, slippage, execution-price, calibration, profitability, and
+performance claim; demo empirical evidence is never relabelled live.
 
 ## Evidence mapping schema
 
@@ -116,5 +129,10 @@ alpha-equivalent evidence from cold re-execution hashes identically.
   the exact validated nine-member bundle. Its offline safety evidence is
   `tests/simulator/integration/test_l5_certificate_collection.py`; pytest never invokes the
   provider path.
+- Offline publication support:
+  `tests/simulator/integration/l5_certificate_finalize.py` runs every mandatory validation,
+  sensitive-value, test, usage, Ruff, format, and mypy command without a shell, records only zero
+  exit codes, atomically recomputes checksums, and rejects repeat or drifted finalization. Evidence is
+  `tests/simulator/integration/test_l5_certificate_bundle.py`.
 - Usage: `tests/simulator/usage/features/18_parity.py`
   (`fr_sim_187`–`fr_sim_193`, `fr_sim_236`–`fr_sim_239`)

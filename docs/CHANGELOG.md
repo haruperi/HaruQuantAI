@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Publish bounded MT5 operational parity
+
+The verified demo certificate now publishes the deterministic MT5 operational semantics shared by explicitly configured sim, demo, and live routes without transferring empirical behavior.
+
+#### Added (1)
+
+- Published `l5-mt5-operational-btcusd-20260816-04`, valid through 2027-08-14 unless invalidated, with a finalized nine-command audit ledger, reproducible checksums, and explicit empirical exclusions.
+
 ### Finalize certificate command evidence
 
 Generated operational certificates can now bind every mandatory offline publication command and successful exit code before final acceptance.

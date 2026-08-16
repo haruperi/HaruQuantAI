@@ -4541,6 +4541,29 @@ passed 40 in 4.86 seconds; Ruff, Ruff format, and mypy passed. Exact commit:
 `Prove validate-only and scan-only modes run from a fresh process.`, and
 `Preserve the unmodified candidate when entry-point setup fails.`
 
+**L5-MT5-Operational publication — 2026-08-16.** After correction commit `a380cb70`, the offline
+finalizer completed in 100.5 seconds and atomically finalized the ignored `-04` bundle. Its immutable
+ledger contains the collection command plus eight mandatory audit commands, all with exit code zero;
+checksums reproduce for all eight hashed members. Fresh-process candidate validation and the
+sensitive-value scan passed; focused collector/bundle/relationship coverage passed 45 tests;
+Simulator passed 548 tests; usage feature 18 passed all eleven mappings; Ruff passed and formatted
+2,860 files; mypy passed 2,811 source files. An independent post-finalization process revalidated the
+bundle schema, exact nine-command ledger, zero sensitive findings, and all checksums. Certificate
+`l5-mt5-operational-btcusd-20260816-04` is therefore published for the deterministic MT5 operational
+semantics shared by explicitly configured `demo` and `live` credential routes, using `demo` evidence
+only. It was issued at `2026-08-16T09:33:41.210057+00:00`, is valid through
+`2027-08-14T00:00:00Z` unless invalidated, and excludes every empirical spread, latency, fill,
+liquidity, slippage, execution-price, calibration, profitability, and performance claim. Generated
+evidence remains ignored at
+`artifacts/sim_live_parity/mt5-operational/v2/l5-mt5-operational-btcusd-20260816-04`.
+Publication authorities: `app/services/simulator/README.md:136`,
+`app/services/simulator/parity/README.md:57`, `docs/PROJECT.md:487`, and
+`docs/ARCHITECTURE.md:1184`. Exact publication commit:
+`docs: publish bounded demo parity certificate` with body bullets
+`Publish the verified MT5 demo operational certificate.`,
+`Certify shared sim, demo, and live operational semantics within the bounded scope.`, and
+`Preserve explicit exclusions for all unobserved empirical behavior.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write

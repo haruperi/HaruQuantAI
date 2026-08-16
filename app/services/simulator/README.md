@@ -133,6 +133,12 @@ scheduling, calibration, and journals.
 - **L5-MT5-Operational is one bounded certificate.** Verified demo evidence certifies
   only the deterministic MT5 contracts shared by demo and live credential routes;
   empirical observations and calibration remain route- and provenance-scoped.
+- **Published certificate.** `l5-mt5-operational-btcusd-20260816-04` was issued from
+  an independently collected MT5 demo `BTCUSD` operational trace on 2026-08-16 and
+  is valid through 2027-08-14 unless a registered trigger invalidates it. Its ignored,
+  nine-member evidence bundle is rooted at
+  `artifacts/sim_live_parity/mt5-operational/v2/l5-mt5-operational-btcusd-20260816-04`;
+  the certificate transfers no empirical demo observation to live.
 - **Engine comparability.** Simulation enters Trading through its public approved-request
   builder and public mutation verbs and never constructs `OrderIntent` directly; the
   deterministic execution scheduler (`FEAT-SIM-15`) owns the only simulated clock and
@@ -317,9 +323,9 @@ Module folders and files are ordered from lowest dependency to highest dependenc
 | Completed | `FEAT-SIM-17` Empirical Execution Calibration | `calibration/` | Immutable evidence partitioning, M1 spread and evidenced execution-component fits, artifact validation, temporal eligibility | `FR-SIM-181`–`FR-SIM-186`, `FR-SIM-224`–`FR-SIM-227` | `tests/simulator/usage/features/17_calibration.py` |
 | Completed | `FEAT-SIM-18` Parity Comparison | `parity/` | `get_parity_envelope`, `get_parity_maturity_ladder`, `normalize_parity_evidence`, `compare_parity_evidence` | `FR-SIM-187`–`FR-SIM-193`, `FR-SIM-236`–`FR-SIM-239` | `tests/simulator/usage/features/18_parity.py` |
 
-All registered Simulator features are completed. The approved sim⇄live parity programme
-remains responsible for the later cross-feature maturity and certification gates in
-`docs/dev/sim-live-parity-implementation-plan.md`. The registration of `FEAT-SIM-15` is the separately
+All registered Simulator features are completed. The sim⇄live parity programme completed its
+bounded L5-MT5-Operational certification gate on 2026-08-16; continuing validity remains governed
+by Envelope v2 invalidation triggers. The registration of `FEAT-SIM-15` is the separately
 approved requirement that admits the `scheduler/` module folder under the structure
 rules in Section 2. `FEAT-SIM-18` is **Completed** as of programme Phase 2 (2026-08-14):
 see `app/services/simulator/parity/README.md` for the feature registration, evidence

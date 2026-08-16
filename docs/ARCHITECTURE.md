@@ -1181,6 +1181,12 @@ derived OHLC paths are research-only unless a registered invariant is proven
 path-independent. The system-level record lives in `docs/PROJECT.md` §3 and the
 executable programme in `docs/dev/sim-live-parity-implementation-plan.md`.
 
+The published Envelope v2 instance is `l5-mt5-operational-btcusd-20260816-04`, issued from an
+independent MT5 demo `BTCUSD` operational trace on 2026-08-16 and valid through 2027-08-14 unless a
+registered build, contract, code/config, specification, source/tick-model, calibration-validity,
+initial-authority, or drift trigger invalidates it. Its generated evidence remains outside source
+control; documentation publishes only its identity, bounded semantics, validity, and exclusions.
+
 ---
 
 ## 6. Where the volume went
