@@ -14,10 +14,17 @@ from tests.simulator.integration.l5_certificate_collection import (
     validate_l5_certificate_bundle,
     write_certificate_bundle,
 )
+from tests.simulator.integration.l5_certificate_finalize import (
+    build_required_audit_commands,
+    finalize_certificate_command_evidence,
+    validate_finalized_command_ledger,
+)
 from tests.simulator.integration.test_parity_relationships import paired_evidence
 
 
-def _synthetic_schema_fixture(bundle: Path) -> None:
+def _synthetic_schema_fixture(
+    bundle: Path, *, command_output: Path | None = None
+) -> None:
     """Create non-certifying fixture bytes for validator tests only."""
     left, right = paired_evidence()
     environment = {
@@ -67,7 +74,8 @@ def _synthetic_schema_fixture(bundle: Path) -> None:
         command=build_collection_command(
             certificate_id="schema-fixture-not-a-certificate",
             symbol="EURUSD",
-            output=Path(
+            output=command_output
+            or Path(
                 "artifacts/sim_live_parity/mt5-operational/v2/"
                 "schema-fixture-not-a-certificate"
             ),
@@ -204,3 +212,100 @@ def test_l5_certificate_bundle_rejects_absolute_collection_command(
     )
     with pytest.raises(ValueError, match="repository-relative"):
         validate_l5_certificate_bundle(bundle)
+
+
+def _finalization_fixture(tmp_path: Path) -> tuple[Path, Path]:
+    """Create one candidate under the required generated-artifact root."""
+    root = tmp_path / "workspace"
+    relative = Path(
+        "artifacts/sim_live_parity/scope/v2/schema-fixture-not-a-certificate"
+    )
+    bundle = root / relative
+    bundle.parent.mkdir(parents=True)
+    _synthetic_schema_fixture(bundle, command_output=relative)
+    return root, bundle
+
+
+def test_certificate_finalization_records_exact_successful_audits(
+    tmp_path: Path,
+) -> None:
+    """Successful mandatory commands become checksummed deterministic evidence."""
+    root, bundle = _finalization_fixture(tmp_path)
+    observed: list[tuple[str, ...]] = []
+
+    def runner(arguments, workspace_root):
+        assert workspace_root == root
+        observed.append(tuple(arguments))
+        return 0
+
+    finalize_certificate_command_evidence(
+        bundle,
+        workspace_root=root,
+        runner=runner,
+    )
+    assert tuple(observed) == build_required_audit_commands(bundle.relative_to(root))
+    validate_l5_certificate_bundle(bundle)
+    validate_finalized_command_ledger(bundle, root)
+    assert all(
+        line.startswith("exit_code=0\t")
+        for line in (bundle / "commands.txt").read_text(encoding="utf-8").splitlines()
+    )
+
+
+def test_certificate_finalization_rejects_repeated_finalization(tmp_path: Path) -> None:
+    """An immutable finalized ledger cannot be rewritten."""
+    root, bundle = _finalization_fixture(tmp_path)
+    finalize_certificate_command_evidence(
+        bundle,
+        workspace_root=root,
+        runner=lambda _arguments, _root: 0,
+    )
+    with pytest.raises(ValueError, match="already finalized"):
+        finalize_certificate_command_evidence(
+            bundle,
+            workspace_root=root,
+            runner=lambda _arguments, _root: 0,
+        )
+
+
+def test_failed_audit_preserves_original_candidate_bytes(tmp_path: Path) -> None:
+    """A failed command leaves the candidate ledger and checksums untouched."""
+    root, bundle = _finalization_fixture(tmp_path)
+    commands_before = (bundle / "commands.txt").read_bytes()
+    checksums_before = (bundle / "checksums.sha256").read_bytes()
+
+    def runner(arguments, workspace_root):
+        del workspace_root
+        return 7 if "pytest" in arguments else 0
+
+    with pytest.raises(RuntimeError, match="exit code 7"):
+        finalize_certificate_command_evidence(
+            bundle,
+            workspace_root=root,
+            runner=runner,
+        )
+    assert (bundle / "commands.txt").read_bytes() == commands_before
+    assert (bundle / "checksums.sha256").read_bytes() == checksums_before
+
+
+def test_finalized_ledger_rejects_failed_or_changed_commands(tmp_path: Path) -> None:
+    """Exit-code or command drift cannot pass final publication validation."""
+    root, bundle = _finalization_fixture(tmp_path)
+    finalize_certificate_command_evidence(
+        bundle,
+        workspace_root=root,
+        runner=lambda _arguments, _root: 0,
+    )
+    commands = bundle / "commands.txt"
+    original = commands.read_text(encoding="utf-8")
+    commands.write_text(
+        original.replace("exit_code=0", "exit_code=1", 1), encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="failed command"):
+        validate_finalized_command_ledger(bundle, root)
+    commands.write_text(
+        original.replace("ruff check .", "ruff check tests", 1),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="differs"):
+        validate_finalized_command_ledger(bundle, root)

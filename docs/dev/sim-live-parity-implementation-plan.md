@@ -4487,6 +4487,46 @@ then executed successfully. Exact commit:
 `Split truncated pages recursively and fail closed at the minimum interval.`, and
 `Expose secret-safe pre-mutation progress without weakening certificate scope.`
 
+**Eighth collection attempt: Operationally successful, publication ledger pending — 2026-08-16.**
+The separately approved Dry Run 39 generated
+`artifacts/sim_live_parity/mt5-operational/v2/l5-mt5-operational-btcusd-20260816-04`
+in 41 seconds after every bounded authority-history window completed before mutation. MT5 reported
+demo mode; the paired Simulation/demo `BTCUSD` check/place/cancel trace passed; the exact pending
+order was cancelled; initial and final authority reconciled; the interval contained zero deals and
+zero non-trade transactions; comparison passed with zero failures and no invalidation; MT5
+disconnected cleanly. Independent audit found nine exact members, reproducible checksums and
+fresh-process validation, eight empirical exclusions, eight invalidation triggers, zero secret
+findings, zero forbidden credential literals, zero active `BTCUSD` orders, and zero recent deals.
+Focused parity passed 40 tests, Simulator passed 543, usage feature 18 passed all eleven mappings,
+Ruff checked and formatted 2,859 files, and mypy passed 2,810 source files. Publication paused
+because the checksummed `commands.txt` contained only the collection command rather than every later
+mandatory audit command and exit code. The bundle remains ignored and unpublished pending offline
+finalization; no further provider call is required.
+
+**Command-evidence finalization correction `CERT-DR39Δ1` — 2026-08-16.** The approved recommendation
+adds a separate offline finalizer so the already-bound collector/application identity and evidence
+JSON remain unchanged. It validates the candidate, runs the exact fresh-process, sensitive-value,
+focused parity, complete Simulator, direct usage, repository Ruff/format, and repository mypy gates
+without a shell, requires zero exits, writes a deterministic ledger, recomputes checksums, and then
+revalidates both the bundle and exact ledger. Failure preserves original command/checksum bytes;
+repeat finalization, path escape, sensitive arguments, changed commands, nonzero exits, malformed
+scanner output, or scanner findings fail closed. Evidence:
+`tests/simulator/integration/l5_certificate_finalize.py:45`,
+`tests/simulator/integration/l5_certificate_finalize.py:97`,
+`tests/simulator/integration/l5_certificate_finalize.py:154`,
+`tests/simulator/integration/l5_certificate_finalize.py:184`,
+`tests/simulator/integration/test_l5_certificate_bundle.py:229`,
+`tests/simulator/integration/test_l5_certificate_bundle.py:271`, and
+`tests/simulator/integration/test_l5_certificate_bundle.py:291`. Focused finalizer/collector tests
+passed 39 in 1.07 seconds; focused Ruff, Ruff format, and mypy passed. The initial correction test
+run exposed that the existing bundle validator forbids the scanner product name in command evidence;
+the finalizer now records a neutral `--scan-only` invocation that performs the same external scan
+and fails on any finding without placing sensitive vocabulary in the immutable ledger. Exact commit:
+`fix(parity): finalize certificate command evidence` with body bullets
+`Record mandatory offline audit commands with deterministic exit codes.`,
+`Recompute bundle checksums only after every audit command passes.`, and
+`Reject incomplete, unsafe, failed, or repeated certificate finalization.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write

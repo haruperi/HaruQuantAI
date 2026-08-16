@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Finalize certificate command evidence
+
+Generated operational certificates can now bind every mandatory offline publication command and successful exit code before final acceptance.
+
+#### Added (1)
+
+- Added an offline, fail-closed certificate finalizer that runs exact audit commands, rejects findings or drift, and recomputes checksums atomically.
+
 ### Bound certificate authority-history collection
 
 MT5 certificate preflight now collects complete authority history through deterministic calendar windows before any mutation.
