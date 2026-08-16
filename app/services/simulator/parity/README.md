@@ -95,5 +95,8 @@ alpha-equivalent evidence from cold re-execution hashes identically.
   / `::test_demo_evidence_cannot_claim_live_scope`
   / `::test_certificate_invalidates_when_bound_identity_changes`,
   `test_cold_determinism.py::test_cold_runs_from_fresh_roots_are_identical`
+- Certificate bundle integrity:
+  `test_l5_certificate_bundle.py::test_l5_certificate_bundle_schema_and_checksums_reproduce`
+  / `::test_l5_certificate_bundle_rejects_tampered_evidence`.
 - Usage: `tests/simulator/usage/features/18_parity.py`
   (`fr_sim_187`–`fr_sim_193`, `fr_sim_236`–`fr_sim_239`)

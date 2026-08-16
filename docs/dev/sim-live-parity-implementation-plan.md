@@ -4202,6 +4202,19 @@ calibration/conformance artifacts; complete initial-authority-state manifest; en
 does not already exist; **EDIT** parity README evidence/status only after certificate verification.
 **DO NOT TOUCH:** source/calibration/thresholds/holdout data, envelope contents, or production accounts.
 
+**Bundle-schema gate status: Completed — 2026-08-16.** The required test now validates the exact
+nine-member bundle, Envelope v2 applicability and empirical exclusions, demo-only evidence inputs,
+reproducible normalization/comparison, dev/MT5/demo collection identity, sensitive-key absence, and
+the complete ordered SHA-256 inventory at
+`tests/simulator/integration/test_l5_certificate_bundle.py:157`. A fixture explicitly labelled
+`test_fixture_only` exercises schema behavior and is never certificate evidence. Tampering fails
+before checksum acceptance at `tests/simulator/integration/test_l5_certificate_bundle.py:261`.
+Focused parity/bundle behavior passed 11 tests; Ruff and targeted mypy passed. Exact commit:
+`test(parity): validate certificate bundle integrity` with body bullets
+`Enforce the exact reproducible nine-member L5 operational bundle.`,
+`Bind demo evidence, shared MT5 semantics, empirical exclusions, and secret-free collection scope.`,
+and `Reject normalized-evidence or checksum tampering without issuing synthetic evidence.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write
