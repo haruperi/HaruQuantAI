@@ -68,7 +68,7 @@ async def dispatch_order_intent(
     return result.data
 
 
-def _intent(*, route: str = "paper", action: str = "submit_order") -> OrderIntent:
+def _intent(*, route: str = "demo", action: str = "submit_order") -> OrderIntent:
     """Build one complete executable intent."""
     return OrderIntent(
         client_order_id="client-order-001",

@@ -716,7 +716,7 @@ The workflow documentation requires explicit backpressure and forbids silent dat
 | -------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------- |
 | `SYS-WF-001` Historical backtest | System remains incomplete outside Brokers | Brokers is upstream acquisition only; broker segment `UNVERIFIED`             |
 | `SYS-WF-002` Governed order path | System workflow not complete              | Brokers mutation boundary `NONCOMPLIANT` because release policy is bypassable |
-| `SYS-WF-008` Paper/live route    | Documented as completed at system level   | Brokers boundary is not statically safe until `REV-BRK-001` is fixed          |
+| `SYS-WF-008` Demo/live route    | Documented as completed at system level   | Brokers boundary is not statically safe until `REV-BRK-001` is fixed          |
 
 ---
 

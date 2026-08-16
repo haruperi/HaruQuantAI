@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Standardize execution route terminology
+
+The system now names its three execution routes consistently as sim, demo, and live.
+
+#### Changed (1)
+
+- Replaced the former demo-route alias across runtime contracts, persistence migrations, APIs, UI, tests, workflows, and active specifications; route selection remains explicit and never depends on broker server naming.
+
 ### Repair parity certification prerequisites
 
 Repository-wide offline certification prerequisites now reconcile with the current public contracts and registries.
@@ -36,7 +44,7 @@ Simulation deals now carry self-sufficient Trading-compatible post-event positio
 
 ### Reconcile positions consistently across routes
 
-Trading now applies one authority-event ordering and position-reconciliation algorithm to Simulation, paper, and live routes (Phase 18a).
+Trading now applies one authority-event ordering and position-reconciliation algorithm to Simulation, demo, and live routes (Phase 18a).
 
 #### Fixed (1)
 
@@ -80,7 +88,7 @@ Trading evaluation now receives route-owned deadline authority while preserving 
 
 #### Changed (1)
 
-- Replaced the evaluation runtime's ambient timeout with a required injected deadline port and monotonic paper/live adapter.
+- Replaced the evaluation runtime's ambient timeout with a required injected deadline port and monotonic demo/live adapter.
 
 ### Cut Simulation over to Trading execution
 
@@ -788,8 +796,8 @@ Trading now exposes an authoritative complete-manifest migration runner, executa
 
 - Changed all Trading feature examples to emit requirement success and bounded data evidence.
 - Changed live workflow teaching programs to virtual non-production adapters that expose no account snapshots or credentials.
-- Changed API and UI mutations to use the exact paper/live route and closed Trading request contract.
-- Changed the workspace Trading panel to collect explicit order and authority inputs for governed submit, cancel, and close actions, default to paper, and re-lock after every attempt.
+- Changed API and UI mutations to use the exact demo/live route and closed Trading request contract.
+- Changed the workspace Trading panel to collect explicit order and authority inputs for governed submit, cancel, and close actions, default to demo, and re-lock after every attempt.
 - Expanded the primary Trading workflow into a documented and executable 22-stage virtual pipeline from canonical request through governed outcome.
 
 #### Fixed (3)
@@ -806,7 +814,7 @@ Trading now exposes an authoritative complete-manifest migration runner, executa
 
 ### Add default Risk account profiles
 
-Risk now provides validated personal-account and generic prop-firm paper policies with immutable database registration.
+Risk now provides validated personal-account and generic prop-firm demo policies with immutable database registration.
 
 #### Added (2)
 
@@ -970,7 +978,7 @@ live-engine gap are all resolved. The UI/API boundary now carries no `Partial`,
 
 - Changed the live what-if exclusion test into a shape invariant: what-if is now reachable, but only as a session with recorded lineage, so no route may mutate a completed run in place.
 - Changed the Simulation routes' rate-limit class from `read` to `compute`. The compute class keyed on the owner string `simulation`, but every Simulation route declares its owner as `simulator`, so backtest runs had silently been limited as if they were reads.
-- Changed Trading's execution boundary from a hardcoded live ban to a configured-route match: paper and live share one path, and live additionally requires explicit enablement.
+- Changed Trading's execution boundary from a hardcoded live ban to a configured-route match: demo and live share one path, and live additionally requires explicit enablement.
 - Changed the rebalance boundary and Trading session read to accept the live route, matching the construction contract that already did. Rebalance now applies Trading's execution gate rather than its own hardcoded refusal, so the two governed capital paths cannot disagree about whether a live request is reachable.
 - Changed the documentation capability to withdrawn scope: `NFR-API-015` and `CAP-UI-019` are retired to Appendix R rather than carried as standing exclusions.
 
@@ -1224,7 +1232,7 @@ Backend v1 now exposes the owner-domain prerequisites for the deferred Simulatio
 #### Changed (2)
 
 - Increased the backend-v1 route registry from 23 to 32 operations while leaving the frontend's existing 23-operation transport catalog for its separate follow-up.
-- Excluded production-capital execution at the API boundary; only explicitly configured paper dependencies may execute mutations, and missing owner references fail closed.
+- Excluded production-capital execution at the API boundary; only explicitly configured demo dependencies may execute mutations, and missing owner references fail closed.
 
 ### Adopt /auth/me identity recovery and add the SSE stream consumer (FEAT-API-10 closeout)
 
@@ -2001,7 +2009,7 @@ The Trading domain now exposes nine focused feature modules with deterministic a
 - `FEAT-TRD-04` Authority Selection and Dispatch.
 - `FEAT-TRD-05` Reconciliation and Retry Guard.
 - `FEAT-TRD-06` Operational and Budget Evidence.
-- `FEAT-TRD-07` Live and Paper Session Lifecycle.
+- `FEAT-TRD-07` Live and Demo Session Lifecycle.
 - `FEAT-TRD-08` Route-Aware Public Actions.
 - `FEAT-TRD-09` Immutable Execution Evidence.
 

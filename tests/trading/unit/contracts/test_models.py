@@ -111,9 +111,10 @@ def _rebalance_data() -> dict[str, object]:
 
 
 def test_trading_route_rejects_unknown() -> None:
-    """Only sim, paper, and live are valid routes."""
-    with pytest.raises(ValueError, match="not a valid TradingRoute"):
-        TradingRoute("package")
+    """Only sim, demo, and live are valid routes."""
+    for unsupported_route in ("package", "paper"):
+        with pytest.raises(ValueError, match="not a valid TradingRoute"):
+            TradingRoute(unsupported_route)
 
 
 def test_trading_request_requires_governed_evidence() -> None:

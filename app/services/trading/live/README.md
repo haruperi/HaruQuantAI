@@ -1,4 +1,4 @@
-# Trading Live and Paper Session Lifecycle
+# Trading Live and Demo Session Lifecycle
 
 This feature module implements `FEAT-TRD-07`. The authoritative lifecycle,
 configuration, gate-order, and requirement definitions are in

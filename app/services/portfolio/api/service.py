@@ -693,8 +693,8 @@ class PortfolioService:
         account_evidence_ref: str,
         market_evidence_ref: str,
         fx_evidence_refs: tuple[str, ...],
-        runtime_profile: Literal["simulation", "paper", "live"],
-        execution_route: Literal["sim", "paper", "live"],
+        runtime_profile: Literal["simulation", "demo", "live"],
+        execution_route: Literal["sim", "demo", "live"],
         approval_refs: tuple[str, ...],
         approval_token_ref: str,
         trading_request_id: str,
@@ -1138,8 +1138,8 @@ async def submit_portfolio_rebalance(
     account_evidence_ref: str,
     market_evidence_ref: str,
     fx_evidence_refs: tuple[str, ...],
-    runtime_profile: Literal["simulation", "paper", "live"],
-    execution_route: Literal["sim", "paper", "live"],
+    runtime_profile: Literal["simulation", "demo", "live"],
+    execution_route: Literal["sim", "demo", "live"],
     approval_refs: tuple[str, ...],
     approval_token_ref: str,
     trading_request_id: str,
@@ -1155,8 +1155,8 @@ async def submit_portfolio_rebalance(
         account_evidence_ref: Account snapshot reference string.
         market_evidence_ref: Market dataset reference string.
         fx_evidence_refs: Tuple of FX evidence reference strings.
-        runtime_profile: Runtime profile name ('simulation', 'paper', 'live').
-        execution_route: Execution route name ('sim', 'paper', 'live').
+        runtime_profile: Runtime profile name ('simulation', 'demo', 'live').
+        execution_route: Execution route name ('sim', 'demo', 'live').
         approval_refs: Tuple of approval reference strings.
         approval_token_ref: Approval token reference string.
         trading_request_id: Trading submission request ID string.

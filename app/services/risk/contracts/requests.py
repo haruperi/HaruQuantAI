@@ -136,7 +136,7 @@ class ProposedTrade(_RequestModel):
     stop_distance: Decimal | None
     market_as_of: datetime
     expires_at: datetime
-    risk_profile: Literal["research", "simulation", "paper", "live"]
+    risk_profile: Literal["research", "simulation", "demo", "live"]
     evidence_refs: Mapping[str, str]
     provenance: Mapping[str, str]
     request_id: str
@@ -337,8 +337,8 @@ class AllocationReviewRequest(_RequestModel):
     market_evidence_ref: str
     fx_evidence_refs: tuple[str, ...]
     evidence_hashes: Mapping[str, str]
-    runtime_profile: Literal["simulation", "paper", "live"]
-    execution_route: Literal["sim", "paper", "live"]
+    runtime_profile: Literal["simulation", "demo", "live"]
+    execution_route: Literal["sim", "demo", "live"]
     approval_refs: tuple[str, ...]
     requested_at: datetime
     request_id: str
@@ -359,7 +359,7 @@ class AllocationReviewRequest(_RequestModel):
         _utc(self.requested_at)
         expected_route = {
             "simulation": "sim",
-            "paper": "paper",
+            "demo": "demo",
             "live": "live",
         }[self.runtime_profile]
         if self.execution_route != expected_route:
@@ -416,8 +416,8 @@ class StrategyOperationalEligibilityRequest(_RequestModel):
     )
     strategy_id: str
     strategy_version: str
-    runtime_profile: Literal["simulation", "paper", "live"]
-    execution_route: Literal["sim", "paper", "live"]
+    runtime_profile: Literal["simulation", "demo", "live"]
+    execution_route: Literal["sim", "demo", "live"]
     policy_version: str
     registration_ref: str
     evidence_refs: Mapping[str, str]
@@ -440,7 +440,7 @@ class StrategyOperationalEligibilityRequest(_RequestModel):
         """
         logger.debug("Validating strategy operational eligibility request")
         _utc(self.requested_at)
-        expected = {"simulation": "sim", "paper": "paper", "live": "live"}
+        expected = {"simulation": "sim", "demo": "demo", "live": "live"}
         if self.execution_route != expected[self.runtime_profile]:
             raise ValueError("profile and route are incompatible")
         if not self.evidence_refs or not self.requested_scope:

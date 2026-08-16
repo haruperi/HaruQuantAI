@@ -134,7 +134,7 @@ class AllocationService:
             if policy_ref != "automatic_within_policy":
                 raise PortfolioError("PORT_CONFIG_INVALID", "SIMULATION_APPROVAL")
             return
-        if runtime_profile not in {"paper", "live"}:
+        if runtime_profile not in {"demo", "live"}:
             raise PortfolioError("PORT_INVALID_INPUT", "RUNTIME_PROFILE")
         if (
             approval_attestation is None

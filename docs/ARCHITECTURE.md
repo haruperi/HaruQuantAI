@@ -2,7 +2,7 @@
 
 ## System Overview & Tech Stack
 
-* **Architectural Pattern**: Modular monolith with service-oriented module boundaries. Aligns research, simulation, paper, and live environments while preventing any bypass of system controllers.
+* **Architectural Pattern**: Modular monolith with service-oriented module boundaries. Aligns research, simulation, demo, and live environments while preventing any bypass of system controllers.
 * **Production Stack Baseline**:
   * *Backend*: Python 3.14, managed with `uv`. FastAPI, Pydantic, Uvicorn (introduced once the API Gateway module lands).
   * *Frontend*: Next.js, React, TypeScript, Tailwind CSS, Radix UI (introduced once the UI module lands).
@@ -14,7 +14,7 @@
 * **Runtime Profiles** (separate from deployment `ENVIRONMENT`):
   * `research`: Data and feature exploration. Zero live broker mutations.
   * `simulation`: Historical backtests via the core trading path. Simulated side effects.
-  * `paper`: Live paths executed against demo infrastructure. Paper side effects.
+  * `demo`: Live paths executed against demo infrastructure. Demo side effects.
   * `live`: Real-capital transactions. Disabled by default; mandates all functional safety gates. Explicit toggle: `ALLOW_LIVE_MUTATIONS=false`.
 * **Deployment Environments**: `ENVIRONMENT` is exactly one of `dev`, `test`, `staging`, or `production`. It never substitutes for `RUNTIME_PROFILE`.
 
@@ -29,10 +29,10 @@
 * Code present: `app/` package with implemented service modules under `app/services/`, including Trading as the surviving live-route runtime and broker-dispatch owner.
 * The retired Live service has been folded into `app/services/trading/`; live execution remains a runtime route/mode, not a standalone service package.
 * Trading order request/intent v2 separates caller-approved fill policy from lifetime policy, binds both to a Brokers-owned provider-specification checksum, and forbids provider-derived intent defaults; explicitly profiled v1 conversion is labelled legacy and excluded from canonical parity.
-* Trading builds approved request v2 values once from immutable Strategy/Risk lineage and exact provider-policy evidence. Simulation, paper, and live then use the same public action verbs, Brokers adapter boundary, and response classifier; Simulation omits only declared live transport and mutation-authorization safety gates and never receives a private mutation callback.
-* Trading owns one route-neutral evaluation cycle with required injected deadline authority: paper/live compose it from monotonic wall time and Simulation supplies scheduler time, while timeout evidence and neutral outcomes retain one semantic shape.
+* Trading builds approved request v2 values once from immutable Strategy/Risk lineage and exact provider-policy evidence. Simulation, demo, and live then use the same public action verbs, Brokers adapter boundary, and response classifier; Simulation omits only declared live transport and mutation-authorization safety gates and never receives a private mutation callback.
+* Trading owns one route-neutral evaluation cycle with required injected deadline authority: demo/live compose it from monotonic wall time and Simulation supplies scheduler time, while timeout evidence and neutral outcomes retain one semantic shape.
 * Brokers order request v2 preserves those two policy dimensions independently: MT5 maps them to `type_filling` and `type_time` through verified constants, and unsupported provider combinations fail before transport rather than falling back to symbol defaults.
-* `app/services/api/README.md` defines the approved gateway/UI boundary and state ownership. Backend v1 exposes registered owner-backed operations, including server-side session identity recovery, an authenticated SSE bridge over Data-owned MT5 streams, Risk reads/commands, and Trading session plus governed submit/cancel/close routes. Trading mutations require complete authority evidence, idempotency, the configured paper/live route, and all owner-side safety gates; live remains disabled by default.
+* `app/services/api/README.md` defines the approved gateway/UI boundary and state ownership. Backend v1 exposes registered owner-backed operations, including server-side session identity recovery, an authenticated SSE bridge over Data-owned MT5 streams, Risk reads/commands, and Trading session plus governed submit/cancel/close routes. Trading mutations require complete authority evidence, idempotency, the configured demo/live route, and all owner-side safety gates; live remains disabled by default.
 * Portfolio is implemented and `Completed`: `app.services.portfolio` is its sole
   public boundary, exposes standalone functions only, and coordinates genuine
   Data/Simulation evidence while keeping Risk approval and Trading execution in
@@ -815,7 +815,7 @@ Portfolio collaboration is contract-governed:
   `ApprovalAttestation` from a different authorized principal; same-principal
   clearance fails without changing canonical state. Trading resumes only after all
   applicable scopes are inactive and reconciliation succeeds.
-* **Portfolio Activation Baseline**: Simulation-profile activation is automatic only within explicit simulation policy. Paper/live activation requires human approval plus current Risk authorization. Active kill switches block activation and rebalance.
+* **Portfolio Activation Baseline**: Simulation-profile activation is automatic only within explicit simulation policy. Demo/live activation requires human approval plus current Risk authorization. Active kill switches block activation and rebalance.
 * **Allocation Safety Baseline**: Capital weights are Portfolio metadata; Risk budgets are authoritative. Existing over-budget exposure creates a Risk-reviewed reduce-only plan, and the system never opens a position solely to match a target weight.
 
 ### Sim⇄Live Parity Failure Taxonomy
@@ -1165,7 +1165,7 @@ correctness control, not convenience.
 
 **Programme-level parity model.** This table-level mirroring is the storage-shape
 precursor of the approved sim⇄live parity programme, which extends parity from
-schema shape to verified execution behavior. `sim`, `paper`, and `live` share one
+schema shape to verified execution behavior. `sim`, `demo`, and `live` share one
 Trading orchestration and differ only at an injected authority boundary. Claims are
 bounded by a versioned **Parity Envelope** (v1 targets MT5 FX only) and mature
 through a ladder: **L1** mutation-path convergence, **L2** evaluation-path
@@ -1432,7 +1432,7 @@ strategy → app.services.data → MT5 → in-memory records
 ```
 
 Nothing is written. `data_fetch_log` records `served_from = 'broker'`,
-`materialized = 0`. This is the default path for live and paper trading.
+`materialized = 0`. This is the default path for live and demo trading.
 
 ### 3.3 Integrity gate before every pinned read
 

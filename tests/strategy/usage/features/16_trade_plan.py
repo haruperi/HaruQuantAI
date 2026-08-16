@@ -146,7 +146,7 @@ def fr_str_074() -> None:
     ready = transition_trade_plan(_plan(), target_status="READY_FOR_RISK")
     _emit(
         "FR-STR-074",
-        validate_trade_plan_for_intent(ready, route="SIM", environment="PAPER"),
+        validate_trade_plan_for_intent(ready, route="SIM", environment="DEMO"),
     )
 
 

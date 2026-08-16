@@ -197,7 +197,7 @@ def test_canonical_app_binds_exact_owner_sources() -> None:
 def test_runtime_profile_and_execution_route_fail_closed() -> None:
     """Reject mismatched routes and live execution without explicit enablement."""
     with pytest.raises(ValueError, match="runtime profile"):
-        build_api_settings(runtime_profile="simulation", execution_route="paper")
+        build_api_settings(runtime_profile="simulation", execution_route="demo")
     with pytest.raises(ValueError, match="live execution"):
         build_api_settings(
             runtime_profile="live",

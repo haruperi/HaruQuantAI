@@ -15,7 +15,7 @@ async def test_monotonic_deadline_allows_work_before_bound() -> None:
     loop = asyncio.get_running_loop()
     factory = create_monotonic_deadline_factory(loop.time)
 
-    async with factory(Decimal(1), {"route": "paper"}):
+    async with factory(Decimal(1), {"route": "demo"}):
         await asyncio.sleep(0)
 
 
@@ -26,7 +26,7 @@ async def test_monotonic_deadline_raises_timeout_at_bound() -> None:
     factory = create_monotonic_deadline_factory(loop.time)
 
     with pytest.raises(TimeoutError):
-        async with factory(Decimal("0.001"), {"route": "paper"}):
+        async with factory(Decimal("0.001"), {"route": "demo"}):
             await asyncio.sleep(0.01)
 
 

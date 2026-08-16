@@ -189,7 +189,7 @@ async def _execute_portfolio_rebalance_value(
         read_only=False,
         modifies_database=True,
         places_trade=True,
-        requires_network=request.route.value in {"paper", "live"},
+        requires_network=request.route.value in {"demo", "live"},
         legacy_status="partial" if partial else "success",
         extensions={"redaction_applied": True},
     )

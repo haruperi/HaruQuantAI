@@ -27,7 +27,7 @@
 ### 2.1 Live execution is far smaller than the exclusion implies
 
 The owner's premise is correct and the code confirms it. `docs/PROJECT.md` §2.1.9 already
-records that Trading "paper and live share the same execution path and differ only by the
+records that Trading "demo and live share the same execution path and differ only by the
 environment/credentials carried in the injected `BrokerConnectionConfig`." Nothing in
 Trading, Brokers, or Risk needs to change.
 
@@ -36,9 +36,9 @@ What actually blocks live today is three lines of gateway policy:
 | Location | Current | Effect |
 |---|---|---|
 | `routes/trading.py:73-77` | `if body.route == "live": raise 403 PRODUCTION_EXECUTION_EXCLUDED` | Hard ban |
-| `routes/trading.py:82` | `settings.execution_route != "paper" or settings.runtime_profile != "paper"` | Only paper is ever configurable |
-| `routes/trading.py:95` | `route: Literal["sim", "paper"]` | Session reads cannot name live |
-| `contracts/models.py:1008-1009` | `Literal["simulation", "paper"]` / `Literal["sim", "paper"]` | Rebalance cannot name live |
+| `routes/trading.py:82` | `settings.execution_route != "demo" or settings.runtime_profile != "demo"` | Only demo is ever configurable |
+| `routes/trading.py:95` | `route: Literal["sim", "demo"]` | Session reads cannot name live |
+| `contracts/models.py:1008-1009` | `Literal["simulation", "demo"]` / `Literal["sim", "demo"]` | Rebalance cannot name live |
 
 Note `contracts/models.py:920-921` (`PortfolioConstructRequest`) **already** admits
 `"live"`, so the domain contracts are inconsistent with each other today — the narrower
@@ -94,12 +94,12 @@ the specification and the decision row is **deleted**, not retained as history.
    `settings.execution_route`, and `"live"` additionally requires
    `settings.allow_live_mutations`. Refusals stay bounded (403 for an unauthorised live
    attempt, 503 when the deployment is not configured for the requested route).
-2. Widen `Literal["sim", "paper"]` to `Literal["sim", "paper", "live"]` on the session
+2. Widen `Literal["sim", "demo"]` to `Literal["sim", "demo", "live"]` on the session
    read and on `PortfolioRebalanceRequest`, making the boundary contracts internally
    consistent with `PortfolioConstructRequest`.
 3. Replace `test_production_capital_execution_is_absent` with
    `test_live_execution_requires_explicit_enablement` — asserting that a live request is
-   refused under a paper deployment and under a live deployment without
+   refused under a demo deployment and under a live deployment without
    `allow_live_mutations`, and admitted only when all gates are set.
 4. Extend `NFR-API-003` evidence: live mutations cannot bypass Trading/Risk live flags,
    broker readiness, reconciliation, idempotency, audit, or kill switch.

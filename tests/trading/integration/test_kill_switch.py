@@ -47,7 +47,7 @@ RiskDecisionPackage = object
 
 
 async def _passed() -> bool:
-    """Return successful paper-session lifecycle evidence."""
+    """Return successful demo-session lifecycle evidence."""
     return True
 
 
@@ -107,7 +107,7 @@ def _emergency_policy(request) -> ActionPolicyVerdict:
     return create_action_policy_verdict(**data)
 
 
-def _paper_account() -> object:
+def _demo_account() -> object:
     """Build account evidence with eligible, skipped, and state-missing orders."""
     data = account_snapshot().model_dump(mode="python")
     data["orders"] = (
@@ -123,11 +123,11 @@ def _paper_account() -> object:
     return build_account_state_snapshot(**data)
 
 
-def _paper_emergency_dependencies(adapter: CountingAdapter):
-    """Build paper bulk dependencies with per-child Option A Risk authority."""
+def _demo_emergency_dependencies(adapter: CountingAdapter):
+    """Build demo bulk dependencies with per-child Option A Risk authority."""
     store = MemoryStore()
     store.projection = create_trading_projection(
-        route="paper",
+        route="demo",
         tenant_id="account-001",
         authority_id="mt5",
         version=1,
@@ -176,7 +176,7 @@ def _paper_emergency_dependencies(adapter: CountingAdapter):
         connection=connection,
         broker_adapter=cast("object", adapter),
         live_session=session,
-        account_state_source=lambda _request: _paper_account(),
+        account_state_source=lambda _request: _demo_account(),
         action_policy_source=_emergency_policy,
         kill_switch_state_source=inactive_kill_switch_hierarchy,
         child_risk_decision_source=_child_risk,
@@ -213,19 +213,19 @@ async def test_kill_switch_blocks_and_reports_partial_emergency_results() -> Non
 
 
 @pytest.mark.anyio
-async def test_paper_bulk_cancel_binds_each_child_risk_authority() -> None:
-    """Paper bulk cancel reports success, skips, and state errors within its bound."""
+async def test_demo_bulk_cancel_binds_each_child_risk_authority() -> None:
+    """Demo bulk cancel reports success, skips, and state errors within its bound."""
     adapter = CountingAdapter()
-    deps, session = _paper_emergency_dependencies(adapter)
+    deps, session = _demo_emergency_dependencies(adapter)
     config = {
         **live_config(),
-        "RUNTIME_PROFILE": "paper",
-        "EXECUTION_ROUTE": "paper",
+        "RUNTIME_PROFILE": "demo",
+        "EXECUTION_ROUTE": "demo",
         "ALLOW_LIVE_MUTATIONS": True,
     }
     await start_live_session(session, config, live_evidence())
     item = trading_request(
-        route="paper",
+        route="demo",
         provider_id="mt5",
         action="cancel_all_orders",
     )

@@ -30,6 +30,6 @@ StrategyQuant X (SQX) offers powerful automation, but raw brute force creates no
 6. Remove highly correlated strategies (return correlation >0.7).
 7. Manually review the top 20‑50 systems for logic sanity.
 8. Run walk-forward analysis on the top 10.
-9. Paper trade the best 3‑5 before allocating real capital.
+9. Demo trade the best 3‑5 before allocating real capital.
 
 This process balances the power of automated strategy creation with human oversight, ensuring only robust SQX outputs progress to testing and funding.

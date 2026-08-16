@@ -306,7 +306,7 @@ margin, credential metadata, token material, or the complete BrokerAccountInfo.
 - The test captures WF-TRD-003 output and asserts absence of sensitive account
   field names and sentinel secret values.
 - Production behavior is not mocked into a false success; genuine integration
-  remains restricted to verified demo/paper/dev targets.
+  remains restricted to verified demo/demo/dev targets.
 
 ## 9. Workstream E — IT and CONTRACT: Risk producer-consumer compatibility
 
@@ -449,7 +449,7 @@ process creation, and unbounded event loops in unit tests.
 
 ### Backend runtime-policy correction
 
-TradingMutationRequest declares route: "paper" | "live"; it does not declare
+TradingMutationRequest declares route: "demo" | "live"; it does not declare
 runtime_profile or execution_route. Replace the ineffective field lookups in
 _enforce_runtime_policy with:
 
@@ -466,9 +466,9 @@ _enforce_runtime_policy with:
     ):
         raise RuntimeError("TRADING_LIVE_MUTATIONS_DISABLED")
 
-If the runtime policy uses sim rather than paper, do not silently equate them.
+If the runtime policy uses sim rather than demo, do not silently equate them.
 Resolve the contract conflict in the authoritative API specification and issue
-a plan delta before changing enum values. Tests must prove paper/live mismatch
+a plan delta before changing enum values. Tests must prove demo/live mismatch
 and disabled-live fail before Trading delegation.
 
 ### Exact frontend request type
@@ -483,7 +483,7 @@ TradingMutationRequest:
       workflow_id: string;
       correlation_id: string;
       causation_id?: string | null;
-      route: "paper" | "live";
+      route: "demo" | "live";
       action: string;
       provider_id?: string | null;
       account_id: string;
@@ -669,7 +669,7 @@ set is a plan delta requiring a new dry run and approval.
   Do not add or upgrade dependencies.
 
 Unresolved dependency: the API runtime policy may name simulation as sim while
-TradingMutationRequest accepts paper/live. Verify the deployed settings contract
+TradingMutationRequest accepts demo/live. Verify the deployed settings contract
 before implementation. If no explicit mapping is documented, stop and request
 an owner decision; do not invent a mapping.
 
@@ -751,12 +751,12 @@ Excluded:
 - Existing owner modifications overlap a listed file: inspect and preserve; stop
   if intent cannot be reconciled.
 - Migration source checksum differs from the recorded ledger: stop immediately.
-- Runtime sim/paper vocabulary lacks an authoritative mapping: request decision.
+- Runtime sim/demo vocabulary lacks an authoritative mapping: request decision.
 - Current Risk contract changes again: regenerate fixtures from the current
   public producer contract and document the compatibility version.
 - UI cannot obtain governed references from authenticated context: leave
   mutation controls disabled and report the dependency; never synthesize them.
-- A test requires a real/live account: replace with demo/paper or a deterministic
+- A test requires a real/live account: replace with demo/demo or a deterministic
   contract test; never relax environment gates.
 - Per-file coverage needs production-only branches that cannot be safely
   exercised: document and redesign the seam through a plan delta rather than

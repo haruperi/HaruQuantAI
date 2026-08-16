@@ -355,7 +355,7 @@ def fr_risk_077() -> None:
 
 
 def fr_risk_078() -> None:
-    """FR-RISK-078: Construct the personal-account paper default with every registered operational limit represented as exact validated policy data."""
+    """FR-RISK-078: Construct the personal-account demo default with every registered operational limit represented as exact validated policy data."""
     _header("Stage 3: Personal Account Default (FR-RISK-078)")
     print("SUCCESS: FR-RISK-078")
     config = build_personal_account_risk_config()
@@ -367,7 +367,7 @@ def fr_risk_078() -> None:
 
 
 def fr_risk_079() -> None:
-    """FR-RISK-079: Construct the stricter generic prop-firm paper default without claiming firm-specific terms."""
+    """FR-RISK-079: Construct the stricter generic prop-firm demo default without claiming firm-specific terms."""
     _header("Stage 3: Prop-Firm Default (FR-RISK-079)")
     print("SUCCESS: FR-RISK-079")
     config = build_prop_firm_risk_config()

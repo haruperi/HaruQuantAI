@@ -209,9 +209,9 @@ def _rebalance_data() -> dict[str, object]:
 
 
 def fr_trd_001() -> None:
-    """FR-TRD-001: Stage 1 — Expose only sim, paper, and live action routes."""
+    """FR-TRD-001: Stage 1 — Expose only sim, demo, and live action routes."""
     _header("Stage 1: Route Selection - Supported Action Routes (FR-TRD-001)")
-    route = get_trading_route("paper")
+    route = get_trading_route("demo")
     print(_format_result(route))
     print(f"Data -> route='{route.value}'")
 

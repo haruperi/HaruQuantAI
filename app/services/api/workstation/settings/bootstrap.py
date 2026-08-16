@@ -33,8 +33,8 @@ class ApiSettings(BaseSettings):
     api_host: str = "127.0.0.1"
     api_port: int = Field(default=8000, ge=1, le=65535)
     api_version: Literal["v1"] = "v1"
-    runtime_profile: Literal["research", "simulation", "paper", "live"] = "research"
-    execution_route: Literal["none", "sim", "paper", "live"] = "none"
+    runtime_profile: Literal["research", "simulation", "demo", "live"] = "research"
+    execution_route: Literal["none", "sim", "demo", "live"] = "none"
     simulation_artifact_root: Path = Path("artifacts/simulation")
     allow_live_mutations: bool = False
     # Shared persistence configuration. Data owns the connection, locking, and
@@ -148,7 +148,7 @@ class ApiSettings(BaseSettings):
         expected_route = {
             "research": "none",
             "simulation": "sim",
-            "paper": "paper",
+            "demo": "demo",
             "live": "live",
         }[self.runtime_profile]
         if self.execution_route != expected_route:

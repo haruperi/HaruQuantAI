@@ -57,7 +57,7 @@ def portfolio_settings(portfolio_now: datetime) -> PortfolioSettings:
         portfolio_allocation_decision_ttl_seconds=900,
         portfolio_activation_approval_policy={
             "simulation": "automatic_within_policy",
-            "paper": "explicit_human",
+            "demo": "explicit_human",
             "live": "explicit_human",
         },
         portfolio_rebalance_drift_threshold=Decimal("0.05"),

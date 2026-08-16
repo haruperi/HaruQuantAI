@@ -14,7 +14,7 @@ export interface TradingViewProps {
 }
 
 interface MutationDraft {
-  route: "paper" | "live";
+  route: "demo" | "live";
   accountId: string;
   strategyId: string;
   strategyVersion: string;
@@ -32,7 +32,7 @@ interface MutationDraft {
 }
 
 const INITIAL_DRAFT: MutationDraft = {
-  route: "paper",
+  route: "demo",
   accountId: "",
   strategyId: "",
   strategyVersion: "",
@@ -209,8 +209,8 @@ export function TradingView({ className }: TradingViewProps = {}): ReactNode {
 
       <fieldset className="workflow-trading-actions">
         <legend>Governed Trading Actions</legend>
-        <p>Paper is the safe default. Authority references must come from backend workflow results; this form never invents them.</p>
-        <label>Route<select aria-label="Route" value={draft.route} onChange={(event) => update("route", event.target.value as MutationDraft["route"])}><option value="paper">paper</option><option value="live">live</option></select></label>
+        <p>Demo is the safe broker default. Authority references must come from backend workflow results; this form never invents them.</p>
+        <label>Route<select aria-label="Route" value={draft.route} onChange={(event) => update("route", event.target.value as MutationDraft["route"])}><option value="demo">demo</option><option value="live">live</option></select></label>
         <label>Account ID<input aria-label="Account ID" value={draft.accountId} onChange={(event) => update("accountId", event.target.value)} /></label>
         <label>Strategy ID<input aria-label="Strategy ID" value={draft.strategyId} onChange={(event) => update("strategyId", event.target.value)} /></label>
         <label>Strategy version<input aria-label="Strategy version" value={draft.strategyVersion} onChange={(event) => update("strategyVersion", event.target.value)} /></label>

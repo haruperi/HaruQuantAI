@@ -7,7 +7,7 @@ from app.utils import validate_id
 _COMPATIBLE_PAIRS = (
     ("research", "none"),
     ("simulation", "sim"),
-    ("paper", "paper"),
+    ("demo", "demo"),
     ("live", "live"),
 )
 _PROFILES = tuple(profile for profile, _ in _COMPATIBLE_PAIRS)

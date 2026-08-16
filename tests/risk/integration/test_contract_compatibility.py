@@ -54,7 +54,7 @@ def test_risk_embeds_the_exact_strategy_intent() -> None:
         stop_distance=Decimal("0.01"),
         market_as_of=NOW,
         expires_at=NOW + timedelta(minutes=1),
-        risk_profile="paper",
+        risk_profile="demo",
         evidence_refs={"market": "market-1"},
         provenance={"source": "strategy"},
         request_id="req-11111111-1111-4111-8111-111111111111",

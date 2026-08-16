@@ -13,7 +13,7 @@ NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 def test_snapshot_is_json_safe() -> None:
     """Normalized authority evidence contains no provider-native objects."""
     snapshot = AuthoritySnapshot(
-        route="paper",
+        route="demo",
         authority_id="mt5",
         account_id="account-001",
         source_id="broker-read-001",

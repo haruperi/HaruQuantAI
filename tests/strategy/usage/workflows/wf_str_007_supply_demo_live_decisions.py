@@ -1,4 +1,4 @@
-"""WF-STR-007: supply proposals to a paper/live runtime boundary."""
+"""WF-STR-007: supply proposals to a demo/live runtime boundary."""
 
 from __future__ import annotations
 

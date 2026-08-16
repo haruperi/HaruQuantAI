@@ -43,7 +43,7 @@ class AuthContext(BaseModel):
     permissions: tuple[str, ...]
     scopes: tuple[str, ...]
     tenant_or_environment: str
-    runtime_profile: Literal["research", "simulation", "paper", "live"] | None = None
+    runtime_profile: Literal["research", "simulation", "demo", "live"] | None = None
     request_id: str
     workflow_id: str
     correlation_id: str
@@ -171,7 +171,7 @@ def create_auth_context(
     permissions: tuple[str, ...],
     scopes: tuple[str, ...],
     tenant_or_environment: str,
-    runtime_profile: Literal["research", "simulation", "paper", "live"] | None = None,
+    runtime_profile: Literal["research", "simulation", "demo", "live"] | None = None,
     request_id: str,
     workflow_id: str,
     correlation_id: str,

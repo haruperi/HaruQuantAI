@@ -46,7 +46,7 @@ class _StrategyConfigRecord(BaseModel):
     config_schema_version: str = Field(..., min_length=1)
     config_json: str = Field(..., min_length=1)
     policy_version: str = Field(..., min_length=1)
-    runtime_profile: Literal["RESEARCH", "SIMULATION", "PAPER", "LIVE"]
+    runtime_profile: Literal["RESEARCH", "SIMULATION", "DEMO", "LIVE"]
     lifecycle_status: Literal["active", "paused", "archived"]
     request_id: str = Field(..., min_length=1)
     correlation_id: str = Field(..., min_length=1)

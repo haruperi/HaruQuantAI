@@ -211,7 +211,7 @@ The migration must bring the seven current Risk tables to these invariants:
 
 | Table | Required constraints/index behavior |
 |---|---|
-| `risk_policy_versions` | `profile IN ('research','simulation','paper','live')`; `json_valid(payload_json)` |
+| `risk_policy_versions` | `profile IN ('research','simulation','demo','live')`; `json_valid(payload_json)` |
 | `risk_eligibility_decisions` | `json_valid(payload_json)` |
 | `risk_allocation_decisions` | existing `active IN (0,1)` retained; `json_valid(payload_json)` |
 | `risk_kill_switch_states` | `scope_level IN ('global','portfolio','strategy','symbol')`; `json_valid(scope_json)`; `state IN ('active','inactive')`; `json_valid(payload_json)` |

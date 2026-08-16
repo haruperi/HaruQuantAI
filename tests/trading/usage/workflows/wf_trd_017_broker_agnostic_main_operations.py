@@ -672,7 +672,7 @@ def _virtual_order_page() -> dict[str, object]:
 
 
 def _provider_mutations_enabled() -> bool:
-    """Return whether genuine demo/paper provider mutations were explicitly armed."""
+    """Return whether genuine demo/demo provider mutations were explicitly armed."""
     if load_settings().environment != "dev":
         return False
     if os.getenv("TRADING_USAGE_ALLOW_PROVIDER_MUTATIONS", "").lower() == "true":
@@ -881,7 +881,7 @@ async def _compose_context(target: Target) -> OperationsContext:
         )
     broker_env = get_broker_connection_environment(connection)
     if not any(
-        name in broker_env.lower() for name in ("demo", "paper", "sandbox", "test")
+        name in broker_env.lower() for name in ("demo", "demo", "sandbox", "test")
     ):
         raise RuntimeError("provider usage requires a verified non-production account")
     created = create_broker_adapter(get_broker_id(target), connection)
@@ -923,7 +923,7 @@ async def _compose_context(target: Target) -> OperationsContext:
         clock=lambda: datetime.now(UTC),
     )
 
-    runtime_profile = "live" if broker_env.lower() == "live" else "paper"
+    runtime_profile = "live" if broker_env.lower() == "live" else "demo"
     if target != "sim" and store.projection is not None:
         target_scope = (runtime_profile, account_id, target)
         seeded_projection = store.projection.model_copy(
@@ -997,7 +997,7 @@ def _request(
             "live"
             if context.connection is not None
             and get_broker_connection_environment(context.connection).lower() == "live"
-            else "paper"
+            else "demo"
         )
     )
     provider_id = None if context.target == "sim" else context.target

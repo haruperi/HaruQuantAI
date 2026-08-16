@@ -1,6 +1,6 @@
 # Implementation Plan · Sim ⇄ Live Parity — Revision 7
 
-**Purpose:** the single executable programme for converging simulation, paper, and live execution
+**Purpose:** the single executable programme for converging simulation, demo, and live execution
 inside an explicitly certified parity envelope.
 **Audience:** the owner and coding agents that must execute a phase mechanically without inventing
 architecture, contracts, file placement, tests, evidence, or commit scope.
@@ -39,12 +39,49 @@ and exact standalone approval before files in that phase may change.
 
 ## Part 0 · Operating contract
 
+### Owner-resolved route and certification correction — 2026-08-16
+
+The owner resolved the remaining route ambiguity as follows: the only execution routes are `sim`,
+`demo`, and `live`; the user explicitly configures the route; credentials select the MT5 session;
+and broker/server naming, including suffixes, is never classification authority. The former demo-
+route alias was removed from current contracts, UI, tests, workflows, and specifications. Applied
+migration steps retain their historical bytes because ledger checksums are immutable; new migration
+steps translate persisted legacy values to `demo` and constrain new route-bearing records.
+
+Automatic C1 blocker resolution: the expanded typed gate exposed a redundant credential-result cast
+and an `object`-typed package-root settings value passed directly to a typed key builder. The bounded
+recommendation removed the redundant cast and added an `ApiSettings` fail-closed type guard at the
+package boundary; credential resolution behavior, secret handling, and authorization are unchanged.
+
+The certification blocker is resolved by the bounded recommendation approved by the owner: verified
+demo evidence may certify only MT5 operational semantics shared by demo and live. It cannot certify
+live spreads, latency, fills, liquidity, slippage distributions, calibration, or other empirical
+market behavior. Those artifacts remain bound to their actual route and provenance. This correction
+is executed as C1 (route vocabulary) followed by C2 (Parity Envelope v2 and operational certificate).
+
+**C1 status: Completed — 2026-08-16.** The canonical enum exposes only the three routes at
+`app/services/trading/contracts/models.py:425`; API settings and mutation schemas bind the explicit
+selection at `app/services/api/workstation/settings/bootstrap.py:36` and
+`app/services/api/workstation/trading/schemas.py:19`; and the UI presents `demo`/`live` broker
+selection at `app/ui/src/components/workflow/trading.tsx:213`. Forward-only route migrations are at
+`app/services/api/identity/migrations/definitions.py:353`,
+`app/services/risk/migrations/definitions.py:347`,
+`app/services/strategy/migrations/definitions.py:464`, and
+`app/services/trading/migrations/definitions.py:514`. Verification: Trading/System 319 passed with
+two credential-dependent MT5 demo skips; Simulator 500 passed; focused cross-domain route contracts
+104 passed; migration gate 23 passed; API integration 7 passed; four Trading usage programs passed;
+UI typecheck and 31 focused tests passed; Ruff passed every changed non-legacy Python file; and mypy
+passed 526 source files. The repository scan finds the retired token only inside immutable applied
+migration bytes, explicit forward-translation SQL, and tests proving rejection/translation. Rollback
+reverts this C1 commit and, for an already-applied database, requires a separately authorized
+forward corrective migration rather than rewriting ledger history.
+
 ### 0.1 Goal and scope
 
-`sim`, `paper`, and `live` use the same Trading orchestration and differ only at an injected authority
+`sim`, `demo`, and `live` use the same Trading orchestration and differ only at an injected authority
 boundary. Simulation reproduces MT5 terminology, validation, state transitions, retcodes, accounting,
 and provider-shaped evidence for every operation admitted by the active **Parity Envelope v1**.
-`paper` means only the explicitly named non-production provider environment in that envelope; it is
+`demo` means only the explicitly named non-production provider environment in that envelope; it is
 not a synonym for either Simulation or live-account execution.
 
 Parity is not a universal claim about every broker configuration. It is a falsifiable certification
@@ -720,7 +757,7 @@ a second requirement.
 names, errors, and exclusions; `git status --short` to prove one-file scope.
 
 **Gate and checklist:** every method/function has signature, inputs, output, error, clock, side effect,
-and owner; dependency graph is acyclic on paper; no owner choice remains hidden in prose.
+and owner; dependency graph is acyclic by design; no owner choice remains hidden in prose.
 
 **STOP:** an existing public contract conflicts; a cross-domain deep import is required; the exact
 eleven-port Simulation dependency bundle cannot accommodate the specified ports without a separate
@@ -828,7 +865,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] Targeted unit/integration tests passed with recorded commands and exit codes. (Not applicable — documentation-only; per-unit validation surface is the `rg` searches, `git diff --check` (clean per unit), and `git status --short` scope proofs.)
 - [x] Ruff and mypy do not apply; all documentation validation commands passed.
 - [x] Usage execution does not apply to this documentation-only phase.
-- [x] Code-domain test gates do not apply; the documentation gate passed. (Dependency graph acyclic on paper: port/builder/deadline/scheduler designs reference no reverse import; per-phase consumer migrations documented.)
+- [x] Code-domain test gates do not apply; the documentation gate passed. (Dependency graph is acyclic by design: port/builder/deadline/scheduler designs reference no reverse import; per-phase consumer migrations documented.)
 - [x] README, changelog, and listed system documents reconciled. (No changelog entry listed for Phase 3 units; system documents already carry the programme architecture from Phase 1.)
 - [x] STOP conditions and rollback path were rechecked. (No STOP triggered; rollback is per-unit `git checkout -- <unit README>` plus this plan record.)
 - [x] Commit remains unauthorized, or its separately authorized hash is recorded. (Owner separately authorized a single combined Phase 3 commit on 2026-08-14 in place of the three per-unit boundaries; committed with a combined message derived from the per-unit texts — hash recorded post-commit below.)
@@ -2972,7 +3009,7 @@ The literal Unit 14b full Simulator command passed all 446 behaviors and exited 
 **Domain:** trading. **Requirements:** `FR-TRD-095`, `FR-TRD-104` … `106`, `111`.
 
 Keep `run_live_evaluation_cycle` as the shared public path. Replace direct wall-clock
-`asyncio.timeout` authority with an injected deadline port: live/paper use monotonic wall time;
+`asyncio.timeout` authority with an injected deadline port: live/demo use monotonic wall time;
 Simulation uses scheduler time. Neutral outcomes and timeout evidence remain identical in semantic
 shape.
 
@@ -3016,7 +3053,7 @@ factories/runtime, live session only where it invokes the cycle, `app/services/t
 business gates, Simulation scheduler, or public cycle semantics.
 
 **Exact port:** private structural async deadline context factory plus injected clock/evidence; live and
-paper adapter uses monotonic wall time, Simulation supplies scheduler time later. Timeout yields the
+demo adapter uses monotonic wall time, Simulation supplies scheduler time later. Timeout yields the
 same canonical neutral/error shape and evidence fields on all routes. No default is permitted in
 production dependency construction.
 
@@ -3699,7 +3736,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 ### Unit 18a completion evidence
 
 - [x] Approval matched Unit 18a. Evidence: owner goal-wide `APPROVED: EXECUTE` and dry run `18a-DR1`.
-- [x] `FR-TRD-107` uses one immutable event contract and one projection algorithm for Simulation, paper, and live, preserving deal-position correlation across modify/reduce/full-close/reversal/protection/liquidation and many-to-one activity. Evidence: `app/services/trading/state/execution_positions.py:133`, `app/services/trading/state/execution_positions.py:244`, `tests/trading/integration/test_two_route_position_reconciliation.py:35`, `tests/trading/usage/features/02_state.py:637`.
+- [x] `FR-TRD-107` uses one immutable event contract and one projection algorithm for Simulation, demo, and live, preserving deal-position correlation across modify/reduce/full-close/reversal/protection/liquidation and many-to-one activity. Evidence: `app/services/trading/state/execution_positions.py:133`, `app/services/trading/state/execution_positions.py:244`, `tests/trading/integration/test_two_route_position_reconciliation.py:35`, `tests/trading/usage/features/02_state.py:637`.
 - [x] `FR-TRD-108` suppresses exact duplicate/late events and blocks forward gaps or conflicting same-sequence identity without advancing state. Evidence: `app/services/trading/state/execution_positions.py:270`, `tests/trading/unit/reconciliation/test_authority_event_ordering.py:36`, `tests/trading/usage/features/05_reconciliation.py:251`.
 - [x] `FR-TRD-109` records unowned foreign/manual exposure as blocking `UNKNOWN`/`ORPHAN_BLOCKED` and never assigns ownership. Evidence: `app/services/trading/state/execution_positions.py:302`, `tests/trading/integration/test_foreign_orphan_block.py:37`, `tests/trading/usage/features/11_trade_ownership.py:55`.
 - [x] `FR-TRD-110` serializes/restores positions, deal correlation, and sequence/event watermarks together; exact replay after restart is a duplicate with no second projection. Evidence: `app/services/trading/state/execution_positions.py:496`, `app/services/trading/state/execution_positions.py:504`, `tests/trading/integration/test_reconciliation_restart.py:16`, `tests/trading/usage/features/05_reconciliation.py:266`.

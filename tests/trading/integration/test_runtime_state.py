@@ -529,7 +529,7 @@ def test_migration_004_preserves_existing_order_and_is_idempotent(
                             "market",
                             "1",
                             "pending_new",
-                            "simulation",
+                            "paper",
                             "cor-33333333-3333-4333-8333-333333333333",
                             now.isoformat(),
                             now.isoformat(),
@@ -544,10 +544,16 @@ def test_migration_004_preserves_existing_order_and_is_idempotent(
         _run_trading_migrations()
         _run_trading_migrations()
         assert _read_rows(
-            "SELECT order_id, state FROM trading_orders "
+            "SELECT order_id, state, runtime_profile FROM trading_orders "
             "WHERE order_id = 'client-upgrade'"
-        ) == ({"order_id": "client-upgrade", "state": "STAGED"},)
+        ) == (
+            {
+                "order_id": "client-upgrade",
+                "state": "STAGED",
+                "runtime_profile": "demo",
+            },
+        )
         assert _read_rows(
             "SELECT COUNT(*) AS count FROM data_migration_ledger "
             "WHERE domain = 'trading'"
-        ) == ({"count": 4},)
+        ) == ({"count": 5},)

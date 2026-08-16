@@ -1130,7 +1130,7 @@ Permitted non-production targets include:
 - Development.
 - Demo.
 - Sandbox.
-- Paper trading.
+- Demo trading.
 - Testnet.
 - Explicit provider test environments.
 
@@ -1146,7 +1146,7 @@ The effective runtime configuration must not select:
 
 A shared provider endpoint may be used only when:
 
-- The authenticated account is conclusively classified as demo, sandbox, paper, testnet, or development.
+- The authenticated account is conclusively classified as demo, sandbox, demo, testnet, or development.
 - Effective permissions provide non-production-only mutation authority.
 - The intended operation remains within that non-production authority.
 

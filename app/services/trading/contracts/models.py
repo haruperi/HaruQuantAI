@@ -426,7 +426,7 @@ class TradingRoute(StrEnum):
     """Supported Trading execution routes."""
 
     SIM = "sim"
-    PAPER = "paper"
+    DEMO = "demo"
     LIVE = "live"
 
 
@@ -659,10 +659,10 @@ class TradingRequest(_TradingModel):
         """
         logger.debug("Validating canonical TradingRequest invariants")
         if (
-            self.route in {TradingRoute.PAPER, TradingRoute.LIVE}
+            self.route in {TradingRoute.DEMO, TradingRoute.LIVE}
             and self.provider_id is None
         ):
-            raise ValueError("paper/live requests require provider_id")
+            raise ValueError("demo/live requests require provider_id")
         if self.valid_until <= self.system_time:
             raise ValueError("valid_until must be later than system_time")
         if self.contract_version == "v1":
@@ -929,10 +929,10 @@ class OrderIntent(_TradingModel):
         if self.approved_volume != self.risk_approved_volume:
             raise ValueError("OrderIntent must preserve exact Risk-approved size")
         if (
-            self.route in {TradingRoute.PAPER, TradingRoute.LIVE}
+            self.route in {TradingRoute.DEMO, TradingRoute.LIVE}
             and self.provider_id is None
         ):
-            raise ValueError("paper/live intent requires provider_id")
+            raise ValueError("demo/live intent requires provider_id")
         if self.valid_until <= self.created_at:
             raise ValueError("intent validity must end after creation")
         if self.contract_version == "v1":
@@ -1246,7 +1246,7 @@ class ClosedPositionRecord(_TradingModel):
     magic: str
     strategy: str
     account: str
-    environment: Literal["demo", "paper", "sim", "live"]
+    environment: Literal["demo", "sim", "live"]
     request_id: str
     correlation_id: str
     evidence_hash: str

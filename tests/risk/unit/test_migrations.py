@@ -18,7 +18,7 @@ _RISK_TABLES = (
 
 def test_migration_definition_is_stable_and_complete() -> None:
     """Register ordered checksummed migrations covering all Risk durable state."""
-    assert len(_RISK_MIGRATION_STEPS) == 2
+    assert len(_RISK_MIGRATION_STEPS) == 3
     step1 = _RISK_MIGRATION_STEPS[0]
     assert step1.domain == "risk"
     assert step1.migration_id == "risk-0001-initial-state"
@@ -44,6 +44,15 @@ def test_migration_definition_is_stable_and_complete() -> None:
     assert "json_valid(payload_json)" in sql2
     assert "WHERE state = 'active'" in sql2
     assert "WHERE decision_id IS NOT NULL" in sql2
+
+    step3 = _RISK_MIGRATION_STEPS[2]
+    assert step3.domain == "risk"
+    assert step3.migration_id == "risk-0003-route-vocabulary"
+    assert (
+        step3.checksum
+        == hashlib.sha256("\n".join(step3.statements).encode("utf-8")).hexdigest()
+    )
+    assert "'demo'" in " ".join(step3.statements)
 
 
 def test_every_risk_table_is_strict_and_audited() -> None:

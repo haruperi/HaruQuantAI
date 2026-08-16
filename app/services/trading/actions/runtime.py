@@ -1,4 +1,4 @@
-"""Thin live/paper evaluation-cycle orchestration through public domain APIs."""
+"""Thin live/demo evaluation-cycle orchestration through public domain APIs."""
 
 # ruff: noqa: BLE001 - public boundaries normalize every failure.
 
@@ -77,7 +77,7 @@ def _route(deps: TradingDependencies) -> TradingRoute:
         deps: Explicit action dependencies.
 
     Returns:
-        Paper or live route.
+        Demo or live route.
 
     Raises:
         TradingError: If the lifecycle dependency is absent.

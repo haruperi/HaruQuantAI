@@ -1,4 +1,4 @@
-"""WF-TRD-003: start a deterministic package-only paper session."""
+"""WF-TRD-003: start a deterministic package-only demo session."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ STAGES = (
     "Accept a virtual non-production session fixture.",
     "Read bounded virtual capability and readiness evidence.",
     "Construct the Trading lifecycle with injected authority sources.",
-    "Start in paper mode and complete startup reconciliation.",
+    "Start in demo mode and complete startup reconciliation.",
     "Return bounded session status without broker mutation.",
 )
 
@@ -32,7 +32,7 @@ async def run() -> None:
     # Stage 1 — INPUT BOUNDARY: deterministic in-memory session.
     _stage(1)
     session = examples.live_gate_session()
-    print("Input: paper, virtual adapter")
+    print("Input: demo, virtual adapter")
     # Stage 2: expose only bounded readiness evidence.
     _stage(2)
     print("Evidence: capability=available, readiness=current")
@@ -43,8 +43,8 @@ async def run() -> None:
     _stage(4)
     runtime = {
         **examples.live_config(),
-        "RUNTIME_PROFILE": "paper",
-        "EXECUTION_ROUTE": "paper",
+        "RUNTIME_PROFILE": "demo",
+        "EXECUTION_ROUTE": "demo",
         "ALLOW_LIVE_MUTATIONS": False,
     }
     outcome = await start_live_session(session, runtime, examples.live_evidence())

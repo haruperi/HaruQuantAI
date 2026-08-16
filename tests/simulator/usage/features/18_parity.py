@@ -61,7 +61,7 @@ def _evidence(certificate_target: str = "demo") -> dict[str, object]:
                 "order": 3,
                 "inputs": {},
                 "outcome": "validate_adapter_capability_exact_match",
-                "route": "paper",
+                "route": "demo",
                 "route_specific": True,
                 "route_policy": "validate_adapter_capability_exact_match",
             },

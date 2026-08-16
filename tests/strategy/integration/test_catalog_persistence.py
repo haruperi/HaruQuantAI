@@ -88,7 +88,7 @@ def test_multi_environment_manifest_requires_explicit_environment(
         update={
             "permitted_environments": (
                 get_strategy_environment("RESEARCH"),
-                get_strategy_environment("PAPER"),
+                get_strategy_environment("DEMO"),
             )
         }
     )

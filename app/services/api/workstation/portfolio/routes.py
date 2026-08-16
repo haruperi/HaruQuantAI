@@ -11,7 +11,7 @@ public boundary and its allow-listed opaque handle operations. The gateway
 produces no evidence, computes no weight, and decides no approval: Risk remains
 the sole approval authority and Portfolio the sole activation authority.
 
-Production capital is not banned here. Paper and live differ only by the
+Production capital is not banned here. Demo and live differ only by the
 credentials in the composed broker configuration, so the rebalance boundary
 mirrors `routes/trading.py`: it requires the request to name the route this
 deployment is actually configured for, and requires live mutations to be
@@ -322,7 +322,7 @@ def _assess_drift(
 def _require_configured_execution_route(route: str, http_request: Request) -> None:
     """Require the named execution route to be the configured one.
 
-    Mirrors `routes/trading.py::_governed_preflight`. A paper deployment can
+    Mirrors `routes/trading.py::_governed_preflight`. A demo deployment can
     never relay a live rebalance even if asked, and a live deployment still
     needs live mutations explicitly enabled.
 

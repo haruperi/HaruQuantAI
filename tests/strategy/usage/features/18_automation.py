@@ -50,7 +50,7 @@ def fr_str_078() -> None:
             risk_interlock=False,
             trading_interlock=False,
             route="SIM",
-            environment="PAPER",
+            environment="DEMO",
         ),
     )
 
@@ -63,7 +63,7 @@ def fr_str_079() -> None:
             risk_interlock=True,
             trading_interlock=True,
             route="SIM",
-            environment="PAPER",
+            environment="DEMO",
         ),
     )
 

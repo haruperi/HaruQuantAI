@@ -60,7 +60,7 @@ def test_live_what_if_reuses_the_session_surface() -> None:
 def test_no_separate_live_execution_surface_exists() -> None:
     """Live execution reuses the one Trading surface rather than adding another.
 
-    Paper and live differ only by the credentials in the composed
+    Demo and live differ only by the credentials in the composed
     `BrokerConnectionConfig`, so there is deliberately no parallel live route
     family. Reachability is a deployment-settings question, enforced in
     `routes/trading.py::_governed_preflight` and covered by

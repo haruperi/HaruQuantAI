@@ -26,6 +26,7 @@ def test_strategy_migrations_are_ordered_and_owned() -> None:
         "0001_strategy_domain",
         "0002_strategy_seven_table_runtime",
         "0003_strategy_operational_planning",
+        "0004_route_vocabulary",
     )
     assert all(step.domain == "strategy" for step in steps)
 

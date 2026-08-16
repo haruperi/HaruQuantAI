@@ -674,7 +674,7 @@ def _virtual_order_page() -> dict[str, object]:
 
 
 def _provider_mutations_enabled() -> bool:
-    """Return whether genuine demo/paper provider mutations are enabled.
+    """Return whether genuine demo/demo provider mutations are enabled.
 
     Returns:
         True if provider mutations are enabled.
@@ -930,8 +930,8 @@ def example_01_connect() -> None:
                     ctx.live_session = session
 
                     config = {
-                        "RUNTIME_PROFILE": "paper",
-                        "EXECUTION_ROUTE": "paper",
+                        "RUNTIME_PROFILE": "demo",
+                        "EXECUTION_ROUTE": "demo",
                         "ALLOW_LIVE_MUTATIONS": True,
                         "LIVE_WORKFLOW_TIMEOUT_SECONDS": "30",
                         "SHUTDOWN_BUDGET_SECONDS": "5",

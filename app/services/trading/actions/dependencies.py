@@ -115,9 +115,9 @@ class TradingDependencies:
 
     Attributes:
         store: Trading-owned state persistence port.
-        connection: Composition-created Broker connection for paper/live.
-        broker_adapter: Injected asynchronous Broker adapter for paper/live.
-        live_session: Stateful live/paper gate owner.
+        connection: Composition-created Broker connection for demo/live.
+        broker_adapter: Injected asynchronous Broker adapter for demo/live.
+        live_session: Stateful live/demo gate owner.
         clock: Aware UTC clock.
         idempotency_retention_seconds: Required positive reservation lifetime.
         concurrency_lock_timeout_seconds: Required positive active-lock bound.

@@ -18,14 +18,14 @@ logger = get_logger(__name__)
 
 
 def _base_values() -> dict[str, object]:
-    """Return shared safe paper-profile configuration material.
+    """Return shared safe demo-profile configuration material.
 
     Returns:
         Fresh mutable configuration mapping.
     """
     return {
-        "profile": "paper",
-        "execution_route": "paper",
+        "profile": "demo",
+        "execution_route": "demo",
         "base_currency": "USD",
         "pending_order_exposure_policy": "include_full_remaining_exposure",
         "evidence_max_age_seconds": {"portfolio": 60, "market": 30},

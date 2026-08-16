@@ -17,7 +17,7 @@ def _request() -> TradingRequest:
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
-        route="paper",
+        route="demo",
         action="submit_order",
         provider_id="provider-001",
         account_id="account-001",
@@ -42,7 +42,7 @@ def _request() -> TradingRequest:
 def _snapshot_data() -> dict[str, object]:
     """Build complete explicit route fact material."""
     return {
-        "route": "paper",
+        "route": "demo",
         "provider_id": "provider-001",
         "account_id": "account-001",
         "symbol": "EURUSD",

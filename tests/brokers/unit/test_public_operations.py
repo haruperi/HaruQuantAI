@@ -23,12 +23,12 @@ def test_connection_accessors_return_documented_opaque_fields() -> None:
         "yahoo",
         "sandbox",
         provider_enabled=True,
-        account_reference="paper-account",
+        account_reference="demo-account",
     )
 
     assert get_broker_connection_id(connection) == "yahoo"
     assert get_broker_connection_environment(connection) == "sandbox"
-    assert get_broker_connection_account_reference(connection) == "paper-account"
+    assert get_broker_connection_account_reference(connection) == "demo-account"
     assert is_broker_connection_enabled(connection)
 
 

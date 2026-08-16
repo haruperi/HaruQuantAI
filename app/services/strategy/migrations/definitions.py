@@ -461,6 +461,43 @@ _STATEMENTS_0003 = (
     ON strategy_lifecycle(strategy_id, created_at)""",
 )
 
+_STATEMENTS_0004 = (
+    """CREATE TABLE strategy_configs__route_vocabulary (
+        config_id TEXT PRIMARY KEY,
+        version_id TEXT NOT NULL
+            REFERENCES strategy_versions_v2(version_id)
+            ON DELETE RESTRICT,
+        strategy_id TEXT NOT NULL,
+        strategy_version TEXT NOT NULL,
+        config_hash TEXT NOT NULL,
+        config_schema_version TEXT NOT NULL,
+        config_json TEXT NOT NULL CHECK (json_valid(config_json)),
+        policy_version TEXT NOT NULL,
+        runtime_profile TEXT NOT NULL CHECK (
+            runtime_profile IN ('RESEARCH', 'SIMULATION', 'DEMO', 'LIVE')
+        ),
+        lifecycle_status TEXT NOT NULL CHECK (
+            lifecycle_status IN ('active', 'paused', 'archived')
+        ),
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE(version_id, config_hash, runtime_profile),
+        CHECK (length(config_hash) = 64)
+    ) STRICT""",
+    """INSERT INTO strategy_configs__route_vocabulary (
+        config_id, version_id, strategy_id, strategy_version, config_hash,
+        config_schema_version, config_json, policy_version, runtime_profile,
+        lifecycle_status, request_id, correlation_id, created_at
+    ) SELECT config_id, version_id, strategy_id, strategy_version, config_hash,
+        config_schema_version, config_json, policy_version,
+        CASE runtime_profile WHEN 'PAPER' THEN 'DEMO' ELSE runtime_profile END,
+        lifecycle_status, request_id, correlation_id, created_at
+    FROM strategy_configs""",
+    "DROP TABLE strategy_configs",
+    ("ALTER TABLE strategy_configs__route_vocabulary RENAME TO strategy_configs"),
+)
+
 
 def _strategy_migration_steps() -> tuple[Any, ...]:
     """Return ordered immutable Strategy migration definitions.
@@ -472,6 +509,7 @@ def _strategy_migration_steps() -> tuple[Any, ...]:
     material_0001 = "\n".join(_STATEMENTS_0001).encode("utf-8")
     material_0002 = "\n".join(_STATEMENTS_0002).encode("utf-8")
     material_0003 = "\n".join(_STATEMENTS_0003).encode("utf-8")
+    material_0004 = "\n".join(_STATEMENTS_0004).encode("utf-8")
     return (
         build_migration_step(
             domain="strategy",
@@ -490,6 +528,12 @@ def _strategy_migration_steps() -> tuple[Any, ...]:
             migration_id="0003_strategy_operational_planning",
             checksum=hashlib.sha256(material_0003).hexdigest(),
             statements=_STATEMENTS_0003,
+        ),
+        build_migration_step(
+            domain="strategy",
+            migration_id="0004_route_vocabulary",
+            checksum=hashlib.sha256(material_0004).hexdigest(),
+            statements=_STATEMENTS_0004,
         ),
     )
 

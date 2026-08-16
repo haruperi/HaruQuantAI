@@ -330,7 +330,7 @@ budget gates. Exercise malformed and contradictory provider receipts.
 ### TRD-WP5 — Live lifecycle
 
 Migrate dependency lookup methods, audit writes, gates, and start/status/stop. Use
-only demo/paper/sandbox integration targets if real integration is separately
+only demo/demo/sandbox integration targets if real integration is separately
 authorized.
 
 ### TRD-WP6 — Actions

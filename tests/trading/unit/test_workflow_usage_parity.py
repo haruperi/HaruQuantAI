@@ -23,7 +23,7 @@ EXPECTED = {
     "WF-TRD-011": "wf_trd_011_build_execution_reconciliation_evidence.py",
     "WF-TRD-012": "wf_trd_012_accept_governed_upstream_request.py",
     "WF-TRD-013": "wf_trd_013_execute_authorized_portfolio_rebalance.py",
-    "WF-TRD-014": "wf_trd_014_run_live_paper_evaluation_cycle.py",
+    "WF-TRD-014": "wf_trd_014_run_live_demo_evaluation_cycle.py",
     "WF-TRD-015": "wf_trd_015_pause_resume_strategy_route.py",
     "WF-TRD-016": "wf_trd_016_modify_working_order_or_open_position.py",
     "WF-TRD-017": "wf_trd_017_broker_agnostic_main_operations.py",

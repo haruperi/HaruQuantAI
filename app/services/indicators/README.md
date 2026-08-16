@@ -386,7 +386,7 @@ flowchart LR
 **Scope:** `Cross-domain`
 **System workflow:** `SYS-WF-001`, `SYS-WF-002`
 
-**Input boundary:** Trading (live/paper) or Simulation (historical) supplies Data-owned normalized market data.
+**Input boundary:** Trading (live/demo) or Simulation (historical) supplies Data-owned normalized market data.
 **Output boundary:** Indicators returns `IndicatorSeries v1`; Strategy consumes only rows whose `available_at <= decision_time`.
 
 1. The orchestrator obtains Data-owned normalized market data â€”

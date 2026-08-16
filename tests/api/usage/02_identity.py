@@ -166,7 +166,7 @@ def main() -> None:
             key = b"u" * 32
             credential = store_api_credential(
                 owner_id=user.user_id,
-                label="paper",
+                label="demo",
                 material={"api_key": SecretStr("usage-only-value")},
                 key_set={"active": key},
                 active_key_id="active",
@@ -186,7 +186,7 @@ def main() -> None:
                 request_id=generate_id("req"),
                 broker_id="mt5",
                 environment="demo",
-                account_reference="usage-paper-account",
+                account_reference="usage-demo-account",
                 provider_enabled=False,
             )
             assert broker_config.broker_id == "mt5"

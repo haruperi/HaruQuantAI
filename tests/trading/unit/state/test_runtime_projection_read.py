@@ -16,11 +16,11 @@ def test_projection_read_uses_exact_scope(monkeypatch: pytest.MonkeyPatch) -> No
         captured.append((value, operation, scope))
 
     monkeypatch.setattr(runtime, "execute_trading_state_store_operation", execute)
-    assert runtime.get_trading_projection("paper", "dev", "account-1") is None
+    assert runtime.get_trading_projection("demo", "dev", "account-1") is None
     assert len(captured) == 1
     assert captured[0][0:2] == (store, "load_projection")
     assert tuple(str(item) for item in captured[0][2]) == (
-        "paper",
+        "demo",
         "dev",
         "account-1",
     )
@@ -32,7 +32,7 @@ def test_projection_read_rejects_incomplete_scope(
 ) -> None:
     """No storage read occurs for incomplete authority scope."""
     with pytest.raises(ValueError, match="scope is incomplete"):
-        runtime.get_trading_projection("paper", tenant_id, authority_id)
+        runtime.get_trading_projection("demo", tenant_id, authority_id)
 
 
 def test_state_operation_rejects_invalid_handle_and_operation() -> None:

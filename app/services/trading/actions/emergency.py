@@ -68,7 +68,7 @@ def _bind_child_authority(
     child: TradingRequest,
     deps: TradingDependencies,
 ) -> TradingRequest:
-    """Bind one paper/live child to exact current Risk authorities.
+    """Bind one demo/live child to exact current Risk authorities.
 
     Args:
         child: Structurally valid derived child request.
@@ -187,7 +187,7 @@ def _bulk_envelope(
         read_only=False,
         modifies_database=True,
         places_trade=True,
-        requires_network=request.route.value in {"paper", "live"},
+        requires_network=request.route.value in {"demo", "live"},
         legacy_status="partial" if partial else "success",
         extensions={"redaction_applied": True},
     )

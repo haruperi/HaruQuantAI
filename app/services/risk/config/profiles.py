@@ -33,7 +33,7 @@ RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 logger = get_logger(__name__)
 
 _HASH_PATTERN = re.compile(r"[0-9a-f]{64}\Z")
-_PROFILES = frozenset({"research", "simulation", "paper", "live"})
+_PROFILES = frozenset({"research", "simulation", "demo", "live"})
 _MAX_SCENARIOS = 100
 _MAX_SCENARIO_POSITIONS = 500
 _ASSESSMENT_EVENTS = frozenset(
@@ -279,8 +279,8 @@ class RiskConfig(BaseModel):
     )
 
     schema_version: Literal["v1"] = "v1"
-    profile: Literal["research", "simulation", "paper", "live"]
-    execution_route: Literal["none", "sim", "paper", "live"]
+    profile: Literal["research", "simulation", "demo", "live"]
+    execution_route: Literal["none", "sim", "demo", "live"]
     policy_version: str
     base_currency: str
     decimal_rounding: Literal["ROUND_HALF_EVEN"] = "ROUND_HALF_EVEN"
@@ -691,7 +691,7 @@ class RiskConfig(BaseModel):
         expected_route = {
             "research": "none",
             "simulation": "sim",
-            "paper": "paper",
+            "demo": "demo",
             "live": "live",
         }[self.profile]
         if self.execution_route != expected_route:

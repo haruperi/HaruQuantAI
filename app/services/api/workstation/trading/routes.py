@@ -70,11 +70,11 @@ def _governed_preflight(
         HTTPException: If production, configuration, or idempotency policy fails.
     """
     settings = request.app.state.api_settings
-    # Paper and live share one execution path and differ only by the
+    # Demo and live share one execution path and differ only by the
     # credentials in the composed BrokerConnectionConfig (docs/PROJECT.md
     # 2.1.9). The boundary therefore does not ban a route; it requires the
     # request to name the route this deployment is actually configured for, so
-    # a paper deployment can never relay a live order even if asked.
+    # a demo deployment can never relay a live order even if asked.
     if body.route != settings.execution_route:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -97,7 +97,7 @@ def _get_session(
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_SessionSource, Depends(_trading_session_source)],
     authority_id: Annotated[str, Query(min_length=1, max_length=200)],
-    route: Annotated[Literal["sim", "paper", "live"], Query()] = "paper",
+    route: Annotated[Literal["sim", "demo", "live"], Query()] = "demo",
 ) -> object:
     """Return one exact-scope aggregate Trading session projection.
 

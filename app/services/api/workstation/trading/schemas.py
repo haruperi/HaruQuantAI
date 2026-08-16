@@ -16,7 +16,7 @@ class TradingMutationRequest(_BaseApiContract):
     workflow_id: str
     correlation_id: str
     causation_id: str | None = None
-    route: Literal["paper", "live"]
+    route: Literal["demo", "live"]
     action: str
     provider_id: str | None = None
     account_id: str

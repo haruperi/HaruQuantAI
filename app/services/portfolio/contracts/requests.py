@@ -24,8 +24,8 @@ from app.utils import get_logger
 logger = get_logger(__name__)
 
 ConstructionMethod = Literal["fixed", "equal", "inverse_volatility"]
-RuntimeProfile = Literal["simulation", "paper", "live"]
-ExecutionRoute = Literal["sim", "paper", "live"]
+RuntimeProfile = Literal["simulation", "demo", "live"]
+ExecutionRoute = Literal["sim", "demo", "live"]
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 
 
@@ -532,7 +532,7 @@ class PortfolioConstructionRequest(PortfolioContractModel):
             raise ValueError("non-fixed methods cannot carry fixed weights")
         expected_route = {
             "simulation": "sim",
-            "paper": "paper",
+            "demo": "demo",
             "live": "live",
         }[self.runtime_profile]
         if self.execution_route != expected_route:

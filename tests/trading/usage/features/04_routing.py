@@ -84,9 +84,9 @@ def _intent() -> OrderIntent:
     )
 
 
-def _paper_intent() -> OrderIntent:
-    """Build one paper intent for adapter-capability validation."""
-    return _intent().model_copy(update={"route": "paper", "provider_id": "mt5"})
+def _demo_intent() -> OrderIntent:
+    """Build one demo intent for adapter-capability validation."""
+    return _intent().model_copy(update={"route": "demo", "provider_id": "mt5"})
 
 
 def _capability() -> dict[str, object]:
@@ -111,7 +111,7 @@ def fr_trd_029() -> None:
     """FR-TRD-029: Stage 2 — Reject adapters lacking required capability declarations."""
     _header("Stage 2: Capability Validation - Validate Adapter Capability (FR-TRD-029)")
     capability_result = validate_adapter_capability(  # type: ignore[arg-type]
-        _paper_intent(),
+        _demo_intent(),
         _capability(),
         operation_timeout_seconds=Decimal(10),
     )
@@ -128,7 +128,7 @@ def fr_trd_030() -> None:
         "receipt_id": "usage-receipt-001",
         "intent_id": "usage-intent-001",
         "client_order_id": "usage-client-order-001",
-        "route": "paper",
+        "route": "demo",
         "authority": "mt5",
         "provider_order_id": "broker-order-001",
         "status": "accepted",
@@ -188,7 +188,7 @@ def fr_trd_096() -> None:
 
     non_sim = asyncio.run(
         dispatch_order_intent(
-            _paper_intent(),
+            _demo_intent(),
             build_broker_connection_config("mt5", "simulation"),
             _Adapter(),
             operation_timeout_seconds=Decimal(10),

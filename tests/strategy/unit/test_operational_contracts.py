@@ -97,7 +97,7 @@ def test_trade_plan_lifecycle_is_immutable_and_sim_only() -> None:
     assert draft["status"] == "DRAFT"
     assert ready["status"] == "READY_FOR_RISK"
     assert (
-        validate_trade_plan_for_intent(ready, route="SIM", environment="PAPER") == ready
+        validate_trade_plan_for_intent(ready, route="SIM", environment="DEMO") == ready
     )
     with pytest.raises(ValueError, match="simulation-only"):
         validate_trade_plan_for_intent(ready, route="LIVE", environment="LIVE")
@@ -175,7 +175,7 @@ def test_operating_exit_manual_expectancy_and_governance_fail_closed() -> None:
             risk_interlock=True,
             trading_interlock=True,
             route="SIM",
-            environment="PAPER",
+            environment="DEMO",
         )["status"]
         == "READY"
     )
@@ -208,7 +208,7 @@ def test_operating_exit_manual_expectancy_and_governance_fail_closed() -> None:
             risk_interlock=False,
             trading_interlock=True,
             route="SIM",
-            environment="PAPER",
+            environment="DEMO",
         )
         == "RESTRICTED"
     )
@@ -218,7 +218,7 @@ def test_operating_exit_manual_expectancy_and_governance_fail_closed() -> None:
             risk_interlock=False,
             trading_interlock=False,
             route="SIM",
-            environment="PAPER",
+            environment="DEMO",
         )
         == "OFF"
     )
@@ -228,7 +228,7 @@ def test_operating_exit_manual_expectancy_and_governance_fail_closed() -> None:
             risk_interlock=True,
             trading_interlock=True,
             route="SIM",
-            environment="PAPER",
+            environment="DEMO",
         )
         == "SUPERVISED"
     )
@@ -238,7 +238,7 @@ def test_operating_exit_manual_expectancy_and_governance_fail_closed() -> None:
             risk_interlock=True,
             trading_interlock=True,
             route="SIM",
-            environment="PAPER",
+            environment="DEMO",
         )
     manual = build_manual_trade_plan(
         player_ref="ply-1",

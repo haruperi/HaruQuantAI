@@ -134,7 +134,7 @@ class ParityRouteGatePolicy(_FrozenModel):
     """
 
     gate_id: str
-    route: Literal["sim", "paper", "live"]
+    route: Literal["sim", "demo", "live"]
     policy: str
 
 

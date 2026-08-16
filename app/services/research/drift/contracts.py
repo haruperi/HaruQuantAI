@@ -1,6 +1,6 @@
 """Performance drift evidence contract (FEAT-RES-15).
 
-Monitors live-simulation/paper outcomes against an approved expectancy
+Monitors live-simulation/demo outcomes against an approved expectancy
 envelope and proposes suspension when drift thresholds are reached. Drift
 evidence is advisory: it never mutates governance state directly. A missing
 approved envelope fails closed to ``INSUFFICIENT_EVIDENCE`` rather than an
@@ -69,9 +69,9 @@ class PerformanceDriftEvidence:
         profile_id: Approved expectancy profile under review.
         observed_from_utc: Inclusive start of the observation window.
         observed_to_utc: Inclusive end of the observation window.
-        observed_win_rate: Observed live-sim/paper win rate.
-        observed_expected_value_r: Observed live-sim/paper EV in R.
-        observed_max_drawdown_r: Observed live-sim/paper drawdown magnitude.
+        observed_win_rate: Observed live-sim/demo win rate.
+        observed_expected_value_r: Observed live-sim/demo EV in R.
+        observed_max_drawdown_r: Observed live-sim/demo drawdown magnitude.
         envelope_win_rate: Approved envelope win rate.
         envelope_expected_value_r: Approved envelope EV in R.
         envelope_max_drawdown_r: Approved envelope drawdown magnitude.
@@ -191,7 +191,7 @@ def _relative_drop(approved: float, observed: float) -> float:
 
     Args:
         approved: Approved envelope metric value.
-        observed: Observed live-sim/paper metric value.
+        observed: Observed live-sim/demo metric value.
 
     Returns:
         Non-negative relative drop fraction.
@@ -222,8 +222,8 @@ def build_performance_drift_evidence(
         profile_id: Approved expectancy profile under review.
         observed_from_utc: Inclusive start of the observation window.
         observed_to_utc: Inclusive end of the observation window.
-        observed_win_rate: Observed live-sim/paper win rate.
-        observed_expected_value_r: Observed live-sim/paper EV in R.
+        observed_win_rate: Observed live-sim/demo win rate.
+        observed_expected_value_r: Observed live-sim/demo EV in R.
         observed_max_drawdown_r: Observed drawdown magnitude in R.
         envelope_win_rate: Approved envelope win rate.
         envelope_expected_value_r: Approved envelope EV in R.

@@ -126,7 +126,7 @@ it: `mypy --strict` verifies each domain's internal frozen type, and the
 `principal_type`, roles, permissions, scopes, tenant/environment, request ID,
 workflow ID, correlation ID, and UTC issue time. Missing or invalid context fails
 closed at the receiving domain. `AuthContext v2` adds the required independent
-`runtime_profile` claim (`research`, `simulation`, `paper`, or `live`); Risk and
+`runtime_profile` claim (`research`, `simulation`, `demo`, or `live`); Risk and
 Trading consume that claim while deployment-tenancy consumers continue to use
 `tenant_or_environment`.
 
@@ -1197,7 +1197,7 @@ capabilities beyond the Section 4 exports.
 | Status    | Setting                       | Type     | Default                                    | Required | Consumers                                              | Description                                                                                                                                                                                   |
 | --------- | ----------------------------- | -------- | ------------------------------------------ | -------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Completed | `ENVIRONMENT`               | `str`  | `dev`                                    | Yes      | All domains                                            | Exactly`dev`, `test`, `staging`, or `production`.                                                                                                                                     |
-| Completed | `RUNTIME_PROFILE`           | `str`  | `research`                               | Yes      | Strategy, Risk, Trading, Simulation, Portfolio, UI/API | Exactly`research`, `simulation`, `paper`, or `live`; route compatibility belongs to Trading.                                                                                          |
+| Completed | `RUNTIME_PROFILE`           | `str`  | `research`                               | Yes      | Strategy, Risk, Trading, Simulation, Portfolio, UI/API | Exactly`research`, `simulation`, `demo`, or `live`; route compatibility belongs to Trading.                                                                                          |
 | Completed | UTC-first policy              | policy   | `Z`-suffixed ISO 8601                    | Yes      | All domains                                            | Non-UTC cross-domain timestamps are rejected.                                                                                                                                                 |
 | Completed | Trace-ID policy               | policy   | Prefixed UUID4                             | Yes      | All domains                                            | Request, workflow, correlation, causation, and event IDs are secret-free strings.                                                                                                             |
 | Completed | Secret-redaction policy       | policy   | Denylist-first, case-insensitive           | Yes      | All domains                                            | Applied before persistence or emission.                                                                                                                                                       |

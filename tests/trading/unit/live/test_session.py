@@ -1,4 +1,4 @@
-"""Unit tests for Trading live/paper session lifecycle."""
+"""Unit tests for Trading live/demo session lifecycle."""
 
 # ruff: noqa: ARG005, INP001
 from datetime import UTC, datetime
@@ -42,7 +42,7 @@ def test_runtime_config_rejects_inexact_and_incomplete_bounds() -> None:
 def test_runtime_config_requires_matching_profile_and_authority() -> None:
     """Profile/route conflicts and blank authority identity fail closed."""
     config = _config()
-    config["EXECUTION_ROUTE"] = "paper"
+    config["EXECUTION_ROUTE"] = "demo"
     with pytest.raises(Exception, match="CONFIGURATION_INVALID"):
         _validate_live_config(config)
     config = _config()

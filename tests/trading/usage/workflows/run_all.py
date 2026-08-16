@@ -22,7 +22,7 @@ WORKFLOWS = (
     "wf_trd_011_build_execution_reconciliation_evidence.py",
     "wf_trd_012_accept_governed_upstream_request.py",
     "wf_trd_013_execute_authorized_portfolio_rebalance.py",
-    "wf_trd_014_run_live_paper_evaluation_cycle.py",
+    "wf_trd_014_run_live_demo_evaluation_cycle.py",
     "wf_trd_015_pause_resume_strategy_route.py",
     "wf_trd_016_modify_working_order_or_open_position.py",
     "wf_trd_017_broker_agnostic_main_operations.py",

@@ -786,17 +786,22 @@ def resolve_system_credential_slot(slot: str, *, request_id: str) -> object:
 
     Raises:
         ValueError: If bootstrap encryption-key configuration is unavailable.
+        TypeError: If the typed API settings snapshot is unavailable.
         IdentityError: If the credential is unavailable or cannot be verified.
     """
     from app.services.api.composition.runtime_settings import build_credential_key_set
     from app.services.api.identity import resolve_credential_reference
+    from app.services.api.workstation.settings.bootstrap import ApiSettings
     from app.utils import derive_stable_id
 
     reference_id = derive_stable_id("id", f"api-credential:system:{slot}")
+    settings = get_api_settings()
+    if not isinstance(settings, ApiSettings):
+        raise TypeError("API settings are unavailable")
     return resolve_credential_reference(
         f"secret://{reference_id}",
         owner_id="system",
-        key_set=build_credential_key_set(get_api_settings()),
+        key_set=build_credential_key_set(settings),
         request_id=request_id,
     )
 

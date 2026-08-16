@@ -233,7 +233,7 @@ def main() -> None:  # noqa: PLR0915 - teaching workflow intentionally linear.
     #
     #   A policy mismatch blocks the request.
     #
-    #   The two defaults currently stored are paper-route policies; neither grants live-trading permission.
+    #   The two defaults currently stored are demo-route policies; neither grants live-trading permission.
     _stage(6, actual=True)
     print("Policy:", config.policy_version, config.profile)
     print("Pinned config hash:", snapshot.config_hash)
@@ -653,7 +653,7 @@ def main() -> None:  # noqa: PLR0915 - teaching workflow intentionally linear.
 
     # Stage 23 — Illustrate later authority evidence without inventing a broker fill.
     #   Trading may submit the order:
-    #   Only now may Trading route the approved order to simulation, paper or live execution.
+    #   Only now may Trading route the approved order to simulation, demo or live execution.
     #
     #   The order remains governed by:
     #   - Exact approved size

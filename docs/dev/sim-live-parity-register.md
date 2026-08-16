@@ -191,12 +191,12 @@ the run context so projections are built and can be asserted in tests.
 
 Sim has no admission control, no startup reconciliation, no drain/flush/shutdown budget, no
 `HEALTH_CHANGED` events, and no package-only mode. `_LiveRuntimeConfig` currently constrains
-`runtime_profile` and `execution_route` to `Literal["paper", "live"]` (`live/config.py:108-113`).
+`runtime_profile` and `execution_route` to `Literal["demo", "live"]` (`live/config.py:108-113`).
 
 **Fix:** widen both literals to include `"sim"`. Provide sim lifecycle steps:
 `startup_reconcile` → verify the tick dataset and engine are ready; `drain_in_flight` → finish the
 current tick; `flush_evidence` → flush the journal; `shutdown_reconcile` → verify ledger invariants.
-Admission for `sim` self-enables (like `paper`), never requiring `allow_live_mutations`.
+Admission for `sim` self-enables (like `demo`), never requiring `allow_live_mutations`.
 
 ---
 

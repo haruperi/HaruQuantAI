@@ -350,6 +350,44 @@ _SETTINGS_UNIFICATION_CHECKSUM = hashlib.sha256(
     ).encode("utf-8")
 ).hexdigest()
 
+_ROUTE_VOCABULARY_STATEMENTS = (
+    """CREATE TABLE api_accounts__route_vocabulary (
+        user_id TEXT PRIMARY KEY,
+        username TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        roles_json TEXT NOT NULL,
+        permissions_json TEXT NOT NULL,
+        scopes_json TEXT NOT NULL,
+        environment TEXT NOT NULL,
+        active INTEGER NOT NULL CHECK (active IN (0, 1)),
+        verified INTEGER NOT NULL CHECK (verified IN (0, 1)),
+        created_at TEXT NOT NULL,
+        last_login_at TEXT,
+        runtime_profile TEXT NOT NULL DEFAULT 'research' CHECK (
+            runtime_profile IN ('research', 'simulation', 'demo', 'live')
+        )
+    ) STRICT""",
+    """INSERT INTO api_accounts__route_vocabulary (
+        user_id, username, password_hash, roles_json, permissions_json,
+        scopes_json, environment, active, verified, created_at, last_login_at,
+        runtime_profile
+    ) SELECT user_id, username, password_hash, roles_json, permissions_json,
+        scopes_json, environment, active, verified, created_at, last_login_at,
+        CASE runtime_profile WHEN 'paper' THEN 'demo' ELSE runtime_profile END
+    FROM api_accounts""",
+    "DROP TABLE api_accounts",
+    "ALTER TABLE api_accounts__route_vocabulary RENAME TO api_accounts",
+)
+_ROUTE_VOCABULARY_CHECKSUM = hashlib.sha256(
+    canonical_json(
+        {
+            "domain": "api",
+            "migration": "api-0010",
+            "sql": _ROUTE_VOCABULARY_STATEMENTS,
+        }
+    ).encode("utf-8")
+).hexdigest()
+
 
 def get_identity_migration_steps() -> tuple[object, ...]:
     """Return the immutable API migration manifest.
@@ -387,6 +425,12 @@ def get_identity_migration_steps() -> tuple[object, ...]:
             migration_id="api-0006",
             checksum=_SETTINGS_UNIFICATION_CHECKSUM,
             statements=_SETTINGS_UNIFICATION_STATEMENTS,
+        ),
+        build_migration_step(
+            domain="api",
+            migration_id="api-0010",
+            checksum=_ROUTE_VOCABULARY_CHECKSUM,
+            statements=_ROUTE_VOCABULARY_STATEMENTS,
         ),
     )
 

@@ -166,7 +166,7 @@ def evaluation_dependencies(intent):
         "object",
         SimpleNamespace(
             config=SimpleNamespace(
-                execution_route="paper", live_workflow_timeout_seconds=Decimal(10)
+                execution_route="demo", live_workflow_timeout_seconds=Decimal(10)
             )
         ),
     )

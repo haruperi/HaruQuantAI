@@ -19,7 +19,7 @@ LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
 LogRender = Literal["json", "human"]
 LogCompression = Literal["zip", "none"]
 Environment = Literal["dev", "test", "staging", "production"]
-RuntimeProfile = Literal["research", "simulation", "paper", "live"]
+RuntimeProfile = Literal["research", "simulation", "demo", "live"]
 
 
 class AppSettings(BaseSettings):

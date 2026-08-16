@@ -86,7 +86,7 @@ def _enforce_runtime_policy(policy: object | None, boundary_request: object) -> 
 
     The gateway does not decide whether a trade is safe — Trading and Risk do.
     What it can do is refuse to forward a request whose own declared
-    ``route`` contradicts the deployment it is running in, so a paper
+    ``route`` contradicts the deployment it is running in, so a demo
     deployment can never relay a live-routed command
     even if a caller asks for one. Live routing additionally requires
     ``allow_live_mutations``, matching the settings-level rule in

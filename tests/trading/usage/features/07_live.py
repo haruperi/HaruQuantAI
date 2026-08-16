@@ -203,12 +203,12 @@ def fr_trd_091() -> None:
 
 
 def fr_trd_104() -> None:
-    """FR-TRD-104: Construct the live/paper deadline from monotonic time."""
+    """FR-TRD-104: Construct the live/demo deadline from monotonic time."""
 
     async def demonstrate() -> None:
         loop = asyncio.get_running_loop()
         factory = create_monotonic_deadline_factory(loop.time)
-        async with factory(Decimal(1), {"route": "paper"}):
+        async with factory(Decimal(1), {"route": "demo"}):
             await asyncio.sleep(0)
 
     asyncio.run(demonstrate())
@@ -234,7 +234,7 @@ for _example_name, _example_function in tuple(globals().items()):
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
-        "FEATURE: FEAT-TRD-07 — live/ — Live and Paper Session Lifecycle\n\n"
+        "FEATURE: FEAT-TRD-07 — live/ — Live and Demo Session Lifecycle\n\n"
         "Purpose: Manage LiveSession lifecycle state, validate startup evidence, evaluate multi-stage safety gates, and govern graceful shutdown.\n\n"
         "Module flow:\n"
         "-> Stage 1: LiveSession initialization and configuration parameter binding\n"

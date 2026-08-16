@@ -1,4 +1,4 @@
-"""Immutable fail-closed Trading live/paper runtime configuration."""
+"""Immutable fail-closed Trading live/demo runtime configuration."""
 
 from collections.abc import Mapping
 from decimal import Decimal, InvalidOperation
@@ -101,14 +101,14 @@ def _staleness_bounds(value: object) -> Mapping[str, Decimal]:
 
 
 class _LiveRuntimeConfig(BaseModel):
-    """Private validated live/paper runtime settings."""
+    """Private validated live/demo runtime settings."""
 
     model_config = ConfigDict(frozen=True, extra="forbid", populate_by_name=True)
 
-    runtime_profile: Literal["sim", "paper", "live"] = Field(
+    runtime_profile: Literal["sim", "demo", "live"] = Field(
         validation_alias=AliasChoices("RUNTIME_PROFILE", "runtime_profile")
     )
-    execution_route: Literal["sim", "paper", "live"] = Field(
+    execution_route: Literal["sim", "demo", "live"] = Field(
         validation_alias=AliasChoices("EXECUTION_ROUTE", "execution_route")
     )
     allow_live_mutations: bool = Field(
@@ -205,7 +205,7 @@ def _validate_live_config(config: Mapping[str, JsonValue]) -> _LiveRuntimeConfig
     Raises:
         TradingError: If config is sensitive, incomplete, or incompatible.
     """
-    logger.info("Validating Trading live/paper configuration")
+    logger.info("Validating Trading live/demo configuration")
     if any(is_sensitive_key(key) for key in config):
         raise TradingError(
             "CONFIGURATION_INVALID",

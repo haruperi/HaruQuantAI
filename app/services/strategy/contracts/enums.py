@@ -10,7 +10,7 @@ class StrategyEnvironment(StrEnum):
 
     RESEARCH = "RESEARCH"
     SIMULATION = "SIMULATION"
-    PAPER = "PAPER"
+    DEMO = "DEMO"
     LIVE = "LIVE"
 
 

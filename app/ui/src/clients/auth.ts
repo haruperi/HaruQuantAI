@@ -22,7 +22,7 @@ export interface Credentials {
  * Response data for register/login (backend returns this dict literal).
  *
  * `runtime_profile` is optional: the backend's `AuthenticatedUser` model
- * already carries it (`"research"|"simulation"|"paper"|"live"`), but no
+ * already carries it (`"research"|"simulation"|"demo"|"live"`), but no
  * route returns it to the UI yet. It is declared here so account-mode
  * presentation (FR-UI-016) starts working the moment a route adds it,
  * without any further UI change; until then it is simply absent.

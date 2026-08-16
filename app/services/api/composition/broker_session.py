@@ -13,7 +13,7 @@ from app.services.brokers import (
     get_broker_id,
 )
 
-_NON_PRODUCTION_ENVIRONMENTS = frozenset({"dev", "demo", "paper", "sandbox", "test"})
+_NON_PRODUCTION_ENVIRONMENTS = frozenset({"dev", "demo", "sandbox", "test"})
 
 
 async def create_non_production_broker_session(

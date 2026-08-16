@@ -40,8 +40,8 @@ def monitor_performance_drift(
         approved_profile: Approved expectancy profile mapping (the envelope).
         observed_from_utc: Inclusive start of the observation window.
         observed_to_utc: Inclusive end of the observation window.
-        observed_win_rate: Observed live-sim/paper win rate.
-        observed_expected_value_r: Observed live-sim/paper EV in R.
+        observed_win_rate: Observed live-sim/demo win rate.
+        observed_expected_value_r: Observed live-sim/demo EV in R.
         observed_max_drawdown_r: Observed drawdown magnitude in R.
         thresholds: Optional drift thresholds; defaults to 25% relative drops.
         generated_at_utc: Evidence generation instant.

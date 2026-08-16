@@ -290,7 +290,7 @@ def fr_trd_064() -> None:
 
 
 def fr_trd_065() -> None:
-    """FR-TRD-065: Stage 3 — Drive live/paper evaluation cycle across domains."""
+    """FR-TRD-065: Stage 3 — Drive live/demo evaluation cycle across domains."""
     _header("Stage 3: Runtime Evaluation - Run Live Evaluation Cycle (FR-TRD-065)")
     eval_deps, _calls = evaluation_dependencies(None)
     eval_res = asyncio.run(run_live_evaluation_cycle(eval_deps, evidence()))

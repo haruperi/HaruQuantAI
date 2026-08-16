@@ -17,7 +17,7 @@ logger = get_logger(__name__)
 _EXECUTION_ROUTE_BY_PROFILE: Final[dict[str, str]] = {
     "research": "none",
     "simulation": "sim",
-    "paper": "paper",
+    "demo": "demo",
     "live": "live",
 }
 _ERROR_CODE: Final[str] = "SYSTEM_RUNTIME_ROUTE_INCOMPATIBLE"

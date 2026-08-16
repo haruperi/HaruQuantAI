@@ -1,7 +1,7 @@
 
 ## Backtesting biases & pitfalls
 
-Backtests only matter when they mirror live-trading reality. The following biases routinely inflate paper performance and must be neutralized before funding a strategy.
+Backtests only matter when they mirror live-trading reality. The following biases routinely inflate simulated performance and must be neutralized before funding a strategy.
 
 ### Look-ahead bias
 
@@ -11,7 +11,7 @@ Backtests only matter when they mirror live-trading reality. The following biase
 - Use only completed bars and add a one-bar delay if necessary.
 - Employ bar magnification (1-minute data for daily systems).
 - Model fills conservatively and add slippage.
-- Compare backtests to walk-forward or paper-trade results—large discrepancies signal bias.
+- Compare backtests to walk-forward or demo results—large discrepancies signal bias.
 
 ### Survivorship bias
 

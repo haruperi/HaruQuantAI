@@ -180,7 +180,7 @@ describe("FR-UI-016/017 account mode derivation", () => {
   it("maps the backend runtime_profile to the presentation account mode", () => {
     expect(mapRuntimeProfileToAccountMode("live")).toBe("live");
     expect(mapRuntimeProfileToAccountMode("simulation")).toBe("simulation");
-    expect(mapRuntimeProfileToAccountMode("paper")).toBe("simulation");
+    expect(mapRuntimeProfileToAccountMode("demo")).toBe("simulation");
     expect(mapRuntimeProfileToAccountMode("research")).toBe("simulation");
     expect(mapRuntimeProfileToAccountMode("something-else")).toBe("unknown");
     expect(mapRuntimeProfileToAccountMode(undefined)).toBe("unknown");

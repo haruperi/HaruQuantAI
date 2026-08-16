@@ -48,7 +48,7 @@ async def _exercise_trading_demo_dispatch() -> None:
             request_id=request_id,
             workflow_id=generate_id("wf"),
             correlation_id=correlation_id,
-            route="paper",
+            route="demo",
             provider_id="mt5",
             account_id="verified-mt5-demo-account",
             strategy_id="trading-demo-validation",

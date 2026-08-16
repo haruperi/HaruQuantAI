@@ -31,7 +31,7 @@ from tests.trading.conftest import (
 
 @pytest.mark.anyio
 async def test_cycle_submits_intent_and_never_sizes() -> None:
-    """Run the complete paper cycle with the exact Risk-approved size."""
+    """Run the complete demo cycle with the exact Risk-approved size."""
     deps, calls = evaluation_dependencies(trade_intent())
     adapter = CountingAdapter()
     connection = broker_connection()
@@ -72,8 +72,8 @@ async def test_cycle_submits_intent_and_never_sizes() -> None:
     await start_live_session(
         session,
         {
-            "RUNTIME_PROFILE": "paper",
-            "EXECUTION_ROUTE": "paper",
+            "RUNTIME_PROFILE": "demo",
+            "EXECUTION_ROUTE": "demo",
             "ALLOW_LIVE_MUTATIONS": False,
             "LIVE_WORKFLOW_TIMEOUT_SECONDS": "10",
             "SHUTDOWN_BUDGET_SECONDS": "5",
@@ -115,4 +115,4 @@ async def test_cycle_submits_intent_and_never_sizes() -> None:
     assert adapter.request is not None
     assert adapter.request.quantity == Decimal("0.50")
     assert len(audits) == 1
-    assert deps.store.load_projection(("paper", "account-001", "mt5")) is not None
+    assert deps.store.load_projection(("demo", "account-001", "mt5")) is not None

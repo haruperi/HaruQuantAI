@@ -73,9 +73,7 @@ _UNIT_SUFFIX: Final = {
     "unit_none": "",
     "": "",
 }
-_NON_PRODUCTION_ENVIRONMENTS: Final = frozenset(
-    {"dev", "demo", "paper", "sandbox", "testnet"}
-)
+_NON_PRODUCTION_ENVIRONMENTS: Final = frozenset({"dev", "demo", "sandbox", "testnet"})
 
 
 def _require_non_production(environment: str) -> None:

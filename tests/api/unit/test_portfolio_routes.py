@@ -542,7 +542,7 @@ def test_rollback_delegates_with_target_version() -> None:
 def test_rebalance_forwards_the_configured_live_route() -> None:
     """A live-configured deployment forwards a live rebalance unchanged.
 
-    Paper and live differ only by broker credentials, so the boundary must not
+    Demo and live differ only by broker credentials, so the boundary must not
     reshape or refuse a live request once the deployment is configured for it.
     """
     captured: list[tuple[str, str, str]] = []

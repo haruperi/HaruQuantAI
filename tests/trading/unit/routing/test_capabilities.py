@@ -28,13 +28,13 @@ def validate_adapter_capability(
 
 
 def _intent() -> OrderIntent:
-    """Build one complete paper-route executable intent."""
+    """Build one complete demo-route executable intent."""
     return OrderIntent(
         client_order_id="client-order-001",
         request_id="req-11111111-1111-4111-8111-111111111111",
         workflow_id="wf-22222222-2222-4222-8222-222222222222",
         correlation_id="cor-33333333-3333-4333-8333-333333333333",
-        route="paper",
+        route="demo",
         provider_id="mt5",
         account_id="account-001",
         strategy_id="strategy-001",

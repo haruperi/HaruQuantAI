@@ -126,8 +126,8 @@ def test_strategy_eligibility_request_binds_exact_version() -> None:
     request = StrategyOperationalEligibilityRequest(
         strategy_id="strategy-1",
         strategy_version="1.0.0",
-        runtime_profile="paper",
-        execution_route="paper",
+        runtime_profile="demo",
+        execution_route="demo",
         policy_version="policy-1",
         registration_ref="registration-1",
         evidence_refs={"market": "market-1"},

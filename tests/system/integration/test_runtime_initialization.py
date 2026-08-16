@@ -5,7 +5,7 @@ from app import validate_runtime_configuration
 def test_application_boundary_fails_closed_before_incompatible_initialization():
     response = validate_runtime_configuration(
         runtime_profile="live",
-        execution_route="paper",
+        execution_route="demo",
     )
 
     assert response.status == "error"

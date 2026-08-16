@@ -1,4 +1,4 @@
-"""Canonical fail-fast live/paper Trading mutation gate sequence."""
+"""Canonical fail-fast live/demo Trading mutation gate sequence."""
 
 from collections.abc import Mapping
 from typing import Any, Literal
@@ -61,7 +61,7 @@ def _gate_envelope(
         read_only=False,
         modifies_database=True,
         places_trade=True,
-        requires_network=request.route.value in {"paper", "live"},
+        requires_network=request.route.value in {"demo", "live"},
         legacy_status=status,
         extensions={
             "route": request.route.value,

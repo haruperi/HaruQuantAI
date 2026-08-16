@@ -210,7 +210,7 @@ def test_activation_blocks_kill_switch_and_missing_human_approval(
     portfolio_settings: PortfolioSettings,
     portfolio_now: datetime,
 ) -> None:
-    """Verify kill switches and paper/live approval policy fail closed.
+    """Verify kill switches and demo/live approval policy fail closed.
 
     Args:
         construction_result: Complete construction result.
@@ -250,7 +250,7 @@ def test_activation_blocks_kill_switch_and_missing_human_approval(
         service.activate(
             construction_result,
             kill_switches=(_inactive_kill_switch(portfolio_now),),
-            runtime_profile="paper",
+            runtime_profile="demo",
             **arguments,
         )
 

@@ -29,7 +29,7 @@ from app.utils import (  # noqa: E402
 from pydantic import SecretStr  # noqa: E402
 
 _TRUE = frozenset({"1", "true", "yes", "on"})
-_SAFE_ENVIRONMENTS = frozenset({"dev", "development", "test", "sandbox", "paper"})
+_SAFE_ENVIRONMENTS = frozenset({"dev", "development", "test", "sandbox", "demo"})
 
 
 def run_real_notification_evidence(evidence_name: str) -> Mapping[str, object]:

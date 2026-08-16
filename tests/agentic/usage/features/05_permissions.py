@@ -201,7 +201,7 @@ def fr_agentic_013() -> None:
             "class not held",
             {"policy": make_policy(permission_classes=("compute_deterministic",))},
         ),
-        ("wrong environment", {"request_scope": {"environment": "paper"}}),
+        ("wrong environment", {"request_scope": {"environment": "demo"}}),
         (
             "wrong asset scope",
             {"request_scope": {"environment": "sandbox", "asset_class": "equities"}},
@@ -267,7 +267,7 @@ def fr_agentic_014() -> None:
         ),
         (
             "different environment",
-            {"attestation": make_attestation(nonce="n5", environment="paper")},
+            {"attestation": make_attestation(nonce="n5", environment="demo")},
         ),
         (
             "self-approval",

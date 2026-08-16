@@ -48,7 +48,7 @@ def fr_str_059() -> None:
             risk_interlock=True,
             trading_interlock=True,
             route="SIM",
-            environment="PAPER",
+            environment="DEMO",
         ),
     )
 

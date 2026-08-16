@@ -65,7 +65,7 @@ def test_submit_order_rejects_non_sim_route_before_engine() -> None:
     """Reject a non-`sim` route at the facade, before the engine is reached."""
     spy = _SpyEngine()
     trader = SimTrader(spy)  # type: ignore[arg-type]
-    intent = _intent().model_copy(update={"route": "paper"})
+    intent = _intent().model_copy(update={"route": "demo"})
     with pytest.raises(SimulationError) as captured:
         unwrap_simulation_response(
             asyncio.run(trader.submit_order(intent)),

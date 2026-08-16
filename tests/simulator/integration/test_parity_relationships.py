@@ -62,7 +62,7 @@ def paired_evidence() -> tuple[dict[str, object], dict[str, object]]:
                 "order": 3,
                 "inputs": {},
                 "outcome": "validate_adapter_capability_exact_match",
-                "route": "paper",
+                "route": "demo",
                 "route_specific": True,
                 "route_policy": "validate_adapter_capability_exact_match",
             },
@@ -185,7 +185,7 @@ def paired_evidence() -> tuple[dict[str, object], dict[str, object]]:
                 "client_order_id": "MT-CO-9",
                 "provider_order_id": "MT-PO-9",
                 "provider_deal_ids": ["MT-DEAL-9"],
-                "route": "paper",
+                "route": "demo",
             },
         ),
         "events": (

@@ -27,7 +27,7 @@ class EvaluationDeadlineFactory(Protocol):
 def create_monotonic_deadline_factory(
     monotonic: Callable[[], float],
 ) -> EvaluationDeadlineFactory:
-    """Create the live/paper adapter over the event loop's monotonic clock.
+    """Create the live/demo adapter over the event loop's monotonic clock.
 
     Args:
         monotonic: Explicit event-loop-compatible monotonic clock.

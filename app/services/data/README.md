@@ -1067,7 +1067,7 @@ bounded read-only `FeedStatus` data.
 Overflow follows `halt`, `drop_and_reconcile`, or `backpressure`; no automatic
 historical reconciliation capability exists, so Phase 1 records and exposes the gap
 only. The initial source is the deterministic fake contract harness. Promotion to one
-MT5 demo feed for the Trading live/paper runtime occurs only after Trading exists and
+MT5 demo feed for the Trading live/demo runtime occurs only after Trading exists and
 the promotion evidence passes.
 
 **Integration test:**

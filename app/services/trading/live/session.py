@@ -1,4 +1,4 @@
-"""Stateful Trading live/paper lifecycle with injected authority dependencies."""
+"""Stateful Trading live/demo lifecycle with injected authority dependencies."""
 
 # ruff: noqa: BLE001 - lifecycle boundaries normalize injected failures.
 
@@ -69,7 +69,7 @@ type _EventSink = Callable[[OperationalEvent], None]
 
 
 class LiveSession:
-    """Own live/paper admission, typed authority sources, and safe shutdown."""
+    """Own live/demo admission, typed authority sources, and safe shutdown."""
 
     def __init__(
         self,
@@ -428,7 +428,7 @@ class LiveSession:
             requires_network=(
                 not operation.endswith(".status")
                 and self._config is not None
-                and self._config.execution_route in {"paper", "live"}
+                and self._config.execution_route in {"demo", "live"}
             ),
             legacy_status=status,
             extensions={
@@ -546,7 +546,7 @@ class LiveSession:
                 data=self._status_data(),
             )
         mutation_requested = (
-            self.config.execution_route in {"sim", "paper"}
+            self.config.execution_route in {"sim", "demo"}
             or self.config.allow_live_mutations
         )
         self._admission_enabled = mutation_requested

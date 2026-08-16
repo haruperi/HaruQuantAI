@@ -22,7 +22,7 @@ def test_map_trading_error_redacts_provider_exception() -> None:
         ConnectionError(raw_secret),
         {
             "operation": "submit_order",
-            "provider_id": "paper-provider",
+            "provider_id": "demo-provider",
             "request_id": "req-001",
             "correlation_id": "corr-001",
             "api_key": "top-secret",  # pragma: allowlist secret

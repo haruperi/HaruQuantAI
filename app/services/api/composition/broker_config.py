@@ -1,7 +1,6 @@
 """Secret-reference resolution at the Brokers composition boundary."""
 
 from collections.abc import Mapping
-from typing import cast
 
 from pydantic import SecretStr
 
@@ -51,14 +50,11 @@ def _resolve_system_credentials(
         IdentityError: If the stored credential cannot be resolved safely.
     """
     reference_id = derive_stable_id("id", f"api-credential:system:{slot}")
-    return cast(
-        "Mapping[str, SecretStr]",
-        resolve_credential_reference(
-            f"secret://{reference_id}",
-            owner_id="system",
-            key_set=build_credential_key_set(get_api_settings()),
-            request_id=request_id,
-        ),
+    return resolve_credential_reference(
+        f"secret://{reference_id}",
+        owner_id="system",
+        key_set=build_credential_key_set(get_api_settings()),
+        request_id=request_id,
     )
 
 

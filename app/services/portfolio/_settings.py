@@ -171,7 +171,7 @@ class PortfolioSettings(BaseSettings):
         if not 0 <= self.portfolio_cross_account_correlation_alert <= 1:
             raise PortfolioError("PORT_CONFIG_INVALID", "CORRELATION_ALERT")
         policies = self.portfolio_activation_approval_policy
-        if set(policies) != {"simulation", "paper", "live"}:
+        if set(policies) != {"simulation", "demo", "live"}:
             raise PortfolioError("PORT_CONFIG_INVALID", "APPROVAL_POLICY")
         if any(not value or value != value.strip() for value in policies.values()):
             raise PortfolioError("PORT_CONFIG_INVALID", "APPROVAL_POLICY")

@@ -1,4 +1,4 @@
-"""WF-TRD-014: run a neutral paper/live evaluation cycle without mutation."""
+"""WF-TRD-014: run a neutral demo/live evaluation cycle without mutation."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from tests.trading.usage.workflows._support import examples
 
 WORKFLOW_ID = "WF-TRD-014"
 STAGES = (
-    "Accept live/paper market update or scheduled trigger with immutable trace evidence.",
+    "Accept live/demo market update or scheduled trigger with immutable trace evidence.",
     "Read Data market/account/context evidence in documented order.",
     "Calculate Indicators and request Strategy decision.",
     "End normally on neutral Strategy output without calling Risk or execution.",

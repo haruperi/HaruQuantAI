@@ -15,7 +15,7 @@ incompatible with runtime configuration.
 | Field | Meaning |
 |---|---|
 | `mandate_id`, `version`, `content_hash` | Stable identity and integrity |
-| `environment` | `development`, `sandbox`, `paper`, or separately approved `live` |
+| `environment` | `development`, `sandbox`, `demo`, or separately approved `live` |
 | `effective_at`, `expires_at` | UTC validity |
 | `owner_principal` | Authenticated mandate owner |
 | `objectives` | Permitted research and advisory objectives |
@@ -48,7 +48,7 @@ Every mandate denies:
 
 - `development`: fake or local dependencies; no external consequential mutations.
 - `sandbox`: isolated provider/data/tool integration against non-production targets.
-- `paper`: deterministic paper trading may consume approved proposals through its
+- `demo`: deterministic demo trading may consume approved proposals through its
   normal pipeline.
 - `live`: Agentic may submit typed proposals only when an independently approved
   system configuration permits it. All receiver-domain and human controls remain

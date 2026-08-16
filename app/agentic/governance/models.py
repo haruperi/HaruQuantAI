@@ -34,7 +34,7 @@ _MAX_TEXT = 2_000
 _MAX_SHORT_TEXT = 200
 _MAX_ITEMS = 64
 
-MandateEnvironment = Literal["development", "sandbox", "paper", "live"]
+MandateEnvironment = Literal["development", "sandbox", "demo", "live"]
 
 # Permission classes an agent may hold. `controlled_mutation` and `critical`
 # are deliberately absent: they are never granted to an agent.

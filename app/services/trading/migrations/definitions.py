@@ -511,6 +511,79 @@ _ORDER_LIFECYCLE_STATE_STATEMENTS = (
     "DROP TABLE trading_order_lifecycle_migration_guard",
 )
 
+_ROUTE_VOCABULARY_STATEMENTS = (
+    """CREATE TABLE trading_orders__route_vocabulary (
+        order_id TEXT PRIMARY KEY,
+        client_order_id TEXT NOT NULL UNIQUE,
+        broker_order_id TEXT,
+        account_id TEXT NOT NULL,
+        symbol_id TEXT NOT NULL,
+        strategy_version_id TEXT,
+        config_id TEXT,
+        signal_id TEXT,
+        risk_decision_id TEXT NOT NULL,
+        side TEXT NOT NULL CHECK (side IN ('buy', 'sell')),
+        order_type TEXT NOT NULL CHECK (
+            order_type IN ('market', 'limit', 'stop', 'stop_limit', 'trailing_stop')
+        ),
+        time_in_force TEXT CHECK (time_in_force IN ('gtc', 'ioc', 'fok', 'day', 'gtd')),
+        quantity_decimal TEXT NOT NULL,
+        filled_qty_decimal TEXT NOT NULL DEFAULT '0',
+        limit_price_decimal TEXT,
+        stop_price_decimal TEXT,
+        avg_fill_price_decimal TEXT,
+        stop_loss_decimal TEXT,
+        take_profit_decimal TEXT,
+        state TEXT NOT NULL CHECK (state IN (
+            'CREATED', 'STAGED', 'SENT', 'ACKNOWLEDGED', 'PARTIALLY_FILLED',
+            'FILLED', 'CANCEL_PENDING', 'CANCELLED', 'REPLACE_PENDING',
+            'REPLACED', 'REJECTED', 'EXPIRED', 'UNKNOWN', 'RECONCILED'
+        )),
+        reject_reason TEXT,
+        runtime_profile TEXT NOT NULL CHECK (
+            runtime_profile IN ('research', 'simulation', 'demo', 'live')
+        ),
+        submitted_at TEXT,
+        terminal_at TEXT,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        CHECK (
+            order_type NOT IN ('limit', 'stop_limit')
+            OR limit_price_decimal IS NOT NULL
+        ),
+        CHECK (
+            order_type NOT IN ('stop', 'stop_limit', 'trailing_stop')
+            OR stop_price_decimal IS NOT NULL
+        ),
+        CHECK (state <> 'REJECTED' OR reject_reason IS NOT NULL)
+    ) STRICT""",
+    """INSERT INTO trading_orders__route_vocabulary
+    SELECT order_id, client_order_id, broker_order_id, account_id, symbol_id,
+        strategy_version_id, config_id, signal_id, risk_decision_id, side,
+        order_type, time_in_force, quantity_decimal, filled_qty_decimal,
+        limit_price_decimal, stop_price_decimal, avg_fill_price_decimal,
+        stop_loss_decimal, take_profit_decimal, state, reject_reason,
+        CASE runtime_profile WHEN 'paper' THEN 'demo' ELSE runtime_profile END,
+        submitted_at, terminal_at, correlation_id, created_at, updated_at
+    FROM trading_orders""",
+    "DROP TABLE trading_orders",
+    "ALTER TABLE trading_orders__route_vocabulary RENAME TO trading_orders",
+    """CREATE INDEX idx_trading_orders_open
+    ON trading_orders(account_id, symbol_id)
+    WHERE state IN (
+        'CREATED', 'STAGED', 'SENT', 'ACKNOWLEDGED', 'PARTIALLY_FILLED',
+        'CANCEL_PENDING', 'REPLACE_PENDING', 'UNKNOWN', 'RECONCILED'
+    )""",
+    """CREATE INDEX idx_trading_orders_broker
+    ON trading_orders(broker_order_id) WHERE broker_order_id IS NOT NULL""",
+    (
+        "CREATE INDEX idx_trading_orders_history "
+        "ON trading_orders(account_id, created_at DESC)"
+    ),
+    "CREATE INDEX idx_trading_orders_risk ON trading_orders(risk_decision_id)",
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Trading schema statements.
@@ -557,6 +630,12 @@ def _get_trading_migrations_value() -> tuple[Any, ...]:
             migration_id="004_order_lifecycle_states",
             checksum=_migration_checksum(_ORDER_LIFECYCLE_STATE_STATEMENTS),
             statements=_ORDER_LIFECYCLE_STATE_STATEMENTS,
+        ),
+        build_migration_step(
+            domain="trading",
+            migration_id="005_route_vocabulary",
+            checksum=_migration_checksum(_ROUTE_VOCABULARY_STATEMENTS),
+            statements=_ROUTE_VOCABULARY_STATEMENTS,
         ),
     )
 

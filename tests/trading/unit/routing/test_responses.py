@@ -18,7 +18,7 @@ def _raw() -> dict[str, object]:
         "receipt_id": "receipt-001",
         "intent_id": "intent-001",
         "client_order_id": "client-order-001",
-        "route": "paper",
+        "route": "demo",
         "authority": "mt5",
         "status": "success",
         "requested_quantity": "1.00",

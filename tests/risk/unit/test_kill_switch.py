@@ -257,7 +257,7 @@ def test_cooldown_blocks_clearance_before_expiry() -> None:
 def test_runtime_profile_mismatch_fails_closed_independent_of_tenancy() -> None:
     """Reject Risk reads when execution profile differs from active policy."""
     config = examples._config()
-    auth = examples._auth(config).model_copy(update={"runtime_profile": "paper"})
+    auth = examples._auth(config).model_copy(update={"runtime_profile": "demo"})
     response = check_risk_kill_switch(
         (examples._inactive_state(),),
         {"portfolio_id": "portfolio-1"},

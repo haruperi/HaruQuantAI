@@ -15,8 +15,8 @@ def test_validate_runtime_configuration_valid_pairs() -> None:
             execution_route="sim",
         ),
         validate_runtime_configuration(
-            runtime_profile="paper",
-            execution_route="paper",
+            runtime_profile="demo",
+            execution_route="demo",
         ),
         validate_runtime_configuration(
             runtime_profile="live",

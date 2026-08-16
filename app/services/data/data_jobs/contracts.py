@@ -335,7 +335,7 @@ class JobDefinition(_Contract):
     end: datetime | None = None
     interval_seconds: int | None = None
     enabled: bool
-    environment: Literal["dev", "demo", "paper", "sandbox", "testnet"] | None = None
+    environment: Literal["dev", "demo", "sandbox", "testnet"] | None = None
     created_at: datetime
     request_id: str
 

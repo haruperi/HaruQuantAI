@@ -362,7 +362,7 @@ Risk rejection, receiver incompatibility, or audit failure blocks activation.
 5. Emit a redacted audit event with complete references —
    `utils.create_audit_event()`, `data.persist_audit_event()`.
 
-Simulation activation is automatic within simulation policy. Paper/live activation requires explicit human approval and current Risk authorization.
+Simulation activation is automatic within simulation policy. Demo/live activation requires explicit human approval and current Risk authorization.
 
 ### `WF-PORT-TER` — Detect Drift and Plan Rebalance
 
@@ -663,7 +663,7 @@ definition and its audit-outbox event atomically and rejects conflicting replays
 | ID          | Requirement                                                                                                          | Verification      |
 | ----------- | -------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | FR-PORT-015 | Require Simulation validation and current Risk authorization before activation.                                      | Gate tests        |
-| FR-PORT-016 | Require explicit human approval for paper/live; allow automatic simulation activation only within simulation policy. | Profile tests     |
+| FR-PORT-016 | Require explicit human approval for demo/live; allow automatic simulation activation only within simulation policy. | Profile tests     |
 | FR-PORT-017 | Block activation while any applicable kill switch is active.                                                         | Kill-switch tests |
 | FR-PORT-018 | Use optimistic concurrency and one active version per scope.                                                         | Repository tests  |
 | FR-PORT-019 | Implement rollback only as a new governed version.                                                                   | History tests     |

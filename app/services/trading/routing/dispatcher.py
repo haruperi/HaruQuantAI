@@ -270,10 +270,10 @@ def _validate_broker_selection(
     connection: BrokerConnection | None,
     broker_adapter: BrokerAdapter | None,
 ) -> tuple[BrokerConnection, BrokerAdapter]:
-    """Validate explicit paper/live authority selection.
+    """Validate explicit demo/live authority selection.
 
     Args:
-        intent: Executable intent selecting paper or live.
+        intent: Executable intent selecting demo or live.
         connection: Injected resolved Broker connection material.
         broker_adapter: Injected asynchronous Broker adapter.
 
@@ -302,10 +302,10 @@ def _validate_broker_selection(
     ):
         raise TradingError("SCOPE_MISMATCH", "Live route requires live environment")
     if (
-        intent.route.value == "paper"
+        intent.route.value == "demo"
         and get_broker_connection_environment(connection) == "live"
     ):
-        raise TradingError("SCOPE_MISMATCH", "Paper route cannot use live environment")
+        raise TradingError("SCOPE_MISMATCH", "Demo route cannot use live environment")
     if get_broker_adapter_contract_version(broker_adapter) != "v1":
         raise TradingError("ADAPTER_INCOMPATIBLE", "Adapter contract is incompatible")
     if get_broker_adapter_schema_id(broker_adapter) != "brokers.adapter.v1":
@@ -524,7 +524,7 @@ async def _dispatch_order_intent_value(
 
     Args:
         intent: Complete deterministic executable intent.
-        connection: Broker connection material for paper/live, otherwise ``None``.
+        connection: Broker connection material for demo/live, otherwise ``None``.
         broker_adapter: Broker mutation authority for the selected route.
         operation_timeout_seconds: Validated exact Broker operation timeout.
         clock: Injected aware UTC receipt clock.
@@ -587,7 +587,7 @@ async def dispatch_order_intent(
 
     Args:
         intent: Complete deterministic executable intent.
-        connection: Broker connection material for paper/live routes.
+        connection: Broker connection material for demo/live routes.
         broker_adapter: Broker mutation authority for the selected route.
         operation_timeout_seconds: Validated exact Broker operation timeout.
         clock: Injected aware UTC receipt clock.
@@ -618,8 +618,8 @@ async def dispatch_order_intent(
             correlation_id=receipt.correlation_id,
             read_only=False,
             modifies_database=True,
-            places_trade=intent.route.value in {"paper", "live"},
-            requires_network=intent.route.value in {"paper", "live"},
+            places_trade=intent.route.value in {"demo", "live"},
+            requires_network=intent.route.value in {"demo", "live"},
             legacy_status="unknown_outcome",
         )
     return success_trading_response(
@@ -631,8 +631,8 @@ async def dispatch_order_intent(
         correlation_id=receipt.correlation_id,
         read_only=False,
         modifies_database=True,
-        places_trade=intent.route.value in {"paper", "live"},
-        requires_network=intent.route.value in {"paper", "live"},
+        places_trade=intent.route.value in {"demo", "live"},
+        requires_network=intent.route.value in {"demo", "live"},
         legacy_status=receipt.status,
     )
 

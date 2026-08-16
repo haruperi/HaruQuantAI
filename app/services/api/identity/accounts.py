@@ -41,7 +41,7 @@ class AuthenticatedUser(BaseModel):
     permissions: tuple[str, ...]
     scopes: tuple[str, ...]
     tenant_or_environment: str
-    runtime_profile: Literal["research", "simulation", "paper", "live"]
+    runtime_profile: Literal["research", "simulation", "demo", "live"]
     active: bool = True
     verified: bool = True
     last_login_at: datetime | None = None
@@ -80,7 +80,7 @@ class AuthenticatedUser(BaseModel):
             scopes=tuple(json.loads(str(row["scopes_json"]))),
             tenant_or_environment=str(row["environment"]),
             runtime_profile=cast(
-                "Literal['research', 'simulation', 'paper', 'live']",
+                "Literal['research', 'simulation', 'demo', 'live']",
                 str(row["runtime_profile"]),
             ),
             active=bool(row["active"]),
@@ -190,7 +190,7 @@ def register_user(
     permissions: tuple[str, ...] = (),
     scopes: tuple[str, ...] = (),
     tenant_or_environment: str = "development",
-    runtime_profile: Literal["research", "simulation", "paper", "live"] = "research",
+    runtime_profile: Literal["research", "simulation", "demo", "live"] = "research",
 ) -> AuthenticatedUser:
     """Register one verified active UI/API user.
 

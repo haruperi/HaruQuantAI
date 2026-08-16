@@ -1,4 +1,4 @@
-# ruff: noqa: E501, E402
+# ruff: noqa: E402, E501, N999, DOC201, S101, SLF001
 """Phase 10 Live Runtime — Usage Examples.
 
 Demonstrates the official public capabilities of the live runtime service.
@@ -319,7 +319,7 @@ def example_04_shadow_and_dry_run_execution() -> None:
     - All results have a side_effect_mode field
     - Package-only results are NOT broker acceptance or evidence
     - No broker adapter is called in package-only mode
-    - Shadow/paper execution runs without real broker account
+    - Shadow/demo execution runs without real broker account
     """
     _print_section("Example 04: Shadow & Dry-Run Execution")
 

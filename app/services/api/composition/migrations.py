@@ -16,7 +16,12 @@ def get_api_migration_steps() -> tuple[object, ...]:
     Returns:
         Ordered API migration steps.
     """
-    return (*get_identity_migration_steps(), *get_watchlist_migration_steps())
+    identity_steps = get_identity_migration_steps()
+    return (
+        *identity_steps[:-1],
+        *get_watchlist_migration_steps(),
+        identity_steps[-1],
+    )
 
 
 def run_api_migrations(request_id: str) -> object:

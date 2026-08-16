@@ -234,7 +234,7 @@ def test_login_settings_credentials_logout(tmp_path: Path) -> None:
         assert legacy_table is None
         record = store_api_credential(
             owner_id=registered.user_id,
-            label="paper-broker",
+            label="demo-broker",
             material={"api_key": SecretStr("test-only-value")},
             key_set={"active": key},
             active_key_id="active",

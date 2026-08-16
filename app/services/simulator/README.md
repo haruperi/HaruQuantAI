@@ -40,11 +40,11 @@ The package is implemented as a clean-start V1 domain. No migration path, compat
 - Indicator formulas or indicator availability rules; Indicators owns them.
 - Strategy code, strategy registration, signal logic, or arbitrary Python code execution; Strategy owns vetted strategy behavior.
 - Risk policy, final sizing approval, exposure limits, or kill-switch state; Risk owns them.
-- `OrderIntent`, route selection, live/paper execution, or reconciliation; Trading owns them. Broker connections/adapters; Brokers owns them. Credential-reference resolution and composition-root `BrokerConnectionConfig` construction; UI/API owns them. All as defined in `docs/PROJECT.md`.
+- `OrderIntent`, route selection, live/demo execution, or reconciliation; Trading owns them. Broker connections/adapters; Brokers owns them. Credential-reference resolution and composition-root `BrokerConnectionConfig` construction; UI/API owns them. All as defined in `docs/PROJECT.md`.
 - Performance metric formulas, scorecards, or advisory conclusions; Analytics owns them.
 - Optimization search algorithms, ranking, walk-forward policy, Monte Carlo/bootstrap analysis, workers, or checkpoints; Optimization owns them.
 - Portfolio construction methods, allocation activation/versioning, drift detection, or rebalance planning; Portfolio owns them.
-- Live broker mutations, live adapter imports, paper execution, or any network access on the simulation execution path.
+- Live broker mutations, live adapter imports, demo execution, or any network access on the simulation execution path.
 - Phase 1 support for equities, ETFs, futures, perpetuals, options, corporate actions, borrow fees, regulatory engines, distributed workers, external report distribution, or production-promotion automation.
 
 ### Shared contracts
@@ -119,7 +119,7 @@ Incomplete, failed, or diagnostic-failed runs may retain bounded diagnostic evid
 ### Sim⇄live parity programme registration
 
 The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementation-plan.md`)
-converges `sim`, `paper`, and `live` on one Trading orchestration with an injected
+converges `sim`, `demo`, and `live` on one Trading orchestration with an injected
 authority boundary. Dependency direction is `Simulation → Trading → Brokers` plus
 `Simulation → Brokers` (read/factory through the Brokers-owned simulation authority
 port); Brokers imports no Simulation symbol, and Simulation keeps matching, accounting,
@@ -1949,7 +1949,7 @@ authoritative in `app/services/simulator/parity/README.md`.
 | Status    | Setting / Limit                 | Type    | Default                                                                | Required | Used by                             | Description                                                                  |
 | --------- | ------------------------------- | ------- | ---------------------------------------------------------------------- | -------- | ----------------------------------- | ---------------------------------------------------------------------------- |
 | Completed | `RUNTIME_PROFILE`             | `str` | `research` system default; `simulation` required for official runs | Yes      | validation, execution, run          | Inherited from Utils; incompatible profile/route fails closed.               |
-| Completed | `EXECUTION_ROUTE`             | `str` | `none` system default; `sim` required for official runs            | Yes      | validation, execution, run          | Trading-owned shared setting; Simulation never permits paper/live routes.    |
+| Completed | `EXECUTION_ROUTE`             | `str` | `none` system default; `sim` required for official runs            | Yes      | validation, execution, run          | Trading-owned shared setting; Simulation never permits demo/live routes.    |
 | Completed | `DATABASE_URL` / `DATA_DIR` | `str` | System configuration                                                   | Yes      | journal, reporting, run             | Data owns infrastructure; Simulation owns only its records and artifacts.    |
 | Completed | UTC-first time policy           | policy  | `Z`-suffixed ISO 8601                                                | Yes      | all modules                         | Non-UTC cross-domain timestamps fail validation.                             |
 | Completed | Correlation/trace ID format     | policy  | prefixed UUID4                                                         | Yes      | journal, run, reporting             | Every cross-domain call and event carries request/correlation/causation IDs. |

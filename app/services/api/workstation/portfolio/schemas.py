@@ -98,8 +98,8 @@ class PortfolioConstructRequest(_BaseApiContract):
     measurement_start: datetime
     measurement_end: datetime
     base_currency: str
-    runtime_profile: Literal["simulation", "paper", "live"]
-    execution_route: Literal["sim", "paper", "live"]
+    runtime_profile: Literal["simulation", "demo", "live"]
+    execution_route: Literal["sim", "demo", "live"]
     simulation_policy_version: str
     requested_at: datetime
 
@@ -199,8 +199,8 @@ class PortfolioRebalanceRequest(_BaseApiContract):
     account_evidence_ref: str
     market_evidence_ref: str
     fx_evidence_refs: tuple[str, ...]
-    runtime_profile: Literal["simulation", "paper", "live"]
-    execution_route: Literal["sim", "paper", "live"]
+    runtime_profile: Literal["simulation", "demo", "live"]
+    execution_route: Literal["sim", "demo", "live"]
     approval_refs: tuple[str, ...]
     approval_token_ref: str
     trading_request_id: str

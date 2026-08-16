@@ -1263,7 +1263,7 @@ flowchart LR
     I --> J["11 · Robustness critic memo"]
     J --> K["12 · HUMAN REVIEW<br/>read the code · sign off"]
     K --> L["13 · Versioned registration<br/>signed, full provenance"]
-    L --> M["14 · Activation<br/>paper → single account → scale"]
+    L --> M["14 · Activation<br/>demo → single account → scale"]
     style B fill:#7a5c00,color:#fff
     style E fill:#8b1a1a,color:#fff
     style I fill:#8b1a1a,color:#fff
@@ -1419,7 +1419,7 @@ Every phase gate additionally requires the economic acceptance test of §14.4 fo
 
 ### Phase 6 — Live-path context filter, conditional
 
-**Scope.** **Only if Chapter 8 still holds against your own evidence.** Context/Regime Filter as a veto-or-reduce gate. `sim` route first, then paper, then a single account.
+**Scope.** **Only if Chapter 8 still holds against your own evidence.** Context/Regime Filter as a veto-or-reduce gate. `sim` route first, then demo, then a single account.
 
 **Deliverables.** Filter, injection test suite, latency budget, shadow-mode comparison. **Plus: your own measured pass and payout rates, resolving the §3.6 dispute from data.**
 

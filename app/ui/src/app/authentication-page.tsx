@@ -43,7 +43,7 @@ const BRAND_FEATURES: ReadonlyArray<{
   {
     icon: TrendingUp,
     title: "Real-time market simulation",
-    body: "Trade live price action across FX, futures and equities in a paper environment.",
+    body: "Trade live price action across FX, futures and equities in a demo environment.",
   },
   {
     icon: Activity,

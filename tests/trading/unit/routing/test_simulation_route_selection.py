@@ -105,7 +105,7 @@ def test_sim_route_rejects_disabled_and_wrong_identity() -> None:
     assert mismatch.value.code == "SCOPE_MISMATCH"
 
 
-@pytest.mark.parametrize("route", ["paper", "live"])
+@pytest.mark.parametrize("route", ["demo", "live"])
 def test_non_sim_routes_forbid_simulation_environment(route: str) -> None:
     """Every non-sim executable route rejects simulation.
 

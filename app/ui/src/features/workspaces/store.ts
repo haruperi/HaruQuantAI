@@ -51,7 +51,7 @@ export function mapRuntimeProfileToAccountMode(profile?: string): AccountMode {
     case "live":
       return "live";
     case "simulation":
-    case "paper":
+    case "demo":
     case "research":
       return "simulation";
     default:

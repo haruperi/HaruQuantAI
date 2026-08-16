@@ -131,7 +131,7 @@ def test_trailing_eod_requires_snapshot_time() -> None:
 @pytest.mark.parametrize(
     ("field", "value"),
     [
-        ("profile", "paper"),
+        ("profile", "demo"),
         ("evidence_max_age_seconds", {}),
         ("kill_switch_activation_permissions", ()),
         ("var_confidence", Decimal(1)),

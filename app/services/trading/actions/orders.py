@@ -81,8 +81,8 @@ def _envelope(
             correlation_id=request.correlation_id,
             read_only=False,
             modifies_database=True,
-            places_trade=request.route.value in {"paper", "live"},
-            requires_network=request.route.value in {"paper", "live"},
+            places_trade=request.route.value in {"demo", "live"},
+            requires_network=request.route.value in {"demo", "live"},
             legacy_status="unknown_outcome",
         )
     status_map = {
@@ -102,8 +102,8 @@ def _envelope(
         correlation_id=request.correlation_id,
         read_only=False,
         modifies_database=True,
-        places_trade=request.route.value in {"paper", "live"},
-        requires_network=request.route.value in {"paper", "live"},
+        places_trade=request.route.value in {"demo", "live"},
+        requires_network=request.route.value in {"demo", "live"},
         legacy_status=status_map[receipt.status],
         extensions={
             "request_id": request.request_id,
@@ -460,7 +460,7 @@ async def _execute_request(
         raise TradingError("VALIDATION_FAILED", "Order validation failed")
     _require_clear_authority_scope(request, deps)
     intent: OrderIntent | None
-    if request.route.value in {"paper", "live"}:
+    if request.route.value in {"demo", "live"}:
         if deps.live_session is None:
             raise TradingError("SERVICE_UNAVAILABLE", "Live session is absent")
         gate = await evaluate_live_gate(request, evidence or {}, deps.live_session)

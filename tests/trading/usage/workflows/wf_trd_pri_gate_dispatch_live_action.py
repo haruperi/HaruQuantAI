@@ -96,12 +96,12 @@ async def run() -> None:  # noqa: PLR0915 - teaching workflow is intentionally l
             "volume": "0.50",
             "strategy": "mean-reversion-v2",
             "account": 10001,
-            "environment": "paper",
+            "environment": "demo",
         }
     ]
     virtual_orders: list[dict[str, object]] = []
     virtual_route_evidence = {
-        "source": "virtual-paper-authority",
+        "source": "virtual-demo-authority",
         "available": True,
         "fresh": True,
         "positions": virtual_positions,
@@ -316,7 +316,7 @@ async def run() -> None:  # noqa: PLR0915 - teaching workflow is intentionally l
         "magic": 3001,
         "strategy": "trend-following-v3",
         "account": 10001,
-        "environment": "paper",
+        "environment": "demo",
     }
     _show("Virtual closed-position record", virtual_closed_position)
 

@@ -136,7 +136,7 @@ class _PositionAuthorityEvent(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid", allow_inf_nan=False)
 
     event_id: str
-    route: Literal["sim", "paper", "live"]
+    route: Literal["sim", "demo", "live"]
     account_id: str
     authority_id: str
     deal_id: str

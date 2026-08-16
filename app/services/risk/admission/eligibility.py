@@ -114,7 +114,7 @@ def _validate_registration(
     )
     environment = {
         "simulation": get_strategy_environment("SIMULATION"),
-        "paper": get_strategy_environment("PAPER"),
+        "demo": get_strategy_environment("DEMO"),
         "live": get_strategy_environment("LIVE"),
     }[request.runtime_profile]
     valid = (

@@ -11,7 +11,7 @@ function input(action: string): TradingMutationInput {
     request_id: "req-1",
     workflow_id: "wf-1",
     correlation_id: "cor-1",
-    route: "paper",
+    route: "demo",
     action,
     account_id: "account-1",
     strategy_id: "strategy-1",

@@ -182,7 +182,7 @@ def test_tool_not_allowed_for_the_role_is_denied() -> None:
 
 
 def test_environment_mismatch_is_denied() -> None:
-    decision = _authorize(request_scope={"environment": "paper"})
+    decision = _authorize(request_scope={"environment": "demo"})
     assert decision.reason == "environment_mismatch"
 
 
@@ -305,7 +305,7 @@ def test_approval_for_a_different_tool_is_denied() -> None:
 def test_approval_for_a_different_environment_is_denied() -> None:
     decision = _authorize(
         tool=_approval_tool(),
-        attestation=_approval_attestation(environment="paper"),
+        attestation=_approval_attestation(environment="demo"),
         nonce_store=build_in_memory_nonce_store(),
     )
     assert decision.reason == "approval_scope_mismatch"

@@ -29,10 +29,10 @@ Strategy turns normalized market state, point-in-time indicator values, validate
 
 - Market-data acquisition, normalization, source failover, or account truth; Data owns these responsibilities.
 - Indicator calculations; Indicators owns formulas, parameter validation, and `IndicatorSeries`.
-- Live or paper runtime orchestration; Trading owns those workflows.
+- Live or demo runtime orchestration; Trading owns those workflows.
 - Operational eligibility, Risk approval, final approved size, allocation/risk budgets, exposure limits, kill-switch policy, or approval tokens; Risk owns them.
 - Multi-strategy construction, allocation versions, drift detection, or rebalance planning; Portfolio owns them and consumes immutable Strategy registry references.
-- Official orders, fills, reconciliation, broker mutation, or execution records; Trading owns them for paper/live and Simulation owns simulated fills/state behind the Trading `sim` route.
+- Official orders, fills, reconciliation, broker mutation, or execution records; Trading owns them for demo/live and Simulation owns simulated fills/state behind the Trading `sim` route.
 - Optimization, performance analytics, research validation, compliance enforcement, deployment, or operational runbooks.
 - Arbitrary Python source, archive, or filesystem-path execution. A sandbox is not part of the initial package.
 - External artifact build, signing, vulnerability scanning, or approval workflows. Strategy stores and validates their immutable references only.
@@ -517,7 +517,7 @@ never reused. New workflows continue from `WF-STR-011`.
 | `WF-STR-003` | `tests/strategy/usage/workflows/wf_str_003_run_stateful_event_hook.py`                |
 | `WF-STR-005` | `tests/strategy/usage/workflows/wf_str_005_create_replay_manifest_checkpoint.py`      |
 | `WF-STR-006` | `tests/strategy/usage/workflows/wf_str_006_export_structured_diagnostics.py`          |
-| `WF-STR-007` | `tests/strategy/usage/workflows/wf_str_007_supply_paper_live_decisions.py`            |
+| `WF-STR-007` | `tests/strategy/usage/workflows/wf_str_007_supply_demo_live_decisions.py`            |
 | `WF-STR-009` | `tests/strategy/usage/workflows/wf_str_009_reject_arbitrary_strategy_code.py`         |
 | `WF-STR-010` | `tests/strategy/usage/workflows/wf_str_010_evaluate_recovered_concrete_signals.py`    |
 | `WF-STR-011` | `tests/strategy/usage/workflows/wf_str_011_adopt_approved_optimization_parameters.py` |
@@ -540,7 +540,7 @@ never reused. New workflows continue from `WF-STR-011`.
 | Completed | Supporting | `WF-STR-003` | Cross-domain | Run stateful event hook                | Typed event + immutable snapshots                                                                  | Intents, diagnostics, and atomic local-state update                                     | `FR-STR-023 → FR-STR-024 → FR-STR-033`                   |
 | Completed | Supporting | `WF-STR-005` | Cross-domain | Create replay manifest and checkpoint  | Identity/config/input hashes + optional local state                                                | Manifest/checkpoint reference to runtime                                                | `FR-STR-029 → FR-STR-030 → FR-STR-031`                   |
 | Completed | Supporting | `WF-STR-006` | Cross-domain | Export structured diagnostics          | Context + bounded diagnostic details                                                               | Redacted diagnostics to caller/audit boundary                                           | `FR-STR-019`                                               |
-| Completed | Supporting | `WF-STR-007` | Cross-domain | Supply paper/live decisions            | Trading invokes Strategy with prepared inputs                                                      | `TradeIntent` to Risk/Trading workflow                                                | `FR-STR-023 → FR-STR-024 → FR-STR-032/033`               |
+| Completed | Supporting | `WF-STR-007` | Cross-domain | Supply demo/live decisions            | Trading invokes Strategy with prepared inputs                                                      | `TradeIntent` to Risk/Trading workflow                                                | `FR-STR-023 → FR-STR-024 → FR-STR-032/033`               |
 | Completed | Supporting | `WF-STR-009` | Cross-domain | Reject arbitrary strategy code         | Raw code/path/archive at command boundary                                                          | Redacted`STRATEGY_ARBITRARY_CODE_REJECTED`; no import                                 | `FR-STR-018 → FR-STR-020/021/023/024`                     |
 | Completed | Supporting | `WF-STR-010` | Cross-domain | Evaluate recovered concrete signals    | Registry-bound evaluator + point-in-time Data/Indicators evidence                                  | Atomic ordered immutable signal tuple or structured failure                             | `FR-STR-038 → FR-STR-039 → FR-STR-040/046 → FR-STR-047` |
 | Completed | Supporting | `WF-STR-011` | Cross-domain | Adopt approved optimization parameters | Explicitly approved`OptimizationResult`-compatible reference plus authenticated adoption command | New hash-addressed immutable configuration record; the approved record is never mutated | `FR-STR-021`                                               |
@@ -669,12 +669,12 @@ Strategy does not create a `RiskDecision`, `OrderIntent`, fill, or official posi
 
 **Integration test:** `tests/strategy/integration/test_diagnostics_workflow.py::test_diagnostics_workflow()`
 
-### `WF-STR-007` — Supply Paper/Live Decisions
+### `WF-STR-007` — Supply Demo/Live Decisions
 
 **Scope:** Cross-domain
 **System workflow:** `SYS-WF-002`
 
-1. Trading owns the live/paper loop and supplies prepared public-contract inputs —
+1. Trading owns the live/demo loop and supplies prepared public-contract inputs —
    `trading.run_live_evaluation_cycle()`.
 2. Strategy validates the reference and evaluates the prepared inputs —
    `strategy.validate_strategy_ref()`, `strategy.run_event_strategy_hook()`.
@@ -1371,7 +1371,7 @@ CREATE TABLE strategy_configs (
     inputs_hash      TEXT    NOT NULL,
     symbol_id        TEXT    NOT NULL,
     timeframe        TEXT    NOT NULL,
-    runtime_profile  TEXT    NOT NULL CHECK (runtime_profile IN ('research','simulation','paper','live')),
+    runtime_profile  TEXT    NOT NULL CHECK (runtime_profile IN ('research','simulation','demo','live')),
     risk_budget_decimal TEXT NOT NULL DEFAULT '0',
     state            TEXT    NOT NULL CHECK (state IN ('draft','active','paused','archived')),
     policy_version   TEXT    NOT NULL DEFAULT '',

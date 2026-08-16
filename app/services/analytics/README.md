@@ -48,7 +48,7 @@ compatibility, currency conversion, or finite numeric validity cannot be proven.
 - UI rendering, API authentication/authorization, financial advice, prop-firm
   enforcement, or final governance decisions.
 - Advanced TCA, attribution, dynamic correlation, explainability,
-  live/paper/backtest degradation, and prop-firm evidence in the initial build.
+  live/demo/backtest degradation, and prop-firm evidence in the initial build.
 - Strategy quality scoring is outside Analytics ownership because no approved
   diagnostic-threshold or recommendation-language contract exists.
 

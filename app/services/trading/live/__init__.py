@@ -1,4 +1,4 @@
-"""Public Trading live/paper lifecycle and gate API."""
+"""Public Trading live/demo lifecycle and gate API."""
 
 from app.services.trading.live.facade import (
     create_live_session,

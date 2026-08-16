@@ -301,7 +301,7 @@ From `AGENTS.md`, and they are not optional:
 - **Fail closed.** If policy is uncertain or evidence is missing, block the action.
 - **No live action by default.** Live trading, risk changes and execution-state
   mutations need explicit deterministic approval. Real integration operations only
-  against verified non-production targets (`ENVIRONMENT=dev`, demo/paper/sandbox). The
+  against verified non-production targets (`ENVIRONMENT=dev`, demo/demo/sandbox). The
   kill switch is deterministic and cannot be bypassed.
 - **No invented data.** Never fabricate backtest results, live performance, or broker
   fills.

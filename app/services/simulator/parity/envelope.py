@@ -181,7 +181,7 @@ _ENVELOPE_V1 = ParityEnvelopeModel(
         ),
         ParityRouteGatePolicy(
             gate_id="adapter_capability_validation",
-            route="paper",
+            route="demo",
             policy="validate_adapter_capability_exact_match",
         ),
     ),

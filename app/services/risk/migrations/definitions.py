@@ -344,6 +344,42 @@ _STATEMENTS_0002 = (
     ),
 )
 
+_STATEMENTS_0003 = (
+    """CREATE TABLE risk_policy_versions__route_vocabulary (
+        config_hash TEXT PRIMARY KEY,
+        policy_version TEXT NOT NULL,
+        profile TEXT NOT NULL CHECK (
+            profile IN ('research', 'simulation', 'demo', 'live')
+        ),
+        payload_json TEXT NOT NULL CHECK (json_valid(payload_json)),
+        effective_at TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        correlation_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    ) STRICT""",
+    """INSERT INTO risk_policy_versions__route_vocabulary (
+        config_hash, policy_version, profile, payload_json,
+        effective_at, request_id, correlation_id, created_at, updated_at
+    ) SELECT config_hash, policy_version,
+        CASE profile WHEN 'paper' THEN 'demo' ELSE profile END,
+        CASE
+            WHEN profile = 'paper' THEN replace(payload_json, '"paper"', '"demo"')
+            ELSE payload_json
+        END,
+        effective_at, request_id, correlation_id, created_at, updated_at
+    FROM risk_policy_versions""",
+    "DROP TABLE risk_policy_versions",
+    (
+        "ALTER TABLE risk_policy_versions__route_vocabulary "
+        "RENAME TO risk_policy_versions"
+    ),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_risk_policy_profile "
+        "ON risk_policy_versions(profile, effective_at DESC)"
+    ),
+)
+
 
 def _checksum(statements: tuple[str, ...]) -> str:
     """Calculate the deterministic migration checksum.
@@ -370,6 +406,12 @@ _RISK_MIGRATION_STEPS = (
         migration_id="risk-0002-schema-constraints",
         checksum=_checksum(_STATEMENTS_0002),
         statements=_STATEMENTS_0002,
+    ),
+    build_migration_step(
+        domain="risk",
+        migration_id="risk-0003-route-vocabulary",
+        checksum=_checksum(_STATEMENTS_0003),
+        statements=_STATEMENTS_0003,
     ),
 )
 

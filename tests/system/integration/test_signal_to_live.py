@@ -170,7 +170,7 @@ def _risk_decision(
 ) -> Any:
     """Review the Strategy intent through the real Risk governor."""
     config = risk_examples._config().model_copy(
-        update={"profile": "paper", "execution_route": "paper"}
+        update={"profile": "demo", "execution_route": "demo"}
     )
     proposal = risk_examples._proposal(config).model_copy(
         update={
@@ -269,7 +269,7 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
             },
         )
         context = create_strategy_execution_context(
-            environment=get_strategy_environment("PAPER"),
+            environment=get_strategy_environment("DEMO"),
             decision_timestamp=risk_examples.NOW,
             timing_policy=get_strategy_timing_policy("EVENT_DRIVEN"),
             seed=0,
@@ -313,7 +313,7 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
             request_id=risk_decision.request_id,
             workflow_id=risk_decision.workflow_id,
             correlation_id=risk_decision.correlation_id,
-            route="paper",
+            route="demo",
             action="submit_order",
             provider_id="mt5",
             account_id=account_id,
@@ -448,8 +448,8 @@ async def _exercise_signal_to_demo(adapter: BrokerAdapter, settings) -> None:  #
         await start_live_session(
             session,
             {
-                "RUNTIME_PROFILE": "paper",
-                "EXECUTION_ROUTE": "paper",
+                "RUNTIME_PROFILE": "demo",
+                "EXECUTION_ROUTE": "demo",
                 "ALLOW_LIVE_MUTATIONS": False,
                 "LIVE_WORKFLOW_TIMEOUT_SECONDS": "30",
                 "SHUTDOWN_BUDGET_SECONDS": "5",

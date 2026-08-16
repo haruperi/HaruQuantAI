@@ -513,7 +513,7 @@ Risk computes the canonical SHA-256 configuration hash. The proposal, snapshot a
 
 A policy mismatch blocks the request.
 
-The two defaults currently stored are paper-route policies; neither grants live-trading permission.
+The two defaults currently stored are demo-route policies; neither grants live-trading permission.
 
 #### 7. Validate identities, environment, lineage , timestamps and request boundaries
 
@@ -816,7 +816,7 @@ A consumed token cannot be reused. Concurrent attempts result in only one valid 
 
 #### 23. Illustrate post-trade evidence refresh using a virtual closed trade
 
-Trading may submit the approved order to simulation, paper or live execution. The order remains governed by:
+Trading may submit the approved order to simulation, demo or live execution. The order remains governed by:
 
 - Exact approved size
 - Exact account and symbol
@@ -1409,8 +1409,8 @@ No environment variable, hidden value, or unlisted field participates in policy.
 | Field | Type | Default | Required / invariant |
 |---|---|---|---|
 | `schema_version` | `Literal["v1"]` | `v1` | Always. |
-| `profile` | `Literal["research", "simulation", "paper", "live"]` | None | Always; must match `execution_route`. |
-| `execution_route` | `Literal["none", "sim", "paper", "live"]` | None | Always; exact system profile/route matrix. |
+| `profile` | `Literal["research", "simulation", "demo", "live"]` | None | Always; must match `execution_route`. |
+| `execution_route` | `Literal["none", "sim", "demo", "live"]` | None | Always; exact system profile/route matrix. |
 | `policy_version` | `str` | None | Always; non-empty immutable policy identity. |
 | `base_currency` | `str` | None | Always. |
 | `decimal_rounding` | `Literal["ROUND_HALF_EVEN"]` | `ROUND_HALF_EVEN` | V1 supports no other mode. |
@@ -1486,7 +1486,7 @@ No environment variable, hidden value, or unlisted field participates in policy.
 No production profile YAML is shipped by this domain build. The composition root
 supplies an approved bounded `config_root`; tests use temporary roots. The model
 defaults are documented functional baselines and every figure remains overridable
-by the selected profile. Missing paper/live configuration still fails closed.
+by the selected profile. Missing demo/live configuration still fails closed.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
@@ -1498,8 +1498,8 @@ by the selected profile. Missing paper/live configuration still fails closed.
 | Completed | `FR-RISK-065` | Expose the drawdown mode, its reference basis, whether it trails unrealised equity, whether a ratchet ceiling applies, and any end-of-day snapshot time and timezone as required configuration. | `DrawdownMode`, `RiskConfig.drawdown_mode` | None | `ValidationError`: mode absent, or `trailing_eod` without a snapshot time and timezone | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_065()`<br>**Unit:** `tests/risk/unit/test_profiles.py::test_trailing_eod_requires_snapshot_time()` |
 | Completed | `FR-RISK-076` | Register durable Risk policy version by canonical configuration hash and effective timestamp. | `register_risk_policy(config: RiskConfig, *, effective_at: datetime, request_id: str, correlation_id: str) -> StandardResponse[str]` | Insert row into `risk_policy_versions` | `RiskDomainError(INVALID_RISK_CONFIG, VALIDATION_FAILED)` | **Unit:** `tests/risk/unit/test_runtime_policy.py::test_register_and_get_risk_policy_end_to_end()` |
 | Completed | `FR-RISK-077` | Retrieve registered durable Risk policy version by canonical configuration hash. | `get_risk_policy(config_hash: str) -> StandardResponse[RiskConfig]` | Read row from `risk_policy_versions` | `RiskDomainError(VALIDATION_FAILED, MISSING_EVIDENCE, INVALID_RISK_CONFIG)` | **Unit:** `tests/risk/unit/test_runtime_policy.py::test_register_and_get_risk_policy_end_to_end()` |
-| Completed | `FR-RISK-078` | Construct the personal-account paper default with every registered operational limit represented as exact validated policy data. | `build_personal_account_risk_config()` | None | `ValidationError`: contradictory limit | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_078()` **Unit:** `tests/risk/unit/test_default_policies.py::test_default_policies_contain_every_registered_operational_limit()` |
-| Completed | `FR-RISK-079` | Construct the stricter generic prop-firm paper default without claiming firm-specific terms. | `build_prop_firm_risk_config()` | None | `ValidationError`: contradictory limit | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_079()` **Unit:** `tests/risk/unit/test_default_policies.py::test_default_policies_contain_every_registered_operational_limit()` |
+| Completed | `FR-RISK-078` | Construct the personal-account demo default with every registered operational limit represented as exact validated policy data. | `build_personal_account_risk_config()` | None | `ValidationError`: contradictory limit | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_078()` **Unit:** `tests/risk/unit/test_default_policies.py::test_default_policies_contain_every_registered_operational_limit()` |
+| Completed | `FR-RISK-079` | Construct the stricter generic prop-firm demo default without claiming firm-specific terms. | `build_prop_firm_risk_config()` | None | `ValidationError`: contradictory limit | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_079()` **Unit:** `tests/risk/unit/test_default_policies.py::test_default_policies_contain_every_registered_operational_limit()` |
 | Completed | `FR-RISK-080` | Register both defaults idempotently through the immutable policy-version boundary. | `register_default_risk_policies(*, effective_at, request_id, correlation_id)` | Insert two `risk_policy_versions` rows | Standard Risk persistence errors | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_080()` **Unit:** `tests/risk/unit/test_default_policies.py::test_default_policy_registration_round_trips_idempotently()` |
 | Completed | `FR-RISK-081` | Validate preferred/maximum risk, ordered losses, kill-switch ordering, count ceilings, and legacy field aliases, failing closed on contradictions. | `RiskConfig` validation | None | `ValidationError`: invalid relationship | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_081()` **Unit:** `tests/risk/unit/test_profiles.py` |
 | Completed | `FR-RISK-088` | Define optional ordered drawdown state-machine thresholds (`drawdown_caution_threshold`/`drawdown_restricted_threshold`/`drawdown_critical_threshold`), mandatory together and bounded by `max_drawdown`; live profile requires them. | `RiskConfig` validation (`app/services/risk/config/profiles.py:313`, `_validate_drawdown_state_thresholds`) | None | `ValidationError`: partially specified or unordered thresholds | **Usage:** `tests/risk/usage/features/02_config.py::fr_risk_088()` **Unit:** `tests/risk/unit/test_profiles.py::test_live_profile_requires_drawdown_state_thresholds()`, `test_new_rule_groups_reject_invalid_values()` |
@@ -1509,7 +1509,7 @@ by the selected profile. Missing paper/live configuration still fails closed.
 **Rules and implementation notes:**
 
 - The registered operational keys are `max_risk_per_trade_pct`, `preferred_risk_per_trade_pct`, `max_daily_loss_pct`, `max_weekly_loss_pct`, `max_monthly_loss_pct`, `max_portfolio_drawdown_pct`, `max_strategy_drawdown_pct`, `max_symbol_drawdown_pct`, `max_symbol_exposure_pct`, `max_currency_cluster_exposure_pct`, `max_correlated_exposure_pct`, `max_total_exposure_pct`, `max_gross_exposure_pct`, `max_net_exposure_pct`, `max_leverage`, `max_total_margin_usage_pct`, `min_free_margin_pct`, `min_margin_level_pct`, `max_open_positions`, `max_pending_orders`, `max_live_strategies`, `max_trades_per_day`, `max_trades_per_strategy_per_day`, `max_consecutive_losses`, `max_spread_pips_default`, `max_slippage_pips_default`, `max_commission_burden_pct`, `max_swap_burden_pct`, `approval_token_ttl_seconds`, `kill_switch_daily_loss_pct`, and `kill_switch_portfolio_drawdown_pct`.
-- `personal-account-default-v1` and `prop-firm-default-v1` are paper-route defaults. They are not account assignments, live authorization, or substitutes for a verified firm mandate.
+- `personal-account-default-v1` and `prop-firm-default-v1` are demo-route defaults. They are not account assignments, live authorization, or substitutes for a verified firm mandate.
 
 - Implement threshold/hash logic from this specification; use no hidden defaults and no direct environment/provider reads.
 - Numeric risk limits are owner policy. The defaults are configurable starting
@@ -2192,7 +2192,7 @@ Risk is the mandatory admission gate. All decision tables are append-only;
 CREATE TABLE risk_policy_versions (
     config_hash      TEXT    PRIMARY KEY,
     policy_version   TEXT    NOT NULL,
-    profile          TEXT    NOT NULL CHECK (profile IN ('research','simulation','paper','live')),
+    profile          TEXT    NOT NULL CHECK (profile IN ('research','simulation','demo','live')),
     payload_json     TEXT    NOT NULL CHECK (json_valid(payload_json)),
     effective_at     TEXT    NOT NULL,
     request_id       TEXT    NOT NULL,

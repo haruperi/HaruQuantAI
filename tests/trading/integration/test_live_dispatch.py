@@ -49,14 +49,14 @@ async def _passed() -> bool:
     return True
 
 
-def _paper_session(
+def _demo_session(
     adapter: _AuditedAdapter,
     store: MemoryStore,
     order: list[str],
     *,
     include_risk: bool = True,
 ) -> Any:
-    """Build a paper session with every real mutation gate injected."""
+    """Build a demo session with every real mutation gate injected."""
     connection = broker_connection()
     return create_live_session(
         store=store,
@@ -106,18 +106,18 @@ async def test_live_dispatch_requires_real_risk_decision() -> None:
 
 @pytest.mark.anyio
 async def test_live_dispatch_completes_single_broker_mutation() -> None:
-    """A fully gated paper request performs one audited Broker mutation."""
+    """A fully gated demo request performs one audited Broker mutation."""
     request_data = live_gate_request().model_dump(mode="python")
-    request_data.update({"route": "paper", "provider_id": "mt5"})
+    request_data.update({"route": "demo", "provider_id": "mt5"})
     request = type(live_gate_request()).model_validate(request_data)
     store = MemoryStore()
     ordering: list[str] = []
     adapter = _AuditedAdapter(ordering)
-    session = _paper_session(adapter, store, ordering)
+    session = _demo_session(adapter, store, ordering)
     config = {
         **live_config(),
-        "RUNTIME_PROFILE": "paper",
-        "EXECUTION_ROUTE": "paper",
+        "RUNTIME_PROFILE": "demo",
+        "EXECUTION_ROUTE": "demo",
         "ALLOW_LIVE_MUTATIONS": True,
     }
     await start_live_session(session, config, live_evidence())
@@ -140,7 +140,7 @@ async def test_live_dispatch_completes_single_broker_mutation() -> None:
     assert ordering == ["pre_audit", "adapter"]
 
     blocked_adapter = _AuditedAdapter([])
-    blocked_session = _paper_session(
+    blocked_session = _demo_session(
         blocked_adapter, MemoryStore(), [], include_risk=False
     )
     await start_live_session(blocked_session, config, live_evidence())

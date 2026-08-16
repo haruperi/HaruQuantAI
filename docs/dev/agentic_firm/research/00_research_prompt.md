@@ -71,8 +71,8 @@ EXISTING SYSTEM — domain modules, all built and running:
                 only when invoked by an approved runtime workflow.
   risk          Intercept every trading proposal and approve or reject against safety
                 limits, exposure and governance policy. THE MASTER GATE.
-  trading       Orchestrate live/paper workflows, convert approved risk decisions into
-                deterministic order intents, execute on route (`sim`/`paper`/`live`)
+  trading       Orchestrate live/demo workflows, convert approved risk decisions into
+                deterministic order intents, execute on route (`sim`/`demo`/`live`)
                 with reconciliation, monitoring and emergency controls.
   simulator     Historical backtest loop; deterministic strategy replay through the core
                 trading path; simulated fills, journals, execution reports.
@@ -656,7 +656,7 @@ TRACK 6 — Build blueprint
         Phase 6 — Only if Track 5.4 concluded Surface B is worthwhile: agent influence
                   on the live decision path, introduced as an advisory filter that can
                   veto or reduce a deterministic signal but never originate or enlarge
-                  one. Paper route first, then a single account.
+                  one. Demo route first, then a single account.
                   GATE: demonstrated reduction in breach probability on live data.
         Phase 7 — Extension across accounts, sequentially, with decorrelation measures
                   from 6.2.5 in place and empirically verified.

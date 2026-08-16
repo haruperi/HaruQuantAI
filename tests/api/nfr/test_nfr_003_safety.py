@@ -1,4 +1,4 @@
-"""NFR-API-003: Live/paper mutations cannot bypass safety gates.
+"""NFR-API-003: Live/demo mutations cannot bypass safety gates.
 
 Verifies that governed Trading mutations (submit order, cancel order, close
 position) are rejected when required safety context is missing: no

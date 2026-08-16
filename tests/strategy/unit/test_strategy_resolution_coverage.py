@@ -19,7 +19,7 @@ from app.utils import generate_id
 def _ref(**overrides: object) -> StrategyRef:
     values: dict[str, object] = {
         "strategy_id": "str-123",
-        "environment": "PAPER",
+        "environment": "DEMO",
         "exact_version": "1.0.0",
         "request_id": generate_id("req"),
         "correlation_id": generate_id("cor"),
@@ -68,7 +68,7 @@ def test_validate_record_rejection_rules() -> None:
     policy = MagicMock(approved_module_roots=("app.strategies",))
 
     manifest = MagicMock()
-    manifest.permitted_environments = ("PAPER",)  # 'LIVE' not permitted
+    manifest.permitted_environments = ("DEMO",)  # 'LIVE' not permitted
     manifest.module_path = "app.strategies.my_strategy"
 
     # 1. Unapproved lifecycle

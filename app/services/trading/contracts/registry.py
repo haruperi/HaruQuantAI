@@ -58,7 +58,7 @@ def _contract_entry(
         "kind": kind,
         "contract_version": TRADING_CONTRACT_VERSION,
         "schema_id": schema_id,
-        "routes": ["sim", "paper", "live"],
+        "routes": ["sim", "demo", "live"],
         "side_effects": safe_side_effects,
         "approval_required": approval_required,
         "idempotency": idempotency,

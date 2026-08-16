@@ -30,7 +30,7 @@ export interface TradingMutationInput {
   workflow_id: string;
   correlation_id: string;
   causation_id?: string | null;
-  route: "paper" | "live";
+  route: "demo" | "live";
   action: string;
   provider_id?: string | null;
   account_id: string;

@@ -6,10 +6,10 @@ from app.utils.errors.exceptions import ConfigurationError
 def test_load_settings_precedence_order() -> None:
     settings = load_settings(
         {"ENVIRONMENT": "test", "LOG_LEVEL": "DEBUG"},
-        {"ENVIRONMENT": "production", "RUNTIME_PROFILE": "paper"},
+        {"ENVIRONMENT": "production", "RUNTIME_PROFILE": "demo"},
     )
     assert settings.environment == "test"
-    assert settings.runtime_profile == "paper"
+    assert settings.runtime_profile == "demo"
     assert settings.logging.level == "DEBUG"
 
 

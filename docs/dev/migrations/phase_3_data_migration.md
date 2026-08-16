@@ -1422,7 +1422,7 @@ git status --short
 git diff --stat
 ```
 
-Live provider validation is opt-in and must use verified development, demo, paper, or
+Live provider validation is opt-in and must use verified development, demo, demo, or
 sandbox targets. A provider outage or credential absence must not be represented as a
 successful provider read.
 

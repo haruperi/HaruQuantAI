@@ -359,7 +359,7 @@ def get_trading_projection(
     """Read one exact-scope aggregate Trading projection.
 
     Args:
-        route: Canonical ``sim``, ``paper``, or ``live`` route.
+        route: Canonical ``sim``, ``demo``, or ``live`` route.
         tenant_id: Authenticated tenant or environment identifier.
         authority_id: Exact account/session authority identifier.
 

@@ -12,13 +12,13 @@ type JsonValue = Any
 
 
 def create_live_session(**values: object) -> LiveSession:
-    """Construct one internal live/paper session.
+    """Construct one internal live/demo session.
 
     Args:
         **values: Session dependency values.
 
     Returns:
-        Internal live/paper session.
+        Internal live/demo session.
     """
     return LiveSession(**cast("Any", values))
 
@@ -28,7 +28,7 @@ async def start_live_session(
     config: Mapping[str, JsonValue],
     evidence: Mapping[str, JsonValue],
 ) -> StandardResponse[Mapping[str, JsonValue]]:
-    """Start a live/paper session through its validated lifecycle.
+    """Start a live/demo session through its validated lifecycle.
 
     Args:
         session: Internal session returned by :func:`create_live_session`.
@@ -44,7 +44,7 @@ async def start_live_session(
 def get_live_session_status(
     session: LiveSession,
 ) -> StandardResponse[Mapping[str, JsonValue]]:
-    """Return current live/paper session status.
+    """Return current live/demo session status.
 
     Args:
         session: Internal session returned by :func:`create_live_session`.
@@ -58,7 +58,7 @@ def get_live_session_status(
 async def stop_live_session(
     session: LiveSession,
 ) -> StandardResponse[Mapping[str, JsonValue]]:
-    """Stop a live/paper session through its safe shutdown lifecycle.
+    """Stop a live/demo session through its safe shutdown lifecycle.
 
     Args:
         session: Internal session returned by :func:`create_live_session`.
@@ -70,7 +70,7 @@ async def stop_live_session(
 
 
 def is_live_session_started(session: LiveSession) -> bool:
-    """Return whether a live/paper session has started.
+    """Return whether a live/demo session has started.
 
     Args:
         session: Internal session returned by :func:`create_live_session`.
@@ -82,7 +82,7 @@ def is_live_session_started(session: LiveSession) -> bool:
 
 
 def is_live_session_admission_enabled(session: LiveSession) -> bool:
-    """Return whether a live/paper session admits new actions.
+    """Return whether a live/demo session admits new actions.
 
     Args:
         session: Internal session returned by :func:`create_live_session`.

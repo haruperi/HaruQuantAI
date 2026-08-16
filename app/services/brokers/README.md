@@ -135,7 +135,7 @@ The Brokers domain is HaruQuantAI's only direct integration boundary to real bro
 - Data-source or execution-route selection, cross-provider fallback, normalization, resampling, enrichment, caching, persistence, or snapshot freshness decisions.
 - Strategy evaluation, risk approval, authorization, kill-switch policy, business idempotency, execution retry policy, reconciliation, incident handling, or execution persistence.
 - Credential persistence, user/database lookup, secret-vault ownership, or implicit configuration discovery.
-- Synthetic prices, ticks, spreads, fills, identifiers, account state, or paper fills. Brokers also owns no simulation behavior (matching, accounting, scheduling, journals); the parity-programme simulation adapter is a pure translation layer over an injected authority port and owns no engine logic.
+- Synthetic prices, ticks, spreads, fills, identifiers, account state, or demo fills. Brokers also owns no simulation behavior (matching, accounting, scheduling, journals); the parity-programme simulation adapter is a pure translation layer over an injected authority port and owns no engine logic.
 - Bulk cancellation, bulk closure, liquidation, averaging, multi-leg orchestration, portfolio allocation, drift detection, or rebalance planning.
 - HTTP/UI DTOs, performance analytics, or any import from a higher business domain.
 - Canonical/friendly market identity, provider or cross-provider alias mappings, or alias resolution. Data converts its identities to exact provider-native symbols before calling Brokers.

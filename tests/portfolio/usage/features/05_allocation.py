@@ -116,12 +116,12 @@ def fr_port_015() -> None:
 
 
 def fr_port_016() -> None:
-    """FR-PORT-016: Stage 2 — Require explicit human approval for paper/live; allow automatic simulation activation only within simulation policy.
+    """FR-PORT-016: Stage 2 — Require explicit human approval for demo/live; allow automatic simulation activation only within simulation policy.
 
-    The system shall enforce human approval for live/paper environments while allowing automatic simulation activation.
+    The system shall enforce human approval for live/demo environments while allowing automatic simulation activation.
     """
     _header(
-        "Stage 2: Environment Governance - Human Approval for Live/Paper (FR-PORT-016)"
+        "Stage 2: Environment Governance - Human Approval for Live/Demo (FR-PORT-016)"
     )
     allocation = create_portfolio_value(
         "ActivePortfolioAllocation", **_allocation_data()
@@ -193,7 +193,7 @@ def main() -> None:
         "Purpose: Govern allocation activation, human approval attestation, kill-switch checks, optimistic concurrency, and rollback versioning.\n\n"
         "Module flow:\n"
         "-> Stage 1: Pre-activation gate verification (Simulation result + Risk decision)\n"
-        "-> Stage 2: Profile governance check (simulation vs paper/live approval) and kill-switch interlock\n"
+        "-> Stage 2: Profile governance check (simulation vs demo/live approval) and kill-switch interlock\n"
         "-> Stage 3: Atomic activation with optimistic concurrency (CAS) and rollback versioning"
     )
 

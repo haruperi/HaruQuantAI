@@ -247,7 +247,7 @@ def build_auth_context(*, principal: AuthSource, trace: AuthSource) -> AuthConte
         _get_field(principal, "runtime_profile"),
         "runtime_profile",
     )
-    if runtime_profile not in {"research", "simulation", "paper", "live"}:
+    if runtime_profile not in {"research", "simulation", "demo", "live"}:
         logger.debug("Unsupported runtime_profile claim")
         _raise_authentication_required()
     issued_at = _coerce_utc_datetime(_get_field(trace, "issued_at"), "issued_at")
@@ -270,7 +270,7 @@ def build_auth_context(*, principal: AuthSource, trace: AuthSource) -> AuthConte
         scopes=scopes,
         tenant_or_environment=tenant,
         runtime_profile=cast(
-            "Literal['research', 'simulation', 'paper', 'live']",
+            "Literal['research', 'simulation', 'demo', 'live']",
             runtime_profile,
         ),
         request_id=request_id,

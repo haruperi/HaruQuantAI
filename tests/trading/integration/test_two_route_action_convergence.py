@@ -1,4 +1,4 @@
-"""Paired paper/simulation Trading action-path convergence tests."""
+"""Paired demo/simulation Trading action-path convergence tests."""
 
 import asyncio
 from decimal import Decimal
@@ -35,11 +35,11 @@ def _dispatch(route: str) -> object:
 def test_two_routes_share_mutation_mapping_and_response_classification() -> None:
     """Route changes authority transport, not action or outcome classification."""
     simulation = _dispatch("sim")
-    paper = _dispatch("paper")
-    assert simulation.status == paper.status == "success"
-    assert simulation.data.status == paper.data.status == "accepted"
-    assert simulation.data.response_classification == paper.data.response_classification
-    assert simulation.data.requested_quantity == paper.data.requested_quantity
+    demo = _dispatch("demo")
+    assert simulation.status == demo.status == "success"
+    assert simulation.data.status == demo.data.status == "accepted"
+    assert simulation.data.response_classification == demo.data.response_classification
+    assert simulation.data.requested_quantity == demo.data.requested_quantity
 
 
 def test_no_private_simulation_import_or_callback_remains() -> None:

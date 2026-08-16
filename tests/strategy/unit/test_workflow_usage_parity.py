@@ -16,7 +16,7 @@ EXPECTED = {
     "WF-STR-SEC": "wf_str_sec_build_hand_off_trade_intent.py",
     "WF-STR-005": "wf_str_005_create_replay_manifest_checkpoint.py",
     "WF-STR-006": "wf_str_006_export_structured_diagnostics.py",
-    "WF-STR-007": "wf_str_007_supply_paper_live_decisions.py",
+    "WF-STR-007": "wf_str_007_supply_demo_live_decisions.py",
     "WF-STR-TER": "wf_str_ter_register_immutable_strategy_version.py",
     "WF-STR-009": "wf_str_009_reject_arbitrary_strategy_code.py",
     "WF-STR-010": "wf_str_010_evaluate_recovered_concrete_signals.py",
