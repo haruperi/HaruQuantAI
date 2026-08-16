@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Supply position authority evidence
+
+Simulation deals now carry self-sufficient Trading-compatible post-event position and ledger authority (Phase 18b).
+
+#### Added (1)
+
+- Added monotonic exposure-event sequencing, economic/availability time, complete post-event position/account snapshots, and deterministic ledger references to every engine deal.
+
 ### Reconcile positions consistently across routes
 
 Trading now applies one authority-event ordering and position-reconciliation algorithm to Simulation, paper, and live routes (Phase 18a).

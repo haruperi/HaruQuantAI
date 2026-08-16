@@ -1695,17 +1695,17 @@ coverage collection measures all 71,461 application statements from four focused
 the global 80% threshold). The scope-correct `--no-cov` gate passed, Simulator Ruff and mypy passed,
 both usage programs passed, and the full Simulator behavioral gate passed 405/405.
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+- [x] Approval matched this exact phase/subphase.
+- [x] Only the local file and documentation manifests changed.
+- [x] Every listed FR has final `path:line` implementation and test evidence.
+- [x] Only verified package-root/public dependency contracts were used.
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes.
+- [x] Ruff format/check and mypy passed for every owning domain.
+- [x] Every local usage program executed directly and passed.
+- [x] Every owning-domain phase gate passed.
+- [x] README, changelog, and listed system documents reconciled.
+- [x] STOP conditions and rollback path were rechecked.
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded.
 
 # Phase 8 · Live execution-position repair
 
@@ -3709,7 +3709,20 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] Owning-domain behavior gate passed. Evidence: `uv run pytest -q --no-cov tests/trading` passed 268 tests with one credential-gated MT5 demo skip; the literal coverage-enabled command passed the same 268 behaviors with the same skip and exited 1 only because repository-wide subset coverage was 22.08%, below the global 80% floor.
 - [x] README, public catalog, changelog, and usage registry reconcile. Evidence: `app/services/trading/README.md`, `app/services/trading/contracts/registry.py`, `docs/CHANGELOG.md`, `tests/trading/integration/test_usage_scripts.py`, `tests/trading/unit/contracts/test_registry.py`.
 - [x] Rollback was reviewed. Evidence: remove the four exact tests; restore state event/watermark functions, exports/catalog, three usages, README/changelog/plan; rerun the literal Unit 18a commands and Phase-8 correlation/restart tests.
-- [x] Commit is authorized goal-wide; the exact Unit 18a message will be used below.
+- [x] Exact Unit 18a commit recorded: `49d867079a0f48f261aa3c165c07a7d288ddf0e5`.
+
+### Unit 18b completion evidence
+
+- [x] Approval matched Unit 18b. Evidence: owner goal-wide `APPROVED: EXECUTE` and dry run `18b-DR1`.
+- [x] `FR-SIM-223` emits every exposure-changing deal with exact order/deal/position identity, economic/availability time, complete post-event position/account authority, deterministic ledger reference, and a Trading-compatible public authority event. Evidence: `app/services/simulator/execution/lifecycle.py:149`, `app/services/simulator/execution/engine.py:94`, `tests/simulator/integration/test_trading_authority_evidence.py:10`, `tests/simulator/usage/features/05_execution.py:581`.
+- [x] The bounded blocker was resolved by assigning a monotonic Simulation exposure-event sequence instead of reusing the market-tick sequence. This permits multiple exposure changes on one tick without conflicting Trading authority identities and preserves the exact emitted deal ID in its receipt. Evidence: `app/services/simulator/execution/engine.py:480`, `app/services/simulator/execution/engine.py:649`, `tests/simulator/integration/test_l3_position_parity.py:10`.
+- [x] Existing generic deal snapshot, journal, checkpoint, resume, and reporting mappings preserve the enriched immutable deal without a parallel reconstruction path. Evidence: `tests/simulator/integration/test_lifecycle_resume.py`, `tests/simulator/unit/test_deal_lifecycle.py`.
+- [x] Targeted and regression behavior passed. Evidence: the two literal integration files passed 2/2; the expanded lifecycle/engine regression set passed 17/17. The literal focused command exited 1 only because repository-wide subset coverage was 19.65%, below the global 80% floor.
+- [x] Quality and usage gates passed. Evidence: Ruff format/check passed; mypy passed 99 source files; `tests/simulator/usage/features/05_execution.py` executed directly and emitted `FR-SIM-223` authority evidence.
+- [x] Owning-domain behavior gate passed. Evidence: `uv run pytest tests/simulator` passed 469 tests and exited 1 only because repository-wide subset coverage was 29.72%, below the global 80% floor; the identical no-coverage domain run passed 469/469.
+- [x] README and changelog reconcile. Evidence: `app/services/simulator/README.md:305`, `app/services/simulator/README.md:1527`, `docs/CHANGELOG.md`.
+- [x] Rollback was reviewed. Evidence: remove the two new integration tests; restore lifecycle/engine authority fields, unit/resume fixtures, usage, README/changelog/plan; rerun the literal Unit 18b commands and lifecycle/engine regressions.
+- [x] Commit is authorized goal-wide; the exact Unit 18b message will be used below.
 
 # Phase 19 · Empirical calibration
 

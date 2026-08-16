@@ -11,6 +11,7 @@ def test_deal_links_order_position_fees_and_transaction() -> None:
     """A lifecycle deal is stable and carries every required foreign key."""
     fields = {
         "order_id": "order-1",
+        "account_id": "account-1",
         "position_id": "position-1",
         "side": "BUY",
         "quantity": Decimal(1),
@@ -18,8 +19,22 @@ def test_deal_links_order_position_fees_and_transaction() -> None:
         "entry": "DEAL_ENTRY_IN",
         "reason": "EXPERT",
         "occurred_at": datetime(2026, 8, 17, tzinfo=UTC),
+        "economic_at": datetime(2026, 8, 17, tzinfo=UTC),
+        "available_at": datetime(2026, 8, 17, tzinfo=UTC),
         "source_sequence": 4,
         "fee_evidence": {"commission": Decimal(-1)},
+        "authority_snapshot": {
+            "position": {
+                "position_id": "position-1",
+                "symbol": "EURUSD",
+                "side": "LONG",
+                "state": "OPEN",
+                "quantity": Decimal(1),
+                "source_sequence": 4,
+            },
+            "account": {"equity": Decimal(1000)},
+        },
+        "ledger_reference": "ledger-1",
     }
     first = build_lifecycle_deal(**fields)  # type: ignore[arg-type]
     second = build_lifecycle_deal(**fields)  # type: ignore[arg-type]

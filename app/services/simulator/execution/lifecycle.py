@@ -149,6 +149,7 @@ def resolve_fill_remainder(
 def build_lifecycle_deal(
     *,
     order_id: str,
+    account_id: str,
     position_id: str,
     side: str,
     quantity: Decimal,
@@ -156,13 +157,18 @@ def build_lifecycle_deal(
     entry: str,
     reason: str,
     occurred_at: datetime,
+    economic_at: datetime,
+    available_at: datetime,
     source_sequence: int,
     fee_evidence: Mapping[str, object],
+    authority_snapshot: Mapping[str, object],
+    ledger_reference: str,
 ) -> Mapping[str, object]:
     """Build one referentially complete deterministic deal projection.
 
     Args:
         order_id: Causal order ticket.
+        account_id: Exact simulated account identity.
         position_id: Affected position ticket.
         side: BUY or SELL authority side.
         quantity: Positive executed volume.
@@ -170,13 +176,18 @@ def build_lifecycle_deal(
         entry: Provider-shaped DEAL_ENTRY value.
         reason: Exact authority reason code.
         occurred_at: Authority timestamp.
+        economic_at: Economic effect timestamp.
+        available_at: Earliest timestamp when the event is observable.
         source_sequence: Durable authority sequence.
         fee_evidence: Itemized immutable fee evidence.
+        authority_snapshot: Complete post-event position and account authority.
+        ledger_reference: Stable reference to the post-event ledger state.
 
     Returns:
         Detached provider-shaped deal mapping.
 
     Raises:
+        TypeError: If authority snapshot containers have invalid types.
         ValueError: If identity, quantities, vocabulary, or time is invalid.
     """
     if (
@@ -184,7 +195,7 @@ def build_lifecycle_deal(
         or entry not in {"DEAL_ENTRY_IN", "DEAL_ENTRY_OUT", "DEAL_ENTRY_INOUT"}
         or any(
             not value or value != value.strip()
-            for value in (order_id, position_id, reason)
+            for value in (order_id, account_id, position_id, reason, ledger_reference)
         )
         or not quantity.is_finite()
         or quantity <= 0
@@ -192,9 +203,39 @@ def build_lifecycle_deal(
         or price <= 0
         or occurred_at.tzinfo is None
         or occurred_at.utcoffset() != timedelta(0)
+        or economic_at.tzinfo is None
+        or economic_at.utcoffset() != timedelta(0)
+        or available_at.tzinfo is None
+        or available_at.utcoffset() != timedelta(0)
+        or economic_at > occurred_at
+        or occurred_at > available_at
         or source_sequence < 0
     ):
         raise ValueError("deal lifecycle evidence is invalid")
+    if set(authority_snapshot) != {"position", "account"}:
+        raise ValueError("deal authority snapshot is incomplete")
+    position = authority_snapshot["position"]
+    account = authority_snapshot["account"]
+    if not isinstance(position, Mapping) or not isinstance(account, Mapping):
+        raise TypeError("deal authority snapshot is invalid")
+    required_position = {
+        "position_id",
+        "symbol",
+        "side",
+        "state",
+        "quantity",
+        "source_sequence",
+    }
+    if (
+        set(position) != required_position
+        or position.get("position_id") != position_id
+        or position.get("source_sequence") != source_sequence
+        or position.get("state") not in {"OPEN", "FLAT"}
+        or position.get("side") not in {"LONG", "SHORT", "UNKNOWN"}
+        or not isinstance(position.get("quantity"), Decimal)
+        or not account
+    ):
+        raise ValueError("deal authority snapshot is invalid")
     material = {
         "order_id": order_id,
         "position_id": position_id,
@@ -202,14 +243,48 @@ def build_lifecycle_deal(
         "source_sequence": source_sequence,
         "occurred_at": occurred_at,
     }
+    deal_id = deterministic_lifecycle_ticket("deal", material)
+    trading_reason = (
+        "REVERSAL"
+        if entry == "DEAL_ENTRY_INOUT"
+        else "PROTECTION"
+        if reason in {"STOP_LOSS", "TAKE_PROFIT"}
+        else "LIQUIDATION"
+        if reason in {"STOP_OUT", "LIQUIDATION"}
+        else "ORDER"
+    )
+    authority_event = {
+        "event_id": deal_id,
+        "route": "sim",
+        "account_id": account_id,
+        "authority_id": "simulator",
+        "deal_id": deal_id,
+        "position_id": position_id,
+        "symbol": position["symbol"],
+        "side": position["side"],
+        "state": position["state"],
+        "quantity": position["quantity"],
+        "source_sequence": source_sequence,
+        "available_at": available_at,
+        "activity_origin": "owned",
+        "reason": trading_reason,
+    }
     return {
-        "deal_id": deterministic_lifecycle_ticket("deal", material),
+        "deal_id": deal_id,
         **material,
         "side": side,
         "quantity": quantity,
         "price": price,
         "reason": reason,
+        "economic_at": economic_at,
+        "available_at": available_at,
         "fee_evidence": dict(fee_evidence),
+        "authority_snapshot": {
+            "position": dict(position),
+            "account": dict(account),
+        },
+        "ledger_reference": ledger_reference,
+        "trading_authority_event": authority_event,
         "event_category": "authority_deal",
     }
 

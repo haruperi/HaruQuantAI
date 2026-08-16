@@ -35,7 +35,7 @@ from app.services.simulator import (
     unwrap_simulation_response,
     validate_provider_order,
 )
-from app.services.trading import create_order_intent
+from app.services.trading import create_order_intent, create_position_authority_event
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 NOW = datetime(2025, 1, 1, tzinfo=UTC)
@@ -505,6 +505,7 @@ def fr_sim_166() -> None:
     deal = _value(
         build_lifecycle_deal(
             order_id=str(ticket),
+            account_id="account-1",
             position_id="position-1",
             side="BUY",
             quantity=Decimal(1),
@@ -512,8 +513,22 @@ def fr_sim_166() -> None:
             entry="DEAL_ENTRY_IN",
             reason="EXPERT",
             occurred_at=NOW,
+            economic_at=NOW,
+            available_at=NOW,
             source_sequence=1,
             fee_evidence={"commission": Decimal(0)},
+            authority_snapshot={
+                "position": {
+                    "position_id": "position-1",
+                    "symbol": "EURUSD",
+                    "side": "LONG",
+                    "state": "OPEN",
+                    "quantity": Decimal(1),
+                    "source_sequence": 1,
+                },
+                "account": {"equity": Decimal(1000)},
+            },
+            ledger_reference="ledger-usage-1",
         )
     )
     print(f"Data -> deal_id='{deal['deal_id']}'")  # type: ignore[index]
@@ -563,6 +578,43 @@ def fr_sim_170() -> None:
     print(f"Data -> resumed_ticket='{first}'")
 
 
+def fr_sim_223() -> None:
+    """FR-SIM-223: Supply self-sufficient Trading position authority evidence."""
+    deal = _value(
+        build_lifecycle_deal(
+            order_id="order-authority",
+            account_id="account",
+            position_id="position-authority",
+            side="BUY",
+            quantity=Decimal(1),
+            price=Decimal("1.1"),
+            entry="DEAL_ENTRY_IN",
+            reason="EXPERT",
+            occurred_at=NOW,
+            economic_at=NOW,
+            available_at=NOW,
+            source_sequence=7,
+            fee_evidence={"commission": Decimal(0)},
+            authority_snapshot={
+                "position": {
+                    "position_id": "position-authority",
+                    "symbol": "EURUSD",
+                    "side": "LONG",
+                    "state": "OPEN",
+                    "quantity": Decimal(1),
+                    "source_sequence": 7,
+                },
+                "account": {"equity": Decimal(1000)},
+            },
+            ledger_reference="ledger-authority",
+        )
+    )
+    event = create_position_authority_event(  # type: ignore[index]
+        **deal["trading_authority_event"]
+    )
+    print(f"Data -> authority_deal_id='{event.deal_id}'")
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -609,6 +661,7 @@ def main() -> None:
     fr_sim_168()
     fr_sim_169()
     fr_sim_170()
+    fr_sim_223()
 
 
 if __name__ == "__main__":

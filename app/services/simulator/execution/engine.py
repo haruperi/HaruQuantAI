@@ -7,7 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from app.services.simulator.accounting import AccountLedger, LedgerFill
 from app.services.simulator.errors import (
@@ -91,26 +91,41 @@ def _receipt_id(intent: OrderIntent, status: str, sequence: int) -> str:
     return f"sim-receipt-{sha256(material.encode('utf-8')).hexdigest()}"
 
 
-def _opening_deal_id(intent: OrderIntent, tick: Tick) -> str:
-    """Return the deal ticket shared by receipt and lifecycle projection.
+def _deal_authority_snapshot(
+    *,
+    position_id: str,
+    symbol: str,
+    side: str,
+    quantity: Decimal,
+    source_sequence: int,
+    account: Mapping[str, object],
+) -> tuple[Mapping[str, object], str]:
+    """Build complete post-event position/account and ledger identity evidence.
 
     Args:
-        intent: Causal Trading intent.
-        tick: Authority fill tick.
+        position_id: Exact affected position identity.
+        symbol: Canonical position symbol.
+        side: Provider BUY/SELL position side.
+        quantity: Post-event open quantity, including zero after full close.
+        source_sequence: Authority source sequence.
+        account: Complete post-event account ledger snapshot.
 
     Returns:
-        Deterministic provider-shaped deal ticket.
+        Immutable-compatible authority snapshot and stable ledger reference.
     """
-    return deterministic_lifecycle_ticket(
-        "deal",
-        {
-            "order_id": f"sim-order-{intent.client_order_id}",
-            "position_id": f"sim-position-{intent.client_order_id}",
-            "entry": "DEAL_ENTRY_IN",
-            "source_sequence": tick.sequence,
-            "occurred_at": tick.timestamp,
+    snapshot: Mapping[str, object] = {
+        "position": {
+            "position_id": position_id,
+            "symbol": symbol,
+            "side": "LONG" if side == "BUY" else "SHORT",
+            "state": "FLAT" if quantity == 0 else "OPEN",
+            "quantity": quantity,
+            "source_sequence": source_sequence,
         },
-    )
+        "account": dict(account),
+    }
+    reference = f"ledger-{sha256(canonical_json(account).encode()).hexdigest()}"
+    return snapshot, reference
 
 
 class EventDrivenExecutionEngine:
@@ -299,7 +314,11 @@ class EventDrivenExecutionEngine:
             Trading-owned execution receipt.
         """
         logger.debug("Constructing Simulation receipt with status %s", status)
-        deal_ids = (_opening_deal_id(intent, tick),) if filled > 0 else ()
+        deal_ids = (
+            (str(cast("Mapping[str, object]", self._deals[-1])["deal_id"]),)
+            if filled > 0
+            else ()
+        )
         return create_execution_receipt(
             receipt_id=_receipt_id(intent, status, tick.sequence),
             intent_id=intent.source_intent_id,
@@ -438,6 +457,7 @@ class EventDrivenExecutionEngine:
             position_id = f"sim-position-{intent.client_order_id}"
             self._positions[position_id] = {
                 "position_id": position_id,
+                "account_id": intent.account_id,
                 "ticket": position_id,
                 "symbol": intent.symbol,
                 "side": intent.side,
@@ -453,8 +473,22 @@ class EventDrivenExecutionEngine:
                 "mae": Decimal(0),
                 "mfe": Decimal(0),
             }
+            account_after = unwrap_simulation_response(
+                self._ledger.snapshot(),
+                operation="simulation.execution.event_driven_execution_engine._apply_match",
+            )
+            authority_sequence = len(self._deals)
+            authority_snapshot, ledger_reference = _deal_authority_snapshot(
+                position_id=position_id,
+                symbol=intent.symbol,
+                side=str(intent.side),
+                quantity=match.filled_quantity,
+                source_sequence=authority_sequence,
+                account=account_after,
+            )
             deal = build_lifecycle_deal(
                 order_id=f"sim-order-{intent.client_order_id}",
+                account_id=intent.account_id,
                 position_id=position_id,
                 side=str(intent.side),
                 quantity=match.filled_quantity,
@@ -462,8 +496,12 @@ class EventDrivenExecutionEngine:
                 entry="DEAL_ENTRY_IN",
                 reason="EXPERT",
                 occurred_at=tick.timestamp,
-                source_sequence=tick.sequence,
+                economic_at=tick.timestamp,
+                available_at=tick.timestamp,
+                source_sequence=authority_sequence,
                 fee_evidence=costs,
+                authority_snapshot=authority_snapshot,
+                ledger_reference=ledger_reference,
             )
             self._deals.append(MappingProxyType(dict(deal)))
         receipt_status: ReceiptStatus = match.status
@@ -604,6 +642,19 @@ class EventDrivenExecutionEngine:
             del self._positions[position_id]
         else:
             position["volume"] = remaining
+        account_after = unwrap_simulation_response(
+            self._ledger.snapshot(),
+            operation="simulation.execution.event_driven_execution_engine._close",
+        )
+        authority_sequence = len(self._deals)
+        authority_snapshot, ledger_reference = _deal_authority_snapshot(
+            position_id=position_id,
+            symbol=str(position["symbol"]),
+            side=side,
+            quantity=remaining,
+            source_sequence=authority_sequence,
+            account=account_after,
+        )
         close_order_id = deterministic_lifecycle_ticket(
             "order",
             {
@@ -615,6 +666,7 @@ class EventDrivenExecutionEngine:
         )
         lifecycle_deal = build_lifecycle_deal(
             order_id=close_order_id,
+            account_id=str(position["account_id"]),
             position_id=position_id,
             side="SELL" if side == "BUY" else "BUY",
             quantity=quantity,
@@ -622,11 +674,15 @@ class EventDrivenExecutionEngine:
             entry="DEAL_ENTRY_OUT",
             reason=exit_reason,
             occurred_at=tick.timestamp,
-            source_sequence=tick.sequence,
+            economic_at=tick.timestamp,
+            available_at=tick.timestamp,
+            source_sequence=authority_sequence,
             fee_evidence={
                 **costs,
                 "gross_profit": gross_profit,
             },
+            authority_snapshot=authority_snapshot,
+            ledger_reference=ledger_reference,
         )
         deal = MappingProxyType(dict(lifecycle_deal))
         self._deals.append(deal)

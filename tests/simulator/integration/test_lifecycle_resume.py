@@ -16,6 +16,7 @@ def test_lifecycle_mapping_survives_verified_checkpoint_restore() -> None:
     occurred_at = datetime(2026, 8, 17, tzinfo=UTC)
     deal = build_lifecycle_deal(
         order_id="order-1",
+        account_id="account-1",
         position_id="position-1",
         side="BUY",
         quantity=Decimal(1),
@@ -23,8 +24,22 @@ def test_lifecycle_mapping_survives_verified_checkpoint_restore() -> None:
         entry="DEAL_ENTRY_IN",
         reason="EXPERT",
         occurred_at=occurred_at,
+        economic_at=occurred_at,
+        available_at=occurred_at,
         source_sequence=1,
         fee_evidence={"commission": Decimal(0)},
+        authority_snapshot={
+            "position": {
+                "position_id": "position-1",
+                "symbol": "EURUSD",
+                "side": "LONG",
+                "state": "OPEN",
+                "quantity": Decimal(1),
+                "source_sequence": 1,
+            },
+            "account": {"equity": Decimal(1000)},
+        },
+        ledger_reference="ledger-1",
     )
     identity = build_replay_identity(
         run_id="run-1",
