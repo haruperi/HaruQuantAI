@@ -1544,6 +1544,86 @@ def build_fill_model_provider(*args: object, **kwargs: object) -> object:
     )
 
 
+def partition_calibration_evidence(*args: object, **kwargs: object) -> object:
+    """Partition eligible execution evidence before empirical fitting."""
+    return _call_feature(
+        "app.services.simulator.calibration",
+        "partition_calibration_evidence",
+        *args,
+        **kwargs,
+    )
+
+
+def fit_spread_calibration(*args: object, **kwargs: object) -> object:
+    """Fit one governed provider-M1 spread calibration artifact."""
+    return _call_feature(
+        "app.services.simulator.calibration", "fit_spread_calibration", *args, **kwargs
+    )
+
+
+def fit_execution_calibration(*args: object, **kwargs: object) -> object:
+    """Fit sufficiently evidenced execution components."""
+    return _call_feature(
+        "app.services.simulator.calibration",
+        "fit_execution_calibration",
+        *args,
+        **kwargs,
+    )
+
+
+def validate_calibration_artifact(
+    *args: object, **kwargs: object
+) -> Mapping[str, object]:
+    """Validate calibration against its locked validation evidence."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.calibration",
+            "validate_calibration_artifact",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def get_calibration_applicability(
+    *args: object, **kwargs: object
+) -> Mapping[str, object]:
+    """Return artifact applicability, exclusions, and validity."""
+    return cast(
+        "Mapping[str, object]",
+        _call_feature(
+            "app.services.simulator.calibration",
+            "get_calibration_applicability",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def dump_calibration_artifact(*args: object, **kwargs: object) -> dict[str, object]:
+    """Serialize one verified calibration artifact."""
+    return cast(
+        "dict[str, object]",
+        _call_feature(
+            "app.services.simulator.calibration",
+            "dump_calibration_artifact",
+            *args,
+            **kwargs,
+        ),
+    )
+
+
+def load_calibration_artifact(*args: object, **kwargs: object) -> object:
+    """Load and checksum-verify one calibration artifact."""
+    return _call_feature(
+        "app.services.simulator.calibration",
+        "load_calibration_artifact",
+        *args,
+        **kwargs,
+    )
+
+
 def build_replay_identity(**fields: object) -> object:
     """Build the canonical Simulator replay identity."""
     return _call_feature(
@@ -1752,6 +1832,7 @@ __all__: tuple[str, ...] = (
     "create_transaction_ledger",
     "describe_lifecycle_race",
     "deterministic_lifecycle_ticket",
+    "dump_calibration_artifact",
     "dump_simulation_value",
     "evaluate_emergency_controls",
     "evaluate_protective_exit",
@@ -1760,8 +1841,11 @@ __all__: tuple[str, ...] = (
     "execute_simulation_handle_operation",
     "execute_simulation_state_store_operation",
     "explicitly_rearm_simulation_session",
+    "fit_execution_calibration",
+    "fit_spread_calibration",
     "get_approved_tick_models",
     "get_calculation_model_identity",
+    "get_calibration_applicability",
     "get_canonical_artifact_types",
     "get_journal_policy",
     "get_margin_state",
@@ -1784,11 +1868,13 @@ __all__: tuple[str, ...] = (
     "is_provider_session_open",
     "is_simulation_value",
     "load_calculation_conformance_artifact",
+    "load_calibration_artifact",
     "load_recovery_checkpoints",
     "match_order",
     "normalize_parity_evidence",
     "normalize_volume",
     "order_injected_events",
+    "partition_calibration_evidence",
     "persist_recovery_checkpoint",
     "persist_recovery_state",
     "plan_stop_out_liquidation",
@@ -1830,6 +1916,7 @@ __all__: tuple[str, ...] = (
     "to_simulation_error_payload",
     "transition_simulation_alert",
     "unwrap_simulation_response",
+    "validate_calibration_artifact",
     "validate_fx_evidence",
     "validate_intent_timing",
     "validate_market_data",

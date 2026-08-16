@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Calibrate execution from governed evidence
+
+Simulator now publishes immutable, leakage-safe empirical calibration artifacts (Phase 19).
+
+#### Added (1)
+
+- Added pre-fit partition hashes, point-in-time and source eligibility, M1 spread and evidenced execution fits, explicit exclusions, validation budgets, scope isolation, drift invalidation, and request identity binding.
+
 ### Supply position authority evidence
 
 Simulation deals now carry self-sufficient Trading-compatible post-event position and ledger authority (Phase 18b).

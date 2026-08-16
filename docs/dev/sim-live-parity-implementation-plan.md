@@ -3722,7 +3722,7 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 - [x] Owning-domain behavior gate passed. Evidence: `uv run pytest tests/simulator` passed 469 tests and exited 1 only because repository-wide subset coverage was 29.72%, below the global 80% floor; the identical no-coverage domain run passed 469/469.
 - [x] README and changelog reconcile. Evidence: `app/services/simulator/README.md:305`, `app/services/simulator/README.md:1527`, `docs/CHANGELOG.md`.
 - [x] Rollback was reviewed. Evidence: remove the two new integration tests; restore lifecycle/engine authority fields, unit/resume fixtures, usage, README/changelog/plan; rerun the literal Unit 18b commands and lifecycle/engine regressions.
-- [x] Commit is authorized goal-wide; the exact Unit 18b message will be used below.
+- [x] Exact Unit 18b commit recorded: `3fd36c35a7051bbdd841175a60db72c0968afe73`.
 
 # Phase 19 · Empirical calibration
 
@@ -3856,17 +3856,36 @@ the phase manifest, verify `git diff --cached --name-only`, and use the applicab
 
 ### Completion checklist
 
-- [ ] Approval matched this exact phase/subphase.
-- [ ] Only the local file and documentation manifests changed.
-- [ ] Every listed FR has final `path:line` implementation and test evidence.
-- [ ] Only verified package-root/public dependency contracts were used.
-- [ ] Targeted unit/integration tests passed with recorded commands and exit codes.
-- [ ] Ruff format/check and mypy passed for every owning domain.
-- [ ] Every local usage program executed directly and passed.
-- [ ] Every owning-domain phase gate passed.
-- [ ] README, changelog, and listed system documents reconciled.
-- [ ] STOP conditions and rollback path were rechecked.
-- [ ] Commit remains unauthorized, or its separately authorized hash is recorded.
+- [x] Approval matched this exact phase/subphase.
+- [x] Only the local file and documentation manifests changed.
+- [x] Every listed FR has final `path:line` implementation and test evidence.
+- [x] Only verified package-root/public dependency contracts were used.
+- [x] Targeted unit/integration tests passed with recorded commands and exit codes.
+- [x] Ruff format/check and mypy passed for every owning domain.
+- [x] Every local usage program executed directly and passed.
+- [x] Every owning-domain phase gate passed.
+- [x] README, changelog, and listed system documents reconciled.
+- [x] STOP conditions and rollback path were rechecked.
+- [x] Commit remains unauthorized, or its separately authorized hash is recorded.
+
+### Unit 19 completion evidence
+
+- [x] Approval matched Unit 19. Evidence: owner goal-wide `APPROVED: EXECUTE` and dry run `19-DR1`.
+- [x] `FR-SIM-181` and `FR-SIM-182` fit provider-M1 end-of-minute lower-bound spread distributions under scheduled-metadata-only regimes. Evidence: `app/services/simulator/calibration/public.py:215`, `app/services/simulator/calibration/spread.py:12`, `tests/simulator/unit/calibration/test_spread_fit.py:8`, `tests/simulator/usage/features/17_calibration.py:91`.
+- [x] `FR-SIM-183` and `FR-SIM-184` fit only sufficiently evidenced execution components while publishing explicit exclusions and exact applicability. Evidence: `app/services/simulator/calibration/public.py:233`, `app/services/simulator/calibration/execution.py:11`, `tests/simulator/unit/calibration/test_execution_fit.py:12`, `tests/simulator/usage/features/17_calibration.py:107`.
+- [x] `FR-SIM-185` and `FR-SIM-227` bind validation tolerance/test, confidence, observed/minimum coverage, economic-error budget, validity, and drift invalidation into the artifact checksum. Evidence: `app/services/simulator/calibration/public.py:257`, `app/services/simulator/calibration/validate.py:15`, `tests/simulator/integration/test_calibration_holdout_isolation.py:18`, `tests/simulator/integration/test_calibration_artifact.py:38`.
+- [x] `FR-SIM-186` prevents demo/live relabelling from sanitized evidence identity through artifact applicability. Evidence: `app/services/simulator/calibration/public.py:92`, `tests/simulator/integration/test_calibration_artifact.py:30`, `tests/simulator/usage/features/17_calibration.py:141`.
+- [x] `FR-SIM-224` publishes versioned canonical artifact serialization/load with complete provenance, partition/policy/estimator identity, tamper detection, cross-process hash stability, and offline-only execution. Evidence: `app/services/simulator/calibration/public.py:283`, `app/services/simulator/calibration/public.py:294`, `tests/simulator/integration/test_calibration_artifact.py:18`, `tests/simulator/integration/test_calibration_artifact.py:49`, `tests/simulator/integration/test_calibration_artifact.py:72`.
+- [x] `FR-SIM-225` enforces matching source identity and prospective availability; late evidence is admitted only under an explicit retrospective/exploratory-only label. Evidence: `app/services/simulator/calibration/partition.py:47`, `tests/simulator/unit/calibration/test_temporal_eligibility.py:19`, `tests/simulator/unit/calibration/test_temporal_eligibility.py:31`, `tests/simulator/usage/features/17_calibration.py:161`.
+- [x] `FR-SIM-226` uses an order-independent SHA-256 selection rule to create disjoint calibration/validation/certification partitions before fitting; fit functions receive calibration records only and validation receives validation records only. Evidence: `app/services/simulator/calibration/partition.py:65`, `tests/simulator/unit/calibration/test_partition.py:86`, `tests/simulator/integration/test_calibration_holdout_isolation.py:18`, `tests/simulator/usage/features/17_calibration.py:167`.
+- [x] Request V2 binds the empirical-calibration artifact checksum into execution/config identity. Evidence: `app/services/simulator/run/contracts.py:319`, `app/services/simulator/run/contracts.py:363`, `tests/simulator/unit/test_run_request_v2.py`.
+- [x] The bounded implementation corrections were resolved locally: the absent plan shorthand `request/contracts.py` mapped to the authoritative `run/contracts.py`; the partition implementation was corrected to match its declared SHA-256 rule; evidence scope/coverage relabelling was closed; and retrospective evidence was labelled exploratory-only. No source evidence, live connection, or certification holdout was opened.
+- [x] Targeted and regression behavior passed. Evidence: six literal files passed 11/11; the expanded calibration/request/realism/parity/public-contract regression set passed 86/86. The literal focused command exited 1 only because repository-wide subset coverage was 1.97%, below the global 80% floor.
+- [x] Quality and usage gates passed. Evidence: Ruff format/check passed 254 files; mypy passed 106 source files; `tests/simulator/usage/features/17_calibration.py` executed directly and emitted all ten requirement demonstrations.
+- [x] Owning-domain behavior gate passed. Evidence: `uv run pytest -q --no-cov tests/simulator` passed 483 tests; the literal coverage-enabled command passed the same 483 behaviors and exited 1 only because repository-wide subset coverage was 29.97%, below the global 80% floor.
+- [x] README, project feature inventory, changelog, feature README, request identity, public surface, and usage evidence reconcile. Evidence: `app/services/simulator/README.md`, `app/services/simulator/calibration/README.md`, `docs/PROJECT.md`, `docs/CHANGELOG.md`, `tests/simulator/unit/test_public_api.py`.
+- [x] Rollback was reviewed. Evidence: remove `calibration/`, six exact test modules, usage 17, root exports, V2 calibration checksum and its fixtures; restore README/project/changelog/plan; rerun the literal Unit 19 commands and request/parity/public-contract regressions.
+- [x] Commit is authorized goal-wide; the exact Unit 19 message will be used below.
 
 # Phase 20 · Seeded stochastic execution realism — L4
 
