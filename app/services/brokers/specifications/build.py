@@ -548,7 +548,7 @@ def build_provider_specification_snapshot(
         _field(symbol_info, "swap_rollover3days"), "swap_rollover3days"
     )
     if rollover_index < 0 or rollover_index >= len(ROLLOVER_WEEKDAYS):
-        message = "swap_rollover3days is outside the verified weekday range"
+        message = "swap_rollover3days is outside the verified provider range"
         raise ValueError(message)
     permissions = _build_permissions(account_info)
     cost_evidence = _build_cost_evidence(cost_evidence_id, cost_evidence_checksum)

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Preserve MT5 crypto rollover evidence
+
+Provider specification snapshots now retain MT5's observed non-weekday rollover sentinel without inventing swap semantics.
+
+#### Fixed (1)
+
+- Mapped raw `swap_rollover3days=7` to explicit `UNSPECIFIED` for 24/7 MT5 symbols while preserving exact weekday mappings and fail-closed rejection outside the observed range.
+
 ### Define shared MT5 operational certification
 
 Parity Envelope v2 separates deterministic MT5 operational semantics from route-specific empirical behavior.

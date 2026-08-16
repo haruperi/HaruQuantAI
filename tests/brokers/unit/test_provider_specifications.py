@@ -131,6 +131,27 @@ def test_fr_brokers_159_builds_typed_current_snapshot() -> None:
     assert dumped["tick_value_profit"] == "1.0"
 
 
+@pytest.mark.parametrize(
+    ("raw_value", "expected"),
+    [(0, "SUNDAY"), (6, "SATURDAY"), (7, "UNSPECIFIED")],
+)
+def test_rollover_day_preserves_verified_and_unspecified_values(
+    raw_value: int, expected: str
+) -> None:
+    """MT5 weekdays map exactly while provider sentinel 7 stays unspecified."""
+    symbol = _symbol_info()._replace(swap_rollover3days=raw_value)  # type: ignore[union-attr]
+    dumped = dump_provider_specification_snapshot(_build(symbol_info=symbol))
+    assert dumped["swap_rollover3days"] == expected
+
+
+@pytest.mark.parametrize("raw_value", [-1, 8])
+def test_unknown_rollover_day_fails_closed(raw_value: int) -> None:
+    """Values outside the observed MT5/provider range remain ineligible."""
+    symbol = _symbol_info()._replace(swap_rollover3days=raw_value)  # type: ignore[union-attr]
+    with pytest.raises(ValueError, match="outside the verified provider range"):
+        _build(symbol_info=symbol)
+
+
 def test_fr_brokers_160_binds_source_and_observation_identity() -> None:
     """FR-BRK-160: identity, provenance, and checksum are bound."""
     snapshot = _build()

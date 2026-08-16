@@ -50,6 +50,11 @@ closed (`FR-BRK-161`). Account-permission evidence records `margin_mode`
 FIFO discipline are not exposed by the upstream Python contract and remain
 explicit `unverified` exclusions.
 
+MT5 documents `swap_rollover3days` weekday values `0..6`. Verified Pepperstone
+demo observations for 24/7 crypto symbols return `7`; the snapshot preserves
+that non-weekday sentinel as `UNSPECIFIED`. It never guesses a weekday or
+interprets the sentinel as proof that swap is absent.
+
 ## Files
 
 | File | Responsibility |

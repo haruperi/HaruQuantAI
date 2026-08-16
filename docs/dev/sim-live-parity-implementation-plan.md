@@ -107,6 +107,27 @@ with body bullets `Update the OpenAPI v1 digest for the approved sim, demo, and 
 `Preserve the 91-operation registry and make no API behavior change.`, and
 `Record and verify the post-C2 certification preflight correction.`
 
+**Automatic MT5-demo blocker correction — 2026-08-16.** The database credential slot and terminal
+path were verified without exposing secret values, and a genuine demo connection succeeded. Sunday
+mutation evidence uses `BTCUSD` as directed by the owner. The first bounded order check created no
+provider state and failed closed because Pepperstone reports `swap_rollover3days=7` for `BTCUSD` and
+`ETHUSD`, while `EURUSD` reports the documented Wednesday value `3`. MT5 documents only weekday
+values `0..6`; the bounded recommendation preserves observed `7` as `UNSPECIFIED`, never as a guessed
+weekday or proof of absent swap, and continues rejecting values outside `0..7`. Exact correction
+commit: `fix(brokers): preserve unspecified mt5 rollover day` with body bullets
+`Admit the observed MT5 rollover sentinel without inventing weekday semantics.`,
+`Keep documented weekday mappings exact and reject values outside the observed range.`, and
+`Verify the correction with BTCUSD demo mutation, cleanup, and provider-specification gates.`
+Implementation evidence: the explicit vocabulary is at
+`app/services/brokers/specifications/contracts.py:93`, mapping remains fail-closed at
+`app/services/brokers/specifications/build.py:547`, and boundary coverage is at
+`tests/brokers/unit/test_provider_specifications.py:133`. Verification passed 26 focused tests,
+Ruff, Brokers mypy (102 files), usage 18, and the 691-test Brokers collection (688 passed with three
+expected opt-in credential skips). The genuine `BTCUSD` demo probe then passed provider snapshot,
+order check, minimum far-limit placement, cancellation, exact state reconciliation, and disconnect;
+no created order or position remains. Rollback reverts only these mapping, test, and documentation
+changes; no migration, credential, or evidence artifact was written.
+
 ### 0.1 Goal and scope
 
 `sim`, `demo`, and `live` use the same Trading orchestration and differ only at an injected authority

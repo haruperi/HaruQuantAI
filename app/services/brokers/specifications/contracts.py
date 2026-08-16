@@ -89,7 +89,10 @@ CALCULATION_MODES: tuple[str, ...] = (
     "UNKNOWN",
 )
 
-#: Rollover weekday names from verified MT5 ``swap_rollover3days`` values.
+#: Rollover weekday names plus MT5's observed non-weekday sentinel.
+#:
+#: MT5 documents weekday values 0..6. Some 24/7 provider symbols report 7;
+#: preserve that observation as unspecified rather than inventing a weekday.
 ROLLOVER_WEEKDAYS: tuple[str, ...] = (
     "SUNDAY",
     "MONDAY",
@@ -98,6 +101,7 @@ ROLLOVER_WEEKDAYS: tuple[str, ...] = (
     "THURSDAY",
     "FRIDAY",
     "SATURDAY",
+    "UNSPECIFIED",
 )
 
 
