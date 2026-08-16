@@ -1,4 +1,4 @@
-# ruff: noqa: C901, PLR0912, PLR0915
+# ruff: noqa: C901, E402, PLR0912, PLR0915
 """Collect a bounded, secret-safe L5 MT5 operational certificate bundle.
 
 This is a directly executable integration program, not a pytest test. It is
@@ -12,11 +12,16 @@ import argparse
 import asyncio
 import hashlib
 import json
+import sys
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import ROUND_DOWN, Decimal
 from pathlib import Path
 from typing import Any
+
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from app.services.api import resolve_system_credential_slot
 from app.services.brokers import (

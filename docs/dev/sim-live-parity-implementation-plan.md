@@ -4266,6 +4266,19 @@ Evidence: `tests/simulator/integration/l5_certificate_collection.py:167`,
 `Fail closed on unsafe environment, foreign activity, incomplete cleanup, or scope drift.`, and
 `Generate the exact deterministic certificate bundle for a separately approved run.`
 
+**First collection attempt: Failed before provider access — 2026-08-16.** The approved Dry Run 27
+command exited during module import with `ModuleNotFoundError: No module named 'app'` because the new
+standalone program lacked the repository-root bootstrap used by existing direct test programs. It
+opened no provider connection, performed no mutation, and created no artifact directory. Correction
+`27DR1Δ1` applies the bounded recommendation: bootstrap the repository root before application
+imports, prove direct execution reaches the explicit authorization gate without provider access,
+and otherwise preserve collector behavior. Evidence:
+`tests/simulator/integration/l5_certificate_collection.py:22`. Exact commit:
+`fix(parity): make certificate collector directly executable` with body bullets
+`Bootstrap the repository root before importing application packages.`,
+`Prove standalone execution reaches the explicit demo authorization gate.`, and
+`Record the pre-provider failed run without issuing certificate evidence.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write
