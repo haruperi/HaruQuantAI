@@ -56,11 +56,11 @@ from app.services.risk.persistence import (
 )
 from app.services.risk.portfolio import build_portfolio_risk_snapshot
 from app.services.risk.regimes import assess_risk_regime
+from app.services.strategy import create_trade_intent_value
 from app.services.strategy.discretionary import (
     get_discretionary_strategy_id,
     strategy_version_for,
 )
-from app.services.strategy.intents.factories import create_trade_intent_value
 from app.utils import canonical_json, derive_stable_id, get_logger
 
 logger = get_logger(__name__)
@@ -544,7 +544,7 @@ def review_manual_order(
         proposal_current_price: Current price used for exposure projection.
         proposal_stop_distance: Optional stop distance for the readiness gate.
         portfolio_id: Optional bound portfolio scope.
-        route: ``"paper"`` or ``"live"``, matching Trading's own route domain.
+        route: ``"demo"`` or ``"live"``, matching Trading's own route domain.
         risk_config: A real, already-constructed ``RiskConfig`` for this route.
         secret_resolver: Resolves the approval-token signing key; supplied by
             the API composition root, which owns encrypted-credential access.
@@ -566,7 +566,7 @@ def review_manual_order(
             fails anywhere in the fixed-precedence review.
     """
     checked_now = now or datetime.now(UTC)
-    environment = "LIVE" if route == "live" else "PAPER"
+    environment = "LIVE" if route == "live" else "DEMO"
     strategy_id = get_discretionary_strategy_id()
     strategy_version = strategy_version_for(environment)
     # account_snapshot/risk_config/auth are intentionally opaque at this

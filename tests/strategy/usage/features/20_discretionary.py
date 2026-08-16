@@ -32,7 +32,7 @@ def _auth() -> object:
         permissions=("strategy:register",),
         scopes=("strategy",),
         tenant_or_environment="development",
-        runtime_profile="paper",
+        runtime_profile="demo",
         request_id=generate_id("req"),
         workflow_id=generate_id("wf"),
         correlation_id=generate_id("cor"),
@@ -41,7 +41,7 @@ def _auth() -> object:
 
 
 def fr_str_083() -> None:
-    """FR-STR-083: Register one immutable Discretionary Manual Order strategy version per Trading-reachable route environment (`PAPER`, `LIVE`), idempotently, through the standard `register_strategy_version` registry gate — no bypass of registration, lifecycle-approval, or module-root checks."""
+    """FR-STR-083: Register one immutable Discretionary Manual Order strategy version per Trading-reachable route environment (`DEMO`, `LIVE`), idempotently, through the standard `register_strategy_version` registry gate — no bypass of registration, lifecycle-approval, or module-root checks."""
     if os.environ.get("RUN_STRATEGY_STATEFUL_USAGE") != "1":
         print("Registration write skipped (RUN_STRATEGY_STATEFUL_USAGE!=1)")
         return
@@ -67,7 +67,7 @@ def fr_str_084() -> None:
 def fr_str_085() -> None:
     """FR-STR-085: Expose the registered strategy identity and its exact per-environment version through function-only public accessors."""
     _emit("FR-STR-085 strategy id", get_discretionary_strategy_id())
-    _emit("FR-STR-085 paper version", discretionary_strategy_version_for("PAPER"))
+    _emit("FR-STR-085 demo version", discretionary_strategy_version_for("DEMO"))
     _emit("FR-STR-085 live version", discretionary_strategy_version_for("LIVE"))
 
 

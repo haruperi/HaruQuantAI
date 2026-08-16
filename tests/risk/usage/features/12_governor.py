@@ -549,7 +549,7 @@ def _manual_order_review(*, account_id: str, equity: Decimal) -> tuple[Any, Any]
         proposal_current_price=Decimal("1.10"),
         proposal_stop_distance=Decimal("0.01"),
         portfolio_id=None,
-        route="paper",
+        route="demo",
         risk_config=config,
         secret_resolver=lambda _: b"example-risk-signing-key-material-32-bytes",
         auth=auth,

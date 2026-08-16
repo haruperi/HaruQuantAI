@@ -12,8 +12,8 @@ import { useDepthStream } from './useDepthStream';
 /** The registered Discretionary Manual Order strategy identity (Risk-side constant). */
 const STRATEGY_ID = 'discretionary-manual-order';
 
-function strategyVersionFor(route: 'paper' | 'live'): string {
-  return route === 'live' ? '1.0.0-live' : '1.0.0-paper';
+function strategyVersionFor(route: 'demo' | 'live'): string {
+  return route === 'live' ? '1.0.0-live' : '1.0.0-demo';
 }
 
 function newId(prefix: string): string {
@@ -70,8 +70,8 @@ interface Props {
    * disabled until a real account is configured for this widget.
    */
   accountId?: string;
-  /** Real execution route; paper is the safe default. */
-  route?: 'paper' | 'live';
+  /** Real execution route; demo is the safe default. */
+  route?: 'demo' | 'live';
   /** Optional bound portfolio scope. */
   portfolioId?: string | null;
   /** Hands off a price-activated ticket to the host; this widget owns no ticket UI. */
@@ -81,7 +81,7 @@ interface Props {
 export const PriceLadderWidget: React.FC<Props> = ({
   symbol = 'EURUSD',
   accountId,
-  route = 'paper',
+  route = 'demo',
   portfolioId = null,
   onOpenTicket,
 }) => {

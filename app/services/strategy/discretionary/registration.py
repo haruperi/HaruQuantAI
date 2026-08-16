@@ -26,9 +26,9 @@ STRATEGY_ID = "discretionary-manual-order"
 _MODULE_PATH = "app.services.strategy.discretionary.module"
 _APPROVED_MODULE_ROOT = "app.services.strategy.discretionary"
 _OWNER_REF = "risk-manual-preflight"
-# Trading's TradingMutationInput.route is exactly "paper" | "live"; the
+# Trading's TradingMutationInput.route is exactly "demo" | "live"; the
 # discretionary strategy only ever needs to be reachable from those routes.
-_ENVIRONMENTS = ("PAPER", "LIVE")
+_ENVIRONMENTS = ("DEMO", "LIVE")
 # SHA-256 of module.py's exact byte content. Strategy source may not read the
 # filesystem at runtime (see test_import_security.py), so this identity
 # module's content hash is a fixed literal, matching the built-in strategy
@@ -51,7 +51,7 @@ def strategy_version_for(environment: str) -> str:
     """Return the registered Discretionary strategy version for one environment.
 
     Args:
-        environment: One of the registered Strategy environments (``PAPER``,
+        environment: One of the registered Strategy environments (``DEMO``,
             ``LIVE``).
 
     Returns:
@@ -119,7 +119,7 @@ def register_discretionary_strategy(auth: object) -> tuple[object, ...]:
     """Idempotently register the Discretionary Manual Order strategy.
 
     Registers one immutable version per Trading-reachable route environment
-    (``PAPER``, ``LIVE``). Safe to call on every process start: a prior
+    (``DEMO``, ``LIVE``). Safe to call on every process start: a prior
     identical registration is reported by Strategy as an ``IDEMPOTENT``
     mutation, and an already-persisted version is reported as ``REJECTED``
     with reason ``IMMUTABLE_VERSION_EXISTS`` — neither is treated as a

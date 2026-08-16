@@ -118,7 +118,7 @@ export interface OrderPreflightInput {
   request_id: string;
   workflow_id: string;
   correlation_id: string;
-  route: "paper" | "live";
+  route: "demo" | "live";
   account_id: string;
   portfolio_id?: string | null;
   symbol: string;
@@ -135,7 +135,7 @@ export interface CancelAllPreflightInput {
   request_id: string;
   workflow_id: string;
   correlation_id: string;
-  route: "paper" | "live";
+  route: "demo" | "live";
   account_id: string;
   portfolio_id?: string | null;
   representative_symbol: string;
@@ -147,7 +147,7 @@ export interface CancelOrderPreflightInput {
   request_id: string;
   workflow_id: string;
   correlation_id: string;
-  route: "paper" | "live";
+  route: "demo" | "live";
   account_id: string;
   portfolio_id?: string | null;
   representative_symbol: string;

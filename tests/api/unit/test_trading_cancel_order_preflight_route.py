@@ -16,7 +16,7 @@ from app.services.api.workstation.trading.orchestration import (
 def _request(**overrides: object) -> Any:
     """Build one minimal single-order cancel preflight boundary request stand-in."""
     values: dict[str, object] = {
-        "route": "paper",
+        "route": "demo",
         "account_id": "account-one",
         "portfolio_id": None,
         "representative_symbol": "EURUSD",

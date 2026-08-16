@@ -73,7 +73,7 @@ class OrderPreflightRequest(_BaseApiContract):
     request_id: str
     workflow_id: str
     correlation_id: str
-    route: Literal["paper", "live"]
+    route: Literal["demo", "live"]
     account_id: str
     portfolio_id: str | None = None
     symbol: str
@@ -114,7 +114,7 @@ class CancelOrderPreflightRequest(_BaseApiContract):
     request_id: str
     workflow_id: str
     correlation_id: str
-    route: Literal["paper", "live"]
+    route: Literal["demo", "live"]
     account_id: str
     portfolio_id: str | None = None
     representative_symbol: str
@@ -136,7 +136,7 @@ class CancelAllPreflightRequest(_BaseApiContract):
     request_id: str
     workflow_id: str
     correlation_id: str
-    route: Literal["paper", "live"]
+    route: Literal["demo", "live"]
     account_id: str
     portfolio_id: str | None = None
     representative_symbol: str
