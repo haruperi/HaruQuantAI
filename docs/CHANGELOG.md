@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Retire pre-release Simulation backtest compatibility
+
+Canonical single-asset and portfolio backtests now use one complete asynchronous request path, while fast research retains a separate explicitly non-canonical contract.
+
+#### Changed (1)
+
+- Removed the pre-release V1 canonical request and synchronous bridge, renamed the parity request and portfolio projection canonically, and migrated Optimization, Portfolio, API, tests, and usage evidence to async execution.
+
 ### Correct legacy three-route connection composition
 
 The legacy Trading example now initializes Simulation without provider credentials or sockets, derives provider session routing from the explicit configured environment, and drives every symbol identity from one setting.

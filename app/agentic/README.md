@@ -632,7 +632,7 @@ to UI/API; it submits no trade or approval.
    run — `agentic.run_deliberation_round()` *(planned)*.
 6. Deterministic tools calculate or simulate every calculable claim —
    `data.get_market_data()`, `indicators.validate_indicator()`,
-   `analytics.build_performance_report()`, `simulator.run_backtest()`.
+   `analytics.build_performance_report()`, `simulator.run_backtest_async()`.
 7. Synthesis preserves supported conclusions, uncertainty, and dissent without
    majority-vote authority — `agentic.synthesize_deliberation()` *(planned)*.
 8. Publish an immutable record, or return `refused` for insufficient evidence —
@@ -670,7 +670,7 @@ Missing or incompatible evidence refuses without recomputation or invention.
 3. Emit an immutable experiment protocol —
    `agentic.build_experiment_spec()` *(planned)*.
 4. Simulation executes the receiver-owned request —
-   `simulator.run_backtest()`.
+   `simulator.run_backtest_async()`.
 5. Bind every verdict to the returned run identifiers —
    `agentic.build_experiment_verdict()` *(planned)*,
    `simulator.resolve_idempotent_run()`.
@@ -727,7 +727,7 @@ network-denied.
 1. Evaluate the staged artefact against deterministic gates —
    `agentic.evaluate_artifact()` *(planned)*.
 2. Obtain Simulation evidence for the artefact —
-   `simulator.run_backtest()`, `simulator.build_artifact_manifest()`.
+   `simulator.run_backtest_async()`, `simulator.build_artifact_manifest()`.
 3. Account for lifetime search budget and holdout use —
    `optimization.detect_overfit_parameters()`.
 4. Run critic review and preserve dissent —

@@ -446,7 +446,7 @@ immutable checksummed revisions under half-open UTC effective intervals. A
 successor closes the prior interval atomically; point-in-time and bounded reads
 must prove complete coverage and never backdate a current observation without
 explicit owner-supplied provenance (`FR-DATA-214`–`216`).
-Simulation binds that history into `SimulationBacktestRequestV2` without
+Simulation binds that history into `SimulationBacktestRequest` without
 importing Data or Brokers types: immutable revision reference projections must
 continuously cover the run interval and match its demo/live certification
 target. V2 configuration identity also covers execution-model, independent
@@ -773,7 +773,7 @@ Portfolio collaboration is contract-governed:
 - Strategy holds only a version-exact expectancy reference. Research remains the authoritative expectancy-profile provider; an absent, failed, stale, or mismatched provider yields `NOT_ELIGIBLE` and falls back to the normal risk-to-reward gate.
 - Portfolio owns `PortfolioDefinition v1`, `PortfolioConstructionRequest/Result v1`, `ActivePortfolioAllocation v1`, and `PortfolioRebalancePlan v1`; immutable definitions are registered/read through the Portfolio root boundary and stored atomically with audit-outbox evidence.
 - Risk owns `AllocationReviewRequest`, `AllocationRiskDecision`, `AllocationBudgetActivationRequest`, and the authoritative risk-budget projection.
-- Simulation owns `PortfolioBacktestRequestV1` / `PortfolioSimulationResult v1`; Analytics owns `PortfolioAllocationEvidence v1`; Data owns `FXConversionEvidence v1`.
+- Simulation owns `PortfolioBacktestRequest` / `PortfolioSimulationResult v1`; Analytics owns `PortfolioAllocationEvidence v1`; Data owns `FXConversionEvidence v1`.
 - Simulation composes its historical loop through a typed receiver-owned dependency bundle. Its state store is constructed before its journal writer; one injected `SimTrader` instance supplies the asynchronous Trading sim-route callable. Canonical manifests hash `journal.jsonl`, `result.json`, and `report.md` and exclude the `manifest.json` envelope itself, preventing self-referential hashes.
 - Completed Simulation runs may be traversed through durable one-hour `sim_sessions` cursors. Frame delivery validates the finalized JSONL hash chain before exposure and emits raw causative journal events over SSE; no live engine is retained and no mutation/what-if operation is admitted.
 - Simulator owns the complete immutable two-step schema manifest and exposes `run_simulator_migrations`; the runner delegates ledger verification, write locking, checksum validation, and transactional execution to Data. Required API startup applies/verifies this manifest before Simulator-backed routes become ready and fails closed on any unsuccessful migration response.

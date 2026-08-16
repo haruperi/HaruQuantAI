@@ -126,8 +126,8 @@ Preserve hash chaining, flush/fsync policy, atomicity, and final hash. Set
 
 ### 4.5 Request hash operations
 
-- `SimulationBacktestRequestV1.calculate_config_hash`
-- `PortfolioBacktestRequestV1.calculate_config_hash`
+- `SimulationBacktestRequest.calculate_config_hash`
+- `PortfolioBacktestRequest.calculate_config_hash`
 
 The exact hash string is raw `data`; response metadata must not influence hash
 material.

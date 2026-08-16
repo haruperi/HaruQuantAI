@@ -59,18 +59,18 @@ Portfolio owns the deterministic construction, versioning, activation, drift ass
 | Owned output | `ActivePortfolioAllocation v1`                                        | Portfolio  | Publish the canonical active allocation version                                     |
 | Owned output | `PortfolioRebalancePlan v1`                                           | Portfolio  | Publish immutable drift and proposed-action lineage                                 |
 | Submitted    | `AllocationReviewRequest v1` / `AllocationBudgetActivationRequest v1` | Risk       | Ask Risk to review and activate its authoritative budget projection                 |
-| Submitted    | `PortfolioBacktestRequestV1`                                          | Simulation | Ask Simulation to validate a candidate                                              |
+| Submitted    | `PortfolioBacktestRequest`                                            | Simulation | Ask Simulation to validate a candidate                                              |
 | Submitted    | `PortfolioRebalanceExecutionRequest v1`                               | Trading    | Ask Trading to execute an authorized plan                                           |
 | Submitted    | `PortfolioRebalanceMeasurementRequest v1`                             | Analytics  | Ask Analytics to measure redacted hash-bound reconciled Trading facts               |
 
 Receiver-owned requests are imported from their receiving domains. Portfolio never
-redefines them. `AllocationReviewRequest v1` and `PortfolioBacktestRequestV1` are
+redefines them. `AllocationReviewRequest v1` and `PortfolioBacktestRequest` are
 self-contained receiver projections built from Portfolio facts: scalar values,
 ordered components, identifiers, versions, references, and hashes only. Neither
 request embeds a Portfolio-owned contract or causes Risk/Simulation to import one.
 Simulation requests also contain Simulation-owned component backtest requests,
 seed, balance, and policy material that Portfolio does not own; callers therefore
-supply the fully formed `PortfolioBacktestRequestV1`, and Portfolio validates its
+supply the fully formed `PortfolioBacktestRequest`, and Portfolio validates its
 trace, candidate, component-weight, profile, and route bindings before submission.
 
 ### Persisted state
@@ -332,7 +332,7 @@ evidence returns a structured Portfolio error and creates no state.
 ### `WF-PORT-003` — Coordinate Simulation and Risk Review
 
 1. Receive the complete immutable construction result, its validated evidence, and a
-   receiver-owned `PortfolioBacktestRequestV1` —
+   receiver-owned `PortfolioBacktestRequest` —
    `portfolio.PortfolioService.coordinate_review()`.
 2. Revalidate the Simulation request against the candidate and evidence lineage —
    `utils.canonical_digest()`.
@@ -473,7 +473,7 @@ sequenceDiagram
     P->>R: Resolve eligibility decisions
     P->>D: Resolve market/account/FX/analytics evidence
     P->>P: Construct immutable candidate
-    P->>Sim: PortfolioBacktestRequestV1
+    P->>Sim: PortfolioBacktestRequest
     Sim-->>P: PortfolioSimulationResult
     P->>R: AllocationReviewRequest
     R-->>P: AllocationRiskDecision

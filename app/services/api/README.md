@@ -116,7 +116,7 @@ Contract names, versions, and owners must match `docs/PROJECT.md`.
 | `StrategyOperationalEligibilityRequest/Decision`, `AllocationReviewRequest`, `AllocationRiskDecision`, `AllocationBudgetActivationRequest` | `v1` | Risk | Operational-eligibility and portfolio review/authorization views and commands without gateway policy. |
 | `TradeRecord`, `ExecutionReceipt`, `OrderIntent`, `OperationalEvent` | `v1` | Trading | Live/demo status, governed execution outcomes, and bounded operational evidence. |
 | `SimulationResult` | `v1` | Simulation | Completed synchronous backtest results; no interactive session lifecycle exists. |
-| `PortfolioBacktestRequestV1` / `PortfolioSimulationResult` | `v1` | Simulation | Synchronous portfolio validation request/result views delegated through Portfolio. |
+| `PortfolioBacktestRequest` / `PortfolioSimulationResult` | `v1` | Simulation | Asynchronous portfolio validation request/result views delegated through Portfolio. |
 | `PerformanceReport` / `PortfolioAllocationEvidence` | `v1` | Analytics | Read-only performance, allocation-evidence, and dashboard views. |
 | `OptimizationResult` | `v1` | Optimization | Terminal synchronous optimization result; no persisted-job/progress/cancellation API exists. |
 | `ResearchReport` | `v1` | Research | Core Edge Lab evidence and research-to-strategy review. |

@@ -149,7 +149,7 @@ submitted `config_hash`. A result that does not bind is refused as
 `RESULT_NOT_FOR_REQUEST` — **before** the verdict model is invoked, so a
 mismatched result is never handed to a model for reconciliation.
 
-The package imports neither `SimulationBacktestRequestV1` nor
+The package imports neither `SimulationBacktestRequest` nor
 `SimulationResult`, and a test asserts that no module names them. There is no
 site at which Agentic could author either contract.
 

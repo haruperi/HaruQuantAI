@@ -24,7 +24,7 @@ Optimization orchestrates bounded, reproducible searches over approved strategy 
 - Validated parameter definitions, conditional activation, safe constraints, and canonical provenance hashes.
 - Bounded lazy grid search and seeded pseudo-random search orchestration.
 - Candidate Cartesian expansion belongs to Optimization and is implemented lazily under approved caps; Optimization must not import a parameter-combination helper from Utils.
-- The optimization-internal, versioned backtest adapter port (`BacktestExecutionAdapter`); it is not a cross-domain contract. Simulation supplies its production implementation, which submits the Simulation-owned `SimulationBacktestRequestV1` and returns `SimulationResult v1`.
+- The optimization-internal, versioned backtest adapter port (`BacktestExecutionAdapter`); it is not a cross-domain contract. Its production implementation submits the Simulation-owned canonical `SimulationBacktestRequest` asynchronously and returns `SimulationResult v1`.
 - Core optimization scoring, deterministic ranking, Deflated Sharpe Ratio evidence, and baseline overfit warnings.
 - Rolling and anchored/expanding time-series splits, purge/embargo evidence, and one walk-forward workflow.
 - Trade-sequence Monte Carlo, parametric simulation, execution-cost stress calculations, and robustness summaries.
@@ -372,7 +372,7 @@ request or mutates Strategy state.
    constraint failures rather than sending them to Simulation —
    `optimization.run_parameter_sweep()`.
 4. Execute each surviving candidate through the version-compatible adapter —
-   `simulator.run_backtest()`.
+   `simulator.run_backtest_async()`.
 5. Score, deduplicate, and rank into deterministic evidence —
    `optimization.rank_parameter_sets()`.
 6. Attach overfit evidence to the ranked set —
@@ -426,7 +426,7 @@ request or mutates Strategy state.
 2. Set effective embargo to at least the supplied average trade duration when that
    duration is valid — `optimization.run_walk_forward_optimization()`.
 3. Select train-window candidates per fold — `optimization.run_parameter_sweep()`.
-4. Evaluate the selected candidates out of sample — `simulator.run_backtest()`.
+4. Evaluate the selected candidates out of sample — `simulator.run_backtest_async()`.
 5. Emit fold pass rate, parameter drift, OOS retention, WFE, and leakage-prevention
    evidence — `optimization.run_walk_forward_matrix()`,
    `optimization.calculate_parameter_stability()`.
@@ -743,7 +743,7 @@ validated candidate + provenance → adapter compatibility checks → Simulation
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Completed | `required_backtest_adapter_version` | `str` | `v1` (tracks `SimulationBacktestRequestV1`) | Yes | `execute_candidate()` | Exact compatible adapter port version; missing/mismatch blocks execution before Simulation is called. |
+| Completed | `required_backtest_adapter_version` | `str` | `v1` (Optimization-owned adapter contract) | Yes | `execute_candidate()` | Exact compatible adapter port version; missing/mismatch blocks execution before Simulation is called. |
 | Completed | `deterministic_only` | `bool` | `True` | Yes | `execute_candidate()` | Blocks stochastic realism with `OPT_NOISY_OBJECTIVE_NOT_ALLOWED` unless a future approved repeated-evaluation policy exists. |
 
 #### `contracts.py` — Execution Contracts
