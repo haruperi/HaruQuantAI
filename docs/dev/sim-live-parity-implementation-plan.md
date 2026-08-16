@@ -4279,6 +4279,21 @@ and otherwise preserve collector behavior. Evidence:
 `Prove standalone execution reaches the explicit demo authorization gate.`, and
 `Record the pre-provider failed run without issuing certificate evidence.`
 
+**Second collection attempt: Failed before provider access — 2026-08-16.** The approved Dry Run 28
+retry reached MT5 adapter construction but failed with `BROKER_CONFIGURATION_INVALID`; it opened no
+adapter/socket, performed no mutation, and created no artifact. Secret-safe type inspection showed
+the database slot correctly returns `SecretStr` values, while the collector had converted the login
+to its masked display text for the required account reference. The process also had no configured
+terminal executable. Correction `28DR1Δ1` unwraps only the login for the in-memory account reference,
+keeps password/server secret-bearing, and requires an explicit existing terminal before adapter
+construction; neither value is logged or serialized. Evidence:
+`tests/simulator/integration/l5_certificate_collection.py:194` and
+`tests/simulator/integration/test_l5_certificate_collection.py:89`. Exact commit:
+`fix(parity): resolve secret-backed demo collector config` with body bullets
+`Use the unwrapped login only for the required in-memory account reference.`,
+`Require an explicitly configured terminal before constructing the MT5 adapter.`, and
+`Record the pre-connection configuration failure without issuing evidence.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write

@@ -191,6 +191,51 @@ def validate_collection_preflight(
         raise RuntimeError("this approved weekend run is restricted to BTCUSD")
 
 
+def _required_secret_text(value: object, field: str) -> str:
+    """Return one required secret value for in-memory provider configuration.
+
+    Args:
+        value: Secret-bearing settings value.
+        field: Non-secret field label used only in an error message.
+
+    Returns:
+        Unwrapped non-empty secret text.
+
+    Raises:
+        RuntimeError: If the value is empty.
+        TypeError: If the value is absent or malformed.
+    """
+    getter = getattr(value, "get_secret_value", None)
+    if not callable(getter):
+        message = f"encrypted MT5 {field} is malformed"
+        raise TypeError(message)
+    result = getter()
+    if not isinstance(result, str) or not result:
+        message = f"encrypted MT5 {field} is empty"
+        raise RuntimeError(message)
+    return result
+
+
+def require_terminal_executable(value: object) -> Path:
+    """Require an explicitly configured existing MT5 terminal executable.
+
+    Args:
+        value: Configured terminal path or ``None``.
+
+    Returns:
+        Resolved existing terminal executable path.
+
+    Raises:
+        RuntimeError: If no exact terminal executable is configured.
+    """
+    if value is None:
+        raise RuntimeError("MT5 terminal executable is not configured")
+    terminal = Path(str(value)).resolve()
+    if not terminal.is_file():
+        raise RuntimeError("configured MT5 terminal executable does not exist")
+    return terminal
+
+
 def _read_json(path: Path) -> dict[str, object]:
     """Read one JSON object from a bundle member.
 
@@ -748,6 +793,7 @@ async def _collect(args: argparse.Namespace) -> Path:
     args.output = validate_collection_output(
         args.output, args.certificate_id, workspace_root=Path.cwd()
     )
+    terminal = require_terminal_executable(provider_settings.mt5_terminal_path)
     slot = resolve_system_credential_slot("mt5", request_id=generate_id("req"))
     if not all(slot.get(name) for name in ("login", "password", "server")):
         raise RuntimeError("encrypted MT5 credential slot is incomplete")
@@ -756,8 +802,8 @@ async def _collect(args: argparse.Namespace) -> Path:
         "password": slot["password"],
         "server": slot["server"],
     }
-    if provider_settings.mt5_terminal_path is not None:
-        credentials["terminal_path"] = provider_settings.mt5_terminal_path
+    credentials["terminal_path"] = terminal
+    account_reference = _required_secret_text(slot["login"], "login")
     config = build_broker_connection_config(
         "mt5",
         "demo",
@@ -769,7 +815,7 @@ async def _collect(args: argparse.Namespace) -> Path:
         circuit_failure_threshold=3,
         circuit_recovery_timeout_sec=5,
         circuit_half_open_max_calls=1,
-        account_reference=str(slot["login"]),
+        account_reference=account_reference,
         credentials=credentials,
     )
     created = create_broker_adapter(get_broker_id("mt5"), config)
@@ -815,7 +861,7 @@ async def _collect(args: argparse.Namespace) -> Path:
             quantity=quantity,
             quantity_unit=str(_field(symbol_info, "quantity_unit")),
             environment="demo",
-            account_reference=str(slot["login"]),
+            account_reference=account_reference,
             limit_price=limit_price,
             time_in_force="GTC",
             client_order_id=client_order_id,

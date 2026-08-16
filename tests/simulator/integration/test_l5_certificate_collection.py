@@ -9,11 +9,14 @@ from pathlib import Path
 
 import pytest
 from app.services.simulator import compare_parity_evidence, get_parity_envelope
+from pydantic import SecretStr
 
 from tests.simulator.integration.l5_certificate_collection import (
     _evidence,
     _has_sensitive_key,
+    _required_secret_text,
     _strip_collection_only,
+    require_terminal_executable,
     validate_authority_interval,
     validate_collection_output,
     validate_collection_preflight,
@@ -81,6 +84,30 @@ def test_sensitive_key_detection_is_recursive() -> None:
         is True
     )
     assert _has_sensitive_key({"server_digest": "a" * 64, "secret_free": True}) is False
+
+
+def test_secret_login_is_unwrapped_only_for_in_memory_account_reference() -> None:
+    """A masked SecretStr representation is never used as the account reference."""
+    value = SecretStr("demo-subject")  # pragma: allowlist secret
+    assert str(value) != "demo-subject"  # pragma: allowlist secret
+    assert (
+        _required_secret_text(value, "login") == "demo-subject"
+    )  # pragma: allowlist secret
+    with pytest.raises(TypeError, match="malformed"):
+        _required_secret_text("masked", "login")
+
+
+def test_terminal_must_be_explicitly_configured_before_adapter_creation(
+    tmp_path: Path,
+) -> None:
+    """Missing or nonexistent terminal configuration fails before provider use."""
+    with pytest.raises(RuntimeError, match="not configured"):
+        require_terminal_executable(None)
+    with pytest.raises(RuntimeError, match="does not exist"):
+        require_terminal_executable(tmp_path / "missing.exe")
+    terminal = tmp_path / "terminal64.exe"
+    terminal.touch()
+    assert require_terminal_executable(terminal) == terminal.resolve()
 
 
 def test_collection_output_is_confined_to_exact_artifact_identity(
