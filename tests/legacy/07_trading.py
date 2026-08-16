@@ -36,6 +36,7 @@ from app.services.brokers import (
     create_broker_adapter,
     disconnect_broker,
     get_broker_account_info,
+    get_broker_connection_environment,
     get_broker_id,
     get_broker_orders,
     get_broker_platform_info,
@@ -884,6 +885,25 @@ def example_01_connect() -> None:
     print(f"--- 1. Connecting to Active Broker: {ctx.target.upper()} ---")
     print("=" * 100)
 
+    if ctx.target == "sim":
+        # Simulation readiness is local and injected; it never resolves provider
+        # credentials or opens an external transport session.
+        ctx.adapter = None
+        ctx.connection = None
+        ctx.live_session = None
+        ctx.connected = True
+        _print_section(
+            "CONNECTION",
+            (
+                ("Target", ctx.target),
+                ("Status", "CONNECTED"),
+                ("Authority", "Deterministic Simulation"),
+                ("Environment", "simulation"),
+                ("Virtual", "Yes"),
+            ),
+        )
+        return
+
     try:
         b_config = resolve_provider_connection_config(
             get_broker_id(ctx.target),
@@ -895,6 +915,9 @@ def example_01_connect() -> None:
             if _status(created) == "success":
                 adapter = get_broker_value_field(created, "data")
                 if adapter is not None:
+                    execution_route = get_broker_connection_environment(
+                        b_config
+                    ).lower()
                     conn_res = asyncio.run(connect_broker(adapter))
                     status_val = _status(conn_res)
 
@@ -930,9 +953,11 @@ def example_01_connect() -> None:
                     ctx.live_session = session
 
                     config = {
-                        "RUNTIME_PROFILE": "demo",
-                        "EXECUTION_ROUTE": "demo",
-                        "ALLOW_LIVE_MUTATIONS": True,
+                        "RUNTIME_PROFILE": execution_route,
+                        "EXECUTION_ROUTE": execution_route,
+                        # This legacy example is non-production evidence and never
+                        # grants live-mutation authority.
+                        "ALLOW_LIVE_MUTATIONS": False,
                         "LIVE_WORKFLOW_TIMEOUT_SECONDS": "30",
                         "SHUTDOWN_BUDGET_SECONDS": "5",
                         "IDEMPOTENCY_RETENTION_SECONDS": 600,

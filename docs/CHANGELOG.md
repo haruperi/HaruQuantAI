@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Correct legacy three-route connection composition
+
+The legacy Trading example now initializes Simulation without provider credentials or sockets and derives provider session routing from the explicit configured environment.
+
+#### Fixed (1)
+
+- Corrected `tests/legacy/07_trading.py` so `sim` reports deterministic local readiness while MT5 and cTrader retain governed non-production provider composition.
+
 ### Publish bounded MT5 operational parity
 
 The verified demo certificate now publishes the deterministic MT5 operational semantics shared by explicitly configured sim, demo, and live routes without transferring empirical behavior.
