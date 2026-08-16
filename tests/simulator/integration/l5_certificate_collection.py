@@ -15,7 +15,7 @@ import json
 import shlex
 import sys
 import tomllib
-from collections.abc import Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import ROUND_DOWN, Decimal
 from pathlib import Path
@@ -149,6 +149,8 @@ _REQUIRED_BUILD_INPUTS = (
     "tests/simulator/integration/l5_certificate_collection.py",
 )
 _HISTORY_EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
+_MIN_HISTORY_WINDOW = timedelta(seconds=1)
+_HISTORY_BOUNDARY_STEP = timedelta(microseconds=1)
 
 
 def _json_safe(value: object) -> object:
@@ -212,6 +214,118 @@ def _items(response: object) -> tuple[object, ...]:
         raise RuntimeError("authority history page is truncated")
     values = _field(data, "items", ())
     return tuple(values)  # type: ignore[arg-type]
+
+
+def build_history_windows(
+    start: datetime, end: datetime
+) -> tuple[tuple[datetime, datetime], ...]:
+    """Partition one inclusive UTC interval into deterministic calendar years.
+
+    Args:
+        start: Inclusive history start with timezone information.
+        end: Inclusive history end after ``start``.
+
+    Returns:
+        Ordered inclusive windows without gaps or overlapping instants.
+
+    Raises:
+        ValueError: If either bound is naive or the interval is empty.
+    """
+    if start.tzinfo is None or end.tzinfo is None or end <= start:
+        raise ValueError(
+            "authority history interval must be ordered and timezone-aware"
+        )
+    cursor = start.astimezone(UTC)
+    terminal = end.astimezone(UTC)
+    windows: list[tuple[datetime, datetime]] = []
+    while cursor <= terminal:
+        next_year = datetime(cursor.year + 1, 1, 1, tzinfo=UTC)
+        window_end = min(terminal, next_year - _HISTORY_BOUNDARY_STEP)
+        windows.append((cursor, window_end))
+        cursor = window_end + _HISTORY_BOUNDARY_STEP
+    return tuple(windows)
+
+
+def _history_progress(kind: str, start: datetime, end: datetime, state: str) -> None:
+    """Emit one secret-safe pre-mutation history progress boundary.
+
+    Args:
+        kind: Allowlisted authority-history category.
+        start: Inclusive UTC window start.
+        end: Inclusive UTC window end.
+        state: Bounded collection lifecycle state.
+    """
+    print(
+        json.dumps(
+            {
+                "event": "certificate_authority_history",
+                "history_kind": kind,
+                "state": state,
+                "window_end": end.astimezone(UTC).isoformat(),
+                "window_start": start.astimezone(UTC).isoformat(),
+            },
+            sort_keys=True,
+        ),
+        flush=True,
+    )
+
+
+async def collect_complete_authority_history(
+    *,
+    kind: str,
+    start: datetime,
+    end: datetime,
+    reader: Callable[[datetime, datetime, int], Awaitable[object]],
+    progress: Callable[[str, datetime, datetime, str], None] = _history_progress,
+) -> tuple[object, ...]:
+    """Collect complete history through bounded windows before any mutation.
+
+    Args:
+        kind: Allowlisted history category used only in progress output.
+        start: Inclusive UTC history start.
+        end: Inclusive UTC history end.
+        reader: Public Brokers history operation for one bounded window.
+        progress: Secret-safe lifecycle receiver.
+
+    Returns:
+        Complete ordered items from all non-truncated windows.
+
+    Raises:
+        RuntimeError: If a page fails or remains truncated at one second.
+        ValueError: If the category or interval is invalid.
+    """
+    if kind not in {"orders", "deals", "transactions"}:
+        raise ValueError("authority history kind is invalid")
+
+    async def collect_window(
+        window_start: datetime, window_end: datetime
+    ) -> tuple[object, ...]:
+        progress(kind, window_start, window_end, "started")
+        response = await reader(window_start, window_end, _STATE_LIMIT)
+        if _field(response, "status") != "success":
+            raise RuntimeError("authority page read failed")
+        data = _field(response, "data")
+        if _field(data, "truncated", False) is True:
+            if window_end - window_start <= _MIN_HISTORY_WINDOW:
+                raise RuntimeError(
+                    "authority history remains truncated at minimum window"
+                )
+            midpoint = window_start + (window_end - window_start) / 2
+            progress(kind, window_start, window_end, "split")
+            left = await collect_window(window_start, midpoint)
+            right = await collect_window(
+                midpoint + _HISTORY_BOUNDARY_STEP,
+                window_end,
+            )
+            return (*left, *right)
+        values = _items(response)
+        progress(kind, window_start, window_end, "completed")
+        return values
+
+    collected: list[object] = []
+    for window_start, window_end in build_history_windows(start, end):
+        collected.extend(await collect_window(window_start, window_end))
+    return tuple(collected)
 
 
 def build_application_identity(workspace_root: Path) -> dict[str, object]:
@@ -1502,20 +1616,45 @@ async def _collect(args: argparse.Namespace) -> Path:
             raise RuntimeError("MT5 demo account lacks trade-write permission")
         started = datetime.now(UTC) - timedelta(seconds=1)
         initial = await _state(demo)
-        pre_orders = _items(
-            await list_broker_order_history(
-                demo, _HISTORY_EPOCH, started, limit=_STATE_LIMIT
+
+        async def read_orders(
+            window_start: datetime, window_end: datetime, limit: int
+        ) -> object:
+            return await list_broker_order_history(
+                demo, window_start, window_end, limit=limit
             )
+
+        async def read_deals(
+            window_start: datetime, window_end: datetime, limit: int
+        ) -> object:
+            return await list_broker_deal_history(
+                demo, window_start, window_end, limit=limit
+            )
+
+        async def read_transactions(
+            window_start: datetime, window_end: datetime, limit: int
+        ) -> object:
+            return await list_broker_account_transactions(
+                demo, window_start, window_end, limit=limit
+            )
+
+        pre_orders = await collect_complete_authority_history(
+            kind="orders",
+            start=_HISTORY_EPOCH,
+            end=started,
+            reader=read_orders,
         )
-        pre_deals = _items(
-            await list_broker_deal_history(
-                demo, _HISTORY_EPOCH, started, limit=_STATE_LIMIT
-            )
+        pre_deals = await collect_complete_authority_history(
+            kind="deals",
+            start=_HISTORY_EPOCH,
+            end=started,
+            reader=read_deals,
         )
-        pre_transactions = _items(
-            await list_broker_account_transactions(
-                demo, _HISTORY_EPOCH, started, limit=_STATE_LIMIT
-            )
+        pre_transactions = await collect_complete_authority_history(
+            kind="transactions",
+            start=_HISTORY_EPOCH,
+            end=started,
+            reader=read_transactions,
         )
         authority_watermark = build_authority_watermark(
             orders=pre_orders,

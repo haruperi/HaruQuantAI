@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Bound certificate authority-history collection
+
+MT5 certificate preflight now collects complete authority history through deterministic calendar windows before any mutation.
+
+#### Fixed (1)
+
+- Split truncated authority-history pages recursively, fail closed at the minimum interval, and emit only secret-safe window progress.
+
 ### Close SQLite verification resources deterministically
 
 API and Agentic persistence verification now closes inspection connections immediately after retaining their existing transaction behavior.

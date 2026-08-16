@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from itertools import pairwise
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -23,7 +25,9 @@ from tests.simulator.integration.l5_certificate_collection import (
     build_certificate_manifest,
     build_collection_command,
     build_collector_provider_settings,
+    build_history_windows,
     build_mt5_credential_mapping,
+    collect_complete_authority_history,
     require_terminal_executable,
     validate_authority_interval,
     validate_collection_output,
@@ -265,6 +269,137 @@ def test_truncated_authority_history_fails_closed() -> None:
     )
     with pytest.raises(RuntimeError, match="truncated"):
         _items(response)
+
+
+def test_history_windows_cover_the_exact_interval_without_overlap() -> None:
+    """Calendar windows cover every instant exactly once."""
+    start = datetime(2024, 6, 1, tzinfo=UTC)
+    end = datetime(2026, 8, 16, tzinfo=UTC)
+    windows = build_history_windows(start, end)
+    assert windows[0][0] == start
+    assert windows[-1][1] == end
+    assert all(
+        right_start == left_end + timedelta(microseconds=1)
+        for (_, left_end), (right_start, _) in pairwise(windows)
+    )
+
+
+def test_complete_authority_history_aggregates_bounded_windows() -> None:
+    """Every complete page contributes to the pre-mutation watermark input."""
+    calls: list[tuple[datetime, datetime, int]] = []
+    progress: list[tuple[str, datetime, datetime, str]] = []
+
+    async def reader(start: datetime, end: datetime, limit: int) -> object:
+        calls.append((start, end, limit))
+        return SimpleNamespace(
+            status="success",
+            data=SimpleNamespace(items=(start.year,), truncated=False),
+        )
+
+    values = asyncio.run(
+        collect_complete_authority_history(
+            kind="orders",
+            start=datetime(2024, 6, 1, tzinfo=UTC),
+            end=datetime(2026, 8, 16, tzinfo=UTC),
+            reader=reader,
+            progress=lambda *event: progress.append(event),
+        )
+    )
+    assert values == (2024, 2025, 2026)
+    assert len(calls) == 3
+    assert all(call[2] == 1_000 for call in calls)
+    assert [event[3] for event in progress] == [
+        "started",
+        "completed",
+        "started",
+        "completed",
+        "started",
+        "completed",
+    ]
+
+
+def test_truncated_history_windows_split_until_complete() -> None:
+    """A truncated provider page is subdivided without dropping an instant."""
+    calls: list[tuple[datetime, datetime]] = []
+
+    async def reader(start: datetime, end: datetime, limit: int) -> object:
+        del limit
+        calls.append((start, end))
+        if len(calls) == 1:
+            return SimpleNamespace(
+                status="success",
+                data=SimpleNamespace(items=(), truncated=True),
+            )
+        return SimpleNamespace(
+            status="success",
+            data=SimpleNamespace(items=((start, end),), truncated=False),
+        )
+
+    start = datetime(2026, 1, 1, tzinfo=UTC)
+    end = start + timedelta(seconds=4)
+    values = asyncio.run(
+        collect_complete_authority_history(
+            kind="deals",
+            start=start,
+            end=end,
+            reader=reader,
+            progress=lambda *_: None,
+        )
+    )
+    assert len(values) == 2
+    assert values[0][0] == start
+    assert values[1][1] == end
+    assert values[1][0] == values[0][1] + timedelta(microseconds=1)
+
+
+def test_minimum_truncated_history_window_fails_closed() -> None:
+    """Completeness uncertainty at the minimum interval blocks collection."""
+
+    async def reader(start: datetime, end: datetime, limit: int) -> object:
+        del start, end, limit
+        return SimpleNamespace(
+            status="success",
+            data=SimpleNamespace(items=(), truncated=True),
+        )
+
+    start = datetime(2026, 1, 1, tzinfo=UTC)
+    with pytest.raises(RuntimeError, match="minimum window"):
+        asyncio.run(
+            collect_complete_authority_history(
+                kind="transactions",
+                start=start,
+                end=start + timedelta(seconds=1),
+                reader=reader,
+                progress=lambda *_: None,
+            )
+        )
+
+
+def test_history_progress_exposes_only_scope_and_time(capsys) -> None:
+    """Default progress output contains no provider authority identifier."""
+
+    async def reader(start: datetime, end: datetime, limit: int) -> object:
+        del start, end, limit
+        return SimpleNamespace(
+            status="success",
+            data=SimpleNamespace(
+                items=(SimpleNamespace(order_id="private-order"),),
+                truncated=False,
+            ),
+        )
+
+    start = datetime(2026, 1, 1, tzinfo=UTC)
+    asyncio.run(
+        collect_complete_authority_history(
+            kind="orders",
+            start=start,
+            end=start + timedelta(seconds=2),
+            reader=reader,
+        )
+    )
+    output = capsys.readouterr().out
+    assert "certificate_authority_history" in output
+    assert "private-order" not in output
 
 
 def test_collection_command_is_relative_and_reproducible() -> None:

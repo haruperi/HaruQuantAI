@@ -4454,6 +4454,39 @@ context restored the intended commit, after which all validation passed. Exact c
 `Close the Agentic durable-runtime inspection connection.`, and
 `Eliminate garbage-collection-dependent SQLite resource warnings.`
 
+**Seventh collection attempt: Timed out safely before mutation — 2026-08-16.** The separately
+approved Dry Run 38 started certificate candidate
+`l5-mt5-operational-btcusd-20260816-03`, but the collector exceeded its 240-second shell timeout,
+emitted no completion boundary, and wrote no artifact directory. Exact process-command inspection
+showed the timeout had left two collector Python processes alive. Read-only terminal verification
+found zero active `BTCUSD` orders, zero recent buy-limit candidates, and zero recent deals; the sole
+recent cancelled `BTCUSD` order predated the `-03` process start, proving this attempt did not reach
+mutation. After this evidence, only the two exact collector processes were terminated; the MT5
+terminal remained running and responsive. No certificate or maturity claim was published.
+
+**Authority-history correction `CERT-DR38Δ1` — 2026-08-16.** The stall was traced to three
+monolithic MT5 history requests from 1970 to the present. Although the async boundary times out after
+15 seconds, an already-running native SDK worker cannot be cancelled and can keep Python waiting at
+executor shutdown. The approved recommendation partitions the inclusive UTC interval into exact
+calendar-year windows, recursively bisects any truncated page, fails closed if a one-second page
+remains truncated, aggregates only complete pages, and emits only category/window/state progress.
+All pre-run history collection remains before the first order mutation. Evidence:
+`tests/simulator/integration/l5_certificate_collection.py:219`,
+`tests/simulator/integration/l5_certificate_collection.py:273`,
+`tests/simulator/integration/l5_certificate_collection.py:1641`,
+`tests/simulator/integration/test_l5_certificate_collection.py:274`,
+`tests/simulator/integration/test_l5_certificate_collection.py:321`, and
+`tests/simulator/integration/test_l5_certificate_collection.py:378`. Collector/bundle tests passed
+35 in 1.10 seconds; the complete Simulator gate passed 543 tests in 34.02 seconds; direct
+`tests/simulator/usage/features/18_parity.py` execution passed all eleven mapped requirements; and
+focused Ruff, Ruff format, and mypy passed. The initially proposed usage command named a nonexistent
+legacy path and failed before execution; the owning README's registered feature program above was
+then executed successfully. Exact commit:
+`fix(parity): bound certificate authority history collection` with body bullets
+`Collect complete MT5 authority history through deterministic bounded windows.`,
+`Split truncated pages recursively and fail closed at the minimum interval.`, and
+`Expose secret-safe pre-mutation progress without weakening certificate scope.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write
