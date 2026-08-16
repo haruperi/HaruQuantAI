@@ -64,13 +64,20 @@ def test_market_and_watchlist_ownership_is_reconciled() -> None:
     ui_registry = _registry(_UI_README)
 
     # The API registry stays fully reconciled; the UI records exactly the
-    # thirteen primary/foundation features (FEAT-UI-01-17) whose requirement
+    # eleven primary/foundation features (FEAT-UI-01-17) whose requirement
     # coverage or focused-folder ownership is not yet evidenced. Naming them
     # keeps the ratchet: no feature can silently regress.
     assert "| Pending |" not in api_registry
     assert set(re.findall(r"\|\s*Pending\s*\|\s*`(FEAT-UI-\d{2})`", ui_registry)) == {
         f"FEAT-UI-{number:02d}" for number in range(1, 18)
-    } - {"FEAT-UI-01", "FEAT-UI-02", "FEAT-UI-03", "FEAT-UI-04", "FEAT-UI-14"}
+    } - {
+        "FEAT-UI-01",
+        "FEAT-UI-02",
+        "FEAT-UI-03",
+        "FEAT-UI-04",
+        "FEAT-UI-05",
+        "FEAT-UI-14",
+    }
     assert "| `workstation/watchlists/` |" in api_registry
     assert "| `workstation/markets/` |" in api_registry
     assert "| `src/features/markets/` |" in ui_registry
@@ -113,7 +120,7 @@ def test_ui_evidence_exception_and_widget_ownership_are_documented() -> None:
         "app/ui/src/features/instrument-panels/OptionsGridWidget.tsx",
         "app/ui/src/components/workflow/OrderTicketModal.tsx",
         "app/ui/src/components/workflow/PositionsWidget.tsx",
-        "app/ui/src/features/instrument-panels/PriceLadderWidget.tsx",
+        "app/ui/src/features/price-ladder/PriceLadderWidget.tsx",
         "app/ui/src/app/workstation/settings/SystemSettingsModal.tsx",
         "app/ui/src/components/workflow/TradeLogWidget.tsx",
         "app/ui/src/features/planning/TradePlanWidget.tsx",
@@ -198,10 +205,10 @@ def test_repository_feature_inventory_is_reconciled() -> None:
         statuses.extend(status for status, _feature_id in rows)
         feature_ids.extend(feature_id for _status, feature_id in rows)
 
-    assert len(feature_ids) == len(set(feature_ids)) == 238
-    assert statuses.count("Completed") == 226
-    assert statuses.count("Pending") == 12
+    assert len(feature_ids) == len(set(feature_ids)) == 239
+    assert statuses.count("Completed") == 228
+    assert statuses.count("Pending") == 11
     assert statuses.count("Partial") == 0
     project = _PROJECT_README.read_text(encoding="utf-8")
-    assert "238 registered application features" in project
-    assert "(94.96%)" in project
+    assert "239 registered application features" in project
+    assert "(95.40%)" in project
