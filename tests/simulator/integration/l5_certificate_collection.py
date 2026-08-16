@@ -23,7 +23,7 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-from app.services.api import resolve_system_credential_slot
+from app.services.api import get_system_settings, resolve_system_credential_slot
 from app.services.brokers import (
     build_broker_connection_config,
     build_broker_order_filter,
@@ -230,10 +230,41 @@ def require_terminal_executable(value: object) -> Path:
     """
     if value is None:
         raise RuntimeError("MT5 terminal executable is not configured")
-    terminal = Path(str(value)).resolve()
+    getter = getattr(value, "get_secret_value", None)
+    raw_value = getter() if callable(getter) else value
+    terminal = Path(str(raw_value)).resolve()
     if not terminal.is_file():
         raise RuntimeError("configured MT5 terminal executable does not exist")
     return terminal
+
+
+def build_collector_provider_settings(system_values: Mapping[str, object]) -> object:
+    """Compose immutable MT5 settings from database-backed system values.
+
+    Args:
+        system_values: Public non-credential system-settings mapping.
+
+    Returns:
+        Secret-redacting broker-provider settings with explicit demo routing.
+
+    Raises:
+        RuntimeError: If MT5 is not enabled or terminal configuration is absent.
+    """
+    enabled = str(system_values.get("MT5_ENABLED", "false")).lower() == "true"
+    terminal = system_values.get("MT5_TERMINAL_PATH")
+    if not enabled:
+        raise RuntimeError("MT5 is not enabled in database-backed system settings")
+    if not terminal:
+        raise RuntimeError(
+            "MT5 terminal is absent from database-backed system settings"
+        )
+    return load_broker_provider_settings(
+        {
+            "mt5_enabled": True,
+            "mt5_environment": "demo",
+            "mt5_terminal_path": terminal,
+        }
+    )
 
 
 def _read_json(path: Path) -> dict[str, object]:
@@ -783,7 +814,11 @@ async def _collect(args: argparse.Namespace) -> Path:
         TypeError: If a public contract returns a malformed shape.
     """
     settings = load_settings()
-    provider_settings = load_broker_provider_settings()
+    system_record = get_system_settings(request_id=generate_id("req"))
+    system_values = _field(system_record, "settings")
+    if not isinstance(system_values, Mapping):
+        raise TypeError("database-backed system settings are malformed")
+    provider_settings = build_collector_provider_settings(system_values)
     validate_collection_preflight(
         execute_demo=args.execute_demo,
         environment=settings.environment,

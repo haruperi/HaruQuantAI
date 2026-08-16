@@ -16,6 +16,7 @@ from tests.simulator.integration.l5_certificate_collection import (
     _has_sensitive_key,
     _required_secret_text,
     _strip_collection_only,
+    build_collector_provider_settings,
     require_terminal_executable,
     validate_authority_interval,
     validate_collection_output,
@@ -108,6 +109,28 @@ def test_terminal_must_be_explicitly_configured_before_adapter_creation(
     terminal = tmp_path / "terminal64.exe"
     terminal.touch()
     assert require_terminal_executable(terminal) == terminal.resolve()
+    redacted_terminal = SecretStr(str(terminal))
+    assert require_terminal_executable(redacted_terminal) == terminal.resolve()
+
+
+def test_provider_settings_are_composed_from_database_system_values(
+    tmp_path: Path,
+) -> None:
+    """Collector composition uses explicit database settings and demo route."""
+    terminal = tmp_path / "terminal64.exe"
+    terminal.touch()
+    settings = build_collector_provider_settings(
+        {"MT5_ENABLED": "true", "MT5_TERMINAL_PATH": str(terminal)}
+    )
+    assert settings.mt5_enabled is True
+    assert settings.mt5_environment == "demo"
+    assert require_terminal_executable(settings.mt5_terminal_path) == terminal.resolve()
+    with pytest.raises(RuntimeError, match="not enabled"):
+        build_collector_provider_settings(
+            {"MT5_ENABLED": "false", "MT5_TERMINAL_PATH": str(terminal)}
+        )
+    with pytest.raises(RuntimeError, match="absent"):
+        build_collector_provider_settings({"MT5_ENABLED": "true"})
 
 
 def test_collection_output_is_confined_to_exact_artifact_identity(

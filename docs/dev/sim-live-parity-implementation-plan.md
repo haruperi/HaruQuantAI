@@ -4294,6 +4294,20 @@ construction; neither value is logged or serialized. Evidence:
 `Require an explicitly configured terminal before constructing the MT5 adapter.`, and
 `Record the pre-connection configuration failure without issuing evidence.`
 
+**Third collection attempt: Failed before provider access — 2026-08-16.** The approved Dry Run 29
+retry stopped at terminal preflight because the immutable Utils settings loader deliberately accepts
+only explicit composition values and does not discover process environment. It performed no
+credential lookup, adapter/socket creation, mutation, or artifact write. Read-only inspection through
+the public API confirmed database-backed system settings already enable MT5 and contain the terminal
+configuration. Correction `29DR1Δ1` therefore composes the secret-redacting provider settings from
+that public record with explicit `demo` routing and removes unsupported process-environment discovery.
+Evidence: `tests/simulator/integration/l5_certificate_collection.py:241` and
+`tests/simulator/integration/test_l5_certificate_collection.py:116`. Exact commit:
+`fix(parity): compose collector from system settings` with body bullets
+`Read MT5 enablement and terminal configuration through the public database-backed settings API.`,
+`Inject the explicit demo route into the immutable broker-provider settings model.`, and
+`Remove unsupported process-environment discovery from certificate collection.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write
