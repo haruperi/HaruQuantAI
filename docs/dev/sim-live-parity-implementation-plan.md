@@ -4417,6 +4417,23 @@ complete partition rerun passed all 1,783 tests. Exact commit:
 `Preserve numeric filenames, direct execution, and bounded teaching assertions.`, and
 `Restore the repository-wide Ruff gate without excluding the legacy directory.`
 
+**API identity usage correction `CERT-DR36` — 2026-08-16.** The repository usage gate found
+that `tests/api/usage/02_identity.py` still submitted the user-preference key `theme` to the
+manifest-governed global system-settings document, which correctly failed closed with
+`SYSTEM_SETTING_KEY_UNKNOWN`. The approved recommendation replaced only that system-scoped example
+with the canonical non-secret `APP_NAME` key already used by API integration evidence; the
+user-scoped `theme` demonstration remains unchanged. No production behavior, public API, schema, or
+migration changed. Evidence: `tests/api/usage/02_identity.py:161`. Direct execution passed; the
+system-settings manifest unit file passed 5 tests; the identity/settings integration file passed 7
+tests with one upstream Starlette deprecation warning; focused Ruff, Ruff format, and mypy passed.
+The first targeted pytest invocation exercised five passing tests but returned nonzero because the
+repository-wide 80% coverage threshold was applied to that isolated slice (30.29%); the established
+`--no-cov` targeted verification then passed and the existing complete-suite coverage evidence
+remains 88%. Exact commit: `fix(api): use canonical system setting in identity usage` with body
+bullets `Replace the stale global theme example with manifest-approved APP_NAME.`,
+`Preserve user preference and optimistic-version demonstrations.`, and
+`Restore directly executable FEAT-API-02 usage evidence.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write

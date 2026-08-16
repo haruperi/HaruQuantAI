@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Restore canonical API identity usage evidence
+
+The standalone identity workflow now demonstrates global settings updates with a manifest-approved non-secret key.
+
+#### Fixed (1)
+
+- Replaced the stale system-scoped `theme` example with canonical `APP_NAME` while preserving the independent user-preference example.
+
 ### Restore lint coverage for legacy executables
 
 Legacy direct-execution programs now inherit the same bounded lint policy as registered standalone usage evidence without excluding the directory from repository checks.

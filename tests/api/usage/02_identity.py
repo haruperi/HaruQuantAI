@@ -158,7 +158,7 @@ def main() -> None:
             )
             system_current = get_system_settings(request_id=generate_id("req"))
             system_updated = update_system_settings(
-                {"theme": "light"},
+                {"APP_NAME": "HaruQuantAI"},
                 actor_id=user.user_id,
                 expected_version=system_current.version,
                 request_id=generate_id("req"),
