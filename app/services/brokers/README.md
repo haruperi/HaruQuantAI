@@ -5,8 +5,8 @@ The immutable Broker error catalogue uses only the Utils-owned `TRANSIENT`,
 categories. Ambiguous mutation outcomes remain non-retryable `UNKNOWN_STATE`.
 
 > **Package:** `app/services/brokers`
-> **Status:** `Completed` — thirteen focused features (`FEAT-BRK-00`..`10`, `FEAT-BRK-17`, `FEAT-BRK-18`) are implemented with package-root APIs, tests, and numbered usage evidence. Later sim⇄live parity-programme extensions remain allocated to their owning phases.
-> **Last updated:** `2026-08-15`
+> **Status:** `Completed` — thirteen focused features (`FEAT-BRK-00`..`10`, `FEAT-BRK-17`, `FEAT-BRK-18`) are implemented with package-root APIs, tests, and numbered usage evidence, including the bounded shared MT5 operational-parity contracts.
+> **Last updated:** `2026-08-16`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
@@ -175,16 +175,18 @@ concrete DTO/event schema ID). Consumers never parse `schema_id` for compatibili
 
 Brokers owns five durable operational/reference tables: `broker_symbol_map`, `broker_health_history`, `broker_route_recovery`, `broker_environment_permissions`, and `broker_event_checkpoints`. It persists no credential, reusable market-data payload, or invented order/fill/position state. `migrations/` and `persistence/` are the two conformant support packages of one Brokers persistence concern: the former owns immutable schema evolution, while the latter owns the exact five-file runtime CRUD boundary. The migration manifest runs through Data's verified ledger, checksum, write-lock, and transaction boundary. Package-root feature operations provide production reachability. Live session and SDK state remains bounded, in memory, adapter-instance scoped, and is discarded at disconnect.
 
-### Sim⇄live parity programme boundaries
+### Sim, demo, and live parity boundaries
 
-The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementation-plan.md`) declares the following Brokers boundaries. None is implemented in the current registry; each lands with its owning requirement in the programme's phases and is registered here as the binding design.
+The completed parity programme establishes the following Brokers boundaries for the
+explicit `sim`, `demo`, and `live` routes. Current feature state, public APIs,
+requirements, and evidence are registered only in this README.
 
-- **Current typed provider specification snapshot.** Brokers will own a typed, versioned current `ProviderSpecificationSnapshot` — execution/order/filling/expiration/GTC modes, stops and freeze levels, directional volume limit, calculation mode, margin and swap evidence, account permissions, and instrument scalars — carrying provider/server/environment/account identity, `observed_at`, retrieval provenance, and checksum. It states **current observation only**: it never invents historical effective bounds, dynamic commission/fee evidence stays a separate typed reference rather than a guessed static rate, and missing required fields fail closed. Immutable effective-dated history is owned by Data's `FEAT-DATA-02` extension; Simulation never interprets raw MT5 metadata.
-- **Simulation adapter boundary.** Brokers will own the simulation broker channel: `BrokerId.SIM` plus `BrokerEnvironment.SIMULATION`, registered through the exact factory pair and mirroring MT5 only. The adapter is a socket-free translation layer over an injected, structurally typed Brokers-owned authority port (`SimulationAuthorityPort`) whose signatures reference no Simulation symbol; Brokers imports nothing from `app.services.simulator`. Brokers owns DTO/error mapping, capabilities, and lifecycle; matching, accounting, scheduling, and journals remain Simulation-owned, and unimplemented operations return canonical `BROKER_CAPABILITY_UNSUPPORTED`.
+- **Current typed provider specification snapshot.** Brokers owns a typed, versioned current `ProviderSpecificationSnapshot` — execution/order/filling/expiration/GTC modes, stops and freeze levels, directional volume limit, calculation mode, margin and swap evidence, account permissions, and instrument scalars — carrying provider/server/environment/account identity, `observed_at`, retrieval provenance, and checksum. It states **current observation only**: it never invents historical effective bounds, dynamic commission/fee evidence stays a separate typed reference rather than a guessed static rate, and missing required fields fail closed. Immutable effective-dated history is owned by Data's `FEAT-DATA-02` extension; Simulation never interprets raw MT5 metadata.
+- **Simulation adapter boundary.** Brokers owns the simulation broker channel: `BrokerId.SIM` plus `BrokerEnvironment.SIMULATION`, registered through the exact factory pair and mirroring MT5 only. The adapter is a socket-free translation layer over an injected, structurally typed Brokers-owned authority port (`SimulationAuthorityPort`) whose signatures reference no Simulation symbol; Brokers imports nothing from `app.services.simulator`. Brokers owns DTO/error mapping, capabilities, and lifecycle; matching, accounting, scheduling, and journals remain Simulation-owned, and unimplemented operations return canonical `BROKER_CAPABILITY_UNSUPPORTED`.
 - **Statelessness.** The simulation adapter owns no matching, accounting, order-state, or business state. All authority values arrive through the injected port already authoritative and are mapped, never recomputed; the adapter remains invocation-local and holds no durable simulation state.
 - **Demo-only fixture collection.** Provider conformance and calculation fixture collection is a write-scoped, separately approved demo-only operation (guarded to `ENVIRONMENT=dev` plus a demo account) and never runs in the default suite; the default suite replays immutable sanitized fixtures offline. Simulation receives immutable fixture artifacts and never invokes collection.
 - **Connection lifecycle.** The simulation channel mirrors the admitted Brokers connection lifecycle through port-backed state — connect, disconnect, reconnect, ping/status, connection events, and session finalization — returning the same canonical lifecycle states and failures, blocking mutations while disconnected, and opening no socket or external connection.
-- **Clock-injection prerequisite.** MT5 mapping timestamp sites (including `_map_quote`/`_map_tick` in `metatrader/mapping.py`) currently read the ambient UTC clock. Before the simulation adapter reuses MT5 mapping, every such site must accept an injected clock with the live aware-UTC clock as its default (programme Phase 11a); simulated reads then bind simulated observation time instead of wall-clock time.
+- **Clock injection.** MT5 mapping timestamp sites accept an injected clock with the aware-UTC runtime clock as the provider default; simulated reads bind simulated observation time instead of wall-clock time.
 - **Capability-intersection rule.** Parity capability is the published intersection between the provider's verified operations and the simulation adapter's admitted surface. The intersection may tighten with each envelope version; missing MT5 operations are never falsely advertised as mirrored or normalized away, and an unsupported read or mutation is never returned as an empty success.
 
 ### `SimulationAuthorityPort` — declared protocol design (programme Phase 3a; implemented as `FR-BRK-172` in Phase 10a)
@@ -2126,10 +2128,9 @@ by UI/API through its completed persisted settings and credential composition bo
 
 ## 6. Open Decisions
 
-These are unresolved owner choices raised by the approved capability audit. They are recorded here, not resolved by this documentation task.
+This section contains unresolved owner choices only.
 
 - **OD-BRK-01 — Normalized account snapshot ownership.** Brokers publishes the distinct `BrokerAccountSnapshot v1` contract while Data owns `AccountStateSnapshot`. The owner must decide whether to retain both names permanently or migrate the normalized account snapshot name and its consumers to Brokers.
-- **OD-BRK-02 — Simulation isolation integration timing.** Broker-side non-production guards are implemented. The owner must decide when to add the cross-domain proof that a Simulator mode cannot obtain a live broker route after `FEAT-SIM-10` is implemented.
 
 ---
 

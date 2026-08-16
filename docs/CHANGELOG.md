@@ -10,6 +10,10 @@ The verified demo certificate now publishes the deterministic MT5 operational se
 
 - Published `l5-mt5-operational-btcusd-20260816-04`, valid through 2027-08-14 unless invalidated, with a finalized nine-command audit ledger, reproducible checksums, and explicit empirical exclusions.
 
+#### Changed (1)
+
+- Folded the completed parity programme into authoritative system and domain documentation, removed resolved planning language, and retired the temporary register and implementation plan.
+
 ### Finalize certificate command evidence
 
 Generated operational certificates can now bind every mandatory offline publication command and successful exit code before final acceptance.
@@ -334,7 +338,7 @@ failure taxonomy before any programme code changes.
 - Registered the L1–L4 maturity ladder with an expiring L5-MT5-Operational certificate, the versioned MT5-FX-only Parity Envelope concept, the market-observability and initial-authority-state identity rules, and the certificate invalidation policy.
 - Recorded the three parity failure classes (mirrored domain failures, fail-closed Simulation-integrity failures, seeded/journalled infrastructure injections) and the Brokers-current versus Data-historical provider-specification evidence ownership.
 - Registered the four Pending Simulation features `FEAT-SIM-15`–`18` plus the declared Brokers, Data, and Trading parity-programme boundaries, the request v2/async operation with preserved v1/sync deprecation windows, and superseded all pre-programme numerical performance results.
-- Folded `sim-as-broker-adapter-decision.md`, `simulator-backtest-pipeline.md`, and `trading-execution-pipeline.md` into the owning authorities and deleted them; `sim-live-parity-register.md` and the implementation plan remain reference-only until the claimed certificate is complete.
+- Folded `sim-as-broker-adapter-decision.md`, `simulator-backtest-pipeline.md`, and `trading-execution-pipeline.md` into the owning authorities and deleted them; the parity register and implementation plan remained temporary until certificate completion.
 
 ### Route live MT5 presentation through the MQL5 TCP bridge
 

@@ -516,8 +516,8 @@ accrued costs; the account interval is exclusive or every foreign/manual event i
    scenario/fault-injection engine.
 
 Feature internals, requirement rows, and evidence remain authoritative in the owning package
-READMEs (`app/services/simulator/README.md` and the Brokers/Data/Trading registries); the
-executable programme is `docs/dev/sim-live-parity-implementation-plan.md`.
+READMEs (`app/services/simulator/README.md` and the Brokers/Data/Trading registries). The published
+certificate identity, scope, validity, and exclusions above are the system-level parity record.
 
 ### Consolidated feature inventory
 
@@ -537,7 +537,8 @@ The twelve `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
 ownership recorded in `app/ui/README.md` — they are the primary trading workspace and
 its enabling foundation, specified by `docs/dev/documentation.pdf`. Simulator
 `FEAT-SIM-17` (Empirical Execution Calibration) and `FEAT-SIM-18` (Parity Comparison)
-are completed; later programme phases govern cross-feature certification maturity.
+are completed, and the bounded L5-MT5-Operational certificate records cross-feature certification
+maturity without making a live empirical claim.
 
 Feature descriptions, requirements, public APIs, persistence, and evidence remain
 authoritative only in the owning package README; this section is the system-level

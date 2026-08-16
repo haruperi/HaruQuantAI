@@ -1,7 +1,7 @@
 # Trading
 
 > **Package:** `app/services/trading`
-> **Status:** `Completed` — all 11 registered features (`FEAT-TRD-01`..`11`) are implemented with Trading-scoped verification and usage evidence. Phase 14a convergence requirements `FR-TRD-088`–`094` and `FR-TRD-113` are implemented; later parity-programme requirements remain Proposed until their owning phases.
+> **Status:** `Completed` — all 11 registered features (`FEAT-TRD-01`..`11`) and parity-programme requirements `FR-TRD-085`–`113` are implemented with Trading-scoped verification and usage evidence.
 > **Last updated:** `2026-08-14`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -124,11 +124,11 @@ filtering. This support directory is not a separately registered feature.
 | Completed | Idempotency reservations and canonical-material versions  | Trading only                                                             | `migrations/definitions.py` |
 | Completed | Reconciliation runs, authority transitions, and incidents | UI/API via `TradeRecord`; Risk via audit evidence where required         | `migrations/definitions.py` |
 
-### Sim⇄live parity programme boundaries
+### Sim, demo, and live parity boundaries
 
-The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementation-plan.md`)
-declares the following Trading designs. Order-policy v2 is implemented in Phase 6a; each
-remaining design lands with its owning requirement (`FR-TRD-085`–`FR-TRD-113`) in the programme's phases.
+The completed parity programme establishes the following Trading contracts for the
+explicit `sim`, `demo`, and `live` routes. Their owning requirements are
+`FR-TRD-085`–`FR-TRD-113`.
 
 - **Paired gate taxonomy.** Business and risk gates are route-independent: `sim`, `demo`,
   and `live` traverse the same gate roles, order, inputs, and outcomes through one action
@@ -144,14 +144,14 @@ remaining design lands with its owning requirement (`FR-TRD-085`–`FR-TRD-113`)
   release window; a v1 request lacking a policy dimension fails closed unless an
   explicitly named, versioned legacy-compatibility profile supplies it, and that legacy
   path is excluded from the parity envelope.
-- **Simulation authority consumption.** Simulation will consume Trading through one
+- **Simulation authority consumption.** Simulation consumes Trading through one
   public approved-request builder and the public mutation verbs; it never constructs
   `OrderIntent` directly and never copies private Trading state. Authority for the `sim`
   route is injected through the Brokers root boundary (the simulation broker channel),
   using the injected Brokers adapter for every route; the route changes only authority
   transport and the declared safety gates.
 - **Async deadline port.** `run_live_evaluation_cycle` remains the single public
-  evaluation path; its deadline authority will be an injected port. Live and demo use
+  evaluation path; its deadline authority is an injected port. Live and demo use
   monotonic wall time; Simulation supplies scheduler time. Neutral outcomes and timeout
   evidence keep identical semantic shape on every route, and no production dependency
   construction may default the port.

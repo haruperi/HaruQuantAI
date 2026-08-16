@@ -1178,8 +1178,8 @@ lease that expires or invalidates when its bound build, contract, code/config
 identity, specification, source/tick model, calibration validity, or detected drift
 changes. Genuine bid/ask tick evidence is mandatory for path-sensitive parity;
 derived OHLC paths are research-only unless a registered invariant is proven
-path-independent. The system-level record lives in `docs/PROJECT.md` §3 and the
-executable programme in `docs/dev/sim-live-parity-implementation-plan.md`.
+path-independent. The system-level record lives in `docs/PROJECT.md` §3; owning package READMEs
+retain the current contracts, requirements, public APIs, and evidence.
 
 The published Envelope v2 instance is `l5-mt5-operational-btcusd-20260816-04`, issued from an
 independent MT5 demo `BTCUSD` operational trace on 2026-08-16 and valid through 2027-08-14 unless a

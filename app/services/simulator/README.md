@@ -116,10 +116,10 @@ publication. This support directory is not a separately registered feature.
 
 Incomplete, failed, or diagnostic-failed runs may retain bounded diagnostic evidence but must not be published as completed `SimulationResult` records.
 
-### Sim⇄live parity programme registration
+### Sim, demo, and live parity contract
 
-The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementation-plan.md`)
-converges `sim`, `demo`, and `live` on one Trading orchestration with an injected
+The completed parity programme converges `sim`, `demo`, and `live` on one Trading
+orchestration with an injected
 authority boundary. Dependency direction is `Simulation → Trading → Brokers` plus
 `Simulation → Brokers` (read/factory through the Brokers-owned simulation authority
 port); Brokers imports no Simulation symbol, and Simulation keeps matching, accounting,
@@ -1970,7 +1970,7 @@ constructed, so adding a failure path adds a catalog row first.
 
 ---
 
-## 6. Open Decisions
+## 6. Completed scheduler requirements
 
 ### Deterministic execution scheduler requirements
 

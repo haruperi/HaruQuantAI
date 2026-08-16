@@ -92,11 +92,11 @@ execution decision.
 - Implicit conversion of foreign file formats on read. `load_dataset` requires a
   Data-written manifest; foreign artifacts enter only through explicit import.
 
-### Sim⇄live parity programme boundaries
+### Sim, demo, and live parity boundaries
 
-The approved sim⇄live parity programme (`docs/dev/sim-live-parity-implementation-plan.md`)
-declares the following Data ownership rules. The provider-specification extension is a
-design registration until the programme's Phase 4b implements it.
+The completed parity programme establishes the following Data ownership rules for the
+explicit `sim`, `demo`, and `live` routes. The provider-specification extension is
+implemented by `FEAT-DATA-02` under `FR-DATA-214`–`216`.
 
 - **Effective-dated provider-specification history.** Brokers owns the typed *current*
   provider specification snapshot; Data (through the `FEAT-DATA-02` extension) owns the
