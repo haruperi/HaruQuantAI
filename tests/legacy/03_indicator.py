@@ -1,4 +1,4 @@
-# ruff: noqa: E501, BLE001, E402
+# ruff: noqa: BLE001
 """Direct, copyable usage catalogue for the Indicators service public API using real MT5 data.
 
 This supplemental catalogue preserves the scenarios from the legacy Indicator example

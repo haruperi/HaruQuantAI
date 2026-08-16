@@ -1,4 +1,4 @@
-# ruff: noqa: E501, BLE001, E402, N999
+# ruff: noqa: BLE001
 """Unified usage example for generic Trading operations working with MT5 and cTrader."""
 
 from __future__ import annotations

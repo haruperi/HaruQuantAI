@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 """Executable optimization service examples."""
 
 from __future__ import annotations

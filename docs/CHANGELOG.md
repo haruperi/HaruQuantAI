@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Restore lint coverage for legacy executables
+
+Legacy direct-execution programs now inherit the same bounded lint policy as registered standalone usage evidence without excluding the directory from repository checks.
+
+#### Changed (1)
+
+- Classified `tests/legacy` programs as executable usage for numeric filenames, path bootstrap, teaching assertions, flexible demonstration boundaries, and usage docstrings while removing redundant inline suppressions and retaining all other Ruff enforcement.
+
 ### Preserve MT5 crypto rollover evidence
 
 Provider specification snapshots now retain MT5's observed non-weekday rollover sentinel without inventing swap semantics.

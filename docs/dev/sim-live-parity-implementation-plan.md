@@ -4394,6 +4394,29 @@ files; collector/bundle tests passed 30 in 0.89 seconds; Simulator passed 538 in
 `Bind the genuine pre-run order and transaction/deal watermark into initial authority.`, and
 `Keep generated command evidence relative, reproducible, and secret-safe.`
 
+**Repository Ruff correction `CERT-DR35Δ1` — 2026-08-16.** The publication gate initially reported
+73 findings, all in directly executable `tests/legacy` programs that did not inherit the existing
+registered-usage policy. The approved recommendation adds one `tests/legacy/*.py` per-file policy
+row rather than excluding the directory, preserving numeric filenames, path bootstrap, bounded
+teaching assertions, flexible demonstration boundaries, and usage-oriented docstrings while every
+other Ruff rule remains active. Applying the policy exposed twenty now-redundant inline suppressions;
+the separately approved delta removed only those comments, retained required `BLE001`, `NPY002`, and
+intentional `F401`, and preserved secret-baseline line positions. Evidence: `pyproject.toml:154`,
+`tests/legacy/01_utils.py:1`, `tests/legacy/03_indicator.py:1`,
+`tests/legacy/07_trading.py:1`, and `tests/legacy/12_research.py:1`. Legacy and repository-wide Ruff
+passed; Ruff format checked 2,859 files; mypy passed 2,810 source files; every legacy script compiled;
+TOML, pre-commit, and secret detection passed; the four independent default-suite partitions passed
+2,528, 1,783, 1,425, and 218 tests respectively, for 5,954 passed with 21 explicit external-provider
+skips; accumulated coverage remained 88%. The first combined coverage shell reached 88% but exceeded
+its 15-minute output timeout and is not counted as suite-completion evidence. The first independent
+Data/Indicators/Optimization/Portfolio/Research partition had one contention-related Optimization
+usage subprocess timeout after 1,782 passes; the exact node passed alone in 8.36 seconds and the clean
+complete partition rerun passed all 1,783 tests. Exact commit:
+`chore(quality): classify legacy scripts as executable usage` with body bullets
+`Apply the existing standalone usage Ruff policy to tests/legacy programs.`,
+`Preserve numeric filenames, direct execution, and bounded teaching assertions.`, and
+`Restore the repository-wide Ruff gate without excluding the legacy directory.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write

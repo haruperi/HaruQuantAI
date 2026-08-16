@@ -1,4 +1,4 @@
-# ruff: noqa: N999
+# Legacy executable usage program.
 """Usage example showing logger logging in HaruQuant."""
 
 import sys
@@ -10,7 +10,7 @@ _project_root = str(Path(__file__).resolve().parents[2])
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
-import app  # noqa: F401, E402
+import app  # noqa: F401
 
 
 def example_01_logger_example() -> None:
@@ -40,7 +40,7 @@ def example_01_logger_example() -> None:
     child_logger = get_logger("01_utils.order_processor")
     child_logger.info("Processing order request with contextual metadata.")
 
-    assert True  # noqa: S101
+    assert True
 
 
 def example_02_error_handling_example() -> None:
@@ -79,7 +79,7 @@ def example_02_error_handling_example() -> None:
     )
     print(f"Route Event Status: {route_result}")
 
-    assert True  # noqa: S101
+    assert True
 
 
 def example_03_standard_tool_envelope_example() -> None:
@@ -133,7 +133,7 @@ def example_03_standard_tool_envelope_example() -> None:
         catalog=get_common_error_catalog(),
     )
     err_payload = error.error
-    assert err_payload is not None  # noqa: S101
+    assert err_payload is not None
     print(f"Error Envelope: {error.status} (code: {err_payload.code})")
 
     print("\n\n 3.4 Response mapping from a raw exception")
@@ -153,7 +153,7 @@ def example_03_standard_tool_envelope_example() -> None:
     print(f"Canonical JSON: {canonical}")
     print(f"Fingerprint ID: {fingerprint}")
 
-    assert True  # noqa: S101
+    assert True
 
 
 def example_04_safe_path_normalization_example() -> None:
@@ -190,7 +190,7 @@ def example_04_safe_path_normalization_example() -> None:
     print(f"Parent directory exists: {target_file.parent.is_dir()}")
 
     shutil.rmtree(temp_dir, ignore_errors=True)
-    assert True  # noqa: S101
+    assert True
 
 
 def example_05_security_and_redaction() -> None:
@@ -206,7 +206,7 @@ def example_05_security_and_redaction() -> None:
     )
 
     print("\n\n 5.1 Redacting sensitive text and mappings")
-    secret_text = "Standard request API_KEY=secret_key_12345 in header."  # noqa: S105
+    secret_text = "Standard request API_KEY=secret_key_12345 in header."
     redacted_text_out = redact_text_value(secret_text)
     print(f"Redacted Text: {redacted_text_out}")
 
@@ -223,7 +223,7 @@ def example_05_security_and_redaction() -> None:
     print(f"Is 'password' sensitive? {is_sensitive_key('password')}")
     print(f"Is 'user_id' sensitive? {is_sensitive_key('user_id')}")
 
-    assert True  # noqa: S101
+    assert True
 
 
 def example_06_runtime_settings() -> None:
@@ -239,7 +239,7 @@ def example_06_runtime_settings() -> None:
     print(f"Loaded config environment: {settings.environment}")
     print(f"Runtime Profile: {settings.runtime_profile}")
 
-    assert True  # noqa: S101
+    assert True
 
 
 def example_07_dataframe_and_combinations() -> None:
@@ -352,7 +352,7 @@ def example_13_paths() -> None:
         with target_file.open("w") as f:
             f.write("timestamp,close\n2026-06-16T12:00:00Z,1.1000")
 
-        assert target_file.exists()  # noqa: S101
+        assert target_file.exists()
         print(f"Verified safe paths creation for target file: '{target_file}'")
 
 

@@ -1,4 +1,3 @@
-# ruff: noqa: E501, E402
 """Direct, copyable usage catalogue demonstrating Simulator domain workflows using real MT5 data.
 
 Example 1: Simulation Mode & Policy Configuration

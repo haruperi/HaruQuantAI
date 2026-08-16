@@ -1,4 +1,3 @@
-# ruff: noqa: E501, E402
 """Direct, copyable usage catalogue demonstrating vectorized and event-driven strategy execution using real MT5 data.
 
 Example 1 runs vectorized strategy evaluation via ``run_vectorized_strategy_signals``

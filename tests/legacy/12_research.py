@@ -1,4 +1,4 @@
-# ruff: noqa: E501, NPY002, E402
+# ruff: noqa: NPY002
 """Usage examples for Research Edge Lab.
 
 Demonstrates data preparation, feature engineering, leakage controls,

@@ -1,4 +1,3 @@
-# ruff: noqa: E501, E402
 """Usage example script for app/services/analytics.
 
 Demonstrates typical workflows using the official analytics AI tools.

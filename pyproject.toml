@@ -151,6 +151,7 @@ ignore = [
 "conftest.py" = ["S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "E501"]
 "tests/*/usage/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "INP001", "E501"]
 "tests/*/usage/**/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "INP001", "E501"]
+"tests/legacy/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "PLC0415", "EM102", "ANN", "INP001", "E501", "E402"]
 "tests/research/**/*.py" = ["INP001"]
 "app/services/data/**/*.py" = ["DOC201", "DOC501"]
 "app/utils/logging/__init__.py" = ["A005"]
