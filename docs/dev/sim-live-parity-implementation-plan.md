@@ -4322,6 +4322,40 @@ four credential-map values retain that type. Evidence:
 `Pass only named non-empty SecretStr values into the Broker credential map.`, and
 `Record the pre-adapter contract failure without issuing evidence.`
 
+**Fifth collection attempt: Operationally successful but unpublished — 2026-08-16.** The separately
+approved Dry Run 31 connected to the configured MT5 demo account, used `BTCUSD`, passed the paired
+Simulation and demo check/place/cancel trace, cancelled the exact pending order, reconciled initial
+and final account/order/position authority byte-for-byte, and found no foreign order or deal activity
+inside the bounded history interval. It generated the exact nine-member provisional bundle at
+`artifacts/sim_live_parity/mt5-operational/v2/l5-mt5-operational-btcusd-20260816-01`, and a fresh
+process reproduced its comparison and checksums. The bundle remains ignored, uncommitted, and
+unpublished: the post-run publication audit found that its v1 manifest schema validated only twelve
+top-level fields and omitted mandatory publication bindings listed below. No maturity or live
+empirical claim was issued.
+
+**Publication-manifest correction `CERT-DR32` — 2026-08-16.** The approved bounded recommendation
+does not retrofit the provisional bundle. It introduces the v2 generated-manifest schema and binds
+every required field to Envelope v2, both evidence payloads, the observed specification interval,
+the complete initial-authority hash and reconciliation watermark, observed account modes, the exact
+exercised capability intersection, included/excluded policy paths, comparator and ignored-field
+registries, secret-free collection provenance, and every registered invalidation trigger. Missing,
+unexpected, mismatched, or tampered publication fields fail closed. Evidence:
+`tests/simulator/integration/l5_certificate_collection.py:374`,
+`tests/simulator/integration/l5_certificate_collection.py:540`,
+`tests/simulator/integration/test_l5_certificate_bundle.py:90`, and
+`tests/simulator/integration/test_l5_certificate_bundle.py:106`. Ruff passed the three correction
+files; targeted mypy passed three source files; collector/bundle tests passed 22 in 0.85 seconds;
+the complete Simulator suite passed 530 in 54.87 seconds; usage 18 passed; and a fresh Python process
+reproduced and accepted the complete fixture bundle. The earlier targeted invocation without
+`--no-cov` ran 13 passing cases and nine schema-mismatch failures before the correction, then failed
+the repository-wide coverage floor because a two-file selection cannot cover the whole application;
+the corrected command uses `--no-cov`, while the already completed serial full-suite baseline remains
+5,940 passed, 21 skipped, and 88% combined coverage. Exact commit:
+`fix(parity): complete certificate publication manifest` with body bullets
+`Bind every required publication field to envelope, evidence, and environment identity.`,
+`Reject missing, mismatched, or tampered certificate provenance and invalidation data.`, and
+`Record the provisional bundle as unpublished pending a new approved demo run.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write

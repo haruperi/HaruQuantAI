@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-from app.services.simulator import get_parity_envelope
 
 from tests.simulator.integration.l5_certificate_collection import (
+    build_certificate_manifest,
     validate_l5_certificate_bundle,
     write_certificate_bundle,
 )
@@ -17,37 +18,40 @@ from tests.simulator.integration.test_parity_relationships import paired_evidenc
 
 def _synthetic_schema_fixture(bundle: Path) -> None:
     """Create non-certifying fixture bytes for validator tests only."""
-    envelope = get_parity_envelope("v2")
-    applicability = envelope["operational_applicability"]
-    scope = envelope["certificate_scope"]
-    assert isinstance(applicability, dict)
-    assert isinstance(scope, dict)
     left, right = paired_evidence()
-    write_certificate_bundle(
-        bundle,
-        manifest={
-            "schema_version": "l5-mt5-operational-certificate.v1",
-            "certificate_id": "schema-fixture-not-a-certificate",
-            "envelope_version": "v2",
-            "evidence_route": applicability["evidence_route"],
-            "provider_routes": applicability["provider_routes"],
-            "certified_semantics": applicability["certified_semantics"],
-            "excluded_empirical_claims": applicability["excluded_empirical_claims"],
-            "asset_class": scope["asset_class"],
-            "status": "valid",
-            "test_fixture_only": True,
-        },
+    environment = {
+        "environment": "dev",
+        "provider": "mt5",
+        "route": "demo",
+        "target_build": "schema-fixture",
+        "server_digest": "a" * 64,
+        "subject_digest": "b" * 64,
+        "secret_free": True,
+    }
+    interval_end = datetime.fromisoformat(str(left["evaluation_time"]))
+    manifest = build_certificate_manifest(
+        certificate_id="schema-fixture-not-a-certificate",
+        symbol="EURUSD",
+        specification={"provider_symbol": "EURUSD", "revision": "fixture-v1"},
+        interval_start=interval_end - timedelta(seconds=3),
+        interval_end=interval_end,
         left=left,
         right=right,
-        environment={
-            "environment": "dev",
-            "provider": "mt5",
-            "route": "demo",
-            "target_build": "schema-fixture",
-            "server_digest": "a" * 64,
-            "subject_digest": "b" * 64,
-            "secret_free": True,
+        environment=environment,
+        account_modes={
+            "trade_mode": "demo",
+            "margin_mode": "netting",
+            "margin_so_mode": "percent",
         },
+        issued_at=datetime(2026, 8, 14, tzinfo=UTC),
+    )
+    manifest["test_fixture_only"] = True
+    write_certificate_bundle(
+        bundle,
+        manifest=manifest,
+        left=left,
+        right=right,
+        environment=environment,
         command="schema fixture; no provider operation",
     )
 
@@ -70,4 +74,46 @@ def test_l5_certificate_bundle_rejects_tampered_evidence(tmp_path: Path) -> None
         json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     with pytest.raises(ValueError, match="normalized right evidence"):
+        validate_l5_certificate_bundle(bundle)
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "admitted_specifications",
+        "initial_authority",
+        "comparison_contract",
+        "evidence_provenance",
+        "invalidation_bindings",
+    ],
+)
+def test_l5_certificate_bundle_rejects_missing_publication_field(
+    tmp_path: Path, field: str
+) -> None:
+    """Every mandatory publication field fails closed when removed."""
+    bundle = tmp_path / "bundle"
+    _synthetic_schema_fixture(bundle)
+    manifest_path = bundle / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    del manifest[field]
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="manifest fields"):
+        validate_l5_certificate_bundle(bundle)
+
+
+def test_l5_certificate_bundle_rejects_invalidation_binding_tampering(
+    tmp_path: Path,
+) -> None:
+    """A changed build binding invalidates the publication manifest."""
+    bundle = tmp_path / "bundle"
+    _synthetic_schema_fixture(bundle)
+    manifest_path = bundle / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["invalidation_bindings"]["build_identity_change"] = "0" * 64
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="invalidation bindings"):
         validate_l5_certificate_bundle(bundle)

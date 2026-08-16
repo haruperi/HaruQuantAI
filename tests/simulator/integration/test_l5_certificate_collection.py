@@ -16,6 +16,7 @@ from tests.simulator.integration.l5_certificate_collection import (
     _has_sensitive_key,
     _required_secret_text,
     _strip_collection_only,
+    build_certificate_manifest,
     build_collector_provider_settings,
     build_mt5_credential_mapping,
     require_terminal_executable,
@@ -195,38 +196,41 @@ def test_authority_interval_requires_cleanup_and_no_foreign_activity() -> None:
 
 def test_bundle_writer_is_deterministic_and_secret_free(tmp_path: Path) -> None:
     """The collector writes the exact validated bundle from bounded evidence."""
-    envelope = get_parity_envelope("v2")
-    applicability = envelope["operational_applicability"]
-    scope = envelope["certificate_scope"]
-    assert isinstance(applicability, dict)
-    assert isinstance(scope, dict)
     left, right = paired_evidence()
     bundle = tmp_path / "bundle"
-    write_certificate_bundle(
-        bundle,
-        manifest={
-            "schema_version": "l5-mt5-operational-certificate.v1",
-            "certificate_id": "offline-collector-fixture",
-            "envelope_version": "v2",
-            "evidence_route": applicability["evidence_route"],
-            "provider_routes": applicability["provider_routes"],
-            "certified_semantics": applicability["certified_semantics"],
-            "excluded_empirical_claims": applicability["excluded_empirical_claims"],
-            "asset_class": scope["asset_class"],
-            "status": "valid",
-            "test_fixture_only": True,
-        },
+    environment = {
+        "environment": "dev",
+        "provider": "mt5",
+        "route": "demo",
+        "target_build": "offline-fixture",
+        "server_digest": "a" * 64,
+        "subject_digest": "b" * 64,
+        "secret_free": True,
+    }
+    interval_end = datetime.fromisoformat(str(left["evaluation_time"]))
+    manifest = build_certificate_manifest(
+        certificate_id="offline-collector-fixture",
+        symbol="EURUSD",
+        specification={"provider_symbol": "EURUSD", "revision": "fixture-v1"},
+        interval_start=interval_end - timedelta(seconds=3),
+        interval_end=interval_end,
         left=left,
         right=right,
-        environment={
-            "environment": "dev",
-            "provider": "mt5",
-            "route": "demo",
-            "target_build": "offline-fixture",
-            "server_digest": "a" * 64,
-            "subject_digest": "b" * 64,
-            "secret_free": True,
+        environment=environment,
+        account_modes={
+            "trade_mode": "demo",
+            "margin_mode": "netting",
+            "margin_so_mode": "percent",
         },
+        issued_at=datetime(2026, 8, 14, tzinfo=UTC),
+    )
+    manifest["test_fixture_only"] = True
+    write_certificate_bundle(
+        bundle,
+        manifest=manifest,
+        left=left,
+        right=right,
+        environment=environment,
         command="offline collector fixture",
     )
     validate_l5_certificate_bundle(bundle)

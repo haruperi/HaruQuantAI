@@ -81,6 +81,60 @@ _SENSITIVE_FRAGMENTS = (
     "token",
 )
 _STATE_LIMIT = 1_000
+_SHA256_HEX_LENGTH = 64
+_MANIFEST_REQUIRED_KEYS = frozenset(
+    {
+        "schema_version",
+        "certificate_id",
+        "envelope_version",
+        "status",
+        "evidence_route",
+        "provider_routes",
+        "provider",
+        "environment",
+        "server_account_mode",
+        "target_build",
+        "allowed_evidence_sources",
+        "certified_semantics",
+        "excluded_empirical_claims",
+        "explicit_scope_exclusions",
+        "asset_class",
+        "admitted_specifications",
+        "market_evidence",
+        "initial_authority",
+        "operation_modes",
+        "capability_intersection",
+        "policy_paths",
+        "invariants",
+        "route_gate_policies",
+        "ignored_fields",
+        "comparison_contract",
+        "evidence_provenance",
+        "issued_at",
+        "valid_through",
+        "invalidation_triggers",
+        "invalidation_bindings",
+    }
+)
+_EXPLICIT_SCOPE_EXCLUSIONS = (
+    "provider_specific_empirical_behavior",
+    "asset_specific_empirical_behavior",
+    "corporate_actions",
+    "auctions",
+    "multi_account_behavior",
+)
+_CAPABILITY_INTERSECTION = (
+    "connect_disconnect",
+    "account_read",
+    "permission_read",
+    "symbol_specification_read",
+    "quote_read_for_safe_order_parameterization",
+    "order_check",
+    "pending_limit_order_place",
+    "pending_order_cancel",
+    "active_order_and_position_read",
+    "bounded_order_and_deal_history_read",
+)
 
 
 def _json_safe(value: object) -> object:
@@ -317,6 +371,172 @@ def _file_digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def build_certificate_manifest(
+    *,
+    certificate_id: str,
+    symbol: str,
+    specification: Mapping[str, object],
+    interval_start: datetime,
+    interval_end: datetime,
+    left: Mapping[str, object],
+    right: Mapping[str, object],
+    environment: Mapping[str, object],
+    account_modes: Mapping[str, object],
+    issued_at: datetime,
+) -> dict[str, object]:
+    """Build the complete immutable Envelope v2 publication manifest.
+
+    Args:
+        certificate_id: Unique generated certificate identity.
+        symbol: Exact provider symbol admitted for the collection interval.
+        specification: Observed provider specification projection.
+        interval_start: Inclusive collection interval start.
+        interval_end: Inclusive collection interval end.
+        left: Simulation operational evidence.
+        right: MT5 demo operational evidence.
+        environment: Secret-free provider/build identity.
+        account_modes: Observed provider account and margin modes.
+        issued_at: Certificate issue time.
+
+    Returns:
+        Complete deterministic certificate publication manifest.
+
+    Raises:
+        ValueError: If observed evidence cannot support the publication scope.
+        TypeError: If an Envelope v2 section or evidence binding is malformed.
+    """
+    envelope = get_parity_envelope("v2")
+    applicability = envelope.get("operational_applicability")
+    scope = envelope.get("certificate_scope")
+    validity = envelope.get("validity")
+    if not all(
+        isinstance(value, Mapping) for value in (applicability, scope, validity)
+    ):
+        raise TypeError("Envelope v2 publication sections are malformed")
+    if interval_end < interval_start:
+        raise ValueError("certificate collection interval is reversed")
+    left_state = left.get("initial_authority_state")
+    right_state = right.get("initial_authority_state")
+    if not isinstance(left_state, Mapping) or left_state != right_state:
+        raise ValueError("certificate evidence lacks one shared initial authority")
+    state_hash = left_state.get("state_hash")
+    if not isinstance(state_hash, str) or len(state_hash) != _SHA256_HEX_LENGTH:
+        raise ValueError("certificate initial-authority hash is malformed")
+    comparison = compare_parity_evidence(left, right, envelope)
+    if not comparison.get("passed") or comparison.get("certificate_invalidated"):
+        raise ValueError("certificate evidence does not pass Envelope v2")
+    environment_hash = _hash(environment)
+    specification_hash = _hash(specification)
+    evidence_hashes = {"left": _hash(left), "right": _hash(right)}
+    comparison_hash = _hash(comparison)
+    identity = left.get("identity")
+    if not isinstance(identity, Mapping) or identity != right.get("identity"):
+        raise ValueError("certificate evidence identity is absent or differs")
+    identity_hash = _hash(identity)
+    invalidation_triggers = tuple(envelope["invalidation_triggers"])
+    invalidation_bindings = {
+        "build_identity_change": environment_hash,
+        "contract_change": _hash(envelope),
+        "code_or_config_identity_change": identity_hash,
+        "specification_revision_change": specification_hash,
+        "source_or_tick_model_change": _hash(
+            {
+                "source_lineage_hash": identity.get("source_lineage_hash"),
+                "tick_lineage_hash": identity.get("tick_lineage_hash"),
+                "market_evidence_class": identity.get("market_evidence_class"),
+            }
+        ),
+        "calibration_validity_change": "not_applicable_operational_contract",
+        "detected_drift": comparison_hash,
+        "initial_authority_state_change": state_hash,
+    }
+    if set(invalidation_bindings) != set(invalidation_triggers):
+        raise ValueError("every invalidation trigger requires one exact binding")
+    return {
+        "schema_version": "l5-mt5-operational-certificate.v2",
+        "certificate_id": certificate_id,
+        "envelope_version": "v2",
+        "status": "valid",
+        "evidence_route": applicability["evidence_route"],
+        "provider_routes": applicability["provider_routes"],
+        "provider": scope["provider"],
+        "environment": "dev",
+        "server_account_mode": scope["server_account_mode"],
+        "target_build": environment.get("target_build"),
+        "allowed_evidence_sources": scope["evidence_sources"],
+        "certified_semantics": applicability["certified_semantics"],
+        "excluded_empirical_claims": applicability["excluded_empirical_claims"],
+        "explicit_scope_exclusions": list(_EXPLICIT_SCOPE_EXCLUSIONS),
+        "asset_class": scope["asset_class"],
+        "admitted_specifications": (
+            {
+                "symbol": symbol,
+                "revision_digest": specification_hash,
+                "effective_from": interval_start.isoformat(),
+                "effective_through": interval_end.isoformat(),
+                "observed_fields": _json_safe(specification),
+            },
+        ),
+        "market_evidence": {
+            "class": scope["market_evidence_class"],
+            "tick_model": "single_bid_ask_quote_not_certified",
+            "resolution": "provider_quote_for_safe_order_parameterization_only",
+            "bid_ask_availability": "observed_not_compared",
+            "depth_availability": "excluded",
+            "clock_edge_coverage": "operation_causal_edges_only",
+        },
+        "initial_authority": {
+            "state_hash": state_hash,
+            "exclusive_account": left_state.get("exclusive_account"),
+            "foreign_activity_event_count": left_state.get(
+                "foreign_activity_event_count"
+            ),
+            "last_reconciled_transaction_deal_watermark": interval_end.isoformat(),
+        },
+        "operation_modes": {
+            "operations": ("check_order", "place_order", "cancel_order"),
+            "order_type": "LIMIT",
+            "time_in_force": "GTC",
+            "fill_mode": "pending_order_no_fill_expected",
+            "position_mode": scope["server_account_mode"],
+            "observed_account_modes": _json_safe(account_modes),
+        },
+        "capability_intersection": _CAPABILITY_INTERSECTION,
+        "policy_paths": {
+            "causal_order": "verified",
+            "route_tag_persistence": "verified",
+            "swap_posting": "excluded_no_position_or_fill",
+            "stop_out": "excluded_no_position_or_margin_stress",
+            "weekly_session": "excluded_operational_pending_order_trace",
+            "dated_session_exceptions": "excluded_operational_pending_order_trace",
+        },
+        "invariants": envelope["invariants"],
+        "route_gate_policies": envelope["route_gate_policies"],
+        "ignored_fields": envelope["ignored_fields"],
+        "comparison_contract": {
+            "comparator_version": "parity-envelope-v2",
+            "normalizer_version": "parity-envelope-v2",
+            "invariant_classes": tuple(
+                sorted({str(item["kind"]) for item in envelope["invariants"]})
+            ),
+            "allowed_route_specific_fields": (),
+            "ignored_field_registry_digest": _hash(envelope["ignored_fields"]),
+            "comparison_digest": comparison_hash,
+        },
+        "evidence_provenance": {
+            "collection_kind": "independent_mt5_demo_operational_holdout",
+            "collection_environment_digest": environment_hash,
+            "evidence_hashes": evidence_hashes,
+            "source_lineage_digest": identity.get("source_lineage_hash"),
+            "tick_lineage_digest": identity.get("tick_lineage_hash"),
+        },
+        "issued_at": issued_at.isoformat(),
+        "valid_through": validity["valid_through"],
+        "invalidation_triggers": invalidation_triggers,
+        "invalidation_bindings": invalidation_bindings,
+    }
+
+
 def validate_l5_certificate_bundle(bundle: Path) -> None:
     """Validate schema, reproducibility, secrecy, and checksums for one bundle.
 
@@ -338,14 +558,26 @@ def validate_l5_certificate_bundle(bundle: Path) -> None:
     if not isinstance(applicability, Mapping) or not isinstance(scope, Mapping):
         raise TypeError("Envelope v2 scope is malformed")
     manifest = _read_json(bundle / "manifest.json")
+    manifest_keys = set(manifest) - {"test_fixture_only"}
+    if manifest_keys != _MANIFEST_REQUIRED_KEYS:
+        raise ValueError("certificate manifest fields are incomplete or unexpected")
     expected = {
-        "schema_version": "l5-mt5-operational-certificate.v1",
+        "schema_version": "l5-mt5-operational-certificate.v2",
         "envelope_version": "v2",
         "evidence_route": applicability["evidence_route"],
         "provider_routes": applicability["provider_routes"],
+        "provider": scope["provider"],
+        "environment": "dev",
+        "server_account_mode": scope["server_account_mode"],
+        "allowed_evidence_sources": scope["evidence_sources"],
         "certified_semantics": applicability["certified_semantics"],
         "excluded_empirical_claims": applicability["excluded_empirical_claims"],
+        "explicit_scope_exclusions": list(_EXPLICIT_SCOPE_EXCLUSIONS),
         "asset_class": scope["asset_class"],
+        "invariants": envelope["invariants"],
+        "route_gate_policies": envelope["route_gate_policies"],
+        "ignored_fields": envelope["ignored_fields"],
+        "invalidation_triggers": envelope["invalidation_triggers"],
         "status": "valid",
     }
     if any(manifest.get(key) != value for key, value in expected.items()):
@@ -374,6 +606,149 @@ def validate_l5_certificate_bundle(bundle: Path) -> None:
         raise ValueError("certificate environment must identify dev/MT5/demo")
     if environment.get("secret_free") is not True:
         raise ValueError("certificate environment lacks secret-free attestation")
+    if (
+        not manifest.get("certificate_id")
+        or not environment.get("target_build")
+        or manifest.get("target_build") != environment.get("target_build")
+    ):
+        raise ValueError("certificate target build is not bound to environment")
+    specifications = manifest.get("admitted_specifications")
+    if not isinstance(specifications, list) or len(specifications) != 1:
+        raise ValueError("certificate must admit exactly one specification interval")
+    specification = specifications[0]
+    if not isinstance(specification, Mapping):
+        raise TypeError("certificate admitted specification is malformed")
+    evidence_symbols = {
+        str(order.get("symbol"))
+        for evidence in (left, right)
+        for order in evidence.get("orders", [])
+        if isinstance(order, Mapping)
+    }
+    if evidence_symbols != {specification.get("symbol")}:
+        raise ValueError("certificate admitted symbol differs from evidence")
+    observed_fields = specification.get("observed_fields")
+    if not isinstance(observed_fields, Mapping) or specification.get(
+        "revision_digest"
+    ) != _hash(observed_fields):
+        raise ValueError("certificate specification revision digest differs")
+    try:
+        effective_from = datetime.fromisoformat(str(specification["effective_from"]))
+        effective_through = datetime.fromisoformat(
+            str(specification["effective_through"])
+        )
+        issued_at = datetime.fromisoformat(str(manifest["issued_at"]))
+        valid_through = datetime.fromisoformat(str(manifest["valid_through"]))
+    except (KeyError, ValueError) as exc:
+        raise ValueError("certificate temporal fields are malformed") from exc
+    if any(
+        value.tzinfo is None
+        for value in (effective_from, effective_through, issued_at, valid_through)
+    ):
+        raise ValueError("certificate temporal fields must be timezone-aware")
+    if effective_through < effective_from or valid_through < issued_at:
+        raise ValueError("certificate temporal interval is reversed")
+    if manifest.get("valid_through") != envelope["validity"]["valid_through"]:
+        raise ValueError("certificate validity differs from Envelope v2")
+    left_state = left.get("initial_authority_state")
+    initial_authority = manifest.get("initial_authority")
+    if not isinstance(left_state, Mapping) or not isinstance(
+        initial_authority, Mapping
+    ):
+        raise TypeError("certificate initial-authority binding is malformed")
+    expected_authority = {
+        "state_hash": left_state.get("state_hash"),
+        "exclusive_account": left_state.get("exclusive_account"),
+        "foreign_activity_event_count": left_state.get("foreign_activity_event_count"),
+        "last_reconciled_transaction_deal_watermark": specification.get(
+            "effective_through"
+        ),
+    }
+    if initial_authority != expected_authority or left_state != right.get(
+        "initial_authority_state"
+    ):
+        raise ValueError("certificate initial-authority binding differs")
+    operation_modes = manifest.get("operation_modes")
+    expected_operation_mode_values = {
+        "operations": ["check_order", "place_order", "cancel_order"],
+        "order_type": "LIMIT",
+        "time_in_force": "GTC",
+        "fill_mode": "pending_order_no_fill_expected",
+        "position_mode": scope["server_account_mode"],
+    }
+    if not isinstance(operation_modes, Mapping) or any(
+        operation_modes.get(key) != value
+        for key, value in expected_operation_mode_values.items()
+    ):
+        raise ValueError("certificate operation modes differ")
+    observed_account_modes = operation_modes.get("observed_account_modes")
+    if not isinstance(observed_account_modes, Mapping) or set(
+        observed_account_modes
+    ) != {"trade_mode", "margin_mode", "margin_so_mode"}:
+        raise ValueError("certificate observed account modes are incomplete")
+    if manifest.get("capability_intersection") != list(_CAPABILITY_INTERSECTION):
+        raise ValueError("certificate capability intersection differs")
+    expected_market_evidence = {
+        "class": scope["market_evidence_class"],
+        "tick_model": "single_bid_ask_quote_not_certified",
+        "resolution": "provider_quote_for_safe_order_parameterization_only",
+        "bid_ask_availability": "observed_not_compared",
+        "depth_availability": "excluded",
+        "clock_edge_coverage": "operation_causal_edges_only",
+    }
+    if manifest.get("market_evidence") != expected_market_evidence:
+        raise ValueError("certificate market-evidence declaration differs")
+    expected_policy_paths = {
+        "causal_order": "verified",
+        "route_tag_persistence": "verified",
+        "swap_posting": "excluded_no_position_or_fill",
+        "stop_out": "excluded_no_position_or_margin_stress",
+        "weekly_session": "excluded_operational_pending_order_trace",
+        "dated_session_exceptions": "excluded_operational_pending_order_trace",
+    }
+    if manifest.get("policy_paths") != expected_policy_paths:
+        raise ValueError("certificate policy-path declarations differ")
+    identity = left.get("identity")
+    if not isinstance(identity, Mapping) or identity != right.get("identity"):
+        raise ValueError("certificate evidence identity differs")
+    expected_comparison_contract = {
+        "comparator_version": "parity-envelope-v2",
+        "normalizer_version": "parity-envelope-v2",
+        "invariant_classes": sorted(
+            {str(item["kind"]) for item in envelope["invariants"]}
+        ),
+        "allowed_route_specific_fields": [],
+        "ignored_field_registry_digest": _hash(envelope["ignored_fields"]),
+        "comparison_digest": _hash(comparison),
+    }
+    if manifest.get("comparison_contract") != expected_comparison_contract:
+        raise ValueError("certificate comparison contract differs")
+    expected_provenance = {
+        "collection_kind": "independent_mt5_demo_operational_holdout",
+        "collection_environment_digest": _hash(environment),
+        "evidence_hashes": {"left": _hash(left), "right": _hash(right)},
+        "source_lineage_digest": identity.get("source_lineage_hash"),
+        "tick_lineage_digest": identity.get("tick_lineage_hash"),
+    }
+    if manifest.get("evidence_provenance") != expected_provenance:
+        raise ValueError("certificate evidence provenance differs")
+    expected_bindings = {
+        "build_identity_change": _hash(environment),
+        "contract_change": _hash(envelope),
+        "code_or_config_identity_change": _hash(identity),
+        "specification_revision_change": _hash(observed_fields),
+        "source_or_tick_model_change": _hash(
+            {
+                "source_lineage_hash": identity.get("source_lineage_hash"),
+                "tick_lineage_hash": identity.get("tick_lineage_hash"),
+                "market_evidence_class": identity.get("market_evidence_class"),
+            }
+        ),
+        "calibration_validity_change": "not_applicable_operational_contract",
+        "detected_drift": _hash(comparison),
+        "initial_authority_state_change": left_state.get("state_hash"),
+    }
+    if manifest.get("invalidation_bindings") != expected_bindings:
+        raise ValueError("certificate invalidation bindings differ")
     for name in _HASHED_FILES:
         if name.endswith(".json") and _has_sensitive_key(_read_json(bundle / name)):
             raise ValueError("certificate bundle contains a sensitive field name")
@@ -974,24 +1349,25 @@ async def _collect(args: argparse.Namespace) -> Path:
         platform = _success_data(
             await get_broker_platform_info(demo), "get_broker_platform_info"
         )
+        specification = _project(
+            symbol_info,
+            (
+                "provider_symbol",
+                "product_profile",
+                "price_precision",
+                "price_step",
+                "min_quantity",
+                "max_quantity",
+                "quantity_step",
+                "quantity_unit",
+                "trade_mode",
+            ),
+        )
         identity_seed = {
             "envelope": get_parity_envelope("v2"),
             "symbol": args.symbol,
             "state_hash": state_hash,
-            "specification": _project(
-                symbol_info,
-                (
-                    "provider_symbol",
-                    "product_profile",
-                    "price_precision",
-                    "price_step",
-                    "min_quantity",
-                    "max_quantity",
-                    "quantity_step",
-                    "quantity_unit",
-                    "trade_mode",
-                ),
-            ),
+            "specification": specification,
         }
         identity_hash = _hash(identity_seed)
         identity = {
@@ -1034,25 +1410,6 @@ async def _collect(args: argparse.Namespace) -> Path:
                 account=account,
             )
         )
-        envelope = get_parity_envelope("v2")
-        applicability = envelope["operational_applicability"]
-        scope = envelope["certificate_scope"]
-        if not isinstance(applicability, Mapping) or not isinstance(scope, Mapping):
-            raise TypeError("Envelope v2 scope is malformed")
-        manifest = {
-            "schema_version": "l5-mt5-operational-certificate.v1",
-            "certificate_id": args.certificate_id,
-            "envelope_version": "v2",
-            "evidence_route": applicability["evidence_route"],
-            "provider_routes": applicability["provider_routes"],
-            "certified_semantics": applicability["certified_semantics"],
-            "excluded_empirical_claims": applicability["excluded_empirical_claims"],
-            "asset_class": scope["asset_class"],
-            "symbol": args.symbol,
-            "status": "valid",
-            "issued_at": datetime.now(UTC).isoformat(),
-            "valid_through": envelope["validity"]["valid_through"],
-        }
         target_build = str(
             _field(platform, "build", _field(platform, "api_or_terminal_version"))
         )
@@ -1065,6 +1422,21 @@ async def _collect(args: argparse.Namespace) -> Path:
             "subject_digest": _hash(str(slot["login"])),
             "secret_free": True,
         }
+        manifest = build_certificate_manifest(
+            certificate_id=args.certificate_id,
+            symbol=args.symbol,
+            specification=specification,
+            interval_start=started,
+            interval_end=finished,
+            left=left,
+            right=right,
+            environment=environment,
+            account_modes={
+                name: account.get(name)
+                for name in ("trade_mode", "margin_mode", "margin_so_mode")
+            },
+            issued_at=datetime.now(UTC),
+        )
         command = (
             "uv run python tests/simulator/integration/l5_certificate_collection.py "
             f"--execute-demo --symbol {args.symbol} "
