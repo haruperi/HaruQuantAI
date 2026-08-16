@@ -95,6 +95,18 @@ empirical result was invented. Envelope v2 and its certificate schema are comple
 remains an evidence operation requiring a separately approved, provenance-verified demo package.
 Rollback reverts this C2 commit only; v1 remains the compatibility envelope throughout.
 
+**Certification preflight correction — 2026-08-16.** The first post-C2 default-suite gate exposed
+one stale OpenAPI digest caused by C1's approved route enum change; operation count remained 91 and
+the registered route inventory was unchanged. The bounded automatic recommendation updates only
+`tests/api/contracts/snapshots/openapi.v1.json` to the deterministic current schema digest. The
+Agentic usage registry failed once in the full run but passed unchanged when rerun directly, so no
+unsubstantiated Agentic edit is made. Focused API/Agentic verification passed 3/3; the clean repeat
+default suite passed 5,914 tests with 21 explicit external-provider skips and 87.60% coverage. Exact
+correction commit: `test(api): reconcile explicit route contract`
+with body bullets `Update the OpenAPI v1 digest for the approved sim, demo, and live route schema.`,
+`Preserve the 91-operation registry and make no API behavior change.`, and
+`Record and verify the post-C2 certification preflight correction.`
+
 ### 0.1 Goal and scope
 
 `sim`, `demo`, and `live` use the same Trading orchestration and differ only at an injected authority
