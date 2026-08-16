@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Close SQLite verification resources deterministically
+
+API and Agentic persistence verification now closes inspection connections immediately after retaining their existing transaction behavior.
+
+#### Fixed (1)
+
+- Replaced garbage-collection-dependent SQLite test cleanup with explicit closing contexts in settings, migration, and durable-runtime evidence.
+
 ### Restore canonical API identity usage evidence
 
 The standalone identity workflow now demonstrates global settings updates with a manifest-approved non-secret key.

@@ -2,6 +2,7 @@
 
 import base64
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 from typing import Any
 
@@ -136,7 +137,7 @@ def test_login_settings_credentials_logout(tmp_path: Path) -> None:
             "settings:read",
             "settings:write",
         )
-        with sqlite3.connect(tmp_path / "api-integration.db") as connection:
+        with closing(sqlite3.connect(tmp_path / "api-integration.db")) as connection:
             compatibility_claims = connection.execute(
                 "SELECT roles_json, permissions_json, scopes_json "
                 "FROM api_accounts WHERE user_id = ?",
@@ -219,7 +220,7 @@ def test_login_settings_credentials_logout(tmp_path: Path) -> None:
                 expected_version=0,
                 request_id=generate_id("req"),
             )
-        with sqlite3.connect(tmp_path / "api-integration.db") as connection:
+        with closing(sqlite3.connect(tmp_path / "api-integration.db")) as connection:
             setting_scopes = connection.execute(
                 "SELECT scope, subject_id FROM api_settings ORDER BY scope"
             ).fetchall()
@@ -470,7 +471,7 @@ def test_system_credentials_are_write_only_and_encrypted(
             is True
         )
 
-    with sqlite3.connect(tmp_path / "api-system-credentials.db") as connection:
+    with closing(sqlite3.connect(tmp_path / "api-system-credentials.db")) as connection:
         stored = connection.execute(
             "SELECT ciphertext_b64 FROM api_credentials"
         ).fetchone()

@@ -4434,6 +4434,26 @@ bullets `Replace the stale global theme example with manifest-approved APP_NAME.
 `Preserve user preference and optimistic-version demonstrations.`, and
 `Restore directly executable FEAT-API-02 usage evidence.`
 
+**SQLite verification lifecycle correction `CERT-DR37` — 2026-08-16.** Full-suite warning
+evidence was traced to six test inspection connections that used SQLite's transaction context but
+relied on garbage collection for closure; warning attribution could therefore appear during later,
+unrelated Analytics or API observability tests. The approved recommendation wraps every affected
+connection in `contextlib.closing`; the one seed write additionally retains the connection's nested
+transaction context so commit/rollback behavior is unchanged. The inspected Analytics schema
+fixture already closed explicitly and required no change. Evidence:
+`tests/api/integration/test_auth_settings.py:140`,
+`tests/api/integration/test_settings_migration.py:39`, and
+`tests/agentic/integration/test_durable_runtime.py:187`. Warning-as-error verification passed 8 API
+integration tests and 3 Agentic durable-runtime tests; focused Ruff, Ruff format, and mypy passed;
+the complete Agentic partition passed 1,313 tests and the complete API partition passed 327 tests
+with only the separately excluded upstream Starlette deprecation warning. The first API targeted
+run exposed that `closing` alone rolled back the seed write; retaining the SQLite transaction
+context restored the intended commit, after which all validation passed. Exact commit:
+`test(quality): close sqlite verification connections` with body bullets
+`Close API settings and migration verification connections deterministically.`,
+`Close the Agentic durable-runtime inspection connection.`, and
+`Eliminate garbage-collection-dependent SQLite resource warnings.`
+
 **Execution order:** preflight scope/environment/build/account exclusivity or complete foreign-event
 coverage; verify all input checksums and validity; cold left/right execution from fresh stores and
 artifact roots; normalize; compare; verify aggregate budget; rerun cold and compare checksums; write

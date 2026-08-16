@@ -1,6 +1,7 @@
 """Integration evidence for durable Agentic public-API composition."""
 
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 from app.agentic import (
@@ -183,7 +184,7 @@ def test_agentic_relational_stores_round_trip_losslessly(tmp_path: Path) -> None
         assert rebuilt_operations.list_incidents(incident.run_id) == (incident,)
 
     database_path = tmp_path / "agentic-runtime.db"
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection:
         replay_row = connection.execute(
             "SELECT verified_references_json, completed_at "
             "FROM agentic_operations_replays WHERE replay_id=?",

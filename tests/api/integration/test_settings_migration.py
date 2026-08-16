@@ -1,6 +1,7 @@
 """Integration evidence for unified settings migration preservation."""
 
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 from app.services.api import run_api_migrations
@@ -35,17 +36,22 @@ def test_api_0006_preserves_legacy_user_settings(tmp_path: Path) -> None:
             )
         )
         assert baseline.status == "success"
-        with sqlite3.connect(database_path) as connection:
+        with closing(sqlite3.connect(database_path)) as connection, connection:
             connection.execute(
                 "INSERT INTO api_user_settings "
                 "(user_id, settings_json, version, updated_at) "
                 "VALUES (?, ?, ?, ?)",
-                ("user-1", '{"theme":"dark"}', 3, "2026-08-04T00:00:00+00:00"),
+                (
+                    "user-1",
+                    '{"theme":"dark"}',
+                    3,
+                    "2026-08-04T00:00:00+00:00",
+                ),
             )
         migrated = run_api_migrations(generate_id("req"))
         assert migrated.status == "success"
 
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection:
         row = connection.execute(
             "SELECT scope, subject_id, settings_json, version, created_at, "
             "updated_at, updated_by, request_id FROM api_settings"
