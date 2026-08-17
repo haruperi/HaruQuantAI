@@ -157,6 +157,19 @@ def test_execute_tick_is_deterministic(tmp_path: Path) -> None:
     assert _value(first.execute_tick(_tick())) == _value(second.execute_tick(_tick()))
 
 
+def test_trusted_raw_tick_matches_public_tick_boundary(tmp_path: Path) -> None:
+    """Keep the canonical orchestrator kernel equal to the public operation."""
+    public = _engine(tmp_path, "public-tick")
+    trusted = _engine(tmp_path, "trusted-tick")
+    public.submit_order(_intent())
+    trusted.submit_order(_intent())
+
+    assert _value(public.execute_tick(_tick())) == trusted.execute_tick_internal(
+        _tick()
+    )
+    assert _value(public.snapshot()) == trusted.snapshot_internal()
+
+
 def test_engine_rejects_empty_provider_revision_history(tmp_path: Path) -> None:
     """Fail closed when canonical provider evidence is absent."""
     with pytest.raises(SimulationError, match="Provider revision evidence") as captured:
@@ -235,6 +248,23 @@ def test_execute_tick_closes_position_on_take_profit(tmp_path: Path) -> None:
     _value(engine.execute_tick(_later_tick(Decimal("1.11500"), Decimal("1.11502"), 1)))
     assert len(engine.closed_trades) == 1
     assert engine.closed_trades[0].profit > Decimal(0)
+
+
+def test_close_profit_and_equity_apply_provider_contract_size(tmp_path: Path) -> None:
+    """Value realized and floating FX PnL in account-currency units."""
+    engine = _engine(tmp_path, "contract-sized-profit")
+    engine.submit_order(_intent())
+    _value(engine.execute_tick(_tick()))
+
+    _value(engine.execute_tick(_later_tick(Decimal("1.10102"), Decimal("1.10104"), 1)))
+    open_account = _value(_value(engine.snapshot())["account"])
+    assert open_account["unrealized"] == Decimal(100)
+
+    engine.close_position("sim-position-order-engine", Decimal(1))
+    closed_account = _value(_value(engine.snapshot())["account"])
+    assert engine.closed_trades[0].profit == Decimal(100)
+    assert closed_account["gross_profit"] == Decimal(100)
+    assert closed_account["balance"] == Decimal(10_100)
 
 
 def test_stop_loss_wins_same_tick_conflict_with_take_profit(tmp_path: Path) -> None:

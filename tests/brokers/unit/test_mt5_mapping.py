@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import numpy as np
+import pytest
 from app.services.brokers.canonical_contracts import BrokerErrorCode
 from app.services.brokers.metatrader.mapping import (
     _map_account,
@@ -30,6 +31,12 @@ def test_map_symbol_preserves_exact_provider_values() -> None:
             name="EURUSD",
             digits=5,
             point=0.00001,
+            trade_tick_size=0.00001,
+            trade_contract_size=100000,
+            trade_mode=4,
+            swap_mode=1,
+            swap_long=-6.5,
+            swap_short=2.1,
             volume_step=0.01,
             volume_min=0.01,
             volume_max=100,
@@ -50,6 +57,12 @@ def test_map_symbol_preserves_path_attribute() -> None:
             name="EURJPY",
             digits=3,
             point=0.001,
+            trade_tick_size=0.001,
+            trade_contract_size=100000,
+            trade_mode=4,
+            swap_mode=1,
+            swap_long=-6.5,
+            swap_short=2.1,
             volume_step=0.01,
             volume_min=0.01,
             volume_max=100,
@@ -58,6 +71,28 @@ def test_map_symbol_preserves_path_attribute() -> None:
     )
     assert symbol.provider_symbol == "EURJPY"
     assert symbol.provider_metadata["path"] == "Forex\\EURJPY"
+
+
+@pytest.mark.parametrize("field", ["point", "trade_tick_size", "trade_contract_size"])
+def test_map_symbol_rejects_missing_provider_contract_fact(field: str) -> None:
+    """Fail closed instead of supplying a symbol-contract fallback."""
+    payload = {
+        "name": "EURUSD",
+        "digits": 5,
+        "point": 0.00001,
+        "trade_tick_size": 0.00001,
+        "trade_contract_size": 100000,
+        "trade_mode": 4,
+        "swap_mode": 1,
+        "swap_long": -7.24,
+        "swap_short": 2.1,
+        "volume_step": 0.01,
+        "volume_min": 0.01,
+        "volume_max": 100,
+    }
+    del payload[field]
+    with pytest.raises(KeyError):
+        _map_symbol(payload)
 
 
 def test_map_quote_preserves_bid_ask_last() -> None:
@@ -160,12 +195,32 @@ def test_map_account_redacts_account_reference() -> None:
             equity=100,
             margin=0,
             margin_free=100,
+            trade_mode=0,
+            margin_mode=1,
+            leverage=100,
         )
     )
     assert account.account_id == "12345"
     assert account.account_reference_redacted == "***"
     assert account.details["login"] == "12345"
     assert account.details["trade_mode"] == "DEMO"
+
+
+def test_map_account_rejects_missing_leverage() -> None:
+    """Fail closed instead of supplying an account-leverage fallback."""
+    with pytest.raises(KeyError):
+        _map_account(
+            _record(
+                login=12345,
+                currency="USD",
+                balance=100,
+                equity=100,
+                margin=0,
+                margin_free=100,
+                trade_mode=0,
+                margin_mode=1,
+            )
+        )
 
 
 def test_map_position_derives_side_from_type_code() -> None:

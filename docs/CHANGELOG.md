@@ -2,6 +2,134 @@
 
 ## [Unreleased]
 
+### Provider-authored Header account identity
+
+The Header now identifies the active trading account rather than the authenticated application login.
+
+#### Added (2)
+
+- Added a minimal read-only Trading account-profile endpoint that obtains DEMO/LIVE account name and trade mode from MT5's canonical account information and returns explicit Simulator identity in SIM.
+- Added typed client and Header loading/unavailable handling for provider account identity.
+
+#### Changed (1)
+
+- Changed the Header account read to use persisted MT5 provider composition and display MT5's actual trade mode; execution continues to refuse an elected-mode/credential mismatch independently.
+
+### Historical SIM execution and durable practice recovery
+
+SIM now means deterministic historical replay rather than a demo-feed alias: approved orders execute against the selected immutable dataset and virtual account, while restart recovery reconstructs and verifies the practice state before explicit rearm.
+
+#### Added (4)
+
+- Added a direct Trading-to-Simulator execution port for session-bound MARKET, LIMIT, STOP, and STOP_LIMIT orders without a broker adapter on the SIM route.
+- Added durable interactive-session request, cursor, state-digest, recovery-generation, and manual-intent persistence through Simulator-owned migrations and Data-owned transactions.
+- Added deterministic restart reconstruction under a distinct recovery journal with exact dataset revision, cursor-bound intent replay, digest verification, and explicit rearm.
+- Added historical-evidence time to Risk review while retaining wall time for decisions, approval tokens, audits, and expiry.
+
+#### Changed (3)
+
+- Changed SIM account and market evidence to come from the active historical session; DEMO and LIVE remain current-bar MT5 modes and mode/credential mismatch fails closed.
+- Changed the personal-account Risk defaults to register separate immutable SIM, DEMO, and complete LIVE policies alongside the prop-firm policy.
+- Changed Simulation live-session API composition to create durable practice sessions and expose restore/rearm operations.
+
+### Consolidate the CFD and forex Trading UI specification
+
+The primary trading workspace now has one documented Trading feature target for MT5-routed CFDs, primarily forex, instead of separate futures/options order-ticket and options-chain targets.
+
+#### Changed (2)
+
+- Changed `FEAT-UI-06` from a futures/options Order Ticket into the target `src/features/trading/` Trading Widget, combining CFD/forex order entry with the existing API-backed Trading session and governed-action presentation.
+- Transferred `FR-UI-147` from the generic workflow-view feature to `FEAT-UI-06` and reconciled the package and system feature inventories without claiming the target code move is complete.
+
+#### Removed (1)
+
+- Retired `FEAT-UI-07` and `FR-UI-073`–`FR-UI-084` without reuse because listed-options ticket and option-chain behavior is outside the owner's CFD/forex MT5 workflow and has no authoritative backend contract.
+
+### Operator-elected application-wide account mode
+
+The operator now elects SIM, DEMO, or LIVE from the profile dropdown and that choice becomes the application's trading context: it is persisted server-side, decides the execution route every governed order and cancellation is admitted on, and stamps the runtime profile carried by routed orders, persisted rows, and authorization claims.
+
+#### Added (4)
+
+- Added the `ACCOUNT_MODE` system setting (`sim`/`demo`/`live`) with hot activation, resolved centrally so one persisted election drives the execution route, the runtime profile, and the mode the shell presents.
+- Added colour-coded account-mode presentation shared by the profile dropdown and the always-visible header badge: sim green, demo amber, live red.
+- Added optimistic-locked persistence of the elected mode that writes the complete system-settings document, reverts on refusal, and never presents a mode the backend is not routing to.
+- Added account-mode resolution, manifest, and boundary-admission tests covering each mode, the bootstrap seed, and the fail-closed fallback.
+
+#### Changed (4)
+
+- Changed the account mode from a server-confirmed value the UI could never elect into an operator-elected setting the backend derives its runtime profile from; selecting LIVE is now what puts the application on the live route.
+- Changed the Trading and Portfolio boundaries to admit a request whose declared route matches the elected account mode rather than the deployment's bootstrap configuration.
+- Changed the header badge from a two-valued simulation/live label to the three real modes, and widened the client execution-route contracts to include `sim`.
+- Changed the price ladder to route every order, cancellation, and account-state read on the active mode, refusing to name a route while the mode is unresolved.
+
+#### Removed (1)
+
+- Removed the `ALLOW_LIVE_MUTATIONS` boundary gate and the blanket refusal of live-routed manual orders and cancellations by owner decision; Risk is the sole authority on whether any order proceeds, and demo versus live is decided by the credentials the operator supplied.
+
+#### Fixed (1)
+
+- Fixed the authenticated identity payloads omitting `runtime_profile`, which left the shell permanently reporting an unknown account mode and order entry disabled by its own fail-closed rule.
+
+### Simulator-matching header profile section
+
+The shell's right-hand header section now mirrors the CME Group Simulator: a segmented digital trading clock, a 1-Click confirmation switch, and a profile badge whose `<` chevron drops a working profile menu.
+
+#### Added (2)
+
+- Added a header profile dropdown that drops from the profile chevron and presents the account-mode selection (SIM/DEMO/LIVE, one active at a time) plus the real System Settings and authenticated sign-out actions.
+- Added digital-clock segment decomposition helpers so the header renders the clock as digit groups with colons and a zone suffix, reusing the same arithmetic as the formatted clock string.
+
+#### Changed (2)
+
+- Changed the header clock from a plain text timestamp to a segmented digital display and the confirmation toggle into an accessible 1-Click switch with the simulator's tooltip text.
+- Renamed the profile menu's account section to "Account Mode:" to match the simulator.
+
+#### Removed (1)
+
+- Removed the simulated-balance reset control by owner decision; the profile menu no longer offers a reset action.
+
+### Fluid docking layout for trading workspaces
+
+The trading workspace now runs on a docking layout engine matching the CME Group Simulator, so widgets fluidly resize, dock as tabs, and split regions instead of snapping to a fixed grid.
+
+#### Changed (3)
+
+- Replaced the fixed 12-column widget grid with a Dockview-based docking workspace offering pixel-fluid splitters, tab docking, edge splits, automatic refill of vacated regions, double-click group maximize, and Alt+Arrow keyboard panel moves.
+- Migrated persisted workspace layouts to serialized docking trees with deterministic column-cluster/row-band conversion for legacy grid-rectangle layouts and template presets, keyed throughout by stable widget ids.
+- Re-oriented every workspace template preset to the exact panel arrangement of its owner-supplied reference thumbnail in `public/templates/`, including side-by-side columns with independent vertical splits and a full-height ladder or options chain.
+
+### Select new trading-UI workspaces from templates
+
+The trading UI now opens every newly created workspace as a template picker mirroring the CME Group Simulator, so a new tab starts from a curated widget set instead of a fixed default.
+
+#### Added (1)
+
+- Added a fail-closed workspace template catalog (Blank, HaruQuant, Chart + Ladder, MultiCharts + Ladder, Options, Charts) that seeds EURUSD-bound registered-widget presets, renames content-template workspaces to the template name, keeps Blank under its deterministic name with an explicit empty-workspace prompt, and rejects unknown template ids without state change.
+
+### Bound canonical point-in-time Simulation evaluation
+
+Canonical backtests now reuse identical scheduler-visible market-data prefixes and evaluate the registered Naive MA Trend strategy through a causal bounded-window evaluator while preserving one no-lookahead Strategy evaluation per generated tick.
+
+#### Changed (1)
+
+- Changed the registered Naive MA Trend strategy from SMA to SMA-seeded recursive EMA and bound the genuine annual example's contract, point, tick, volume, leverage, filling, and signed point-swap conversion facts to a current checksum-bearing read-only MT5 demo snapshot.
+
+#### Fixed (3)
+
+- Replaced redundant per-tick source-dataset reconstruction with a run-scoped monotonic-prefix cursor, bounded identity-safe Indicator reuse, and a registered strictly progressing Naive MA Trend evaluator parity-tested against the official-EMA batch path; validated full reports now retain serialization safety without the untrusted item ceiling.
+- Corrected Simulation realized, unrealized, MAE, and MFE valuation to apply provider contract size and preserved signed swap cash debits and credits.
+- Reduced the genuine annual canonical Simulation kernel from 27.09 to 4.79 seconds by reusing one-time validated strategy bindings and trusted internal engine/ledger operations, with raw/public and compact/public parity coverage and unchanged ticks, trades, equity, and PnL.
+
+### Qualify research gaps with persisted holiday evidence
+
+Research market-data quality now distinguishes fully supported calendar holidays from
+unexplained missing bars without treating economic events as broker schedules.
+
+#### Changed (1)
+
+- Added fail-closed, symbol-relevant holiday qualification with explicit provenance while retaining blocking `MISSING_BARS` for incomplete, absent, or unmatched evidence.
+
 ### Retire pre-release Simulation backtest compatibility
 
 Canonical single-asset and portfolio backtests now use one complete asynchronous request path, while fast research retains a separate explicitly non-canonical contract.

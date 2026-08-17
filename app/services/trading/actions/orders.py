@@ -514,6 +514,7 @@ async def _execute_request(
         deps.broker_adapter,
         operation_timeout_seconds=deps.broker_operation_timeout_seconds,
         clock=deps.clock,
+        simulation_execution_source=deps.simulation_execution_source,
     )
     _record_receipt(request, receipt, attempt_event_id, deps)
     _complete_reservation(request, receipt, deps)

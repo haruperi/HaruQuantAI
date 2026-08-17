@@ -58,24 +58,36 @@ def _resolve_system_credentials(
     )
 
 
-def build_system_broker_connection_config(broker_id: str, *, request_id: str) -> object:
-    """Build a non-production Broker config from authoritative stored settings.
+def build_system_broker_connection_config(
+    broker_id: str,
+    *,
+    request_id: str,
+    environment: str | None = None,
+) -> object:
+    """Build a system Broker config from authoritative stored settings.
 
     Args:
         broker_id: Exact Brokers provider identifier.
         request_id: Canonical request identifier.
+        environment: Explicit elected MT5 environment. Other providers retain
+            their fixed non-production environment.
 
     Returns:
         Immutable Brokers-owned connection configuration.
 
     Raises:
-        ValueError: If the provider is unsupported, disabled, or its resolved
-            target is not an approved non-production environment.
+        ValueError: If the provider is unsupported, disabled, or the requested
+            environment is invalid for that provider.
         IdentityError: If required credentials cannot be resolved safely.
     """
     if broker_id not in _PROVIDER_SETTINGS:
         raise ValueError("unsupported system broker provider")
-    enabled_key, environment, credential_slot = _PROVIDER_SETTINGS[broker_id]
+    enabled_key, default_environment, credential_slot = _PROVIDER_SETTINGS[broker_id]
+    resolved_environment = environment or default_environment
+    if environment is not None and broker_id != "mt5":
+        raise ValueError("environment override is supported only for mt5")
+    if broker_id == "mt5" and resolved_environment not in {"demo", "live"}:
+        raise ValueError("mt5 system environment is invalid")
     settings_record = get_system_settings(request_id=request_id)
     if not _enabled(settings_record.settings.get(enabled_key, "false")):
         message = f"{broker_id} system provider is disabled"
@@ -96,7 +108,7 @@ def build_system_broker_connection_config(broker_id: str, *, request_id: str) ->
     logger.info("Composing one enabled non-production system broker configuration")
     return _build_broker_config(
         broker_id=broker_id,
-        environment=environment,
+        environment=resolved_environment,
         account_reference=account_reference,
         credentials=credentials or None,
         provider_enabled=True,

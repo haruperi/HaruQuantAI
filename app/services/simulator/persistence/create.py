@@ -245,7 +245,75 @@ def create_recovery_checkpoint_record(
         raise ValueError("Simulator recovery checkpoint was not created")
 
 
+def create_interactive_session_record(
+    store: object, value: Mapping[str, object], *, request_id: str
+) -> None:
+    """Persist one immutable interactive-session request and initial checkpoint.
+
+    Raises:
+        ValueError: If persistence reports an invalid affected-row count.
+    """
+    _require_store(store)
+    result = _execute(
+        (
+            "INSERT INTO sim_interactive_sessions "
+            "(session_id, run_id, request_json, cursor, status, state_hash, "
+            "created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(session_id) DO NOTHING",
+        ),
+        (
+            (
+                _text_field(value, "session_id"),
+                _text_field(value, "run_id"),
+                canonical_json(value["request"], max_items=None),
+                value["cursor"],
+                _text_field(value, "status"),
+                _text_field(value, "state_hash"),
+                _text_field(value, "created_at"),
+                _text_field(value, "updated_at"),
+            ),
+        ),
+        request_id=request_id,
+    )
+    if result.affected_rows not in {0, 1}:
+        raise ValueError("Interactive Simulation session was not persisted")
+
+
+def create_interactive_intent_record(
+    store: object, value: Mapping[str, object], *, request_id: str
+) -> None:
+    """Append one cursor-bound manual intent idempotently.
+
+    Raises:
+        ValueError: If persistence reports an invalid affected-row count.
+    """
+    _require_store(store)
+    result = _execute(
+        (
+            "INSERT INTO sim_interactive_intents "
+            "(session_id, sequence, accepted_cursor, intent_json, intent_hash, "
+            "created_at) VALUES (?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(session_id, intent_hash) DO NOTHING",
+        ),
+        (
+            (
+                _text_field(value, "session_id"),
+                value["sequence"],
+                value["accepted_cursor"],
+                canonical_json(value["intent"], max_items=None),
+                _text_field(value, "intent_hash"),
+                _text_field(value, "created_at"),
+            ),
+        ),
+        request_id=request_id,
+    )
+    if result.affected_rows not in {0, 1}:
+        raise ValueError("Interactive Simulation intent was not persisted")
+
+
 __all__ = [
+    "create_interactive_intent_record",
+    "create_interactive_session_record",
     "create_recovery_checkpoint_record",
     "create_run_record",
     "create_session_record",

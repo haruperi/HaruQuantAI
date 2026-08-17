@@ -14,6 +14,28 @@ import type { ApiResponse } from "./contracts";
 import { tradingRoutes } from "./routes";
 import { request, type RequestOptions } from "./request";
 
+/** Minimal provider-authored identity shown in the application Header. */
+export const tradingAccountProfileSchema = z.object({
+  contract_version: z.literal("v1"),
+  schema_id: z.literal("api.trading.account_profile.v1"),
+  account_name: z.string().min(1),
+  trade_mode: z.enum(["SIMULATION", "DEMO", "REAL", "CONTEST"]),
+  environment_label: z.string().min(1),
+  source: z.enum(["simulator", "mt5"]),
+  retrieved_at: z.string(),
+});
+export type TradingAccountProfile = z.infer<typeof tradingAccountProfileSchema>;
+
+/** Read the active Simulator or MT5 account identity. */
+export function accountProfile(
+  options?: RequestOptions
+): Promise<ApiResponse<TradingAccountProfile>> {
+  return request<TradingAccountProfile>(tradingRoutes.accountProfile, {
+    schema: tradingAccountProfileSchema,
+    ...options,
+  });
+}
+
 /** Trading session projection (opaque; Trading-owned `TradingProjection.v1`). */
 export const tradingProjectionSchema = z.record(z.string(), z.unknown());
 export type TradingProjection = z.infer<typeof tradingProjectionSchema>;
@@ -50,6 +72,45 @@ export function listWorkingOrders(projection: TradingProjection): WorkingOrder[]
   return orders;
 }
 
+/**
+ * One real open position, exactly as Trading's own state projection reports
+ * it. `broker_position_id` is what `POST /positions/{position_id}/close`
+ * targets; a position without a positive quantity is already flat and is
+ * never closable.
+ */
+export const positionSchema = z.object({
+  position_id: z.string(),
+  account_id: z.string(),
+  symbol: z.string(),
+  broker_position_id: z.string(),
+  side: z.enum(["LONG", "SHORT", "UNKNOWN"]),
+  state: z.string(),
+  quantity: z.union([z.string(), z.number()]),
+  average_entry_price: z.union([z.string(), z.number()]).nullable().optional(),
+});
+export type Position = z.infer<typeof positionSchema>;
+
+/**
+ * Extract every real position Trading's session projection reports.
+ *
+ * Positions the projection reports as flat or with a non-positive quantity are
+ * omitted: they are closed history, not open exposure, and must never be
+ * counted or offered for closing.
+ */
+export function listPositions(projection: TradingProjection): Position[] {
+  const raw = projection.positions;
+  if (typeof raw !== "object" || raw === null) return [];
+  const positions: Position[] = [];
+  for (const value of Object.values(raw as Record<string, unknown>)) {
+    const parsed = positionSchema.safeParse(value);
+    if (!parsed.success) continue;
+    if (parsed.data.state === "FLAT") continue;
+    if (Number(parsed.data.quantity) <= 0) continue;
+    positions.push(parsed.data);
+  }
+  return positions;
+}
+
 /** Execution receipt (opaque; Trading-owned `ExecutionReceipt.v1`). */
 export const executionReceiptSchema = z.record(z.string(), z.unknown());
 export type ExecutionReceipt = z.infer<typeof executionReceiptSchema>;
@@ -62,7 +123,7 @@ export interface TradingMutationInput {
   workflow_id: string;
   correlation_id: string;
   causation_id?: string | null;
-  route: "demo" | "live";
+  route: "sim" | "demo" | "live";
   action: string;
   provider_id?: string | null;
   account_id: string;
@@ -118,7 +179,7 @@ export interface OrderPreflightInput {
   request_id: string;
   workflow_id: string;
   correlation_id: string;
-  route: "demo" | "live";
+  route: "sim" | "demo" | "live";
   account_id: string;
   portfolio_id?: string | null;
   symbol: string;
@@ -135,7 +196,7 @@ export interface CancelAllPreflightInput {
   request_id: string;
   workflow_id: string;
   correlation_id: string;
-  route: "demo" | "live";
+  route: "sim" | "demo" | "live";
   account_id: string;
   portfolio_id?: string | null;
   representative_symbol: string;
@@ -147,7 +208,7 @@ export interface CancelOrderPreflightInput {
   request_id: string;
   workflow_id: string;
   correlation_id: string;
-  route: "demo" | "live";
+  route: "sim" | "demo" | "live";
   account_id: string;
   portfolio_id?: string | null;
   representative_symbol: string;
@@ -257,6 +318,7 @@ export function closePosition(
 
 /** Aggregated trading client. */
 export const trading = {
+  accountProfile,
   session,
   preflightOrder,
   submitOrder,

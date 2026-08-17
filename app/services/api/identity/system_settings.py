@@ -57,6 +57,16 @@ _SYSTEM_DEFINITIONS = (
         allowed_values=("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"),
     ),
     _SystemSettingDefinition(
+        "ACCOUNT_MODE",
+        "settings.environment.account_mode",
+        "Account mode",
+        "Application-wide trading context: sim executes virtually against the "
+        "Simulator, while demo and live both relay to the connected MT5 "
+        "terminal and differ only by the credentials the operator supplies.",
+        allowed_values=("sim", "demo", "live"),
+        activation="hot",
+    ),
+    _SystemSettingDefinition(
         "RUNTIME_BROKER",
         "settings.environment.runtime_broker",
         "Runtime broker",

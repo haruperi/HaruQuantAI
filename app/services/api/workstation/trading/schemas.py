@@ -7,6 +7,20 @@ from typing import Literal
 from app.services.api.contracts.models import _BaseApiContract
 
 
+class TradingAccountProfileResponse(_BaseApiContract):
+    """Minimal provider-authored identity displayed by the Trading shell."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.trading.account_profile.v1"] = (
+        "api.trading.account_profile.v1"
+    )
+    account_name: str
+    trade_mode: Literal["SIMULATION", "DEMO", "REAL", "CONTEST"]
+    environment_label: str
+    source: Literal["simulator", "mt5"]
+    retrieved_at: datetime
+
+
 class TradingMutationRequest(_BaseApiContract):
     """Exact API projection of one governed Trading request."""
 
@@ -16,10 +30,11 @@ class TradingMutationRequest(_BaseApiContract):
     workflow_id: str
     correlation_id: str
     causation_id: str | None = None
-    route: Literal["demo", "live"]
+    route: Literal["sim", "demo", "live"]
     action: str
     provider_id: str | None = None
     account_id: str
+    simulation_session_id: str | None = None
     portfolio_id: str | None = None
     strategy_id: str
     strategy_version: str
@@ -73,8 +88,9 @@ class OrderPreflightRequest(_BaseApiContract):
     request_id: str
     workflow_id: str
     correlation_id: str
-    route: Literal["demo", "live"]
+    route: Literal["sim", "demo", "live"]
     account_id: str
+    simulation_session_id: str | None = None
     portfolio_id: str | None = None
     symbol: str
     side: Literal["BUY", "SELL"]
@@ -114,8 +130,9 @@ class CancelOrderPreflightRequest(_BaseApiContract):
     request_id: str
     workflow_id: str
     correlation_id: str
-    route: Literal["demo", "live"]
+    route: Literal["sim", "demo", "live"]
     account_id: str
+    simulation_session_id: str | None = None
     portfolio_id: str | None = None
     representative_symbol: str
     target_broker_order_id: str
@@ -136,8 +153,9 @@ class CancelAllPreflightRequest(_BaseApiContract):
     request_id: str
     workflow_id: str
     correlation_id: str
-    route: Literal["demo", "live"]
+    route: Literal["sim", "demo", "live"]
     account_id: str
+    simulation_session_id: str | None = None
     portfolio_id: str | None = None
     representative_symbol: str
     idempotency_key: str
@@ -164,5 +182,6 @@ __all__ = (
     "CancelOrderPreflightRequest",
     "OrderPreflightRequest",
     "OrderPreflightResponse",
+    "TradingAccountProfileResponse",
     "TradingMutationRequest",
 )

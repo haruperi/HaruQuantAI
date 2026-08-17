@@ -86,7 +86,7 @@
 
 - **Secrets**: Never commit secrets. Redact sensitive values in logs. Use `.env.example` only.
 - **Fail-Closed**: If policy is uncertain or evidence is missing, block the action.
-- **No Live Action by Default**: Live trading, risk changes, and execution state mutations require explicit, deterministic approval. Real integration operations are permitted only against verified non-production targets (`ENVIRONMENT=dev`, demo/demo/sandbox accounts). Any attempt to touch or mutate production infrastructure is a blocking safety violation.
+- **No Live Action by Default**: Live trading, risk changes, and execution state mutations require explicit, deterministic approval. Real integration operations are permitted only against verified non-production targets (`ENVIRONMENT=dev`, demo/testnet/sandbox accounts), with one exception: MetaTrader 5 may connect to a live environment when the operator has elected `ACCOUNT_MODE=live` **and** supplied live MT5 credentials. A mode/credential mismatch fails closed rather than trading one environment under another's label. Every other provider remains non-production. Any attempt to touch or mutate production infrastructure is a blocking safety violation.
 - **Kill Switch**: Deterministic. No caller can override or bypass a kill switch.
 - **No Invented Data**: The system must never invent backtest results, live performance, or broker fills.
 - **Deterministic Policy**: Python code is the sole policy-enforcement authority.
@@ -120,7 +120,7 @@
 
 ## 7. Integration
 
-- **Environment Boundaries**: Real integration operations are permitted only against verified non-production targets (`ENVIRONMENT=dev`, demo/demo/sandbox accounts).
+- **Environment Boundaries**: Real integration operations are permitted only against verified non-production targets (`ENVIRONMENT=dev`, demo/testnet/sandbox accounts), except for operator-elected live MetaTrader 5 as defined in §3.
 - **Targeted Testing & Verification**: Development verification uses targeted test commands (`uv run pytest <test_file_path>`). Full test suites are restricted during iterative development to optimize time.
 - **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `uv run pytest <test_file_path>`, `uv run ruff check .`, `uv run mypy .`.
 - **Restricted Commands (Require `APPROVED: EXECUTE`)**: `rm -rf`, `git reset`, `git clean`, `uv add`/`uv remove`, `docker compose`, live broker calls, real email/Telegram sends, destructive SQL.

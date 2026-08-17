@@ -9,6 +9,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  clockSegmentsAtOffset,
   formatClockAtOffset,
   parseUtcOffset,
 } from "./clock";
@@ -92,5 +93,28 @@ describe("formatClockAtOffset", () => {
 
   it("renders the label verbatim", () => {
     expect(formatClockAtOffset(UTC_MIDNIGHT, -360, "CDT")).toContain("CDT");
+  });
+});
+
+describe("clockSegmentsAtOffset", () => {
+  const UTC_EVENING = Date.UTC(2026, 7, 10, 18, 16, 31);
+
+  it("splits the digital clock into digit groups and a suffix", () => {
+    const segments = clockSegmentsAtOffset(UTC_EVENING, -360, "UTC-6");
+    expect(segments).toEqual({
+      hour: "12",
+      minute: "16",
+      second: "31",
+      meridiem: "pm",
+      label: "UTC-6",
+      date: "08/10/2026",
+    });
+  });
+
+  it("rejoins into exactly the formatted clock string", () => {
+    const s = clockSegmentsAtOffset(UTC_EVENING, -360, "UTC-6");
+    expect(`${s.hour}:${s.minute}:${s.second} ${s.meridiem} ${s.label} ${s.date}`).toBe(
+      formatClockAtOffset(UTC_EVENING, -360, "UTC-6"),
+    );
   });
 });

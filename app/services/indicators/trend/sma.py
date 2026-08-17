@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
-import numpy as np
 import pandas as pd
 from numpy.lib.stride_tricks import sliding_window_view
 
@@ -154,18 +153,26 @@ def sma(
         index=index,
         dtype="float64",
     )
-    is_valid = np.arange(len(records)) >= period - 1
     values = prices.rolling(window=period, min_periods=period).mean()
-    row_time = pd.Series(index, index=index)
-    computed_from_start = row_time.shift(period - 1)
-    computed_from_start[~is_valid] = pd.NaT
-    computed_from_end = row_time.copy()
-    computed_from_end[~is_valid] = pd.NaT
-    available_at = pd.Series([record.available_at for record in records], index=index)
-    rolling_available = _rolling_available_at(records, index, period)
-    available_at[is_valid] = rolling_available[is_valid]
-    unavailable_reason = pd.Series(pd.NA, index=index, dtype=object)
-    unavailable_reason[~is_valid] = "warmup"
+    warmup_count = min(period - 1, len(records))
+    ready_count = len(records) - warmup_count
+    computed_from_start = pd.Series(
+        [pd.NaT] * warmup_count + list(index[:ready_count]), index=index
+    )
+    computed_from_end = pd.Series(
+        [pd.NaT] * warmup_count + list(index[warmup_count:]), index=index
+    )
+    source_available = [record.available_at for record in records]
+    rolling_available = _rolling_available_at(records, index, period).tolist()
+    available_at = pd.Series(
+        source_available[:warmup_count] + rolling_available[warmup_count:],
+        index=index,
+    )
+    unavailable_reason = pd.Series(
+        ["warmup"] * warmup_count + [pd.NA] * ready_count,
+        index=index,
+        dtype=object,
+    )
     output_column = _output_column(source, period)
 
     return build_indicator_result(

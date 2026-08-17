@@ -1,9 +1,9 @@
 # UI
 
 > **Package:** `app/ui/`
-> **Status:** `In Progress` — 25 registered UI features; 11 `Completed`, 13 `Pending`,
+> **Status:** `In Progress` — 24 registered UI features; 14 `Completed`, 9 `Pending`,
 > and 1 `Partial` requirement coverage or focused-folder ownership.
-> **Last updated:** `2026-08-12`
+> **Last updated:** `2026-08-17`
 
 > This README is the package's **single source of truth** for requirements, final
 > structure, implementation sequence, progress, verification evidence, and tests.
@@ -102,8 +102,8 @@ flowchart TD
     SHELL --> WORKSPACE[[Workspace Layout and Session Mode]]
     WORKSPACE --> WIDGETS[[Primary Trading Widgets]]
     WIDGETS --> MARKETS[[Markets / Watchlist]]
-    WIDGETS --> CHARTS[[Chart / Price Ladder / Options Grid]]
-    WIDGETS --> ORDERS[[Order Ticket / Positions / Trade Log]]
+    WIDGETS --> CHARTS[[Chart / Price Ladder]]
+    WIDGETS --> ORDERS[[Trading / Positions / Trade Log]]
     WIDGETS --> PLAN[[Trade Plan / Education / Challenges]]
     SHELL --> ADDON[[Layered cockpit and workflow add-ons]]
 ```
@@ -125,8 +125,7 @@ app/ui/
     ├── features/watchlists/              # FEAT-UI-03
     ├── features/chart/                   # FEAT-UI-04
     ├── features/price-ladder/            # FEAT-UI-05
-    ├── features/order-ticket/            # FEAT-UI-06 (target)
-    ├── features/options-grid/            # FEAT-UI-07 (target)
+    ├── features/trading/                 # FEAT-UI-06 (target)
     ├── features/trade-log/               # FEAT-UI-08 (target)
     ├── features/positions/               # FEAT-UI-09 (target)
     ├── features/trade-plan/              # FEAT-UI-10 (target)
@@ -154,13 +153,12 @@ app/ui/
 
 | Status | Feature | Owning module | Public surface | Requirements | Verification evidence |
 |---|---|---|---|---|---|
-| Completed | `FEAT-UI-01` Workspace Layout and Session Mode | `src/features/workspaces/` | Workspace and widget layout state, confirmation mode, account mode | `FR-UI-001`–`FR-UI-029` | `src/features/workspaces/store.test.ts` |
+| Completed | `FEAT-UI-01` Workspace Layout and Session Mode | `src/features/workspaces/` | Workspace and widget layout state, workspace templates, docking layout trees, confirmation mode, account mode | `FR-UI-001`–`FR-UI-029`; `FR-UI-195`–`FR-UI-199`; `FR-UI-200`–`FR-UI-205` | `src/features/workspaces/store.test.ts`; `dockLayout.test.ts`; `TemplatePicker.test.tsx`; `WorkspaceEmptyState.test.tsx`; `src/components/layout/DockingWorkspace.test.tsx` |
 | Completed | `FEAT-UI-02` Markets Widget | `src/features/markets/` | `MarketsWidget` through the feature barrel | `FR-UI-030`–`FR-UI-037`; `FR-UI-192`–`FR-UI-193` | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FEAT-UI-03` Watchlist Widget | `src/features/watchlists/` | `WatchlistWidget` through the feature barrel | `FR-UI-038`–`FR-UI-045`; `FR-UI-192` | `src/features/watchlists/WatchlistWidget.test.tsx` |
 | Completed | `FEAT-UI-04` Charting Tools Widget | `src/features/chart/` | `ChartWidget` | `FR-UI-046`–`FR-UI-054`; `FR-UI-194` | `src/features/chart/ChartWidget.test.tsx` |
 | Completed | `FEAT-UI-05` Price Ladder Widget | `src/features/price-ladder/` | `PriceLadderWidget` | `FR-UI-055`–`FR-UI-062` | `src/features/price-ladder/PriceLadderWidget.test.tsx`; `useDepthStream.test.tsx` |
-| Pending | `FEAT-UI-06` Order Ticket | Target: `src/features/order-ticket/`; current: `src/components/workflow/OrderTicketModal.tsx` | `OrderTicketModal` (futures and options tabs) | `FR-UI-063`–`FR-UI-079` | Pending evidence |
-| Pending | `FEAT-UI-07` Options Grid Widget | Target: `src/features/options-grid/`; current: `src/features/instrument-panels/OptionsGridWidget.tsx` | `OptionsGridWidget` | `FR-UI-080`–`FR-UI-084` | Pending evidence; blocked on an owning backend domain |
+| Partial | `FEAT-UI-06` Trading Widget | Target: `src/features/trading/`; current: `src/components/workflow/trading.tsx` and `OrderTicketModal.tsx` | `TradingWidget` through the feature barrel | `FR-UI-063`–`FR-UI-072`; `FR-UI-147` | `src/components/workflow/trading.test.tsx`; order-entry and focused-folder evidence pending |
 | Pending | `FEAT-UI-08` Trade Log Widget | Target: `src/features/trade-log/`; current: `src/components/workflow/TradeLogWidget.tsx` | `TradeLogWidget` | `FR-UI-085`–`FR-UI-089` | Pending evidence |
 | Pending | `FEAT-UI-09` Positions and Orders Widgets | Target: `src/features/positions/`; current: `src/components/workflow/PositionsWidget.tsx` | `PositionsWidget`, orders presentation | `FR-UI-090`–`FR-UI-098` | Pending evidence |
 | Pending | `FEAT-UI-10` Trade Plan Widget | Target: `src/features/trade-plan/`; current: `src/features/planning/TradePlanWidget.tsx` | `TradePlanWidget` | `FR-UI-099`–`FR-UI-104` | Pending evidence |
@@ -171,7 +169,7 @@ app/ui/
 | Pending | `FEAT-UI-15` Session and Page Context | `src/context/` | Auth, page, governed-preflight, and stream context | `FR-UI-127`–`FR-UI-131` | `src/context/{auth,page,governed,streams}.test.ts(x)`; further evidence pending |
 | Pending | `FEAT-UI-16` Application Shell and Navigation | `src/components/layout/` | `Header`, `Sidebar`, `WorkspaceGrid`, session clock | `FR-UI-132`–`FR-UI-137` | `src/components/layout/clock.test.ts`; further evidence pending |
 | Pending | `FEAT-UI-17` Protected Routing and Access Gate | `src/app/` | `AuthenticationPage`, `ProtectedLayout`, `WorkflowPage` | `FR-UI-138`–`FR-UI-141` | `src/app/{authentication-page,protected-layout,pages.contract}.test.ts(x)`; further evidence pending |
-| Completed | `FEAT-UI-18` Domain Workflow Views                    | `src/components/workflow/`                                                                                | `AppShell` and focused domain workflow views                                  | `FR-UI-142`–`FR-UI-150` | `src/components/workflow/*.test.tsx`                                                                 |
+| Completed | `FEAT-UI-18` Domain Workflow Views                    | `src/components/workflow/`                                                                                | `AppShell` and non-Trading focused domain workflow views                      | `FR-UI-142`–`FR-UI-146`; `FR-UI-148`–`FR-UI-150` | Focused non-Trading `src/components/workflow/*.test.tsx`                                                |
 | Completed | `FEAT-UI-19` Instrument Panels                        | `src/features/instrument-panels/`                                                                         | `InstrumentPanels`, `InstrumentValue`                                       | `FR-UI-151`–`FR-UI-156` | `src/features/instrument-panels/components.test.tsx`                                                 |
 | Completed | `FEAT-UI-20` Navigation, Planning, and Warning Panels | `src/features/planning/`                                                                                  | `PlanningPanels`, `WarningItem`                                             | `FR-UI-157`–`FR-UI-161` | `src/features/planning/components.test.tsx`                                                          |
 | Completed | `FEAT-UI-21` Workflow Stage Pages                     | `src/features/workflow-pages/`, `src/app/workstation/`                                                  | `WorkflowStages`, `WorkflowStage`, workstation routes                       | `FR-UI-162`–`FR-UI-168` | `src/features/workflow-pages/components.test.tsx`                                                    |
@@ -180,7 +178,7 @@ app/ui/
 | Completed | `FEAT-UI-24` Training, Replay, and Qualification UX   | `src/features/training-ux/`                                                                               | `TrainingPanel`, `QualificationView`                                        | `FR-UI-180`–`FR-UI-185` | `src/features/training-ux/components.test.tsx`                                                       |
 | Completed | `FEAT-UI-25` MT5 Market Ticks Diagnostic Widget       | `src/features/market-ticks/`                                                                              | `MarketTicksTableWidget`                                                     | `FR-UI-186`–`FR-UI-191`; `FR-UI-193` | `src/features/market-ticks/MarketTicksTableWidget.test.tsx`, `useMarketSnapshots.test.tsx`           |
 
-**Primary UI.** `FEAT-UI-01`–`FEAT-UI-13` are the trading workspace and widgets
+**Primary UI.** `FEAT-UI-01`–`FEAT-UI-06` and `FEAT-UI-08`–`FEAT-UI-13` are the trading workspace and widgets
 specified by `docs/dev/documentation.pdf`. `FEAT-UI-14`–`FEAT-UI-17` are the foundation
 that enables them. `FEAT-UI-18`–`FEAT-UI-24` are additive layers and own no primary widget.
 
@@ -188,8 +186,9 @@ that enables them. `FEAT-UI-18`–`FEAT-UI-24` are additive layers and own no pr
 consumes backend `FEAT-API-11` Account Watchlists. UI feature identity remains
 independent from the API's `FEAT-API-*` registry.
 
-**Blocked features.** `FEAT-UI-07`, `FEAT-UI-11`, and `FEAT-UI-12`, and the options
-group of `FEAT-UI-06`, have no owning backend domain; see Section 6.
+**Blocked features.** `FEAT-UI-11` and `FEAT-UI-12` have no owning backend domain;
+see Section 6. Listed-options and options-chain UI scope is withdrawn because the
+owner trades CFDs, primarily forex through MT5; the retired identifiers are not reused.
 
 **Non-feature support directories.** `src/types/` and `src/utils/` are documented
 shared type and helper directories owning no feature behaviour. `src/mock/` is
@@ -325,7 +324,11 @@ workspace-related field; see the feature's own `README.md` for that gap.
 | Status    | File             | Responsibility                                            | Key exports                                                                             | Dependencies                                                                                                                |
 | --------- | ---------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Completed | `contracts.ts` | Workspace and widget layout contracts                     | `Workspace`, `Widget`, `WidgetType`, `AccountMode`                              | **Standard library:** None**Required third-party:** Zod**Local:** None                                    |
-| Completed | `store.ts`     | Bounded layout, confirmation-mode, and account-mode state | `useWorkspaceStore`, `selectOrderEntryDisabled`, `mapRuntimeProfileToAccountMode` | **Standard library:** localStorage**Required third-party:** Zustand**Local:** utils/gridLayout, contracts |
+| Completed | `templates.ts` | Workspace template catalog (FR-UI-195–FR-UI-197)          | `WORKSPACE_TEMPLATES`, `WorkspaceTemplate`, `findWorkspaceTemplate`            | **Standard library:** None**Required third-party:** None**Local:** contracts                              |
+| Completed | `dockLayout.ts` | Docking layout tree factory and legacy migration (FR-UI-201) | `buildDockLayout`                                                              | **Standard library:** None**Required third-party:** dockview-react (types only)**Local:** contracts        |
+| Completed | `store.ts`     | Bounded layout, confirmation-mode, and account-mode state | `useWorkspaceStore`, `selectOrderEntryDisabled`, `mapRuntimeProfileToAccountMode` | **Standard library:** localStorage**Required third-party:** Zustand**Local:** contracts, templates, dockLayout |
+| Completed | `TemplatePicker.tsx` | New-workspace template picker screen (FR-UI-195/196/198) | `TemplatePicker` through the feature barrel                                  | **Standard library:** None**Required third-party:** None**Local:** store, templates                       |
+| Completed | `WorkspaceEmptyState.tsx` | Explicit empty-workspace prompt (FR-UI-026/197)    | `WorkspaceEmptyState` through the feature barrel                              | **Standard library:** None**Required third-party:** None**Local:** None                                   |
 | Completed | `index.ts`     | Sole public surface for the feature                       | feature barrel                                                                          | **Standard library:** None**Required third-party:** None**Local:** store and contracts                    |
 
 | Status    | Requirement ID | Responsibility                                                                                                                                                | Component / Function / Type | Side Effects         | Failure presentation     | Usage / Test                                                                                             |
@@ -335,30 +338,42 @@ workspace-related field; see the feature's own `README.md` for that gap.
 | Completed | `FR-UI-003`  | Default an unnamed new workspace to a deterministic incrementing name.                                                                                        | workspace actions           | Local persistence    | Deterministic naming     | `store.test.ts`                                                                                        |
 | Completed | `FR-UI-004`  | Allow renaming, duplicating, and deleting a workspace; deleting the last remaining workspace is rejected.                                                     | workspace actions           | Local persistence    | Rejection explicit       | `store.test.ts`                                                                                        |
 | Completed | `FR-UI-005`  | Allow a workspace to be designated the default opened on next session start.                                                                                  | workspace actions           | Local persistence    | Default visible          | `store.test.ts`                                                                                        |
-| Completed | `FR-UI-006`  | Support relocating a widget within the grid by pointer drag, showing the target region before release.                                                        | `Widget`                  | Local persistence    | Drop target visible      | `store.test.ts`; `WorkspaceGrid.tsx` pointer-drag handlers                                           |
-| Completed | `FR-UI-007`  | Provide an equivalent keyboard-operable path for every drag-and-drop layout action.                                                                           | `Widget`                  | Local persistence    | Keyboard path preserved  | `WorkspaceGrid.tsx` keyboard pickup/move/resize handlers                                               |
-| Completed | `FR-UI-008`  | Support expanding one widget to fill the workspace and restoring it to its prior rectangle.                                                                   | `Workspace`               | Local persistence    | Prior rectangle retained | `store.test.ts`                                                                                        |
+| Completed | `FR-UI-006`  | Support moving a widget by dragging its tab: dropping on a panel's centre docks it as a tab in that group, dropping on an edge splits the region in that direction, and the layout always fills the workspace with no gaps or overlaps. | `DockingWorkspace`  | Local persistence    | Drop overlay visible      | `DockingWorkspace.test.tsx`; live docking evidence                                                        |
+| Completed | `FR-UI-007`  | Provide a keyboard-operable path for layout moves: focused tabs switch with arrow keys and Alt+Arrow moves the active panel left/right/above/below; splitter pixel-resizing remains pointer-only and tracked as a follow-up. | `DockingWorkspace`  | Local persistence    | Keyboard path preserved   | `DockingWorkspace.test.tsx`                                                                             |
+| Completed | `FR-UI-008`  | Support expanding a widget's group to fill the workspace (double-click its tab) and restoring the prior layout (double-click again or select another tab).        | `DockingWorkspace`  | Local persistence    | Prior layout retained     | `store.test.ts` (expand/contract state)                                                                  |
 | Completed | `FR-UI-009`  | Persist layout to browser-local storage only; layout is a client preference and never system state.                                                           | store                       | Local persistence    | Non-authoritative        | `store.test.ts`                                                                                        |
 | Completed | `FR-UI-010`  | Restore a corrupt or unreadable persisted layout to the default workspace rather than failing to render.                                                      | store                       | Local persistence    | Default restored         | `store.test.ts`                                                                                        |
 | Completed | `FR-UI-011`  | Provide an order-confirmation toggle that, when disabled, submits without the client-side confirmation dialog.                                                | mode actions                | Local state mutation | Mode always visible      | `store.test.ts`                                                                                        |
 | Completed | `FR-UI-012`  | Default the toggle to confirmation-required on every new session; the setting is never inherited silently.                                                    | mode actions                | Local state mutation | Safe default             | `store.test.ts`                                                                                        |
-| Completed | `FR-UI-013`  | Present the active confirmation mode persistently in the shell.                                                                                               | mode actions                | None                 | Mode always visible      | `Header.tsx` confirmation-mode toggle                                                                  |
+| Completed | `FR-UI-013`  | Present the active confirmation mode persistently in the shell.                                                                                               | mode actions                | None                 | Mode always visible      | `Header.tsx` confirmation-mode toggle; `Header.test.tsx`                                               |
 | Completed | `FR-UI-014`  | Treat the toggle as presentation only; it never suppresses or pre-satisfies API authorization, approval, idempotency, governance, or kill-switch enforcement. | mode actions                | None                 | API authority unchanged  | `store.test.ts`                                                                                        |
 | Completed | `FR-UI-015`  | Apply the toggle identically in simulation and live; the difference between modes is the environment switch, not a different order path.                      | mode actions                | None                 | One order path           | `store.test.ts`                                                                                        |
-| Completed | `FR-UI-016`  | Present the active account mode — simulation or live — persistently and unambiguously.                                                                      | mode actions                | None                 | Mode always visible      | `Header.tsx` account-mode badge                                                                        |
-| Completed | `FR-UI-017`  | Derive the mode from API-authoritative environment configuration; UI never elects the mode.                                                                   | mode actions                | External API call    | No client election       | `store.test.ts`; `context/auth.tsx`                                                                  |
-| Completed | `FR-UI-018`  | Require an explicit confirmed action to change mode and re-establish session context afterwards.                                                              | mode actions                | External API call    | Confirmation required    | `context/auth.tsx` (mode is re-derived only through the governed session-recovery/login/register flow) |
+| Completed | `FR-UI-016`  | Present the active account mode — sim, demo, or live — persistently, unambiguously, and colour-coded.                                                        | mode actions                | None                 | Mode always visible      | `Header.test.tsx` badge tests                                                                          |
+| Completed | `FR-UI-017`  | Elect the mode from the profile dropdown and persist it as the `ACCOUNT_MODE` system setting; the backend setting is authoritative for every session. Supersedes the previous never-client-elected rule by owner decision (2026-08-17). | mode actions                | External API call    | Selection persisted      | `Header.test.tsx`; `store.test.ts`                                                                   |
+| Completed | `FR-UI-018`  | Require an explicit operator action to change mode, apply it only once the backend has accepted it, and revert on refusal.                                    | mode actions                | External API call    | Explicit action required | `Header.test.tsx` (selection, persistence, and revert-on-refusal)                                      |
 | Completed | `FR-UI-019`  | Present simulated and live balances distinctly and never combine them in one total.                                                                           | mode actions                | None                 | No combined total        | `Header.tsx` (single balance figure per active mode)                                                   |
-| Completed | `FR-UI-020`  | Offer a balance reset action in simulation mode only, with explicit confirmation.                                                                             | mode actions                | External API call    | Absent in live mode      | `Header.tsx` reset control                                                                             |
-| Completed | `FR-UI-021`  | Fail closed when mode is unknown: present as unknown and disable order entry until resolved.                                                                  | mode actions                | None                 | Order entry disabled     | `store.test.ts`; `OrderTicketModal.tsx`                                                              |
+| Completed | `FR-UI-203`  | Persist the elected account mode as the complete system-settings document under its observed version, so a mode change never erases another setting and a concurrent edit is refused. | mode actions | External API call | Full-document write | `Header.test.tsx` (full-document write assertion)                                              |
+| Completed | `FR-UI-204`  | Route every governed order, cancellation, and account-state read on the active mode's route, and refuse to act at all while the mode is unresolved.            | mode actions                | External API call    | Route follows mode       | `PriceLadderWidget.tsx` route resolution; `store.test.ts`                                              |
+| Completed | `FR-UI-205`  | Colour-code the account mode identically in the profile dropdown and the header badge: sim green, demo amber, live red.                                        | mode actions                | None                 | One palette, both places | `Header.test.tsx`; `index.css` account-mode palette                                                    |
+| Completed | `FR-UI-206`  | Display the active provider account name above its authoritative environment in the Header. DEMO/LIVE consume MT5-authored account-profile evidence—including MT5's actual environment when it differs from the elected execution mode—while SIM consumes the explicit Simulator identity. Loading and unavailable states are visible, and the app-login username is never substituted for broker identity. | `Header` | External API call | Loading/unavailable explicit | `Header.test.tsx`; `clients/trading.test.ts` |
+| Removed   | `FR-UI-020`  | Balance reset control removed by owner decision (2026-08-16): no reset action is offered in the shell; the requirement is retired.                              | none                        | None                 | No reset offered         | Owner decision; `docs/CHANGELOG.md` [Unreleased]                                                       |
+| Completed | `FR-UI-021`  | Fail closed when mode is unknown: present as unknown, disable order entry, and name no route until resolved.                                                  | mode actions                | None                 | Order entry disabled     | `store.test.ts`; `Header.test.tsx`; `OrderTicketModal.tsx`                                           |
 | Completed | `FR-UI-022`  | Present the market-data delay applicable to the active mode where the API declares one.                                                                       | mode actions                | External API call    | Unknown remains explicit | `marketDataDelaySeconds` field, undefined until the API supplies one                                   |
 | Completed | `FR-UI-023`  | Present widget type and title from the registered widget-type set only.                                                                                       | `WidgetType`              | None                 | Unknown type rejected    | `store.test.ts`                                                                                        |
-| Completed | `FR-UI-024`  | Reject a layout rectangle that would place a widget outside the bounded grid.                                                                                 | `Widget`                  | Local persistence    | Rejection explicit       | `store.test.ts`                                                                                        |
-| Completed | `FR-UI-025`  | Preserve widget identity across reorder, duplicate, and restore operations.                                                                                   | `Widget`                  | Local persistence    | Stable identity          | `store.test.ts`                                                                                        |
+| Completed | `FR-UI-024`  | Keep every widget inside the workspace bounds inherently: the docking layout always fills the container and cannot express out-of-bounds or overlapping regions. | `DockingWorkspace`  | Local persistence    | No out-of-bounds state    | `dockLayout.test.ts`                                                                                     |
+| Completed | `FR-UI-025`  | Preserve widget identity across docking moves, duplication, and restore operations: panel ids equal widget ids and never change.                              | `DockingWorkspace`  | Local persistence    | Stable identity          | `dockLayout.test.ts`; `store.test.ts`                                                                    |
 | Completed | `FR-UI-026`  | Present an empty workspace explicitly rather than as a failed render.                                                                                         | `Workspace`               | None                 | Empty state truthful     | `store.test.ts`                                                                                        |
 | Completed | `FR-UI-027`  | Never persist account, credential, or order state to browser-local storage.                                                                                   | store                       | Local persistence    | Layout keys only         | `store.test.ts`                                                                                        |
 | Completed | `FR-UI-028`  | Expose workspace and mode state only through the feature barrel.                                                                                              | `index.ts`                | None                 | No deep import           | Consumer files import only from`features/workspaces`                                                   |
 | Completed | `FR-UI-029`  | Import no fixture data; every displayed value is API-sourced or a labelled client preference.                                                                 | store                       | None                 | No fixture import        | `store.test.ts`                                                                                        |
+| Completed | `FR-UI-195`  | Create a new workspace as pending its template choice: deterministically named, widget-free, and rendered as the template picker instead of the widget grid; creation stays bounded by FR-UI-002. | `addWorkspace`, `TemplatePicker` | Local persistence | Bounded creation kept    | `store.test.ts`; `TemplatePicker.test.tsx`                                                            |
+| Completed | `FR-UI-196`  | Apply a content template to the active pending workspace by seeding the template's registered-widget preset, whose rectangle set reproduces the reference thumbnail's exact panel orientation (`public/templates/`, Dark/Light), and renaming the workspace to the template name. | `applyWorkspaceTemplate`  | Local persistence    | Unknown template rejected | `store.test.ts`; `TemplatePicker.test.tsx`; `dockLayout.test.ts`                                         |
+| Completed | `FR-UI-197`  | Apply the Blank template by leaving the workspace empty under its deterministic name and presenting the explicit empty-workspace prompt. | `applyWorkspaceTemplate`, `WorkspaceEmptyState` | Local persistence | Empty state truthful       | `store.test.ts`; `WorkspaceEmptyState.test.tsx`                                                       |
+| Completed | `FR-UI-198`  | Present every template as a labeled card control operable by pointer and keyboard.                                                                          | `TemplatePicker`          | None                 | Full keyboard path        | `TemplatePicker.test.tsx`                                                                              |
+| Completed | `FR-UI-199`  | Reject an unregistered template id without any state change.                                                                                                 | `applyWorkspaceTemplate`  | None                 | No state change           | `store.test.ts`                                                                                        |
+| Completed | `FR-UI-200`  | Support fluid pixel-level resizing of adjacent layout regions by dragging the splitter between them, with the drop landing at the exact pointer position.      | `DockingWorkspace`  | Local persistence    | Continuous resize         | Live docking evidence; `DockingWorkspace.test.tsx`                                                       |
+| Completed | `FR-UI-201`  | Persist the serialized docking layout per workspace, restore it on reload, and deterministically convert grid-rectangle layouts (and template presets) into proportional docking trees by a column-cluster then row-band partition, so side-by-side columns keep independent vertical splits. | `dockLayout.ts`, `setWorkspaceDockLayout` | Local persistence | Legacy layouts convert or fall back | `dockLayout.test.ts`; `store.test.ts`                                                    |
+| Completed | `FR-UI-202`  | Collapse layout regions vacated by a moved or closed widget and expand the remaining regions to refill the workspace automatically.                            | `DockingWorkspace`  | Local persistence    | No gaps or dead regions   | Live docking evidence                                                                                    |
 
 ### Configuration and Limits Manifest
 
@@ -386,7 +401,7 @@ workspace-related field; see the feature's own `README.md` for that gap.
 | Completed | `FR-UI-034`  | Offer filtering of the directory by asset class.                                                                                                                             | `MarketsWidget`           | Local state mutation                    | Empty filter truthful            | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-035`  | Offer sorting by symbol, change, and volume with a stable tiebreak.                                                                                                          | `MarketsWidget`           | Local state mutation                    | Deterministic ordering           | `src/features/markets/MarketsWidget.test.tsx` |
 | Completed | `FR-UI-036`  | Offer a direct trade action per row that opens the order ticket pre-filled with that instrument while its text and accessible label present green live, yellow stale, or red not-live quote status without changing trading authority. | `MarketsWidget`           | Local state mutation                    | Ticket authority unchanged       | `src/features/markets/MarketsWidget.test.tsx` |
-| Completed | `FR-UI-037`  | Offer per-row actions targeting the chart, price ladder, and options surfaces at the selected instrument.                                                                    | `MarketsWidget`           | Navigation                              | Unavailable target disabled      | `src/features/markets/MarketsWidget.test.tsx` |
+| Completed | `FR-UI-037`  | Offer per-row actions targeting the chart and price ladder surfaces at the selected instrument.                                                                              | `MarketsWidget`           | Navigation                              | Unavailable target disabled      | `src/features/markets/MarketsWidget.test.tsx` |
 
 ### Configuration and Limits Manifest
 
@@ -492,70 +507,67 @@ Chart bar-count limits follow the registered Data contract; the current maximum 
 
 None; order limits follow the registered Trading contracts.
 
-### 4.6 `src/features/order-ticket/` — Order Ticket
+### 4.6 `src/features/trading/` — Trading Widget
 
-**Purpose:** Capture and submit explicit futures and options orders through registered Trading operations.
+**Purpose:** Present the authoritative Trading session and capture explicit CFD
+orders, primarily forex orders routed through MT5, without becoming the source of
+market, Risk, account, order, position, or execution truth.
 
-**Target location:** `src/features/order-ticket/`. One modal owns both tabs
-(`OrderTicketModal.tsx:17` toggles `'futures' | 'options'`), so one feature owns both
-requirement groups. The options group is blocked on an owning backend domain.
+**Target location:** `src/features/trading/`. The focused feature will merge the
+valid order-entry behavior from `src/components/workflow/OrderTicketModal.tsx` with
+the existing API-backed session and governed-action behavior in
+`src/components/workflow/trading.tsx`. The existing `trading` workspace type and
+sidebar item remain its entry point; no separate page route is introduced.
 
-### Files
-
-| Status  | File                     | Responsibility                                   | Key exports          | Dependencies                                                                                                                       |
-| ------- | ------------------------ | ------------------------------------------------ | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Pending | `OrderTicketModal.tsx` | Futures and options order capture and submission | `OrderTicketModal` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/trading and context/governed |
-| Pending | `index.ts`             | Sole public surface for the feature              | `OrderTicketModal` | **Standard library:** None**Required third-party:** None**Local:** `OrderTicketModal.tsx`                      |
-
-| Status            | Requirement ID | Responsibility                                                                                         | Component / Function / Type | Side Effects         | Failure presentation        | Usage / Test     |
-| ----------------- | -------------- | ------------------------------------------------------------------------------------------------------ | --------------------------- | -------------------- | --------------------------- | ---------------- |
-| Pending           | `FR-UI-063`  | Present the current market for the selected instrument at ticket open, with freshness.                 | order ticket                | External API call    | Stale market marked stale   | Pending evidence |
-| Pending           | `FR-UI-064`  | Require an explicit buy or sell side; no side is preselected.                                          | order ticket                | None                 | Submission blocked          | Pending evidence |
-| Pending           | `FR-UI-065`  | Offer the registered order types: market, limit, stop, and stop-limit.                                 | order ticket                | None                 | Unsupported type absent     | Pending evidence |
-| Pending           | `FR-UI-066`  | Enable and require exactly the price fields the selected order type needs, and disable the rest.       | order ticket                | Local state mutation | Inapplicable field disabled | Pending evidence |
-| Pending           | `FR-UI-067`  | Enforce a minimum quantity of one and reject non-positive or non-integer quantities before submission. | order ticket                | None                 | Validation message shown    | Pending evidence |
-| Pending           | `FR-UI-068`  | Offer the registered time-in-force values and require an explicit selection.                           | order ticket                | None                 | Submission blocked          | Pending evidence |
-| Pending           | `FR-UI-069`  | Validate the ticket for completeness only; the API remains the sole authority on acceptance.           | order ticket                | None                 | API rejection visible       | Pending evidence |
-| Pending           | `FR-UI-070`  | Submit through the registered Trading operation with an idempotency key and never retry automatically. | order ticket                | External API call    | No silent resubmission      | Pending evidence |
-| Pending           | `FR-UI-071`  | Present the submission outcome with reason and retryability; an ambiguous outcome presents as unknown. | order ticket                | None                 | Never invent success        | Pending evidence |
-| Pending           | `FR-UI-072`  | Present the confirmation step per the active confirmation mode, showing the fully resolved order.      | order ticket                | Local state mutation | Confirmation retained       | Pending evidence |
-| Pending (blocked) | `FR-UI-073`  | Toggle between the futures and options ticket for the selected underlying.                             | `OrderTicketModal`        | Local state mutation | No owning API contract      | Pending evidence |
-| Pending (blocked) | `FR-UI-074`  | Require an explicit contract expiration selection.                                                     | `OrderTicketModal`        | Local state mutation | Submission blocked          | Pending evidence |
-| Pending (blocked) | `FR-UI-075`  | Require an explicit put or call selection.                                                             | `OrderTicketModal`        | Local state mutation | Submission blocked          | Pending evidence |
-| Pending (blocked) | `FR-UI-076`  | Present a bounded strike range centred on the at-the-money strike.                                     | `OrderTicketModal`        | External API call    | Absent chain explicit       | Pending evidence |
-| Pending (blocked) | `FR-UI-077`  | Present the current market for the specific option side selected.                                      | `OrderTicketModal`        | External API call    | Unknown remains explicit    | Pending evidence |
-| Pending (blocked) | `FR-UI-078`  | Apply the same order-type, quantity, time-in-force, and submission rules as the futures ticket.        | `OrderTicketModal`        | External API call    | API rejection visible       | Pending evidence |
-| Pending (blocked) | `FR-UI-079`  | Fail closed when no options chain is available for the underlying.                                     | `OrderTicketModal`        | None                 | Never invent a chain        | Pending evidence |
-
-### Configuration and Limits Manifest
-
-None; idempotency and authority limits are owned by the registered Trading contracts.
-
-### 4.7 `src/features/options-grid/` — Options Grid Widget
-
-**Purpose:** Present an options chain grid and hand off to the order ticket.
-
-**Target location:** `src/features/options-grid/`. Blocked: no service domain owns
-options chains, and the widget currently reads fixture data from `src/mock/`.
+Detailed position/order filtering and lifecycle presentation remains owned by
+`FEAT-UI-09`. The Trading Widget may present a bounded session summary or compose
+that feature through its public surface, but it must not create a second detailed
+positions/orders implementation.
 
 ### Files
 
-| Status  | File                      | Responsibility                                 | Key exports           | Dependencies                                                                                                                              |
-| ------- | ------------------------- | ---------------------------------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Pending | `OptionsGridWidget.tsx` | Options chain presentation and ticket hand-off | `OptionsGridWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** fixture data pending an owning API contract |
-| Pending | `index.ts`              | Sole public surface for the feature            | `OptionsGridWidget` | **Standard library:** None**Required third-party:** None**Local:** `OptionsGridWidget.tsx`                            |
+| Status  | File                | Responsibility                                                      | Key exports       | Dependencies                                                                                                                         |
+| ------- | ------------------- | ------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Partial | `TradingWidget.tsx` | Trading session context and governed action composition             | `TradingWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/trading, context/governed, positions public surface |
+| Pending | `OrderTicket.tsx`   | CFD/forex order capture, confirmation, preflight, and submission     | Private component | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/trading, typed market evidence                    |
+| Pending | `index.ts`          | Sole public surface for the feature                                 | `TradingWidget` | **Standard library:** None**Required third-party:** None**Local:** `TradingWidget.tsx`                                                |
 
-| Status            | Requirement ID | Responsibility                                                          | Component / Function / Type | Side Effects         | Failure presentation       | Usage / Test     |
-| ----------------- | -------------- | ----------------------------------------------------------------------- | --------------------------- | -------------------- | -------------------------- | ---------------- |
-| Pending (blocked) | `FR-UI-080`  | Present an options chain grid for a selected underlying and expiration. | `OptionsGridWidget`       | External API call    | No owning API contract     | Pending evidence |
-| Pending (blocked) | `FR-UI-081`  | Allow adding and removing underlyings from the grid.                    | `OptionsGridWidget`       | Local state mutation | Empty grid truthful        | Pending evidence |
-| Pending (blocked) | `FR-UI-082`  | Present call and put sides against a shared strike axis.                | `OptionsGridWidget`       | None                 | Missing strike explicit    | Pending evidence |
-| Pending (blocked) | `FR-UI-083`  | Open an order ticket pre-filled from an activated bid or offer cell.    | `OptionsGridWidget`       | Local state mutation | Ticket authority unchanged | Pending evidence |
-| Pending (blocked) | `FR-UI-084`  | Present an absent quote as explicitly absent.                           | `OptionsGridWidget`       | None                 | Never invent a quote       | Pending evidence |
+| Status    | Requirement ID | Responsibility                                                                                                                                                                   | Component / Function / Type | Side Effects         | Failure presentation                       | Usage / Test        |
+| --------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | -------------------- | ------------------------------------------ | ------------------- |
+| Pending   | `FR-UI-063`  | Present the API-sourced current bid/ask market and freshness for the selected provider-native CFD/forex symbol when the ticket opens.                                             | `OrderTicket`             | External API call    | Stale, unavailable, and unknown explicit   | Pending evidence    |
+| Pending   | `FR-UI-064`  | Require an explicit BUY or SELL side; no side is preselected.                                                                                                                     | `OrderTicket`             | None                 | Submission blocked                         | Pending evidence    |
+| Pending   | `FR-UI-065`  | Offer only the Trading contract's registered MARKET, LIMIT, STOP, and STOP_LIMIT order types that the active route and instrument support.                                        | `OrderTicket`             | None                 | Unsupported type absent                    | Pending evidence    |
+| Pending   | `FR-UI-066`  | Enable and require exactly the execution-price fields the selected order type needs, while presenting optional stop-loss and take-profit fields only when the verified contract supports them. | `OrderTicket`             | Local state mutation | Inapplicable fields disabled               | Pending evidence    |
+| Pending   | `FR-UI-067`  | Validate positive decimal quantity against the API-supplied quantity unit, minimum, maximum, and step; do not impose a futures-style integer quantity.                             | `OrderTicket`             | None                 | Contract limit or step error shown         | Pending evidence    |
+| Pending   | `FR-UI-068`  | Offer only registered time-in-force values supported for the selected route, instrument, and order type; preserve an omitted value when the authority owns a documented default. | `OrderTicket`             | None                 | Unsupported instruction absent             | Pending evidence    |
+| Pending   | `FR-UI-069`  | Validate ticket completeness and typed input only; API, Risk, Trading, and the execution authority remain solely responsible for acceptance.                                      | `OrderTicket`             | None                 | Authoritative rejection visible            | Pending evidence    |
+| Pending   | `FR-UI-070`  | Obtain a real Risk preflight decision, then submit exactly once through the registered Trading operation with its idempotency key; never retry a mutation automatically.          | `OrderTicket`             | External API call    | No submit without approval; no silent retry | Pending evidence    |
+| Pending   | `FR-UI-071`  | Present the authoritative submission outcome with reasons and retryability; ambiguous or timed-out authority outcomes remain unknown until reconciled.                            | `OrderTicket`             | None                 | Never invent success                       | Pending evidence    |
+| Pending   | `FR-UI-072`  | Present the fully resolved order through the active confirmation mode while leaving all backend authorization, approval, idempotency, and kill-switch checks unchanged.           | `OrderTicket`             | Local state mutation | Confirmation retained when required        | Pending evidence    |
+| Completed | `FR-UI-147`  | Present API-authored Trading account/session context and governed submit, cancel, and close actions requiring explicit authoritative evidence.                                    | `TradingWidget`           | External API call    | Loading, unavailable, preflight, and API rejection explicit | `src/components/workflow/trading.test.tsx` |
+
+### Withdrawn scope
+
+`FEAT-UI-07`, `FR-UI-073`–`FR-UI-079`, and `FR-UI-080`–`FR-UI-084` are retired
+without reuse. They described futures/options ticket tabs and an options-chain grid,
+which do not belong in the owner's CFD/forex MT5 workflow and have no authoritative
+backend contract. The legacy `OptionsGridWidget`, options fixture, sidebar entry,
+workspace type, template, and futures/options modal behavior remain implementation
+cleanup for a separately approved coding task; they are not registered target scope.
 
 ### Configuration and Limits Manifest
 
-None.
+- Mutation routes follow the configured gateway contract. `sim` binds every order
+  to an explicit historical Simulation session and its replay cursor; `demo` uses
+  current broker bars with virtual broker funds; `live` uses current broker bars
+  and the real account selected by verified live MT5 credentials.
+- Quantity unit, minimum, maximum, step, price tick, supported order types, and
+  time-in-force values come from authoritative API/provider evidence.
+- Position close remains unavailable unless authoritative governance references are
+  supplied; the UI must not fabricate them because no dedicated close-position
+  preflight route currently exists.
+- Idempotency, approval lifetime, Risk policy, kill switch, and execution authority
+  limits remain owned by their registered backend contracts.
 
 ### 4.8 `src/features/trade-log/` — Trade Log Widget
 
@@ -781,10 +793,13 @@ None; scope and authority are owned by the registered settings operation.
 
 | Status    | File                            | Responsibility                                 | Key exports       | Dependencies                                                                                                  |
 | --------- | ------------------------------- | ---------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------- |
-| Pending   | `Header.tsx`                  | Shell header, mode and confirmation indicators | `Header`        | **Standard library:** browser APIs**Required third-party:** React**Local:** context         |
+| Pending   | `Header.tsx`                  | Shell header, mode and confirmation indicators, digital clock, 1-Click switch, profile section with dropdown chevron | `Header`        | **Standard library:** browser APIs**Required third-party:** React**Local:** context, `ProfileDropdown`, features/workspaces, store         |
 | Pending   | `Sidebar.tsx`                 | Permitted-route navigation                     | `Sidebar`       | **Standard library:** None**Required third-party:** React, Next**Local:** context           |
-| Pending   | `WorkspaceGrid.tsx`           | Bounded responsive widget grid host            | `WorkspaceGrid` | **Standard library:** browser APIs**Required third-party:** React**Local:** workspace state |
-| Completed | `clock.ts`, `clock.test.ts` | Session clock and drift presentation           | clock helpers     | **Standard library:** Date**Required third-party:** None**Local:** clients/health           |
+| Pending   | `WorkspaceGrid.tsx`           | Workspace content router: template picker, empty state, or docking host | `WorkspaceGrid` | **Standard library:** browser APIs**Required third-party:** React**Local:** features/workspaces, `DockingWorkspace` |
+| Completed | `DockingWorkspace.tsx`      | Dockview docking host: fluid splitters, tab docking, edge splits, maximize, Alt+Arrow keyboard moves, layout persistence (FR-UI-006/007/008/024/200/202) | `DockingWorkspace` | **Standard library:** browser APIs**Required third-party:** React, dockview-react, dockview-core**Local:** features/workspaces, `WidgetContentHost` |
+| Completed | `WidgetContentHost.tsx`     | Widget-type to widget-component rendering switch shared by layout hosts | `WidgetContentHost` | **Standard library:** None**Required third-party:** React**Local:** widget features |
+| Completed | `ProfileDropdown.tsx`, `Header.test.tsx` | Header profile menu: account-mode selection (SIM/DEMO/LIVE) and Settings/Logout actions (FR-UI-011/013) | `ProfileDropdown` | **Standard library:** browser APIs**Required third-party:** React**Local:** context, store |
+| Completed | `clock.ts`, `clock.test.ts` | Session clock and drift presentation, digital-clock segment decomposition | clock helpers     | **Standard library:** Date**Required third-party:** None**Local:** clients/health           |
 
 | Status    | Requirement ID | Responsibility                                                                                                    | Component / Function / Type | Side Effects         | Failure presentation    | Usage / Test      |
 | --------- | -------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------- | -------------------- | ----------------------- | ----------------- |
@@ -829,7 +844,7 @@ None.
 
 | Status    | File                                                               | Responsibility                              | Key exports               | Dependencies                                                                                                      |
 | --------- | ------------------------------------------------------------------ | ------------------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Completed | `shell.tsx`, domain view files, `playback.tsx`, `whatIf.tsx` | Accessible shell and focused workflow views | workflow component barrel | **Standard library:** browser APIs**Required third-party:** React**Local:** clients and context |
+| Completed | `shell.tsx`, non-Trading domain view files, `playback.tsx`, `whatIf.tsx` | Accessible shell and focused non-Trading workflow views | workflow component barrel | **Standard library:** browser APIs**Required third-party:** React**Local:** clients and context |
 
 | Status    | Requirement ID | Responsibility                                                 | Component / Function / Type | Side Effects         | Failure presentation            | Usage / Test            |
 | --------- | -------------- | -------------------------------------------------------------- | --------------------------- | -------------------- | ------------------------------- | ----------------------- |
@@ -838,7 +853,6 @@ None.
 | Completed | `FR-UI-144`  | Present registered Strategy catalogue/version evidence.        | `StrategyWorkspace`       | External API call    | Typed error state               | `strategies.test.tsx` |
 | Completed | `FR-UI-145`  | Present Simulation requests/results without invented metrics.  | `SimulationView`          | External API call    | Typed error state               | `simulation.test.tsx` |
 | Completed | `FR-UI-146`  | Present read-only canonical Risk state.                        | `RiskView`                | External API call    | Explicit unknown/error state    | `risk.test.tsx`       |
-| Completed | `FR-UI-147`  | Present governed Trading actions requiring explicit authority. | `TradingView`             | External API call    | Preflight/API rejection         | `trading.test.tsx`    |
 | Completed | `FR-UI-148`  | Present registered Research evidence only.                     | `ResearchWorkspace`       | External API call    | Typed error state               | `research.test.tsx`   |
 | Completed | `FR-UI-149`  | Present every Data capability in explicit UI states.           | `DataWorkspace`           | External API call    | Loading/error/empty state       | `data.test.tsx`       |
 | Completed | `FR-UI-150`  | Never fabricate provider readiness or market evidence.         | workflow views              | None                 | Unavailable remains unavailable | workflow NFR tests      |
@@ -1044,11 +1058,10 @@ following owner choices remain unresolved.
 
 | Decision                                   | Detail                                                                                                                                                                                                                                                                                                                                                                              |
 | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| No owning backend domain for four surfaces | Options chains (`FEAT-UI-07`, and the options group `FR-UI-073`–`FR-UI-079` of `FEAT-UI-06`), learning content (`FEAT-UI-11`), and multi-participant challenges (`FEAT-UI-12`) have no owning service domain. `docs/PROJECT.md` retired documentation file I/O on the same ground. Each stays blocked until an owner is named or the scope is recorded as withdrawn. |
-| Fixture data reaches production modules    | `src/mock/` is imported by `OptionsGridWidget.tsx`, `EducationWidget.tsx`, and `store/useTradingStore.ts` (`MarketsWidget.tsx` no longer imports it as of `FEAT-UI-02`). Those surfaces can display values with no API origin, against `NFR-UI-007` and `AGENTS.md` §3 "No Invented Data". Blocks the affected features from reaching `Completed`.               |
-| Order-confirmation governance basis        | Per owner decision the confirmation control behaves identically in simulation and live, differing only by environment switch. Recorded basis: the dialog is a client-side convenience, not a safety control, and`AGENTS.md` names backend Python as the sole policy-enforcement authority. Owner confirmation of this basis is outstanding.                                       |
-| Two overlapping presentation paradigms     | The primary widget workspace (`FEAT-UI-01`–`FEAT-UI-13`) and the layered cockpit features (`FEAT-UI-18`–`FEAT-UI-24`) both present market state and trading actions. The widget model is primary by owner decision; whether the cockpit layer converges into it or remains distinct is undecided.                                                                         |
-| Eight registered folders do not yet exist   | `FEAT-UI-06`–`FEAT-UI-13` register target paths whose code still resides in its previous location. Until the moves land, those features do not satisfy the one-feature-one-folder structure rule. `FEAT-UI-01`, `FEAT-UI-02`, `FEAT-UI-03`, `FEAT-UI-04`, and `FEAT-UI-05` completed their moves and are no longer in this set.                                                      |
+| No owning backend domain for two surfaces  | Learning content (`FEAT-UI-11`) and multi-participant challenges (`FEAT-UI-12`) have no owning service domain. `docs/PROJECT.md` retired documentation file I/O on the same ground. Each stays blocked until an owner is named or the scope is recorded as withdrawn. |
+| Fixture data reaches production modules    | `src/mock/` is imported by the retired `OptionsGridWidget.tsx`, `EducationWidget.tsx`, and `store/useTradingStore.ts` (`MarketsWidget.tsx` no longer imports it as of `FEAT-UI-02`). Those legacy/registered surfaces can display values with no API origin, against `NFR-UI-007` and `AGENTS.md` §3 "No Invented Data". The retired options implementation requires separately approved cleanup, and affected registered features cannot become `Completed` while they consume fixtures. |
+| Remaining overlapping presentation paradigms | The owner resolved Trading action ownership by consolidating the former order-ticket/options targets and `TradingView` into primary `FEAT-UI-06`. Other primary widgets and layered cockpit features (`FEAT-UI-18`–`FEAT-UI-24`) still overlap in market-state presentation; whether those remaining surfaces converge or stay distinct is undecided. |
+| Seven registered folders do not yet exist  | `FEAT-UI-06` and `FEAT-UI-08`–`FEAT-UI-13` register target paths whose code still resides in previous locations. Until the moves land, those features do not satisfy the one-feature-one-folder structure rule. `FEAT-UI-01`–`FEAT-UI-05` completed their moves and are no longer in this set. |
 
 ---
 
@@ -1088,11 +1101,11 @@ uv run ruff format --check tests/ui/structural/test_feature_registry.py
 
 ### Package completion checklist
 
-- [ ] The final package tree matches Section 2. `FEAT-UI-06`–`FEAT-UI-13` still reside in their previous locations.
+- [ ] The final package tree matches Section 2. `FEAT-UI-06` and `FEAT-UI-08`–`FEAT-UI-13` still reside in their previous locations.
 - [X] Completed module sections are arranged in dependency order.
-- [ ] Every registered feature owns one focused folder. Pending the `FEAT-UI-06`–`FEAT-UI-13` moves.
+- [ ] Every registered feature owns one focused folder. Pending the `FEAT-UI-06` and `FEAT-UI-08`–`FEAT-UI-13` moves.
 - [X] Every completed functional requirement has focused automated evidence.
-- [ ] Every registered functional requirement has focused automated evidence. 70 requirements remain `Pending`.
+- [ ] Every registered functional requirement has focused automated evidence. 54 requirements remain `Pending`.
 - [ ] No production module imports fixture data (`NFR-UI-007`).
 - [X] Typed API clients have route-contract parity evidence.
 - [X] UI owns no durable state, business calculation, authorization, or broker connection.

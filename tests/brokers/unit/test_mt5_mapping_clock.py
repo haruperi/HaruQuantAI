@@ -34,6 +34,9 @@ def _cases() -> tuple[tuple[str, Callable[[Callable[[], datetime]], object], str
         "equity": 100,
         "margin": 0,
         "margin_free": 100,
+        "trade_mode": 0,
+        "margin_mode": 1,
+        "leverage": 100,
     }
     return (
         (

@@ -103,6 +103,7 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.risk.kill_switch", method: "GET", path: "/api/v1/risk/kill-switch", permission: "risk:read" },
   { id: "api.risk.decisions", method: "GET", path: "/api/v1/risk/decisions", permission: "risk:read" },
   { id: "api.trading.session", method: "GET", path: "/api/v1/trading/session", permission: "trading:read" },
+  { id: "api.trading.account_profile", method: "GET", path: "/api/v1/trading/account-profile", permission: "trading:read" },
   { id: "api.trading.preflight_order", method: "POST", path: "/api/v1/trading/orders/preflight", permission: "trading:write" },
   { id: "api.trading.submit_order", method: "POST", path: "/api/v1/trading/orders", permission: "trading:write" },
   { id: "api.trading.cancel_order", method: "DELETE", path: "/api/v1/trading/orders/{order_id}", permission: "trading:write" },
@@ -153,9 +154,9 @@ const EXPECTED: ReadonlyArray<{
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 93 operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(96);
-    expect(ROUTE_CONTRACTS).toHaveLength(93);
+  it("has exactly the approved 94 typed operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(97);
+    expect(ROUTE_CONTRACTS).toHaveLength(94);
   });
 
   it("matches every expected id, method, path, and permission", () => {

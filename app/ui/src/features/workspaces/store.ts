@@ -2,25 +2,19 @@
  * Workspace layout and session-mode store (FEAT-UI-01).
  *
  * Owns non-authoritative workspace/widget layout, order-confirmation
- * presentation mode, and live/simulation account-mode presentation. Only
+ * presentation mode, and the app-wide account mode (sim/demo/live). Only
  * layout (`workspaces`, `activeWorkspaceId`, `defaultWorkspaceId`) persists to
  * `localStorage` (FR-UI-009); confirmation mode and account mode are session
- * state that is never inherited across a reload (FR-UI-012, FR-UI-027).
+ * state that is never inherited across a reload (FR-UI-012, FR-UI-027) - the
+ * backend's `ACCOUNT_MODE` system setting is the authority for the mode and is
+ * re-read every session.
+ * Live layout geometry lives in each workspace's serialized Dockview tree
+ * (`dock`, FR-UI-201); the widget list is the panel registry.
  */
 
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 
-import {
-  GRID_COLUMNS,
-  MIN_COL_SPAN,
-  MAX_COL_SPAN,
-  MIN_ROW_SPAN,
-  MAX_ROW_SPAN,
-  rectOf,
-  isAreaFree,
-  findFreeCell,
-} from "../../utils/gridLayout";
 import {
   MAX_CUSTOM_WORKSPACES,
   persistedLayoutSchema,
@@ -29,6 +23,8 @@ import {
   type WidgetType,
   type Workspace,
 } from "./contracts";
+import { buildDockLayout } from "./dockLayout";
+import { findWorkspaceTemplate, type WorkspaceTemplateId } from "./templates";
 
 /** Loose id comparison replaced with an explicit string coercion everywhere. */
 const sameId = (a: string | number, b: string | number | null): boolean => String(a) === String(b);
@@ -45,15 +41,25 @@ const SYMBOL_TITLE_SUFFIX: Partial<Record<WidgetType, string>> = {
   optionsGrid: "Options",
 };
 
-/** Maps the backend's `runtime_profile` to the UI's account-mode presentation. Never guesses. */
+/**
+ * Maps the backend's `runtime_profile` to the app-wide account mode.
+ *
+ * The backend derives `runtime_profile` from the same `ACCOUNT_MODE` setting
+ * the operator selects, so this is a vocabulary translation, not a guess:
+ * Trading names the virtual profile `simulation` where the route and the
+ * account mode both name it `sim`. A `research` deployment has no execution
+ * route, so it resolves to the virtual mode. Anything unrecognized stays
+ * `unknown` and fails closed (FR-UI-021).
+ */
 export function mapRuntimeProfileToAccountMode(profile?: string): AccountMode {
   switch (profile) {
     case "live":
       return "live";
-    case "simulation":
     case "demo":
+      return "demo";
+    case "simulation":
     case "research":
-      return "simulation";
+      return "sim";
     default:
       return "unknown";
   }
@@ -92,8 +98,13 @@ export interface WorkspaceStoreState {
   // Order-confirmation presentation mode (session-only)
   orderConfirmationRequired: boolean;
 
-  // Account mode presentation (session-only, API-derived)
+  // Application-wide account mode. Never persisted client-side: the backend's
+  // ACCOUNT_MODE system setting is authoritative and is re-read every session
+  // (FR-UI-027).
   accountMode: AccountMode;
+  // Version of the system-settings record the mode was read from, required by
+  // the backend's optimistic locking on write. -1 means "not yet read".
+  accountModeVersion: number;
   marketDataDelaySeconds?: number;
 
   // Workspace actions
@@ -103,15 +114,15 @@ export interface WorkspaceStoreState {
   duplicateWorkspace: (id: number) => void;
   deleteWorkspace: (id: number) => void;
   addWorkspace: () => void;
+  applyWorkspaceTemplate: (templateId: WorkspaceTemplateId) => void;
+  /** Persist the docking host's serialized layout for one workspace (FR-UI-201). */
+  setWorkspaceDockLayout: (workspaceId: number, layout: unknown) => void;
 
-  // Widget layout actions
+  // Widget registry actions
   expandWidget: (widgetId: string | null) => void;
   contractWidget: () => void;
   toggleExpandWidget: (widgetId: string | null) => void;
   switchExpandedWidget: (widgetId: string) => void;
-  reorderWidgets: (sourceWidgetId: string, targetWidgetId: string) => void;
-  moveWidgetToCell: (widgetId: string, col: number, row: number) => void;
-  resizeWidget: (widgetId: string, colSpan: number, rowSpan: number) => void;
   addWidgetToWorkspace: (widgetType: WidgetType, customTitle?: string, symbol?: string) => void;
   setWidgetSymbol: (widgetId: string, symbol: string) => void;
   removeWidget: (widgetId: string) => void;
@@ -120,8 +131,18 @@ export interface WorkspaceStoreState {
   setOrderConfirmationRequired: (required: boolean) => void;
   toggleOrderConfirmation: () => void;
 
-  // Account-mode actions - the only legal writer of `accountMode` (FR-UI-017)
+  // Account-mode actions (FR-UI-016/017/203)
+  /** Apply the mode the authenticated session reports (`runtime_profile`). */
   setAccountModeFromRuntimeProfile: (profile?: string) => void;
+  /**
+   * Apply the mode read from, or written to, the ACCOUNT_MODE system setting.
+   *
+   * The caller owns the network round trip; this records the outcome so every
+   * consumer of the store observes one app-wide mode. `'unknown'` is accepted
+   * so a refused write can fail closed back to the unresolved state rather
+   * than leaving a mode the backend is not routing to (FR-UI-021).
+   */
+  applyAccountMode: (mode: AccountMode, version: number) => void;
 }
 
 /** True whenever account mode is unresolved - order entry must fail closed (FR-UI-021). */
@@ -169,6 +190,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       orderConfirmationRequired: true,
 
       accountMode: "unknown",
+      accountModeVersion: -1,
       marketDataDelaySeconds: undefined,
 
       setActiveWorkspace: (id) => set({ activeWorkspaceId: id }),
@@ -187,15 +209,19 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           const source = state.workspaces.find((ws) => sameId(ws.id, id));
           if (!source || state.workspaces.length >= MAX_CUSTOM_WORKSPACES) return state;
           const newId = Math.max(...state.workspaces.map((ws) => Number(ws.id) || 0)) + 1;
+          const widgets = source.widgets.map((widget) => ({
+            ...widget,
+            id: `${widget.type}-${newId}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          }));
+          // The serialized tree references widget ids, so it is rebuilt for the
+          // copied ids rather than cloned (FR-UI-025).
           const copy: Workspace = {
             ...source,
             id: newId,
             name: `${source.name} Copy`,
             expandedWidgetId: null,
-            widgets: source.widgets.map((widget) => ({
-              ...widget,
-              id: `${widget.type}-${newId}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-            })),
+            widgets,
+            dock: buildDockLayout(widgets) ?? undefined,
           };
           return { workspaces: [...state.workspaces, copy], activeWorkspaceId: newId };
         }),
@@ -209,6 +235,11 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           return { workspaces: remaining, activeWorkspaceId: nextActive, defaultWorkspaceId: nextDefault };
         }),
 
+      /**
+       * Create a workspace pending its template choice (FR-UI-195): the new
+       * workspace is deterministically named (FR-UI-003), opens empty, and is
+       * flagged so the grid renders the template picker instead of widgets.
+       */
       addWorkspace: () =>
         set((state) => {
           if (state.workspaces.length >= MAX_CUSTOM_WORKSPACES) return state;
@@ -226,13 +257,70 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           const newWs: Workspace = {
             id: newId,
             name: `New Workspace-${nextNum}`,
-            widgets: [
-              { id: `markets-${newId}`, type: "markets", title: "Markets", colSpan: 6, rowSpan: 2 },
-              { id: `chart-${newId}`, type: "chart", title: "EURUSD Chart", symbol: "EURUSD", colSpan: 6, rowSpan: 2 },
-            ],
+            widgets: [],
             expandedWidgetId: null,
+            templateChoicePending: true,
           };
           return { workspaces: [...state.workspaces, newWs], activeWorkspaceId: newId };
+        }),
+
+      /**
+       * Apply a workspace template to the active workspace (FR-UI-196/197).
+       *
+       * Content templates replace the widget set with the template's preset,
+       * rename the workspace to the template name, and seed a proportional
+       * docking layout from the preset (FR-UI-201); Blank keeps the
+       * deterministic name and empties the workspace. Unregistered ids are
+       * rejected without any state change (FR-UI-199).
+       */
+      applyWorkspaceTemplate: (templateId) =>
+        set((state) => {
+          const template = findWorkspaceTemplate(templateId);
+          const activeWs = state.workspaces.find((ws) => sameId(ws.id, state.activeWorkspaceId));
+          if (!template || !activeWs) return state;
+
+          const stamp = Date.now();
+          const widgets: Widget[] = template.widgets.map((preset, index) => ({
+            id: `${preset.type}-${activeWs.id}-${stamp}-${index}`,
+            type: preset.type,
+            title: preset.title,
+            symbol: preset.symbol,
+            col: preset.col,
+            row: preset.row,
+            colSpan: preset.colSpan,
+            rowSpan: preset.rowSpan,
+          }));
+
+          return {
+            workspaces: state.workspaces.map((ws) =>
+              sameId(ws.id, state.activeWorkspaceId)
+                ? {
+                    ...ws,
+                    widgets,
+                    dock: buildDockLayout(widgets) ?? undefined,
+                    name: template.workspaceName ?? ws.name,
+                    templateChoicePending: false,
+                  }
+                : ws
+            ),
+          };
+        }),
+
+      /**
+       * Record the docking host's serialized layout (FR-UI-201). Identical
+       * layouts are ignored so restore-triggered layout-change events cannot
+       * feed back into new state.
+       */
+      setWorkspaceDockLayout: (workspaceId, layout) =>
+        set((state) => {
+          const target = state.workspaces.find((ws) => sameId(ws.id, workspaceId));
+          if (!target) return state;
+          if (JSON.stringify(target.dock) === JSON.stringify(layout)) return state;
+          return {
+            workspaces: state.workspaces.map((ws) =>
+              sameId(ws.id, workspaceId) ? { ...ws, dock: layout } : ws
+            ),
+          };
         }),
 
       expandWidget: (widgetId) =>
@@ -274,102 +362,16 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
           ),
         })),
 
-      /**
-       * Drop a widget onto another widget: the two exchange rectangles, so a
-       * narrow widget dropped on a wide one grows to fill it. Nothing else moves.
-       */
-      reorderWidgets: (sourceWidgetId, targetWidgetId) =>
-        set((state) => {
-          const activeWs = state.workspaces.find((ws) => sameId(ws.id, state.activeWorkspaceId));
-          if (!activeWs || !targetWidgetId || targetWidgetId === "END") return state;
-
-          const widgets = [...activeWs.widgets];
-          const sourceIdx = widgets.findIndex((w) => sameId(w.id, sourceWidgetId));
-          const targetIdx = widgets.findIndex((w) => sameId(w.id, targetWidgetId));
-          if (sourceIdx === -1 || targetIdx === -1 || sourceIdx === targetIdx) return state;
-
-          const sourceRect = rectOf(widgets[sourceIdx]);
-          const targetRect = rectOf(widgets[targetIdx]);
-
-          widgets[sourceIdx] = { ...widgets[sourceIdx], ...targetRect };
-          widgets[targetIdx] = { ...widgets[targetIdx], ...sourceRect };
-
-          return {
-            workspaces: state.workspaces.map((ws) => (sameId(ws.id, state.activeWorkspaceId) ? { ...ws, widgets } : ws)),
-          };
-        }),
-
-      /**
-       * Drop a widget onto empty canvas: it is pinned at those exact
-       * coordinates and stays there. Out-of-bounds and occupied targets are
-       * rejected outright (FR-UI-024) - the state is returned unchanged.
-       */
-      moveWidgetToCell: (widgetId, col, row) =>
-        set((state) => {
-          const activeWs = state.workspaces.find((ws) => sameId(ws.id, state.activeWorkspaceId));
-          if (!activeWs) return state;
-
-          const widget = activeWs.widgets.find((w) => sameId(w.id, widgetId));
-          if (!widget) return state;
-
-          const { colSpan, rowSpan } = rectOf(widget);
-          const nextCol = Math.min(Math.max(col, 1), GRID_COLUMNS - colSpan + 1);
-          const nextRow = Math.max(row, 1);
-
-          if (widget.col === nextCol && widget.row === nextRow) return state;
-          if (!isAreaFree(activeWs.widgets, { col: nextCol, row: nextRow, colSpan, rowSpan }, widgetId)) {
-            return state;
-          }
-
-          return {
-            workspaces: state.workspaces.map((ws) =>
-              sameId(ws.id, state.activeWorkspaceId)
-                ? { ...ws, widgets: ws.widgets.map((w) => (sameId(w.id, widgetId) ? { ...w, col: nextCol, row: nextRow } : w)) }
-                : ws
-            ),
-          };
-        }),
-
-      /**
-       * Resize a widget by corner drag or keyboard step. Spans are clamped to
-       * the 12-column grid and the registered min/max spans; growing into an
-       * occupied neighbour is rejected (FR-UI-024), shrinking always succeeds.
-       */
-      resizeWidget: (widgetId, colSpan, rowSpan) =>
-        set((state) => {
-          const activeWs = state.workspaces.find((ws) => sameId(ws.id, state.activeWorkspaceId));
-          if (!activeWs) return state;
-
-          const widget = activeWs.widgets.find((w) => sameId(w.id, widgetId));
-          if (!widget) return state;
-
-          const { col, row } = rectOf(widget);
-          const nextColSpan = Math.min(Math.max(Math.round(colSpan), MIN_COL_SPAN), Math.min(MAX_COL_SPAN, GRID_COLUMNS - col + 1));
-          const nextRowSpan = Math.min(Math.max(Math.round(rowSpan), MIN_ROW_SPAN), MAX_ROW_SPAN);
-
-          if (widget.colSpan === nextColSpan && widget.rowSpan === nextRowSpan) return state;
-
-          const grew = nextColSpan > (widget.colSpan || 6) || nextRowSpan > (widget.rowSpan || 2);
-          if (grew && !isAreaFree(activeWs.widgets, { col, row, colSpan: nextColSpan, rowSpan: nextRowSpan }, widgetId)) {
-            return state;
-          }
-
-          return {
-            workspaces: state.workspaces.map((ws) =>
-              sameId(ws.id, state.activeWorkspaceId)
-                ? { ...ws, widgets: ws.widgets.map((w) => (sameId(w.id, widgetId) ? { ...w, colSpan: nextColSpan, rowSpan: nextRowSpan } : w)) }
-                : ws
-            ),
-          };
-        }),
-
       addWidgetToWorkspace: (widgetType, customTitle, symbol = "EURUSD") =>
         set((state) => ({
           workspaces: state.workspaces.map((ws) => {
             if (!sameId(ws.id, state.activeWorkspaceId)) return ws;
-            const newWidgetId = `${widgetType}-${Date.now()}`;
-            const cell = findFreeCell(ws.widgets, 6, 2);
-            const newWidget: Widget = { id: newWidgetId, type: widgetType, title: customTitle || widgetType, symbol, ...cell, colSpan: 6, rowSpan: 2 };
+            const newWidget: Widget = {
+              id: `${widgetType}-${Date.now()}`,
+              type: widgetType,
+              title: customTitle || widgetType,
+              symbol,
+            };
             return { ...ws, widgets: [...ws.widgets, newWidget] };
           }),
         })),
@@ -420,7 +422,9 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       removeWidget: (widgetId) =>
         set((state) => ({
           workspaces: state.workspaces.map((ws) =>
-            sameId(ws.id, state.activeWorkspaceId) ? { ...ws, widgets: ws.widgets.filter((w) => w.id !== widgetId) } : ws
+            sameId(ws.id, state.activeWorkspaceId)
+              ? { ...ws, widgets: ws.widgets.filter((w) => !sameId(w.id, widgetId)) }
+              : ws
           ),
         })),
 
@@ -428,6 +432,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       toggleOrderConfirmation: () => set((state) => ({ orderConfirmationRequired: !state.orderConfirmationRequired })),
 
       setAccountModeFromRuntimeProfile: (profile) => set({ accountMode: mapRuntimeProfileToAccountMode(profile) }),
+      applyAccountMode: (mode, version) => set({ accountMode: mode, accountModeVersion: version }),
     }),
     {
       name: "hq:workspace-layout",

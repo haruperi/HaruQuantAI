@@ -9,7 +9,6 @@ from app.services.api.workstation.trading import orchestration as trading_depend
 from app.services.api.workstation.trading import routes as trading
 from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI, HTTPException
-from starlette.requests import Request
 
 from tests.api._support import get_json
 
@@ -54,102 +53,102 @@ def test_session_read_delegates_exact_scope() -> None:
     assert captured == [("demo", "development", "account-1")]
 
 
-def _preflight_request(
-    execution_route: str,
-    runtime_profile: str,
-    allow_live_mutations: bool,
-) -> Request:
-    """Build one request bound to a deployment's runtime settings.
+def _active_mode(monkeypatch: pytest.MonkeyPatch, route: str) -> None:
+    """Pin the operator-selected account mode both boundaries resolve.
 
     Args:
-        execution_route: Deployment execution route.
-        runtime_profile: Deployment runtime profile.
-        allow_live_mutations: Whether live mutation is explicitly enabled.
+        monkeypatch: Test patcher.
+        route: Execution route the active account mode maps to.
+    """
+    monkeypatch.setattr(trading, "resolve_execution_route", lambda **_: route)
+    monkeypatch.setattr(
+        trading_dependencies, "resolve_execution_route", lambda **_: route
+    )
+
+
+def _mutation(route: str) -> Any:
+    """Build one boundary request declaring its governed route.
+
+    Args:
+        route: Caller-declared sim, demo, or live route.
 
     Returns:
-        Starlette request carrying the settings the preflight reads.
+        Minimal stand-in for the Trading mutation boundary DTO.
     """
-    app = FastAPI()
-    app.state.api_settings = SimpleNamespace(
-        execution_route=execution_route,
-        runtime_profile=runtime_profile,
-        allow_live_mutations=allow_live_mutations,
-    )
-    return Request({"type": "http", "app": app})
+    return cast("Any", SimpleNamespace(route=route, idempotency_key="mutation-1"))
 
 
-def test_live_request_is_refused_by_a_demo_deployment() -> None:
-    """A demo deployment never relays a live order, even when asked."""
-    request = _preflight_request("demo", "demo", allow_live_mutations=False)
-    body = cast("Any", SimpleNamespace(route="live", idempotency_key="mutation-1"))
+def test_live_request_is_refused_while_the_app_is_in_sim(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A request never elects a route the operator has not selected."""
+    _active_mode(monkeypatch, "sim")
     with pytest.raises(HTTPException) as raised:
-        trading._governed_preflight(body, request, "mutation-1")
+        trading._governed_preflight(_mutation("live"), "mutation-1")
     assert raised.value.status_code == 503
     assert raised.value.detail == "EXECUTION_ROUTE_NOT_CONFIGURED"
 
 
-def test_live_execution_requires_explicit_enablement() -> None:
-    """A live deployment still refuses until live mutation is enabled.
+def test_live_request_is_admitted_when_live_is_the_selected_mode(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Selecting LIVE is what admits a live order.
 
-    Demo and live share one execution path, so the only thing standing between
-    a correctly routed request and real capital is this flag. It is therefore
-    checked independently of the route match.
+    No separate live-enablement flag is consulted: Risk is the sole authority
+    on whether the order proceeds, and demo versus live is decided by which
+    credentials the operator supplied.
     """
-    request = _preflight_request("live", "live", allow_live_mutations=False)
-    body = cast("Any", SimpleNamespace(route="live", idempotency_key="mutation-1"))
+    _active_mode(monkeypatch, "live")
+    trading._governed_preflight(_mutation("live"), "mutation-1")
+
+
+def test_demo_request_is_refused_while_the_app_is_live(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The route match is symmetric: a live app refuses a demo order."""
+    _active_mode(monkeypatch, "live")
     with pytest.raises(HTTPException) as raised:
-        trading._governed_preflight(body, request, "mutation-1")
-    assert raised.value.status_code == 403
-    assert raised.value.detail == "LIVE_MUTATIONS_DISABLED"
-
-
-def test_live_execution_is_admitted_only_when_every_gate_is_set() -> None:
-    """All gates aligned admits the request to the owner boundary."""
-    request = _preflight_request("live", "live", allow_live_mutations=True)
-    body = cast("Any", SimpleNamespace(route="live", idempotency_key="mutation-1"))
-    trading._governed_preflight(body, request, "mutation-1")
-
-
-def test_demo_request_is_refused_by_a_live_deployment() -> None:
-    """The route match is symmetric: a live deployment refuses a demo order."""
-    request = _preflight_request("live", "live", allow_live_mutations=True)
-    body = cast("Any", SimpleNamespace(route="demo", idempotency_key="mutation-1"))
-    with pytest.raises(HTTPException) as raised:
-        trading._governed_preflight(body, request, "mutation-1")
+        trading._governed_preflight(_mutation("demo"), "mutation-1")
     assert raised.value.status_code == 503
     assert raised.value.detail == "EXECUTION_ROUTE_NOT_CONFIGURED"
+
+
+def test_sim_request_is_admitted_while_the_app_is_in_sim(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Sim is a first-class route, not an absence of one."""
+    _active_mode(monkeypatch, "sim")
+    trading._governed_preflight(_mutation("sim"), "mutation-1")
+
+
+def test_mismatched_idempotency_key_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The transport header must agree with the body it claims to key."""
+    _active_mode(monkeypatch, "demo")
+    with pytest.raises(HTTPException) as raised:
+        trading._governed_preflight(_mutation("demo"), "a-different-key")
+    assert raised.value.status_code == 422
+    assert raised.value.detail == "IDEMPOTENCY_KEY_REQUIRED"
 
 
 # --- Composed runtime-policy enforcement (Section 5 shared policy) ------------
 
 
-def _policy(
-    runtime_profile: str = "demo",
-    execution_route: str = "demo",
-    allow_live_mutations: bool = False,
-) -> Any:
-    """Build one validated gateway runtime policy stand-in.
-
-    Args:
-        runtime_profile: Deployment runtime profile.
-        execution_route: Deployment execution route.
-        allow_live_mutations: Whether live mutation is explicitly enabled.
+def _policy() -> Any:
+    """Build one composed gateway runtime policy stand-in.
 
     Returns:
-        Object exposing the three shared policy attributes.
+        Object standing in for validated gateway runtime settings.
     """
-    return SimpleNamespace(
-        runtime_profile=runtime_profile,
-        execution_route=execution_route,
-        allow_live_mutations=allow_live_mutations,
-    )
+    return SimpleNamespace(runtime_profile="demo", execution_route="demo")
 
 
-def _body(route: str = "demo") -> Any:
+def _body(route: str | None = "demo") -> Any:
     """Build one boundary request declaring its governed route.
 
     Args:
-        route: Caller-declared demo or live route.
+        route: Caller-declared route, or None when authority is absent.
 
     Returns:
         Minimal stand-in for the Trading mutation boundary DTO.
@@ -157,34 +156,38 @@ def _body(route: str = "demo") -> Any:
     return SimpleNamespace(route=route)
 
 
-def test_runtime_policy_allows_a_matching_request() -> None:
-    """A request agreeing with the deployment passes the boundary check."""
+def test_runtime_policy_allows_a_matching_request(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A request agreeing with the active mode passes the boundary check."""
+    _active_mode(monkeypatch, "demo")
     trading_dependencies._enforce_runtime_policy(_policy(), _body())
 
 
-def test_runtime_policy_rejects_route_mismatch() -> None:
-    """A deployment never relays a request declaring a different route."""
+def test_runtime_policy_rejects_route_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The gateway never relays a request declaring a different route."""
+    _active_mode(monkeypatch, "demo")
     with pytest.raises(RuntimeError, match="TRADING_EXECUTION_ROUTE_MISMATCH"):
         trading_dependencies._enforce_runtime_policy(_policy(), _body(route="live"))
 
 
-def test_runtime_policy_rejects_missing_route_authority() -> None:
-    """A deployment without mutation-route authority fails closed."""
+def test_runtime_policy_rejects_missing_route_authority(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A request without a declared route fails closed."""
+    _active_mode(monkeypatch, "demo")
     with pytest.raises(RuntimeError, match="TRADING_EXECUTION_ROUTE_MISSING"):
-        trading_dependencies._enforce_runtime_policy(
-            _policy(execution_route="none"), _body()
-        )
+        trading_dependencies._enforce_runtime_policy(_policy(), _body(route=None))
 
 
-def test_runtime_policy_requires_explicit_live_enablement() -> None:
-    """Live routing stays refused until it is deliberately enabled."""
-    live_policy = _policy(runtime_profile="live", execution_route="live")
-    with pytest.raises(RuntimeError, match="TRADING_LIVE_MUTATIONS_DISABLED"):
-        trading_dependencies._enforce_runtime_policy(live_policy, _body(route="live"))
-    enabled = _policy(
-        runtime_profile="live", execution_route="live", allow_live_mutations=True
-    )
-    trading_dependencies._enforce_runtime_policy(enabled, _body(route="live"))
+def test_runtime_policy_admits_live_without_any_enablement_flag(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Live routing is admitted purely by the elected mode."""
+    _active_mode(monkeypatch, "live")
+    trading_dependencies._enforce_runtime_policy(_policy(), _body(route="live"))
 
 
 def test_runtime_policy_is_skipped_when_none_is_composed() -> None:

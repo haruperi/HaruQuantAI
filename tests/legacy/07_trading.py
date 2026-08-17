@@ -6,7 +6,6 @@ from __future__ import annotations
 import asyncio
 import os
 import sys
-import time
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -65,7 +64,7 @@ from app.services.trading import (
 from app.utils import generate_id, load_broker_provider_settings
 
 Target = Literal["sim", "mt5", "ctrader"]
-EXECUTION_TARGET: Target = "sim"
+EXECUTION_TARGET: Target = "mt5"
 SYMBOL = "BTCUSD"
 
 
@@ -1686,22 +1685,22 @@ if __name__ == "__main__":
     example_02_terminal()
     example_03_account()
     example_04_symbol()
-    example_05_position()
-    example_06_order()
-    example_07_history_order()
-    example_08_history_deal()
-    example_09_open_position()
-    example_10_calc_profit_margin()
-    time.sleep(2)
-    example_11_modify_position()
-    time.sleep(2)
-    example_12_close_partial_position()
-    time.sleep(2)
-    example_13_close_position()
-    time.sleep(2)
-    example_14_pending_orders()
-    time.sleep(2)
-    example_15_modify_pending_orders()
-    time.sleep(2)
-    example_16_delete_pending_orders()
+    # example_05_position()
+    # example_06_order()
+    # example_07_history_order()
+    # example_08_history_deal()
+    # example_09_open_position()
+    # example_10_calc_profit_margin()
+    # time.sleep(2)
+    # example_11_modify_position()
+    # time.sleep(2)
+    # example_12_close_partial_position()
+    # time.sleep(2)
+    # example_13_close_position()
+    # time.sleep(2)
+    # example_14_pending_orders()
+    # time.sleep(2)
+    # example_15_modify_pending_orders()
+    # time.sleep(2)
+    # example_16_delete_pending_orders()
     example_17_shutdown()

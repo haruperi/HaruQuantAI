@@ -16,6 +16,7 @@ import math
 from collections.abc import Mapping
 from dataclasses import dataclass
 from importlib import import_module
+from threading import Lock
 from typing import TYPE_CHECKING, Final, Literal, cast
 
 from app.services.indicators.core.errors import (
@@ -32,6 +33,14 @@ logger = get_logger(__name__)
 # each call near 3,750 items — a wide margin that survives future record fields
 # while still amortizing call overhead across long histories.
 _CHECKSUM_CHUNK_RECORDS: Final[int] = 250
+_INPUT_CHECKSUM_LOCK = Lock()
+_input_checksum_dataset: object | None = None
+_input_checksum_records: object | None = None
+_input_checksum_value: str | None = None
+_SOURCE_FRAME_LOCK = Lock()
+_source_frame_dataset: object | None = None
+_source_frame_records: object | None = None
+_source_frame_value: object | None = None
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -238,8 +247,7 @@ class IndicatorResult:
                 "generated columns collide with source columns",
                 {"columns": colliding},
             )
-        joined = source_frame.join(generated, how="left")
-        return joined.copy(deep=True)
+        return pd.concat((source_frame, generated), axis=1)
 
 
 def _parameter_hash(config: IndicatorConfig) -> str:
@@ -285,17 +293,35 @@ def _input_checksum(data: MarketDataset) -> str:
     Raises:
         None.
     """
-    payload = data.model_dump(mode="json")
-    records = cast("list[object]", payload.pop("records"))
-    digest = hashlib.sha256()
-    digest.update(canonical_json(payload).encode("utf-8"))
-    for start in range(0, len(records), _CHECKSUM_CHUNK_RECORDS):
-        # ASCII record separator cannot appear unescaped inside JSON text, so
-        # concatenated chunk payloads stay unambiguous.
-        digest.update(b"\x1e")
-        chunk = records[start : start + _CHECKSUM_CHUNK_RECORDS]
-        digest.update(canonical_json(chunk).encode("utf-8"))
-    return digest.hexdigest()
+    global _input_checksum_dataset  # noqa: PLW0603
+    global _input_checksum_records  # noqa: PLW0603
+    global _input_checksum_value  # noqa: PLW0603
+
+    records_identity = data.records
+    with _INPUT_CHECKSUM_LOCK:
+        if (
+            data is _input_checksum_dataset
+            and records_identity is _input_checksum_records
+            and _input_checksum_value is not None
+        ):
+            return _input_checksum_value
+        payload = data.model_dump(mode="json")
+        records = cast("list[object]", payload.pop("records"))
+        digest = hashlib.sha256()
+        digest.update(canonical_json(payload).encode("utf-8"))
+        for start in range(0, len(records), _CHECKSUM_CHUNK_RECORDS):
+            # ASCII record separator cannot appear unescaped inside JSON text, so
+            # concatenated chunk payloads stay unambiguous.
+            digest.update(b"\x1e")
+            chunk = records[start : start + _CHECKSUM_CHUNK_RECORDS]
+            digest.update(canonical_json(chunk).encode("utf-8"))
+        value = digest.hexdigest()
+        # Retaining one immutable dataset bounds memory while sharing its exact
+        # checksum across sibling calculations and their canonical joins.
+        _input_checksum_dataset = data
+        _input_checksum_records = records_identity
+        _input_checksum_value = value
+        return value
 
 
 def _serialize_output_cell(value: object) -> object:
@@ -360,18 +386,37 @@ def _project_source_frame(data: MarketDataset) -> pd.DataFrame:
     Raises:
         None.
     """
-    records = cast("tuple[OHLCVRecord, ...]", data.records)
-    index = pd.DatetimeIndex(
-        [record.timestamp for record in records], name="timestamp", tz="UTC"
-    )
-    frame = pd.DataFrame(index=index)
-    frame["symbol"] = data.symbol
-    frame["open"] = [float(record.open) for record in records]
-    frame["high"] = [float(record.high) for record in records]
-    frame["low"] = [float(record.low) for record in records]
-    frame["close"] = [float(record.close) for record in records]
-    frame["volume"] = [float(record.volume) for record in records]
-    return frame
+    global _source_frame_dataset  # noqa: PLW0603
+    global _source_frame_records  # noqa: PLW0603
+    global _source_frame_value  # noqa: PLW0603
+
+    records_identity = data.records
+    with _SOURCE_FRAME_LOCK:
+        if (
+            data is _source_frame_dataset
+            and records_identity is _source_frame_records
+            and _source_frame_value is not None
+        ):
+            return cast("pd.DataFrame", _source_frame_value)
+        records = cast("tuple[OHLCVRecord, ...]", records_identity)
+        index = pd.DatetimeIndex(
+            [record.timestamp for record in records], name="timestamp", tz="UTC"
+        )
+        frame = pd.DataFrame(
+            {
+                "symbol": [data.symbol] * len(records),
+                "open": [float(record.open) for record in records],
+                "high": [float(record.high) for record in records],
+                "low": [float(record.low) for record in records],
+                "close": [float(record.close) for record in records],
+                "volume": [float(record.volume) for record in records],
+            },
+            index=index,
+        )
+        _source_frame_dataset = data
+        _source_frame_records = records_identity
+        _source_frame_value = frame
+        return frame
 
 
 def _validate_finalization_shape(
@@ -561,19 +606,24 @@ def build_indicator_result(
     )
     _validate_finalization_values(output_values, unavailable_reason)
 
-    frame = pd.DataFrame(index=output_values.index.copy())
+    row_count = len(output_values)
+    frame_material = {
+        "symbol": [data.symbol] * row_count,
+        **{
+            column: output_values[column].to_numpy(dtype="float64", copy=True)
+            for column in output_columns
+        },
+        "available_at": pd.Series(available_at).to_numpy(copy=True),
+        "computed_from_start": pd.Series(computed_from_start).to_numpy(copy=True),
+        "computed_from_end": pd.Series(computed_from_end).to_numpy(copy=True),
+        "source_timeframe": [source_timeframe] * row_count,
+        "data_quality_status": [data.quality_report.quality_status] * row_count,
+        "data_quality_decision": [data.quality_report.quality_decision] * row_count,
+        "data_quality_score": [float(data.quality_report.quality_score)] * row_count,
+        "unavailable_reason": pd.Series(unavailable_reason).to_numpy(copy=True),
+    }
+    frame = pd.DataFrame(frame_material, index=output_values.index.copy())
     frame.index.name = "timestamp"
-    frame["symbol"] = data.symbol
-    for column in output_columns:
-        frame[column] = output_values[column].to_numpy(dtype="float64", copy=True)
-    frame["available_at"] = pd.Series(available_at).to_numpy(copy=True)
-    frame["computed_from_start"] = pd.Series(computed_from_start).to_numpy(copy=True)
-    frame["computed_from_end"] = pd.Series(computed_from_end).to_numpy(copy=True)
-    frame["source_timeframe"] = source_timeframe
-    frame["data_quality_status"] = data.quality_report.quality_status
-    frame["data_quality_decision"] = data.quality_report.quality_decision
-    frame["data_quality_score"] = float(data.quality_report.quality_score)
-    frame["unavailable_reason"] = pd.Series(unavailable_reason).to_numpy(copy=True)
 
     if _input_checksum(data) != input_checksum:
         raise IndicatorError(

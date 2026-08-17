@@ -1,8 +1,8 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 239 registered application features, 228 are implemented and structurally reconciled (95.40%); 11 are `Pending` and none are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
-> **Last updated:** `2026-08-15`
+> **Status:** `In Progress` — of 238 registered application features, 228 are implemented and structurally reconciled (95.80%); 9 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Last updated:** `2026-08-17`
 
 > This document is the system-level source of truth.
 > It defines how domains fit together, how cross-domain workflows operate, which rules apply system-wide, and how the complete system is verified.
@@ -521,21 +521,23 @@ certificate identity, scope, validity, and exclusions above are the system-level
 
 ### Consolidated feature inventory
 
-The owning package READMEs collectively register exactly 237 canonical `FEAT-*`
+The owning package READMEs collectively register exactly 238 canonical `FEAT-*`
 features. No secondary programme or work-package identifier namespace is active.
 
 | Status | Count |
 | --- | ---: |
-| Completed | 225 |
-| Pending | 12 |
-| Partial | 0 |
+| Completed | 228 |
+| Pending | 9 |
+| Partial | 1 |
 | Missing | 0 |
-| **Total** | **237** |
+| **Total** | **238** |
 
-The twelve `Pending` features are `FEAT-UI-05`–`FEAT-UI-13`, `FEAT-UI-15`,
-`FEAT-UI-16`, and `FEAT-UI-17`, each awaiting requirement evidence or focused-folder
-ownership recorded in `app/ui/README.md` — they are the primary trading workspace and
-its enabling foundation, specified by `docs/dev/documentation.pdf`. Simulator
+The nine `Pending` features are `FEAT-UI-08`–`FEAT-UI-13`, `FEAT-UI-15`,
+`FEAT-UI-16`, and `FEAT-UI-17`; `FEAT-UI-06` is `Partial` because its existing
+Trading session behavior is evidenced while its consolidated CFD/forex order-entry
+behavior and focused-folder ownership remain pending in `app/ui/README.md`. These
+features belong to the primary trading workspace and its enabling foundation,
+specified by `docs/dev/documentation.pdf`. Simulator
 `FEAT-SIM-17` (Empirical Execution Calibration) and `FEAT-SIM-18` (Parity Comparison)
 are completed, and the bounded L5-MT5-Operational certificate records cross-feature certification
 maturity without making a live empirical claim.
@@ -1215,9 +1217,10 @@ Only settings or limits shared across multiple domains belong here. Feature-spec
 | Status    | Setting / Limit                                                              | Type               | Default                                       | Required    | Owner       | Used by                                                                              | Description                                                                                                                                                                                        |
 | --------- | ---------------------------------------------------------------------------- | ------------------ | --------------------------------------------- | ----------- | ----------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Completed | `ENVIRONMENT`                                                              | `str`            | `dev`                                       | Yes         | `Utils`   | All domains                                                                          | Deployment posture: exactly`dev`, `test`, `staging`, or `production`; distinct from runtime profile and execution route                                                                    |
-| Completed | `RUNTIME_PROFILE`                                                          | `str`            | `research`                                  | Yes         | `Utils`   | Strategy, Risk, Trading, Simulation, Portfolio, UI/API                               | Active profile:`research`, `simulation`, `demo`, or `live`                                                                                                                                |
-| Completed | `EXECUTION_ROUTE`                                                          | `str`            | `none`                                      | Conditional | `Trading` | Risk, Trading, Simulation, Portfolio, UI/API                                         | Active route:`none`, `sim`, `demo`, or `live`; must be compatible with `RUNTIME_PROFILE`                                                                                                |
-| Completed | `ALLOW_LIVE_MUTATIONS`                                                     | `bool`           | `false`                                     | Yes         | `Trading` | Trading, Portfolio, UI/API                                                           | Master live-trading enablement;`false` blocks all broker mutation regardless of approval. Risk does not consume or redefine this Trading-owned execution gate.                                   |
+| Completed | `ACCOUNT_MODE`                                                             | `str`            | seeded from`EXECUTION_ROUTE`              | Yes         | `UI/API`  | Trading, Portfolio, Risk, UI/API                                                     | Operator-elected application-wide mode:`sim`, `demo`, or `live`. Persisted as a hot UI/API system setting and authoritative at request time for the active execution route and the runtime profile stamped onto routed orders, persisted rows, and auth-context claims. Absent or unrecognized resolves to `sim`. |
+| Completed | `RUNTIME_PROFILE`                                                          | `str`            | `research`                                  | Yes         | `Utils`   | Strategy, Risk, Trading, Simulation, Portfolio, UI/API                               | Bootstrap profile:`research`, `simulation`, `demo`, or `live`. Seeds `ACCOUNT_MODE` before an operator has elected one; it does not override a persisted election.                     |
+| Completed | `EXECUTION_ROUTE`                                                          | `str`            | `none`                                      | Conditional | `Trading` | Risk, Trading, Simulation, Portfolio, UI/API                                         | Bootstrap route:`none`, `sim`, `demo`, or `live`; must be compatible with `RUNTIME_PROFILE`. The active route follows `ACCOUNT_MODE`.                                                  |
+| Completed | `ALLOW_LIVE_MUTATIONS`                                                     | `bool`           | `false`                                     | No          | `Trading` | Trading                                                                              | Retained bootstrap value, no longer a boundary gate. Retired as an execution gate by owner decision (2026-08-17): Risk is the sole authority on whether any order proceeds, and demo versus live is decided by the credentials the operator supplied. |
 | Completed | `DATABASE_URL` / `DATA_DIR`                                              | `str` / `Path` | None                                         | Conditional | `Data`    | Data, Strategy, Risk, Trading, Simulation, Optimization, Research, Portfolio, Agentic, UI/API | Shared connection and artifact-root configuration; persistence boundaries fail closed before work when the applicable value is absent, and each persistent domain owns its own tables/files. |
 | Completed | `QUALITY_PROFILE`                                                          | `str`            | `standard`                                  | Yes         | `Data`    | Data, Indicators, Strategy, Trading, Simulation, Optimization, Research, Portfolio, Analytics, Agentic, UI/API | Series-level market-data quality strictness: exactly`strict`, `standard`, or `lenient`. Selects one frozen threshold set; individual thresholds are not separately tunable. Determines which detected issues are blocking, so it changes fail-closed behaviour for every `MarketDataset` consumer. |
 | Missing   | `METRICS_ENABLED`                                                          | `bool`           | `false`                                     | No          | `UI/API`  | All emitting domains                                                                 | Master enablement for operational telemetry recording and the Prometheus exposition surface. Disabled by default; telemetry is never an input to a governed decision and its unavailability never blocks execution.                                                                              |
@@ -1259,6 +1262,16 @@ non-canonical, or incompatible values return the centrally registered
 submitted values.
 
 An incompatible profile/route pair causes initialization to fail closed.
+
+This table governs the bootstrap pair. At runtime the operator elects one
+account mode from the shell, which is persisted as the `ACCOUNT_MODE` system
+setting and maps onto the same matrix: `sim` -> route `sim` and profile
+`simulation`, `demo` -> `demo`/`demo`, `live` -> `live`/`live`. That election
+is the authority every boundary checks a declared route against. `demo` and
+`live` share one execution path into the connected MT5 terminal and differ only
+by the credentials the operator supplied; the application-level distinction is
+registry marking - every routed order, thread, and persisted row is stamped
+with the elected profile - rather than a technical gate.
 
 ### Boundary-limit ownership
 
@@ -1373,7 +1386,7 @@ The audit matrix is the system-level record of per-domain conformance.
 | 12. Portfolio | Domain package | `app/services/portfolio` |
 | 13. Agentic | Orchestration domain package | `app/agentic` |
 | 14. UI-API | Domain package | `app/services/api` |
-| 15. UI | Frontend application (25 registered features, including the focused MT5 snapshot diagnostic widget) | `app/ui` |
+| 15. UI | Frontend application (24 registered features, including the consolidated CFD/forex Trading widget and focused MT5 snapshot diagnostic widget) | `app/ui` |
 
 #### Status legend
 

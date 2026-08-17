@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 
 from app.services.risk.config.factories import create_risk_config
@@ -17,15 +17,26 @@ from app.utils import get_logger
 logger = get_logger(__name__)
 
 
-def _base_values() -> dict[str, object]:
-    """Return shared safe demo-profile configuration material.
+def _base_values(
+    profile: str = "demo",
+    execution_route: str = "demo",
+) -> dict[str, object]:
+    """Return shared configuration material for one profile and route.
+
+    The account's risk appetite does not change with the venue it trades on, so
+    every profile reuses the same thresholds; only the profile/route pair the
+    policy is scoped to differs.
+
+    Args:
+        profile: Risk profile the policy is scoped to.
+        execution_route: Compatible execution route for that profile.
 
     Returns:
         Fresh mutable configuration mapping.
     """
     return {
-        "profile": "demo",
-        "execution_route": "demo",
+        "profile": profile,
+        "execution_route": execution_route,
         "base_currency": "USD",
         "pending_order_exposure_policy": "include_full_remaining_exposure",
         "evidence_max_age_seconds": {"portfolio": 60, "market": 30},
@@ -41,15 +52,67 @@ def _base_values() -> dict[str, object]:
     }
 
 
-def build_personal_account_risk_config() -> object:
+def build_personal_account_risk_config(
+    profile: str = "demo",
+    execution_route: str = "demo",
+) -> object:
     """Build the registered personal-account default Risk policy.
+
+    Args:
+        profile: Risk profile the policy is scoped to; defaults to the
+            registered demo policy.
+        execution_route: Compatible execution route for that profile.
 
     Returns:
         Validated immutable Risk configuration.
+
+    Raises:
+        ValueError: If the profile and route are incompatible, or the profile
+            demands safety policy these defaults do not carry. The ``live``
+            profile does: it additionally requires stressed regime policy and a
+            complete emergency/audit/drawdown threshold set, which is owner
+            policy rather than a default, so a live policy fails closed here
+            until those values are registered.
     """
+    live_values: dict[str, object] = {}
+    if profile == "live":
+        live_values = {
+            "missing_calendar_mode": "block",
+            "stressed_lookback_days": 252,
+            "crisis_windows_utc": {
+                "covid_market_shock": (
+                    datetime(2020, 2, 20, tzinfo=UTC),
+                    datetime(2020, 4, 7, 23, 59, 59, tzinfo=UTC),
+                ),
+                "ukraine_invasion_market_shock": (
+                    datetime(2022, 2, 24, tzinfo=UTC),
+                    datetime(2022, 3, 31, 23, 59, 59, tzinfo=UTC),
+                ),
+            },
+            "audit_timeout_seconds": Decimal(5),
+            "token_state_timeout_seconds": Decimal(5),
+            "double_spend_owner": "risk_store",
+            "drawdown_caution_threshold": Decimal("0.03"),
+            "drawdown_restricted_threshold": Decimal("0.06"),
+            "drawdown_critical_threshold": Decimal("0.08"),
+            "emergency_flash_crash_move_pct": Decimal("0.05"),
+            "emergency_flash_crash_window_seconds": 60,
+            "emergency_connectivity_loss_seconds": 30,
+            "emergency_margin_call_utilization_pct": Decimal("0.80"),
+            "emergency_recovery_lock_seconds": 900,
+            "assessment_recalc_events": (
+                "fill",
+                "cancellation",
+                "position_change",
+                "valuation_change",
+                "policy_change",
+            ),
+            "assessment_max_staleness_seconds": 120,
+        }
     return create_risk_config(
-        **_base_values(),
-        policy_version="personal-account-default-v1",
+        **_base_values(profile, execution_route),
+        **live_values,
+        policy_version=f"personal-account-{execution_route}-v1",
         max_risk_per_trade_pct=Decimal("0.01"),
         preferred_risk_per_trade_pct=Decimal("0.005"),
         max_daily_loss=Decimal("0.03"),
@@ -149,10 +212,18 @@ def register_default_risk_policies(
     Returns:
         Policy names mapped to their canonical configuration hashes.
     """
-    logger.info("Registering the two default Risk policy profiles")
+    logger.info("Registering the default Risk policy profiles")
     hashes: dict[str, str] = {}
     for name, config in (
-        ("personal_account", build_personal_account_risk_config()),
+        (
+            "personal_account_sim",
+            build_personal_account_risk_config("simulation", "sim"),
+        ),
+        ("personal_account_demo", build_personal_account_risk_config()),
+        (
+            "personal_account_live",
+            build_personal_account_risk_config("live", "live"),
+        ),
         ("prop_firm", build_prop_firm_risk_config()),
     ):
         response = register_risk_policy(

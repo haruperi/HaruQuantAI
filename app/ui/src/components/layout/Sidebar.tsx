@@ -19,17 +19,12 @@ import {
   GraduationCap,
   FileSpreadsheet,
   History,
-  HelpCircle,
-  ThumbsUp,
-  Info,
-  ShieldAlert,
-  Cookie,
   LayoutDashboard,
   FlaskConical,
   TrendingUp,
   AlertTriangle,
-  PieChart
-  ,Settings
+  PieChart,
+  Settings,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -56,11 +51,6 @@ export const Sidebar: React.FC = () => {
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('markets', 'Markets')}>
           <Globe size={15} />
           {!isCollapsed && <span>Markets</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('marketTicks', 'Market Ticks Test')}>
-          <Globe size={15} />
-          {!isCollapsed && <span>Market Ticks Test</span>}
         </div>
 
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('watchlist', 'Watchlists')}>
@@ -127,10 +117,12 @@ export const Sidebar: React.FC = () => {
           <FlaskConical size={15} />
           {!isCollapsed && <span>Optimization</span>}
         </div>
+
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('portfolio', 'Portfolio')}>
           <PieChart size={15} />
           {!isCollapsed && <span>Portfolio</span>}
         </div>
+
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('agentic', 'Agentic Operator')}>
           <span>Agentic Operator</span>
         </div>
@@ -148,11 +140,6 @@ export const Sidebar: React.FC = () => {
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('trading', 'Trading')}>
           <TrendingUp size={15} />
           {!isCollapsed && <span>Trading</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('indicators', 'Indicators')}>
-          <Layers size={15} />
-          {!isCollapsed && <span>Indicators</span>}
         </div>
       </div>
 
@@ -188,31 +175,6 @@ export const Sidebar: React.FC = () => {
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('tradeLog', 'Trade Log')}>
           <History size={15} />
           {!isCollapsed && <span>Trade Log</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => alert('HaruQuantAI Simulator Help')}>
-          <HelpCircle size={15} />
-          {!isCollapsed && <span>Help</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => alert('Send Feedback')}>
-          <ThumbsUp size={15} />
-          {!isCollapsed && <span>Feedback</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => alert('About HaruQuantAI Trading Simulator')}>
-          <Info size={15} />
-          {!isCollapsed && <span>About</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => alert('Legal Terms & Conditions')}>
-          <ShieldAlert size={15} />
-          {!isCollapsed && <span>Legal</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => alert('Cookie Settings')}>
-          <Cookie size={15} />
-          {!isCollapsed && <span>Cookie Settings</span>}
         </div>
       </div>
     </aside>

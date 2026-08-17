@@ -118,6 +118,9 @@ def _map_symbol(value: object) -> BrokerSymbolInfo:
 
     Returns:
         Canonical symbol information.
+
+    Raises:
+        ValueError: If required provider facts are missing or invalid.
     """
     symbol = str(_field(value, "name"))
     digits = int(_field(value, "digits"))
@@ -129,7 +132,7 @@ def _map_symbol(value: object) -> BrokerSymbolInfo:
     elif isinstance(value, dict):
         raw_dict = dict(value)
 
-    trade_mode_raw = _optional(value, "trade_mode")
+    trade_mode_raw = _field(value, "trade_mode")
     trade_mode_str = (
         {
             0: "DISABLED",
@@ -139,7 +142,7 @@ def _map_symbol(value: object) -> BrokerSymbolInfo:
             4: "FULL",
         }.get(cast("int", trade_mode_raw), str(trade_mode_raw))
         if trade_mode_raw is not None
-        else "FULL"
+        else str(trade_mode_raw)
     )
     trade_mode_desc = (
         {
@@ -150,10 +153,10 @@ def _map_symbol(value: object) -> BrokerSymbolInfo:
             4: "Full trading access",
         }.get(cast("int", trade_mode_raw), "Full access")
         if trade_mode_raw is not None
-        else "Full trading access"
+        else "Unknown"
     )
 
-    swap_mode_raw = _optional(value, "swap_mode")
+    swap_mode_raw = _field(value, "swap_mode")
     swap_mode_str = (
         {
             0: "DISABLED",
@@ -166,14 +169,14 @@ def _map_symbol(value: object) -> BrokerSymbolInfo:
             7: "REOPEN_BID",
         }.get(cast("int", swap_mode_raw), str(swap_mode_raw))
         if swap_mode_raw is not None
-        else "POINTS"
+        else str(swap_mode_raw)
     )
 
-    point = float(_optional(value, "point") or (10.0**-digits))
-    tick_size = float(
-        _optional(value, "trade_tick_size") or _optional(value, "tick_size") or point
-    )
-    contract_size = float(_optional(value, "trade_contract_size") or 100000.0)
+    point = float(_field(value, "point"))
+    tick_size = float(_field(value, "trade_tick_size"))
+    contract_size = float(_field(value, "trade_contract_size"))
+    if point <= 0 or tick_size <= 0 or contract_size <= 0:
+        raise ValueError("MT5 symbol point, tick size, and contract size are required")
 
     bid = _optional(value, "bid")
     ask = _optional(value, "ask")
@@ -193,8 +196,8 @@ def _map_symbol(value: object) -> BrokerSymbolInfo:
             "volume_max": float(_field(value, "volume_max")),
             "volume_step": float(_field(value, "volume_step")),
             "swap_mode": swap_mode_str,
-            "swap_long": float(_optional(value, "swap_long") or 0.0),
-            "swap_short": float(_optional(value, "swap_short") or 0.0),
+            "swap_long": float(_field(value, "swap_long")),
+            "swap_short": float(_field(value, "swap_short")),
         }
     )
     if bid is not None:
@@ -354,6 +357,9 @@ def _map_account(value: object, *, clock: Clock = _live_clock) -> BrokerAccountI
 
     Returns:
         Canonical account information.
+
+    Raises:
+        ValueError: If required provider facts are missing or invalid.
     """
     currency = str(_field(value, "currency"))
     balance = Decimal(str(_field(value, "balance")))
@@ -361,29 +367,29 @@ def _map_account(value: object, *, clock: Clock = _live_clock) -> BrokerAccountI
     margin = Decimal(str(_field(value, "margin")))
     free_margin = Decimal(str(_field(value, "margin_free")))
 
-    trade_mode_raw = _optional(value, "trade_mode")
+    trade_mode_raw = _field(value, "trade_mode")
     trade_mode_str = (
         {0: "DEMO", 1: "CONTEST", 2: "REAL"}.get(
             cast("int", trade_mode_raw), str(trade_mode_raw)
         )
         if trade_mode_raw is not None
-        else "DEMO"
+        else str(trade_mode_raw)
     )
     trade_mode_desc = (
         {0: "Demo account", 1: "Contest account", 2: "Real account"}.get(
             cast("int", trade_mode_raw), "Unknown"
         )
         if trade_mode_raw is not None
-        else "Demo account"
+        else "Unknown"
     )
 
-    margin_mode_raw = _optional(value, "margin_mode")
+    margin_mode_raw = _field(value, "margin_mode")
     margin_mode_str = (
         {0: "NETTING", 1: "HEDGING", 2: "EXCHANGE"}.get(
             cast("int", margin_mode_raw), str(margin_mode_raw)
         )
         if margin_mode_raw is not None
-        else "HEDGING"
+        else str(margin_mode_raw)
     )
     margin_mode_desc = (
         {
@@ -392,12 +398,14 @@ def _map_account(value: object, *, clock: Clock = _live_clock) -> BrokerAccountI
             2: "Exchange position accounting",
         }.get(cast("int", margin_mode_raw), "Unknown")
         if margin_mode_raw is not None
-        else "Hedging position accounting"
+        else "Unknown"
     )
 
     credit = Decimal(str(_optional(value, "credit") or 0))
     profit = Decimal(str(_optional(value, "profit") or 0))
-    leverage = _optional(value, "leverage") or 100
+    leverage = _field(value, "leverage")
+    if Decimal(str(leverage)) <= 0:
+        raise ValueError("MT5 account leverage is required and must be positive")
     trade_allowed = _optional(value, "trade_allowed")
     trade_expert = _optional(value, "trade_expert")
     limit_orders = _optional(value, "limit_orders") or 0

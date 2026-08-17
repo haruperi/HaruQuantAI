@@ -13,10 +13,9 @@ the sole approval authority and Portfolio the sole activation authority.
 
 Production capital is not banned here. Demo and live differ only by the
 credentials in the composed broker configuration, so the rebalance boundary
-mirrors `routes/trading.py`: it requires the request to name the route this
-deployment is actually configured for, and requires live mutations to be
-explicitly enabled. Reachability is a deployment-settings question, not a
-routing one.
+mirrors `trading/routes.py`: it requires the request to name the route the
+operator has actually selected as the account mode. Whether the change is
+allowed at all is Risk's decision, not the boundary's.
 """
 
 from __future__ import annotations
@@ -25,7 +24,7 @@ import inspect
 from collections.abc import Callable
 from typing import Annotated, Any, cast
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
 from app.services.api.identity import (
     require_auth_context,
@@ -42,6 +41,7 @@ from app.services.api.workstation.portfolio.schemas import (
     PortfolioRebalanceRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     PortfolioRollbackRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
+from app.services.api.workstation.settings.account_mode import resolve_execution_route
 from app.utils import generate_id
 
 type AuthContext = Any
@@ -346,38 +346,31 @@ def _assess_drift(
     return _delegate(source, "drift", portfolio_id, request, auth)
 
 
-def _require_configured_execution_route(route: str, http_request: Request) -> None:
-    """Require the named execution route to be the configured one.
+def _require_configured_execution_route(route: str) -> None:
+    """Require the named execution route to be the active one.
 
-    Mirrors `routes/trading.py::_governed_preflight`. A demo deployment can
-    never relay a live rebalance even if asked, and a live deployment still
-    needs live mutations explicitly enabled.
+    Mirrors ``trading/routes.py::_require_configured_route``: the route follows
+    the operator-selected ``ACCOUNT_MODE``, so a request can never elect an
+    execution context the operator has not selected. No separate live
+    enablement flag is consulted - Risk is the sole authority on whether an
+    allocation change may proceed.
 
     Args:
         route: Execution route named by the request.
-        http_request: Live request carrying the composed application settings.
 
     Raises:
-        HTTPException: If the deployment is not configured for the route, or
-            live mutations are not explicitly enabled.
+        HTTPException: If the named route is not the active route.
     """
-    settings = http_request.app.state.api_settings
-    if route != settings.execution_route:
+    if route != resolve_execution_route(request_id=generate_id("req")):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="EXECUTION_ROUTE_NOT_CONFIGURED",
-        )
-    if route == "live" and not settings.allow_live_mutations:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="LIVE_MUTATIONS_DISABLED",
         )
 
 
 @router.post("/rebalance", response_model=None)
 async def _submit_rebalance(
     request: PortfolioRebalanceRequest,
-    http_request: Request,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_PortfolioSource, Depends(_portfolio_source)],
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
@@ -392,7 +385,7 @@ async def _submit_rebalance(
             configuration, idempotency, or composition fails.
     """
     require_human_permission(auth, "portfolio:rebalance")
-    _require_configured_execution_route(request.execution_route, http_request)
+    _require_configured_execution_route(request.execution_route)
     key = _require_idempotency(idempotency_key)
     return await _await_result(
         run_idempotent_write(

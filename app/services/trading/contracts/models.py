@@ -453,6 +453,7 @@ class TradingRequest(_TradingModel):
     action: TradingAction
     provider_id: str | None = None
     account_id: str
+    simulation_session_id: str | None = None
     portfolio_id: str | None = None
     strategy_id: str
     strategy_version: str
@@ -544,6 +545,7 @@ class TradingRequest(_TradingModel):
 
     @field_validator(
         "provider_id",
+        "simulation_session_id",
         "portfolio_id",
         "symbol",
         "order_id",
@@ -713,6 +715,7 @@ class OrderIntent(_TradingModel):
     route: TradingRoute
     provider_id: str | None
     account_id: str
+    simulation_session_id: str | None = None
     strategy_id: str
     strategy_version: str
     source_intent_id: str
@@ -819,6 +822,7 @@ class OrderIntent(_TradingModel):
 
     @field_validator(
         "provider_id",
+        "simulation_session_id",
         "target_broker_order_id",
         "target_broker_position_id",
     )

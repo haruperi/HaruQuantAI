@@ -21,3 +21,10 @@ missing/duplicate bars and `poor` or `critical` grades are `rejected`;
 `degraded` is `review_required`; otherwise issues or warnings produce
 `accepted_with_warnings`, and clean evidence is `accepted`. Unchecked evidence is
 `not_evaluated` and fails closed at operational consumers.
+
+For research datasets only, a gap fully covered by a relevant holiday event from
+complete persisted Economic Calendar coverage is reported as the non-blocking
+`CALENDAR_SUPPORTED_CLOSURE` warning. This qualification retains the event identity,
+provider, and classification basis. It does not certify a broker schedule, authorize
+trading, excuse an unmatched part of a gap, or alter the blocking status of ordinary
+`MISSING_BARS` evidence.

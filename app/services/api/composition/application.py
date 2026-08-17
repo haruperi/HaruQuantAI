@@ -7,6 +7,9 @@ from typing import Any, cast
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.services.api.composition.broker_config import (
+    build_system_broker_connection_config,
+)
 from app.services.api.composition.in_process import (
     build_in_process_graph,
     get_graph_closers,
@@ -67,6 +70,7 @@ from app.services.api.workstation.portfolio.routes import router as portfolio_ro
 from app.services.api.workstation.research.routes import router as research_router
 from app.services.api.workstation.risk.orchestration import build_risk_command_source
 from app.services.api.workstation.risk.routes import router as risk_router
+from app.services.api.workstation.settings.account_mode import resolve_runtime_profile
 from app.services.api.workstation.settings.bootstrap import (
     ApiSettings,
     get_api_settings,
@@ -91,6 +95,7 @@ from app.services.api.workstation.strategies.orchestration import (
 )
 from app.services.api.workstation.strategies.routes import router as strategies_router
 from app.services.api.workstation.trading.orchestration import (
+    build_trading_account_profile_source,
     build_trading_cancel_all_preflight_source,
     build_trading_cancel_order_preflight_source,
     build_trading_mutation_source,
@@ -99,6 +104,48 @@ from app.services.api.workstation.trading.orchestration import (
 from app.services.api.workstation.trading.routes import router as trading_router
 from app.services.api.workstation.watchlists.routes import router as watchlists_router
 from app.utils import generate_id, utc_now
+
+
+async def _connect_trading_account_profile_broker(route: str) -> object:
+    """Connect MT5 from the API's authoritative persisted provider settings.
+
+    Args:
+        route: Elected demo or live account route.
+
+    Returns:
+        Connected Brokers-owned MT5 adapter.
+
+    Raises:
+        ValueError: If configuration, construction, or connection fails.
+    """
+    from app.services.brokers import (
+        connect_broker,
+        create_broker_adapter,
+        disconnect_broker,
+        get_broker_id,
+    )
+
+    config = cast(
+        "Any",
+        build_system_broker_connection_config(
+            "mt5",
+            request_id=generate_id("req"),
+            environment=route,
+        ),
+    )
+    response = cast(
+        "Any",
+        create_broker_adapter(cast("Any", get_broker_id("mt5")), config),
+    )
+    if response.error is not None or response.data is None:
+        raise ValueError("broker adapter construction failed")
+    adapter = response.data
+    connected = cast("Any", await connect_broker(adapter))
+    if connected.error is not None:
+        await disconnect_broker(adapter)
+        raise ValueError("broker adapter connection failed")
+    return adapter
+
 
 _SESSION_COOKIE = "hq_session"
 _ROUTERS = (
@@ -169,6 +216,9 @@ def _build_canonical_graph(
             ),
             "strategy.mutation_source": build_strategy_mutation_source(
                 strategy_dependencies
+            ),
+            "trading.account_profile_source": build_trading_account_profile_source(
+                _connect_trading_account_profile_broker
             ),
             "trading.cancel_all_preflight_source": (
                 build_trading_cancel_all_preflight_source()
@@ -243,7 +293,11 @@ def _resolve_auth_context(request: Request) -> object:
                 "permissions": user.permissions,
                 "scopes": user.scopes,
                 "tenant_or_environment": user.tenant_or_environment,
-                "runtime_profile": user.runtime_profile,
+                # The account row records the profile the account was created
+                # under; the operator-selected ACCOUNT_MODE is what the
+                # application is actually running as, and every downstream
+                # authority checks this claim, so the elected mode is the claim.
+                "runtime_profile": resolve_runtime_profile(request_id=request_id),
             },
             trace={
                 "issued_at": utc_now(),
@@ -272,7 +326,7 @@ def _resolve_auth_context(request: Request) -> object:
                     "permissions": all_permissions,
                     "scopes": ("*",),
                     "tenant_or_environment": "development",
-                    "runtime_profile": settings.runtime_profile,
+                    "runtime_profile": resolve_runtime_profile(request_id=request_id),
                 },
                 trace={
                     "issued_at": utc_now(),

@@ -32,7 +32,9 @@ def _digest(value: object) -> str:
     logger.debug("Hashing canonical Analytics evidence")
     try:
         safe = to_report_json_safe(value)
-        return hashlib.sha256(canonical_json(safe).encode("utf-8")).hexdigest()
+        return hashlib.sha256(
+            canonical_json(safe, max_items=None).encode("utf-8")
+        ).hexdigest()
     except (AnalyticsValidationError, Exception, TypeError) as error:
         raise AnalyticsValidationError("Analytics evidence cannot be hashed") from error
 

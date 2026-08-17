@@ -76,7 +76,7 @@ def test_default_policies_contain_every_registered_operational_limit() -> None:
 
 
 def test_default_policy_registration_round_trips_idempotently(tmp_path: Path) -> None:
-    """Register exactly two defaults and reconstruct both by canonical hash."""
+    """Register every default and reconstruct each by canonical hash."""
     with data_settings_context(_settings(tmp_path)):
         migration = run_risk_migrations(request_id=generate_id("req"))
         assert migration.status == "success"
@@ -94,7 +94,12 @@ def test_default_policy_registration_round_trips_idempotently(tmp_path: Path) ->
             operation="register_default_risk_policies",
         )
         assert first == second
-        assert set(first) == {"personal_account", "prop_firm"}
+        assert set(first) == {
+            "personal_account_sim",
+            "personal_account_demo",
+            "personal_account_live",
+            "prop_firm",
+        }
         versions = {
             unwrap_risk_response(
                 get_risk_policy(config_hash), operation="get_risk_policy"
@@ -102,6 +107,29 @@ def test_default_policy_registration_round_trips_idempotently(tmp_path: Path) ->
             for config_hash in first.values()
         }
         assert versions == {
-            "personal-account-default-v1",
+            "personal-account-sim-v1",
+            "personal-account-demo-v1",
+            "personal-account-live-v1",
             "prop-firm-default-v1",
         }
+
+
+def test_live_personal_policy_contains_owner_approved_safety_values() -> None:
+    """Pin the complete initial LIVE policy approved by the owner."""
+    policy = build_personal_account_risk_config("live", "live")
+    assert policy.policy_version == "personal-account-live-v1"
+    assert policy.missing_calendar_mode == "block"
+    assert policy.stressed_lookback_days == 252
+    assert set(policy.crisis_windows_utc) == {
+        "covid_market_shock",
+        "ukraine_invasion_market_shock",
+    }
+    assert policy.drawdown_caution_threshold == Decimal("0.03")
+    assert policy.drawdown_restricted_threshold == Decimal("0.06")
+    assert policy.drawdown_critical_threshold == Decimal("0.08")
+    assert policy.emergency_flash_crash_move_pct == Decimal("0.05")
+    assert policy.emergency_flash_crash_window_seconds == 60
+    assert policy.emergency_connectivity_loss_seconds == 30
+    assert policy.emergency_margin_call_utilization_pct == Decimal("0.80")
+    assert policy.emergency_recovery_lock_seconds == 900
+    assert policy.assessment_max_staleness_seconds == 120

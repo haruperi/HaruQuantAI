@@ -153,8 +153,6 @@ class ApiSettings(BaseSettings):
         }[self.runtime_profile]
         if self.execution_route != expected_route:
             raise ValueError("runtime profile and execution route are incompatible")
-        if self.execution_route == "live" and not self.allow_live_mutations:
-            raise ValueError("live execution requires explicit mutation enablement")
 
     @model_validator(mode="after")
     def _validate_cross_field_limits(self) -> ApiSettings:

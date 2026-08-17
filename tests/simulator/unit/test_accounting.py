@@ -73,8 +73,8 @@ def test_calculate_execution_costs_is_exact() -> None:
         ),
         ExecutionCostModel(
             commission_per_lot_per_side=Decimal("1.5"),
-            long_swap_per_lot_rollover=Decimal("0.2"),
-            short_swap_per_lot_rollover=Decimal("0.3"),
+            long_swap_per_lot_rollover=Decimal("-0.2"),
+            short_swap_per_lot_rollover=Decimal("-0.3"),
         ),
     )
     assert costs == {
@@ -82,6 +82,31 @@ def test_calculate_execution_costs_is_exact() -> None:
         "swap": Decimal("-1.2"),
         "total": Decimal("-4.2"),
     }
+
+
+@pytest.mark.parametrize(
+    ("rate", "expected"),
+    [
+        (Decimal("-7.24"), Decimal("-7.24")),
+        (Decimal("2.1"), Decimal("2.1")),
+        (Decimal(0), Decimal(0)),
+    ],
+)
+def test_calculate_execution_costs_preserves_signed_swap_cash_effect(
+    rate: Decimal, expected: Decimal
+) -> None:
+    """Preserve provider-derived debit, credit, and zero swap effects."""
+    costs = calculate_execution_costs(
+        ExecutionCostInput(
+            volume=Decimal(1), side="BUY", rollover_multiplier=Decimal(1)
+        ),
+        ExecutionCostModel(
+            commission_per_lot_per_side=Decimal(0),
+            long_swap_per_lot_rollover=rate,
+            short_swap_per_lot_rollover=Decimal(0),
+        ),
+    )
+    assert costs["swap"] == expected
 
 
 def test_calculate_execution_costs_rejects_invalid_commission() -> None:

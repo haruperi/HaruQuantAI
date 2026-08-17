@@ -3,11 +3,74 @@
 from __future__ import annotations
 
 import inspect
+from bisect import bisect_right
 from collections.abc import Awaitable, Callable
 from datetime import datetime
+from itertools import pairwise
 from typing import Any, cast
 
 from app.services.data import build_market_dataset
+
+
+class _PointInTimeDatasetCursor:
+    """Materialize scheduler-visible prefixes without repeated validation."""
+
+    def __init__(self, dataset: object) -> None:
+        """Index one already validated immutable source dataset.
+
+        Args:
+            dataset: Complete Data-owned ``MarketDataset`` admitted for the run.
+        """
+        self._dataset = dataset
+        self._records = tuple(cast("Any", dataset).records)
+        self._timestamps = tuple(record.timestamp for record in self._records)
+        self._available_at = tuple(record.available_at for record in self._records)
+        self._prefix_ordered = all(
+            left <= right
+            for values in (self._timestamps, self._available_at)
+            for left, right in pairwise(values)
+        )
+        self._visible_count = -1
+        self._visible_dataset: object | None = None
+
+    def build(self, decision_at: datetime) -> object:
+        """Return the exact evidence visible at one scheduler instant.
+
+        Args:
+            decision_at: Current scheduler decision instant.
+
+        Returns:
+            A Data-owned dataset containing no future evidence.
+
+        Raises:
+            ValueError: If no source evidence is visible.
+        """
+        if not self._prefix_ordered:
+            return build_point_in_time_dataset(self._dataset, decision_at)
+        visible_count = min(
+            bisect_right(self._timestamps, decision_at),
+            bisect_right(self._available_at, decision_at),
+        )
+        if visible_count == 0:
+            raise ValueError("no market evidence is available at decision_at")
+        if visible_count == self._visible_count and self._visible_dataset is not None:
+            return self._visible_dataset
+        records = self._records[:visible_count]
+        quality_report = cast("Any", self._dataset).quality_report.model_copy(
+            update={"record_count": visible_count, "checked_count": visible_count}
+        )
+        self._visible_dataset = cast("Any", self._dataset).model_copy(
+            update={
+                "records": records,
+                "start": records[0].timestamp,
+                "end": records[-1].timestamp,
+                "available_at": records[-1].available_at,
+                "record_count": visible_count,
+                "quality_report": quality_report,
+            }
+        )
+        self._visible_count = visible_count
+        return self._visible_dataset
 
 
 def build_point_in_time_dataset(dataset: object, decision_at: datetime) -> object:
@@ -72,6 +135,8 @@ async def run_point_in_time_evaluation(
     dataset: object,
     decision_at: datetime,
     cycle: Callable[[object, datetime], object | Awaitable[object]],
+    *,
+    point_in_time_cursor: _PointInTimeDatasetCursor | None = None,
 ) -> object:
     """Invoke one shared Trading cycle with scheduler-bounded evidence.
 
@@ -79,11 +144,16 @@ async def run_point_in_time_evaluation(
         dataset: Complete immutable source dataset.
         decision_at: Current scheduler instant.
         cycle: Injected owner composition invoking Trading's public cycle.
+        point_in_time_cursor: Optional run-scoped validated-prefix cache.
 
     Returns:
         The exact shared Trading-cycle result.
     """
-    visible = build_point_in_time_dataset(dataset, decision_at)
+    visible = (
+        point_in_time_cursor.build(decision_at)
+        if point_in_time_cursor is not None
+        else build_point_in_time_dataset(dataset, decision_at)
+    )
     result = cycle(visible, decision_at)
     if inspect.isawaitable(result):
         return await cast("Awaitable[object]", result)

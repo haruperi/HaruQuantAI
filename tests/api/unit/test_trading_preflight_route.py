@@ -33,20 +33,30 @@ def _request(**overrides: object) -> Any:
     return SimpleNamespace(**values)
 
 
-def test_preflight_refuses_live_routing_before_touching_a_broker(
+def test_live_routing_reaches_the_real_risk_path_like_any_other_route(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Live routing is refused deterministically, with no broker connection attempt."""
+    """Live routing is not special-cased ahead of Risk.
+
+    The boundary used to refuse a live order outright. It no longer does:
+    Risk is the sole authority on whether one may proceed, so a live request
+    must reach the same broker and review path demo does. Reaching the broker
+    connection is what proves no pre-emptive refusal survives.
+    """
     import app.services.brokers as brokers_module
 
-    async def _fail_connect(*_args: object, **_kwargs: object) -> object:
-        raise AssertionError("must not connect a broker for a refused live request")
+    connected: list[object] = []
 
-    monkeypatch.setattr(brokers_module, "create_connected_broker", _fail_connect)
+    async def _connect(*args: object, **_kwargs: object) -> object:
+        connected.append(args)
+        raise RuntimeError("BROKER_PROBE")
+
+    monkeypatch.setattr(brokers_module, "create_connected_broker", _connect)
     source = build_trading_preflight_source()
 
-    with pytest.raises(RuntimeError, match="MANUAL_ORDER_LIVE_NOT_CONFIGURED"):
+    with pytest.raises(RuntimeError, match="BROKER_PROBE"):
         asyncio.run(source(_request(route="live"), auth=SimpleNamespace()))
+    assert connected, "a live request must reach the real broker path"
 
 
 def test_preflight_fails_closed_when_the_account_snapshot_is_unavailable(

@@ -107,6 +107,7 @@ type ChildRiskDecisionSource = Callable[[TradingRequest], RiskDecisionPackage | 
 type ExecutionRiskDecisionSource = Callable[
     [TradingRequest], RiskDecisionPackage | None
 ]
+type SimulationExecutionSource = Callable[[object], Awaitable[object]]
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -142,6 +143,8 @@ class TradingDependencies:
         risk_source: Risk decision evaluation port.
         child_risk_decision_source: Exact per-child emergency Risk authority.
         execution_risk_decision_source: Exact per-request Simulation Risk authority.
+        simulation_execution_source: Direct Simulator-owned execution port for
+            an unchanged approved SIM OrderIntent.
         execution_positions: Process-local Trading execution-position state.
         evaluation_deadline_factory: Route-owned async evaluation deadline.
     """
@@ -175,6 +178,7 @@ class TradingDependencies:
     child_risk_decision_source: ChildRiskDecisionSource
     execution_risk_decision_source: ExecutionRiskDecisionSource
     evaluation_deadline_factory: EvaluationDeadlineFactory
+    simulation_execution_source: SimulationExecutionSource | None = None
     execution_positions: object = field(default_factory=create_execution_position_store)
 
     def __post_init__(self) -> None:

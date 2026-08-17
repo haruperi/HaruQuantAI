@@ -50,7 +50,7 @@ class SymbolSpecification(BaseModel):
 
 
 class ExecutionCostModel(BaseModel):
-    """Explicit Phase 1 cash-per-lot execution cost model."""
+    """Explicit commission debit and signed cash-per-lot swap model."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -58,14 +58,10 @@ class ExecutionCostModel(BaseModel):
     long_swap_per_lot_rollover: Decimal
     short_swap_per_lot_rollover: Decimal
 
-    @field_validator(
-        "commission_per_lot_per_side",
-        "long_swap_per_lot_rollover",
-        "short_swap_per_lot_rollover",
-    )
+    @field_validator("commission_per_lot_per_side")
     @classmethod
-    def _validate_cost(cls, value: Decimal) -> Decimal:
-        """Validate one finite non-negative debit rate.
+    def _validate_commission(cls, value: Decimal) -> Decimal:
+        """Validate one finite non-negative commission debit rate.
 
         Args:
             value: Candidate cost rate.
@@ -78,7 +74,27 @@ class ExecutionCostModel(BaseModel):
         """
         logger.debug("Validating Simulation execution cost rate")
         if not value.is_finite() or value < 0:
-            raise ValueError("Execution cost rates must be finite and non-negative")
+            raise ValueError("Commission rate must be finite and non-negative")
+        return value
+
+    @field_validator("long_swap_per_lot_rollover", "short_swap_per_lot_rollover")
+    @classmethod
+    def _validate_swap(cls, value: Decimal) -> Decimal:
+        """Validate one finite signed cash swap effect.
+
+        Args:
+            value: Candidate provider-derived cash effect per lot.
+
+        Returns:
+            Validated signed effect; negative debits and positive credits remain
+            unchanged.
+
+        Raises:
+            ValueError: If the rate is non-finite.
+        """
+        logger.debug("Validating Simulation signed swap cash effect")
+        if not value.is_finite():
+            raise ValueError("Swap cash effect must be finite")
         return value
 
 
@@ -195,14 +211,14 @@ def calculate_execution_costs(
     fill: ExecutionCostInput,
     model: ExecutionCostModel,
 ) -> dict[str, Decimal]:
-    """Calculate deterministic signed commission and swap debits.
+    """Calculate deterministic commission debit and signed swap effect.
 
     Args:
         fill: Exact fill volume, side, and rollover multiplier.
         model: Explicit cost rates.
 
     Returns:
-        Itemized negative-or-zero cost mapping.
+        Itemized signed cash-effect mapping.
 
     Raises:
         SimulationError: If commission or swap cannot be calculated finitely.
@@ -224,7 +240,7 @@ def calculate_execution_costs(
         else model.short_swap_per_lot_rollover
     )
     try:
-        swap = -(fill.volume * swap_rate * fill.rollover_multiplier)
+        swap = fill.volume * swap_rate * fill.rollover_multiplier
     except DecimalException as error:
         raise SimulationError(
             "SIM_SWAP_CALCULATION_FAILED", "Swap calculation failed"

@@ -6,6 +6,7 @@ from app.services.indicators import (
     join_indicator_result,
     sma,
 )
+from app.services.indicators.core import results as result_module
 
 from tests.indicators.helpers import build_dataset, unwrap_response
 
@@ -52,3 +53,26 @@ def test_join_rejects_a_different_dataset() -> None:
     assert response.status == "error"
     assert response.error is not None
     assert response.error.code == "IND_INPUT_MUTATION_DETECTED"
+
+
+def test_input_checksum_reuse_is_limited_to_one_dataset_identity(
+    monkeypatch,
+) -> None:
+    """The bounded checksum cache never aliases an equivalent new dataset."""
+    dataset = build_dataset([(1, 2, 0, 1, 10)] * 4)
+    clone = build_dataset([(1, 2, 0, 1, 10)] * 4)
+    calls = 0
+    canonical_json = result_module.canonical_json
+
+    def counting_canonical_json(value):
+        nonlocal calls
+        calls += 1
+        return canonical_json(value)
+
+    monkeypatch.setattr(result_module, "canonical_json", counting_canonical_json)
+    first = result_module._input_checksum(dataset)
+    first_calls = calls
+    assert result_module._input_checksum(dataset) == first
+    assert calls == first_calls
+    assert result_module._input_checksum(clone) == first
+    assert calls > first_calls

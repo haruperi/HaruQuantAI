@@ -7,12 +7,12 @@ recorded run it started from.
 
 Three properties are deliberate:
 
-* **Sessions are not durable.** A session holds a live
-  ``EventDrivenExecutionEngine`` with an open journal writer, which cannot be
-  serialised. Rather than invent a persistence format for engine internals,
-  sessions live in a bounded registry and are lost on restart. The registry is
-  capped and sessions expire, so an abandoned exploration cannot pin memory.
-  Official runs remain fully durable; only exploration is ephemeral.
+* **Practice sessions can be durable without serialising the engine.** The
+  immutable request, replay cursor, canonical state digest, and cursor-bound
+  manual intents are persisted. Restart creates a distinct recovery journal,
+  rebuilds from the exact dataset revision, and remains exposure-blocked until
+  digest verification and explicit rearm. Ephemeral advisory sessions remain
+  available to bounded internal callers that do not request durability.
 
 * **A branch never mutates its parent.** Branching replays the parent's
   deterministic inputs from the first tick to the divergence point and then
@@ -31,16 +31,33 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime, timedelta
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, cast
 
-from app.services.simulator.errors import SimulationError
+from app.services.simulator.errors import SimulationError, unwrap_simulation_response
+from app.services.simulator.execution import SimTrader
+from app.services.simulator.persistence import (
+    append_interactive_intent_and_checkpoint,
+    create_interactive_session_record,
+    create_simulator_persistence_store,
+    read_interactive_intent_records,
+    read_interactive_session_record,
+    update_interactive_session_record,
+)
 from app.services.simulator.run.orchestrator import (
     RunContext,
     advance_run_timeline,
     prepare_run_context,
     submit_orders_before,
 )
-from app.utils import canonical_json, derive_stable_id, get_logger, utc_now
+from app.utils import (
+    canonical_digest,
+    canonical_json,
+    derive_stable_id,
+    format_utc_timestamp,
+    generate_id,
+    get_logger,
+    utc_now,
+)
 
 if TYPE_CHECKING:
     from app.services.simulator.run.contracts import (
@@ -64,8 +81,12 @@ class _LiveSession:
         "created_at",
         "cursor",
         "divergence_index",
+        "durable",
         "last_used_at",
         "receipts",
+        "recovery_generation",
+        "recovery_run_id",
+        "recovery_state",
         "request",
         "run_id",
         "session_id",
@@ -81,6 +102,7 @@ class _LiveSession:
         *,
         branch_of: str | None = None,
         divergence_index: int | None = None,
+        durable: bool = False,
     ) -> None:
         """Bind one prepared context to a session identity.
 
@@ -91,6 +113,7 @@ class _LiveSession:
             context: Prepared deterministic run context.
             branch_of: Parent session identity when this is a branch.
             divergence_index: Tick index at which this branch diverged.
+            durable: Whether every cursor and manual intent must be persisted.
         """
         now = utc_now()
         self.session_id = session_id
@@ -99,6 +122,10 @@ class _LiveSession:
         self.context = context
         self.branch_of = branch_of
         self.divergence_index = divergence_index
+        self.durable = durable
+        self.recovery_generation = 0
+        self.recovery_run_id: str | None = None
+        self.recovery_state = "running"
         self.cursor = 0
         self.unsent = list(context.order_intents)
         self.receipts: list[object] = []
@@ -187,11 +214,24 @@ def _project(session: _LiveSession) -> Mapping[str, object]:
         Detached read-only session state.
     """
     total = len(session.context.timeline)
+    replay_timestamp = (
+        None
+        if session.cursor == 0
+        else session.context.timeline[session.cursor - 1].timestamp
+    )
+    account_state = unwrap_simulation_response(
+        session.context.engine.snapshot(),
+        operation="simulation.state.live_session.snapshot",
+    )
     return MappingProxyType(
         {
             "session_id": session.session_id,
             "run_id": session.run_id,
             "cursor": session.cursor,
+            "replay_timestamp": replay_timestamp,
+            "dataset_ref": session.request.data_ref,
+            "dataset_revision": session.request.data_version,
+            "dataset_hash": session.request.data_hash,
             "tick_count": total,
             "complete": session.cursor >= total,
             "receipt_count": len(session.receipts),
@@ -199,8 +239,143 @@ def _project(session: _LiveSession) -> Mapping[str, object]:
             "branch_of": session.branch_of,
             "divergence_index": session.divergence_index,
             "advisory": True,
+            "durable": session.durable,
+            "recovery_state": session.recovery_state,
+            "exposure_blocked": session.recovery_state != "running",
+            "account_state": account_state,
         }
     )
+
+
+def _store() -> object:
+    """Create one opaque Simulator persistence handle.
+
+    Returns:
+        Private handle delegating transactions through Data.
+    """
+    return create_simulator_persistence_store(lambda value: value)
+
+
+def _state_hash(session: _LiveSession) -> str:
+    """Hash the complete reproducible interactive-session projection.
+
+    Returns:
+        Canonical SHA-256 state digest.
+    """
+    projected = _project(session)
+    return canonical_digest(
+        {
+            "cursor": session.cursor,
+            "dataset_ref": projected["dataset_ref"],
+            "dataset_revision": projected["dataset_revision"],
+            "dataset_hash": projected["dataset_hash"],
+            "tick_count": projected["tick_count"],
+            "receipt_count": projected["receipt_count"],
+            "pending_intents": projected["pending_intents"],
+            "account_state": projected["account_state"],
+        }
+    )
+
+
+def _checkpoint(session: _LiveSession, *, request_id: str) -> None:
+    """Persist one durable cursor and state digest.
+
+    Args:
+        session: Durable interactive session.
+        request_id: Trace identity for the Data transaction.
+
+    Raises:
+        SimulationError: If the checkpoint cannot be confirmed.
+    """
+    if not session.durable:
+        return
+    now = format_utc_timestamp(utc_now())
+    status = (
+        "completed" if session.cursor >= len(session.context.timeline) else "running"
+    )
+    if not update_interactive_session_record(
+        _store(),
+        session_id=session.session_id,
+        cursor=session.cursor,
+        status=status,
+        state_hash=_state_hash(session),
+        recovery_generation=session.recovery_generation,
+        recovery_run_id=session.recovery_run_id,
+        updated_at=now,
+        request_id=request_id,
+    ):
+        raise SimulationError(
+            "SIM_PERSISTENCE_FAILED", "Interactive session checkpoint failed"
+        )
+
+
+async def submit_live_simulation_order(session_id: str, intent: object) -> object:
+    """Submit one unchanged Trading intent to an active historical session.
+
+    Args:
+        session_id: Active dataset-bound session identity.
+        intent: Trading-owned approved OrderIntent.
+
+    Returns:
+        Trading-owned execution receipt produced by the session engine.
+
+    Raises:
+        SimulationError: If the session is absent, complete, or the intent is
+            not bound to the selected session.
+    """
+    session = _require(session_id)
+    if session.recovery_state != "running":
+        raise SimulationError(
+            "SIM_RECOVERY_STATE_INVALID", "Recovered session requires explicit rearm"
+        )
+    if session.cursor >= len(session.context.timeline):
+        raise SimulationError(
+            "SIM_UNSUPPORTED_OPERATION", "Completed session cannot accept orders"
+        )
+    if getattr(intent, "simulation_session_id", None) != session_id:
+        raise SimulationError(
+            "SIM_INVALID_CONFIG", "Order is not bound to the active session"
+        )
+    if session.durable:
+        now = format_utc_timestamp(utc_now())
+        material = cast("Any", intent).model_dump(mode="json", warnings=False)
+        accepted = append_interactive_intent_and_checkpoint(
+            _store(),
+            intent={
+                "session_id": session.session_id,
+                "sequence": len(session.receipts),
+                "accepted_cursor": session.cursor,
+                "intent": material,
+                "intent_hash": canonical_digest(material),
+                "created_at": now,
+            },
+            checkpoint={
+                "session_id": session.session_id,
+                "cursor": session.cursor,
+                "status": "running",
+                "state_hash": _state_hash(session),
+                "recovery_generation": session.recovery_generation,
+                "recovery_run_id": session.recovery_run_id,
+                "updated_at": now,
+            },
+            request_id=str(getattr(intent, "request_id", generate_id("req"))),
+        )
+        if not accepted:
+            raise SimulationError(
+                "SIM_PERSISTENCE_FAILED", "Interactive intent checkpoint failed"
+            )
+    trader = SimTrader(session.context.engine)
+    response = await trader.submit_order(intent)
+    receipt = unwrap_simulation_response(
+        response,
+        operation="simulation.state.submit_live_simulation_order",
+    )
+    session.receipts.append(receipt)
+    _checkpoint(
+        session,
+        request_id=str(getattr(intent, "request_id", generate_id("req"))),
+    )
+    return receipt
 
 
 def create_live_simulation_session(
@@ -208,6 +383,7 @@ def create_live_simulation_session(
     dependencies: SimulationRunDependencies,
     *,
     request_id: str,
+    durable: bool = False,
 ) -> Mapping[str, object]:
     """Open one bounded live what-if session at the start of a timeline.
 
@@ -215,6 +391,7 @@ def create_live_simulation_session(
         request: Receiver-owned backtest request.
         dependencies: Explicit Simulator run dependency bundle.
         request_id: Operation request identifier.
+        durable: Persist the request, cursor, state hash, and manual intents.
 
     Session identity is derived from the request, so opening twice with the
     same ``request_id`` re-opens the same session rather than silently starting
@@ -241,8 +418,157 @@ def create_live_simulation_session(
         )
     run_id = f"whatif-{session_id}"
     context = prepare_run_context(request, dependencies, run_id)
-    session = _LiveSession(session_id, run_id, request, context)
+    session = _LiveSession(session_id, run_id, request, context, durable=durable)
     _SESSIONS[session_id] = session
+    if durable:
+        now = format_utc_timestamp(utc_now())
+        create_interactive_session_record(
+            _store(),
+            {
+                "session_id": session_id,
+                "run_id": run_id,
+                "request": request.model_dump(mode="json", warnings=False),
+                "cursor": 0,
+                "status": "running",
+                "state_hash": _state_hash(session),
+                "created_at": now,
+                "updated_at": now,
+            },
+            request_id=request_id,
+        )
+    return _project(session)
+
+
+def restore_live_simulation_session(
+    session_id: str,
+    dependencies: SimulationRunDependencies,
+    *,
+    request_id: str,
+) -> Mapping[str, object]:
+    """Reconstruct one durable historical session and leave exposure blocked.
+
+    The immutable dataset revision is loaded again through the ordinary run
+    dependency, cursor-bound manual intents are reapplied, and the resulting
+    state must match the persisted digest. A distinct recovery run identity
+    preserves the original journal.
+
+    Args:
+        session_id: Durable interactive session identity.
+        dependencies: Exact Simulator run dependency bundle.
+        request_id: Recovery trace identity.
+
+    Returns:
+        Verified projection requiring explicit rearm.
+
+    Raises:
+        SimulationError: If persistence, replay, or state integrity fails.
+    """
+    from app.services.simulator.run.contracts import SimulationBacktestRequest
+    from app.services.trading import parse_order_intent
+
+    record = read_interactive_session_record(_store(), session_id)
+    if record is None or not isinstance(record.get("request"), Mapping):
+        raise SimulationError(
+            "SIM_SESSION_NOT_FOUND", "Durable interactive session was not found"
+        )
+    generation = int(str(record["recovery_generation"])) + 1
+    recovery_run_id = f"recovery-{session_id}-{generation}"
+    now = format_utc_timestamp(utc_now())
+    if not update_interactive_session_record(
+        _store(),
+        session_id=session_id,
+        cursor=int(str(record["cursor"])),
+        status="recovery_locked",
+        state_hash=str(record["state_hash"]),
+        recovery_generation=generation,
+        recovery_run_id=recovery_run_id,
+        updated_at=now,
+        request_id=request_id,
+    ):
+        raise SimulationError("SIM_PERSISTENCE_FAILED", "Recovery lock failed")
+    request = SimulationBacktestRequest.model_validate(record["request"])
+    context = prepare_run_context(request, dependencies, recovery_run_id)
+    session = _LiveSession(
+        session_id,
+        recovery_run_id,
+        request,
+        context,
+        durable=True,
+    )
+    session.recovery_generation = generation
+    session.recovery_run_id = recovery_run_id
+    target_cursor = int(str(record["cursor"]))
+    persisted = read_interactive_intent_records(_store(), session_id)
+    by_cursor: dict[int, list[Mapping[str, object]]] = {}
+    for row in persisted:
+        by_cursor.setdefault(int(str(row["accepted_cursor"])), []).append(row)
+    if target_cursor > 0:
+        _submit_due_before_first_tick(session)
+    for cursor in range(target_cursor + 1):
+        for row in by_cursor.get(cursor, []):
+            material = row.get("intent")
+            if not isinstance(material, Mapping):
+                raise SimulationError(
+                    "SIM_INTEGRITY_FAILURE", "Persisted manual intent is malformed"
+                )
+            intent = parse_order_intent(material)
+            receipt = unwrap_simulation_response(
+                context.engine.submit_order(intent),
+                operation="simulation.state.restore_live_session.intent",
+            )
+            session.receipts.append(receipt)
+        if cursor < target_cursor:
+            session.cursor = advance_run_timeline(
+                context.engine,
+                context.timeline,
+                session.unsent,
+                session.receipts,
+                start_index=session.cursor,
+                max_ticks=1,
+            )
+    if _state_hash(session) != record["state_hash"]:
+        raise SimulationError(
+            "SIM_INTEGRITY_FAILURE", "Interactive session reconstruction mismatched"
+        )
+    session.recovery_state = "verified"
+    _SESSIONS[session_id] = session
+    update_interactive_session_record(
+        _store(),
+        session_id=session_id,
+        cursor=session.cursor,
+        status="verified",
+        state_hash=_state_hash(session),
+        recovery_generation=generation,
+        recovery_run_id=recovery_run_id,
+        updated_at=format_utc_timestamp(utc_now()),
+        request_id=request_id,
+    )
+    return _project(session)
+
+
+def rearm_live_simulation_session(
+    session_id: str, *, approved: bool, request_id: str
+) -> Mapping[str, object]:
+    """Explicitly rearm one verified reconstructed historical session.
+
+    Args:
+        session_id: Verified session identity.
+        approved: Deterministic operator approval.
+        request_id: Rearm trace identity.
+
+    Returns:
+        Running durable session projection.
+
+    Raises:
+        SimulationError: If verification or explicit approval is absent.
+    """
+    session = _require(session_id)
+    if not approved or session.recovery_state != "verified":
+        raise SimulationError(
+            "SIM_RECOVERY_STATE_INVALID", "Verified explicit rearm is required"
+        )
+    session.recovery_state = "running"
+    _checkpoint(session, request_id=request_id)
     return _project(session)
 
 
@@ -266,6 +592,10 @@ def step_live_simulation(session_id: str, ticks: int) -> Mapping[str, object]:
             "Step size must be a positive bounded tick count",
         )
     session = _require(session_id)
+    if session.recovery_state != "running":
+        raise SimulationError(
+            "SIM_RECOVERY_STATE_INVALID", "Recovered session requires explicit rearm"
+        )
     context = session.context
     if session.cursor == 0:
         _submit_due_before_first_tick(session)
@@ -277,6 +607,7 @@ def step_live_simulation(session_id: str, ticks: int) -> Mapping[str, object]:
         start_index=session.cursor,
         max_ticks=ticks,
     )
+    _checkpoint(session, request_id=generate_id("req"))
     return _project(session)
 
 
@@ -435,6 +766,9 @@ __all__ = (
     "close_live_simulation_session",
     "create_live_simulation_session",
     "read_live_simulation_state",
+    "rearm_live_simulation_session",
     "reset_live_simulation_sessions",
+    "restore_live_simulation_session",
     "step_live_simulation",
+    "submit_live_simulation_order",
 )

@@ -16,6 +16,60 @@ from app.utils import canonical_json, get_logger
 logger = get_logger(__name__)
 
 
+def append_interactive_intent_and_checkpoint(
+    store: object,
+    *,
+    intent: Mapping[str, object],
+    checkpoint: Mapping[str, object],
+    request_id: str,
+) -> bool:
+    """Atomically append one manual intent and advance its session checkpoint.
+
+    Args:
+        store: Opaque Simulator persistence handle.
+        intent: Immutable cursor-bound intent row.
+        checkpoint: Replacement session checkpoint fields.
+        request_id: Trace identifier.
+
+    Returns:
+        Whether both statements completed in one Data-owned transaction.
+    """
+    _require_store(store)
+    result = _execute(
+        (
+            "INSERT INTO sim_interactive_intents "
+            "(session_id, sequence, accepted_cursor, intent_json, intent_hash, "
+            "created_at) VALUES (?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(session_id, intent_hash) DO NOTHING",
+            "UPDATE sim_interactive_sessions SET cursor=?, status=?, "
+            "state_hash=?, recovery_generation=?, recovery_run_id=?, updated_at=? "
+            "WHERE session_id=? AND cursor<=?",
+        ),
+        (
+            (
+                _text_field(intent, "session_id"),
+                intent["sequence"],
+                intent["accepted_cursor"],
+                canonical_json(intent["intent"], max_items=None),
+                _text_field(intent, "intent_hash"),
+                _text_field(intent, "created_at"),
+            ),
+            (
+                checkpoint["cursor"],
+                _text_field(checkpoint, "status"),
+                _text_field(checkpoint, "state_hash"),
+                checkpoint["recovery_generation"],
+                checkpoint.get("recovery_run_id"),
+                _text_field(checkpoint, "updated_at"),
+                _text_field(checkpoint, "session_id"),
+                checkpoint["cursor"],
+            ),
+        ),
+        request_id=request_id,
+    )
+    return result.affected_rows in {1, 2}
+
+
 def update_run_record(
     store: object,
     *,
@@ -189,8 +243,51 @@ def update_secured_session_record(
     return result.affected_rows == 1
 
 
+def update_interactive_session_record(
+    store: object,
+    *,
+    session_id: str,
+    cursor: int,
+    status: str,
+    state_hash: str,
+    recovery_generation: int,
+    recovery_run_id: str | None,
+    updated_at: str,
+    request_id: str,
+) -> bool:
+    """Compare-and-advance one interactive recovery checkpoint.
+
+    Returns:
+        Whether exactly one session row was advanced.
+    """
+    _require_store(store)
+    result = _execute(
+        (
+            "UPDATE sim_interactive_sessions SET cursor=?, status=?, "
+            "state_hash=?, recovery_generation=?, recovery_run_id=?, updated_at=? "
+            "WHERE session_id=? AND cursor<=?",
+        ),
+        (
+            (
+                cursor,
+                status,
+                state_hash,
+                recovery_generation,
+                recovery_run_id,
+                updated_at,
+                session_id,
+                cursor,
+            ),
+        ),
+        request_id=request_id,
+    )
+    return result.affected_rows == 1
+
+
 __all__ = [
+    "append_interactive_intent_and_checkpoint",
     "complete_run_record",
+    "update_interactive_session_record",
     "update_run_record",
     "update_secured_session_record",
     "update_session_record",

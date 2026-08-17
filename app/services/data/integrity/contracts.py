@@ -69,6 +69,7 @@ class QualityFlag(StrEnum):
         CLOCK_DRIFT: A record's receive time drifted from its own event time.
         STALE_QUOTE: The newest record's receive time exceeded the maximum age.
         SOURCE_DISAGREEMENT: Primary and backup sources disagreed beyond tolerance.
+        CALENDAR_SUPPORTED_CLOSURE: A gap overlaps relevant persisted holiday evidence.
     """
 
     MISSING_BARS = "MISSING_BARS"
@@ -81,6 +82,7 @@ class QualityFlag(StrEnum):
     CLOCK_DRIFT = "CLOCK_DRIFT"
     STALE_QUOTE = "STALE_QUOTE"
     SOURCE_DISAGREEMENT = "SOURCE_DISAGREEMENT"
+    CALENDAR_SUPPORTED_CLOSURE = "CALENDAR_SUPPORTED_CLOSURE"
 
 
 def _aggregate_flags_raw(report: DataQualityReport) -> tuple[QualityFlag, ...]:

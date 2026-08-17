@@ -522,6 +522,9 @@ def review_manual_order(
     workflow_id: str,
     correlation_id: str,
     now: datetime | None = None,
+    market_evidence_time: datetime | None = None,
+    temporal_context: str = "runtime",
+    historical_evidence_refs: Mapping[str, str] | None = None,
 ) -> object:
     """Review one human-initiated order through Risk's real fixed-precedence gate.
 
@@ -554,6 +557,10 @@ def review_manual_order(
         workflow_id: Canonical workflow identity.
         correlation_id: Canonical correlation identity.
         now: Explicit decision time; defaults to the real current UTC time.
+        market_evidence_time: Historical market time for Simulation evidence.
+        temporal_context: ``runtime`` or ``historical_simulation``.
+        historical_evidence_refs: Exact session, dataset revision, and cursor
+            bindings required for historical Simulation review.
 
     Returns:
         The ``RiskDecisionPackage`` produced by ``review_trade_risk``, plus
@@ -564,9 +571,22 @@ def review_manual_order(
     Raises:
         RiskDomainError: If validation, evidence, approval, or persistence
             fails anywhere in the fixed-precedence review.
+        ValueError: If historical temporal evidence is incomplete or is used
+            outside the Simulation route.
     """
     checked_now = now or datetime.now(UTC)
-    environment = "LIVE" if route == "live" else "DEMO"
+    evidence_now = market_evidence_time or checked_now
+    if temporal_context not in {"runtime", "historical_simulation"}:
+        raise ValueError("temporal_context is invalid")
+    if temporal_context == "historical_simulation":
+        if route != "sim" or market_evidence_time is None:
+            raise ValueError("historical simulation requires sim evidence time")
+        required_refs = {"simulation_session_id", "dataset_revision", "replay_cursor"}
+        if historical_evidence_refs is None or not required_refs <= set(
+            historical_evidence_refs
+        ):
+            raise ValueError("historical simulation evidence identity is incomplete")
+    environment = "LIVE" if route == "live" else "SIM" if route == "sim" else "DEMO"
     strategy_id = get_discretionary_strategy_id()
     strategy_version = strategy_version_for(environment)
     # account_snapshot/risk_config/auth are intentionally opaque at this
@@ -597,7 +617,7 @@ def review_manual_order(
         requested_sizing_mode=None,
         quantity_hint=proposal_quantity,
         notional_hint=None,
-        signal_timestamp=checked_now,
+        signal_timestamp=evidence_now,
         decision_timestamp=checked_now,
         parent_intent_id=None,
         stop_loss=None,
@@ -631,34 +651,40 @@ def review_manual_order(
         return_timestamps=(),
         return_history={},
         correlations=_portfolio_correlations(
-            "mt5", (*open_symbols, proposal_symbol), request_id=request_id
+            "simulator" if route == "sim" else "mt5",
+            (*open_symbols, proposal_symbol),
+            request_id=request_id,
         ),
         exposure_dimensions={},
-        as_of=checked_now,
-        expires_at=checked_now + timedelta(minutes=1),
-        provenance={"source": "manual_preflight"},
+        as_of=evidence_now,
+        expires_at=evidence_now + timedelta(minutes=1),
+        provenance={
+            "source": "manual_preflight",
+            "temporal_context": temporal_context,
+            **dict(historical_evidence_refs or {}),
+        },
         missing_fields=(),
         request_id=request_id,
         workflow_id=workflow_id,
     )
     snapshot = unwrap_risk_response(
-        build_portfolio_risk_snapshot(portfolio_state, config, now=checked_now),
+        build_portfolio_risk_snapshot(portfolio_state, config, now=evidence_now),
         operation="build_portfolio_risk_snapshot",
     )
 
     market_evidence = cast(
         "Any",
         _build_market_context(
-            source_id="mt5",
+            source_id="simulator" if route == "sim" else "mt5",
             symbol=proposal_symbol,
             basket=open_symbols,
             timezone="UTC",
             request_id=request_id,
-            now=checked_now,
+            now=evidence_now,
         ),
     )
     regime = unwrap_risk_response(
-        assess_risk_regime(snapshot, market_evidence, config, now=checked_now),
+        assess_risk_regime(snapshot, market_evidence, config, now=evidence_now),
         operation="assess_risk_regime",
     )
 
@@ -676,11 +702,18 @@ def review_manual_order(
         requested_size=proposal_quantity,
         current_price=proposal_current_price,
         stop_distance=proposal_stop_distance,
-        market_as_of=checked_now,
+        market_as_of=evidence_now,
         expires_at=checked_now + timedelta(minutes=5),
         risk_profile=route,
-        evidence_refs={"account": account.account_id, "market": proposal_symbol},
-        provenance={"source": "manual_preflight"},
+        evidence_refs={
+            "account": account.account_id,
+            "market": proposal_symbol,
+            **dict(historical_evidence_refs or {}),
+        },
+        provenance={
+            "source": "manual_preflight",
+            "temporal_context": temporal_context,
+        },
         request_id=request_id,
         workflow_id=workflow_id,
         correlation_id=correlation_id,
@@ -743,6 +776,7 @@ def review_manual_order(
                     auth,
                     attestation=attestation,
                     now=governor_now,
+                    evidence_now=evidence_now,
                 ),
             ),
             operation="review_trade_risk",

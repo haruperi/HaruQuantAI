@@ -21,6 +21,7 @@ from app.services.api.workstation.portfolio import (
     orchestration as portfolio_dependencies,
 )
 from app.services.api.workstation.portfolio import routes as portfolio
+from app.services.api.workstation.portfolio import routes as portfolio_routes
 from app.services.api.workstation.portfolio.schemas import (
     PortfolioConstructRequest,
     PortfolioDefinitionRequest,
@@ -539,12 +540,16 @@ def test_rollback_delegates_with_target_version() -> None:
     assert captured == [("rollback", "v0")]
 
 
-def test_rebalance_forwards_the_configured_live_route() -> None:
-    """A live-configured deployment forwards a live rebalance unchanged.
+def test_rebalance_forwards_the_live_route_when_live_is_the_elected_mode(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Selecting LIVE is what admits a live rebalance.
 
     Demo and live differ only by broker credentials, so the boundary must not
-    reshape or refuse a live request once the deployment is configured for it.
+    reshape or refuse a live request once the operator has elected live. No
+    separate enablement flag applies: Risk decides whether it proceeds.
     """
+    monkeypatch.setattr(portfolio_routes, "resolve_execution_route", lambda **_: "live")
     captured: list[tuple[str, str, str]] = []
 
     def _source(operation: str, *args: object) -> object:
@@ -553,14 +558,7 @@ def test_rebalance_forwards_the_configured_live_route() -> None:
         return {"status": "success"}
 
     status_code, _body = post_json(
-        _lifecycle_app(
-            _source,
-            settings=build_api_settings(
-                runtime_profile="live",
-                execution_route="live",
-                allow_live_mutations=True,
-            ),
-        ),
+        _lifecycle_app(_source),
         "/api/v1/portfolio/rebalance",
         _rebalance_payload("live", "live"),
         headers={"Idempotency-Key": _key()},
@@ -569,13 +567,16 @@ def test_rebalance_forwards_the_configured_live_route() -> None:
     assert captured == [("rebalance", "live", "live")]
 
 
-def test_rebalance_refuses_a_route_the_deployment_is_not_configured_for() -> None:
-    """A research deployment never relays a live rebalance, even if asked.
+def test_rebalance_refuses_a_route_the_operator_has_not_elected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A sim-elected application never relays a live rebalance, even if asked.
 
-    This is the same gate `routes/trading.py` applies. Without it the two
+    This is the same gate `trading/routes.py` applies. Without it the two
     governed capital paths would disagree: Trading would refuse the request
     while Portfolio forwarded it.
     """
+    monkeypatch.setattr(portfolio_routes, "resolve_execution_route", lambda **_: "sim")
 
     def _source(operation: str, *args: object) -> object:
         raise AssertionError("source must not be called for an unconfigured route")
@@ -590,31 +591,36 @@ def test_rebalance_refuses_a_route_the_deployment_is_not_configured_for() -> Non
     assert body["detail"] == "EXECUTION_ROUTE_NOT_CONFIGURED"
 
 
-def test_rebalance_refuses_live_without_explicit_enablement() -> None:
-    """Being configured for live is not the same as being enabled for it.
+def test_rebalance_consults_no_live_enablement_flag(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Live capital is gated by Risk, not by a deployment flag.
 
-    `build_api_settings` refuses to construct this combination, so the flag is
-    checked independently of the route match rather than being inferred from
-    it. Mirrors `tests/api/unit/test_trading_routes.py`, which stubs the same
-    otherwise-unconstructible state to cover the same defensive branch.
+    The boundary used to additionally require ``allow_live_mutations``. That
+    check was deliberately removed: Risk is the sole authority on whether an
+    allocation change proceeds, so a live-elected deployment forwards the
+    request regardless of the flag's value.
     """
+    monkeypatch.setattr(portfolio_routes, "resolve_execution_route", lambda **_: "live")
+    forwarded: list[str] = []
 
-    def _source(operation: str, *args: object) -> object:
-        raise AssertionError("source must not be called with live mutations disabled")
+    def _source(operation: str, *_args: object) -> object:
+        forwarded.append(operation)
+        return {"status": "success"}
 
     settings = SimpleNamespace(
-        execution_route="live",
-        runtime_profile="live",
+        execution_route="demo",
+        runtime_profile="demo",
         allow_live_mutations=False,
     )
-    status_code, body = post_json(
+    status_code, _body = post_json(
         _lifecycle_app(_source, settings=settings),
         "/api/v1/portfolio/rebalance",
         _rebalance_payload("live", "live"),
         headers={"Idempotency-Key": _key()},
     )
-    assert status_code == 403
-    assert body["detail"] == "LIVE_MUTATIONS_DISABLED"
+    assert status_code == 200
+    assert forwarded == ["rebalance"]
 
 
 def test_drift_requires_read_permission_and_delegates() -> None:

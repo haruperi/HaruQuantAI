@@ -64,7 +64,7 @@ def serialize_report(
         raise AnalyticsValidationError(message)
     try:
         if format_name == "json":
-            rendered = canonical_json(to_report_json_safe(report))
+            rendered = canonical_json(to_report_json_safe(report), max_items=None)
         else:
             rendered = _human_readable(report)
     except Exception as error:

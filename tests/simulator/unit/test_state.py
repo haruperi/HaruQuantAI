@@ -46,6 +46,7 @@ def test_simulation_imports_no_data_storage_module() -> None:
         "001_simulator_state_v1",
         "002_simulator_playback_sessions_v1",
         "003_simulator_secured_sessions_v1",
+        "004_simulator_interactive_recovery_v1",
     ]
     session_ddl = SIMULATION_MIGRATIONS[1].statements[0]
     assert "CREATE TABLE IF NOT EXISTS sim_sessions" in session_ddl
@@ -62,6 +63,9 @@ def test_simulation_imports_no_data_storage_module() -> None:
     )
     secured_ddl = "\n".join(SIMULATION_MIGRATIONS[2].statements)
     assert "sim_session_checkpoints" in secured_ddl
+    interactive_ddl = "\n".join(SIMULATION_MIGRATIONS[3].statements)
+    assert "sim_interactive_sessions" in interactive_ddl
+    assert "sim_interactive_intents" in interactive_ddl
     assert "recovery_state" in secured_ddl
     assert "replay_identity_json" in secured_ddl
 
@@ -125,6 +129,22 @@ def test_state_store_records_and_loads_idempotency(tmp_path: Path) -> None:
     loaded = store.load_run("req-test")
     assert loaded is not None
     assert loaded["result_payload"] == {"status": "completed"}
+
+
+def test_state_store_records_trusted_full_result_payload(tmp_path: Path) -> None:
+    """Persist trusted canonical results beyond the untrusted item ceiling."""
+    store = SqliteSimulationStateStore(tmp_path / "state.db", tmp_path / "artifacts")
+    result_payload = {"events": tuple(range(10_001))}
+    store.record_idempotency(
+        "req-large-result",
+        "a" * 64,
+        "run-large-result",
+        "completed",
+        result_payload,
+    )
+    loaded = store.load_run("req-large-result")
+    assert loaded is not None
+    assert loaded["result_payload"] == {"events": list(range(10_001))}
 
 
 def test_state_store_rejects_idempotency_conflict(tmp_path: Path) -> None:

@@ -16,6 +16,8 @@ from decimal import Decimal
 
 from app.services.data.contracts.records import OHLCVRecord
 from app.services.data.contracts.responses import unwrap_data_response
+from app.services.data.economic_calendar.closures import CalendarClosureEvidence
+from app.services.data.integrity.anomalies import _detect_gap_issues
 from app.services.data.time_sessions.contracts import SessionWindow
 from app.services.data.time_sessions.gaps import GapType, classify_gap
 
@@ -207,3 +209,38 @@ def test_detect_unexpected_gaps_needs_a_timeframe() -> None:
     base = datetime(2024, 1, 8, 9, 0, tzinfo=UTC)
     records = (_bar(base), _bar(base + timedelta(minutes=30)))
     assert detect_unexpected_gaps(records, None) is None
+
+
+def test_calendar_holiday_support_is_non_blocking_and_provenanced() -> None:
+    """A relevant persisted holiday supports, but does not authorize, a gap."""
+    base = datetime(2025, 12, 24, 21, 0, tzinfo=UTC)
+    records = (_bar(base), _bar(datetime(2025, 12, 26, 0, 0, tzinfo=UTC)))
+    closure = CalendarClosureEvidence(
+        event_id="scrape:forexfactory:holiday-usd",
+        provider="scrape:forexfactory",
+        opens_at=datetime(2025, 12, 25, tzinfo=UTC),
+        closes_at=datetime(2025, 12, 26, tzinfo=UTC),
+        classification_basis="legacy_title_word",
+    )
+
+    issues = _detect_gap_issues(records, "H1", calendar_closures=(closure,))
+
+    assert tuple(issue.code for issue in issues) == ("CALENDAR_SUPPORTED_CLOSURE",)
+    assert "holiday-usd@legacy_title_word" in issues[0].samples[0]
+
+
+def test_unmatched_holiday_does_not_hide_missing_bars() -> None:
+    """A holiday outside the missing interval leaves the gap blocking."""
+    base = datetime(2025, 12, 24, 21, 0, tzinfo=UTC)
+    records = (_bar(base), _bar(datetime(2025, 12, 26, 0, 0, tzinfo=UTC)))
+    closure = CalendarClosureEvidence(
+        event_id="scrape:forexfactory:unrelated",
+        provider="scrape:forexfactory",
+        opens_at=datetime(2025, 12, 27, tzinfo=UTC),
+        closes_at=datetime(2025, 12, 28, tzinfo=UTC),
+        classification_basis="provider_event_type",
+    )
+
+    issues = _detect_gap_issues(records, "H1", calendar_closures=(closure,))
+
+    assert tuple(issue.code for issue in issues) == ("MISSING_BARS",)

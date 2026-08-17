@@ -2,7 +2,13 @@
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { cancelOrder, closePosition, submitOrder, type TradingMutationInput } from "./trading";
+import {
+  accountProfile,
+  cancelOrder,
+  closePosition,
+  submitOrder,
+  type TradingMutationInput,
+} from "./trading";
 
 const realFetch = globalThis.fetch;
 
@@ -84,5 +90,28 @@ describe("Trading governed client", () => {
     for (const [, requestOptions] of calls) {
       expect(requestOptions?.body).toContain('"risk_decision_id":"risk-1"');
     }
+  });
+
+  it("validates the provider-authored account profile", async () => {
+    const payload = JSON.parse(await response().text());
+    payload.data = {
+      contract_version: "v1",
+      schema_id: "api.trading.account_profile.v1",
+      account_name: "Rufaro MT5",
+      trade_mode: "DEMO",
+      environment_label: "Demo Environment",
+      source: "mt5",
+      retrieved_at: "2026-08-17T00:00:00Z",
+    };
+    globalThis.fetch = vi.fn(async () => new Response(JSON.stringify(payload), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    })) as unknown as typeof fetch;
+
+    const result = await accountProfile();
+    expect(result.data?.account_name).toBe("Rufaro MT5");
+    expect(String(vi.mocked(globalThis.fetch).mock.calls[0][0])).toContain(
+      "/api/v1/trading/account-profile",
+    );
   });
 });

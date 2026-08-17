@@ -6,9 +6,8 @@ its state, fork an advisory what-if branch, and close it.
 
 Two boundary facts are deliberate and visible in the responses:
 
-* Sessions are in-process and non-durable. A gateway restart loses them, so an
-  unknown session is reported as gone rather than silently reopened, and no
-  route promises persistence.
+* Practice sessions persist their immutable request, replay cursor, state
+  digest, and manual intent journal. Private engine objects are never stored.
 * Every projection carries an advisory marker and a branch journals under its
   own run identity. A what-if answer is evidence for a human, never an official
   `SimulationResult`.
@@ -152,6 +151,43 @@ def _read_session(
     """
     require_human_permission(auth, "simulation:read")
     return _delegate(source, "read", session_id)
+
+
+@router.post("/{session_id}/restore", response_model=None)
+def _restore_session(
+    session_id: str,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_LiveSource, Depends(_live_source)],
+) -> object:
+    """Reconstruct and verify one durable session after process restart.
+
+    Returns:
+        Verified exposure-blocked session projection.
+
+    Raises:
+        HTTPException: If authorization, composition, or integrity fails.
+    """
+    require_human_permission(auth, "simulation:run")
+    return _delegate(source, "restore", session_id, generate_id("req"))
+
+
+@router.post("/{session_id}/rearm", response_model=None)
+def _rearm_session(
+    session_id: str,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_LiveSource, Depends(_live_source)],
+    approved: Annotated[bool, Query()] = False,
+) -> object:
+    """Explicitly rearm one verified reconstructed practice session.
+
+    Returns:
+        Running durable session projection.
+
+    Raises:
+        HTTPException: If authorization, composition, or approval fails.
+    """
+    require_human_permission(auth, "simulation:run")
+    return _delegate(source, "rearm", session_id, approved, generate_id("req"))
 
 
 @router.post("/{session_id}/step", response_model=None)

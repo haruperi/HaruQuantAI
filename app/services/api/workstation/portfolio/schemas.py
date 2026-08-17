@@ -186,9 +186,9 @@ class PortfolioRebalanceRequest(_BaseApiContract):
     """Governed Portfolio rebalance submission.
 
     Every evidence reference is opaque and owner-resolved. The runtime profile
-    and execution route must match the deployment's composed settings, and a
-    live route additionally requires ``allow_live_mutations``; the composition
-    layer enforces both before Portfolio is reached.
+    and execution route must match the operator-selected account mode; the
+    composition layer enforces that before Portfolio is reached. No separate
+    live-enablement flag applies - Risk decides whether the change proceeds.
     """
 
     contract_version: Literal["v1"] = "v1"

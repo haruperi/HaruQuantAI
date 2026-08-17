@@ -6,8 +6,11 @@ from app.services.simulator.state.live_sessions import (
     close_live_simulation_session,
     create_live_simulation_session,
     read_live_simulation_state,
+    rearm_live_simulation_session,
     reset_live_simulation_sessions,
+    restore_live_simulation_session,
     step_live_simulation,
+    submit_live_simulation_order,
 )
 from app.services.simulator.state.runtime import build_simulation_state_store
 from app.services.simulator.state.sessions import (
@@ -28,7 +31,10 @@ __all__ = [
     "create_simulation_session",
     "read_live_simulation_state",
     "read_simulation_session",
+    "rearm_live_simulation_session",
     "reset_live_simulation_sessions",
+    "restore_live_simulation_session",
     "step_live_simulation",
     "stream_simulation_session_frames",
+    "submit_live_simulation_order",
 ]

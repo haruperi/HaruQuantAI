@@ -14,7 +14,7 @@ export interface TradingViewProps {
 }
 
 interface MutationDraft {
-  route: "demo" | "live";
+  route: "sim" | "demo" | "live";
   accountId: string;
   strategyId: string;
   strategyVersion: string;

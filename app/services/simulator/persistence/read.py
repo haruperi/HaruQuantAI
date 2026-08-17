@@ -184,8 +184,74 @@ def read_recovery_checkpoint_records(
     )
 
 
+def read_interactive_session_record(
+    store: object, session_id: str
+) -> Mapping[str, object] | None:
+    """Read one durable interactive-session recovery record.
+
+    Returns:
+        Normalized session row, or ``None`` when absent.
+    """
+    _require_store(store)
+    row = _one_row(
+        "SELECT session_id, run_id, request_json, cursor, status, state_hash, "
+        "recovery_generation, recovery_run_id, created_at, updated_at "
+        "FROM sim_interactive_sessions WHERE session_id=?",
+        (session_id,),
+    )
+    if row is None:
+        return None
+    return {
+        "session_id": str(row["session_id"]),
+        "run_id": str(row["run_id"]),
+        "request": _decode_payload(row["request_json"]),
+        "cursor": int(str(row["cursor"])),
+        "status": str(row["status"]),
+        "state_hash": str(row["state_hash"]),
+        "recovery_generation": int(str(row["recovery_generation"])),
+        "recovery_run_id": (
+            None if row.get("recovery_run_id") is None else str(row["recovery_run_id"])
+        ),
+        "created_at": str(row["created_at"]),
+        "updated_at": str(row["updated_at"]),
+    }
+
+
+def read_interactive_intent_records(
+    store: object, session_id: str
+) -> tuple[Mapping[str, object], ...]:
+    """Read cursor-bound manual intents in deterministic replay order.
+
+    Returns:
+        Ordered immutable intent rows.
+    """
+    _require_store(store)
+    rows = _execute(
+        (
+            "SELECT session_id, sequence, accepted_cursor, intent_json, "
+            "intent_hash, created_at FROM sim_interactive_intents "
+            "WHERE session_id=? ORDER BY accepted_cursor, sequence",
+        ),
+        ((session_id,),),
+        max_rows=100_000,
+    ).rows
+    return tuple(
+        {
+            "session_id": str(row["session_id"]),
+            "sequence": int(str(row["sequence"])),
+            "accepted_cursor": int(str(row["accepted_cursor"])),
+            "intent": _decode_payload(row["intent_json"]),
+            "intent_hash": str(row["intent_hash"]),
+            "created_at": str(row["created_at"]),
+        }
+        for row in rows
+    )
+
+
 __all__ = [
     "read_completed_run_record",
+    "read_interactive_intent_records",
+    "read_interactive_session_record",
     "read_recovery_checkpoint_records",
     "read_result_record",
     "read_run_record",

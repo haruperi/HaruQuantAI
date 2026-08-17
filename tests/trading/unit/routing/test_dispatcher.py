@@ -55,12 +55,37 @@ async def dispatch_order_intent(
     broker_adapter: object | None,
 ) -> ExecutionReceipt:
     """Invoke the public dispatcher with explicit deterministic runtime policy."""
+
+    async def simulation_source(value: OrderIntent) -> ExecutionReceipt:
+        """Return one exact-scope virtual receipt for SIM tests."""
+        return ExecutionReceipt(
+            receipt_id="sim-receipt-001",
+            intent_id=value.source_intent_id,
+            client_order_id=value.client_order_id,
+            route="sim",
+            authority="simulator",
+            provider_order_id="sim-order-001",
+            status="accepted",
+            requested_quantity=value.approved_volume,
+            filled_quantity=Decimal(0),
+            authority_timestamp=NOW,
+            received_at=NOW,
+            response_classification="confirmed",
+            retry_safe=False,
+            reconciliation_required=False,
+            request_id=value.request_id,
+            correlation_id=value.correlation_id,
+        )
+
     result = await _dispatch_order_intent(
         intent,
-        connection,
-        broker_adapter,
+        None if intent.route.value == "sim" else connection,
+        None if intent.route.value == "sim" else broker_adapter,
         operation_timeout_seconds=Decimal(10),
         clock=lambda: NOW,
+        simulation_execution_source=(
+            simulation_source if intent.route.value == "sim" else None
+        ),
     )
     if result.status == "error" or not isinstance(result.data, ExecutionReceipt):
         code = "UNKNOWN_ERROR" if result.error is None else result.error.code
@@ -396,30 +421,73 @@ def test_dispatch_has_single_mutation_boundary() -> None:
     assert limited_response.error.code == "UNKNOWN_OUTCOME"
     assert limited_response.metadata.extensions["legacy_status"] == "unknown_outcome"
 
-    simulation_adapter = _Adapter(broker="sim", environment="simulation")
+    seen: list[OrderIntent] = []
+
+    async def simulation_source(intent: OrderIntent) -> ExecutionReceipt:
+        """Record the unchanged intent and return confirmed virtual evidence."""
+        seen.append(intent)
+        return ExecutionReceipt(
+            receipt_id="sim-receipt-direct",
+            intent_id=intent.source_intent_id,
+            client_order_id=intent.client_order_id,
+            route="sim",
+            authority="simulator",
+            provider_order_id="sim-order-direct",
+            status="accepted",
+            requested_quantity=intent.approved_volume,
+            filled_quantity=Decimal(0),
+            authority_timestamp=NOW,
+            received_at=NOW,
+            response_classification="confirmed",
+            retry_safe=False,
+            reconciliation_required=False,
+            request_id=intent.request_id,
+            correlation_id=intent.correlation_id,
+        )
+
+    intent = _intent(route="sim")
     sim_receipt = asyncio.run(
-        dispatch_order_intent(
-            _intent(route="sim"), _sim_connection(), simulation_adapter
+        _dispatch_order_intent(
+            intent,
+            None,
+            None,
+            operation_timeout_seconds=Decimal(10),
+            clock=lambda: NOW,
+            simulation_execution_source=simulation_source,
         )
     )
-    assert simulation_adapter.calls == 1
-    assert sim_receipt.status == "accepted"
+    assert sim_receipt.data is not None
+    assert seen == [intent]
+    assert sim_receipt.data.status == "accepted"
 
 
 def test_dispatch_rejects_mismatched_authority_selection() -> None:
     """Absent, disabled, or cross-route authorities fail before mutation."""
     adapter = _Adapter()
     broker = adapter
+    from app.services.trading.routing.dispatcher import _dispatch_order_intent_value
+
     with pytest.raises(TradingError):
-        asyncio.run(dispatch_order_intent(_intent(route="sim"), None, None))
+        asyncio.run(
+            _dispatch_order_intent_value(
+                _intent(route="sim"),
+                None,
+                None,
+                operation_timeout_seconds=Decimal(10),
+                clock=lambda: NOW,
+            )
+        )
     with pytest.raises(TradingError):
         asyncio.run(dispatch_order_intent(_intent(), None, None))
     with pytest.raises(TradingError):
         asyncio.run(
-            dispatch_order_intent(
+            _dispatch_order_intent_value(
                 _intent(route="sim"),
                 _connection(),
                 broker,
+                operation_timeout_seconds=Decimal(10),
+                clock=lambda: NOW,
+                simulation_execution_source=lambda _: None,
             )
         )
     with pytest.raises(TradingError):

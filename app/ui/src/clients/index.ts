@@ -7,7 +7,7 @@
  *   import { apiClients, unwrapData, ApiClientError } from "@/clients";
  *   const { data } = await apiClients.health.liveness();
  *
- * The catalog exposes typed clients only for the 91 registered backend-v1
+ * The catalog exposes typed clients only for the registered backend-v1
  * operations. No parallel generic helper exists; every call delegates through
  * the single `request` transport. The drift test asserts this catalog matches
  * the backend route inventory exactly.
@@ -92,13 +92,15 @@ export type {
   CancelOrderPreflightInput,
   ExecutionReceipt,
   OrderPreflightInput,
+  Position,
   RiskPreflightResponse,
   SubmitOrderInput,
   TradingMutationInput,
+  TradingAccountProfile,
   TradingProjection,
   WorkingOrder,
 } from "./trading";
-export { listWorkingOrders } from "./trading";
+export { listPositions, listWorkingOrders } from "./trading";
 export type { PortfolioDefinitionBody, PortfolioRecord } from "./portfolio";
 
 export type {

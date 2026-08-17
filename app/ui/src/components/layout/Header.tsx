@@ -2,7 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
-import { useWorkspaceStore, type Workspace } from '../../features/workspaces';
+import {
+  useWorkspaceStore,
+  ACCOUNT_MODE_SETTING_KEY,
+  isSelectableAccountMode,
+  type SelectableAccountMode,
+  type Workspace,
+} from '../../features/workspaces';
+import { useAuth } from '../../context';
+import { ProfileDropdown } from './ProfileDropdown';
 import {
   ChevronLeft,
   Plus,
@@ -13,11 +21,30 @@ import {
   Pencil,
   Trash2,
   Check,
-  FileJson,
-  RotateCcw
+  FileJson
 } from 'lucide-react';
-import { apiClients, unwrapData } from '@/clients';
-import { formatClockAtOffset, localOffsetMinutes, parseUtcOffset } from './clock';
+import { apiClients, unwrapData, type TradingAccountProfile } from '@/clients';
+import {
+  clockSegmentsAtOffset,
+  localClockSegments,
+  localOffsetMinutes,
+  parseUtcOffset,
+  type ClockSegments,
+} from './clock';
+
+/**
+ * What each mode means, stated plainly on hover.
+ *
+ * Demo and live are technically one path into the same MT5 terminal and are
+ * separated by the credentials the operator configured, so the tooltip says
+ * exactly that rather than implying demo is a safety mechanism.
+ */
+const ACCOUNT_MODE_TITLES: Record<string, string> = {
+  sim: 'SIM: orders are executed virtually by the simulator. Nothing reaches a broker.',
+  demo: 'DEMO: orders are sent to the connected MT5 terminal using the demo credentials you configured.',
+  live: 'LIVE: orders are sent to the connected MT5 terminal using the live credentials you configured. Real money.',
+  unknown: 'Account mode has not been resolved yet - order entry is disabled.',
+};
 
 export const Header: React.FC = () => {
   const {
@@ -27,12 +54,16 @@ export const Header: React.FC = () => {
     margin,
     available,
     mode,
-    resetBalance
+    openSettings
   } = useTradingStore();
+  const { logout } = useAuth();
+
   const {
     orderConfirmationRequired,
     setOrderConfirmationRequired,
     accountMode,
+    accountModeVersion,
+    applyAccountMode,
     workspaces,
     activeWorkspaceId,
     setActiveWorkspace,
@@ -44,9 +75,9 @@ export const Header: React.FC = () => {
     deleteWorkspace
   } = useWorkspaceStore();
 
-  const [confirmingReset, setConfirmingReset] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
-  const [currentTime, setCurrentTime] = useState('');
+  const [clock, setClock] = useState<ClockSegments | null>(null);
   const [timeMismatch, setTimeMismatch] = useState(false);
   const [workspaceMenuId, setWorkspaceMenuId] = useState<number | null>(null);
   const [renameWorkspaceId, setRenameWorkspaceId] = useState<number | null>(null);
@@ -60,6 +91,20 @@ export const Header: React.FC = () => {
   const [tzValue, setTzValue] = useState<string | undefined>(undefined);
   const [tzLoaded, setTzLoaded] = useState(false);
 
+  // The whole system-settings document, held so a mode change can be written
+  // back as the complete document the backend's replace semantics expect.
+  // Writing only ACCOUNT_MODE would erase every other setting.
+  const [systemSettings, setSystemSettings] = useState<Record<string, string> | null>(null);
+  const [accountModePending, setAccountModePending] = useState(false);
+  const [accountProfile, setAccountProfile] = useState<TradingAccountProfile | null>(null);
+  const [accountProfileLoading, setAccountProfileLoading] = useState(false);
+
+  const accountName = accountProfile?.account_name
+    ?? (accountProfileLoading ? 'Account loading' : 'Account unavailable');
+  const accountEnvironment = accountProfile?.environment_label
+    ?? (accountProfileLoading ? 'Environment loading' : 'Environment unavailable');
+  const avatarLetter = accountName.charAt(0).toUpperCase() || 'A';
+
   useEffect(() => {
     if (tzLoaded) return;
     let cancelled = false;
@@ -69,9 +114,21 @@ export const Header: React.FC = () => {
         if (cancelled) return;
         const current = unwrapData(response);
         setTzValue(current.settings.TIMEZONE);
+        setSystemSettings(current.settings);
+        // The record version is recorded even when no mode is stored yet: it
+        // is what the first-ever selection needs to lock its write against.
+        // Until an operator has chosen, the mode the session reported stands.
+        const stored = current.settings[ACCOUNT_MODE_SETTING_KEY];
+        applyAccountMode(
+          isSelectableAccountMode(stored)
+            ? stored
+            : useWorkspaceStore.getState().accountMode,
+          current.version,
+        );
       })
       .catch(() => {
-        // Auth failure or backend unreachable: fall back to local time.
+        // Auth failure or backend unreachable: fall back to local time and
+        // leave the account mode as the session reported it.
         if (!cancelled) setTzValue(undefined);
       })
       .finally(() => {
@@ -80,37 +137,79 @@ export const Header: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [tzLoaded]);
+  }, [tzLoaded, applyAccountMode]);
+
+  useEffect(() => {
+    if (accountMode === 'unknown' || accountModePending) {
+      setAccountProfile(null);
+      return;
+    }
+    let cancelled = false;
+    setAccountProfileLoading(true);
+    void apiClients.trading
+      .accountProfile()
+      .then((response) => {
+        if (!cancelled) setAccountProfile(unwrapData(response));
+      })
+      .catch(() => {
+        if (!cancelled) setAccountProfile(null);
+      })
+      .finally(() => {
+        if (!cancelled) setAccountProfileLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [accountMode, accountModeVersion, accountModePending]);
+
+  /**
+   * Persist an operator-selected account mode as the app-wide context.
+   *
+   * The mode is applied optimistically so the shell recolours immediately, and
+   * reverted if the write is refused - the application must never present a
+   * mode the backend is not actually routing to.
+   */
+  const handleSelectAccountMode = (mode: SelectableAccountMode) => {
+    if (mode === accountMode || accountModePending) return;
+    if (systemSettings === null || accountModeVersion < 0) {
+      showWorkspaceToast('Account mode unavailable - settings not loaded');
+      return;
+    }
+    const previousMode = accountMode;
+    const previousVersion = accountModeVersion;
+    setAccountModePending(true);
+    applyAccountMode(mode, previousVersion);
+    void apiClients.settings
+      .updateSystem(
+        { ...systemSettings, [ACCOUNT_MODE_SETTING_KEY]: mode },
+        previousVersion,
+      )
+      .then((response) => {
+        const updated = unwrapData(response);
+        setSystemSettings(updated.settings);
+        applyAccountMode(mode, updated.version);
+        showWorkspaceToast(`Account mode: ${mode.toUpperCase()}`);
+      })
+      .catch(() => {
+        applyAccountMode(previousMode === 'unknown' ? 'sim' : previousMode, previousVersion);
+        showWorkspaceToast('Account mode change refused');
+      })
+      .finally(() => setAccountModePending(false));
+  };
 
   useEffect(() => {
     const updateTime = () => {
       const parsed = parseUtcOffset(tzValue);
-      const now = new Date();
       if (parsed === null) {
         // No valid configured offset: render device-local time and never flag
         // a mismatch (there is nothing to compare against).
         const label = tzValue && tzValue.trim() ? tzValue : `UTC${localOffsetMinutes() / 60 >= 0 ? '+' : ''}${localOffsetMinutes() / 60}`;
-        setCurrentTime(
-          now.toLocaleTimeString('en-US', {
-            hour12: true,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          }).toLowerCase() +
-            ' ' +
-            label +
-            ' ' +
-            now.toLocaleDateString('en-US', {
-              month: '2-digit',
-              day: '2-digit',
-              year: 'numeric',
-            }),
-        );
+        setClock(localClockSegments(label));
         setTimeMismatch(false);
         return;
       }
       const local = localOffsetMinutes();
-      setCurrentTime(formatClockAtOffset(now.getTime(), parsed, tzValue as string));
+      setClock(clockSegmentsAtOffset(Date.now(), parsed, tzValue as string));
       setTimeMismatch(parsed !== local);
     };
     updateTime();
@@ -183,23 +282,15 @@ export const Header: React.FC = () => {
 
         {/* Financial Metrics Status Bar */}
         <div className="account-metrics-bar">
-          {/* Account mode badge (FR-UI-016): live/simulation/unknown, always visible, never client-elected */}
+          {/* Account mode badge (FR-UI-016/205): the app-wide mode, always
+              visible and colour-coded to match the profile dropdown. */}
           <span
-            className="metric-item"
+            className="metric-item account-mode-badge"
             role="status"
-            title={
-              accountMode === 'unknown'
-                ? 'Account mode has not been confirmed by the server yet - order entry is disabled'
-                : `Account mode: ${accountMode}`
-            }
-            style={{
-              fontWeight: 700,
-              fontSize: '10px',
-              letterSpacing: '0.5px',
-              color: accountMode === 'live' ? '#ff4975' : accountMode === 'simulation' ? '#00e473' : '#8a99ad'
-            }}
+            data-mode={accountMode}
+            title={ACCOUNT_MODE_TITLES[accountMode]}
           >
-            {accountMode === 'live' ? 'LIVE' : accountMode === 'simulation' ? 'SIMULATION' : 'MODE UNKNOWN'}
+            {accountMode === 'unknown' ? 'MODE UNKNOWN' : accountMode.toUpperCase()}
           </span>
 
           <div className="metric-item">
@@ -224,35 +315,6 @@ export const Header: React.FC = () => {
             <span className="metric-value neutral">${available.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
           </div>
 
-          {/* Balance reset (FR-UI-020): simulation mode only, requires explicit confirmation */}
-          {accountMode === 'simulation' && !confirmingReset && (
-            <button
-              className="cme-metric-caret"
-              title="Reset simulated balance"
-              onClick={() => setConfirmingReset(true)}
-            >
-              <RotateCcw size={14} />
-            </button>
-          )}
-          {accountMode === 'simulation' && confirmingReset && (
-            <span className="metric-item" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ fontSize: '10px' }}>Reset balance?</span>
-              <button
-                className="btn-cme btn-outline btn-sm"
-                onClick={() => {
-                  resetBalance();
-                  setConfirmingReset(false);
-                  showWorkspaceToast('Simulated balance reset');
-                }}
-              >
-                Confirm
-              </button>
-              <button className="btn-cme btn-outline btn-sm" onClick={() => setConfirmingReset(false)}>
-                Cancel
-              </button>
-            </span>
-          )}
-
           <button className="cme-metric-caret" title="Collapse metrics">
             <ChevronLeft size={14} />
           </button>
@@ -260,41 +322,88 @@ export const Header: React.FC = () => {
 
         {/* Right Info, Confirmation-Mode Toggle & Profile Badge */}
         <div className="cme-header-actions">
-          <span className={`cme-clock-text${timeMismatch ? ' mismatch' : ''}`}>
-            {currentTime}
-          </span>
-
-          {/* Order-confirmation mode toggle (FR-UI-011/013), always visible */}
           <div
-            className={`one-click-toggle ${!orderConfirmationRequired ? 'active-one-click' : ''}`}
+            className={`digital-time${timeMismatch ? ' mismatch' : ''}`}
+            aria-label={clock ? `${clock.hour}:${clock.minute}:${clock.second} ${clock.meridiem} ${clock.label} ${clock.date}` : 'clock'}
+          >
+            {clock && (
+              <>
+                <span className="dt-seg">{clock.hour}</span>
+                <span className="dt-colon" aria-hidden="true">:</span>
+                <span className="dt-seg">{clock.minute}</span>
+                <span className="dt-colon" aria-hidden="true">:</span>
+                <span className="dt-seg">{clock.second}</span>
+                <span className="dt-suffix">{` ${clock.meridiem} ${clock.label} ${clock.date}`}</span>
+              </>
+            )}
+          </div>
+
+          {/* Order-confirmation mode toggle (FR-UI-011/013), always visible.
+              Checked means 1-click trading: orders submit with no dialog. */}
+          <div
+            className="one-click-toggle"
+            role="switch"
+            aria-checked={!orderConfirmationRequired}
+            aria-label="1-Click trading"
+            tabIndex={0}
             onClick={() => {
               setOrderConfirmationRequired(!orderConfirmationRequired);
               showWorkspaceToast(orderConfirmationRequired ? '⚡ Order confirmation DISABLED' : 'Order confirmation ENABLED');
+            }}
+            onKeyDown={(event: React.KeyboardEvent) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                setOrderConfirmationRequired(!orderConfirmationRequired);
+                showWorkspaceToast(orderConfirmationRequired ? '⚡ Order confirmation DISABLED' : 'Order confirmation ENABLED');
+              }
             }}
             title={orderConfirmationRequired ? 'Order confirmation ON (every order shows a confirmation dialog)' : 'Order confirmation OFF (orders submit immediately)'}
           >
             <div className={`cme-toggle-switch ${!orderConfirmationRequired ? 'active' : ''}`}>
               <div className="cme-toggle-knob" />
             </div>
-            <span style={{ fontWeight: !orderConfirmationRequired ? 700 : 500, color: !orderConfirmationRequired ? '#00e473' : 'inherit' }}>
-              {orderConfirmationRequired ? 'Confirm' : '1-Click'}
+            <span className="one-click-label">1-Click</span>
+            <span
+              className="one-click-info"
+              title="1-click trading enables users to execute a trade with a single click without displaying a secondary confirmation of the trade. Order submissions are based on settings and selections the user configures prior to execution."
+            >
+              <Info size={12} aria-hidden="true" />
             </span>
-            <Info size={12} color={!orderConfirmationRequired ? "#00e473" : "#8a99ad"} />
           </div>
 
-          {/* User Profile Avatar & Name */}
+          {/* User Profile Avatar & Name with dropdown chevron */}
           <div className="cme-user-badge">
-            <div className="cme-avatar-circle">R</div>
-            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
-              <span className="cme-user-name">Rufaro Haruperi</span>
-              <span className="cme-user-sub">Practice Mode</span>
+            <div className="cme-avatar-circle">{avatarLetter}</div>
+            <div className="cme-user-text">
+              <div className="cme-user-top">
+                <span className="cme-user-name">{accountName}</span>
+                <button
+                  type="button"
+                  className="profile-dropdown-button"
+                  aria-haspopup="menu"
+                  aria-expanded={profileMenuOpen}
+                  aria-label={profileMenuOpen ? 'Close profile menu' : 'Open profile menu'}
+                  onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                >
+                  <ChevronLeft size={14} />
+                </button>
+              </div>
+              <span className="cme-user-sub">{accountEnvironment}</span>
             </div>
-          </div>
-
-          {/* Far Right Rating Badge (★ 2.0) */}
-          <div className="cme-orange-badge">
-            <Star size={12} fill="#fff" color="#fff" />
-            <span>2.0</span>
+            <ProfileDropdown
+              open={profileMenuOpen}
+              onClose={() => setProfileMenuOpen(false)}
+              accountMode={accountMode}
+              pending={accountModePending}
+              onSelectAccountMode={handleSelectAccountMode}
+              onOpenSettings={() => openSettings()}
+              onLogout={() => {
+                void logout().then(
+                  () => showWorkspaceToast('Signed out'),
+                  () => showWorkspaceToast('Sign out failed'),
+                );
+              }}
+            />
           </div>
         </div>
       </header>

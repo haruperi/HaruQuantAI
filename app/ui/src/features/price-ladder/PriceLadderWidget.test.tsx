@@ -5,18 +5,22 @@ import { PriceLadderWidget } from './PriceLadderWidget';
 
 const {
   depthStreamMock,
+  quotesMock,
   sessionMock,
   preflightOrderMock,
   submitOrderMock,
   preflightCancelAllOrdersMock,
   cancelAllOrdersMock,
+  closePositionMock,
 } = vi.hoisted(() => ({
   depthStreamMock: vi.fn(),
+  quotesMock: vi.fn(),
   sessionMock: vi.fn(),
   preflightOrderMock: vi.fn(),
   submitOrderMock: vi.fn(),
   preflightCancelAllOrdersMock: vi.fn(),
   cancelAllOrdersMock: vi.fn(),
+  closePositionMock: vi.fn(),
 }));
 
 let orderConfirmationRequired = false;
@@ -30,7 +34,7 @@ vi.mock('../workspaces', () => ({
 
 vi.mock('../../clients', () => ({
   apiClients: {
-    data: { depthStream: depthStreamMock },
+    data: { depthStream: depthStreamMock, quotes: quotesMock },
     trading: {
       session: sessionMock,
       preflightOrder: preflightOrderMock,
@@ -39,10 +43,13 @@ vi.mock('../../clients', () => ({
       cancelAllOrders: cancelAllOrdersMock,
       preflightCancelOrder: vi.fn(),
       cancelOrder: vi.fn(),
+      closePosition: closePositionMock,
     },
   },
   listWorkingOrders: (projection: { orders?: Record<string, unknown> }) =>
     Object.values(projection.orders ?? {}),
+  listPositions: (projection: { positions?: Record<string, unknown> }) =>
+    Object.values(projection.positions ?? {}),
 }));
 
 function emptyBookStream(): AsyncIterable<unknown> {
@@ -77,8 +84,11 @@ describe('PriceLadderWidget — FR-UI-055 through FR-UI-062', () => {
     submitOrderMock.mockReset();
     preflightCancelAllOrdersMock.mockReset();
     cancelAllOrdersMock.mockReset();
+    quotesMock.mockReset();
+    closePositionMock.mockReset();
     depthStreamMock.mockImplementation(() => emptyBookStream());
     sessionMock.mockResolvedValue({ status: 'success', data: { orders: {} } });
+    quotesMock.mockResolvedValue({ status: 'success', data: { rows: [] } });
   });
 
   afterEach(() => {
@@ -109,7 +119,7 @@ describe('PriceLadderWidget — FR-UI-055 through FR-UI-062', () => {
     render(<PriceLadderWidget symbol="EURUSD" accountId="acct-1" />);
     await waitFor(() => expect(screen.getByText('50')).toBeTruthy());
 
-    fireEvent.click(screen.getByText(/BUY MARKET/));
+    fireEvent.click(screen.getByText(/BUY MKT/));
 
     await waitFor(() => expect(preflightOrderMock).toHaveBeenCalledTimes(1));
     expect(submitOrderMock).not.toHaveBeenCalled();
@@ -135,7 +145,7 @@ describe('PriceLadderWidget — FR-UI-055 through FR-UI-062', () => {
     render(<PriceLadderWidget symbol="EURUSD" accountId="acct-1" />);
     await waitFor(() => expect(screen.getByText('50')).toBeTruthy());
 
-    fireEvent.click(screen.getByText(/BUY MARKET/));
+    fireEvent.click(screen.getByText(/BUY MKT/));
 
     await waitFor(() => expect(submitOrderMock).toHaveBeenCalledTimes(1));
     const submitted = submitOrderMock.mock.calls[0][0];
@@ -203,8 +213,111 @@ describe('PriceLadderWidget — FR-UI-055 through FR-UI-062', () => {
 
     await waitFor(() => expect(screen.getByText('50')).toBeTruthy());
     expect(screen.getByText(/NO ACCOUNT/)).toBeTruthy();
-    expect((screen.getByText(/BUY MARKET/) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByText(/BUY MKT/) as HTMLButtonElement).disabled).toBe(true);
     expect(sessionMock).not.toHaveBeenCalled();
+  });
+
+  it('flattens only through an approved Risk review of the opposing order', async () => {
+    sessionMock.mockResolvedValue({
+      status: 'success',
+      data: {
+        orders: {},
+        positions: {
+          'pos-1': {
+            position_id: 'pos-1',
+            account_id: 'acct-1',
+            symbol: 'EURUSD',
+            broker_position_id: 'broker-pos-1',
+            side: 'LONG',
+            state: 'OPEN',
+            quantity: '2',
+          },
+        },
+      },
+    });
+    preflightOrderMock.mockResolvedValue({
+      status: 'success',
+      data: {
+        state: 'approve',
+        risk_decision_id: 'decision-3',
+        action_policy_verdict_id: 'verdict-3',
+        approval_token_ref: 'token-3',
+        reasons: [],
+        expires_at: '2026-01-01T00:00:00Z',
+      },
+    });
+    closePositionMock.mockResolvedValue({ status: 'success', data: {} });
+
+    render(<PriceLadderWidget symbol="EURUSD" accountId="acct-1" />);
+    await waitFor(() =>
+      expect((screen.getByText('FLATTEN') as HTMLButtonElement).disabled).toBe(false)
+    );
+
+    fireEvent.click(screen.getByText('FLATTEN'));
+
+    // Confirmation is mandatory, exactly as cancel-all is.
+    expect(closePositionMock).not.toHaveBeenCalled();
+    expect(screen.getByText(/Flatten 1 open EURUSD position/)).toBeTruthy();
+
+    fireEvent.click(screen.getByText('Confirm Flatten'));
+
+    await waitFor(() => expect(closePositionMock).toHaveBeenCalledTimes(1));
+    // A long is unwound by a reviewed SELL of the same size.
+    expect(preflightOrderMock.mock.calls[0][0].side).toBe('SELL');
+    expect(preflightOrderMock.mock.calls[0][0].quantity).toBe(2);
+    const [positionId, body] = closePositionMock.mock.calls[0];
+    expect(positionId).toBe('broker-pos-1');
+    expect(body.action).toBe('close_position');
+    expect(body.target_broker_position_id).toBe('broker-pos-1');
+    expect(body.risk_decision_id).toBe('decision-3');
+    expect(body.approval_token_ref).toBe('token-3');
+  });
+
+  it('never flattens when the Risk review of the opposing order declines', async () => {
+    sessionMock.mockResolvedValue({
+      status: 'success',
+      data: {
+        orders: {},
+        positions: {
+          'pos-1': {
+            position_id: 'pos-1',
+            account_id: 'acct-1',
+            symbol: 'EURUSD',
+            broker_position_id: 'broker-pos-1',
+            side: 'SHORT',
+            state: 'OPEN',
+            quantity: '1',
+          },
+        },
+      },
+    });
+    preflightOrderMock.mockResolvedValue({
+      status: 'success',
+      data: {
+        state: 'reject',
+        risk_decision_id: 'decision-4',
+        action_policy_verdict_id: null,
+        approval_token_ref: null,
+        reasons: ['exposure_limit'],
+        expires_at: '2026-01-01T00:00:00Z',
+      },
+    });
+
+    render(<PriceLadderWidget symbol="EURUSD" accountId="acct-1" />);
+    await waitFor(() =>
+      expect((screen.getByText('FLATTEN') as HTMLButtonElement).disabled).toBe(false)
+    );
+
+    fireEvent.click(screen.getByText('FLATTEN'));
+    fireEvent.click(screen.getByText('Confirm Flatten'));
+
+    await waitFor(() => expect(preflightOrderMock).toHaveBeenCalledTimes(1));
+    expect(closePositionMock).not.toHaveBeenCalled();
+    // A short is unwound by a BUY, and the rejection is surfaced verbatim.
+    expect(preflightOrderMock.mock.calls[0][0].side).toBe('BUY');
+    await waitFor(() =>
+      expect(screen.getByText(/Flatten not approved: reject/)).toBeTruthy()
+    );
   });
 
   it('re-centers on Spacebar as well as the pointer button (FR-UI-062)', async () => {

@@ -311,7 +311,11 @@ def create_simulation_session(
 
 
 def create_live_simulation_session(
-    request: object, dependencies: object, *, request_id: str
+    request: object,
+    dependencies: object,
+    *,
+    request_id: str,
+    durable: bool = False,
 ) -> StandardResponse[object]:
     """Open one bounded live what-if session over a prepared run."""
     return _guarded(
@@ -319,8 +323,34 @@ def create_live_simulation_session(
         operation="simulation.state.create_live_simulation_session",
         risk_level="low",
         read_only=False,
-        modifies_database=False,
-    )(request, dependencies, request_id=request_id)
+        modifies_database=durable,
+    )(request, dependencies, request_id=request_id, durable=durable)
+
+
+def restore_live_simulation_session(
+    session_id: str, dependencies: object, *, request_id: str
+) -> StandardResponse[object]:
+    """Reconstruct one durable session and leave it recovery-blocked."""
+    return _guarded(
+        _operation("app.services.simulator.state", "restore_live_simulation_session"),
+        operation="simulation.state.restore_live_simulation_session",
+        risk_level="high",
+        read_only=False,
+        modifies_database=True,
+    )(session_id, dependencies, request_id=request_id)
+
+
+def rearm_live_simulation_session(
+    session_id: str, *, approved: bool, request_id: str
+) -> StandardResponse[object]:
+    """Explicitly rearm one verified reconstructed session."""
+    return _guarded(
+        _operation("app.services.simulator.state", "rearm_live_simulation_session"),
+        operation="simulation.state.rearm_live_simulation_session",
+        risk_level="high",
+        read_only=False,
+        modifies_database=True,
+    )(session_id, approved=approved, request_id=request_id)
 
 
 def step_live_simulation(session_id: str, ticks: int) -> StandardResponse[object]:
@@ -332,6 +362,22 @@ def step_live_simulation(session_id: str, ticks: int) -> StandardResponse[object
         read_only=False,
         modifies_database=False,
     )(session_id, ticks)
+
+
+async def submit_live_simulation_order(
+    session_id: str, intent: object
+) -> StandardResponse[object]:
+    """Submit an unchanged approved intent to one historical session."""
+    return await _guarded_async(
+        cast(
+            "Any",
+            _operation("app.services.simulator.state", "submit_live_simulation_order"),
+        ),
+        operation="simulation.state.submit_live_simulation_order",
+        risk_level="medium",
+        read_only=False,
+        modifies_database=False,
+    )(session_id, intent)
 
 
 def read_live_simulation_state(session_id: str) -> StandardResponse[object]:
@@ -2047,6 +2093,7 @@ __all__: tuple[str, ...] = (
     "pump_simulation_scheduler_once",
     "read_live_simulation_state",
     "read_simulation_session",
+    "rearm_live_simulation_session",
     "recover_simulation_unknown_outcome",
     "replay_journal",
     "reset_live_simulation_sessions",
@@ -2054,6 +2101,7 @@ __all__: tuple[str, ...] = (
     "resolve_fill_remainder",
     "resolve_idempotent_run",
     "resolve_order_expiration",
+    "restore_live_simulation_session",
     "restore_realism_stream",
     "restore_simulation_scheduler",
     "restore_simulation_session",
@@ -2078,6 +2126,7 @@ __all__: tuple[str, ...] = (
     "start_simulation_checklist",
     "step_live_simulation",
     "stream_simulation_session_frames",
+    "submit_live_simulation_order",
     "to_simulation_error_payload",
     "transition_simulation_alert",
     "unwrap_simulation_response",

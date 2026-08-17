@@ -40,7 +40,9 @@ from app.services.simulator import (
     execute_simulation_handle_operation,
     unwrap_simulation_response,
 )
-from app.services.strategy import create_strategy_decision
+from app.services.strategy import (
+    create_strategy_decision,
+)
 from app.services.trading import build_approved_trading_request, create_order_intent
 from app.utils import (
     canonical_digest,

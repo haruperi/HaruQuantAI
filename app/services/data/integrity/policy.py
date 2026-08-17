@@ -62,6 +62,9 @@ QUALITY_REMEDIATION: Final[Mapping[str, str]] = {
     "MISSING_BARS": "Backfill the reported range from an approved source.",
     "DUPLICATE_BARS": "Re-ingest the range and deduplicate on the exact timestamp.",
     "PRICE_SPIKE": "Verify the reported bars against a second approved source.",
+    "CALENDAR_SUPPORTED_CLOSURE": (
+        "Retain the calendar provenance warning; broker-session authority is unproven."
+    ),
     "FLAT_LINE": "Confirm the venue was open and the feed was live for the run.",
     "ZERO_VOLUME": "Confirm the venue was open and the feed reported real volume.",
     "SPREAD_BREACH": "Review venue conditions before using the range for costing.",

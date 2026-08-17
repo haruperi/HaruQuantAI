@@ -26,7 +26,10 @@ from app.services.simulator.reporting import (
     build_markdown_report,
 )
 from app.services.simulator.run.audit import emit_simulation_audit
-from app.services.simulator.run.evaluation import run_point_in_time_evaluation
+from app.services.simulator.run.evaluation import (
+    _PointInTimeDatasetCursor,
+    run_point_in_time_evaluation,
+)
 from app.services.simulator.state.runtime import (
     validate_account_activity_ownership,
     validate_initial_authority_state,
@@ -482,15 +485,14 @@ async def advance_trading_timeline(
     Raises:
         ValueError: If point-in-time evidence or composition is invalid.
     """
+    point_in_time_cursor = (
+        _PointInTimeDatasetCursor(source_dataset)
+        if source_dataset is not None
+        else None
+    )
     for tick in timeline:
         receipts.extend(
-            cast(
-                "Iterable[object]",
-                unwrap_simulation_response(
-                    cast("Any", engine).execute_tick(tick),
-                    operation="simulation.run.engine_execute_tick",
-                ),
-            )
+            cast("Iterable[object]", cast("Any", engine).execute_tick_internal(tick))
         )
         if source_dataset is not None:
             try:
@@ -502,6 +504,7 @@ async def advance_trading_timeline(
                             visible, decision_at, engine, request
                         )
                     ),
+                    point_in_time_cursor=point_in_time_cursor,
                 )
             except ValueError as error:
                 if str(error) == "no market evidence is available at decision_at":

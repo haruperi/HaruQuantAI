@@ -6,6 +6,9 @@ from app.services.strategy.evaluators.decomposing_trade import DecomposingTradeE
 from app.services.strategy.evaluators.harriet_hedging import HarrietHedgingEvaluator
 from app.services.strategy.evaluators.market_structure import MarketStructureEvaluator
 from app.services.strategy.evaluators.naive_ma_trend import NaiveMATrendEvaluator
+from app.services.strategy.evaluators.naive_ma_trend_incremental import (
+    NaiveMATrendIncrementalEvaluator,
+)
 from app.services.strategy.evaluators.random_walk import RandomWalkEvaluator
 from app.services.strategy.evaluators.sqx_breakout_atr_trailing import (
     SQXBreakoutAtrTrailingEvaluator,
@@ -17,6 +20,7 @@ _EVALUATORS: Mapping[str, Callable[..., object]] = {
     "harriet_hedging": HarrietHedgingEvaluator,
     "market_structure": MarketStructureEvaluator,
     "naive_ma_trend": NaiveMATrendEvaluator,
+    "naive_ma_trend_incremental": NaiveMATrendIncrementalEvaluator,
     "random_walk": RandomWalkEvaluator,
     "sqx_breakout_atr_trailing": SQXBreakoutAtrTrailingEvaluator,
     "white_fairy": WhiteFairyEvaluator,

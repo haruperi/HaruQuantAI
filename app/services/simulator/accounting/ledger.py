@@ -136,7 +136,20 @@ class AccountLedger:
         Raises:
             SimulationError: If margin or account invariants would fail.
         """
-        logger.info("Applying %s fill to Simulation ledger", fill.action)
+        return self.apply_fill_internal(fill)
+
+    def apply_fill_internal(self, fill: LedgerFill) -> Mapping[str, Decimal]:
+        """Apply one already boundary-validated fill inside Simulation.
+
+        Args:
+            fill: Validated simulated fill effects.
+
+        Returns:
+            Itemized signed cash effects.
+
+        Raises:
+            SimulationError: If margin or account invariants would fail.
+        """
         normalize_volume(fill.volume, self._symbol_specification)
         costs = calculate_execution_costs(
             ExecutionCostInput(
@@ -190,12 +203,58 @@ class AccountLedger:
         Raises:
             SimulationError: If the supplied value is not finite.
         """
-        logger.debug("Marking the Simulation account to market")
+        self.mark_to_market_internal(unrealized)
+
+    def mark_to_market_internal(self, unrealized: Decimal) -> None:
+        """Record one already boundary-validated floating PnL value.
+
+        Args:
+            unrealized: Signed aggregate floating PnL.
+
+        Raises:
+            SimulationError: If the supplied value is non-finite.
+        """
         if not unrealized.is_finite():
             raise SimulationError(
                 "SIM_ACCOUNT_INVARIANT_BROKEN", "Unrealized value is not finite"
             )
         self._unrealized = unrealized
+
+    def calculate_profit(
+        self,
+        *,
+        side: Literal["BUY", "SELL"],
+        volume: Decimal,
+        entry_price: Decimal,
+        exit_price: Decimal,
+    ) -> Decimal:
+        """Value an FX price movement using the configured contract size.
+
+        Args:
+            side: Position direction.
+            volume: Position volume in lots.
+            entry_price: Position opening price.
+            exit_price: Current or closing price.
+
+        Returns:
+            Signed account-currency profit before costs.
+
+        Raises:
+            SimulationError: If any calculation input is invalid.
+        """
+        normalize_volume(volume, self._symbol_specification)
+        for value, field in ((entry_price, "entry_price"), (exit_price, "exit_price")):
+            if not value.is_finite() or value <= 0:
+                raise SimulationError(
+                    "SIM_INVALID_CONFIG", f"{field} must be finite and positive"
+                )
+        direction = Decimal(1) if side == "BUY" else Decimal(-1)
+        return (
+            direction
+            * (exit_price - entry_price)
+            * self._symbol_specification.contract_size
+            * volume
+        )
 
     @operation_guard(
         operation="simulation.accounting.account_ledger.snapshot",
@@ -211,7 +270,17 @@ class AccountLedger:
         Raises:
             SimulationError: If current state is inconsistent.
         """
-        logger.debug("Creating immutable Simulation account snapshot")
+        return self.snapshot_internal()
+
+    def snapshot_internal(self) -> Mapping[str, Decimal | str]:
+        """Return the trusted internal immutable account projection.
+
+        Returns:
+            Immutable mapping of current account values.
+
+        Raises:
+            SimulationError: If current state is inconsistent.
+        """
         equity = self._balance + self._unrealized
         free_margin = equity - self._used_margin
         if any(

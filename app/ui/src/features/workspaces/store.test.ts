@@ -1,12 +1,14 @@
 /**
  * Unit tests for the FEAT-UI-01 workspace/session-mode store, mapped to
- * FR-UI-001 through FR-UI-029 in `app/ui/README.md` §4.1.
+ * FR-UI-001 through FR-UI-029, FR-UI-195 through FR-UI-199, and
+ * FR-UI-200 through FR-UI-202 in `app/ui/README.md` §4.1.
  */
 
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { useWorkspaceStore, selectOrderEntryDisabled, mapRuntimeProfileToAccountMode } from "./store";
 import { MAX_CUSTOM_WORKSPACES, persistedLayoutSchema, widgetSchema } from "./contracts";
+import { WORKSPACE_TEMPLATES, type WorkspaceTemplateId } from "./templates";
 
 const initialState = useWorkspaceStore.getState();
 
@@ -51,7 +53,7 @@ describe("FR-UI-004 rename/duplicate/delete", () => {
     expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)?.name).toBe("My Workspace");
   });
 
-  it("duplicates a workspace with a fresh id and widget ids, preserving widget content", () => {
+  it("duplicates a workspace with fresh widget ids and a dock tree keyed by the new ids", () => {
     const before = useWorkspaceStore.getState().workspaces.length;
     useWorkspaceStore.getState().duplicateWorkspace(1);
     const state = useWorkspaceStore.getState();
@@ -60,6 +62,8 @@ describe("FR-UI-004 rename/duplicate/delete", () => {
     expect(copy.name).toBe("HaruQuantAI Workspace Copy");
     expect(copy.widgets.map((w) => w.type)).toEqual(state.workspaces[0].widgets.map((w) => w.type));
     expect(copy.widgets.every((w) => !state.workspaces[0].widgets.some((orig) => orig.id === w.id))).toBe(true);
+    const copyIds = copy.widgets.map((w) => w.id);
+    expect(Object.keys((copy.dock as { panels: Record<string, unknown> }).panels).sort()).toEqual([...copyIds].sort());
   });
 
   it("rejects deleting the last remaining workspace", () => {
@@ -82,36 +86,19 @@ describe("FR-UI-005 default workspace designation", () => {
   });
 });
 
-describe("FR-UI-006/025 reorder preserves widget identity", () => {
-  it("swaps rectangles between two widgets while keeping their ids", () => {
-    useWorkspaceStore.getState().reorderWidgets("markets-1", "chart-1");
-    const ws = useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!;
-    expect(ws.widgets.map((w) => w.id)).toEqual(["markets-1", "chart-1", "ladder-1", "positions-1"]);
-    const markets = ws.widgets.find((w) => w.id === "markets-1")!;
-    const chart = ws.widgets.find((w) => w.id === "chart-1")!;
-    expect(markets.col).toBe(7); // took chart's original position
-    expect(chart.col).toBe(1); // took markets' original position
-  });
-});
-
-describe("FR-UI-008 expand/contract retains the prior rectangle", () => {
-  it("does not mutate a widget's rect on expand or contract", () => {
-    const before = useWorkspaceStore
-      .getState()
-      .workspaces.find((w) => w.id === 1)!
-      .widgets.find((w) => w.id === "markets-1")!;
-
+describe("FR-UI-008 expand/contract retains the prior layout", () => {
+  it("sets and clears the expanded widget without touching widget identity", () => {
     useWorkspaceStore.getState().expandWidget("markets-1");
     expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.expandedWidgetId).toBe("markets-1");
 
     useWorkspaceStore.getState().contractWidget();
-    const after = useWorkspaceStore
-      .getState()
-      .workspaces.find((w) => w.id === 1)!
-      .widgets.find((w) => w.id === "markets-1")!;
-
     expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.expandedWidgetId).toBeNull();
-    expect(after).toEqual(before);
+    expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.widgets.map((w) => w.id)).toEqual([
+      "markets-1",
+      "chart-1",
+      "ladder-1",
+      "positions-1",
+    ]);
   });
 });
 
@@ -177,16 +164,18 @@ describe("FR-UI-011/012 order-confirmation mode", () => {
 });
 
 describe("FR-UI-016/017 account mode derivation", () => {
-  it("maps the backend runtime_profile to the presentation account mode", () => {
+  it("maps the backend runtime_profile to the app-wide account mode", () => {
     expect(mapRuntimeProfileToAccountMode("live")).toBe("live");
-    expect(mapRuntimeProfileToAccountMode("simulation")).toBe("simulation");
-    expect(mapRuntimeProfileToAccountMode("demo")).toBe("simulation");
-    expect(mapRuntimeProfileToAccountMode("research")).toBe("simulation");
+    // Demo is its own mode now: it is broker-connected, not virtual.
+    expect(mapRuntimeProfileToAccountMode("demo")).toBe("demo");
+    // Trading names the virtual profile `simulation`; the app names it `sim`.
+    expect(mapRuntimeProfileToAccountMode("simulation")).toBe("sim");
+    expect(mapRuntimeProfileToAccountMode("research")).toBe("sim");
     expect(mapRuntimeProfileToAccountMode("something-else")).toBe("unknown");
     expect(mapRuntimeProfileToAccountMode(undefined)).toBe("unknown");
   });
 
-  it("defaults to unknown and is only ever changed via setAccountModeFromRuntimeProfile", () => {
+  it("defaults to unknown until a runtime profile resolves it", () => {
     expect(useWorkspaceStore.getState().accountMode).toBe("unknown");
     useWorkspaceStore.getState().setAccountModeFromRuntimeProfile("live");
     expect(useWorkspaceStore.getState().accountMode).toBe("live");
@@ -194,11 +183,26 @@ describe("FR-UI-016/017 account mode derivation", () => {
     expect(useWorkspaceStore.getState().accountMode).toBe("unknown");
   });
 
-  it("is not persisted - every session re-derives it from the live identity", () => {
-    useWorkspaceStore.getState().setAccountModeFromRuntimeProfile("live");
+  it("applies an operator selection together with its settings version", () => {
+    useWorkspaceStore.getState().applyAccountMode("live", 12);
+    expect(useWorkspaceStore.getState().accountMode).toBe("live");
+    // The version is what the next optimistic-locked write sends.
+    expect(useWorkspaceStore.getState().accountModeVersion).toBe(12);
+  });
+
+  it("accepts unknown so a refused write can fail closed", () => {
+    useWorkspaceStore.getState().applyAccountMode("live", 4);
+    useWorkspaceStore.getState().applyAccountMode("unknown", 4);
+    expect(useWorkspaceStore.getState().accountMode).toBe("unknown");
+    expect(selectOrderEntryDisabled(useWorkspaceStore.getState())).toBe(true);
+  });
+
+  it("is not persisted - the backend setting is authoritative every session", () => {
+    useWorkspaceStore.getState().applyAccountMode("live", 3);
     const options = useWorkspaceStore.persist.getOptions();
     const persisted = options.partialize!(useWorkspaceStore.getState());
     expect(persisted).not.toHaveProperty("accountMode");
+    expect(persisted).not.toHaveProperty("accountModeVersion");
   });
 });
 
@@ -218,38 +222,6 @@ describe("FR-UI-023 widget type is from the registered set only", () => {
     expect(widgetSchema.safeParse({ ...base, type: "markets" }).success).toBe(true);
     expect(widgetSchema.safeParse({ ...base, type: "marketTicks" }).success).toBe(true);
     expect(widgetSchema.safeParse({ ...base, type: "not-a-real-widget" }).success).toBe(false);
-  });
-});
-
-describe("FR-UI-024 rectangle bounds", () => {
-  it("moveWidgetToCell clamps a destination beyond the grid back onto it", () => {
-    // A large row keeps the destination free of the other seed widgets, so the
-    // move actually happens and the clamp on `col` is what's being verified.
-    useWorkspaceStore.getState().moveWidgetToCell("markets-1", 999, 50);
-    const widget = useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.widgets.find((w) => w.id === "markets-1")!;
-    expect(widget.row).toBe(50);
-    expect(widget.col).toBe(7); // clamped to GRID_COLUMNS(12) - colSpan(6) + 1
-  });
-
-  it("moveWidgetToCell rejects a destination already occupied", () => {
-    const before = useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.widgets.find((w) => w.id === "markets-1")!;
-    // chart-1 occupies col 7, row 1 - moving markets-1 exactly there should be a no-op.
-    useWorkspaceStore.getState().moveWidgetToCell("markets-1", 7, 1);
-    const after = useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.widgets.find((w) => w.id === "markets-1")!;
-    expect(after.col).toBe(before.col);
-    expect(after.row).toBe(before.row);
-  });
-
-  it("resizeWidget clamps span to the 12-column grid and registered maximum", () => {
-    // Clear the siblings first so growth isn't itself rejected for colliding
-    // with a neighbour - this test is specifically about the span clamp.
-    useWorkspaceStore.getState().removeWidget("chart-1");
-    useWorkspaceStore.getState().removeWidget("ladder-1");
-    useWorkspaceStore.getState().removeWidget("positions-1");
-    useWorkspaceStore.getState().resizeWidget("markets-1", 999, 999);
-    const widget = useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.widgets.find((w) => w.id === "markets-1")!;
-    expect(widget.colSpan).toBe(12); // GRID_COLUMNS - col(1) + 1
-    expect(widget.rowSpan).toBe(6); // MAX_ROW_SPAN
   });
 });
 
@@ -341,5 +313,95 @@ describe("symbol-bound widget headings follow the charted symbol", () => {
       .widgets.find((w) => w.id === "positions-1")!;
     expect(widget.title).toBe("Positions & Orders");
     expect(widget.symbol).toBe("EURUSD");
+  });
+});
+
+describe("FR-UI-195 new workspaces open pending their template choice", () => {
+  it("creates a widgetless pending workspace with the deterministic name and makes it active", () => {
+    useWorkspaceStore.getState().addWorkspace();
+    const state = useWorkspaceStore.getState();
+    const created = state.workspaces.find((w) => w.name === "New Workspace-2")!;
+    expect(created.widgets).toEqual([]);
+    expect(created.templateChoicePending).toBe(true);
+    expect(state.activeWorkspaceId).toBe(created.id);
+  });
+});
+
+describe("FR-UI-196 content templates seed widgets, rename, and seed a dock layout", () => {
+  it("applies Chart + Ladder to the active pending workspace with EURUSD-bound presets", () => {
+    useWorkspaceStore.getState().addWorkspace();
+    useWorkspaceStore.getState().applyWorkspaceTemplate("chart-ladder");
+
+    const ws = useWorkspaceStore.getState().workspaces.find((w) => w.name === "Chart + Ladder")!;
+    expect(ws.templateChoicePending).toBeFalsy();
+    expect(ws.widgets.map((w) => w.type)).toEqual(["markets", "tradePlan", "chart", "priceLadder"]);
+    expect(ws.widgets.find((w) => w.type === "priceLadder")).toMatchObject({ symbol: "EURUSD", title: "EURUSD DOM" });
+    expect(ws.widgets.find((w) => w.type === "chart")).toMatchObject({ symbol: "EURUSD", title: "EURUSD Chart" });
+    expect(Object.keys((ws.dock as { panels: Record<string, unknown> }).panels).sort()).toEqual(
+      ws.widgets.map((w) => w.id).sort()
+    );
+  });
+
+  it("seeds every template with unique widget ids and a dock tree keyed by exactly those ids", () => {
+    for (const template of WORKSPACE_TEMPLATES) {
+      useWorkspaceStore.setState(initialState, true);
+      useWorkspaceStore.getState().addWorkspace();
+      useWorkspaceStore.getState().applyWorkspaceTemplate(template.id as WorkspaceTemplateId);
+
+      const state = useWorkspaceStore.getState();
+      const ws = state.workspaces.find((w) => w.id === state.activeWorkspaceId)!;
+      expect(new Set(ws.widgets.map((w) => w.id)).size).toBe(ws.widgets.length);
+      if (template.widgets.length > 0) {
+        expect(Object.keys((ws.dock as { panels: Record<string, unknown> }).panels).sort()).toEqual(
+          ws.widgets.map((w) => w.id).sort()
+        );
+      } else {
+        expect(ws.dock).toBeUndefined();
+      }
+    }
+  });
+});
+
+describe("FR-UI-197 Blank keeps the deterministic name and empties the workspace", () => {
+  it("clears the pending flag without renaming or seeding widgets", () => {
+    useWorkspaceStore.getState().addWorkspace();
+    useWorkspaceStore.getState().applyWorkspaceTemplate("blank");
+
+    const ws = useWorkspaceStore.getState().workspaces.find((w) => w.name === "New Workspace-2")!;
+    expect(ws.widgets).toEqual([]);
+    expect(ws.templateChoicePending).toBeFalsy();
+  });
+});
+
+describe("FR-UI-199 unknown template ids are rejected", () => {
+  it("leaves workspace state unchanged for an unregistered template id", () => {
+    useWorkspaceStore.getState().addWorkspace();
+    const before = useWorkspaceStore.getState().workspaces;
+    useWorkspaceStore.getState().applyWorkspaceTemplate("not-a-template" as WorkspaceTemplateId);
+    expect(useWorkspaceStore.getState().workspaces).toEqual(before);
+  });
+});
+
+describe("FR-UI-201 docking layout persistence", () => {
+  it("records a serialized dock layout for the addressed workspace only", () => {
+    const layout = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: {} };
+    useWorkspaceStore.getState().setWorkspaceDockLayout(1, layout);
+    const state = useWorkspaceStore.getState();
+    expect(state.workspaces.find((w) => w.id === 1)!.dock).toEqual(layout);
+    expect(state.workspaces.find((w) => w.id === 2)!.dock).toBeUndefined();
+  });
+
+  it("ignores an identical serialized layout so restore events cannot loop", () => {
+    const layout = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: {} };
+    useWorkspaceStore.getState().setWorkspaceDockLayout(1, layout);
+    const before = useWorkspaceStore.getState();
+    useWorkspaceStore.getState().setWorkspaceDockLayout(1, JSON.parse(JSON.stringify(layout)));
+    expect(useWorkspaceStore.getState()).toBe(before);
+  });
+
+  it("ignores layout writes for an unknown workspace", () => {
+    const before = useWorkspaceStore.getState();
+    useWorkspaceStore.getState().setWorkspaceDockLayout(999, { panels: {} });
+    expect(useWorkspaceStore.getState()).toBe(before);
   });
 });

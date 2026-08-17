@@ -620,6 +620,7 @@ class RiskGovernor:
         *,
         attestation: ApprovalAttestation | None = None,
         now: datetime,
+        evidence_now: datetime | None = None,
     ) -> RiskDecisionPackage:
         """Review one proposed trade through fixed fail-closed precedence.
 
@@ -632,6 +633,8 @@ class RiskGovernor:
             auth: Authenticated caller and trace context.
             attestation: Optional UI/API-produced human approval evidence.
             now: Caller-supplied UTC decision time.
+            evidence_now: Optional historical evidence time. Decision tokens,
+                audit records, and expiry remain bound to ``now``.
 
         Returns:
             Audited canonical Risk decision package.
@@ -644,10 +647,13 @@ class RiskGovernor:
         started_at = monotonic()
         try:
             checked_now = _utc(now)
-            self._validate_common(snapshot, auth, checked_now)
-            self._validate_trade_bindings(proposal, snapshot, market, auth, checked_now)
+            checked_evidence_now = _utc(evidence_now or now)
+            self._validate_common(snapshot, auth, checked_evidence_now)
+            self._validate_trade_bindings(
+                proposal, snapshot, market, auth, checked_evidence_now
+            )
             checks = self._base_checks(
-                snapshot, market, regime, kill_switch_states, checked_now
+                snapshot, market, regime, kill_switch_states, checked_evidence_now
             )
             modifier = min(regime.modifiers.values(), default=Decimal(1))
             capped_size = proposal.requested_size * modifier
@@ -1056,6 +1062,7 @@ def review_trade_risk(
     *,
     attestation: ApprovalAttestation | None = None,
     now: datetime,
+    evidence_now: datetime | None = None,
 ) -> object:
     """Review one proposed trade through an opaque Risk governor.
 
@@ -1069,6 +1076,8 @@ def review_trade_risk(
         auth: Authenticated caller and trace context.
         attestation: Optional current human approval evidence.
         now: Explicit aware-UTC decision time.
+        evidence_now: Optional historical evidence time used only for evidence
+            freshness and market-time validation.
 
     Returns:
         Standard response carrying the canonical Risk decision.
@@ -1087,6 +1096,7 @@ def review_trade_risk(
         auth,
         attestation=attestation,
         now=now,
+        evidence_now=evidence_now,
     )
 
 

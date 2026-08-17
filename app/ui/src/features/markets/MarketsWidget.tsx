@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { useWorkspaceStore } from '../workspaces';
 import { apiClients, unwrapData, type MarketRow, type Watchlist } from '@/clients';
-import { MoreVertical, LineChart, AlignJustify, Layers } from 'lucide-react';
+import { MoreVertical, LineChart, AlignJustify } from 'lucide-react';
 
 import { CmeProgressBar } from '../../components/common/CmeProgressBar';
 import { WATCHLISTS_CHANGED_EVENT } from '../watchlists/watchlistEvents';
@@ -107,7 +107,13 @@ export const MarketsWidget: React.FC<MarketsWidgetProps> = ({
   const [activeWatchlistId, setActiveWatchlistId] = useState<string | null>(null);
 
   const { openOrderTicket, submitOrder } = useTradingStore();
-  const { orderConfirmationRequired, addWidgetToWorkspace } = useWorkspaceStore();
+  const {
+    orderConfirmationRequired,
+    addWidgetToWorkspace,
+    setWidgetSymbol,
+    workspaces,
+    activeWorkspaceId,
+  } = useWorkspaceStore();
 
   const [watchlistsLoaded, setWatchlistsLoaded] = useState(false);
 
@@ -599,7 +605,13 @@ export const MarketsWidget: React.FC<MarketsWidgetProps> = ({
                         <div
                           className="sidebar-menu-item"
                           onClick={() => {
-                            addWidgetToWorkspace('chart', `${p.symbol} Chart`, p.symbol);
+                            const activeWs = workspaces.find((ws) => String(ws.id) === String(activeWorkspaceId));
+                            const existingChart = activeWs?.widgets.find((w) => w.type === 'chart');
+                            if (existingChart) {
+                              setWidgetSymbol(existingChart.id, p.symbol);
+                            } else {
+                              addWidgetToWorkspace('chart', `${p.symbol} Chart`, p.symbol);
+                            }
                             setActiveMenuSymbol(null);
                           }}
                         >
@@ -608,22 +620,17 @@ export const MarketsWidget: React.FC<MarketsWidgetProps> = ({
                         <div
                           className="sidebar-menu-item"
                           onClick={() => {
-                            addWidgetToWorkspace('priceLadder', `${p.symbol} DOM`, p.symbol);
+                            const activeWs = workspaces.find((ws) => String(ws.id) === String(activeWorkspaceId));
+                            const existingLadder = activeWs?.widgets.find((w) => w.type === 'priceLadder');
+                            if (existingLadder) {
+                              setWidgetSymbol(existingLadder.id, p.symbol);
+                            } else {
+                              addWidgetToWorkspace('priceLadder', `${p.symbol} DOM`, p.symbol);
+                            }
                             setActiveMenuSymbol(null);
                           }}
                         >
                           <AlignJustify size={14} /> Price Ladder
-                        </div>
-                        {/* Options Grid has no owning backend domain (FEAT-UI-07,
-                            README §6) - unavailable for every row, not a
-                            per-symbol guess, so it stays disabled everywhere. */}
-                        <div
-                          className="sidebar-menu-item disabled"
-                          aria-disabled="true"
-                          title="Options are not available yet"
-                          style={{ opacity: 0.4, cursor: 'not-allowed' }}
-                        >
-                          <Layers size={14} /> Options
                         </div>
                       </div>
                     )}

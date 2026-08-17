@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Any, cast
+from types import MappingProxyType
+from typing import Any, Final, cast
 
+from app.services.api.workstation.settings.account_mode import resolve_execution_route
+from app.services.api.workstation.trading.schemas import TradingAccountProfileResponse
 from app.services.trading import (
     cancel_all_orders,
     cancel_order,
@@ -13,12 +16,111 @@ from app.services.trading import (
     create_trading_request,
     submit_order,
 )
+from app.utils import generate_id, get_logger, utc_now
+
+logger = get_logger(__name__)
 
 type AuthContext = Any
 type _MutationOperation = Callable[[str, object, AuthContext], Awaitable[object]]
 type _PreflightOperation = Callable[[object, AuthContext], Awaitable[object]]
+type _AccountProfileOperation = Callable[[], Awaitable[object]]
+type _ModeBrokerConnector = Callable[[str], Awaitable[object]]
 
 _ACCOUNT_SNAPSHOT_MAX_AGE_SECONDS = 30
+
+
+def _field(value: object, name: str, default: object = None) -> object:
+    """Read one public mapping or attribute field.
+
+    Returns:
+        Requested field value or the supplied default.
+    """
+    if isinstance(value, dict):
+        return value.get(name, default)
+    return getattr(value, name, default)
+
+
+def _read_simulation_account_state(
+    request: object,
+) -> tuple[object, Any, dict[str, str]]:
+    """Build Data-owned account evidence from one historical session snapshot.
+
+    Returns:
+        Account snapshot, replay timestamp, and immutable replay identity refs.
+
+    Raises:
+        RuntimeError: If the session or its current replay evidence is absent.
+    """
+    from datetime import timedelta
+
+    from app.services.data import build_account_state_snapshot
+    from app.services.simulator import read_live_simulation_state
+
+    session_id = getattr(request, "simulation_session_id", None)
+    if not isinstance(session_id, str) or not session_id:
+        raise RuntimeError("SIMULATION_SESSION_REQUIRED")
+    response = cast("Any", read_live_simulation_state(session_id))
+    if response.status != "success" or response.data is None:
+        raise RuntimeError("SIMULATION_SESSION_UNAVAILABLE")
+    state = cast("Any", response.data)
+    replay_time = state.get("replay_timestamp")
+    if replay_time is None:
+        raise RuntimeError("SIMULATION_REPLAY_CURSOR_UNAVAILABLE")
+    engine = cast("Any", state["account_state"])
+    account = cast("Any", engine["account"])
+    positions = tuple(
+        {
+            "position_id": str(_field(item, "position_id")),
+            "symbol": str(_field(item, "symbol")),
+            "side": (
+                "LONG"
+                if str(_field(item, "side")).upper() in {"BUY", "LONG"}
+                else "SHORT"
+            ),
+            "quantity": _field(item, "quantity"),
+            "entry_price": _field(item, "entry_price"),
+        }
+        for item in engine["positions"]
+    )
+    orders = tuple(
+        {
+            "order_id": str(_field(item, "client_order_id")),
+            "symbol": str(_field(item, "symbol")),
+            "side": str(_field(item, "side")),
+            "state": "pending",
+            "quantity": _field(item, "approved_volume"),
+            "price": _field(item, "price") or _field(item, "stop_price"),
+        }
+        for item in engine["pending_orders"]
+    )
+    snapshot = build_account_state_snapshot(
+        account_id=cast("Any", request).account_id,
+        currency=str(account["account_currency"]),
+        balances=(
+            {
+                "asset": str(account["account_currency"]),
+                "total": account["balance"],
+                "available": account["free_margin"],
+            },
+        ),
+        equity=account["equity"],
+        margin_used=account["used_margin"],
+        margin_available=account["free_margin"],
+        positions=positions,
+        orders=orders,
+        connected=True,
+        trading_allowed=not bool(state["complete"]),
+        source_id="simulator",
+        snapshot_at=replay_time,
+        expires_at=replay_time + timedelta(seconds=_ACCOUNT_SNAPSHOT_MAX_AGE_SECONDS),
+        request_id=cast("Any", request).request_id,
+    )
+    refs = {
+        "simulation_session_id": session_id,
+        "dataset_revision": str(state["dataset_revision"]),
+        "replay_cursor": str(state["cursor"]),
+    }
+    return snapshot, replay_time, refs
 
 
 def build_api_trading_dependencies(**values: object) -> object:
@@ -33,6 +135,36 @@ def build_api_trading_dependencies(**values: object) -> object:
     return create_trading_dependencies(**values)
 
 
+def build_simulation_execution_source() -> Callable[[object], Awaitable[object]]:
+    """Bind Trading's direct SIM port to a historical Simulator session.
+
+    Returns:
+        Async operation accepting one unchanged Trading OrderIntent.
+    """
+
+    async def _execute(intent: object) -> object:
+        """Submit one exact intent to its explicitly selected session.
+
+        Returns:
+            Simulator-produced Trading execution receipt.
+
+        Raises:
+            RuntimeError: If no simulation session identity is supplied or the
+                Simulator refuses the session-bound mutation.
+        """
+        from app.services.simulator import submit_live_simulation_order
+
+        session_id = getattr(intent, "simulation_session_id", None)
+        if not isinstance(session_id, str) or not session_id:
+            raise RuntimeError("SIMULATION_SESSION_REQUIRED")
+        response = cast("Any", await submit_live_simulation_order(session_id, intent))
+        if response.status != "success" or response.data is None:
+            raise RuntimeError("SIMULATION_EXECUTION_REFUSED")
+        return response.data
+
+    return _execute
+
+
 def build_trading_mutation_source(
     dependencies: object | None,
     *,
@@ -42,11 +174,10 @@ def build_trading_mutation_source(
 
     Args:
         dependencies: Complete Trading-owned dependency container.
-        runtime_policy: Validated gateway runtime settings carrying
-            ``execution_route`` and
-            ``allow_live_mutations``. When supplied, every mutation is checked
-            against it before delegation; when omitted the check is skipped and
-            Trading's own gates remain the only authority.
+        runtime_policy: Validated gateway runtime settings. When supplied,
+            every mutation's declared route is checked against the active
+            account mode before delegation; when omitted the check is skipped
+            and Trading's own gates remain the only authority.
 
     Returns:
         Async route operation delegating exclusively to Trading public functions.
@@ -90,12 +221,14 @@ def _enforce_runtime_policy(policy: object | None, boundary_request: object) -> 
     """Reject a mutation whose declared runtime disagrees with the deployment.
 
     The gateway does not decide whether a trade is safe — Trading and Risk do.
-    What it can do is refuse to forward a request whose own declared
-    ``route`` contradicts the deployment it is running in, so a demo
-    deployment can never relay a live-routed command
-    even if a caller asks for one. Live routing additionally requires
-    ``allow_live_mutations``, matching the settings-level rule in
-    ``_settings.py`` and AGENTS.md section 3.
+    What it can do is refuse to forward a request whose own declared ``route``
+    contradicts the mode the application is actually in, so a request can never
+    elect its own execution context.
+
+    That mode is the operator-selected ``ACCOUNT_MODE``, not bootstrap
+    configuration. No separate live-enablement flag is consulted: Risk is the
+    sole authority on whether any order - manual or automatic - may proceed,
+    and demo versus live is decided by which credentials the operator supplied.
 
     Args:
         policy: Validated gateway runtime settings, or ``None`` when no policy
@@ -103,19 +236,124 @@ def _enforce_runtime_policy(policy: object | None, boundary_request: object) -> 
         boundary_request: Validated Trading mutation boundary DTO.
 
     Raises:
-        RuntimeError: If the request contradicts the composed runtime policy.
+        RuntimeError: If the request contradicts the active account mode.
     """
     if policy is None:
         return
     declared_route = getattr(boundary_request, "route", None)
-    expected_route = getattr(policy, "execution_route", None)
-
-    if declared_route is None or expected_route in (None, "none"):
+    if declared_route is None:
         raise RuntimeError("TRADING_EXECUTION_ROUTE_MISSING")
-    if declared_route != expected_route:
+    if declared_route != resolve_execution_route(request_id=generate_id("req")):
         raise RuntimeError("TRADING_EXECUTION_ROUTE_MISMATCH")
-    if declared_route == "live" and not getattr(policy, "allow_live_mutations", False):
-        raise RuntimeError("TRADING_LIVE_MUTATIONS_DISABLED")
+
+
+# The elected account mode names both the Risk profile the policy is scoped to
+# and the route it is compatible with. Trading calls the virtual profile
+# `simulation` where the route names it `sim`.
+_RISK_PROFILE_BY_ROUTE: Final = MappingProxyType(
+    {"sim": "simulation", "demo": "demo", "live": "live"}
+)
+
+
+async def _connect_mode_broker(route: str) -> object:
+    """Connect the broker the active account mode actually executes through.
+
+    Demo and live are the same MT5 execution path and differ only by the
+    credentials the operator supplied. Because they are the same path, the
+    label and the credentials have to agree: relaying a demo-credentialled
+    order while stamping it live - or the reverse - would make the registry
+    marking that separates them a lie. A mismatch therefore fails closed.
+
+    Args:
+        route: Execution route of the active account mode.
+
+    Returns:
+        Connected broker adapter for the active mode.
+
+    Raises:
+        RuntimeError: If the configured MT5 environment contradicts the elected
+            mode, or the sim venue is requested but not composed.
+    """
+    from app.services.brokers import (
+        create_connected_broker,
+        resolve_provider_connection_config,
+    )
+
+    if route == "sim":
+        # The sim route requires a Brokers `sim`/`simulation` authority that no
+        # production component implements yet, so it is refused rather than
+        # silently served by a real broker.
+        raise RuntimeError("SIM_EXECUTION_VENUE_UNAVAILABLE")
+    wants_live = route == "live"
+    config = resolve_provider_connection_config("mt5", allow_live=wants_live)
+    if (str(config.environment) == "live") != wants_live:
+        logger.error("Configured MT5 environment contradicts the elected mode")
+        raise RuntimeError("ACCOUNT_MODE_CREDENTIAL_MISMATCH")
+    return await create_connected_broker("mt5", allow_live=wants_live)
+
+
+def build_trading_account_profile_source(
+    connect_mode_broker: _ModeBrokerConnector | None = None,
+) -> _AccountProfileOperation:
+    """Build the active mode's provider-authored account identity read.
+
+    Returns:
+        Async operation returning the minimal Header account profile.
+    """
+
+    async def _read() -> object:
+        """Read the active account name and execution environment.
+
+        Returns:
+            Validated minimal account-profile response.
+
+        Raises:
+            RuntimeError: If MT5 identity is unavailable.
+            TypeError: If MT5 account details are structurally malformed.
+        """
+        route = resolve_execution_route(request_id=generate_id("req"))
+        if route == "sim":
+            return TradingAccountProfileResponse(
+                account_name="Simulation Account",
+                trade_mode="SIMULATION",
+                environment_label="Simulation Environment",
+                source="simulator",
+                retrieved_at=utc_now(),
+            )
+        from app.services.brokers import disconnect_broker, get_broker_account_info
+
+        connector = connect_mode_broker or _connect_mode_broker
+        adapter = await connector(route)
+        try:
+            response = cast("Any", await get_broker_account_info(cast("Any", adapter)))
+            if response.status != "success" or response.data is None:
+                raise RuntimeError("TRADING_ACCOUNT_PROFILE_UNAVAILABLE")
+            account = cast("Any", response.data)
+            details = account.details
+            if not callable(getattr(details, "get", None)):
+                raise TypeError("TRADING_ACCOUNT_PROFILE_MALFORMED")
+            name = details.get("name")
+            trade_mode = details.get("trade_mode")
+            if not isinstance(name, str) or not name.strip() or name == "N/A":
+                raise RuntimeError("TRADING_ACCOUNT_PROFILE_MALFORMED")
+            if trade_mode not in {"DEMO", "REAL", "CONTEST"}:
+                raise RuntimeError("TRADING_ACCOUNT_PROFILE_MALFORMED")
+            labels = {
+                "DEMO": "Demo Environment",
+                "REAL": "Live Environment",
+                "CONTEST": "Contest Environment",
+            }
+            return TradingAccountProfileResponse(
+                account_name=name.strip(),
+                trade_mode=trade_mode,
+                environment_label=labels[trade_mode],
+                source="mt5",
+                retrieved_at=account.retrieved_at,
+            )
+        finally:
+            await disconnect_broker(cast("Any", adapter))
+
+    return _read
 
 
 def _resolve_approval_signing_key(request_id: str) -> bytes:
@@ -150,16 +388,15 @@ def build_trading_preflight_source() -> _PreflightOperation:
 
     Connects a real broker adapter, reads a real account snapshot, and
     reviews the candidate order through Risk's genuine fixed-precedence gate
-    (``app.services.risk.review_manual_order``). Live routing is refused
-    deterministically: no verified live ``RiskConfig`` exists in this
-    deployment yet (AGENTS.md section 3, "No Live Action by Default").
+    (``app.services.risk.review_manual_order``). Every route is reviewed the
+    same way: Risk is the sole authority on whether an order may proceed, so
+    no route is refused ahead of that review.
 
     Returns:
         Async route operation producing a real Risk decision/verdict pair.
 
     Raises:
-        RuntimeError: If the route is live, or the broker/account snapshot
-            is unavailable.
+        RuntimeError: If the broker or account snapshot is unavailable.
     """
 
     async def _preflight(boundary_request: object, auth: AuthContext) -> object:
@@ -169,10 +406,11 @@ def build_trading_preflight_source() -> _PreflightOperation:
             A mapping matching ``OrderPreflightResponse``.
 
         Raises:
-            RuntimeError: If live routing is requested or evidence is
-                unavailable.
+            RuntimeError: If required account or approval evidence is
+                unavailable. Live routing is not refused here; Risk is the
+                sole authority on whether the order may proceed.
         """
-        from app.services.brokers import create_connected_broker, disconnect_broker
+        from app.services.brokers import disconnect_broker
         from app.services.data import (
             build_account_snapshot_request,
             get_account_state_snapshot,
@@ -183,29 +421,35 @@ def build_trading_preflight_source() -> _PreflightOperation:
         )
 
         request = cast("Any", boundary_request)
-        if request.route == "live":
-            raise RuntimeError("MANUAL_ORDER_LIVE_NOT_CONFIGURED")
 
-        adapter = await create_connected_broker("mt5")
-        try:
-            snapshot_response = get_account_state_snapshot(
-                build_account_snapshot_request(
-                    source_id="mt5",
-                    account_id=request.account_id,
-                    max_age_seconds=_ACCOUNT_SNAPSHOT_MAX_AGE_SECONDS,
-                    request_id=request.request_id,
-                ),
-                adapter,
+        replay_time = None
+        replay_refs = None
+        if request.route == "sim":
+            account_snapshot, replay_time, replay_refs = _read_simulation_account_state(
+                request
             )
-        finally:
-            await disconnect_broker(adapter)
-        if snapshot_response.status != "success" or snapshot_response.data is None:
-            raise RuntimeError("ACCOUNT_SNAPSHOT_UNAVAILABLE")
+        else:
+            adapter = await _connect_mode_broker(request.route)
+            try:
+                snapshot_response = get_account_state_snapshot(
+                    build_account_snapshot_request(
+                        source_id="mt5",
+                        account_id=request.account_id,
+                        max_age_seconds=_ACCOUNT_SNAPSHOT_MAX_AGE_SECONDS,
+                        request_id=request.request_id,
+                    ),
+                    adapter,
+                )
+            finally:
+                await disconnect_broker(cast("Any", adapter))
+            if snapshot_response.status != "success" or snapshot_response.data is None:
+                raise RuntimeError("ACCOUNT_SNAPSHOT_UNAVAILABLE")
+            account_snapshot = snapshot_response.data
 
         decision, verdict = cast(
             "tuple[Any, Any]",
             review_manual_order(
-                account_snapshot=snapshot_response.data,
+                account_snapshot=account_snapshot,
                 proposal_symbol=request.symbol,
                 proposal_side=request.side,
                 proposal_order_type=request.order_type,
@@ -214,7 +458,9 @@ def build_trading_preflight_source() -> _PreflightOperation:
                 proposal_stop_distance=request.stop_distance,
                 portfolio_id=request.portfolio_id,
                 route=request.route,
-                risk_config=build_personal_account_risk_config(),
+                risk_config=build_personal_account_risk_config(
+                    _RISK_PROFILE_BY_ROUTE[request.route], request.route
+                ),
                 secret_resolver=lambda _ref: _resolve_approval_signing_key(
                     request.request_id
                 ),
@@ -222,6 +468,11 @@ def build_trading_preflight_source() -> _PreflightOperation:
                 request_id=request.request_id,
                 workflow_id=request.workflow_id,
                 correlation_id=request.correlation_id,
+                market_evidence_time=replay_time,
+                temporal_context=(
+                    "historical_simulation" if request.route == "sim" else "runtime"
+                ),
+                historical_evidence_refs=replay_refs,
             ),
         )
         return {
@@ -258,9 +509,11 @@ async def _authorize_cancellation(
         A mapping matching ``OrderPreflightResponse``/``CancelAllPreflightResponse``.
 
     Raises:
-        RuntimeError: If live routing is requested or evidence is unavailable.
+        RuntimeError: If required account or approval evidence is unavailable.
+            Live routing is not refused here; Risk is the sole authority on
+            whether the cancellation may proceed.
     """
-    from app.services.brokers import create_connected_broker, disconnect_broker
+    from app.services.brokers import disconnect_broker
     from app.services.data import (
         build_account_snapshot_request,
         get_account_state_snapshot,
@@ -271,10 +524,8 @@ async def _authorize_cancellation(
     )
 
     request = cast("Any", boundary_request)
-    if request.route == "live":
-        raise RuntimeError("MANUAL_ORDER_LIVE_NOT_CONFIGURED")
 
-    adapter = await create_connected_broker("mt5")
+    adapter = await _connect_mode_broker(request.route)
     try:
         snapshot_response = get_account_state_snapshot(
             build_account_snapshot_request(
@@ -286,7 +537,7 @@ async def _authorize_cancellation(
             adapter,
         )
     finally:
-        await disconnect_broker(adapter)
+        await disconnect_broker(cast("Any", adapter))
     if snapshot_response.status != "success" or snapshot_response.data is None:
         raise RuntimeError("ACCOUNT_SNAPSHOT_UNAVAILABLE")
 
@@ -298,7 +549,9 @@ async def _authorize_cancellation(
             action=action,
             action_scope=action_scope,
             portfolio_id=request.portfolio_id,
-            risk_config=build_personal_account_risk_config(),
+            risk_config=build_personal_account_risk_config(
+                _RISK_PROFILE_BY_ROUTE[request.route], request.route
+            ),
             secret_resolver=lambda _ref: _resolve_approval_signing_key(
                 request.request_id
             ),
@@ -342,8 +595,9 @@ def build_trading_cancel_order_preflight_source() -> _PreflightOperation:
             A mapping matching ``OrderPreflightResponse``.
 
         Raises:
-            RuntimeError: If live routing is requested or evidence is
-                unavailable.
+            RuntimeError: If required account or approval evidence is
+                unavailable. Live routing is not refused here; Risk is the
+                sole authority on whether the order may proceed.
         """
         request = cast("Any", boundary_request)
         return await _authorize_cancellation(
@@ -379,8 +633,9 @@ def build_trading_cancel_all_preflight_source() -> _PreflightOperation:
             A mapping matching ``CancelAllPreflightResponse``.
 
         Raises:
-            RuntimeError: If live routing is requested or evidence is
-                unavailable.
+            RuntimeError: If required account or approval evidence is
+                unavailable. Live routing is not refused here; Risk is the
+                sole authority on whether the order may proceed.
         """
         request = cast("Any", boundary_request)
         return await _authorize_cancellation(
@@ -392,6 +647,8 @@ def build_trading_cancel_all_preflight_source() -> _PreflightOperation:
 
 __all__ = (
     "build_api_trading_dependencies",
+    "build_simulation_execution_source",
+    "build_trading_account_profile_source",
     "build_trading_cancel_all_preflight_source",
     "build_trading_cancel_order_preflight_source",
     "build_trading_mutation_source",

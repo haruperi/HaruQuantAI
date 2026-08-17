@@ -53,31 +53,56 @@ def _intent(route: str = "sim") -> OrderIntent:
     )
 
 
-def _dispatch(intent: OrderIntent, connection: object) -> ExecutionReceipt:
+def _receipt(intent: OrderIntent) -> ExecutionReceipt:
+    """Build one exact-scope Simulator receipt."""
+    return ExecutionReceipt(
+        receipt_id="sim-route-receipt",
+        intent_id=intent.source_intent_id,
+        client_order_id=intent.client_order_id,
+        route="sim",
+        authority="simulator",
+        provider_order_id="sim-route-order",
+        status="accepted",
+        requested_quantity=intent.approved_volume,
+        filled_quantity=Decimal(0),
+        authority_timestamp=NOW,
+        received_at=NOW,
+        response_classification="confirmed",
+        retry_safe=False,
+        reconciliation_required=False,
+        request_id=intent.request_id,
+        correlation_id=intent.correlation_id,
+    )
+
+
+def _dispatch(intent: OrderIntent) -> ExecutionReceipt:
     """Dispatch with deterministic runtime policy.
 
     Args:
         intent: Intent to dispatch.
-        connection: Broker connection descriptor.
-
     Returns:
         Confirmed receipt.
     """
+
+    async def source(value: OrderIntent) -> ExecutionReceipt:
+        assert value is intent
+        return _receipt(value)
+
     return asyncio.run(
         _dispatch_order_intent_value(
             intent,
-            connection,
-            _Adapter(broker="sim", environment="simulation"),
+            None,
+            None,
             operation_timeout_seconds=Decimal(1),
             clock=lambda: NOW,
+            simulation_execution_source=source,
         )
     )
 
 
 def test_sim_route_requires_exact_simulation_pair() -> None:
     """The exact sim/simulation pair dispatches once."""
-    connection = build_broker_connection_config("sim", "simulation")
-    assert _dispatch(_intent(), connection).status == "accepted"
+    assert _dispatch(_intent()).status == "accepted"
 
 
 @pytest.mark.parametrize("environment", ["live", "demo", "testnet", "sandbox"])
@@ -89,7 +114,16 @@ def test_sim_route_rejects_every_other_environment(environment: str) -> None:
     """
     connection = build_broker_connection_config("sim", environment)
     with pytest.raises(TradingError) as captured:
-        _dispatch(_intent(), connection)
+        asyncio.run(
+            _dispatch_order_intent_value(
+                _intent(),
+                connection,
+                _Adapter(broker="sim", environment="simulation"),
+                operation_timeout_seconds=Decimal(1),
+                clock=lambda: NOW,
+                simulation_execution_source=lambda _: None,
+            )
+        )
     assert captured.value.code == "SCOPE_MISMATCH"
 
 
@@ -97,11 +131,29 @@ def test_sim_route_rejects_disabled_and_wrong_identity() -> None:
     """Admission fails before callback for disabled or wrong identity."""
     exact = build_broker_connection_config("sim", "simulation")
     with pytest.raises(TradingError) as disabled:
-        _dispatch(_intent(), replace(exact, provider_enabled=False))
-    assert disabled.value.code == "GATE_BLOCKED"
+        asyncio.run(
+            _dispatch_order_intent_value(
+                _intent(),
+                replace(exact, provider_enabled=False),
+                _Adapter(broker="sim", environment="simulation"),
+                operation_timeout_seconds=Decimal(1),
+                clock=lambda: NOW,
+                simulation_execution_source=lambda _: None,
+            )
+        )
+    assert disabled.value.code == "SCOPE_MISMATCH"
     wrong = build_broker_connection_config("mt5", "simulation")
     with pytest.raises(TradingError) as mismatch:
-        _dispatch(_intent(), wrong)
+        asyncio.run(
+            _dispatch_order_intent_value(
+                _intent(),
+                wrong,
+                _Adapter(broker="sim", environment="simulation"),
+                operation_timeout_seconds=Decimal(1),
+                clock=lambda: NOW,
+                simulation_execution_source=lambda _: None,
+            )
+        )
     assert mismatch.value.code == "SCOPE_MISMATCH"
 
 
@@ -114,5 +166,13 @@ def test_non_sim_routes_forbid_simulation_environment(route: str) -> None:
     """
     connection = build_broker_connection_config("mt5", "simulation")
     with pytest.raises(TradingError) as captured:
-        _dispatch(_intent(route), connection)
+        asyncio.run(
+            _dispatch_order_intent_value(
+                _intent(route),
+                connection,
+                _Adapter(),
+                operation_timeout_seconds=Decimal(1),
+                clock=lambda: NOW,
+            )
+        )
     assert captured.value.code == "SCOPE_MISMATCH"

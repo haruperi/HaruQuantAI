@@ -30,8 +30,8 @@ from app.services.data import (
 )
 from app.services.indicators import (
     atr,
+    ema,
     rsi,
-    sma,
     zigzag,
 )
 from app.services.strategy import (
@@ -358,11 +358,21 @@ def fr_str_040() -> None:
         "naive-ma-trend",
         {"fast_ma_period": 5, "slow_ma_period": 10, "filter_ma_period": 20},
         lambda slice_: (
-            _unwrap_indicator(sma(slice_, period=5)),
-            _unwrap_indicator(sma(slice_, period=10)),
-            _unwrap_indicator(sma(slice_, period=20)),
+            _unwrap_indicator(ema(slice_, period=5)),
+            _unwrap_indicator(ema(slice_, period=10)),
+            _unwrap_indicator(ema(slice_, period=20)),
         ),
-        ("sma",),
+        ("ema",),
+        market,
+        point,
+    )
+    _audit(
+        "Stage 1: Incremental Naive MA Trend Parity (FR-STR-040)",
+        "naive_ma_trend_incremental",
+        "naive-ma-trend",
+        {"fast_ma_period": 5, "slow_ma_period": 10, "filter_ma_period": 20},
+        lambda _slice: (),
+        (),
         market,
         point,
     )

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, Literal, cast
 
@@ -20,6 +20,10 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
     unwrap_data_response,
+)
+from app.services.data.economic_calendar.closures import (
+    CalendarClosureEvidence,
+    resolve_calendar_closures,
 )
 from app.services.data.market_data.requests import (
     AvailabilityRequest,
@@ -275,6 +279,7 @@ def _quality_report(
     raw_batch: RawSourceBatch,
     warnings: tuple[str, ...] = (),
     timeframe: str | None = None,
+    symbol: str | None = None,
 ) -> DataQualityReport:
     """Build truthful evidence for the complete canonical validation pass.
 
@@ -287,6 +292,7 @@ def _quality_report(
         raw_batch: The ``raw_batch`` argument.
         warnings: The ``warnings`` argument.
         timeframe: The ``timeframe`` argument.
+        symbol: Exact symbol used to resolve registered calendar relevance.
 
     Returns:
         The result produced by the operation.
@@ -296,9 +302,24 @@ def _quality_report(
 
     # Internal public-to-public call resolved on the private raw core so the
     # migrated ``inspect_records_quality`` response boundary is not nested.
+    calendar_closures: tuple[CalendarClosureEvidence, ...] = ()
+    if records and timeframe is not None and symbol is not None:
+        try:
+            calendar_closures = resolve_calendar_closures(
+                symbol,
+                records[0].timestamp,
+                records[-1].timestamp + timedelta(microseconds=1),
+                request_id=raw_batch.request_id,
+            )
+        except DataError:
+            logger.warning(
+                "Persisted calendar closure evidence is unavailable | symbol=%s",
+                symbol,
+            )
     report = _inspect_records_quality_raw(
         records,
         timeframe,
+        calendar_closures=calendar_closures,
         generated_at=raw_batch.retrieved_at,
         request_id=raw_batch.request_id,
     )
@@ -389,7 +410,13 @@ def _dataset(
         end=records[-1].timestamp,
         available_at=raw_batch.retrieved_at,
         record_count=len(records),
-        quality_report=_quality_report(records, raw_batch, warnings, request.timeframe),
+        quality_report=_quality_report(
+            records,
+            raw_batch,
+            warnings,
+            request.timeframe,
+            request.symbol,
+        ),
         source_metadata={
             "source_id": source_id,
             "provider_symbol": provider_symbol,

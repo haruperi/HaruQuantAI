@@ -90,6 +90,20 @@ def test_to_report_json_safe_normalizes_pandas_evidence() -> None:
     assert safe["frame"] == [{"value": 1}, {"value": 2}]
 
 
+def test_to_report_json_safe_accepts_large_trusted_report_evidence() -> None:
+    """Validated Analytics report evidence is not capped as an untrusted payload."""
+    safe = to_report_json_safe({"equity_points": tuple(range(10_001))})
+    assert safe["equity_points"] == list(range(10_001))
+
+
+def test_to_report_json_safe_retains_cycle_rejection() -> None:
+    """Trusted report sizing does not weaken recursive safety validation."""
+    cyclic: list[object] = []
+    cyclic.append(cyclic)
+    with pytest.raises(AnalyticsValidationError):
+        to_report_json_safe(cyclic)
+
+
 def test_analytics_defines_no_utils_duplicate_primitive() -> None:
     """The contracts port does not expose duplicate Utils primitives."""
     logger.debug("Testing Analytics Utils primitive ownership boundary")

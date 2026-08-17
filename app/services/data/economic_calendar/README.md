@@ -12,7 +12,7 @@ and use the current UTC clock.
 
 - Production files: `firecrawl_transport.py`, `reader_transport.py`, `event_urls.py`, `ingestion.py`, `normalization.py`, `parsing.py`,
   `scraper.py`, `events.py`,
-  `profiling.py`, `providers.py`, `restriction.py`, `calendar_state.py`,
+  `profiling.py`, `providers.py`, `restriction.py`, `calendar_state.py`, `closures.py`,
   `service.py`, and `store.py`.
 - Requirements: `FR-DATA-095`–`FR-DATA-099`, `FR-DATA-123`–`FR-DATA-129`,
   and `FR-DATA-168`–`FR-DATA-180`.
@@ -47,3 +47,11 @@ queries. Successful empty queries produce `calendar_state="open"`; unavailable
 calendar evidence remains `unknown` so Risk applies its configured
 missing-evidence policy. Risk alone interprets the state, and Trading consumes
 only Risk decisions.
+
+`closures.py` is an internal research-quality bridge. It returns holiday support only
+when persisted calendar coverage is complete for the requested interval and the event
+is relevant to the registered symbol currencies. Explicit provider `event_type`
+evidence is preferred; exact legacy title-word matching is retained as identified
+fallback provenance for already-persisted rows. Support spans the event's UTC calendar
+day and is non-authoritative: it cannot become broker schedule evidence or trading
+authority.

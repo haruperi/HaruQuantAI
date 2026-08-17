@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping
 from typing import cast
 
@@ -175,7 +176,7 @@ def build_quality_flag(
 
 
 def to_report_json_safe(value: object) -> object:
-    """Convert report-specific analytical values through Utils serialization.
+    """Convert trusted report evidence through unbounded Utils serialization.
 
     Args:
         value: Candidate report evidence.
@@ -188,7 +189,8 @@ def to_report_json_safe(value: object) -> object:
     """
     logger.info("Converting Analytics report evidence to JSON-safe values")
     try:
-        return _utils_to_json_safe(_normalize_analytical_value(value))
+        encoded = canonical_json(_normalize_analytical_value(value), max_items=None)
+        return json.loads(encoded)
     except Exception as error:
         raise AnalyticsValidationError(
             "report value is not finite JSON-safe evidence"

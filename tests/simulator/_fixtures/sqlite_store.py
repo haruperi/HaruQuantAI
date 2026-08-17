@@ -356,7 +356,11 @@ class SqliteSimulationStateStore:
         """
         logger.info("Recording Simulation idempotency state %s", status)
         self._validate_identity(run_id, "run_id")
-        serialized = None if result_payload is None else canonical_json(result_payload)
+        serialized = (
+            None
+            if result_payload is None
+            else canonical_json(result_payload, max_items=None)
+        )
         conflict = False
         try:
             with closing(self._connect()) as connection, connection:

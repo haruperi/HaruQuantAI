@@ -9,9 +9,9 @@ reconstructs the boundary DTO into the owner request and delegates.
 Two properties are worth stating at the boundary because they shape what the
 routes may claim:
 
-* **Sessions are in-process and non-durable.** A gateway restart loses them.
-  The routes therefore never promise persistence, and a lost session is
-  reported as unknown rather than silently reopened.
+* **Practice sessions are durable.** The immutable request, replay cursor,
+  state hash, and cursor-bound manual intents are persisted; engine internals
+  remain reconstructed state rather than serialized authority.
 * **Branch output is advisory.** Every projection carries ``advisory: true``
   and a branch journals under its own run identity, so a what-if answer can
   never be mistaken for an official ``SimulationResult``.
@@ -32,6 +32,8 @@ from app.services.simulator import (
     create_live_simulation_session,
     create_simulation_value,
     read_live_simulation_state,
+    rearm_live_simulation_session,
+    restore_live_simulation_session,
     step_live_simulation,
 )
 
@@ -90,11 +92,22 @@ def _build_handlers(dependencies: object | None) -> Mapping[str, _Handler]:
             cast("Any", _run_request(args[0])),
             cast("Any", dependencies),
             request_id=cast("str", args[1]),
+            durable=True,
         ),
         "step": lambda args: step_live_simulation(
             cast("str", args[0]), cast("int", args[1])
         ),
         "read": lambda args: read_live_simulation_state(cast("str", args[0])),
+        "restore": lambda args: restore_live_simulation_session(
+            cast("str", args[0]),
+            cast("Any", dependencies),
+            request_id=cast("str", args[1]),
+        ),
+        "rearm": lambda args: rearm_live_simulation_session(
+            cast("str", args[0]),
+            approved=cast("bool", args[1]),
+            request_id=cast("str", args[2]),
+        ),
         "branch": lambda args: branch_live_simulation(
             cast("str", args[0]),
             cast("Mapping[str, object]", args[1]),

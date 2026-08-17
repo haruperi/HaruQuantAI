@@ -85,19 +85,35 @@ class _TransportParams:
     circuit_half_open_max_calls: int = 1
 
 
-def _require_non_production(provider: str, environment: str) -> None:
+def _require_non_production(
+    provider: str,
+    environment: str,
+    *,
+    allow_live: bool = False,
+) -> None:
     """Block live-provider configuration before adapter construction.
+
+    MetaTrader 5 is the single documented exception (AGENTS.md section 3): it
+    may resolve a live environment when the caller explicitly opts in, which
+    only the operator-elected ``ACCOUNT_MODE=live`` path does. Every other
+    provider remains non-production regardless of the flag, and an opt-in never
+    invents credentials - the operator still has to have supplied live ones.
 
     Args:
         provider: Canonical provider identifier for diagnostics.
         environment: Resolved provider environment.
+        allow_live: Whether the caller has explicitly elected live execution.
 
     Raises:
-        ValueError: If the environment is not an approved non-production target.
+        ValueError: If the environment is not an approved target for the caller.
     """
-    if environment not in _NON_PRODUCTION_ENVIRONMENTS:
-        message = f"{provider} standalone connections reject live environments"
-        raise ValueError(message)
+    if environment in _NON_PRODUCTION_ENVIRONMENTS:
+        return
+    if allow_live and provider == "mt5":
+        logger.warning("Resolving a live MT5 connection on explicit election")
+        return
+    message = f"{provider} standalone connections reject live environments"
+    raise ValueError(message)
 
 
 def _resolve_credentials(
@@ -126,19 +142,22 @@ def _resolve_credentials(
 def _mt5_config(
     settings: _ProviderSettings,
     transport: _TransportParams,
+    *,
+    allow_live: bool = False,
 ) -> BrokerConnectionConfig:
     """Resolve the MT5 connection configuration from enabled settings.
 
     Args:
         settings: Value supplied to the operation.
         transport: Value supplied to the operation.
+        allow_live: Whether the caller has explicitly elected live execution.
 
     Returns:
         Resolved immutable MT5 connection configuration.
 
     Raises:
         ValueError: If MT5 is disabled, credentials are missing, or the
-            environment is live.
+            environment is live without an explicit live election.
     """
     if not settings.mt5_enabled:
         raise ValueError("mt5 standalone usage requires provider enablement")
@@ -152,7 +171,7 @@ def _mt5_config(
     )
     if settings.mt5_terminal_path is not None:
         credentials["terminal_path"] = settings.mt5_terminal_path
-    _require_non_production("mt5", settings.mt5_environment)
+    _require_non_production("mt5", settings.mt5_environment, allow_live=allow_live)
     return build_broker_connection_config(
         broker_id=BrokerId.MT5,
         environment=BrokerEnvironment(settings.mt5_environment),
@@ -279,8 +298,9 @@ def resolve_provider_connection_config(
     circuit_failure_threshold: int = 5,
     circuit_recovery_timeout_sec: float = 30.0,
     circuit_half_open_max_calls: int = 1,
+    allow_live: bool = False,
 ) -> BrokerConnectionConfig:
-    """Resolve one governed non-production provider connection configuration.
+    """Resolve one governed provider connection configuration.
 
     Credentials and environment are read from the central provider settings.
     Credential-free providers (Binance Spot, Dukascopy, Yahoo) skip credential
@@ -296,13 +316,17 @@ def resolve_provider_connection_config(
         circuit_failure_threshold: Circuit breaker failure threshold.
         circuit_recovery_timeout_sec: Circuit breaker recovery delay in seconds.
         circuit_half_open_max_calls: Circuit breaker half-open max calls.
+        allow_live: Whether the caller has explicitly elected live execution.
+            Honoured for MetaTrader 5 only; every other provider stays
+            non-production.
 
     Returns:
         Resolved immutable provider connection configuration.
 
     Raises:
         ValueError: If the provider is disabled, credentials are missing, the
-            environment is live, or the broker identifier is unsupported.
+            environment is live without an explicit election, or the broker
+            identifier is unsupported.
     """
     resolved = BrokerId(broker_id) if isinstance(broker_id, str) else broker_id
     provider_settings = _require_provider_settings(
@@ -318,7 +342,7 @@ def resolve_provider_connection_config(
         circuit_half_open_max_calls=circuit_half_open_max_calls,
     )
     if resolved is BrokerId.MT5:
-        return _mt5_config(provider_settings, transport)
+        return _mt5_config(provider_settings, transport, allow_live=allow_live)
     if resolved is BrokerId.CTRADER:
         return _ctrader_config(provider_settings, transport)
     if resolved in {BrokerId.BINANCE_SPOT, BrokerId.DUKASCOPY, BrokerId.YAHOO}:
@@ -332,6 +356,7 @@ async def create_connected_broker(
     *,
     settings: object | None = None,
     connect: bool = True,
+    allow_live: bool = False,
 ) -> BrokerAdapter:
     """Create one provider adapter from settings and optionally connect it.
 
@@ -344,15 +369,20 @@ async def create_connected_broker(
         broker_id: Canonical broker/provider identifier or its string value.
         settings: Optional pre-resolved provider settings; loaded when ``None``.
         connect: When ``True``, connect the adapter before returning it.
+        allow_live: Whether the caller has explicitly elected live execution.
+            Honoured for MetaTrader 5 only.
 
     Returns:
         The created (and when requested connected) broker adapter.
 
     Raises:
         ValueError: If the provider is disabled, credentials are missing, the
-            environment is live, or construction fails.
+            environment is live without an explicit election, or construction
+            fails.
     """
-    config = resolve_provider_connection_config(broker_id, settings=settings)
+    config = resolve_provider_connection_config(
+        broker_id, settings=settings, allow_live=allow_live
+    )
     created = create_broker_adapter(config.broker_id, config)
     if created.error is not None or created.data is None:
         raise ValueError("broker adapter construction failed")

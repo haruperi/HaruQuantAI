@@ -42,6 +42,7 @@ _LEGACY_PATHS = {
     "settings.database.sqlite_busy_timeout_seconds",
     "settings.database.write_lock_lease_seconds",
     "settings.dukascopy.enabled",
+    "settings.environment.account_mode",
     "settings.environment.api_host",
     "settings.environment.api_port",
     "settings.environment.app_name",
@@ -147,3 +148,31 @@ def test_external_credential_key_must_decode_to_256_bits() -> None:
     )
 
     assert build_credential_key_set(settings) == {"bootstrap-v1": key}
+
+
+def test_account_mode_is_a_hot_three_valued_system_setting() -> None:
+    """ACCOUNT_MODE is the app-wide mode the operator elects.
+
+    It is manifest-constrained to the three real modes and activates hot: the
+    mode has to take effect on the next request, not after a restart, because
+    the operator switches it from the shell.
+    """
+    definition = next(
+        item for item in get_system_settings_manifest() if item["key"] == "ACCOUNT_MODE"
+    )
+    assert definition["allowed_values"] == ("sim", "demo", "live")
+    assert definition["activation"] == "hot"
+    assert definition["value_kind"] == "string"
+
+
+@pytest.mark.parametrize("mode", ["sim", "demo", "live"])
+def test_every_account_mode_validates(mode: str) -> None:
+    """Each real mode is accepted by the system-settings validator."""
+    assert validate_system_settings({"ACCOUNT_MODE": mode})["ACCOUNT_MODE"] == mode
+
+
+@pytest.mark.parametrize("mode", ["SIM", "paper", "research", "", " sim"])
+def test_an_unrecognized_account_mode_is_refused(mode: str) -> None:
+    """Nothing outside the three modes may ever be persisted."""
+    with pytest.raises(IdentityError, match="SYSTEM_SETTING_VALUE_INVALID"):
+        validate_system_settings({"ACCOUNT_MODE": mode})

@@ -258,7 +258,10 @@ def _build_performance_report(
     )
     report = _replace_hashes(report, compute_reproducibility_hashes(result, report))
     safe = to_report_json_safe(report)
-    if len(canonical_json(safe).encode("utf-8")) > config.max_response_bytes:
+    if (
+        len(canonical_json(safe, max_items=None).encode("utf-8"))
+        > config.max_response_bytes
+    ):
         raise AnalyticsValidationError("performance report exceeds configured bound")
     return report
 

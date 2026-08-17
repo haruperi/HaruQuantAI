@@ -156,7 +156,7 @@ def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
     assert "/api/v1/auth/login" in paths
     assert "/api/v1/auth/me" in paths
     assert "/api/v1/indicators" in paths
-    assert len(paths) == 89
+    assert len(paths) == 92
     assert "/api/v1/data/bars" in paths
     assert "/api/v1/portfolio/{portfolio_id}/activate" in paths
     assert "/api/v1/portfolio/{portfolio_id}/rollback" in paths
@@ -195,21 +195,25 @@ def test_canonical_app_binds_exact_owner_sources() -> None:
 
 
 def test_runtime_profile_and_execution_route_fail_closed() -> None:
-    """Reject mismatched routes and live execution without explicit enablement."""
+    """Reject a bootstrap profile and route that are not a compatible pair."""
     with pytest.raises(ValueError, match="runtime profile"):
         build_api_settings(runtime_profile="simulation", execution_route="demo")
-    with pytest.raises(ValueError, match="live execution"):
-        build_api_settings(
-            runtime_profile="live",
-            execution_route="live",
-            allow_live_mutations=False,
-        )
+
+
+def test_live_bootstrap_needs_no_separate_mutation_enablement() -> None:
+    """A live bootstrap pair constructs without an enablement flag.
+
+    The live-enablement gate was removed by owner decision: Risk is the sole
+    authority on whether any order proceeds, and demo versus live is decided
+    by which credentials the operator supplied. Bootstrap only has to declare
+    a compatible profile/route pair.
+    """
     settings = build_api_settings(
         runtime_profile="live",
         execution_route="live",
-        allow_live_mutations=True,
+        allow_live_mutations=False,
     )
-    assert settings.allow_live_mutations is True
+    assert settings.execution_route == "live"
 
 
 def test_canonical_app_fails_closed_before_owner_delegation() -> None:

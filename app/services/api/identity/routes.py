@@ -16,6 +16,7 @@ from app.services.api.identity import (
     revoke_session,
     validate_csrf,
 )
+from app.services.api.workstation.settings.account_mode import resolve_runtime_profile
 from app.services.api.workstation.settings.bootstrap import get_api_settings
 from app.utils import generate_id, get_logger
 
@@ -154,6 +155,7 @@ def _register(
         "user_id": user.user_id,
         "username": user.username,
         "expires_at": session.expires_at,
+        "runtime_profile": resolve_runtime_profile(request_id=request_id),
     }
 
 
@@ -189,6 +191,7 @@ def _login(
         "user_id": user.user_id,
         "username": user.username,
         "expires_at": session.expires_at,
+        "runtime_profile": resolve_runtime_profile(request_id=request_id),
     }
 
 
@@ -214,6 +217,7 @@ def _me(request: Request) -> dict[str, object]:
                 "user_id": "usr_haruquantai",
                 "username": "haruquantai",
                 "expires_at": "2099-01-01T00:00:00Z",
+                "runtime_profile": resolve_runtime_profile(request_id=request_id),
             }
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -227,9 +231,13 @@ def _me(request: Request) -> dict[str, object]:
                 "user_id": "usr_haruquantai",
                 "username": "haruquantai",
                 "expires_at": "2099-01-01T00:00:00Z",
+                "runtime_profile": resolve_runtime_profile(request_id=request_id),
             }
         _raise_identity_http_error(error)
-    return identity.model_dump(mode="json")
+    return {
+        **identity.model_dump(mode="json"),
+        "runtime_profile": resolve_runtime_profile(request_id=request_id),
+    }
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)

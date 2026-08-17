@@ -3,7 +3,10 @@
 from decimal import Decimal
 
 from app.services.analytics.adapters.results import adapt_trading_result
-from app.services.analytics.reports.hashes import compute_reproducibility_hashes
+from app.services.analytics.reports.hashes import (
+    _digest,
+    compute_reproducibility_hashes,
+)
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -34,3 +37,8 @@ def test_hashes_change_only_for_material_input() -> None:
     first_hashes = compute_reproducibility_hashes(first)
     assert first_hashes == compute_reproducibility_hashes(first)
     assert first_hashes.input_hash != compute_reproducibility_hashes(second).input_hash
+
+
+def test_hashes_accept_large_trusted_analytics_evidence() -> None:
+    """Trusted complete Analytics evidence is hashed without an item ceiling."""
+    assert len(_digest({"equity_points": tuple(range(10_001))})) == 64

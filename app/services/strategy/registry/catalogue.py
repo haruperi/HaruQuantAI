@@ -80,7 +80,7 @@ _BUILTIN_DESCRIPTORS: tuple[_BuiltinStrategyDescriptor, ...] = (
             "slow_ma_period": 50,
             "filter_ma_period": 200,
         },
-        required_indicators=("sma",),
+        required_indicators=("ema",),
         required_data=("EURUSD:H1",),
         requires_account_snapshot=False,
         source_hash="c4cae5c0953770f89288a5fa0a0221cea71b86fa97de2f5864ee367c699938a8",  # pragma: allowlist secret  # noqa: E501

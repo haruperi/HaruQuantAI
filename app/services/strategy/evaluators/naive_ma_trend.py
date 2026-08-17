@@ -46,7 +46,7 @@ class NaiveMATrendEvaluator(_SignalEvaluatorBase):
 
         Args:
             evidence: Point-in-time market evidence.
-            indicators: Official SMA results for all configured periods.
+            indicators: Official EMA results for all configured periods.
             config: Validated immutable configuration.
             context: Fixed deterministic evaluation context.
 
@@ -64,19 +64,19 @@ class NaiveMATrendEvaluator(_SignalEvaluatorBase):
             raise _SignalConfigError("moving-average periods must be at least two")
         fast_now, fast_previous = _current_previous(
             _indicator_values(
-                indicators, indicator_id="sma", output_column=f"sma_{fast}"
+                indicators, indicator_id="ema", output_column=f"ema_{fast}"
             ),
-            f"sma_{fast}",
+            f"ema_{fast}",
         )
         slow_values = _indicator_values(
-            indicators, indicator_id="sma", output_column=f"sma_{slow}"
+            indicators, indicator_id="ema", output_column=f"ema_{slow}"
         )
-        slow_now, slow_previous = _current_previous(slow_values, f"sma_{slow}")
+        slow_now, slow_previous = _current_previous(slow_values, f"ema_{slow}")
         trend_now = _current_value(
             _indicator_values(
-                indicators, indicator_id="sma", output_column=f"sma_{trend}"
+                indicators, indicator_id="ema", output_column=f"ema_{trend}"
             ),
-            f"sma_{trend}",
+            f"ema_{trend}",
         )
         up_cross = fast_now > slow_now and fast_previous <= slow_previous
         down_cross = fast_now < slow_now and fast_previous >= slow_previous

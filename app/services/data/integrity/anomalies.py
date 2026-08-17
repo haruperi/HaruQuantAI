@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from app.services.data.contracts.dataset import CanonicalRecord
+    from app.services.data.economic_calendar.closures import CalendarClosureEvidence
     from app.services.data.time_sessions.contracts import SessionWindow
 
 from app.services.data.contracts.dataset import QUALITY_SAMPLE_LIMIT
@@ -475,14 +476,15 @@ def detect_extreme_spread_widening(
     )
 
 
-def detect_unexpected_gaps(
+def _detect_gap_issues(
     records: Sequence[CanonicalRecord],
     timeframe: str | None,
     sessions: Sequence[SessionWindow] | None = None,
+    calendar_closures: Sequence[CalendarClosureEvidence] = (),
     *,
     policy: QualityPolicy | None = None,
     limit: int = QUALITY_SAMPLE_LIMIT,
-) -> QualityIssue | None:
+) -> tuple[QualityIssue, ...]:
     """Detect missing bars that a declared session break does not explain.
 
     ``detect_timestamp_gaps`` reports every gap against raw timeframe frequency, which
@@ -501,6 +503,7 @@ def detect_unexpected_gaps(
             because expected frequency is undefined without it.
         sessions: Declared session windows covering the period. ``None`` still
             discounts weekend-only intervals but reports other gaps as unverified.
+        calendar_closures: Relevant persisted research-only holiday evidence.
         policy: Threshold profile to apply. Defaults to the active configured profile.
         limit: Maximum number of bounded samples to attach to the issue.
 
@@ -511,10 +514,11 @@ def detect_unexpected_gaps(
     logger.debug("Detecting unexpected gaps against declared sessions")
     active = policy or _get_quality_policy_raw()
     if timeframe is None or len(records) < _MIN_GAP_PAIR:
-        return None
+        return ()
     spec = get_timeframe_spec(timeframe)
 
     unexplained: list[str] = []
+    supported: list[str] = []
     for earlier, later in pairwise(records):
         expected_next = earlier.timestamp + spec.duration
         if later.timestamp <= expected_next:
@@ -524,20 +528,68 @@ def detect_unexpected_gaps(
             continue
         if classify_gap(expected_next, later.timestamp, sessions) in _EXPECTED_GAPS:
             continue
+        matching = tuple(
+            closure
+            for closure in calendar_closures
+            if closure.opens_at < later.timestamp and closure.closes_at > expected_next
+        )
+        if matching:
+            references = ",".join(
+                f"{closure.event_id}@{closure.classification_basis}"
+                for closure in matching
+            )
+            supported.append(
+                f"{expected_next.isoformat()}..{later.timestamp.isoformat()}|{references}"
+            )
+            continue
         unexplained.append(
             f"{expected_next.isoformat()}..{later.timestamp.isoformat()}"
         )
 
-    if not unexplained:
-        return None
-    return _issue(
-        "MISSING_BARS",
-        "critical",
-        "Missing bars were observed outside any declared session break.",
-        len(unexplained),
-        tuple(unexplained),
-        limit,
+    issues: list[QualityIssue] = []
+    if unexplained:
+        issues.append(
+            _issue(
+                "MISSING_BARS",
+                "critical",
+                "Missing bars were observed outside any declared session break.",
+                len(unexplained),
+                tuple(unexplained),
+                limit,
+            )
+        )
+    if supported:
+        issues.append(
+            _issue(
+                "CALENDAR_SUPPORTED_CLOSURE",
+                "warning",
+                "A gap overlaps relevant persisted holiday evidence; "
+                "broker-session authority is unproven.",
+                len(supported),
+                tuple(supported),
+                limit,
+            )
+        )
+    return tuple(issues)
+
+
+def detect_unexpected_gaps(
+    records: Sequence[CanonicalRecord],
+    timeframe: str | None,
+    sessions: Sequence[SessionWindow] | None = None,
+    *,
+    policy: QualityPolicy | None = None,
+    limit: int = QUALITY_SAMPLE_LIMIT,
+) -> QualityIssue | None:
+    """Return the first ordinary unexpected-gap issue for compatibility."""
+    issues = _detect_gap_issues(
+        records,
+        timeframe,
+        sessions,
+        policy=policy,
+        limit=limit,
     )
+    return issues[0] if issues else None
 
 
 def detect_out_of_order_records(

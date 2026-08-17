@@ -43,10 +43,10 @@ if TYPE_CHECKING:
 
 from app.services.data.contracts.dataset import QUALITY_SAMPLE_LIMIT
 from app.services.data.integrity.anomalies import (
+    _detect_gap_issues,
     _detect_runs,
     _detect_spikes,
     _detect_spread_breach,
-    detect_unexpected_gaps,
 )
 from app.services.data.integrity.policy import (
     QUALITY_BLOCKING_ISSUES,
@@ -244,6 +244,7 @@ def inspect_dataset_quality(
     *,
     policy: QualityPolicy | None = None,
     sessions: Sequence[SessionWindow] | None = None,
+    calendar_closures: Sequence[object] = (),
     generated_at: datetime | None = None,
 ) -> StandardResponse[DataQualityReport]:
     """Produce scored bounded quality evidence for one dataset.
@@ -253,6 +254,7 @@ def inspect_dataset_quality(
         policy: Optional explicit thresholds; the configured profile is used when
             omitted.
         sessions: Optional authoritative UTC session windows covering the dataset.
+        calendar_closures: Relevant persisted research-only holiday evidence.
         generated_at: Optional explicit evidence timestamp.
 
     Returns:
@@ -270,6 +272,7 @@ def inspect_dataset_quality(
             dataset.timeframe,
             policy=policy,
             sessions=sessions,
+            calendar_closures=calendar_closures,
             generated_at=(
                 generated_at if generated_at is not None else dataset.available_at
             ),
@@ -284,6 +287,7 @@ def _inspect_records_quality_raw(
     *,
     policy: QualityPolicy | None = None,
     sessions: Sequence[SessionWindow] | None = None,
+    calendar_closures: Sequence[object] = (),
     generated_at: datetime,
     request_id: str | None = None,
 ) -> DataQualityReport:
@@ -294,6 +298,7 @@ def _inspect_records_quality_raw(
         timeframe: The ``timeframe`` argument.
         policy: The ``policy`` argument.
         sessions: The ``sessions`` argument.
+        calendar_closures: Relevant persisted research-only holiday evidence.
         generated_at: The ``generated_at`` argument.
         request_id: The ``request_id`` argument.
 
@@ -309,15 +314,17 @@ def _inspect_records_quality_raw(
     limit = _MAX_SAMPLES
 
     warnings: list[str] = []
+    gap_issues = _detect_gap_issues(
+        records,
+        timeframe,
+        sessions,
+        calendar_closures,  # type: ignore[arg-type]
+        policy=active,
+        limit=limit,
+    )
     candidates = [
         _detect_duplicates(records, limit),
-        detect_unexpected_gaps(
-            records,
-            timeframe,
-            sessions,
-            policy=active,
-            limit=limit,
-        ),
+        *gap_issues,
         _detect_spikes(records, active, limit),
         _detect_runs(
             records,
@@ -343,6 +350,12 @@ def _inspect_records_quality_raw(
     issues, truncated = _fit_samples(detected, limit)
     if timeframe is not None and not sessions:
         warnings.append("calendar_unverified")
+    if gap_issues and any(
+        issue.code == "CALENDAR_SUPPORTED_CLOSURE" for issue in gap_issues
+    ):
+        warnings.append(
+            "holiday_closure_supported_by_economic_calendar_not_broker_schedule"
+        )
     if any(
         getattr(record, "spread", None) is not None
         and getattr(record, "spread_unit", None) != getattr(record, "price_unit", None)

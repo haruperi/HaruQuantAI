@@ -54,6 +54,74 @@ function pad2(value: number): string {
 }
 
 /**
+ * One renderable split of the header clock.
+ *
+ * The profile-section clock renders the time as separate digit groups
+ * (`05 : 24 : 52`) followed by a suffix (`pm UTC-6 08/10/2026`); these
+ * segments carry exactly that decomposition so both the digital display and
+ * its accessible label derive from one computation.
+ */
+export interface ClockSegments {
+  hour: string;
+  minute: string;
+  second: string;
+  meridiem: string;
+  label: string;
+  date: string;
+}
+
+/** Decompose a wall-clock `Date` (read via its UTC getters) into segments. */
+function segmentsOf(shifted: Date, label: string): ClockSegments {
+  const rawHour = shifted.getUTCHours();
+  const hour12 = rawHour % 12 === 0 ? 12 : rawHour % 12;
+  return {
+    hour: pad2(hour12),
+    minute: pad2(shifted.getUTCMinutes()),
+    second: pad2(shifted.getUTCSeconds()),
+    meridiem: rawHour < 12 ? "am" : "pm",
+    label,
+    date: `${pad2(shifted.getUTCMonth() + 1)}/${pad2(shifted.getUTCDate())}/${shifted.getUTCFullYear()}`,
+  };
+}
+
+/**
+ * Compute the clock segments for a UTC instant shifted to a given offset.
+ *
+ * Args:
+ *   utcMs: UTC epoch milliseconds to display.
+ *   offsetMinutes: Signed offset in minutes applied to `utcMs`.
+ *   label: Zone label rendered in the suffix.
+ *
+ * Returns:
+ *   Digit-group segments plus the suffix parts for the digital clock.
+ */
+export function clockSegmentsAtOffset(
+  utcMs: number,
+  offsetMinutes: number,
+  label: string,
+): ClockSegments {
+  return segmentsOf(new Date(utcMs + offsetMinutes * 60_000), label);
+}
+
+/**
+ * Compute the clock segments for the device-local wall time.
+ *
+ * Args:
+ *   label: Zone label rendered in the suffix.
+ *
+ * Returns:
+ *   Digit-group segments plus the suffix parts for the digital clock.
+ */
+export function localClockSegments(label: string): ClockSegments {
+  // Read local wall time through the UTC getters by shifting the epoch by
+  // the device offset, mirroring the fixed-offset path.
+  return segmentsOf(
+    new Date(Date.now() + localOffsetMinutes() * 60_000),
+    label,
+  );
+}
+
+/**
  * Format a wall-clock string for a UTC instant shifted to a given offset.
  *
  * The output mirrors the existing header format (lowercase 12-hour time with
@@ -73,14 +141,6 @@ export function formatClockAtOffset(
   offsetMinutes: number,
   label: string,
 ): string {
-  const shifted = new Date(utcMs + offsetMinutes * 60_000);
-  const rawHour = shifted.getUTCHours();
-  const hour12 = rawHour % 12 === 0 ? 12 : rawHour % 12;
-  const minute = shifted.getUTCMinutes();
-  const second = shifted.getUTCSeconds();
-  const meridiem = rawHour < 12 ? "am" : "pm";
-  const month = pad2(shifted.getUTCMonth() + 1);
-  const day = pad2(shifted.getUTCDate());
-  const year = shifted.getUTCFullYear();
-  return `${pad2(hour12)}:${pad2(minute)}:${pad2(second)} ${meridiem} ${label} ${month}/${day}/${year}`;
+  const s = clockSegmentsAtOffset(utcMs, offsetMinutes, label);
+  return `${s.hour}:${s.minute}:${s.second} ${s.meridiem} ${s.label} ${s.date}`;
 }

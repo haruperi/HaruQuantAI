@@ -735,6 +735,12 @@ Every official `period` is an integer satisfying
 | Completed | `FR-INDI-009` | The system shall expose a copy-safe projection containing generated indicator, availability, and quality columns without original OHLCV columns. | `IndicatorResult.values_only: pd.DataFrame` | None | None | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_results.py::test_values_only_excludes_source_columns()` |
 | Completed | `FR-INDI-010` | The system shall privately project one matching `MarketDataset v1`, append generated columns to that copied canonical tabular projection, and preserve source columns, row count/order, timestamp/symbol layout, warmup rows, and input identity; collisions fail. | `IndicatorResult.join_to(data: MarketDataset, mode: Literal["copy"] = "copy") -> StandardResponse[pd.DataFrame]` | None | `StandardResponse.error`: invalid mode, dataset/checksum mismatch, output collision, or detected mutation | **Usage:** `tests/indicators/usage/features/01_core.py`<br>**Unit:** `tests/indicators/unit/test_results.py::test_join_to_preserves_input_and_alignment()` |
 
+Result assembly constructs canonical frames atomically. One lock-protected cache may
+reuse the checksum and source projection of only the current immutable dataset
+instance across sibling calculations and joins. A distinct dataset identity always
+recomputes both values, so equivalent content cannot alias provenance and historical
+rolling windows are not retained.
+
 #### Exact manifest and result fields
 
 `IndicatorManifest` is a frozen serializable dataclass with these exact fields:

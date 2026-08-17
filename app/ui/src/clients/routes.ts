@@ -463,6 +463,12 @@ export const riskRoutes = {
 // --- Trading session (8) -------------------------------------------------
 
 export const tradingRoutes = {
+  accountProfile: route({
+    id: "api.trading.account_profile",
+    method: "GET",
+    path: "/api/v1/trading/account-profile",
+    permission: "trading:read",
+  }),
   session: route({
     id: "api.trading.session",
     method: "GET",
@@ -901,6 +907,7 @@ export const ROUTE_CONTRACTS = [
   simulationRoutes.result,
   riskRoutes.killSwitch,
   riskRoutes.decisions,
+  tradingRoutes.accountProfile,
   tradingRoutes.session,
   tradingRoutes.preflightOrder,
   tradingRoutes.submitOrder,
@@ -952,7 +959,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 96;
+export const ROUTE_CONTRACT_COUNT = 97;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

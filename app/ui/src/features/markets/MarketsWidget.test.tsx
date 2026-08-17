@@ -6,7 +6,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MarketsWidget } from './MarketsWidget';
 import { WATCHLISTS_CHANGED_EVENT } from '../watchlists/watchlistEvents';
 
-const { marketsMock, quotesMock, snapshotStreamMock, listMock, openOrderTicketMock, submitOrderMock, addWidgetToWorkspaceMock } = vi.hoisted(() => ({
+const {
+  marketsMock,
+  quotesMock,
+  snapshotStreamMock,
+  listMock,
+  openOrderTicketMock,
+  submitOrderMock,
+  addWidgetToWorkspaceMock,
+  setWidgetSymbolMock,
+} = vi.hoisted(() => ({
   marketsMock: vi.fn(),
   quotesMock: vi.fn(),
   snapshotStreamMock: vi.fn(),
@@ -14,6 +23,7 @@ const { marketsMock, quotesMock, snapshotStreamMock, listMock, openOrderTicketMo
   openOrderTicketMock: vi.fn(),
   submitOrderMock: vi.fn(),
   addWidgetToWorkspaceMock: vi.fn(),
+  setWidgetSymbolMock: vi.fn(),
 }));
 
 vi.mock('../../store/useTradingStore', () => ({
@@ -24,12 +34,16 @@ vi.mock('../../store/useTradingStore', () => ({
 }));
 
 let orderConfirmationRequired = true;
+let mockWorkspaces: any[] = [];
 vi.mock('../workspaces', () => ({
   useWorkspaceStore: () => ({
     get orderConfirmationRequired() {
       return orderConfirmationRequired;
     },
+    workspaces: mockWorkspaces,
+    activeWorkspaceId: 1,
     addWidgetToWorkspace: addWidgetToWorkspaceMock,
+    setWidgetSymbol: setWidgetSymbolMock,
   }),
 }));
 
@@ -519,7 +533,8 @@ describe('MarketsWidget', () => {
     expect(openOrderTicketMock).not.toHaveBeenCalled();
   });
 
-  it('offers Chart and Price Ladder per row, and disables Options everywhere (FR-UI-037)', async () => {
+  it('offers Chart and Price Ladder per row, and omits Options (FR-UI-037)', async () => {
+    mockWorkspaces = [];
     marketsMock.mockResolvedValue(directoryPage([marketRow()], null));
     render(<MarketsWidget />);
     await screen.findByText('EURUSD');
@@ -527,14 +542,37 @@ describe('MarketsWidget', () => {
     fireEvent.click(screen.getByRole('button', { name: '' })); // the MoreVertical row-menu toggle
     expect(screen.getByText('Chart')).toBeTruthy();
     expect(screen.getByText('Price Ladder')).toBeTruthy();
-    const optionsItem = screen.getByText('Options').closest('[aria-disabled]');
-    expect(optionsItem?.getAttribute('aria-disabled')).toBe('true');
-
-    fireEvent.click(screen.getByText('Options'));
-    expect(addWidgetToWorkspaceMock).not.toHaveBeenCalled();
+    expect(screen.queryByText('Options')).toBeNull();
 
     fireEvent.click(screen.getByText('Chart'));
     expect(addWidgetToWorkspaceMock).toHaveBeenCalledWith('chart', 'EURUSD Chart', 'EURUSD');
+
+    fireEvent.click(screen.getByRole('button', { name: '' }));
+    fireEvent.click(screen.getByText('Price Ladder'));
+    expect(addWidgetToWorkspaceMock).toHaveBeenCalledWith('priceLadder', 'EURUSD DOM', 'EURUSD');
+  });
+
+  it('updates existing Chart and Price Ladder widget symbol when already in workspace (FR-UI-037)', async () => {
+    mockWorkspaces = [
+      {
+        id: 1,
+        widgets: [
+          { id: 'chart-1', type: 'chart', symbol: 'EURUSD' },
+          { id: 'ladder-1', type: 'priceLadder', symbol: 'EURUSD' },
+        ],
+      },
+    ];
+    marketsMock.mockResolvedValue(directoryPage([marketRow({ symbol: 'GBPUSD' })], null));
+    render(<MarketsWidget />);
+    await screen.findByText('GBPUSD');
+
+    fireEvent.click(screen.getByRole('button', { name: '' }));
+    fireEvent.click(screen.getByText('Chart'));
+    expect(setWidgetSymbolMock).toHaveBeenCalledWith('chart-1', 'GBPUSD');
+
+    fireEvent.click(screen.getByRole('button', { name: '' }));
+    fireEvent.click(screen.getByText('Price Ladder'));
+    expect(setWidgetSymbolMock).toHaveBeenCalledWith('ladder-1', 'GBPUSD');
   });
 
   it('renders em dashes instead of inventing unavailable evidence (FR-UI-030/032)', async () => {

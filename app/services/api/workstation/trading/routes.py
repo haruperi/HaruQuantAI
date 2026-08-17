@@ -5,13 +5,14 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
 from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
     run_idempotent_write_async,
 )
+from app.services.api.workstation.settings.account_mode import resolve_execution_route
 from app.services.api.workstation.trading.schemas import (  # noqa: TC001
     CancelAllPreflightRequest,
     CancelOrderPreflightRequest,
@@ -24,6 +25,7 @@ type AuthContext = Any
 type _SessionSource = Callable[[str, str, str, AuthContext], object | None]
 type _MutationSource = Callable[[str, object, AuthContext], Awaitable[object]]
 type _PreflightSource = Callable[[object, AuthContext], Awaitable[object]]
+type _AccountProfileSource = Callable[[], Awaitable[object]]
 
 router = APIRouter(prefix="/api/v1/trading", tags=["trading"])
 
@@ -75,6 +77,18 @@ def _trading_preflight_source() -> _PreflightSource:
     )
 
 
+def _trading_account_profile_source() -> _AccountProfileSource:
+    """Fail closed until the MT5 account-profile reader is composed.
+
+    Raises:
+        HTTPException: Always, when the source is not composed.
+    """
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail="TRADING_ACCOUNT_PROFILE_UNAVAILABLE",
+    )
+
+
 def _trading_cancel_order_preflight_source() -> _PreflightSource:
     """Fail closed until composition injects the real single-cancel Risk review.
 
@@ -99,37 +113,69 @@ def _trading_cancel_all_preflight_source() -> _PreflightSource:
     )
 
 
-def _governed_preflight(
-    body: TradingMutationRequest,
-    request: Request,
-    idempotency_key: str | None,
-) -> None:
-    """Enforce boundary policy before delegating a Trading mutation.
+def _require_configured_route(route: str) -> None:
+    """Require a request to name the route the application is currently in.
+
+    Demo and live share one execution path and differ only by the credentials
+    in the composed ``BrokerConnectionConfig``. The boundary therefore does not
+    ban a route; it refuses a route the operator has not selected, so a request
+    can never elect its own execution context.
+
+    That route follows the operator-selected ``ACCOUNT_MODE`` rather than
+    bootstrap configuration: selecting LIVE is what puts the application on the
+    live route, and supplying live rather than demo credentials is what makes
+    it a live account. ``ALLOW_LIVE_MUTATIONS`` is deliberately not consulted
+    here - it governs the unattended background Trading loop, where no operator
+    is present to elect the mode.
+
+    Args:
+        route: Execution route declared by the request.
 
     Raises:
-        HTTPException: If production, configuration, or idempotency policy fails.
+        HTTPException: If the declared route is not the active route.
     """
-    settings = request.app.state.api_settings
-    # Demo and live share one execution path and differ only by the
-    # credentials in the composed BrokerConnectionConfig (docs/PROJECT.md
-    # 2.1.9). The boundary therefore does not ban a route; it requires the
-    # request to name the route this deployment is actually configured for, so
-    # a demo deployment can never relay a live order even if asked.
-    if body.route != settings.execution_route:
+    if route != resolve_execution_route(request_id=generate_id("req")):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="EXECUTION_ROUTE_NOT_CONFIGURED",
         )
-    if body.route == "live" and not settings.allow_live_mutations:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="LIVE_MUTATIONS_DISABLED",
-        )
-    if idempotency_key is None or idempotency_key != body.idempotency_key:
+
+
+def _require_matching_idempotency_key(
+    declared_key: str,
+    idempotency_key: str | None,
+) -> None:
+    """Require the transport idempotency header to match the request body.
+
+    Args:
+        declared_key: Idempotency key declared inside the request body.
+        idempotency_key: Idempotency key supplied as a transport header.
+
+    Raises:
+        HTTPException: If the header is absent or disagrees with the body.
+    """
+    if idempotency_key is None or idempotency_key != declared_key:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="IDEMPOTENCY_KEY_REQUIRED",
         )
+
+
+def _governed_preflight(
+    body: TradingMutationRequest,
+    idempotency_key: str | None,
+) -> None:
+    """Enforce boundary policy before delegating a Trading mutation.
+
+    Args:
+        body: Governed Trading mutation request.
+        idempotency_key: Idempotency key supplied as a transport header.
+
+    Raises:
+        HTTPException: If production, configuration, or idempotency policy fails.
+    """
+    _require_configured_route(body.route)
+    _require_matching_idempotency_key(body.idempotency_key, idempotency_key)
 
 
 @router.get("/session", response_model=None)
@@ -157,10 +203,41 @@ def _get_session(
     return result
 
 
+@router.get("/account-profile", response_model=None)
+async def _get_account_profile(
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_AccountProfileSource, Depends(_trading_account_profile_source)],
+) -> object:
+    """Return the active Simulator or MT5 account identity for the shell.
+
+    Returns:
+        Minimal provider-authored account profile.
+
+    Raises:
+        HTTPException: If authorization, composition, or provider evidence fails.
+        RuntimeError: If an unexpected provider failure is reported.
+        TypeError: If unexpected provider account material is malformed.
+    """
+    require_human_permission(auth, "trading:read")
+    try:
+        return await source()
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="TRADING_ACCOUNT_PROFILE_UNAVAILABLE",
+        ) from error
+    except (RuntimeError, TypeError) as error:
+        if str(error) not in {
+            "TRADING_ACCOUNT_PROFILE_MALFORMED",
+            "TRADING_ACCOUNT_PROFILE_UNAVAILABLE",
+        }:
+            raise
+        raise HTTPException(status_code=503, detail=str(error)) from error
+
+
 @router.post("/orders", response_model=None)
 async def _submit_order(
     body: TradingMutationRequest,
-    request: Request,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_MutationSource, Depends(_trading_mutation_source)],
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
@@ -175,7 +252,7 @@ async def _submit_order(
         RuntimeError: If Trading reports an unexpected runtime failure.
     """
     require_human_permission(auth, "trading:write")
-    _governed_preflight(body, request, idempotency_key)
+    _governed_preflight(body, idempotency_key)
     if body.action != "submit_order":
         raise HTTPException(status_code=422, detail="TRADING_ACTION_MISMATCH")
     try:
@@ -199,7 +276,6 @@ async def _submit_order(
 @router.post("/orders/preflight", response_model=None)
 async def _preflight_order(
     body: OrderPreflightRequest,
-    request: Request,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_PreflightSource, Depends(_trading_preflight_source)],
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
@@ -219,17 +295,8 @@ async def _preflight_order(
         RuntimeError: If Trading reports an unexpected runtime failure.
     """
     require_human_permission(auth, "trading:write")
-    settings = request.app.state.api_settings
-    if body.route != settings.execution_route:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="EXECUTION_ROUTE_NOT_CONFIGURED",
-        )
-    if idempotency_key is None or idempotency_key != body.idempotency_key:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="IDEMPOTENCY_KEY_REQUIRED",
-        )
+    _require_configured_route(body.route)
+    _require_matching_idempotency_key(body.idempotency_key, idempotency_key)
     try:
         return await run_idempotent_write_async(
             principal_id=auth.principal_id,
@@ -253,7 +320,6 @@ async def _preflight_order(
 @router.post("/orders/cancel-all/preflight", response_model=None)
 async def _preflight_cancel_all_orders(
     body: CancelAllPreflightRequest,
-    request: Request,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_PreflightSource, Depends(_trading_cancel_all_preflight_source)],
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
@@ -273,17 +339,8 @@ async def _preflight_cancel_all_orders(
         RuntimeError: If Trading reports an unexpected runtime failure.
     """
     require_human_permission(auth, "trading:write")
-    settings = request.app.state.api_settings
-    if body.route != settings.execution_route:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="EXECUTION_ROUTE_NOT_CONFIGURED",
-        )
-    if idempotency_key is None or idempotency_key != body.idempotency_key:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="IDEMPOTENCY_KEY_REQUIRED",
-        )
+    _require_configured_route(body.route)
+    _require_matching_idempotency_key(body.idempotency_key, idempotency_key)
     try:
         return await run_idempotent_write_async(
             principal_id=auth.principal_id,
@@ -307,7 +364,6 @@ async def _preflight_cancel_all_orders(
 @router.post("/orders/cancel-all", response_model=None)
 async def _cancel_all_orders(
     body: TradingMutationRequest,
-    request: Request,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_MutationSource, Depends(_trading_mutation_source)],
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
@@ -323,7 +379,7 @@ async def _cancel_all_orders(
         RuntimeError: If Trading reports an unexpected runtime failure.
     """
     require_human_permission(auth, "trading:write")
-    _governed_preflight(body, request, idempotency_key)
+    _governed_preflight(body, idempotency_key)
     if body.action != "cancel_all_orders":
         raise HTTPException(status_code=422, detail="TRADING_ACTION_MISMATCH")
     try:
@@ -348,7 +404,6 @@ async def _cancel_all_orders(
 async def _preflight_cancel_order(
     order_id: str,
     body: CancelOrderPreflightRequest,
-    request: Request,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[
         _PreflightSource, Depends(_trading_cancel_order_preflight_source)
@@ -372,17 +427,8 @@ async def _preflight_cancel_order(
     require_human_permission(auth, "trading:write")
     if body.target_broker_order_id != order_id:
         raise HTTPException(status_code=422, detail="TRADING_ACTION_MISMATCH")
-    settings = request.app.state.api_settings
-    if body.route != settings.execution_route:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="EXECUTION_ROUTE_NOT_CONFIGURED",
-        )
-    if idempotency_key is None or idempotency_key != body.idempotency_key:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="IDEMPOTENCY_KEY_REQUIRED",
-        )
+    _require_configured_route(body.route)
+    _require_matching_idempotency_key(body.idempotency_key, idempotency_key)
     try:
         return await run_idempotent_write_async(
             principal_id=auth.principal_id,
@@ -407,7 +453,6 @@ async def _preflight_cancel_order(
 async def _cancel_order(
     order_id: str,
     body: TradingMutationRequest,
-    request: Request,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_MutationSource, Depends(_trading_mutation_source)],
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
@@ -422,7 +467,7 @@ async def _cancel_order(
         RuntimeError: If Trading reports an unexpected runtime failure.
     """
     require_human_permission(auth, "trading:write")
-    _governed_preflight(body, request, idempotency_key)
+    _governed_preflight(body, idempotency_key)
     if body.action != "cancel_order" or body.target_broker_order_id != order_id:
         raise HTTPException(status_code=422, detail="TRADING_ACTION_MISMATCH")
     try:
@@ -447,7 +492,6 @@ async def _cancel_order(
 async def _close_position(
     position_id: str,
     body: TradingMutationRequest,
-    request: Request,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_MutationSource, Depends(_trading_mutation_source)],
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
@@ -462,7 +506,7 @@ async def _close_position(
         RuntimeError: If Trading reports an unexpected runtime failure.
     """
     require_human_permission(auth, "trading:write")
-    _governed_preflight(body, request, idempotency_key)
+    _governed_preflight(body, idempotency_key)
     if body.action != "close_position" or body.target_broker_position_id != position_id:
         raise HTTPException(status_code=422, detail="TRADING_ACTION_MISMATCH")
     try:

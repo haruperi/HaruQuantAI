@@ -441,16 +441,13 @@ class EventDrivenExecutionEngine:
                 tick.timestamp,
                 intent.source_intent_id,
             )
-            costs = unwrap_simulation_response(
-                self._ledger.apply_fill(
-                    LedgerFill(
-                        action="OPEN",
-                        side=intent.side,
-                        volume=match.filled_quantity,
-                        price=match.execution_price,
-                    )
-                ),
-                operation="simulation.execution.event_driven_execution_engine._apply_match",
+            costs = self._ledger.apply_fill_internal(
+                LedgerFill(
+                    action="OPEN",
+                    side=intent.side,
+                    volume=match.filled_quantity,
+                    price=match.execution_price,
+                )
             )
             position_id = f"sim-position-{intent.client_order_id}"
             self._positions[position_id] = {
@@ -471,10 +468,7 @@ class EventDrivenExecutionEngine:
                 "mae": Decimal(0),
                 "mfe": Decimal(0),
             }
-            account_after = unwrap_simulation_response(
-                self._ledger.snapshot(),
-                operation="simulation.execution.event_driven_execution_engine._apply_match",
-            )
+            account_after = self._ledger.snapshot_internal()
             authority_sequence = len(self._deals)
             authority_snapshot, ledger_reference = _deal_authority_snapshot(
                 position_id=position_id,
@@ -534,16 +528,16 @@ class EventDrivenExecutionEngine:
             entry = Decimal(str(position["entry_price"]))
             volume = Decimal(str(position["volume"]))
             side = str(position["side"])
-            movement = (
-                tick.bid - entry if side == "BUY" else entry - tick.ask
-            ) * volume
+            movement = self._ledger.calculate_profit(
+                side="BUY" if side == "BUY" else "SELL",
+                volume=volume,
+                entry_price=entry,
+                exit_price=tick.bid if side == "BUY" else tick.ask,
+            )
             position["mae"] = min(Decimal(str(position["mae"])), movement)
             position["mfe"] = max(Decimal(str(position["mfe"])), movement)
             unrealized += movement
-        unwrap_simulation_response(
-            self._ledger.mark_to_market(unrealized),
-            operation="simulation.execution.event_driven_execution_engine._observe_excursions",
-        )
+        self._ledger.mark_to_market_internal(unrealized)
 
     def _close(
         self,
@@ -576,13 +570,13 @@ class EventDrivenExecutionEngine:
         side = str(position["side"])
         exit_price = tick.bid if side == "BUY" else tick.ask
         entry_price = Decimal(str(position["entry_price"]))
-        gross_profit = (
-            exit_price - entry_price if side == "BUY" else entry_price - exit_price
-        ) * quantity
-        account = unwrap_simulation_response(
-            self._ledger.snapshot(),
-            operation="simulation.execution.event_driven_execution_engine._close",
+        gross_profit = self._ledger.calculate_profit(
+            side="BUY" if side == "BUY" else "SELL",
+            volume=quantity,
+            entry_price=entry_price,
+            exit_price=exit_price,
         )
+        account = self._ledger.snapshot_internal()
         used_margin = Decimal(str(account["used_margin"]))
         margin_released = used_margin * quantity / current_volume
         unwrap_simulation_response(
@@ -599,18 +593,15 @@ class EventDrivenExecutionEngine:
             ),
             operation="simulation.execution.event_driven_execution_engine._close",
         )
-        costs = unwrap_simulation_response(
-            self._ledger.apply_fill(
-                LedgerFill(
-                    action="CLOSE",
-                    side="BUY" if side == "BUY" else "SELL",
-                    volume=quantity,
-                    price=exit_price,
-                    gross_profit=gross_profit,
-                    margin_released=margin_released,
-                )
-            ),
-            operation="simulation.execution.event_driven_execution_engine._close",
+        costs = self._ledger.apply_fill_internal(
+            LedgerFill(
+                action="CLOSE",
+                side="BUY" if side == "BUY" else "SELL",
+                volume=quantity,
+                price=exit_price,
+                gross_profit=gross_profit,
+                margin_released=margin_released,
+            )
         )
         share = quantity / current_volume
         self._closed_trades.append(
@@ -640,10 +631,7 @@ class EventDrivenExecutionEngine:
             del self._positions[position_id]
         else:
             position["volume"] = remaining
-        account_after = unwrap_simulation_response(
-            self._ledger.snapshot(),
-            operation="simulation.execution.event_driven_execution_engine._close",
-        )
+        account_after = self._ledger.snapshot_internal()
         authority_sequence = len(self._deals)
         authority_snapshot, ledger_reference = _deal_authority_snapshot(
             position_id=position_id,
@@ -751,7 +739,20 @@ class EventDrivenExecutionEngine:
         Raises:
             SimulationError: If timing, matching, or accounting fails.
         """
-        logger.info("Executing Simulation tick %s", tick.sequence)
+        return self.execute_tick_internal(tick)
+
+    def execute_tick_internal(self, tick: Tick) -> tuple[ExecutionReceipt, ...]:
+        """Execute one validated canonical tick inside the trusted run loop.
+
+        Args:
+            tick: Next canonical ordered tick.
+
+        Returns:
+            Terminal or partial receipts produced by this tick.
+
+        Raises:
+            SimulationError: If timing, matching, or accounting fails.
+        """
         if self._last_seen is not None and (
             tick.timestamp <= self._last_seen.timestamp
             or tick.sequence <= self._last_seen.sequence
@@ -819,10 +820,7 @@ class EventDrivenExecutionEngine:
             else:
                 del self._pending[order_id]
         self._observe_excursions(tick)
-        account = unwrap_simulation_response(
-            self._ledger.snapshot(),
-            operation="simulation.execution.event_driven_execution_engine.execute_tick",
-        )
+        account = self._ledger.snapshot_internal()
         self._equity_observations.append(
             (tick.timestamp, Decimal(str(account["equity"])))
         )
@@ -864,7 +862,14 @@ class EventDrivenExecutionEngine:
         Returns:
             Deeply immutable state projection.
         """
-        logger.debug("Creating immutable Simulation engine snapshot")
+        return self.snapshot_internal()
+
+    def snapshot_internal(self) -> Mapping[str, object]:
+        """Return the trusted internal immutable engine projection.
+
+        Returns:
+            Immutable engine and account state.
+        """
         positions = tuple(
             MappingProxyType(dict(row)) for row in self._positions.values()
         )
@@ -876,7 +881,7 @@ class EventDrivenExecutionEngine:
                 "pending_orders": tuple(row[0] for row in self._pending.values()),
                 "deals": tuple(self._deals),
                 "closed_trades": tuple(self._closed_trades),
-                "account": self._ledger.snapshot(),
+                "account": self._ledger.snapshot_internal(),
             }
         )
 

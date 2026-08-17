@@ -59,6 +59,16 @@ class _Engine:
         """
         return intent
 
+    def snapshot(self) -> Any:
+        """Return a bounded virtual account projection."""
+        return {
+            "orders": (),
+            "positions": (),
+            "pending_orders": (),
+            "deals": (),
+            "account": {"balance": "100000"},
+        }
+
 
 class _Request:
     """Backtest-request stand-in supporting the owner copy contract."""
@@ -70,6 +80,9 @@ class _Request:
             **fields: Arbitrary request fields.
         """
         self.fields = fields
+        self.data_ref = str(fields.get("data_ref", "dataset-test"))
+        self.data_version = str(fields.get("data_version", "revision-test"))
+        self.data_hash = str(fields.get("data_hash", "a" * 64))
 
     def model_copy(self, *, update: dict[str, object]) -> _Request:
         """Return a new request carrying the overrides.
@@ -81,6 +94,19 @@ class _Request:
             Independent overridden request.
         """
         return _Request(**{**self.fields, **update})
+
+    def model_dump(self, **_kwargs: object) -> dict[str, object]:
+        """Return the immutable dataset request material.
+
+        Returns:
+            JSON-safe request mapping used by durable-session tests.
+        """
+        return {
+            **self.fields,
+            "data_ref": self.data_ref,
+            "data_version": self.data_version,
+            "data_hash": self.data_hash,
+        }
 
 
 def _tick(index: int) -> Any:
@@ -265,6 +291,39 @@ def test_reopening_the_same_request_is_idempotent() -> None:
     assert second["session_id"] == first["session_id"]
     assert second["cursor"] == 2
     assert len(live_sessions._SESSIONS) == 1
+
+
+@pytest.mark.usefixtures("_prepared")
+def test_durable_session_persists_request_and_each_cursor(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Durable practice state is checkpointed without serializing the engine."""
+    created: list[dict[str, object]] = []
+    updated: list[dict[str, object]] = []
+    monkeypatch.setattr(live_sessions, "_store", object)
+    monkeypatch.setattr(
+        live_sessions,
+        "create_interactive_session_record",
+        lambda _store, value, **_kwargs: created.append(dict(value)),
+    )
+
+    def _update(_store: object, **values: object) -> bool:
+        updated.append(values)
+        return True
+
+    monkeypatch.setattr(live_sessions, "update_interactive_session_record", _update)
+    state = create_live_simulation_session(
+        _Request(), object(), request_id="req-durable", durable=True
+    )
+    assert created[0]["request"] == {
+        "data_ref": "dataset-test",
+        "data_version": "revision-test",
+        "data_hash": "a" * 64,
+    }
+    assert "engine" not in created[0]
+    step_live_simulation(str(state["session_id"]), 2)
+    assert updated[-1]["cursor"] == 2
+    assert len(str(updated[-1]["state_hash"])) == 64
 
 
 @pytest.mark.usefixtures("_prepared")

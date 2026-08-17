@@ -36,7 +36,9 @@ export const systemSettingDefinitionSchema = z.object({
   allowed_values: z.array(z.string()),
   minimum: z.number().nullable(),
   maximum: z.number().nullable(),
-  activation: z.literal("restart_required"),
+  // `hot` settings take effect on the next read; `restart_required` ones do
+  // not. ACCOUNT_MODE is the first hot definition the manifest declares.
+  activation: z.enum(["hot", "restart_required"]),
 });
 export type SystemSettingDefinition = z.infer<typeof systemSettingDefinitionSchema>;
 

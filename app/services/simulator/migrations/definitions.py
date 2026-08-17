@@ -153,6 +153,48 @@ SIMULATION_MIGRATIONS += (
     ),
 )
 
+_INTERACTIVE_RECOVERY_STATEMENTS = (
+    (
+        "CREATE TABLE IF NOT EXISTS sim_interactive_sessions ("
+        "session_id TEXT PRIMARY KEY, run_id TEXT NOT NULL, "
+        "request_json TEXT NOT NULL CHECK(json_valid(request_json)), "
+        "cursor INTEGER NOT NULL CHECK(cursor >= 0), "
+        "status TEXT NOT NULL CHECK(status IN "
+        "('running', 'recovery_locked', 'verified', 'completed', 'closed')), "
+        "state_hash TEXT NOT NULL CHECK(length(state_hash) = 64), "
+        "recovery_generation INTEGER NOT NULL DEFAULT 0 "
+        "CHECK(recovery_generation >= 0), "
+        "recovery_run_id TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL"
+        ") STRICT"
+    ),
+    (
+        "CREATE TABLE IF NOT EXISTS sim_interactive_intents ("
+        "session_id TEXT NOT NULL, sequence INTEGER NOT NULL CHECK(sequence >= 0), "
+        "accepted_cursor INTEGER NOT NULL CHECK(accepted_cursor >= 0), "
+        "intent_json TEXT NOT NULL CHECK(json_valid(intent_json)), "
+        "intent_hash TEXT NOT NULL CHECK(length(intent_hash) = 64), "
+        "created_at TEXT NOT NULL, PRIMARY KEY(session_id, sequence), "
+        "UNIQUE(session_id, intent_hash), "
+        "FOREIGN KEY(session_id) REFERENCES sim_interactive_sessions(session_id)"
+        ") STRICT"
+    ),
+    (
+        "CREATE INDEX IF NOT EXISTS idx_sim_interactive_intents_cursor "
+        "ON sim_interactive_intents(session_id, accepted_cursor, sequence)"
+    ),
+)
+
+SIMULATION_MIGRATIONS += (
+    build_migration_step(
+        domain="simulator",
+        migration_id="004_simulator_interactive_recovery_v1",
+        checksum=sha256(
+            "\n".join(_INTERACTIVE_RECOVERY_STATEMENTS).encode("utf-8")
+        ).hexdigest(),
+        statements=_INTERACTIVE_RECOVERY_STATEMENTS,
+    ),
+)
+
 
 def run_simulator_migrations(request_id: str) -> object:
     """Apply the complete immutable Simulator migration manifest through Data.

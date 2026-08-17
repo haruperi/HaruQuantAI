@@ -71,6 +71,9 @@ def resolve_runtime_source_id(
     if override is not None and override.strip():
         return override.strip()
     trace_id = request_id if request_id is not None else generate_id("req")
+    # Price data is not mode-dependent: quotes always come from the configured
+    # RUNTIME_BROKER regardless of account mode. Only account state - positions,
+    # margin, exposure - follows the mode, and Trading owns that by route.
     record = get_system_settings(request_id=trace_id)
     broker = str(record.settings.get("RUNTIME_BROKER", "")).strip().lower()
     source_id = _BROKER_TO_SOURCE.get(broker)

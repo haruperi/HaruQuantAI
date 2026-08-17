@@ -41,6 +41,7 @@ from app.utils import (
 type StandardResponse[T] = Any
 type BrokerConnection = object
 type BrokerAdapter = object
+type SimulationExecutionSource = Callable[[OrderIntent], Any]
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 
 logger = get_logger(__name__)
@@ -512,6 +513,45 @@ def _validate_dispatch_policy(operation_timeout_seconds: Decimal) -> None:
         raise TradingError("CONFIGURATION_INVALID", "Dispatch timeout is invalid")
 
 
+async def _dispatch_simulation_intent(
+    intent: OrderIntent,
+    simulation_execution_source: SimulationExecutionSource | None,
+    *,
+    operation_timeout_seconds: Decimal,
+    clock: Callable[[], datetime],
+) -> ExecutionReceipt:
+    """Dispatch one intent through the direct Simulator authority.
+
+    Returns:
+        Validated Simulation execution receipt.
+
+    Raises:
+        TradingError: If Simulation authority or receipt evidence is invalid.
+    """
+    if simulation_execution_source is None:
+        raise TradingError(
+            "SERVICE_UNAVAILABLE", "Simulation execution authority is unavailable"
+        )
+    try:
+        async with asyncio.timeout(float(operation_timeout_seconds)):
+            receipt = await simulation_execution_source(intent)
+    except TimeoutError:
+        return _timeout_receipt(intent, clock())
+    except TradingError:
+        raise
+    except Exception:
+        return _uncertain_failure_receipt(intent, clock())
+    if not isinstance(receipt, ExecutionReceipt):
+        raise TradingError(
+            "MALFORMED_RECEIPT", "Simulator returned an invalid execution receipt"
+        )
+    if receipt.intent_id != intent.source_intent_id or receipt.route.value != "sim":
+        raise TradingError(
+            "MALFORMED_RECEIPT", "Simulator receipt scope mismatches the intent"
+        )
+    return receipt
+
+
 async def _dispatch_order_intent_value(
     intent: OrderIntent,
     connection: BrokerConnection | None,
@@ -519,6 +559,7 @@ async def _dispatch_order_intent_value(
     *,
     operation_timeout_seconds: Decimal,
     clock: Callable[[], datetime],
+    simulation_execution_source: SimulationExecutionSource | None = None,
 ) -> ExecutionReceipt:
     """Dispatch exactly one approved intent to its selected authority.
 
@@ -528,6 +569,7 @@ async def _dispatch_order_intent_value(
         broker_adapter: Broker mutation authority for the selected route.
         operation_timeout_seconds: Validated exact Broker operation timeout.
         clock: Injected aware UTC receipt clock.
+        simulation_execution_source: Direct historical Simulator authority.
 
     Returns:
         Canonical execution receipt from the selected authority.
@@ -540,6 +582,17 @@ async def _dispatch_order_intent_value(
         "Dispatching Trading intent %s via %s", intent.client_order_id, intent.route
     )
     _validate_dispatch_policy(operation_timeout_seconds)
+    if intent.route.value == "sim":
+        if connection is not None or broker_adapter is not None:
+            raise TradingError(
+                "SCOPE_MISMATCH", "Sim route cannot use Broker mutation authority"
+            )
+        return await _dispatch_simulation_intent(
+            intent,
+            simulation_execution_source,
+            operation_timeout_seconds=operation_timeout_seconds,
+            clock=clock,
+        )
     _validate_route_environment(intent, connection)
     selected_connection, selected_adapter = _validate_broker_selection(
         intent,
@@ -582,6 +635,7 @@ async def dispatch_order_intent(
     *,
     operation_timeout_seconds: Decimal,
     clock: Callable[[], datetime],
+    simulation_execution_source: SimulationExecutionSource | None = None,
 ) -> StandardResponse[ExecutionReceipt]:
     """Dispatch one intent and preserve the raw receipt in response data.
 
@@ -591,6 +645,7 @@ async def dispatch_order_intent(
         broker_adapter: Broker mutation authority for the selected route.
         operation_timeout_seconds: Validated exact Broker operation timeout.
         clock: Injected aware UTC receipt clock.
+        simulation_execution_source: Direct historical Simulator authority.
 
     Returns:
         Successful receipt response, or an error response for unknown outcomes.
@@ -602,6 +657,7 @@ async def dispatch_order_intent(
             broker_adapter,
             operation_timeout_seconds=operation_timeout_seconds,
             clock=clock,
+            simulation_execution_source=simulation_execution_source,
         )
     except Exception as error:
         from app.services.trading.contracts.errors import map_trading_error

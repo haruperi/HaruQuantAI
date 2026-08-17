@@ -346,7 +346,7 @@ describe('ChartWidget — FR-UI-046 Symbol Universe Autocomplete & Bar Fetching'
         symbol="EURUSD"
         streamSettlingMs={0}
         rolloverFetchDelayMs={60_000}
-        rolloverRetryDelayMs={25}
+        rolloverRetryDelayMs={100}
       />
     );
 
