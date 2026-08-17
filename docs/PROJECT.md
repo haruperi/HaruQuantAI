@@ -1,7 +1,7 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 238 registered application features, 228 are implemented and structurally reconciled (95.80%); 9 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Status:** `In Progress` — of 240 registered application features, 230 are implemented and structurally reconciled (95.83%); 9 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
 > **Last updated:** `2026-08-17`
 
 > This document is the system-level source of truth.
@@ -443,7 +443,7 @@ Utils is required by every domain; only the Utils → Brokers edge is drawn to k
 - **Data** needs Utils and Brokers; it is the sole gateway to market data, storage, and normalized read-only broker/account state.
 - **Indicators** consume normalized Data output. **Strategy** consumes Data and Indicators.
 - **Risk** consumes Strategy proposals and Data account snapshots; it must be independent of Trading so that execution can never influence approval.
-- **Trading** orchestrates live/demo evaluation by invoking the public APIs of Data, Indicators, Strategy, and Risk. It owns execution only after Risk approval and is the single execution owner for `sim`, `demo`, and `live` routes; broker mutations are dispatched through the Brokers domain's canonical `BrokerAdapter` (mutation operations are Trading-only).
+- **Trading** orchestrates live/demo evaluation by invoking the public APIs of Data, Indicators, Strategy, and Risk. It owns execution only after Risk approval and is the single execution owner for `sim`, `demo`, and `live` routes; broker mutations are dispatched through the Brokers domain's canonical `BrokerAdapter` (mutation operations are Trading-only). Its durable execution-session registry stores exact Data-owned dataset lineage for SIM, assigns authenticated per-user logical SIM identities, and keeps reconstructible Simulator runtime references separate from persistent identity.
 - **Simulation** replays history through the Trading `sim` route, so it sits above Trading. Since it orchestrates the historical backtest loop, it depends directly on `Data`, `Indicators`, `Strategy`, `Risk`, and `Trading`. The sim⇄live parity programme additionally fixes the direction `Simulation → Trading → Brokers` plus `Simulation → Brokers`: Simulation is a read/factory consumer of Brokers (it constructs and drives the Brokers-owned simulation broker channel through an injected, structurally typed authority port), while all application mutation operations remain Trading-only. Brokers imports no Simulation symbol, and the dependency graph remains acyclic.
 - **Specification evidence ownership** (parity programme): Brokers owns the typed *current* provider specification snapshot — current observation only, never inventing historical effective bounds. Data owns immutable effective-dated historical specification revisions with point-in-time reads and coverage proof. Simulation owns historical execution behavior and never interprets raw provider metadata or backdates current evidence.
 - **Analytics** consumes an Analytics-owned closed-trade projection emitted by Trading or Simulation plus benchmarks from Data. It imports neither producer implementation; only `reports/allocation.py` waits for the Simulation-owned `PortfolioSimulationResult v1` producer fixture.

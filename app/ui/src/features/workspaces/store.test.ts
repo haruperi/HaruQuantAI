@@ -207,12 +207,15 @@ describe("FR-UI-016/017 account mode derivation", () => {
 });
 
 describe("FR-UI-021 fail-closed order entry", () => {
-  it("disables order entry exactly when account mode is unknown", () => {
+  it("requires both a resolved account mode and matching platform evidence", () => {
     expect(selectOrderEntryDisabled(useWorkspaceStore.getState())).toBe(true);
     useWorkspaceStore.getState().setAccountModeFromRuntimeProfile("simulation");
+    expect(selectOrderEntryDisabled(useWorkspaceStore.getState())).toBe(true);
+    useWorkspaceStore.getState().applyPlatformAccountMode("sim", true);
     expect(selectOrderEntryDisabled(useWorkspaceStore.getState())).toBe(false);
-    useWorkspaceStore.getState().setAccountModeFromRuntimeProfile("live");
-    expect(selectOrderEntryDisabled(useWorkspaceStore.getState())).toBe(false);
+    useWorkspaceStore.getState().applyAccountMode("live", 2);
+    useWorkspaceStore.getState().applyPlatformAccountMode("demo", false);
+    expect(selectOrderEntryDisabled(useWorkspaceStore.getState())).toBe(true);
   });
 });
 

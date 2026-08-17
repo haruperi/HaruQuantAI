@@ -121,6 +121,34 @@ export function localClockSegments(label: string): ClockSegments {
   );
 }
 
+/** Format one UTC instant as a value accepted by ``datetime-local``. */
+export function dateTimeLocalValue(utcMs: number, offsetMinutes: number): string {
+  const shifted = new Date(utcMs + offsetMinutes * 60_000);
+  return `${shifted.getUTCFullYear()}-${pad2(shifted.getUTCMonth() + 1)}-${pad2(shifted.getUTCDate())}T${pad2(shifted.getUTCHours())}:${pad2(shifted.getUTCMinutes())}`;
+}
+
+/** Convert a ``datetime-local`` wall time at one fixed UTC offset to epoch milliseconds. */
+export function utcMsFromLocalValue(
+  value: string,
+  offsetMinutes: number,
+): number | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value);
+  if (!match) return null;
+  const [, year, month, day, hour, minute] = match.map(Number);
+  const wallTimeMs = Date.UTC(year, month - 1, day, hour, minute);
+  const parsed = new Date(wallTimeMs);
+  if (
+    parsed.getUTCFullYear() !== year
+    || parsed.getUTCMonth() !== month - 1
+    || parsed.getUTCDate() !== day
+    || parsed.getUTCHours() !== hour
+    || parsed.getUTCMinutes() !== minute
+  ) {
+    return null;
+  }
+  return wallTimeMs - offsetMinutes * 60_000;
+}
+
 /**
  * Format a wall-clock string for a UTC instant shifted to a given offset.
  *

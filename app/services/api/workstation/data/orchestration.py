@@ -31,6 +31,7 @@ from app.services.data import (
     fetch_market_dataset,
     get_market_data,
     import_external_dataset,
+    list_verified_datasets,
     save_dataset,
 )
 
@@ -63,6 +64,8 @@ def build_dataset_source() -> _DataOperation:
             ValueError: If the requested operation is not registered.
             RuntimeError: If Data reports no dataset for the request.
         """
+        if operation == "list":
+            return list_verified_datasets(request_id=str(args[0]))
         if operation == "dialects":
             return describe_import_dialects()
         if operation == "import":

@@ -19,6 +19,7 @@ from app.services.api.identity.persistence.delete import (
     delete_idempotency_record,
 )
 from app.services.api.identity.persistence.read import (
+    read_account_identity_by_user_id,
     read_account_record,
     read_approval_record,
     read_auth_failure_record,
@@ -48,6 +49,7 @@ __all__ = [
     "delete_auth_failure_record",
     "delete_idempotency_record",
     "finalize_idempotency_record",
+    "read_account_identity_by_user_id",
     "read_account_record",
     "read_approval_record",
     "read_auth_failure_record",

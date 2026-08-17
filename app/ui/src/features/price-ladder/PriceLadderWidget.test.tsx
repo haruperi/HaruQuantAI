@@ -29,6 +29,8 @@ vi.mock('../workspaces', () => ({
     get orderConfirmationRequired() {
       return orderConfirmationRequired;
     },
+    accountMode: 'demo',
+    tradingModeCompatible: true,
   }),
 }));
 

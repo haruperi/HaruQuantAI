@@ -211,6 +211,12 @@ export const dataRoutes = {
     permission: "data:read",
     paginated: true,
   }),
+  datasets: route({
+    id: "api.data.datasets",
+    method: "GET",
+    path: "/api/v1/data/datasets",
+    permission: "data:read",
+  }),
   markets: route({
     id: "api.data.markets",
     method: "GET",
@@ -463,6 +469,75 @@ export const riskRoutes = {
 // --- Trading session (8) -------------------------------------------------
 
 export const tradingRoutes = {
+  executionSessions: route({
+    id: "api.trading.execution_sessions",
+    method: "GET",
+    path: "/api/v1/trading/execution-sessions",
+    permission: "trading:read",
+  }),
+  createExecutionSession: route({
+    id: "api.trading.create_execution_session",
+    method: "POST",
+    path: "/api/v1/trading/execution-sessions",
+    permission: "trading:write",
+    sideEffect: "write",
+  }),
+  updateExecutionSession: route({
+    id: "api.trading.update_execution_session",
+    method: "PATCH",
+    path: "/api/v1/trading/execution-sessions/{session_id}",
+    permission: "trading:write",
+    sideEffect: "write",
+  }),
+  defaultExecutionSession: route({
+    id: "api.trading.default_execution_session",
+    method: "POST",
+    path: "/api/v1/trading/execution-sessions/{session_id}/default",
+    permission: "trading:write",
+    sideEffect: "write",
+  }),
+  startExecutionSession: route({
+    id: "api.trading.start_execution_session",
+    method: "POST",
+    path: "/api/v1/trading/execution-sessions/{session_id}/start",
+    permission: "trading:write",
+    sideEffect: "write",
+  }),
+  stopExecutionSession: route({
+    id: "api.trading.stop_execution_session",
+    method: "POST",
+    path: "/api/v1/trading/execution-sessions/{session_id}/stop",
+    permission: "trading:write",
+    sideEffect: "write",
+  }),
+  archiveExecutionSession: route({
+    id: "api.trading.archive_execution_session",
+    method: "DELETE",
+    path: "/api/v1/trading/execution-sessions/{session_id}",
+    permission: "trading:write",
+    sideEffect: "write",
+  }),
+  executionSessionEvents: route({
+    id: "api.trading.execution_session_events",
+    method: "GET",
+    path: "/api/v1/trading/execution-sessions/{session_id}/events",
+    permission: "trading:read",
+  }),
+  completeExecutionSessionConfiguration: route({
+    id: "api.trading.complete_execution_session_configuration",
+    method: "POST",
+    path: "/api/v1/trading/execution-sessions/{session_id}/complete-configuration",
+    permission: "trading:write",
+    sideEffect: "write",
+  }),
+  executionSessionActivity: route({
+    id: "api.trading.execution_session_activity",
+    method: "GET",
+    path: "/api/v1/trading/execution-sessions/{session_id}/activity",
+    permission: "trading:read",
+    sideEffect: "stream",
+    stream: true,
+  }),
   accountProfile: route({
     id: "api.trading.account_profile",
     method: "GET",
@@ -878,6 +953,7 @@ export const ROUTE_CONTRACTS = [
   watchlistsRoutes.update,
   watchlistsRoutes.delete,
   dataRoutes.symbols,
+  dataRoutes.datasets,
   dataRoutes.markets,
   dataRoutes.quotes,
   dataRoutes.bars,
@@ -908,6 +984,16 @@ export const ROUTE_CONTRACTS = [
   riskRoutes.killSwitch,
   riskRoutes.decisions,
   tradingRoutes.accountProfile,
+  tradingRoutes.executionSessions,
+  tradingRoutes.createExecutionSession,
+  tradingRoutes.updateExecutionSession,
+  tradingRoutes.defaultExecutionSession,
+  tradingRoutes.startExecutionSession,
+  tradingRoutes.stopExecutionSession,
+  tradingRoutes.archiveExecutionSession,
+  tradingRoutes.executionSessionEvents,
+  tradingRoutes.completeExecutionSessionConfiguration,
+  tradingRoutes.executionSessionActivity,
   tradingRoutes.session,
   tradingRoutes.preflightOrder,
   tradingRoutes.submitOrder,
@@ -959,7 +1045,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 97;
+export const ROUTE_CONTRACT_COUNT = 110;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

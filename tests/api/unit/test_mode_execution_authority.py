@@ -12,8 +12,10 @@ import asyncio
 from types import SimpleNamespace
 
 import pytest
-from app.services.api.workstation.trading import orchestration
+from app.services.api.workstation.trading import orchestration, routes
+from app.services.api.workstation.trading.schemas import ExecutionSessionActionRequest
 from app.services.risk import build_personal_account_risk_config
+from fastapi import HTTPException
 
 
 class _StubBrokers:
@@ -88,6 +90,174 @@ def test_demo_mode_connects_demo_without_electing_live(
     asyncio.run(orchestration._connect_mode_broker("demo"))
     assert brokers.resolved_allow_live == [False]
     assert brokers.connected_allow_live == [False]
+
+
+def test_sim_session_start_is_blocked_when_system_mode_is_demo(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The SIM start path cannot bypass the authoritative system mode."""
+    auth = SimpleNamespace(principal_id="owner", tenant_or_environment="dev")
+    session = SimpleNamespace(
+        session_id="session-sim",
+        mode="sim",
+        simulation_session_id="owner_1",
+    )
+    monkeypatch.setattr(routes, "require_human_permission", lambda *_: None)
+    monkeypatch.setattr(routes, "_owned_session", lambda *_: session)
+
+    async def _profile(_auth: object) -> object:
+        return SimpleNamespace(selected_mode="demo", mode_compatible=True)
+
+    async def _start(
+        _session_id: str,
+        *,
+        expected_version: int,
+        authority_start: object,
+        request_id: str,
+    ) -> object:
+        del expected_version, request_id
+        evidence = await authority_start({})  # type: ignore[operator]
+        assert evidence["verified"] is False
+        raise ValueError("execution session authority verification failed")
+
+    monkeypatch.setattr(routes, "start_execution_session", _start)
+    with pytest.raises(HTTPException) as raised:
+        asyncio.run(
+            routes._start_execution_session(
+                "session-sim",
+                ExecutionSessionActionRequest(expected_version=0),
+                auth,
+                _profile,
+            )
+        )
+    assert raised.value.status_code == 409
+    assert raised.value.detail == "execution session authority verification failed"
+
+
+def test_configured_non_default_sim_candidate_can_start(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A stopped SIM candidate is verified from itself, not Header selection."""
+    auth = SimpleNamespace(principal_id="owner", tenant_or_environment="dev")
+    session = SimpleNamespace(
+        session_id="session-sim",
+        mode="sim",
+        provider_account_ref="owner",
+        simulation_session_id="owner_1",
+        dataset_ref="dataset-one",
+        dataset_revision="revision-one",
+        dataset_hash="a" * 64,
+        sim_initial_balance="100000",
+        sim_leverage=100,
+        sim_account_currency="USD",
+    )
+    monkeypatch.setattr(routes, "require_human_permission", lambda *_: None)
+    monkeypatch.setattr(routes, "_owned_session", lambda *_: session)
+    monkeypatch.setattr(
+        routes,
+        "list_verified_datasets",
+        lambda **_: (
+            {
+                "dataset_id": "dataset-one",
+                "revision": "revision-one",
+                "content_hash": "a" * 64,
+            },
+        ),
+    )
+
+    async def _profile(_auth: object) -> object:
+        return SimpleNamespace(
+            selected_mode="sim",
+            mode_compatible=False,
+            account_name="owner",
+        )
+
+    async def _start(
+        _session_id: str,
+        *,
+        expected_version: int,
+        authority_start: object,
+        request_id: str,
+    ) -> object:
+        del expected_version, request_id
+        evidence = await authority_start({})  # type: ignore[operator]
+        assert evidence["verified"] is True
+        return session
+
+    monkeypatch.setattr(routes, "start_execution_session", _start)
+    result = asyncio.run(
+        routes._start_execution_session(
+            "session-sim",
+            ExecutionSessionActionRequest(expected_version=6),
+            auth,
+            _profile,
+        )
+    )
+    assert result is session
+
+
+@pytest.mark.parametrize("missing_identity", [True, False])
+def test_sim_candidate_rejects_missing_configuration_or_stale_dataset(
+    monkeypatch: pytest.MonkeyPatch, missing_identity: bool
+) -> None:
+    """Candidate identity and exact current dataset lineage are both mandatory."""
+    auth = SimpleNamespace(principal_id="owner", tenant_or_environment="dev")
+    session = SimpleNamespace(
+        session_id="session-sim",
+        mode="sim",
+        provider_account_ref=None if missing_identity else "owner",
+        simulation_session_id="owner_1",
+        dataset_ref="dataset-one",
+        dataset_revision="revision-one",
+        dataset_hash="a" * 64,
+        sim_initial_balance="100000",
+        sim_leverage=100,
+        sim_account_currency="USD",
+    )
+    monkeypatch.setattr(routes, "require_human_permission", lambda *_: None)
+    monkeypatch.setattr(routes, "_owned_session", lambda *_: session)
+    monkeypatch.setattr(
+        routes,
+        "list_verified_datasets",
+        lambda **_: (
+            {
+                "dataset_id": "dataset-one",
+                "revision": "revision-one",
+                "content_hash": ("a" if missing_identity else "b") * 64,
+            },
+        ),
+    )
+
+    async def _profile(_auth: object) -> object:
+        return SimpleNamespace(
+            selected_mode="sim",
+            mode_compatible=False,
+            account_name="owner",
+        )
+
+    async def _start(
+        _session_id: str,
+        *,
+        expected_version: int,
+        authority_start: object,
+        request_id: str,
+    ) -> object:
+        del expected_version, request_id
+        evidence = await authority_start({})  # type: ignore[operator]
+        assert evidence["verified"] is False
+        raise ValueError("execution session authority verification failed")
+
+    monkeypatch.setattr(routes, "start_execution_session", _start)
+    with pytest.raises(HTTPException) as raised:
+        asyncio.run(
+            routes._start_execution_session(
+                "session-sim",
+                ExecutionSessionActionRequest(expected_version=6),
+                auth,
+                _profile,
+            )
+        )
+    assert raised.value.status_code == 409
 
 
 def test_live_mode_elects_live_and_connects_live(
@@ -166,3 +336,36 @@ def test_live_risk_policy_contains_mandatory_safety_policy() -> None:
     assert config.execution_route == "live"
     assert config.audit_persistence_required is True
     assert config.assessment_recalc_events
+
+
+@pytest.mark.parametrize(
+    ("route", "platform_mode"),
+    [("sim", "SIMULATION"), ("demo", "DEMO"), ("live", "REAL")],
+)
+def test_platform_mode_gate_accepts_exact_pairs(
+    monkeypatch: pytest.MonkeyPatch, route: str, platform_mode: str
+) -> None:
+    """Only the three exact owner-approved mode pairs are admitted."""
+
+    async def _read(_route: str) -> str:
+        return platform_mode
+
+    monkeypatch.setattr(orchestration, "_read_platform_trade_mode", _read)
+    asyncio.run(orchestration._require_platform_mode_match(route))
+
+
+@pytest.mark.parametrize(
+    ("route", "platform_mode"),
+    [("live", "DEMO"), ("demo", "REAL"), ("sim", "DEMO"), ("demo", "CONTEST")],
+)
+def test_platform_mode_gate_rejects_every_mismatch(
+    monkeypatch: pytest.MonkeyPatch, route: str, platform_mode: str
+) -> None:
+    """Mismatched or unsupported platform evidence fails closed."""
+
+    async def _read(_route: str) -> str:
+        return platform_mode
+
+    monkeypatch.setattr(orchestration, "_read_platform_trade_mode", _read)
+    with pytest.raises(RuntimeError, match="ACCOUNT_MODE_PLATFORM_MISMATCH"):
+        asyncio.run(orchestration._require_platform_mode_match(route))

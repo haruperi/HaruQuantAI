@@ -72,26 +72,32 @@ export const SystemSettingsModal: React.FC = () => {
   const [credentials, setCredentials] = useState<CredentialStatus[]>([]);
   const [credentialValues, setCredentialValues] = useState<Record<string, Record<string, string>>>({});
   const [message, setMessage] = useState('');
-  const [loaded, setLoaded] = useState(false);
 
-  // Load settings only when the modal is first opened; avoid fetching while hidden.
+  // Refresh on every closed-to-open transition so changes made by another
+  // settings surface, such as the Header clock, are never hidden by stale state.
   useEffect(() => {
-    if (!isSettingsOpen || loaded) return;
+    if (!isSettingsOpen) return;
+    let cancelled = false;
     setMessage('Loading settings…');
     void Promise.all([
       apiClients.settings.readManifest(),
       apiClients.settings.readSystem(),
       apiClients.settings.readCredentials(),
     ]).then(([manifestResponse, settingsResponse, credentialResponse]) => {
+      if (cancelled) return;
       setManifest(unwrapData(manifestResponse));
       const current = unwrapData(settingsResponse);
       setValues({ ...current.settings });
       setVersion(current.version);
       setCredentials(unwrapData(credentialResponse));
       setMessage('');
-      setLoaded(true);
-    }).catch(() => setMessage('Unable to load administrator settings.'));
-  }, [isSettingsOpen, loaded]);
+    }).catch(() => {
+      if (!cancelled) setMessage('Unable to load administrator settings.');
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isSettingsOpen]);
 
   // Close on Escape.
   useEffect(() => {
@@ -109,9 +115,23 @@ export const SystemSettingsModal: React.FC = () => {
     try {
       const updated = unwrapData(await apiClients.settings.updateSystem(values, version));
       setVersion(updated.version);
-      setMessage('Settings saved. Restart required before they become active.');
+      const selectedMode = values.ACCOUNT_MODE?.toLowerCase();
+      if (selectedMode === 'sim' || selectedMode === 'demo' || selectedMode === 'live') {
+        const sessions = unwrapData(await apiClients.trading.listExecutionSessions());
+        const active = sessions.find((session) => session.is_active);
+        if (active && active.mode !== selectedMode) {
+          await apiClients.trading.actOnExecutionSession('stop', active);
+        }
+        const selected = sessions.find(
+          (session) => session.mode === selectedMode && session.is_default,
+        );
+        if (selected && selected.lifecycle_state !== 'running') {
+          await apiClients.trading.actOnExecutionSession('start', selected);
+        }
+      }
+      setMessage('Settings saved. The default session for the selected mode is active.');
     } catch {
-      setMessage('Settings were not saved. Refresh to resolve a version conflict.');
+      setMessage('Settings or the selected mode session could not be activated. Trading remains disabled.');
     }
   }
 

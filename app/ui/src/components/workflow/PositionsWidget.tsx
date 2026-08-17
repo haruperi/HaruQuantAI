@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
-import { useWorkspaceStore } from '../../features/workspaces';
+import { selectTradingActivityDisabled, useWorkspaceStore } from '../../features/workspaces';
 
 export const PositionsWidget: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'positions' | 'orders'>('positions');
@@ -19,6 +19,7 @@ export const PositionsWidget: React.FC = () => {
     submitOrder
   } = useTradingStore();
   const { orderConfirmationRequired } = useWorkspaceStore();
+  const tradingDisabled = useWorkspaceStore(selectTradingActivityDisabled);
 
   const filteredOrders = orders.filter((o) => {
     if (ordFilter === 'Working') return o.status === 'Working';
@@ -64,7 +65,7 @@ export const PositionsWidget: React.FC = () => {
               ))}
             </div>
 
-            <button className="btn-cme btn-outline btn-sm" onClick={flattenPositions} style={{ color: 'var(--cme-warning-yellow)' }}>
+            <button className="btn-cme btn-outline btn-sm" disabled={tradingDisabled} onClick={flattenPositions} style={{ color: 'var(--cme-warning-yellow)' }}>
               FLATTEN ALL POSITIONS
             </button>
           </div>
@@ -119,6 +120,7 @@ export const PositionsWidget: React.FC = () => {
                         <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
                           <button
                             className="btn-cme btn-outline btn-sm"
+                            disabled={tradingDisabled}
                             onClick={() => {
                               if (!orderConfirmationRequired) {
                                 submitOrder({ symbol: p.symbol, side: 'BUY', qty: 1, orderType: 'Market' });
@@ -129,7 +131,7 @@ export const PositionsWidget: React.FC = () => {
                           >
                             TRADE
                           </button>
-                          <button className="btn-cme btn-sell btn-sm" onClick={flattenPositions}>
+                          <button className="btn-cme btn-sell btn-sm" disabled={tradingDisabled} onClick={flattenPositions}>
                             FLATTEN
                           </button>
                         </div>
@@ -160,7 +162,7 @@ export const PositionsWidget: React.FC = () => {
               ))}
             </div>
 
-            <button className="btn-cme btn-outline btn-sm" onClick={cancelAllOrders} style={{ color: 'var(--cme-sell-red)' }}>
+            <button className="btn-cme btn-outline btn-sm" disabled={tradingDisabled} onClick={cancelAllOrders} style={{ color: 'var(--cme-sell-red)' }}>
               CANCEL ALL
             </button>
           </div>
@@ -217,7 +219,7 @@ export const PositionsWidget: React.FC = () => {
                     </td>
                     <td style={{ textAlign: 'center' }}>
                       {o.status === 'Working' && (
-                        <button className="btn-cme btn-outline btn-sm" onClick={() => cancelOrder(o.id)}>
+                        <button className="btn-cme btn-outline btn-sm" disabled={tradingDisabled} onClick={() => cancelOrder(o.id)}>
                           CANCEL
                         </button>
                       )}

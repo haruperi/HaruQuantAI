@@ -10,21 +10,188 @@
 
 import { z } from "zod";
 
-import type { ApiResponse } from "./contracts";
+import type { ApiResponse, StreamEvent } from "./contracts";
 import { tradingRoutes } from "./routes";
 import { request, type RequestOptions } from "./request";
+import { openStream, type StreamTransportOptions } from "./stream";
 
-/** Minimal provider-authored identity shown in the application Header. */
+const nullableMetricSchema = z.union([z.string(), z.number()]).nullable();
+
+/** Provider-authored identity and account metrics shown in the Header. */
 export const tradingAccountProfileSchema = z.object({
   contract_version: z.literal("v1"),
   schema_id: z.literal("api.trading.account_profile.v1"),
   account_name: z.string().min(1),
+  session_name: z.string().min(1).nullable(),
   trade_mode: z.enum(["SIMULATION", "DEMO", "REAL", "CONTEST"]),
+  selected_mode: z.enum(["sim", "demo", "live"]),
+  mode_compatible: z.boolean(),
   environment_label: z.string().min(1),
   source: z.enum(["simulator", "mt5"]),
+  currency: z.string().nullable(),
+  balance: nullableMetricSchema,
+  equity: nullableMetricSchema,
+  profit: nullableMetricSchema,
+  margin: nullableMetricSchema,
+  free_margin: nullableMetricSchema,
+  margin_level: nullableMetricSchema,
+  leverage: nullableMetricSchema,
   retrieved_at: z.string(),
 });
 export type TradingAccountProfile = z.infer<typeof tradingAccountProfileSchema>;
+
+export const executionSessionSchema = z.object({
+  session_id: z.string(),
+  principal_id: z.string(),
+  environment_id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  mode: z.enum(["sim", "demo", "live"]),
+  provider: z.string(),
+  provider_account_ref: z.string().nullable(),
+  credential_ref: z.string().nullable(),
+  simulation_session_id: z.string().nullable(),
+  sim_sequence: z.number().int().positive().nullable(),
+  simulation_runtime_ref: z.string().nullable(),
+  dataset_ref: z.string().nullable(),
+  dataset_revision: z.string().nullable(),
+  dataset_hash: z.string().nullable(),
+  sim_initial_balance: nullableMetricSchema,
+  sim_leverage: z.number().nullable(),
+  sim_account_currency: z.string().nullable(),
+  lifecycle_state: z.string(),
+  recovery_state: z.string(),
+  is_default: z.boolean(),
+  is_active: z.boolean(),
+  auto_start: z.boolean(),
+  metadata: z.record(z.string(), z.string()),
+  last_error_code: z.string().nullable(),
+  last_reconciled_at: z.string().nullable(),
+  started_at: z.string().nullable(),
+  stopped_at: z.string().nullable(),
+  archived_at: z.string().nullable(),
+  version: z.number(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+export type ExecutionSession = z.infer<typeof executionSessionSchema>;
+
+export interface ExecutionSessionCreateInput {
+  name: string;
+  mode: "sim" | "demo" | "live";
+  provider: string;
+  description?: string;
+  provider_account_ref?: string | null;
+  credential_ref?: string | null;
+  simulation_session_id?: string | null;
+  dataset_ref?: string | null;
+  dataset_revision?: string | null;
+  dataset_hash?: string | null;
+  sim_initial_balance?: string | number | null;
+  sim_leverage?: number | null;
+  sim_account_currency?: string | null;
+  auto_start?: boolean;
+  metadata?: Record<string, string>;
+}
+
+export const executionSessionEventSchema = z.object({
+  event_id: z.string(),
+  session_id: z.string(),
+  sequence: z.number(),
+  event_type: z.string(),
+  payload: z.record(z.string(), z.unknown()),
+  occurred_at: z.string(),
+  request_id: z.string(),
+  payload_json: z.string().optional(),
+});
+export type ExecutionSessionEvent = z.infer<typeof executionSessionEventSchema>;
+
+export function listExecutionSessions(options?: RequestOptions): Promise<ApiResponse<ExecutionSession[]>> {
+  return request(tradingRoutes.executionSessions, { schema: z.array(executionSessionSchema), ...options });
+}
+
+export function createExecutionSession(input: ExecutionSessionCreateInput, options?: RequestOptions): Promise<ApiResponse<ExecutionSession>> {
+  return request(tradingRoutes.createExecutionSession, { schema: executionSessionSchema, body: input, ...options });
+}
+
+export function updateExecutionSession(
+  session: ExecutionSession,
+  input: Pick<ExecutionSessionCreateInput, "name" | "description" | "auto_start" | "metadata">,
+  options?: RequestOptions
+): Promise<ApiResponse<ExecutionSession>> {
+  return request(tradingRoutes.updateExecutionSession, {
+    schema: executionSessionSchema,
+    pathParams: { session_id: session.session_id },
+    body: {
+      expected_version: session.version,
+      name: input.name,
+      description: input.description ?? "",
+      auto_start: input.auto_start ?? true,
+      metadata: input.metadata ?? {},
+    },
+    ...options,
+  });
+}
+
+export function executionSessionEvents(
+  sessionId: string,
+  options?: RequestOptions
+): Promise<ApiResponse<ExecutionSessionEvent[]>> {
+  return request(tradingRoutes.executionSessionEvents, {
+    schema: z.array(executionSessionEventSchema),
+    pathParams: { session_id: sessionId },
+    ...options,
+  });
+}
+
+/** Complete a stopped legacy SIM session with one verified dataset. */
+export function completeExecutionSessionConfiguration(
+  session: ExecutionSession,
+  dataset: { dataset_id: string; revision: string; content_hash: string },
+  options?: RequestOptions
+): Promise<ApiResponse<ExecutionSession>> {
+  return request(tradingRoutes.completeExecutionSessionConfiguration, {
+    schema: executionSessionSchema,
+    pathParams: { session_id: session.session_id },
+    body: {
+      expected_version: session.version,
+      dataset_ref: dataset.dataset_id,
+      dataset_revision: dataset.revision,
+      dataset_hash: dataset.content_hash,
+    },
+    ...options,
+  });
+}
+
+/** Stream bounded, redacted file-backed activity for one owned session. */
+export function executionSessionActivity(
+  sessionId: string,
+  options?: Omit<StreamTransportOptions, "pathParams">
+): AsyncIterable<StreamEvent> {
+  return openStream(tradingRoutes.executionSessionActivity, {
+    pathParams: { session_id: sessionId },
+    ...options,
+  });
+}
+
+export function actOnExecutionSession(
+  action: "default" | "start" | "stop" | "archive",
+  session: ExecutionSession,
+  options?: RequestOptions
+): Promise<ApiResponse<ExecutionSession>> {
+  const routes = {
+    default: tradingRoutes.defaultExecutionSession,
+    start: tradingRoutes.startExecutionSession,
+    stop: tradingRoutes.stopExecutionSession,
+    archive: tradingRoutes.archiveExecutionSession,
+  } as const;
+  return request(routes[action], {
+    schema: executionSessionSchema,
+    pathParams: { session_id: session.session_id },
+    body: { expected_version: session.version },
+    ...options,
+  });
+}
 
 /** Read the active Simulator or MT5 account identity. */
 export function accountProfile(
@@ -319,6 +486,13 @@ export function closePosition(
 /** Aggregated trading client. */
 export const trading = {
   accountProfile,
+  listExecutionSessions,
+  createExecutionSession,
+  updateExecutionSession,
+  executionSessionEvents,
+  completeExecutionSessionConfiguration,
+  executionSessionActivity,
+  actOnExecutionSession,
   session,
   preflightOrder,
   submitOrder,

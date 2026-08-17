@@ -584,6 +584,77 @@ _ROUTE_VOCABULARY_STATEMENTS = (
     "CREATE INDEX idx_trading_orders_risk ON trading_orders(risk_decision_id)",
 )
 
+_EXECUTION_SESSION_REGISTRY_STATEMENTS = (
+    """CREATE TABLE IF NOT EXISTS trading_sessions (
+        session_id TEXT PRIMARY KEY,
+        principal_id TEXT NOT NULL,
+        environment_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        mode TEXT NOT NULL CHECK(mode IN ('sim','demo','live')),
+        provider TEXT NOT NULL,
+        provider_account_ref TEXT,
+        credential_ref TEXT,
+        simulation_session_id TEXT,
+        dataset_ref TEXT,
+        dataset_revision TEXT,
+        dataset_hash TEXT,
+        lifecycle_state TEXT NOT NULL CHECK(lifecycle_state IN
+            ('draft','stopped','starting','running','stopping',
+             'recovery_required','verified','error','archived')),
+        recovery_state TEXT NOT NULL,
+        is_default INTEGER NOT NULL DEFAULT 0 CHECK(is_default IN (0,1)),
+        is_active INTEGER NOT NULL DEFAULT 0 CHECK(is_active IN (0,1)),
+        auto_start INTEGER NOT NULL DEFAULT 1 CHECK(auto_start IN (0,1)),
+        metadata_json TEXT NOT NULL CHECK(json_valid(metadata_json)),
+        last_error_code TEXT,
+        last_reconciled_at TEXT,
+        started_at TEXT,
+        stopped_at TEXT,
+        archived_at TEXT,
+        version INTEGER NOT NULL DEFAULT 0 CHECK(version >= 0),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        CHECK(mode='sim' OR simulation_session_id IS NULL),
+        CHECK(mode='sim' OR dataset_ref IS NULL)
+    ) STRICT""",
+    """CREATE UNIQUE INDEX IF NOT EXISTS idx_trading_sessions_default_mode
+        ON trading_sessions(principal_id, environment_id, mode)
+        WHERE is_default=1 AND archived_at IS NULL""",
+    """CREATE UNIQUE INDEX IF NOT EXISTS idx_trading_sessions_active
+        ON trading_sessions(principal_id, environment_id)
+        WHERE is_active=1 AND archived_at IS NULL""",
+    """CREATE INDEX IF NOT EXISTS idx_trading_sessions_list
+        ON trading_sessions(principal_id, environment_id, mode, updated_at DESC)""",
+    """CREATE TABLE IF NOT EXISTS trading_session_events (
+        event_id TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        sequence INTEGER NOT NULL CHECK(sequence >= 0),
+        event_type TEXT NOT NULL,
+        payload_json TEXT NOT NULL CHECK(json_valid(payload_json)),
+        occurred_at TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        UNIQUE(session_id, sequence),
+        FOREIGN KEY(session_id) REFERENCES trading_sessions(session_id)
+    ) STRICT""",
+    """CREATE INDEX IF NOT EXISTS idx_trading_session_events
+        ON trading_session_events(session_id, sequence DESC)""",
+)
+
+_SIM_SESSION_ACCOUNT_CONFIGURATION_STATEMENTS = (
+    "ALTER TABLE trading_sessions ADD COLUMN sim_initial_balance_decimal TEXT",
+    "ALTER TABLE trading_sessions ADD COLUMN sim_leverage INTEGER",
+    "ALTER TABLE trading_sessions ADD COLUMN sim_account_currency TEXT",
+)
+
+_SESSION_RUNTIME_BINDING_STATEMENTS = (
+    "ALTER TABLE trading_sessions ADD COLUMN sim_sequence INTEGER",
+    "ALTER TABLE trading_sessions ADD COLUMN simulation_runtime_ref TEXT",
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_trading_sessions_sim_sequence "
+    "ON trading_sessions(principal_id, sim_sequence) "
+    "WHERE mode='sim' AND sim_sequence IS NOT NULL",
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Trading schema statements.
@@ -636,6 +707,24 @@ def _get_trading_migrations_value() -> tuple[Any, ...]:
             migration_id="005_route_vocabulary",
             checksum=_migration_checksum(_ROUTE_VOCABULARY_STATEMENTS),
             statements=_ROUTE_VOCABULARY_STATEMENTS,
+        ),
+        build_migration_step(
+            domain="trading",
+            migration_id="006_execution_session_registry",
+            checksum=_migration_checksum(_EXECUTION_SESSION_REGISTRY_STATEMENTS),
+            statements=_EXECUTION_SESSION_REGISTRY_STATEMENTS,
+        ),
+        build_migration_step(
+            domain="trading",
+            migration_id="007_sim_session_account_configuration",
+            checksum=_migration_checksum(_SIM_SESSION_ACCOUNT_CONFIGURATION_STATEMENTS),
+            statements=_SIM_SESSION_ACCOUNT_CONFIGURATION_STATEMENTS,
+        ),
+        build_migration_step(
+            domain="trading",
+            migration_id="008_session_runtime_bindings",
+            checksum=_migration_checksum(_SESSION_RUNTIME_BINDING_STATEMENTS),
+            statements=_SESSION_RUNTIME_BINDING_STATEMENTS,
         ),
     )
 

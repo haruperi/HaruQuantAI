@@ -3,6 +3,7 @@
 from app.services.api.identity.accounts import (
     AuthenticatedUser,
     authenticate_user,
+    get_username_for_principal,
     register_user,
 )
 from app.services.api.identity.approvals import (
@@ -79,6 +80,7 @@ __all__ = (
     "get_system_settings",
     "get_system_settings_manifest",
     "get_user_settings",
+    "get_username_for_principal",
     "hash_password",
     "recover_session_identity",
     "register_user",

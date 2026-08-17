@@ -7,6 +7,7 @@
   * *Backend*: Python 3.14, managed with `uv`. FastAPI, Pydantic, Uvicorn (introduced once the API Gateway module lands).
   * *Frontend*: Next.js, React, TypeScript, Tailwind CSS, Radix UI (introduced once the UI module lands).
   * *Persistence*: SQLite (launch baseline). Each persistent domain owns its logical schemas and migration definitions; Data owns shared connections, locking, migration execution, and the immutable migration ledger.
+  * *Execution Sessions*: Trading owns durable SIM/DEMO/LIVE session definitions and append-only lifecycle evidence. The database stores reconstructable identities, provider/credential references, dataset lineage, defaults, metadata, and lifecycle state; SIM definitions additionally store operator-authored opening balance, leverage, and account currency. The authenticated active/default session supplies the Header's session identity, and the active/default SIM session supplies its initial account profile while DEMO/LIVE metrics remain MT5-authored. A session may start only when its persisted mode equals the authoritative system `ACCOUNT_MODE` and platform compatibility also passes. Process-local broker sockets and runtime handles are deliberately excluded and recreated only after authority verification.
   * *Data Science*: `pandas`, `numpy`, `scipy`, `scikit-learn`, `numba`, approved `pyarrow`/`fastparquet`.
   * *Broker Gate*: The Brokers domain owns provider-neutral adapter contracts and dispatch; MT5, cTrader, and Binance are adapter implementations selected by explicit configuration and readiness policy.
   * *Quality Gate*: `ruff` (lint + format), `mypy` (static types), `pytest` (tests/coverage), `pre-commit` (enforced hook chain).
@@ -2290,6 +2291,17 @@ Use it as three things instead:
    baseline compatibility.
 
 Everything else should be retired rather than reconciled.
+
+### Durable execution-session identity and observability
+
+Trading owns durable SIM, DEMO, and LIVE session projections plus their append-only
+lifecycle journal. Identity account names are read by API and handed to Trading;
+SIM logical identifiers are transactionally allocated per principal as
+`username_N`. Data owns the integrity-verified dataset catalogue and Trading stores
+only an exact dataset ID/revision/hash binding. Simulator runtime handles remain
+separate and reconstructible. API may expose an authenticated session-filtered SSE
+view over configured, already-redacted application log files, but it cannot execute
+terminal commands and never copies those lines into relational persistence.
 
 ### Notification configuration and delivery
 

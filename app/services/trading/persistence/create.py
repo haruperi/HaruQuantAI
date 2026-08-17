@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime
@@ -176,6 +177,72 @@ def create_trading_runtime_store(codecs: Mapping[str, _Codec]) -> object:
     """
     logger.debug("Creating Trading relational persistence handle")
     return _TradingPersistenceStore(dict(codecs))
+
+
+def create_execution_session_record(
+    value: Mapping[str, object], request_id: str
+) -> None:
+    """Create one session projection and its initial immutable event.
+
+    Raises:
+        ValueError: If session creation fails to insert both records.
+    """
+    metadata = json.dumps(value.get("metadata", {}), separators=(",", ":"))
+    created_at = str(value["created_at"])
+    result = _execute(
+        (
+            "INSERT INTO trading_sessions (session_id, principal_id, environment_id, "
+            "name, description, mode, provider, provider_account_ref, credential_ref, "
+            "simulation_session_id, dataset_ref, dataset_revision, dataset_hash, "
+            "sim_initial_balance_decimal, sim_leverage, sim_account_currency, "
+            "lifecycle_state, recovery_state, is_default, is_active, auto_start, "
+            "metadata_json, version, created_at, updated_at) VALUES "
+            "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO trading_session_events (event_id, session_id, sequence, "
+            "event_type, payload_json, occurred_at, request_id) VALUES (?,?,?,?,?,?,?)",
+        ),
+        (
+            (
+                value["session_id"],
+                value["principal_id"],
+                value["environment_id"],
+                value["name"],
+                value.get("description", ""),
+                value["mode"],
+                value["provider"],
+                value.get("provider_account_ref"),
+                value.get("credential_ref"),
+                value.get("simulation_session_id"),
+                value.get("dataset_ref"),
+                value.get("dataset_revision"),
+                value.get("dataset_hash"),
+                value.get("sim_initial_balance"),
+                value.get("sim_leverage"),
+                value.get("sim_account_currency"),
+                value["lifecycle_state"],
+                value["recovery_state"],
+                int(bool(value.get("is_default"))),
+                int(bool(value.get("is_active"))),
+                int(bool(value.get("auto_start", True))),
+                metadata,
+                value.get("version", 0),
+                created_at,
+                str(value["updated_at"]),
+            ),
+            (
+                generate_id("evt"),
+                value["session_id"],
+                0,
+                "created",
+                "{}",
+                created_at,
+                request_id,
+            ),
+        ),
+        request_id=request_id,
+    )
+    if result.affected_rows != 2:  # noqa: PLR2004
+        raise ValueError("Trading execution session creation was incomplete")
 
 
 def create_idempotency_record(
@@ -484,6 +551,7 @@ def create_trade_ownership_record(
 __all__ = [
     "create_closed_position_record",
     "create_event_record",
+    "create_execution_session_record",
     "create_idempotency_record",
     "create_projection_record",
     "create_protective_order_records",

@@ -31,6 +31,7 @@ export const WIDGET_TYPES = [
   "simulation",
   "risk",
   "trading",
+  "sessions",
   "indicators",
 ] as const;
 
@@ -91,6 +92,9 @@ export interface GridRect {
  * `'unknown'` is the pre-resolution state and fails closed (FR-UI-021).
  */
 export type AccountMode = "sim" | "demo" | "live" | "unknown";
+
+/** Provider-authored execution mode, unresolved until account evidence loads. */
+export type PlatformAccountMode = "sim" | "demo" | "live" | "contest" | "unknown";
 
 /** The three selectable modes, in presentation order. */
 export const SELECTABLE_ACCOUNT_MODES = ["sim", "demo", "live"] as const;

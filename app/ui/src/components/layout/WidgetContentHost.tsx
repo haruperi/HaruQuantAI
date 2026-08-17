@@ -28,6 +28,7 @@ import { AgenticView } from '../workflow/agentic';
 import { SimulationView } from '../workflow/simulation';
 import { RiskView } from '../workflow/risk';
 import { TradingView } from '../workflow/trading';
+import { SessionRegistryWidget } from '../../features/session-registry';
 import { IndicatorWorkspace } from '../workflow/indicators';
 import type { Widget } from '../../features/workspaces';
 
@@ -75,6 +76,8 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
       return <RiskView />;
     case 'trading':
       return <TradingView />;
+    case 'sessions':
+      return <SessionRegistryWidget />;
     case 'indicators':
       return <IndicatorWorkspace />;
     default:

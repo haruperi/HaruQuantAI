@@ -8,9 +8,9 @@ The gateway holds no dataset, chooses no storage location, and never
 substitutes a provider result.
 """
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from datetime import datetime
-from typing import Annotated, Any
+from typing import Annotated, Any, cast
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
@@ -301,6 +301,20 @@ def _prepare_dataset(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(error),
         ) from error
+
+
+@router.get("/datasets", response_model=None)
+def _list_datasets(
+    context: Annotated[AuthContext, Depends(require_auth_context)],
+    source: Annotated[_DatasetSource, Depends(_dataset_source)],
+) -> object:
+    """Return bounded verified datasets available to SIM sessions.
+
+    Returns:
+        Data-owned verified dataset summaries.
+    """
+    require_permission(context, "data:read")
+    return list(cast("Iterable[object]", source("list", generate_id("req"))))
 
 
 @router.get("/imports/dialects", response_model=None)

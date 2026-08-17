@@ -23,6 +23,7 @@ from app.services.data import (
     generate_synthetic_bars,
     get_provider_specification_revision,
     get_provider_specification_revisions,
+    list_verified_datasets,
     load_csv,
     load_local_dataset,
     load_parquet,
@@ -274,6 +275,7 @@ def main() -> None:
             fr_data_214()
             fr_data_215()
             fr_data_216()
+            print(_format_result(list_verified_datasets(request_id=generate_id("req"))))
             print("SUCCESS: FEAT-DATA-02 completed")
     run_persistence_support()
     run_catalog_support()

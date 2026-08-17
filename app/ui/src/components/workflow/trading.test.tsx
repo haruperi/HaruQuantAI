@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { TradingView } from "./trading";
+import { useWorkspaceStore } from "@/features/workspaces";
 
 function successEnvelope(data: unknown): Response {
   return new Response(
@@ -37,6 +38,11 @@ const realFetch = globalThis.fetch;
 
 describe("TradingView — FR-UI-015", () => {
   beforeEach(() => {
+    useWorkspaceStore.setState({
+      accountMode: "demo",
+      platformAccountMode: "demo",
+      tradingModeCompatible: true,
+    });
     globalThis.fetch = vi.fn(async () =>
       successEnvelope({
         account: { balance: 100000, equity: 100000 },
@@ -57,6 +63,18 @@ describe("TradingView — FR-UI-015", () => {
       expect(screen.getByText("Positions")).toBeTruthy();
       expect(screen.getByText("Orders")).toBeTruthy();
     });
+  });
+
+  it("presents the governed actions as an accessible trading cockpit", async () => {
+    render(<TradingView />);
+    expect(screen.getByRole("heading", { name: "Trading" })).toBeTruthy();
+    expect(screen.getByText("Governed execution")).toBeTruthy();
+    expect(await screen.findByLabelText("Trading evidence")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Execution context" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Order details" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Authority evidence" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Broker targets" })).toBeTruthy();
+    expect(screen.getByLabelText("Trading action controls")).toBeTruthy();
   });
 
   it("governedActionsBlocked: Submit/Cancel/Close are disabled before arming preflight", async () => {

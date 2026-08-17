@@ -2,6 +2,79 @@
 
 ## [Unreleased]
 
+### Restyle the governed Trading workspace
+
+The Trading widget now uses the same responsive execution-cockpit visual language as Trading Sessions while retaining its existing behavior and safety gates.
+
+#### Changed (1)
+
+- Grouped existing account evidence, order inputs, authority references, broker targets, status messages, and action controls into polished responsive panels without changing Trading business logic.
+
+### Add durable multi-mode trading sessions
+
+Trading sessions now persist independently of process lifetime and can be managed from a dedicated workstation widget.
+
+#### Added (7)
+
+- Added a Trading-owned SIM/DEMO/LIVE session registry with immutable lifecycle events, optimistic revisions, per-mode defaults, and one active foreground session.
+- Added authenticated execution-session list, create, metadata, default, start, stop, archive, and event API boundaries with provider-mode verification before start.
+- Added a typed Sessions workspace widget with create, default, start, stop, archive, refresh, and metadata inspection controls.
+- Added durable SIM opening balance, leverage, and currency configuration, with active/default-session values projected into the Header account metrics.
+- Added authenticated `username_N` SIM identities with transactional per-user sequencing and a separate reconstructible Simulator runtime reference.
+- Added verified Data dataset discovery and exact dataset ID/revision/hash binding for SIM sessions.
+- Added a bounded session-filtered live activity console backed by redacted application log files without duplicating streamed lines in the database.
+
+#### Changed (3)
+
+- Replaced the basic session form with a responsive execution-session cockpit containing mode summaries, session cards, an explicit lifecycle command bar, metadata, event history, editing, confirmations, and complete loading/empty/error states.
+- Added the active/default session name beside the Header mode and made session start fail closed unless the session mode matches the authoritative system mode.
+- Added a stopped-only legacy SIM completion workflow that resolves historical principals, requires an explicit verified dataset, and atomically fills username-based Account Name, `username_N` Simulation ID, and dataset lineage; the editable session name remains separate and incomplete SIM profiles are incompatible until corrected.
+
+#### Fixed (2)
+
+- Added Trading migrations to the required API startup lifecycle so session routes cannot reach an uninitialized Trading schema and return a plain HTTP 500 response.
+- Fixed stopped non-default SIM starts to verify the selected candidate directly and return typed conflicts for expected safety refusals instead of HTTP 500.
+
+#### Security (2)
+
+- Scoped every session API operation to the authenticated principal and environment and retained credential references without persisting credential values.
+- Session start now fails closed when bound dataset integrity evidence no longer matches, and activity streaming exposes no raw terminal execution surface.
+
+### Replace mock Header funds with account metrics
+
+The Header now presents the active provider account's standard balance and margin figures without substituting local fixture data.
+
+#### Added (2)
+
+- Added provider-authored Balance, Profit, Margin, Free Margin, Margin Level, Leverage, and Equity fields to the active account-profile contract and Header.
+- Added an accessible account-metrics settings menu with session-local Profit presentation and mode-owned leverage behavior.
+
+#### Changed (2)
+
+- Renamed Practice Funds to Balance, Profit/Loss to Profit, and Available to Equity.
+- Replaced the unavailable Pips choice with a session-local Percent display calculated as floating profit divided by balance, with zero or missing balance shown as unavailable.
+
+### Enforce selected-to-platform trading mode parity
+
+Trading now fails closed unless the operator-selected mode exactly matches provider-authored platform evidence.
+
+#### Added (2)
+
+- Added an API security gate before every Trading preflight and mutation for exact sim/SIMULATION, demo/DEMO, and live/REAL pairs.
+- Added global UI compatibility state, a persistent mismatch warning, and disabled mutation controls across the Header, Trading view, Price Ladder, Order Ticket, and Positions/Orders surfaces.
+
+### Add operator display-time correction
+
+The Header clock now opens an accessible correction dialog for session-local display time and the persisted fixed UTC offset.
+
+#### Added (1)
+
+- Added pointer and keyboard clock activation with apply, cancel, reset, validation, and failed-persistence handling for `FR-UI-207`.
+
+#### Fixed (1)
+
+- Fixed clock-tick rerenders collapsing the active timezone selector and made System Settings refresh externally persisted timezone changes whenever it opens.
+
 ### Provider-authored Header account identity
 
 The Header now identifies the active trading account rather than the authenticated application login.

@@ -19,6 +19,7 @@ import {
   MAX_CUSTOM_WORKSPACES,
   persistedLayoutSchema,
   type AccountMode,
+  type PlatformAccountMode,
   type Widget,
   type WidgetType,
   type Workspace,
@@ -105,6 +106,8 @@ export interface WorkspaceStoreState {
   // Version of the system-settings record the mode was read from, required by
   // the backend's optimistic locking on write. -1 means "not yet read".
   accountModeVersion: number;
+  platformAccountMode: PlatformAccountMode;
+  tradingModeCompatible: boolean;
   marketDataDelaySeconds?: number;
 
   // Workspace actions
@@ -143,11 +146,15 @@ export interface WorkspaceStoreState {
    * than leaving a mode the backend is not routing to (FR-UI-021).
    */
   applyAccountMode: (mode: AccountMode, version: number) => void;
+  applyPlatformAccountMode: (mode: PlatformAccountMode, compatible: boolean) => void;
 }
 
 /** True whenever account mode is unresolved - order entry must fail closed (FR-UI-021). */
 export const selectOrderEntryDisabled = (state: WorkspaceStoreState): boolean =>
-  state.accountMode === "unknown";
+  state.accountMode === "unknown" || !state.tradingModeCompatible;
+
+/** True unless fresh provider evidence exactly matches the elected mode. */
+export const selectTradingActivityDisabled = selectOrderEntryDisabled;
 
 /** localStorage wrapper that never throws and never returns unparsable JSON. */
 const safeStorage: StateStorage = {
@@ -191,6 +198,8 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
 
       accountMode: "unknown",
       accountModeVersion: -1,
+      platformAccountMode: "unknown",
+      tradingModeCompatible: false,
       marketDataDelaySeconds: undefined,
 
       setActiveWorkspace: (id) => set({ activeWorkspaceId: id }),
@@ -433,6 +442,10 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
 
       setAccountModeFromRuntimeProfile: (profile) => set({ accountMode: mapRuntimeProfileToAccountMode(profile) }),
       applyAccountMode: (mode, version) => set({ accountMode: mode, accountModeVersion: version }),
+      applyPlatformAccountMode: (mode, compatible) => set({
+        platformAccountMode: mode,
+        tradingModeCompatible: compatible,
+      }),
     }),
     {
       name: "hq:workspace-layout",

@@ -166,6 +166,25 @@ def read_account_record(
     )
 
 
+def read_account_identity_by_user_id(
+    user_id: str, *, request_id: str
+) -> tuple[Mapping[str, object], ...]:
+    """Read one non-secret API account identity by stable user ID.
+
+    Args:
+        user_id: Stable authenticated principal identifier.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Zero or one user ID and username rows.
+    """
+    return _read_rows(
+        "SELECT user_id, username FROM api_accounts WHERE user_id = ?",
+        (user_id,),
+        request_id=request_id,
+    )
+
+
 def read_session_record(
     session_digest: str, *, request_id: str
 ) -> tuple[Mapping[str, object], ...]:
@@ -297,6 +316,7 @@ def read_settings_record(
 
 
 __all__ = [
+    "read_account_identity_by_user_id",
     "read_account_record",
     "read_approval_record",
     "read_auth_failure_record",

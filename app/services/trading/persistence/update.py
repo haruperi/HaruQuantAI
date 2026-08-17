@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+from datetime import UTC, datetime
+
 from app.services.trading.persistence.create import (
     _EventValue,
     _execute,
@@ -24,6 +27,276 @@ _ORDER_COLUMNS = (
     "runtime_profile, submitted_at, terminal_at, correlation_id, created_at, "
     "updated_at"
 )
+
+
+def _append_session_event(
+    session_id: str,
+    event_type: str,
+    payload: dict[str, object],
+    request_id: str,
+    expected_version: int,
+) -> tuple[str, tuple[object, ...]]:
+    """Build a revision-conditional lifecycle-event append.
+
+    Returns:
+        Parameterized SQL and bound values.
+    """
+    from app.utils import generate_id
+
+    return (
+        "INSERT INTO trading_session_events "
+        "(event_id, session_id, sequence, event_type, payload_json, occurred_at, "
+        "request_id) SELECT ?, ?, (SELECT COALESCE(MAX(sequence), -1) + 1 "
+        "FROM trading_session_events WHERE session_id=?), ?, ?, ?, ? "
+        "WHERE EXISTS (SELECT 1 FROM trading_sessions "
+        "WHERE session_id=? AND version=?)",
+        (
+            generate_id("evt"),
+            session_id,
+            session_id,
+            event_type,
+            json.dumps(payload, separators=(",", ":")),
+            datetime.now(UTC).isoformat(),
+            request_id,
+            session_id,
+            expected_version,
+        ),
+    )
+
+
+def update_execution_session_record(
+    session_id: str,
+    *,
+    expected_version: int,
+    changes: dict[str, object],
+    event_type: str,
+    request_id: str,
+) -> None:
+    """Compare-and-swap allowlisted session columns and append an event.
+
+    Raises:
+        ValueError: If the update is unsupported or its revision is stale.
+    """
+    allowed = {
+        "name",
+        "description",
+        "auto_start",
+        "metadata",
+        "lifecycle_state",
+        "recovery_state",
+        "is_active",
+        "last_error_code",
+        "last_reconciled_at",
+        "started_at",
+        "stopped_at",
+        "archived_at",
+        "updated_at",
+        "simulation_session_id",
+        "simulation_runtime_ref",
+        "provider_account_ref",
+        "dataset_ref",
+        "dataset_revision",
+        "dataset_hash",
+    }
+    if not changes or not set(changes).issubset(allowed):
+        raise ValueError("unsupported execution session update")
+    columns: list[str] = []
+    values: list[object] = []
+    for key, raw_value in changes.items():
+        column = "metadata_json" if key == "metadata" else key
+        columns.append(f"{column}=?")
+        value = raw_value
+        if key == "metadata":
+            value = json.dumps(value, separators=(",", ":"))
+        elif key in {"auto_start", "is_active"}:
+            value = int(bool(value))
+        values.append(value)
+    columns.extend(("version=version+1",))
+    event_sql, event_params = _append_session_event(
+        session_id,
+        event_type,
+        {key: str(value) for key, value in changes.items()},
+        request_id,
+        expected_version + 1,
+    )
+    result = _execute(
+        (
+            f"UPDATE trading_sessions SET {', '.join(columns)} "  # noqa: S608
+            "WHERE session_id=? AND version=? AND archived_at IS NULL",
+            event_sql,
+        ),
+        ((*values, session_id, expected_version), event_params),
+        request_id=request_id,
+    )
+    if result.affected_rows != _MIN_ATOMIC_AFFECTED_ROWS:
+        raise ValueError("Trading execution session revision conflict")
+
+
+def assign_simulation_session_identity_record(
+    session_id: str,
+    *,
+    expected_version: int,
+    username: str,
+    request_id: str,
+) -> None:
+    """Allocate one monotonic per-principal SIM identity atomically.
+
+    Args:
+        session_id: Durable Trading session identifier.
+        expected_version: Optimistic session revision.
+        username: Identifier-safe authenticated login name.
+        request_id: Caller trace identifier.
+
+    Raises:
+        ValueError: If allocation loses its revision race or is inapplicable.
+    """
+    next_sequence = (
+        "(SELECT COALESCE(MAX(s.sim_sequence), 0) + 1 FROM trading_sessions AS s "
+        "WHERE s.principal_id=(SELECT principal_id FROM trading_sessions "
+        "WHERE session_id=?))"
+    )
+    now = datetime.now(UTC).isoformat()
+    event_sql, event_params = _append_session_event(
+        session_id,
+        "simulation_identity_assigned",
+        {"username": username},
+        request_id,
+        expected_version + 1,
+    )
+    result = _execute(
+        (
+            "UPDATE trading_sessions SET "  # noqa: S608
+            f"sim_sequence={next_sequence}, "
+            f"simulation_session_id=? || '_' || {next_sequence}, "
+            "provider_account_ref=?, "
+            "version=version+1, updated_at=? WHERE session_id=? AND version=? "
+            "AND mode='sim' AND simulation_session_id IS NULL",
+            event_sql,
+        ),
+        (
+            (
+                session_id,
+                username,
+                session_id,
+                username,
+                now,
+                session_id,
+                expected_version,
+            ),
+            event_params,
+        ),
+        request_id=request_id,
+    )
+    if result.affected_rows != _MIN_ATOMIC_AFFECTED_ROWS:
+        raise ValueError("SIM session identity allocation conflict")
+
+
+def complete_simulation_session_configuration_record(
+    session_id: str,
+    *,
+    expected_version: int,
+    username: str,
+    account_name: str,
+    dataset_ref: str,
+    dataset_revision: str,
+    dataset_hash: str,
+    request_id: str,
+) -> None:
+    """Atomically complete identity and dataset lineage for a stopped legacy SIM.
+
+    Raises:
+        ValueError: If the session is running, unavailable, or revision-stale.
+    """
+    next_sequence = (
+        "(SELECT COALESCE(MAX(s.sim_sequence), 0) + 1 FROM trading_sessions AS s "
+        "WHERE s.principal_id=(SELECT principal_id FROM trading_sessions "
+        "WHERE session_id=?))"
+    )
+    now = datetime.now(UTC).isoformat()
+    event_sql, event_params = _append_session_event(
+        session_id,
+        "configuration_completed",
+        {"account_name": account_name, "dataset_ref": dataset_ref},
+        request_id,
+        expected_version + 1,
+    )
+    statement = (
+        "UPDATE trading_sessions SET "  # noqa: S608 - fixed internal fragments.
+        f"sim_sequence=COALESCE(sim_sequence, {next_sequence}), "
+        "simulation_session_id=COALESCE(simulation_session_id, ? || '_' || "
+        f"{next_sequence}), "
+        "provider_account_ref=?, dataset_ref=?, dataset_revision=?, "
+        "dataset_hash=?, version=version+1, updated_at=? "
+        "WHERE session_id=? AND version=? AND mode='sim' AND is_active=0 "
+        "AND lifecycle_state IN ('draft','stopped','error','verified')"
+    )
+    result = _execute(
+        (
+            statement,
+            event_sql,
+        ),
+        (
+            (
+                session_id,
+                username,
+                session_id,
+                account_name,
+                dataset_ref,
+                dataset_revision,
+                dataset_hash,
+                now,
+                session_id,
+                expected_version,
+            ),
+            event_params,
+        ),
+        request_id=request_id,
+    )
+    if result.affected_rows != _MIN_ATOMIC_AFFECTED_ROWS:
+        raise ValueError("legacy SIM configuration requires a stopped current revision")
+
+
+def set_default_execution_session_record(
+    session_id: str, *, expected_version: int, request_id: str
+) -> None:
+    """Atomically replace the default session within one mode and scope.
+
+    Raises:
+        ValueError: If the session is unavailable or its revision is stale.
+    """
+    from app.services.trading.persistence.read import read_execution_session_record
+
+    current = read_execution_session_record(session_id)
+    if current is None or current["lifecycle_state"] == "archived":
+        raise ValueError("execution session is unavailable")
+    now = datetime.now(UTC).isoformat()
+    event_sql, event_params = _append_session_event(
+        session_id, "default_selected", {}, request_id, expected_version + 1
+    )
+    result = _execute(
+        (
+            "UPDATE trading_sessions SET is_default=0, version=version+1, updated_at=? "
+            "WHERE principal_id=? AND environment_id=? AND mode=? AND is_default=1 "
+            "AND session_id<>?",
+            "UPDATE trading_sessions SET is_default=1, version=version+1, updated_at=? "
+            "WHERE session_id=? AND version=? AND archived_at IS NULL",
+            event_sql,
+        ),
+        (
+            (
+                now,
+                current["principal_id"],
+                current["environment_id"],
+                current["mode"],
+                session_id,
+            ),
+            (now, session_id, expected_version),
+            event_params,
+        ),
+        request_id=request_id,
+    )
+    if result.affected_rows < _MIN_ATOMIC_AFFECTED_ROWS:
+        raise ValueError("Trading default session revision conflict")
 
 
 def update_idempotency_record(
@@ -292,7 +565,9 @@ def update_event_projection_records(
 
 
 __all__ = [
+    "set_default_execution_session_record",
     "update_event_projection_records",
+    "update_execution_session_record",
     "update_idempotency_record",
     "update_projection_record",
 ]

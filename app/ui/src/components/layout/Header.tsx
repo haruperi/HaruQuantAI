@@ -11,6 +11,8 @@ import {
 } from '../../features/workspaces';
 import { useAuth } from '../../context';
 import { ProfileDropdown } from './ProfileDropdown';
+import { AccountMetricsMenu } from './AccountMetricsMenu';
+import { TimeCorrectionDialog, type TimeCorrection } from './TimeCorrectionDialog';
 import {
   ChevronLeft,
   Plus,
@@ -46,16 +48,41 @@ const ACCOUNT_MODE_TITLES: Record<string, string> = {
   unknown: 'Account mode has not been resolved yet - order entry is disabled.',
 };
 
+/** Bound how long UI compatibility evidence can remain unrefreshed. */
+const ACCOUNT_PROFILE_REFRESH_MS = 5_000;
+
+const metricNumber = (value: string | number | null | undefined): number | null => {
+  if (value === null || value === undefined) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const formatMoney = (value: string | number | null | undefined, currency?: string | null): string => {
+  const parsed = metricNumber(value);
+  if (parsed === null) return '—';
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency || 'USD',
+      minimumFractionDigits: 2,
+    }).format(parsed);
+  } catch {
+    return parsed.toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+};
+
+const formatProfitPercent = (
+  profit: string | number | null | undefined,
+  balance: string | number | null | undefined,
+): string => {
+  const parsedProfit = metricNumber(profit);
+  const parsedBalance = metricNumber(balance);
+  if (parsedProfit === null || parsedBalance === null || parsedBalance === 0) return '—';
+  return `${((parsedProfit / parsedBalance) * 100).toFixed(2)}%`;
+};
+
 export const Header: React.FC = () => {
-  const {
-    practiceBalance,
-    challengeBalance,
-    netPL,
-    margin,
-    available,
-    mode,
-    openSettings
-  } = useTradingStore();
+  const { openSettings } = useTradingStore();
   const { logout } = useAuth();
 
   const {
@@ -64,6 +91,9 @@ export const Header: React.FC = () => {
     accountMode,
     accountModeVersion,
     applyAccountMode,
+    platformAccountMode,
+    tradingModeCompatible,
+    applyPlatformAccountMode,
     workspaces,
     activeWorkspaceId,
     setActiveWorkspace,
@@ -76,9 +106,13 @@ export const Header: React.FC = () => {
   } = useWorkspaceStore();
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [metricsMenuOpen, setMetricsMenuOpen] = useState(false);
+  const [profitDisplay, setProfitDisplay] = useState<'money' | 'percent'>('money');
 
   const [clock, setClock] = useState<ClockSegments | null>(null);
   const [timeMismatch, setTimeMismatch] = useState(false);
+  const [timeCorrectionOpen, setTimeCorrectionOpen] = useState(false);
+  const [clockCorrectionMs, setClockCorrectionMs] = useState(0);
   const [workspaceMenuId, setWorkspaceMenuId] = useState<number | null>(null);
   const [renameWorkspaceId, setRenameWorkspaceId] = useState<number | null>(null);
   const [renameDraft, setRenameDraft] = useState('');
@@ -103,6 +137,9 @@ export const Header: React.FC = () => {
     ?? (accountProfileLoading ? 'Account loading' : 'Account unavailable');
   const accountEnvironment = accountProfile?.environment_label
     ?? (accountProfileLoading ? 'Environment loading' : 'Environment unavailable');
+  const sessionName = accountProfileLoading
+    ? 'LOADING'
+    : (accountProfile?.session_name ?? 'NO SESSION');
   const avatarLetter = accountName.charAt(0).toUpperCase() || 'A';
 
   useEffect(() => {
@@ -142,25 +179,41 @@ export const Header: React.FC = () => {
   useEffect(() => {
     if (accountMode === 'unknown' || accountModePending) {
       setAccountProfile(null);
+      applyPlatformAccountMode('unknown', false);
       return;
     }
     let cancelled = false;
-    setAccountProfileLoading(true);
-    void apiClients.trading
-      .accountProfile()
-      .then((response) => {
-        if (!cancelled) setAccountProfile(unwrapData(response));
-      })
-      .catch(() => {
-        if (!cancelled) setAccountProfile(null);
-      })
-      .finally(() => {
+    const refreshProfile = (): void => {
+      setAccountProfileLoading(true);
+      void apiClients.trading.accountProfile().then((response) => {
+        if (!cancelled) {
+          const profile = unwrapData(response);
+          const platformMode = profile.trade_mode === 'SIMULATION'
+            ? 'sim'
+            : profile.trade_mode === 'DEMO'
+              ? 'demo'
+              : profile.trade_mode === 'REAL'
+                ? 'live'
+                : 'contest';
+          setAccountProfile(profile);
+          applyPlatformAccountMode(platformMode, profile.mode_compatible);
+        }
+      }).catch(() => {
+        if (!cancelled) {
+          setAccountProfile(null);
+          applyPlatformAccountMode('unknown', false);
+        }
+      }).finally(() => {
         if (!cancelled) setAccountProfileLoading(false);
       });
+    };
+    refreshProfile();
+    const timer = window.setInterval(refreshProfile, ACCOUNT_PROFILE_REFRESH_MS);
     return () => {
       cancelled = true;
+      window.clearInterval(timer);
     };
-  }, [accountMode, accountModeVersion, accountModePending]);
+  }, [accountMode, accountModeVersion, accountModePending, applyPlatformAccountMode]);
 
   /**
    * Persist an operator-selected account mode as the app-wide context.
@@ -209,16 +262,47 @@ export const Header: React.FC = () => {
         return;
       }
       const local = localOffsetMinutes();
-      setClock(clockSegmentsAtOffset(Date.now(), parsed, tzValue as string));
+      setClock(clockSegmentsAtOffset(Date.now() + clockCorrectionMs, parsed, tzValue as string));
       setTimeMismatch(parsed !== local);
     };
     updateTime();
     const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
-  }, [tzValue]);
+  }, [tzValue, clockCorrectionMs]);
 
-  const isChallenge = mode === 'challenge';
-  const displayFunds = isChallenge ? challengeBalance : practiceBalance;
+  const persistClockTimezone = async (timezone: string): Promise<boolean> => {
+    if (systemSettings === null || accountModeVersion < 0) return false;
+    try {
+      const updated = unwrapData(await apiClients.settings.updateSystem(
+        { ...systemSettings, TIMEZONE: timezone },
+        accountModeVersion,
+      ));
+      setSystemSettings(updated.settings);
+      applyAccountMode(accountMode, updated.version);
+      setTzValue(timezone);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleApplyTimeCorrection = async (correction: TimeCorrection): Promise<boolean> => {
+    if (!await persistClockTimezone(correction.timezone)) return false;
+    setClockCorrectionMs(correction.correctedUtcMs - Date.now());
+    setTimeCorrectionOpen(false);
+    showWorkspaceToast('Display time corrected');
+    return true;
+  };
+
+  const handleResetTimeCorrection = async (): Promise<boolean> => {
+    setClockCorrectionMs(0);
+    setTimeCorrectionOpen(false);
+    showWorkspaceToast('Display time reset');
+    return true;
+  };
+
+  const profit = metricNumber(accountProfile?.profit);
+  const leverage = metricNumber(accountProfile?.leverage);
 
   const showWorkspaceToast = (message: string) => {
     setWorkspaceToast(message);
@@ -290,41 +374,96 @@ export const Header: React.FC = () => {
             data-mode={accountMode}
             title={ACCOUNT_MODE_TITLES[accountMode]}
           >
-            {accountMode === 'unknown' ? 'MODE UNKNOWN' : accountMode.toUpperCase()}
+            {accountMode === 'unknown'
+              ? 'MODE UNKNOWN'
+              : `${accountMode.toUpperCase()} : ${sessionName}`}
           </span>
+          {!tradingModeCompatible && (
+            <span className="trading-mode-block" role="alert">
+              Trading disabled: selected {accountMode.toUpperCase()}, platform {platformAccountMode.toUpperCase()}
+            </span>
+          )}
 
           <div className="metric-item">
-            <span className="metric-label">{isChallenge ? 'CHALLENGE FUNDS' : 'PRACTICE FUNDS'}</span>
-            <span className="metric-value neutral">${displayFunds.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+            <span className="metric-label">BALANCE</span>
+            <span className="metric-value neutral">{formatMoney(accountProfile?.balance, accountProfile?.currency)}</span>
           </div>
 
           <div className="metric-item">
-            <span className="metric-label">PROFIT/LOSS</span>
-            <span className={`metric-value ${netPL > 0 ? 'positive' : netPL < 0 ? 'negative' : 'neutral'}`}>
-              {netPL < 0 ? `-$${Math.abs(netPL).toFixed(2)}` : `$${netPL.toFixed(2)}`}
+            <span className="metric-label">PROFIT</span>
+            <span className={`metric-value ${profit !== null && profit > 0 ? 'positive' : profit !== null && profit < 0 ? 'negative' : 'neutral'}`}>
+              {profitDisplay === 'money'
+                ? formatMoney(accountProfile?.profit, accountProfile?.currency)
+                : formatProfitPercent(accountProfile?.profit, accountProfile?.balance)}
             </span>
           </div>
 
           <div className="metric-item">
             <span className="metric-label">MARGIN</span>
-            <span className="metric-value neutral">${margin.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+            <span className="metric-value neutral">{formatMoney(accountProfile?.margin, accountProfile?.currency)}</span>
           </div>
 
           <div className="metric-item">
-            <span className="metric-label">AVAILABLE</span>
-            <span className="metric-value neutral">${available.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+            <span className="metric-label">FREE MARGIN</span>
+            <span className="metric-value neutral">{formatMoney(accountProfile?.free_margin, accountProfile?.currency)}</span>
           </div>
 
-          <button className="cme-metric-caret" title="Collapse metrics">
-            <ChevronLeft size={14} />
-          </button>
+          <div className="metric-item">
+            <span className="metric-label">MARGIN LEVEL</span>
+            <span className="metric-value neutral">
+              {metricNumber(accountProfile?.margin_level) === null ? '—' : `${metricNumber(accountProfile?.margin_level)?.toFixed(2)}%`}
+            </span>
+          </div>
+
+          <div className="metric-item">
+            <span className="metric-label">LEVERAGE</span>
+            <span className="metric-value neutral">{leverage === null ? '—' : `1:${leverage}`}</span>
+          </div>
+
+          <div className="metric-item">
+            <span className="metric-label">EQUITY</span>
+            <span className="metric-value neutral">{formatMoney(accountProfile?.equity, accountProfile?.currency)}</span>
+          </div>
+
+          <div className="account-metrics-menu-anchor">
+            <button
+              type="button"
+              className="cme-metric-caret"
+              title="Account metric settings"
+              aria-label="Account metric settings"
+              aria-haspopup="menu"
+              aria-expanded={metricsMenuOpen}
+              onClick={() => setMetricsMenuOpen((open) => !open)}
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <AccountMetricsMenu
+              open={metricsMenuOpen}
+              accountMode={accountMode}
+              leverage={leverage}
+              profitDisplay={profitDisplay}
+              onProfitDisplayChange={setProfitDisplay}
+              onClose={() => setMetricsMenuOpen(false)}
+            />
+          </div>
         </div>
 
         {/* Right Info, Confirmation-Mode Toggle & Profile Badge */}
         <div className="cme-header-actions">
-          <div
+          <button
+            type="button"
             className={`digital-time${timeMismatch ? ' mismatch' : ''}`}
             aria-label={clock ? `${clock.hour}:${clock.minute}:${clock.second} ${clock.meridiem} ${clock.label} ${clock.date}` : 'clock'}
+            aria-haspopup="dialog"
+            aria-expanded={timeCorrectionOpen}
+            onClick={() => setTimeCorrectionOpen(true)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                setTimeCorrectionOpen(true);
+              }
+            }}
+            title="Correct display time and time zone"
           >
             {clock && (
               <>
@@ -336,7 +475,7 @@ export const Header: React.FC = () => {
                 <span className="dt-suffix">{` ${clock.meridiem} ${clock.label} ${clock.date}`}</span>
               </>
             )}
-          </div>
+          </button>
 
           {/* Order-confirmation mode toggle (FR-UI-011/013), always visible.
               Checked means 1-click trading: orders submit with no dialog. */}
@@ -407,6 +546,15 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </header>
+      {timeCorrectionOpen && clock && (
+        <TimeCorrectionDialog
+          currentUtcMs={Date.now() + clockCorrectionMs}
+          timezone={tzValue && parseUtcOffset(tzValue) !== null ? tzValue : 'UTC'}
+          onApply={handleApplyTimeCorrection}
+          onClose={() => setTimeCorrectionOpen(false)}
+          onReset={handleResetTimeCorrection}
+        />
+      )}
 
       {/* 2. SUB HEADER WORKSPACE TABS BAR matching reference image */}
       <div className="cme-header-sub">

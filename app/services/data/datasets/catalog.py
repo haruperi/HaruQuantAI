@@ -26,6 +26,7 @@ from app.services.data.persistence import (
     read_provider_specification_revision_as_of,
     read_provider_specification_revision_interval,
     read_provider_specification_revisions,
+    read_ready_dataset_catalog_records,
     read_verified_research_source_record,
     update_provider_specification_revision,
 )
@@ -48,6 +49,59 @@ _SNAPSHOT_IDENTITY_FIELDS = (
     "account_digest",
     "provider_symbol",
 )
+
+
+def list_verified_datasets(
+    *, request_id: str, limit: int = 500
+) -> tuple[dict[str, object], ...]:
+    """List bounded integrity-verified dataset identities for selection.
+
+    Args:
+        request_id: Caller trace identifier.
+        limit: Maximum joined artifact rows inspected.
+
+    Returns:
+        Dataset summaries whose complete artifact sets remain verified.
+
+    Raises:
+        DataError: If the requested bound is invalid.
+    """
+    if limit <= 0 or limit > _MAX_CATALOG_ROWS:
+        raise DataError("LIMIT_EXCEEDED", request_id=request_id)
+    rows = read_ready_dataset_catalog_records(request_id=request_id, limit=limit).rows
+    grouped: dict[str, list[Mapping[str, object]]] = {}
+    for row in rows:
+        grouped.setdefault(str(row["dataset_id"]), []).append(row)
+    result: list[dict[str, object]] = []
+    for dataset_id, artifacts in grouped.items():
+        first = artifacts[0]
+        if len(artifacts) != int(str(first["file_count"])) or any(
+            str(item["verify_state"]) != "verified" for item in artifacts
+        ):
+            continue
+        hashes = [str(item["content_hash"]) for item in artifacts]
+        revisions = [str(item["source_revision"]) for item in artifacts]
+        result.append(
+            {
+                "dataset_id": dataset_id,
+                "label": " ".join(
+                    part
+                    for part in (
+                        str(first.get("canonical_symbol") or "Dataset"),
+                        str(first.get("timeframe") or ""),
+                    )
+                    if part
+                ),
+                "dataset_kind": str(first["dataset_kind"]),
+                "symbol": first.get("canonical_symbol"),
+                "timeframe": first.get("timeframe"),
+                "revision": hashlib.sha256("|".join(revisions).encode()).hexdigest(),
+                "content_hash": hashlib.sha256("|".join(hashes).encode()).hexdigest(),
+                "row_count": int(str(first["total_rows"])),
+                "active": True,
+            }
+        )
+    return tuple(result)
 
 
 def _provider_identity(
@@ -761,6 +815,7 @@ __all__ = (
     "get_provider_specification_revision",
     "get_provider_specification_revisions",
     "get_verified_research_source",
+    "list_verified_datasets",
     "reconcile_data_catalog",
     "record_catalog_fetch",
     "record_catalog_quality_event",

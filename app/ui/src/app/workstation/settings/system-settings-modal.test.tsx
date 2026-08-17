@@ -14,7 +14,7 @@ import { cleanup, render, waitFor } from "@testing-library/react";
 import { SystemSettingsModal } from "./SystemSettingsModal";
 
 // Hoist fixtures so the hoisted vi.mock factories can reference them.
-const { manifestFixture, settingsFixture } = vi.hoisted(() => ({
+const { manifestFixture, settingsFixture, readSystem, tradingStoreState } = vi.hoisted(() => ({
   manifestFixture: [
     { key: "LOG_LEVEL", label: "Log level", description: "Minimum application log severity.", value_kind: "string", allowed_values: ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], minimum: null, maximum: null, activation: "restart_required" as const },
     { key: "RUNTIME_BROKER", label: "Runtime broker", description: "Provider selected for composed broker operations.", value_kind: "string", allowed_values: ["binance", "ctrader", "dukascopy", "mt5", "yahoo"], minimum: null, maximum: null, activation: "restart_required" as const },
@@ -32,15 +32,17 @@ const { manifestFixture, settingsFixture } = vi.hoisted(() => ({
     updated_at: "2026-01-01T00:00:00Z",
     restart_required: false,
   },
+  readSystem: vi.fn(),
+  tradingStoreState: {
+    isSettingsOpen: true,
+    closeSettings: vi.fn(),
+    openSettings: vi.fn(),
+  },
 }));
 
 // Stub the zustand store: modal open by default so the component renders.
 vi.mock("../../../store/useTradingStore", () => ({
-  useTradingStore: () => ({
-    isSettingsOpen: true,
-    closeSettings: vi.fn(),
-    openSettings: vi.fn(),
-  }),
+  useTradingStore: () => tradingStoreState,
 }));
 
 // Mock the settings client so the modal loads synchronously in tests.
@@ -48,7 +50,7 @@ vi.mock("@/clients", () => ({
   apiClients: {
     settings: {
       readManifest: vi.fn().mockResolvedValue({ ok: true, data: manifestFixture }),
-      readSystem: vi.fn().mockResolvedValue({ ok: true, data: settingsFixture }),
+      readSystem,
       readCredentials: vi.fn().mockResolvedValue({ ok: true, data: [] }),
       updateSystem: vi.fn(),
       updateCredential: vi.fn(),
@@ -60,6 +62,9 @@ vi.mock("@/clients", () => ({
 describe("SystemSettingsModal — field control rendering", () => {
   beforeEach(() => {
     cleanup();
+    tradingStoreState.isSettingsOpen = true;
+    readSystem.mockReset();
+    readSystem.mockResolvedValue({ ok: true, data: settingsFixture });
   });
   afterEach(() => {
     cleanup();
@@ -143,5 +148,26 @@ describe("SystemSettingsModal — field control rendering", () => {
     const appName = findControl("Application name") as HTMLInputElement;
     expect(appName.tagName).toBe("INPUT");
     expect(appName.value).toBe("HaruQuantAI");
+  });
+
+  it("refreshes the timezone whenever the modal is reopened", async () => {
+    const { rerender } = render(<SystemSettingsModal />);
+    await waitFor(() => expect((findControl("Display timezone") as HTMLSelectElement).value).toBe("UTC+2"));
+
+    tradingStoreState.isSettingsOpen = false;
+    rerender(<SystemSettingsModal />);
+    readSystem.mockResolvedValue({
+      ok: true,
+      data: {
+        ...settingsFixture,
+        settings: { ...settingsFixture.settings, TIMEZONE: "UTC-6" },
+        version: 2,
+      },
+    });
+    tradingStoreState.isSettingsOpen = true;
+    rerender(<SystemSettingsModal />);
+
+    await waitFor(() => expect((findControl("Display timezone") as HTMLSelectElement).value).toBe("UTC-6"));
+    expect(readSystem).toHaveBeenCalledTimes(2);
   });
 });

@@ -67,9 +67,20 @@ def test_trading_source_converts_and_delegates(
         return expected
 
     monkeypatch.setattr(trading_dependencies, "submit_order", submit)
+    checked_routes: list[str] = []
+
+    async def require_mode(route: str) -> None:
+        checked_routes.append(route)
+
+    monkeypatch.setattr(
+        trading_dependencies, "_require_platform_mode_match", require_mode
+    )
     source = trading_dependencies.build_trading_mutation_source("dependencies")
-    boundary = SimpleNamespace(model_dump=lambda **_: {"action": "submit_order"})
+    boundary = SimpleNamespace(
+        route="demo", model_dump=lambda **_: {"action": "submit_order"}
+    )
     assert asyncio.run(source("submit_order", boundary, object())) is expected
+    assert checked_routes == ["demo"]
 
 
 def test_trading_source_dispatches_cancel_all_orders(
@@ -89,9 +100,20 @@ def test_trading_source_dispatches_cancel_all_orders(
         return expected
 
     monkeypatch.setattr(trading_dependencies, "cancel_all_orders", cancel_all)
+    checked_routes: list[str] = []
+
+    async def require_mode(route: str) -> None:
+        checked_routes.append(route)
+
+    monkeypatch.setattr(
+        trading_dependencies, "_require_platform_mode_match", require_mode
+    )
     source = trading_dependencies.build_trading_mutation_source("dependencies")
-    boundary = SimpleNamespace(model_dump=lambda **_: {"action": "cancel_all_orders"})
+    boundary = SimpleNamespace(
+        route="demo", model_dump=lambda **_: {"action": "cancel_all_orders"}
+    )
     assert asyncio.run(source("cancel_all_orders", boundary, object())) is expected
+    assert checked_routes == ["demo"]
 
 
 def test_broker_session_rejects_production_before_credentials() -> None:

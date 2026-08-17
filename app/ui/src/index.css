@@ -287,7 +287,288 @@ body {
   border: none;
   border-radius: 0;
   padding: 0;
-  gap: 12px;
+  gap: 8px;
+}
+
+/* FEAT-UI-26 — durable execution-session cockpit. */
+.session-registry {
+  --session-panel: rgba(8, 27, 48, 0.76);
+  --session-border: rgba(130, 170, 208, 0.2);
+  min-height: 100%;
+  color: #e8f3ff;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(0, 143, 255, 0.13), transparent 32rem),
+    radial-gradient(circle at 92% 8%, rgba(42, 215, 164, 0.08), transparent 28rem),
+    #0b2947;
+  padding: 18px;
+  overflow: auto;
+}
+
+.session-registry button,
+.session-registry input,
+.session-registry select { font: inherit; }
+.session-registry button { cursor: pointer; }
+.session-registry button:disabled { cursor: not-allowed; opacity: 0.48; }
+
+.session-registry__hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 5px 2px 17px;
+  border-bottom: 1px solid var(--session-border);
+}
+.session-registry__hero h2 { margin: 4px 0 2px; font-size: 24px; letter-spacing: -0.03em; }
+.session-registry__hero p { margin: 0; color: #8faac2; font-size: 12px; }
+.session-registry__eyebrow { display: flex; align-items: center; gap: 6px; color: #57c7ff; font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.session-registry__hero-actions { display: flex; gap: 8px; }
+
+.session-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: #eaf5ff;
+  font-size: 11px;
+  font-weight: 750;
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+.session-button:not(:disabled):hover { transform: translateY(-1px); }
+.session-button--primary { background: linear-gradient(135deg, #087be8, #19a6e8); box-shadow: 0 7px 22px rgba(0, 122, 232, 0.22); }
+.session-button--ghost { border-color: var(--session-border); background: rgba(8, 25, 44, 0.66); color: #a9bfd4; }
+.session-button--secondary { border-color: rgba(97, 151, 198, 0.36); background: rgba(31, 72, 107, 0.55); }
+.session-button--start { background: linear-gradient(135deg, #087d62, #13ad7d); box-shadow: 0 7px 20px rgba(0, 166, 117, 0.17); }
+.session-button--stop { background: linear-gradient(135deg, #a7640b, #d98b18); }
+.session-button--danger { border-color: rgba(255, 90, 103, 0.3); background: rgba(115, 31, 43, 0.3); color: #ff9aa3; }
+
+.session-registry__mode-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+.session-mode-summary { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 9px; padding: 10px 12px; border: 1px solid var(--session-border); border-radius: 9px; background: rgba(8, 28, 49, 0.7); }
+.session-mode-summary__dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 12px currentColor; }
+.session-mode-summary--sim .session-mode-summary__dot { color: #45c9ff; background: currentColor; }
+.session-mode-summary--demo .session-mode-summary__dot { color: #f4b83f; background: currentColor; }
+.session-mode-summary--live .session-mode-summary__dot { color: #ff5264; background: currentColor; }
+.session-mode-summary div { display: flex; flex-direction: column; }
+.session-mode-summary strong { font-size: 11px; }
+.session-mode-summary small { color: #7894ad; font-size: 9px; }
+.session-mode-summary__state { padding: 3px 7px; border-radius: 10px; background: rgba(117, 149, 177, 0.12); color: #8da8bf; font-size: 9px; text-transform: uppercase; }
+
+.session-registry__alert { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px 12px; border: 1px solid rgba(255, 103, 115, 0.45); border-radius: 8px; background: rgba(93, 26, 40, 0.45); color: #ffb3ba; }
+.session-registry__alert div { display: flex; flex-direction: column; }
+.session-registry__alert strong { font-size: 11px; }
+.session-registry__alert span { font-size: 9px; opacity: 0.8; }
+.session-registry__alert button { border: 0; background: transparent; color: #fff; font-size: 10px; font-weight: 800; }
+
+.session-editor { margin: 0 0 13px; padding: 13px; border: 1px solid rgba(52, 166, 245, 0.35); border-radius: 10px; background: linear-gradient(135deg, rgba(11, 46, 77, 0.95), rgba(8, 31, 54, 0.95)); box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18); }
+.session-editor__title { display: flex; justify-content: space-between; margin-bottom: 11px; }
+.session-editor__title div { display: flex; flex-direction: column; }
+.session-editor__title strong { font-size: 12px; }
+.session-editor__title span { color: #7f9bb4; font-size: 9px; }
+.session-editor__title button { border: 0; background: transparent; color: #8ba7bf; }
+.session-editor__fields { display: grid; grid-template-columns: minmax(170px, 1fr) minmax(210px, 1.5fr) 110px auto; align-items: end; gap: 9px; }
+.session-editor__fields label { display: flex; flex-direction: column; gap: 4px; }
+.session-editor__fields label > span { color: #89a4bc; font-size: 9px; font-weight: 750; text-transform: uppercase; }
+.session-editor__fields input,
+.session-editor__fields select { width: 100%; height: 34px; border: 1px solid rgba(117, 159, 195, 0.28); border-radius: 6px; outline: none; background: rgba(5, 20, 36, 0.78); color: #eaf5ff; padding: 0 9px; font-size: 11px; }
+.session-editor__fields input:focus,
+.session-editor__fields select:focus { border-color: #268ee8; box-shadow: 0 0 0 2px rgba(38, 142, 232, 0.14); }
+.session-editor__leverage { display: flex; align-items: center; height: 34px; border: 1px solid rgba(117, 159, 195, 0.28); border-radius: 6px; background: rgba(5, 20, 36, 0.78); }
+.session-editor__leverage b { padding-left: 9px; color: #6f8ca5; font-size: 11px; }
+.session-editor__leverage input { height: 32px; border: 0; background: transparent; }
+
+.session-registry__workspace { display: grid; grid-template-columns: minmax(260px, 0.82fr) minmax(410px, 1.5fr); min-height: 420px; border: 1px solid var(--session-border); border-radius: 11px; overflow: hidden; background: rgba(5, 20, 36, 0.45); box-shadow: 0 18px 55px rgba(0, 0, 0, 0.16); }
+.session-registry__list-pane { border-right: 1px solid var(--session-border); background: rgba(7, 25, 44, 0.54); }
+.session-pane-heading { display: flex; justify-content: space-between; padding: 11px 13px; border-bottom: 1px solid var(--session-border); color: #bcd1e4; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+.session-pane-heading small { color: #67849e; }
+.session-card-list { display: flex; flex-direction: column; gap: 6px; padding: 9px; }
+.session-card { position: relative; display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 9px; width: 100%; min-height: 58px; padding: 9px 10px; overflow: hidden; text-align: left; border: 1px solid transparent; border-radius: 8px; background: rgba(20, 50, 76, 0.44); color: #dbeafa; }
+.session-card::before { content: ''; position: absolute; inset: 8px auto 8px 0; width: 2px; border-radius: 3px; background: #45c9ff; opacity: 0.6; }
+.session-card--demo::before { background: #f4b83f; }
+.session-card--live::before { background: #ff5264; }
+.session-card:hover { border-color: rgba(87, 157, 215, 0.34); background: rgba(30, 68, 101, 0.56); }
+.session-card.is-selected { border-color: rgba(48, 154, 238, 0.72); background: linear-gradient(100deg, rgba(22, 83, 128, 0.62), rgba(21, 56, 85, 0.52)); box-shadow: 0 0 0 1px rgba(48, 154, 238, 0.13); }
+.session-card__mode { min-width: 38px; padding: 4px 5px; border-radius: 4px; background: rgba(74, 155, 211, 0.14); color: #6ed2ff; font-size: 8px; font-weight: 900; text-align: center; }
+.session-card--demo .session-card__mode { color: #ffd46b; background: rgba(244, 184, 63, 0.12); }
+.session-card--live .session-card__mode { color: #ff8290; background: rgba(255, 82, 100, 0.12); }
+.session-card__body { display: flex; min-width: 0; flex-direction: column; }
+.session-card__body strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.session-card__body small { color: #718da6; font-size: 9px; }
+.session-card__default { position: absolute; right: 9px; bottom: 5px; display: flex; align-items: center; gap: 3px; color: #efbe52; font-size: 8px; }
+.session-card__chevron { transform: rotate(-90deg); color: #65829c; }
+
+.session-status-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #6e879b; }
+.session-status-dot--running { background: #25d296; box-shadow: 0 0 9px rgba(37, 210, 150, 0.75); }
+.session-status-dot--error,
+.session-status-dot--recovery_required { background: #ff5c6d; }
+.session-status-dot--starting,
+.session-status-dot--stopping { background: #f5b840; }
+
+.session-registry__detail-pane { padding: 15px; background: linear-gradient(145deg, rgba(11, 37, 62, 0.34), rgba(4, 18, 32, 0.2)); }
+.session-registry__detail-empty,
+.session-registry__empty,
+.session-registry__loading { display: flex; min-height: 240px; align-items: center; justify-content: center; flex-direction: column; gap: 7px; color: #69869f; text-align: center; }
+.session-registry__empty { padding: 25px 18px; }
+.session-registry__empty h3 { margin: 4px 0 0; color: #cfe2f3; font-size: 14px; }
+.session-registry__empty p { max-width: 290px; margin: 0 0 8px; font-size: 10px; line-height: 1.5; }
+.session-registry__empty-icon { display: grid; width: 52px; height: 52px; place-items: center; border: 1px solid rgba(63, 161, 232, 0.25); border-radius: 15px; background: rgba(36, 118, 178, 0.12); color: #51baf2; }
+.session-registry__detail-empty strong { color: #bdd1e3; font-size: 12px; }
+.session-registry__detail-empty span { font-size: 9px; }
+
+.session-detail__header { display: flex; align-items: flex-start; justify-content: space-between; padding-bottom: 13px; }
+.session-detail__header h3 { margin: 7px 0 1px; font-size: 19px; }
+.session-detail__header p { margin: 0; color: #7895ad; font-size: 10px; }
+.session-detail__mode { padding: 3px 7px; border-radius: 4px; background: rgba(69, 201, 255, 0.13); color: #67d0ff; font-size: 8px; font-weight: 900; }
+.session-detail__mode--demo { background: rgba(244, 184, 63, 0.13); color: #ffd469; }
+.session-detail__mode--live { background: rgba(255, 82, 100, 0.13); color: #ff8290; }
+.session-icon-button { display: grid; width: 31px; height: 31px; place-items: center; border: 1px solid var(--session-border); border-radius: 6px; background: rgba(15, 46, 72, 0.68); color: #a5bed3; }
+.session-control-bar { display: flex; flex-wrap: wrap; gap: 7px; padding: 11px; border: 1px solid var(--session-border); border-radius: 8px; background: rgba(5, 20, 35, 0.5); }
+.session-detail__facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 10px 0; }
+.session-detail__facts > div { display: flex; flex-direction: column; padding: 9px; border: 1px solid var(--session-border); border-radius: 7px; background: rgba(14, 42, 66, 0.45); }
+.session-detail__facts span { color: #6e8aa3; font-size: 8px; text-transform: uppercase; }
+.session-detail__facts strong { display: flex; align-items: center; gap: 6px; margin-top: 3px; color: #d9e9f7; font-size: 10px; }
+.session-legacy-setup { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(170px, .7fr) auto; align-items: end; gap: 10px; margin-top: 8px; padding: 10px; border: 1px solid rgba(255, 185, 64, .38); border-radius: 7px; background: rgba(105, 62, 5, .16); }
+.session-legacy-setup div { display: flex; flex-direction: column; gap: 3px; }
+.session-legacy-setup strong { color: #ffd17a; font-size: 10px; }
+.session-legacy-setup span { color: #a7b9c8; font-size: 8px; }
+.session-legacy-setup select { min-height: 29px; border: 1px solid var(--session-border); border-radius: 5px; background: #071f35; color: #c6dced; font-size: 9px; }
+.session-detail__section { margin-top: 8px; border: 1px solid var(--session-border); border-radius: 7px; background: rgba(7, 25, 43, 0.5); }
+.session-detail__section summary { display: flex; align-items: center; gap: 7px; padding: 9px 11px; cursor: pointer; color: #abc3d7; font-size: 10px; font-weight: 750; list-style: none; }
+.session-detail__section summary > span { margin-left: auto; padding: 2px 6px; border-radius: 9px; background: rgba(80, 136, 181, 0.15); font-size: 8px; }
+.session-detail__section summary > svg:last-child { margin-left: auto; transition: transform 120ms ease; }
+.session-detail__section[open] summary > svg:last-child { transform: rotate(180deg); }
+.session-detail__section dl { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0; padding: 0 11px 9px; }
+.session-detail__section dl div { display: flex; min-width: 0; flex-direction: column; padding: 7px; border-top: 1px solid rgba(112, 151, 184, 0.1); }
+.session-detail__section dt { color: #66839c; font-size: 8px; text-transform: uppercase; }
+.session-detail__section dd { margin: 3px 0 0; overflow: hidden; color: #b8cede; font: 9px/1.3 var(--font-mono, monospace); text-overflow: ellipsis; white-space: nowrap; }
+
+/* Governed Trading cockpit — visual parity with the execution-session registry. */
+.workflow-trading {
+  --trading-border: rgba(91, 145, 188, 0.25);
+  min-height: 100%;
+  padding: 18px;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(23, 153, 220, 0.14), transparent 31%),
+    linear-gradient(155deg, #0b2a46 0%, #09233c 52%, #071c31 100%);
+  color: #e6f2fb;
+}
+
+.workflow-trading button,
+.workflow-trading input,
+.workflow-trading select { font: inherit; }
+
+.workflow-trading__hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 2px 2px 15px;
+  border-bottom: 1px solid var(--trading-border);
+}
+
+.workflow-trading__hero h2 { margin: 4px 0 2px; font-size: 24px; letter-spacing: -0.03em; }
+.workflow-trading__hero p { max-width: 690px; margin: 0; color: #8faac2; font-size: 12px; line-height: 1.45; }
+.workflow-trading__eyebrow { display: flex; align-items: center; gap: 6px; color: #57c7ff; font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.workflow-trading__route { display: flex; align-items: center; gap: 7px; flex: 0 0 auto; padding: 8px 11px; border: 1px solid rgba(80, 199, 255, 0.3); border-radius: 7px; background: rgba(15, 73, 111, 0.55); color: #74d6ff; font-size: 10px; font-weight: 800; letter-spacing: 0.06em; }
+.workflow-trading__route--demo { border-color: rgba(255, 190, 55, 0.35); background: rgba(100, 69, 11, 0.3); color: #ffd166; }
+.workflow-trading__route--live { border-color: rgba(255, 84, 107, 0.42); background: rgba(107, 25, 39, 0.34); color: #ff8292; }
+
+.workflow-trading__state { display: flex; min-height: 180px; align-items: center; justify-content: center; flex-direction: column; gap: 7px; color: #7696b1; text-align: center; }
+.workflow-trading__state strong { color: #c9ddeb; font-size: 12px; }
+.workflow-trading__state span { font-size: 10px; }
+.workflow-trading__alert,
+.workflow-trading__warning { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 12px; border: 1px solid rgba(255, 103, 115, 0.42); border-radius: 8px; background: rgba(93, 26, 40, 0.4); color: #ffb3ba; }
+.workflow-trading__alert div,
+.workflow-trading__warning div { display: flex; flex-direction: column; gap: 2px; }
+.workflow-trading__alert strong,
+.workflow-trading__warning strong { font-size: 11px; }
+.workflow-trading__alert span,
+.workflow-trading__warning span { font-size: 9px; opacity: 0.84; }
+
+.workflow-trading__evidence { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+.workflow-trading__evidence-card { min-width: 0; min-height: 108px; padding: 11px; border: 1px solid var(--trading-border); border-radius: 9px; background: linear-gradient(145deg, rgba(16, 55, 85, 0.7), rgba(6, 26, 44, 0.72)); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); }
+.workflow-trading__evidence-card > span:first-child { display: flex; align-items: center; gap: 7px; padding-bottom: 8px; border-bottom: 1px solid rgba(112, 151, 184, 0.13); color: #8db5d1; font-size: 9px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.workflow-trading__evidence-card pre { max-height: 145px; margin: 8px 0 0; overflow: auto; color: #bfe2f5; font: 9px/1.5 var(--font-mono, monospace); white-space: pre-wrap; }
+.workflow-trading__evidence-card em { display: block; margin-top: 10px; color: #64849e; font-size: 10px; }
+
+.workflow-trading-actions { min-width: 0; margin: 0; padding: 0 14px 14px; border: 1px solid var(--trading-border); border-radius: 11px; background: rgba(5, 20, 36, 0.48); box-shadow: 0 18px 55px rgba(0, 0, 0, 0.16); }
+.workflow-trading-actions:disabled { opacity: 1; }
+.workflow-trading-actions__heading { display: flex; width: calc(100% - 2px); align-items: center; justify-content: space-between; padding: 12px 0 10px; color: #d6e8f5; }
+.workflow-trading-actions__heading > span { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.workflow-trading-actions__heading small { padding: 3px 7px; border-radius: 10px; background: rgba(74, 133, 177, 0.16); color: #789ab5; font-size: 8px; font-weight: 800; text-transform: uppercase; }
+.workflow-trading-actions__note { margin: 10px 0; padding: 9px 11px; border-left: 2px solid #2f9fd8; border-radius: 0 6px 6px 0; background: rgba(27, 93, 132, 0.14); color: #87a8be; font-size: 10px; line-height: 1.45; }
+.workflow-trading__warning { margin: 2px 0 10px; }
+
+.workflow-trading__form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.workflow-trading__form-card { min-width: 0; padding: 11px; border: 1px solid var(--trading-border); border-radius: 8px; background: linear-gradient(145deg, rgba(13, 43, 68, 0.58), rgba(5, 23, 39, 0.52)); }
+.workflow-trading__form-card h3 { display: flex; align-items: center; gap: 7px; margin: 0 0 10px; color: #a9c8dd; font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.workflow-trading__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.workflow-trading__fields--single { grid-template-columns: 1fr; }
+.workflow-trading__field--wide { grid-column: 1 / -1; }
+.workflow-trading__fields label { display: flex; min-width: 0; flex-direction: column; gap: 4px; color: #7895ad; font-size: 8px; font-weight: 750; letter-spacing: 0.04em; text-transform: uppercase; }
+.workflow-trading__fields input,
+.workflow-trading__fields select { width: 100%; min-width: 0; height: 31px; box-sizing: border-box; padding: 0 9px; border: 1px solid rgba(91, 145, 188, 0.32); border-radius: 5px; outline: none; background: #071e33; color: #d6e8f5; font-size: 10px; text-transform: none; transition: border-color 120ms ease, box-shadow 120ms ease; }
+.workflow-trading__fields input:focus,
+.workflow-trading__fields select:focus { border-color: #35aee8; box-shadow: 0 0 0 2px rgba(53, 174, 232, 0.12); }
+.workflow-trading__fields input:disabled,
+.workflow-trading__fields select:disabled { color: #60788d; background: #071a2b; }
+
+.workflow-trading__inline-message { display: flex; align-items: center; gap: 7px; margin-top: 9px; padding: 8px 10px; border-radius: 6px; font-size: 10px; }
+.workflow-trading__inline-message--error { border: 1px solid rgba(255, 103, 115, 0.35); background: rgba(93, 26, 40, 0.32); color: #ffabb4; }
+.workflow-trading__inline-message--success { border: 1px solid rgba(42, 204, 151, 0.34); background: rgba(10, 86, 64, 0.28); color: #74e4bb; }
+.workflow-trading__command-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 11px; padding: 10px; border: 1px solid var(--trading-border); border-radius: 8px; background: rgba(4, 18, 31, 0.68); }
+.workflow-trading__command-actions { display: flex; align-items: center; justify-content: flex-end; gap: 7px; }
+.workflow-trading__button { display: inline-flex; min-height: 32px; align-items: center; justify-content: center; gap: 7px; padding: 0 12px; border: 1px solid rgba(90, 147, 190, 0.38); border-radius: 6px; cursor: pointer; background: rgba(15, 48, 74, 0.9); color: #bdd4e5; font-size: 10px; font-weight: 800; transition: transform 100ms ease, filter 100ms ease, opacity 100ms ease; }
+.workflow-trading__button:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
+.workflow-trading__button:focus-visible { outline: 2px solid #4bc7ff; outline-offset: 2px; }
+.workflow-trading__button:disabled { cursor: not-allowed; opacity: 0.38; }
+.workflow-trading__button--arm { border-color: rgba(64, 178, 230, 0.48); background: rgba(14, 91, 134, 0.72); color: #bfeaff; }
+.workflow-trading__button--submit { border-color: rgba(33, 211, 157, 0.42); background: linear-gradient(135deg, #069b73, #087f68); color: #fff; }
+.workflow-trading__button--secondary { background: rgba(15, 48, 74, 0.72); }
+
+@media (max-width: 980px) {
+  .workflow-trading__evidence { grid-template-columns: 1fr 1fr; }
+  .workflow-trading__evidence-card:first-child { grid-column: 1 / -1; }
+  .workflow-trading__command-bar { align-items: stretch; flex-direction: column; }
+  .workflow-trading__command-actions { justify-content: stretch; }
+  .workflow-trading__command-actions .workflow-trading__button { flex: 1; }
+}
+
+@media (max-width: 700px) {
+  .workflow-trading { padding: 12px; }
+  .workflow-trading__hero { flex-direction: column; }
+  .workflow-trading__evidence,
+  .workflow-trading__form-grid { grid-template-columns: 1fr; }
+  .workflow-trading__evidence-card:first-child { grid-column: auto; }
+  .workflow-trading__fields { grid-template-columns: 1fr; }
+  .workflow-trading__field--wide { grid-column: auto; }
+  .workflow-trading__command-actions { flex-direction: column; }
+  .workflow-trading__command-actions .workflow-trading__button,
+  .workflow-trading__command-bar > .workflow-trading__button { width: 100%; }
+}
+.session-event-list { margin: 0; padding: 0 13px 10px 25px; list-style: none; }
+.session-event-list li { position: relative; display: flex; gap: 9px; padding: 6px 0; border-left: 1px solid rgba(85, 135, 177, 0.24); }
+.session-event-list__marker { width: 7px; height: 7px; margin: 4px 0 0 -4px; border: 2px solid #0b2947; border-radius: 50%; background: #4fb7ef; }
+.session-event-list li div { display: flex; flex-direction: column; }
+.session-event-list strong { color: #b8cede; font-size: 9px; }
+.session-event-list small { color: #66839b; font-size: 8px; }
+.session-event-list__empty { border-left: 0 !important; color: #6f899f; font-size: 9px; }
+.session-activity__controls { display: flex; align-items: center; gap: 6px; padding: 0 10px 8px; }
+.session-activity__controls span { margin-right: auto; color: #66839b; font-size: 8px; }
+.session-activity__controls button { border: 1px solid rgba(77, 159, 215, 0.3); border-radius: 4px; background: #0b2b48; color: #a8cde5; font-size: 8px; cursor: pointer; }
+.session-activity__console { min-height: 96px; max-height: 190px; margin: 0 10px 10px; padding: 10px; overflow: auto; border: 1px solid rgba(52, 210, 160, 0.18); border-radius: 5px; background: #03111e; color: #8fd8bd; font: 8px/1.55 var(--font-mono, monospace); white-space: pre-wrap; }
+.is-spinning { animation: session-spin 850ms linear infinite; }
+@keyframes session-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 820px) {
+  .session-registry__hero { flex-direction: column; }
+  .session-registry__workspace { grid-template-columns: 1fr; }
+  .session-registry__list-pane { border-right: 0; border-bottom: 1px solid var(--session-border); }
+  .session-editor__fields { grid-template-columns: 1fr; }
+  .session-detail__facts { grid-template-columns: 1fr 1fr; }
 }
 
 .metric-item {
@@ -296,7 +577,7 @@ body {
   align-items: flex-start;
   justify-content: center;
   gap: 2px;
-  width: 110px;
+  width: 92px;
 }
 
 .metric-label {
@@ -356,6 +637,83 @@ body {
   font-weight: 400;
   color: #dbdbdb;
   letter-spacing: 0.5px;
+  background: transparent;
+  border: 0;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.account-metrics-menu-anchor {
+  position: relative;
+}
+
+.account-metrics-menu {
+  position: absolute;
+  z-index: 1200;
+  top: 25px;
+  right: 0;
+  width: 270px;
+  padding: 14px;
+  color: #fff;
+  background: #0c2746;
+  border: 1px solid #294867;
+  border-radius: 3px;
+  box-shadow: 0 10px 28px rgb(0 0 0 / 45%);
+}
+
+.account-metrics-menu fieldset {
+  display: grid;
+  gap: 8px;
+  padding: 0 0 12px;
+  margin: 0 0 12px;
+  border: 0;
+  border-bottom: 1px solid #294867;
+}
+
+.account-metrics-menu legend,
+.metric-leverage-setting {
+  margin-bottom: 8px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+
+.account-metrics-menu label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+}
+
+.account-metrics-menu label:has(input:disabled) {
+  color: #718294;
+}
+
+.metric-leverage-setting input {
+  width: 80px;
+  margin-left: auto;
+}
+
+.metric-setting-note {
+  display: block;
+  color: #8296aa;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.trading-mode-block {
+  color: var(--financial-negative);
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.digital-time:hover,
+.digital-time:focus-visible {
+  outline: 1px solid var(--cme-blue-cyan);
+  outline-offset: 2px;
 }
 
 .digital-time .dt-seg {
@@ -378,6 +736,36 @@ body {
 .digital-time.mismatch .dt-seg,
 .digital-time.mismatch .dt-suffix {
   color: var(--financial-negative);
+}
+
+.time-correction-overlay {
+  z-index: 1200;
+}
+
+.time-correction-dialog {
+  width: min(390px, calc(100vw - 32px));
+}
+
+.time-correction-note,
+.time-correction-message {
+  margin: 0;
+  color: var(--text-muted-grey);
+  font-size: 12px;
+}
+
+.time-correction-message {
+  color: var(--financial-negative);
+}
+
+.time-correction-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.time-correction-actions .primary {
+  background: var(--cme-blue-primary);
+  color: #fff;
 }
 
 .one-click-toggle {

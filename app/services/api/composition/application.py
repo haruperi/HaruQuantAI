@@ -94,6 +94,9 @@ from app.services.api.workstation.strategies.orchestration import (
     build_strategy_mutation_source,
 )
 from app.services.api.workstation.strategies.routes import router as strategies_router
+from app.services.api.workstation.trading.activity import (
+    router as trading_activity_router,
+)
 from app.services.api.workstation.trading.orchestration import (
     build_trading_account_profile_source,
     build_trading_cancel_all_preflight_source,
@@ -164,6 +167,7 @@ _ROUTERS = (
     portfolio_router,
     risk_router,
     trading_router,
+    trading_activity_router,
     optimization_router,
     dashboards_router,
     operator_router,

@@ -39,6 +39,7 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.watchlists.update", method: "PATCH", path: "/api/v1/watchlists/{watchlist_id}", permission: "watchlists:write" },
   { id: "api.watchlists.delete", method: "DELETE", path: "/api/v1/watchlists/{watchlist_id}", permission: "watchlists:write" },
   { id: "api.data.symbols", method: "GET", path: "/api/v1/data/symbols", permission: "data:read" },
+  { id: "api.data.datasets", method: "GET", path: "/api/v1/data/datasets", permission: "data:read" },
   { id: "api.data.markets", method: "GET", path: "/api/v1/data/markets", permission: "data:read" },
   { id: "api.data.quotes", method: "GET", path: "/api/v1/data/quotes", permission: "data:read" },
   { id: "api.data.bars", method: "GET", path: "/api/v1/data/bars", permission: "data:read" },
@@ -104,6 +105,16 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.risk.decisions", method: "GET", path: "/api/v1/risk/decisions", permission: "risk:read" },
   { id: "api.trading.session", method: "GET", path: "/api/v1/trading/session", permission: "trading:read" },
   { id: "api.trading.account_profile", method: "GET", path: "/api/v1/trading/account-profile", permission: "trading:read" },
+  { id: "api.trading.execution_sessions", method: "GET", path: "/api/v1/trading/execution-sessions", permission: "trading:read" },
+  { id: "api.trading.create_execution_session", method: "POST", path: "/api/v1/trading/execution-sessions", permission: "trading:write" },
+  { id: "api.trading.update_execution_session", method: "PATCH", path: "/api/v1/trading/execution-sessions/{session_id}", permission: "trading:write" },
+  { id: "api.trading.default_execution_session", method: "POST", path: "/api/v1/trading/execution-sessions/{session_id}/default", permission: "trading:write" },
+  { id: "api.trading.start_execution_session", method: "POST", path: "/api/v1/trading/execution-sessions/{session_id}/start", permission: "trading:write" },
+  { id: "api.trading.stop_execution_session", method: "POST", path: "/api/v1/trading/execution-sessions/{session_id}/stop", permission: "trading:write" },
+  { id: "api.trading.archive_execution_session", method: "DELETE", path: "/api/v1/trading/execution-sessions/{session_id}", permission: "trading:write" },
+  { id: "api.trading.execution_session_events", method: "GET", path: "/api/v1/trading/execution-sessions/{session_id}/events", permission: "trading:read" },
+  { id: "api.trading.complete_execution_session_configuration", method: "POST", path: "/api/v1/trading/execution-sessions/{session_id}/complete-configuration", permission: "trading:write" },
+  { id: "api.trading.execution_session_activity", method: "GET", path: "/api/v1/trading/execution-sessions/{session_id}/activity", permission: "trading:read" },
   { id: "api.trading.preflight_order", method: "POST", path: "/api/v1/trading/orders/preflight", permission: "trading:write" },
   { id: "api.trading.submit_order", method: "POST", path: "/api/v1/trading/orders", permission: "trading:write" },
   { id: "api.trading.cancel_order", method: "DELETE", path: "/api/v1/trading/orders/{order_id}", permission: "trading:write" },
@@ -154,9 +165,9 @@ const EXPECTED: ReadonlyArray<{
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 94 typed operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(97);
-    expect(ROUTE_CONTRACTS).toHaveLength(94);
+  it("has exactly the approved 105 typed operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(110);
+    expect(ROUTE_CONTRACTS).toHaveLength(105);
   });
 
   it("matches every expected id, method, path, and permission", () => {

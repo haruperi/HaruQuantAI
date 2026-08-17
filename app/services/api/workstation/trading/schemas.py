@@ -4,20 +4,78 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal
 
+from pydantic import Field
+
 from app.services.api.contracts.models import _BaseApiContract
 
 
+class ExecutionSessionCreateRequest(_BaseApiContract):
+    """Create one durable execution-session definition."""
+
+    name: str
+    mode: Literal["sim", "demo", "live"]
+    provider: str
+    description: str = ""
+    provider_account_ref: str | None = None
+    credential_ref: str | None = None
+    simulation_session_id: str | None = None
+    dataset_ref: str | None = None
+    dataset_revision: str | None = None
+    dataset_hash: str | None = None
+    sim_initial_balance: Decimal | None = None
+    sim_leverage: int | None = Field(default=None, ge=1, le=1000)
+    sim_account_currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
+    auto_start: bool = True
+    metadata: dict[str, str] = Field(default_factory=dict)
+
+
+class ExecutionSessionUpdateRequest(_BaseApiContract):
+    """Update mutable execution-session metadata with optimistic locking."""
+
+    expected_version: int
+    name: str
+    description: str = ""
+    auto_start: bool = True
+    metadata: dict[str, str] = Field(default_factory=dict)
+
+
+class ExecutionSessionActionRequest(_BaseApiContract):
+    """Apply one revision-checked session lifecycle action."""
+
+    expected_version: int
+
+
+class ExecutionSessionConfigurationRequest(_BaseApiContract):
+    """Complete one stopped legacy SIM session."""
+
+    expected_version: int
+    dataset_ref: str
+    dataset_revision: str
+    dataset_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
 class TradingAccountProfileResponse(_BaseApiContract):
-    """Minimal provider-authored identity displayed by the Trading shell."""
+    """Provider-authored identity and account metrics shown by the shell."""
 
     contract_version: Literal["v1"] = "v1"
     schema_id: Literal["api.trading.account_profile.v1"] = (
         "api.trading.account_profile.v1"
     )
     account_name: str
+    session_name: str | None = None
     trade_mode: Literal["SIMULATION", "DEMO", "REAL", "CONTEST"]
+    selected_mode: Literal["sim", "demo", "live"]
+    mode_compatible: bool
     environment_label: str
     source: Literal["simulator", "mt5"]
+    currency: str | None = None
+    balance: Decimal | None = None
+    equity: Decimal | None = None
+    profit: Decimal | None = None
+    margin: Decimal | None = None
+    free_margin: Decimal | None = None
+    margin_level: Decimal | None = None
+    leverage: Decimal | None = None
     retrieved_at: datetime
 
 

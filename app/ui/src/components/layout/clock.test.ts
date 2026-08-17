@@ -10,8 +10,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   clockSegmentsAtOffset,
+  dateTimeLocalValue,
   formatClockAtOffset,
   parseUtcOffset,
+  utcMsFromLocalValue,
 } from "./clock";
 
 describe("parseUtcOffset", () => {
@@ -116,5 +118,24 @@ describe("clockSegmentsAtOffset", () => {
     expect(`${s.hour}:${s.minute}:${s.second} ${s.meridiem} ${s.label} ${s.date}`).toBe(
       formatClockAtOffset(UTC_EVENING, -360, "UTC-6"),
     );
+  });
+});
+
+describe("manual clock correction values", () => {
+  it("formats an instant as local input text at the selected offset", () => {
+    expect(dateTimeLocalValue(Date.UTC(2026, 7, 17, 7, 30), 120)).toBe(
+      "2026-08-17T09:30",
+    );
+  });
+
+  it("converts valid local input back to a UTC instant", () => {
+    expect(utcMsFromLocalValue("2026-08-17T09:30", 120)).toBe(
+      Date.UTC(2026, 7, 17, 7, 30),
+    );
+  });
+
+  it("rejects malformed and impossible local values", () => {
+    expect(utcMsFromLocalValue("", 0)).toBeNull();
+    expect(utcMsFromLocalValue("2026-02-30T09:30", 0)).toBeNull();
   });
 });

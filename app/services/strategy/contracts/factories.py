@@ -225,6 +225,8 @@ def get_strategy_environment(value: str) -> StrategyEnvironment:
     Returns:
         Approved Strategy environment enum instance.
     """
+    if value == "SIM":
+        value = "SIMULATION"
     return StrategyEnvironment(value)
 
 

@@ -1,7 +1,7 @@
 /** Public UI seam for Workspace Layout and Session Mode (FEAT-UI-01). */
-export { useWorkspaceStore, selectOrderEntryDisabled, mapRuntimeProfileToAccountMode } from './store';
+export { useWorkspaceStore, selectOrderEntryDisabled, selectTradingActivityDisabled, mapRuntimeProfileToAccountMode } from './store';
 export type { WorkspaceStoreState } from './store';
-export type { Workspace, Widget, WidgetType, GridRect, AccountMode, SelectableAccountMode, ConfirmationMode } from './contracts';
+export type { Workspace, Widget, WidgetType, GridRect, AccountMode, PlatformAccountMode, SelectableAccountMode, ConfirmationMode } from './contracts';
 export {
   MAX_CUSTOM_WORKSPACES,
   WIDGET_TYPES,

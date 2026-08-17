@@ -36,6 +36,9 @@ def test_migrations_are_ordered_and_forward_only() -> None:
         "003_execution_lifecycle",
         "004_order_lifecycle_states",
         "005_route_vocabulary",
+        "006_execution_session_registry",
+        "007_sim_session_account_configuration",
+        "008_session_runtime_bindings",
     )
     replacement = tuple(item for item in statements if "POSITIONS__NEW" in item)
     assert replacement

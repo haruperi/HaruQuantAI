@@ -102,11 +102,12 @@ export const PriceLadderWidget: React.FC<Props> = ({
   portfolioId = null,
   onOpenTicket,
 }) => {
-  const { orderConfirmationRequired, accountMode } = useWorkspaceStore();
+  const { orderConfirmationRequired, accountMode, tradingModeCompatible } = useWorkspaceStore();
   // An unresolved mode leaves no route to trade on; order entry is already
   // disabled in that state (FR-UI-021), so the ladder never invents one.
   const route: SelectableAccountMode | null =
-    routeOverride ?? (accountMode === 'unknown' ? null : accountMode);
+    routeOverride ?? (accountMode === 'unknown' || !tradingModeCompatible ? null : accountMode);
+  const tradingDisabled = route === null;
   const hasAccount = Boolean(accountId);
 
   const [orderQty, setOrderQty] = useState(1);
@@ -666,7 +667,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
         {String(order.intent.approved_volume)}
         <button
           type="button"
-          disabled={busy || !order.broker_order_id}
+          disabled={busy || tradingDisabled || !order.broker_order_id}
           onClick={() => void cancelWorkingOrder(order)}
           title={order.broker_order_id ? 'Cancel this order' : 'Awaiting broker acknowledgement'}
           style={{
@@ -751,7 +752,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
           </div>
           <button
             className="btn-cme btn-outline btn-sm ladder-flatten"
-            disabled={busy || !hasAccount || positions.length === 0}
+            disabled={busy || tradingDisabled || !hasAccount || positions.length === 0}
             onClick={() => setConfirmingFlatten(true)}
             title={
               positions.length === 0
@@ -763,7 +764,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
           </button>
           <button
             className="btn-cme btn-outline btn-sm"
-            disabled={busy || workingOrders.length === 0}
+            disabled={busy || tradingDisabled || workingOrders.length === 0}
             onClick={() => setConfirmingCancelAll(true)}
             title="Cancel All Working Orders"
           >
@@ -774,7 +775,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <button
             className="btn-cme btn-buy btn-sm"
-            disabled={busy || (!hasAccount && !onOpenTicket)}
+            disabled={busy || tradingDisabled || (!hasAccount && !onOpenTicket)}
             onClick={() => void submitQuickOrder('BUY', null)}
             style={{ flex: 1 }}
           >
@@ -793,7 +794,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
 
           <button
             className="btn-cme btn-sell btn-sm"
-            disabled={busy || (!hasAccount && !onOpenTicket)}
+            disabled={busy || tradingDisabled || (!hasAccount && !onOpenTicket)}
             onClick={() => void submitQuickOrder('SELL', null)}
             style={{ flex: 1 }}
           >
@@ -912,7 +913,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
           className="ladder-footer-btn"
           aria-label="Cancel all resting buy orders"
           title="Cancel all resting buy orders"
-          disabled={busy || workingOrders.every((order) => order.intent.side !== 'BUY')}
+          disabled={busy || tradingDisabled || workingOrders.every((order) => order.intent.side !== 'BUY')}
           onClick={() => void cancelSide('BUY')}
         >
           <X size={13} color="var(--cme-sell-red)" />
@@ -949,7 +950,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
           className="ladder-footer-btn"
           aria-label="Cancel all resting sell orders"
           title="Cancel all resting sell orders"
-          disabled={busy || workingOrders.every((order) => order.intent.side !== 'SELL')}
+          disabled={busy || tradingDisabled || workingOrders.every((order) => order.intent.side !== 'SELL')}
           onClick={() => void cancelSide('SELL')}
         >
           <X size={13} color="var(--cme-sell-red)" />
@@ -971,7 +972,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
               <button className="btn-cme btn-outline btn-sm" onClick={() => setConfirmingFlatten(false)}>
                 Keep Position
               </button>
-              <button className="btn-cme btn-sell btn-sm" disabled={busy} onClick={() => void flattenPosition()}>
+              <button className="btn-cme btn-sell btn-sm" disabled={busy || tradingDisabled} onClick={() => void flattenPosition()}>
                 Confirm Flatten
               </button>
             </div>
@@ -990,7 +991,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
               <button className="btn-cme btn-outline btn-sm" onClick={() => setConfirmingCancelAll(false)}>
                 Keep Orders
               </button>
-              <button className="btn-cme btn-sell btn-sm" disabled={busy} onClick={() => void cancelAllOrders()}>
+              <button className="btn-cme btn-sell btn-sm" disabled={busy || tradingDisabled} onClick={() => void cancelAllOrders()}>
                 Confirm Cancel All
               </button>
             </div>

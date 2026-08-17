@@ -15,6 +15,7 @@ from app.services.api.identity.passwords import hash_password, verify_password
 from app.services.api.identity.persistence import (
     create_account_record,
     delete_auth_failure_record,
+    read_account_identity_by_user_id,
     read_account_record,
     read_auth_failure_record,
     read_auth_lock_record,
@@ -287,4 +288,35 @@ def authenticate_user(
     return AuthenticatedUser.from_row(row)
 
 
-__all__ = ("AuthenticatedUser", "IdentityError", "authenticate_user", "register_user")
+def get_username_for_principal(principal_id: str, *, request_id: str) -> str:
+    """Resolve the non-secret login name for an authenticated principal.
+
+    Args:
+        principal_id: Stable authenticated user identifier.
+        request_id: Caller trace identifier.
+
+    Returns:
+        Exact registered username.
+
+    Raises:
+        IdentityError: If the principal has no account identity.
+    """
+    rows = read_account_identity_by_user_id(principal_id, request_id=request_id)
+    if len(rows) != 1 and principal_id.startswith("usr_"):
+        # Baseline workstation sessions used ``usr_<username>`` before Identity
+        # adopted stable account IDs. Resolve only an exact registered username.
+        rows = read_account_record(
+            principal_id.removeprefix("usr_"), request_id=request_id
+        )
+    if len(rows) != 1:
+        raise IdentityError("IDENTITY_ACCOUNT_NOT_FOUND")
+    return str(rows[0]["username"])
+
+
+__all__ = (
+    "AuthenticatedUser",
+    "IdentityError",
+    "authenticate_user",
+    "get_username_for_principal",
+    "register_user",
+)

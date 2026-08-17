@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, cast
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
 from app.services.api.identity import (
+    get_username_for_principal,
     require_auth_context,
     require_human_permission,
     run_idempotent_write_async,
@@ -16,8 +17,26 @@ from app.services.api.workstation.settings.account_mode import resolve_execution
 from app.services.api.workstation.trading.schemas import (  # noqa: TC001
     CancelAllPreflightRequest,
     CancelOrderPreflightRequest,
+    ExecutionSessionActionRequest,
+    ExecutionSessionConfigurationRequest,
+    ExecutionSessionCreateRequest,
+    ExecutionSessionUpdateRequest,
     OrderPreflightRequest,
     TradingMutationRequest,
+)
+from app.services.data import list_verified_datasets
+from app.services.trading import (
+    archive_execution_session,
+    assign_simulation_session_identity,
+    complete_simulation_session_configuration,
+    create_execution_session,
+    get_execution_session,
+    get_execution_session_events,
+    list_execution_sessions,
+    set_default_execution_session,
+    start_execution_session,
+    stop_execution_session,
+    update_execution_session_metadata,
 )
 from app.utils import generate_id
 
@@ -25,7 +44,7 @@ type AuthContext = Any
 type _SessionSource = Callable[[str, str, str, AuthContext], object | None]
 type _MutationSource = Callable[[str, object, AuthContext], Awaitable[object]]
 type _PreflightSource = Callable[[object, AuthContext], Awaitable[object]]
-type _AccountProfileSource = Callable[[], Awaitable[object]]
+type _AccountProfileSource = Callable[[AuthContext], Awaitable[object]]
 
 router = APIRouter(prefix="/api/v1/trading", tags=["trading"])
 
@@ -37,6 +56,7 @@ _RUNTIME_POLICY_REFUSALS = frozenset(
         "TRADING_RUNTIME_PROFILE_MISMATCH",
         "TRADING_EXECUTION_ROUTE_MISMATCH",
         "TRADING_LIVE_MUTATIONS_DISABLED",
+        "ACCOUNT_MODE_PLATFORM_MISMATCH",
     }
 )
 
@@ -161,6 +181,325 @@ def _require_matching_idempotency_key(
         )
 
 
+def _session_payload(value: object) -> object:
+    """Serialize one private Trading projection at the HTTP boundary.
+
+    Returns:
+        JSON-compatible serialized dict or raw object.
+    """
+    dump = getattr(value, "model_dump", None)
+    return dump(mode="json") if callable(dump) else value
+
+
+def _owned_session(session_id: str, auth: AuthContext) -> object:
+    """Require an execution session to belong to the authenticated scope.
+
+    Returns:
+        Verified owned execution session instance.
+
+    Raises:
+        HTTPException: If session is not found or not owned.
+    """
+    value = get_execution_session(session_id)
+    if value is None:
+        raise HTTPException(status_code=404, detail="EXECUTION_SESSION_NOT_FOUND")
+    if (
+        getattr(value, "principal_id", None) != auth.principal_id
+        or getattr(value, "environment_id", None) != auth.tenant_or_environment
+    ):
+        raise HTTPException(status_code=404, detail="EXECUTION_SESSION_NOT_FOUND")
+    return value
+
+
+@router.get("/execution-sessions", response_model=None)
+def _list_execution_sessions(
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    mode: Annotated[Literal["sim", "demo", "live"] | None, Query()] = None,
+) -> object:
+    """List the caller's durable non-archived execution sessions.
+
+    Returns:
+        List of session projection payloads.
+    """
+    require_human_permission(auth, "trading:read")
+    values = list_execution_sessions(
+        principal_id=auth.principal_id,
+        environment_id=auth.tenant_or_environment,
+        mode=mode,
+    )
+    return [_session_payload(value) for value in values]
+
+
+@router.post("/execution-sessions", response_model=None, status_code=201)
+def _create_execution_session(
+    body: ExecutionSessionCreateRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+) -> object:
+    """Create one stopped execution-session definition.
+
+    Returns:
+        Created Trading session projection payload.
+    """
+    require_human_permission(auth, "trading:write")
+    request_id = generate_id("req")
+    username = (
+        get_username_for_principal(auth.principal_id, request_id=request_id)
+        if body.mode == "sim"
+        else None
+    )
+    value = create_execution_session(
+        principal_id=auth.principal_id,
+        environment_id=auth.tenant_or_environment,
+        request_id=request_id,
+        simulation_username=username,
+        **body.model_dump(mode="python"),
+    )
+    return _session_payload(value)
+
+
+@router.patch("/execution-sessions/{session_id}", response_model=None)
+def _update_execution_session(
+    session_id: str,
+    body: ExecutionSessionUpdateRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+) -> object:
+    """Update mutable registry metadata with optimistic locking.
+
+    Returns:
+        Updated Trading session projection payload.
+    """
+    require_human_permission(auth, "trading:write")
+    _owned_session(session_id, auth)
+    value = update_execution_session_metadata(
+        session_id, request_id=generate_id("req"), **body.model_dump(mode="python")
+    )
+    return _session_payload(value)
+
+
+@router.post("/execution-sessions/{session_id}/default", response_model=None)
+def _default_execution_session(
+    session_id: str,
+    body: ExecutionSessionActionRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+) -> object:
+    """Select the default session for its mode.
+
+    Returns:
+        Updated Trading session projection payload.
+    """
+    require_human_permission(auth, "trading:write")
+    _owned_session(session_id, auth)
+    return _session_payload(
+        set_default_execution_session(
+            session_id,
+            expected_version=body.expected_version,
+            request_id=generate_id("req"),
+        )
+    )
+
+
+@router.delete("/execution-sessions/{session_id}", response_model=None)
+def _archive_execution_session(
+    session_id: str,
+    body: ExecutionSessionActionRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+) -> object:
+    """Archive a stopped session while retaining its evidence.
+
+    Returns:
+        Archived Trading session projection payload.
+    """
+    require_human_permission(auth, "trading:write")
+    _owned_session(session_id, auth)
+    return _session_payload(
+        archive_execution_session(
+            session_id,
+            expected_version=body.expected_version,
+            request_id=generate_id("req"),
+        )
+    )
+
+
+@router.get("/execution-sessions/{session_id}/events", response_model=None)
+def _execution_session_events(
+    session_id: str,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+) -> object:
+    """Read the immutable lifecycle journal for one session.
+
+    Returns:
+        List of session lifecycle event projections.
+    """
+    require_human_permission(auth, "trading:read")
+    _owned_session(session_id, auth)
+    return list(get_execution_session_events(session_id))
+
+
+@router.post(
+    "/execution-sessions/{session_id}/complete-configuration", response_model=None
+)
+def _complete_execution_session_configuration(
+    session_id: str,
+    body: ExecutionSessionConfigurationRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+) -> object:
+    """Complete identity and dataset lineage for one stopped legacy SIM.
+
+    Returns:
+        Completed Trading session projection.
+
+    Raises:
+        HTTPException: If the selected dataset is not currently verified.
+    """
+    require_human_permission(auth, "trading:write")
+    _owned_session(session_id, auth)
+    match = next(
+        (
+            item
+            for item in list_verified_datasets(request_id=generate_id("req"))
+            if item["dataset_id"] == body.dataset_ref
+            and item["revision"] == body.dataset_revision
+            and item["content_hash"] == body.dataset_hash
+        ),
+        None,
+    )
+    if match is None:
+        raise HTTPException(status_code=422, detail="SIM_DATASET_NOT_VERIFIED")
+    request_id = generate_id("req")
+    username = get_username_for_principal(auth.principal_id, request_id=request_id)
+    value = complete_simulation_session_configuration(
+        session_id,
+        expected_version=body.expected_version,
+        username=username,
+        account_name=username,
+        dataset_ref=body.dataset_ref,
+        dataset_revision=body.dataset_revision,
+        dataset_hash=body.dataset_hash,
+        request_id=request_id,
+    )
+    return _session_payload(value)
+
+
+@router.post("/execution-sessions/{session_id}/start", response_model=None)
+async def _start_execution_session(
+    session_id: str,
+    body: ExecutionSessionActionRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+    profile_source: Annotated[
+        _AccountProfileSource, Depends(_trading_account_profile_source)
+    ],
+) -> object:
+    """Verify provider mode and start one foreground execution session.
+
+    Returns:
+        Running Trading session projection payload.
+
+    Raises:
+        HTTPException: If verification fails or a state conflict occurs.
+    """
+    require_human_permission(auth, "trading:write")
+    session = _owned_session(session_id, auth)
+    expected_version = body.expected_version
+    if (
+        getattr(session, "mode", None) == "sim"
+        and getattr(session, "simulation_session_id", None) is None
+    ):
+        request_id = generate_id("req")
+        session = assign_simulation_session_identity(
+            session_id,
+            expected_version=expected_version,
+            username=get_username_for_principal(
+                auth.principal_id, request_id=request_id
+            ),
+            request_id=request_id,
+        )
+        expected_version = int(cast("Any", session).version)
+
+    async def verify(_: object) -> dict[str, object]:
+        profile = await profile_source(auth)
+        session_mode = getattr(session, "mode", None)
+        selected_mode = getattr(profile, "selected_mode", None)
+        dataset_verified = True
+        candidate_configured = True
+        if session_mode == "sim":
+            candidate_configured = all(
+                getattr(session, field, None) is not None
+                for field in (
+                    "provider_account_ref",
+                    "simulation_session_id",
+                    "dataset_ref",
+                    "dataset_revision",
+                    "dataset_hash",
+                    "sim_initial_balance",
+                    "sim_leverage",
+                    "sim_account_currency",
+                )
+            )
+            dataset_verified = any(
+                item["dataset_id"] == getattr(session, "dataset_ref", None)
+                and item["revision"] == getattr(session, "dataset_revision", None)
+                and item["content_hash"] == getattr(session, "dataset_hash", None)
+                for item in list_verified_datasets(request_id=generate_id("req"))
+            )
+        profile_compatible = (
+            candidate_configured
+            if session_mode == "sim"
+            else bool(getattr(profile, "mode_compatible", False))
+        )
+        return {
+            "verified": (
+                profile_compatible
+                and selected_mode == session_mode
+                and dataset_verified
+            ),
+            "mode": selected_mode,
+            "simulation_session_id": getattr(session, "simulation_session_id", None),
+            "account_name": getattr(profile, "account_name", None),
+        }
+
+    try:
+        value = await start_execution_session(
+            session_id,
+            expected_version=expected_version,
+            authority_start=verify,
+            request_id=generate_id("req"),
+        )
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error
+    return _session_payload(value)
+
+
+@router.post("/execution-sessions/{session_id}/stop", response_model=None)
+async def _stop_execution_session(
+    session_id: str,
+    body: ExecutionSessionActionRequest,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+) -> object:
+    """Stop admission for one running logical execution session.
+
+    Returns:
+        Stopped Trading session projection payload.
+    """
+    require_human_permission(auth, "trading:write")
+    _owned_session(session_id, auth)
+
+    async def reconcile(_: object) -> dict[str, object]:
+        # Session stop disables new admission; broker-owned positions remain
+        # durable at the provider and are reconciled on the next verified start.
+        return {"safe_to_stop": True}
+
+    value = await stop_execution_session(
+        session_id,
+        expected_version=body.expected_version,
+        authority_stop=reconcile,
+        request_id=generate_id("req"),
+    )
+    return _session_payload(value)
+
+
 def _governed_preflight(
     body: TradingMutationRequest,
     idempotency_key: str | None,
@@ -220,7 +559,7 @@ async def _get_account_profile(
     """
     require_human_permission(auth, "trading:read")
     try:
-        return await source()
+        return await source(auth)
     except ValueError as error:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -308,6 +647,8 @@ async def _preflight_order(
             operation=lambda: source(body, auth),
         )
     except RuntimeError as error:
+        if str(error) == "ACCOUNT_MODE_PLATFORM_MISMATCH":
+            raise HTTPException(status_code=409, detail=str(error)) from error
         if str(error) == "MANUAL_ORDER_LIVE_NOT_CONFIGURED":
             raise HTTPException(status_code=403, detail=str(error)) from error
         if str(error) == "ACCOUNT_SNAPSHOT_UNAVAILABLE":
@@ -352,6 +693,8 @@ async def _preflight_cancel_all_orders(
             operation=lambda: source(body, auth),
         )
     except RuntimeError as error:
+        if str(error) == "ACCOUNT_MODE_PLATFORM_MISMATCH":
+            raise HTTPException(status_code=409, detail=str(error)) from error
         if str(error) == "MANUAL_ORDER_LIVE_NOT_CONFIGURED":
             raise HTTPException(status_code=403, detail=str(error)) from error
         if str(error) == "ACCOUNT_SNAPSHOT_UNAVAILABLE":
@@ -440,6 +783,8 @@ async def _preflight_cancel_order(
             operation=lambda: source(body, auth),
         )
     except RuntimeError as error:
+        if str(error) == "ACCOUNT_MODE_PLATFORM_MISMATCH":
+            raise HTTPException(status_code=409, detail=str(error)) from error
         if str(error) == "MANUAL_ORDER_LIVE_NOT_CONFIGURED":
             raise HTTPException(status_code=403, detail=str(error)) from error
         if str(error) == "ACCOUNT_SNAPSHOT_UNAVAILABLE":

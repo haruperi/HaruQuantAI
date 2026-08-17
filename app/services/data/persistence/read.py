@@ -797,6 +797,32 @@ def read_catalog_dataset(
     )
 
 
+def read_ready_dataset_catalog_records(
+    *, request_id: str, limit: int
+) -> TransactionResult:
+    """Read bounded ready datasets and their integrity-bearing artifacts.
+
+    Args:
+        request_id: Caller trace identity.
+        limit: Maximum joined artifact rows.
+
+    Returns:
+        Transaction result ordered by dataset and artifact identity.
+    """
+    return _execute_read(
+        "SELECT d.dataset_id, d.dataset_kind, d.timeframe, d.schema_version, "
+        "d.normalization_version, d.state, d.file_count, d.total_rows, "
+        "s.canonical_symbol, f.artifact_id, f.content_hash, f.source_revision, "
+        "f.verify_state FROM data_datasets AS d "
+        "LEFT JOIN data_symbols AS s ON s.symbol_id=d.symbol_id "
+        "JOIN data_partition_files AS f ON f.dataset_id=d.dataset_id "
+        "WHERE d.state='ready' ORDER BY d.dataset_id, f.artifact_id",
+        (),
+        request_id=request_id,
+        max_rows=limit,
+    )
+
+
 def read_catalog_files_for_range(
     dataset_id: str,
     range_start_utc: int,

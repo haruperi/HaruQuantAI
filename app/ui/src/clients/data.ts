@@ -368,6 +368,28 @@ export function prepareDataset(
   });
 }
 
+const datasetSummarySchema = z.object({
+  dataset_id: z.string().min(1),
+  label: z.string().min(1),
+  dataset_kind: z.string().min(1),
+  symbol: z.string().nullable(),
+  timeframe: z.string().nullable(),
+  revision: z.string().min(1),
+  content_hash: z.string().length(64),
+  row_count: z.number().int().nonnegative(),
+  active: z.literal(true),
+});
+
+export type DatasetSummary = z.infer<typeof datasetSummarySchema>;
+
+/** List integrity-verified datasets eligible for SIM session binding. */
+export function datasets(options?: RequestOptions): Promise<ApiResponse<DatasetSummary[]>> {
+  return request<DatasetSummary[]>(dataRoutes.datasets, {
+    schema: z.array(datasetSummarySchema),
+    ...options,
+  });
+}
+
 /** Read the import dialects Data supports (requires `data:read`). */
 export function importDialects(
   options?: RequestOptions
@@ -405,6 +427,7 @@ export const data = {
   snapshotStream,
   depthStream,
   prepareDataset,
+  datasets,
   importDialects,
   importDataset,
 };

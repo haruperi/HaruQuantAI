@@ -13,6 +13,89 @@ from app.utils import get_logger
 
 logger = get_logger(__name__)
 
+_SESSION_COLUMNS = (
+    "session_id, principal_id, environment_id, name, description, mode, provider, "
+    "provider_account_ref, credential_ref, simulation_session_id, sim_sequence, "
+    "simulation_runtime_ref, dataset_ref, "
+    "dataset_revision, dataset_hash, lifecycle_state, recovery_state, is_default, "
+    "sim_initial_balance_decimal, sim_leverage, sim_account_currency, "
+    "is_active, auto_start, metadata_json, last_error_code, last_reconciled_at, "
+    "started_at, stopped_at, archived_at, version, created_at, updated_at"
+)
+
+
+def _session_row(row: Mapping[str, object]) -> Mapping[str, object]:
+    """Decode one relational execution-session row.
+
+    Returns:
+        Decoded session dictionary.
+    """
+    result = dict(row)
+    result["metadata"] = json.loads(str(result.pop("metadata_json")))
+    result["sim_initial_balance"] = result.pop("sim_initial_balance_decimal")
+    for field in ("is_default", "is_active", "auto_start"):
+        result[field] = bool(result[field])
+    return result
+
+
+def read_execution_session_record(session_id: str) -> Mapping[str, object] | None:
+    """Read one durable execution session, including archived records.
+
+    Returns:
+        Session record dictionary if found, otherwise None.
+    """
+    row = _one_row(
+        f"SELECT {_SESSION_COLUMNS} FROM trading_sessions WHERE session_id=?",  # noqa: S608
+        (session_id,),
+    )
+    return None if row is None else _session_row(row)
+
+
+def read_execution_session_records(
+    principal_id: str, environment_id: str, mode: str | None = None
+) -> tuple[Mapping[str, object], ...]:
+    """List non-archived execution sessions for one exact scope.
+
+    Returns:
+        Tuple of session record dictionaries.
+    """
+    mode_clause = "" if mode is None else " AND mode=?"
+    parameters: tuple[object, ...] = (
+        (principal_id, environment_id)
+        if mode is None
+        else (principal_id, environment_id, mode)
+    )
+    rows = _execute(
+        (
+            f"SELECT {_SESSION_COLUMNS} FROM trading_sessions WHERE principal_id=? "  # noqa: S608
+            f"AND environment_id=? AND archived_at IS NULL{mode_clause} "
+            "ORDER BY updated_at DESC",
+        ),
+        (parameters,),
+        max_rows=1000,
+    ).rows
+    return tuple(_session_row(row) for row in rows)
+
+
+def read_execution_session_events(session_id: str) -> tuple[Mapping[str, object], ...]:
+    """Read bounded newest-first lifecycle events for one session.
+
+    Returns:
+        Tuple of event record dictionaries.
+    """
+    rows = _execute(
+        (
+            "SELECT event_id, session_id, sequence, event_type, payload_json, "
+            "occurred_at, request_id FROM trading_session_events WHERE session_id=? "
+            "ORDER BY sequence DESC",
+        ),
+        ((session_id,),),
+        max_rows=1000,
+    ).rows
+    return tuple(
+        {**row, "payload": json.loads(str(row["payload_json"]))} for row in rows
+    )
+
 
 def _one_row(
     statement: str,

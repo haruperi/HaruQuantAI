@@ -1,7 +1,7 @@
 # Trading
 
 > **Package:** `app/services/trading`
-> **Status:** `Completed` — all 11 registered features (`FEAT-TRD-01`..`11`) and parity-programme requirements `FR-TRD-085`–`113` are implemented with Trading-scoped verification and usage evidence.
+> **Status:** `Completed` — all 12 registered features (`FEAT-TRD-01`..`12`) are implemented with Trading-scoped verification and usage evidence.
 > **Last updated:** `2026-08-14`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -305,6 +305,25 @@ Modules and files are ordered from lowest dependency to highest dependency.
 | Completed | `FEAT-TRD-09` Immutable Execution Evidence        | `reporting/`      | `build_trading_report`, `build_execution_audit_record`, and `parse_execution_audit_record`; exact declarations: Section 4.9 | Section 4.9 functional requirements | `tests/trading/usage/features/09_reporting.py`      |
 | Completed | `FEAT-TRD-10` Protective-Order Lifecycle | `protective_orders/` | Validated bracket/OCO plan transport, exact coverage proof, safe residual resizing, append-only persistence, orphan/reverse-exposure prevention | `FR-TRD-078`..`FR-TRD-080` | `tests/trading/usage/features/10_protective_orders.py` |
 | Completed | `FEAT-TRD-11` Trade Ownership | `trade_ownership/` | Validated player / supervised-automation / automated ownership, append-only persistence, and fail-closed foreign/manual orphan detection | `FR-TRD-081`..`FR-TRD-083`, `FR-TRD-109` | `tests/trading/usage/features/11_trade_ownership.py` |
+| Completed | `FEAT-TRD-12` Durable Execution Session Registry | `session_registry/` | `create_execution_session`, `assign_simulation_session_identity`, `complete_simulation_session_configuration`, `list_execution_sessions`, `get_execution_session`, metadata/default/archive controls, start/stop lifecycle, active-session resolution, verified dataset lineage, SIM opening-account configuration, and immutable events | `FR-TRD-115`–`FR-TRD-129` | `tests/trading/usage/features/12_session_registry.py`; `tests/trading/integration/test_execution_session_registry.py`; `tests/api/unit/test_mode_execution_authority.py` |
+
+#### FEAT-TRD-12 requirements
+
+- `FR-TRD-115`: Trading shall persist SIM, DEMO, and LIVE session definitions, provider references, dataset lineage, metadata, lifecycle state, and timestamps in Trading-owned storage; credentials remain references only.
+- `FR-TRD-116`: Trading shall retain an append-only lifecycle event journal and archive definitions instead of deleting historical evidence.
+- `FR-TRD-117`: Exactly one non-archived default may exist per principal, environment, and mode, and at most one foreground session may be active per principal and environment.
+- `FR-TRD-118`: Start shall verify authority mode before admission and fail closed on missing or contradictory evidence.
+- `FR-TRD-119`: Every mutable operation shall use optimistic revision checks and atomic projection-plus-event persistence.
+- `FR-TRD-120`: Process restart shall reconstruct registry state from the database; transient sockets and runtime handles shall never be serialized.
+- `FR-TRD-121`: A newly created SIM session shall persist an operator-supplied finite positive opening balance, leverage from 1 through 1000, and a three-letter account currency; the currency defaults to USD.
+- `FR-TRD-122`: DEMO and LIVE sessions shall reject local opening balance, leverage, or currency because those account values remain provider-authored.
+- `FR-TRD-123`: Legacy SIM sessions without opening-account configuration remain readable but explicitly unconfigured; persistence shall never invent values for them.
+- `FR-TRD-124`: Starting a session shall require its persisted mode to equal the current authoritative system `ACCOUNT_MODE`; missing, unresolved, or different mode evidence fails closed for SIM, DEMO, and LIVE before the session becomes active.
+- `FR-TRD-125`: Trading shall persist the provider-authored account name on successful start and assign every SIM logical identity as the authenticated username plus a per-principal, transactional, monotonically increasing number (`username_N`); the separate Simulator runtime reference shall never replace that identity.
+- `FR-TRD-126`: Every new SIM session shall bind an integrity-verified Data-owned dataset ID, aggregate revision, and content hash; start shall re-verify the exact lineage and fail closed when it is missing, stale, or incomplete.
+- `FR-TRD-127`: `trading_session_events` shall retain durable lifecycle transitions and their timestamps. Session-filtered operational logs remain file-owned, bounded, and redacted and shall not be duplicated into the lifecycle table.
+- `FR-TRD-128`: A stopped legacy SIM may atomically complete its Account Name, authenticated logical identity, and explicitly selected verified dataset lineage. Running or stale sessions fail closed, and completion appends one `configuration_completed` event.
+- `FR-TRD-129`: SIM Account Name shall equal the authenticated username, SIM logical identity shall equal that username plus its per-principal sequence (`username_N`), and neither value shall be derived from the independently editable session name. DEMO/LIVE account names remain provider-authored.
 
 ```text
 trading/
@@ -1905,6 +1924,22 @@ No feature-specific setting. Report schema version follows `TRADING_CONTRACT_VER
 ### Persistence - Database
 
 This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `trading_`.
+
+#### `trading_sessions` and `trading_session_events`
+
+`trading_sessions` is the durable current-state registry for SIM, DEMO, and LIVE
+execution sessions. It stores scoped identity, lifecycle/default state, provider and
+credential references, Simulator dataset lineage, metadata, optimistic version, and
+timestamps. For SIM only, `sim_initial_balance_decimal`, `sim_leverage`, and
+`sim_account_currency` store the user-defined opening account configuration. Broker
+sockets and credentials are never stored in this table. `trading_session_events` is
+the append-only lifecycle journal linked by `session_id`; archival retains both rows.
+Migration `007_sim_session_account_configuration` adds the nullable SIM columns
+without rewriting historical session rows. Migration `008_session_runtime_bindings`
+adds the per-principal SIM sequence and separate Simulator runtime reference; the
+unique partial index prevents sequence reuse. Lifecycle duration is derived from
+the persisted start/stop timestamps. Redacted operational lines remain in configured
+log files and are never inserted into either session table.
 
 Event-sourced: `trading_events` is the write model and `trading_orders` is its
 order-state projection. `trading_positions` is an insert-only ledger of complete

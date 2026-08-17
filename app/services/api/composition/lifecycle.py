@@ -35,6 +35,7 @@ from app.services.indicators import run_indicators_migrations
 from app.services.optimization import run_optimization_migrations
 from app.services.portfolio import run_portfolio_migrations
 from app.services.simulator import run_simulator_migrations
+from app.services.trading import run_trading_migrations
 from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
@@ -162,6 +163,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         if simulator_result.status != "success" or simulator_result.data is None:
             app.state.api_ready = False
             raise StartupError("SIMULATOR_STORAGE_INITIALIZATION_FAILED")
+        trading_result = cast(
+            "_MigrationResponse",
+            run_trading_migrations(request_id=generate_id("req")),
+        )
+        if trading_result.status != "success" or trading_result.data is None:
+            app.state.api_ready = False
+            raise StartupError("TRADING_STORAGE_INITIALIZATION_FAILED")
         analytics_result = cast(
             "_MigrationResponse",
             run_analytics_migrations(generate_id("req")),

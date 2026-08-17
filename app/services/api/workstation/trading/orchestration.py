@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
+from decimal import Decimal
 from types import MappingProxyType
 from typing import Any, Final, cast
 
+from app.services.api.identity import get_username_for_principal
 from app.services.api.workstation.settings.account_mode import resolve_execution_route
 from app.services.api.workstation.trading.schemas import TradingAccountProfileResponse
 from app.services.trading import (
@@ -14,6 +16,8 @@ from app.services.trading import (
     close_position,
     create_trading_dependencies,
     create_trading_request,
+    list_execution_sessions,
+    resolve_active_execution_session,
     submit_order,
 )
 from app.utils import generate_id, get_logger, utc_now
@@ -23,10 +27,13 @@ logger = get_logger(__name__)
 type AuthContext = Any
 type _MutationOperation = Callable[[str, object, AuthContext], Awaitable[object]]
 type _PreflightOperation = Callable[[object, AuthContext], Awaitable[object]]
-type _AccountProfileOperation = Callable[[], Awaitable[object]]
+type _AccountProfileOperation = Callable[[AuthContext], Awaitable[object]]
 type _ModeBrokerConnector = Callable[[str], Awaitable[object]]
 
 _ACCOUNT_SNAPSHOT_MAX_AGE_SECONDS = 30
+_PLATFORM_MODE_BY_ROUTE: Final = MappingProxyType(
+    {"sim": "SIMULATION", "demo": "DEMO", "live": "REAL"}
+)
 
 
 def _field(value: object, name: str, default: object = None) -> object:
@@ -199,6 +206,7 @@ def build_trading_mutation_source(
         if dependencies is None:
             raise RuntimeError("TRADING_MUTATIONS_UNAVAILABLE")
         _enforce_runtime_policy(runtime_policy, boundary_request)
+        await _require_platform_mode_match(cast("Any", boundary_request).route)
         request = create_trading_request(
             **cast("Any", boundary_request).model_dump(mode="python", warnings=False)
         )
@@ -292,6 +300,52 @@ async def _connect_mode_broker(route: str) -> object:
     return await create_connected_broker("mt5", allow_live=wants_live)
 
 
+async def _read_platform_trade_mode(route: str) -> str:
+    """Read the execution venue's provider-authored mode.
+
+    Args:
+        route: Operator-selected execution route.
+
+    Returns:
+        Canonical provider trade mode.
+
+    Raises:
+        RuntimeError: If provider mode evidence is unavailable or malformed.
+    """
+    if route == "sim":
+        return "SIMULATION"
+    from app.services.brokers import disconnect_broker, get_broker_account_info
+
+    adapter = await _connect_mode_broker(route)
+    try:
+        response = cast("Any", await get_broker_account_info(cast("Any", adapter)))
+        if response.status != "success" or response.data is None:
+            raise RuntimeError("TRADING_ACCOUNT_PROFILE_UNAVAILABLE")
+        details = cast("Any", response.data).details
+        trade_mode = (
+            details.get("trade_mode")
+            if callable(getattr(details, "get", None))
+            else None
+        )
+        if trade_mode not in {"DEMO", "REAL", "CONTEST"}:
+            raise RuntimeError("TRADING_ACCOUNT_PROFILE_MALFORMED")
+        return cast("str", trade_mode)
+    finally:
+        await disconnect_broker(cast("Any", adapter))
+
+
+async def _require_platform_mode_match(route: str) -> None:
+    """Fail closed unless selected and provider-authored modes agree.
+
+    Raises:
+        RuntimeError: If platform evidence is unavailable or does not match.
+    """
+    actual = await _read_platform_trade_mode(route)
+    if actual != _PLATFORM_MODE_BY_ROUTE.get(route):
+        logger.error("Provider-authored account mode contradicts the elected mode")
+        raise RuntimeError("ACCOUNT_MODE_PLATFORM_MISMATCH")
+
+
 def build_trading_account_profile_source(
     connect_mode_broker: _ModeBrokerConnector | None = None,
 ) -> _AccountProfileOperation:
@@ -301,7 +355,7 @@ def build_trading_account_profile_source(
         Async operation returning the minimal Header account profile.
     """
 
-    async def _read() -> object:
+    async def _read(auth: AuthContext) -> object:
         """Read the active account name and execution environment.
 
         Returns:
@@ -312,12 +366,57 @@ def build_trading_account_profile_source(
             TypeError: If MT5 account details are structurally malformed.
         """
         route = resolve_execution_route(request_id=generate_id("req"))
+        session = resolve_active_execution_session(
+            principal_id=auth.principal_id,
+            environment_id=auth.tenant_or_environment,
+            mode=route,
+        )
+        if session is None:
+            candidates = list_execution_sessions(
+                principal_id=auth.principal_id,
+                environment_id=auth.tenant_or_environment,
+                mode=route,
+            )
+            session = next(
+                (item for item in candidates if getattr(item, "is_default", False)),
+                None,
+            )
+        session_name = (
+            None if session is None else str(getattr(session, "name", "")).strip()
+        ) or None
         if route == "sim":
+            username = get_username_for_principal(
+                auth.principal_id, request_id=generate_id("req")
+            )
+            balance_value = getattr(session, "sim_initial_balance", None)
+            leverage_value = getattr(session, "sim_leverage", None)
+            currency_value = getattr(session, "sim_account_currency", None)
+            configuration_complete = session is not None and all(
+                getattr(session, field, None)
+                for field in (
+                    "provider_account_ref",
+                    "simulation_session_id",
+                    "dataset_ref",
+                    "dataset_revision",
+                    "dataset_hash",
+                )
+            )
             return TradingAccountProfileResponse(
-                account_name="Simulation Account",
+                account_name=username,
+                session_name=session_name,
                 trade_mode="SIMULATION",
+                selected_mode="sim",
+                mode_compatible=configuration_complete,
                 environment_label="Simulation Environment",
                 source="simulator",
+                currency=currency_value,
+                balance=balance_value,
+                equity=balance_value,
+                profit=Decimal(0) if balance_value is not None else None,
+                margin=Decimal(0) if balance_value is not None else None,
+                free_margin=balance_value,
+                margin_level=None,
+                leverage=leverage_value,
                 retrieved_at=utc_now(),
             )
         from app.services.brokers import disconnect_broker, get_broker_account_info
@@ -334,6 +433,9 @@ def build_trading_account_profile_source(
                 raise TypeError("TRADING_ACCOUNT_PROFILE_MALFORMED")
             name = details.get("name")
             trade_mode = details.get("trade_mode")
+            profit = details.get("profit")
+            margin_level = details.get("margin_level")
+            leverage = details.get("leverage")
             if not isinstance(name, str) or not name.strip() or name == "N/A":
                 raise RuntimeError("TRADING_ACCOUNT_PROFILE_MALFORMED")
             if trade_mode not in {"DEMO", "REAL", "CONTEST"}:
@@ -345,9 +447,22 @@ def build_trading_account_profile_source(
             }
             return TradingAccountProfileResponse(
                 account_name=name.strip(),
+                session_name=session_name,
                 trade_mode=trade_mode,
+                selected_mode=cast("Any", route),
+                mode_compatible=trade_mode == _PLATFORM_MODE_BY_ROUTE[route],
                 environment_label=labels[trade_mode],
                 source="mt5",
+                currency=account.currency,
+                balance=account.balance,
+                equity=account.equity,
+                profit=None if profit is None else Decimal(str(profit)),
+                margin=account.margin,
+                free_margin=account.free_margin,
+                margin_level=(
+                    None if margin_level is None else Decimal(str(margin_level))
+                ),
+                leverage=None if leverage is None else Decimal(str(leverage)),
                 retrieved_at=account.retrieved_at,
             )
         finally:
@@ -421,6 +536,7 @@ def build_trading_preflight_source() -> _PreflightOperation:
         )
 
         request = cast("Any", boundary_request)
+        await _require_platform_mode_match(request.route)
 
         replay_time = None
         replay_refs = None
@@ -524,6 +640,7 @@ async def _authorize_cancellation(
     )
 
     request = cast("Any", boundary_request)
+    await _require_platform_mode_match(request.route)
 
     adapter = await _connect_mode_broker(request.route)
     try:

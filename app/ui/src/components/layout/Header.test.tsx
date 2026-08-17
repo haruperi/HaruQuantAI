@@ -48,10 +48,21 @@ beforeEach(() => {
     data: {
       contract_version: "v1",
       schema_id: "api.trading.account_profile.v1",
-      account_name: "Simulation Account",
+      account_name: "haruquantai",
+      session_name: "Research SIM",
       trade_mode: "SIMULATION",
+      selected_mode: "sim",
+      mode_compatible: true,
       environment_label: "Simulation Environment",
       source: "simulator",
+      currency: null,
+      balance: null,
+      equity: null,
+      profit: null,
+      margin: null,
+      free_margin: null,
+      margin_level: null,
+      leverage: null,
       retrieved_at: "2026-08-17T00:00:00Z",
     },
   });
@@ -77,6 +88,20 @@ const openMenu = async () => {
 };
 
 describe("header profile section rendering", () => {
+  it("shows the selected mode and active session name together", async () => {
+    render(<Header />);
+    expect(await screen.findByRole("status")).toHaveTextContent("SIM : Research SIM");
+  });
+
+  it("shows an explicit no-session state", async () => {
+    const current = await accountProfile();
+    accountProfile.mockResolvedValueOnce({
+      data: { ...current.data, session_name: null },
+    });
+    render(<Header />);
+    expect(await screen.findByRole("status")).toHaveTextContent("SIM : NO SESSION");
+  });
+
   it("renders the digital clock as segmented digit groups with a zone suffix", async () => {
     render(<Header />);
     const clock = await screen.findByLabelText(/:\d\d (am|pm) UTC \d\d\/\d\d\/\d{4}/);
@@ -84,6 +109,31 @@ describe("header profile section rendering", () => {
     expect(clock.querySelectorAll(".dt-seg")).toHaveLength(3);
     expect(clock.querySelectorAll(".dt-colon")).toHaveLength(2);
     expect(clock.querySelector(".dt-suffix")?.textContent).toMatch(/ (am|pm) UTC /);
+    expect(clock).toHaveAttribute("aria-haspopup", "dialog");
+  });
+
+  it("opens a correction dialog and persists the selected timezone", async () => {
+    render(<Header />);
+    const clock = await screen.findByLabelText(/:\d\d (am|pm) UTC \d\d\/\d\d\/\d{4}/);
+    fireEvent.click(clock);
+    expect(screen.getByRole("dialog", { name: "Correct display time" })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Time zone"), { target: { value: "UTC+2" } });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+
+    await waitFor(() => expect(updateSystem).toHaveBeenCalledWith(
+      { TIMEZONE: "UTC+2", LOG_LEVEL: "INFO", ACCOUNT_MODE: "sim" },
+      7,
+    ));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  });
+
+  it("opens the clock correction dialog from the keyboard", async () => {
+    render(<Header />);
+    const clock = await screen.findByLabelText(/:\d\d (am|pm) UTC \d\d\/\d\d\/\d{4}/);
+    clock.focus();
+    fireEvent.keyDown(clock, { key: "Enter" });
+    expect(screen.getByRole("dialog", { name: "Correct display time" })).toBeInTheDocument();
   });
 
   it("renders the 1-Click switch reflecting the confirmation mode", () => {
@@ -125,7 +175,7 @@ describe("header profile section rendering", () => {
 
   it("shows the provider account name, environment, and chevron", async () => {
     render(<Header />);
-    expect(await screen.findByText("Simulation Account")).toBeInTheDocument();
+    expect(await screen.findByText("haruquantai")).toBeInTheDocument();
     expect(screen.getByText("Simulation Environment")).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Open profile menu" }),
@@ -141,15 +191,119 @@ describe("header profile section rendering", () => {
         schema_id: "api.trading.account_profile.v1",
         account_name: "Rufaro MT5",
         trade_mode: "DEMO",
+        selected_mode: "demo",
+        mode_compatible: true,
         environment_label: "Demo Environment",
         source: "mt5",
+        currency: "USD",
+        balance: "100000.00",
+        equity: "100125.50",
+        profit: "125.50",
+        margin: "1000.00",
+        free_margin: "99125.50",
+        margin_level: "10012.55",
+        leverage: "100",
         retrieved_at: "2026-08-17T00:00:00Z",
       },
     });
     render(<Header />);
     expect(await screen.findByText("Rufaro MT5")).toBeInTheDocument();
     expect(screen.getByText("Demo Environment")).toBeInTheDocument();
+    expect(screen.getByText("BALANCE")).toBeInTheDocument();
+    expect(screen.getByText("$100,000.00")).toBeInTheDocument();
+    expect(screen.getByText("PROFIT")).toBeInTheDocument();
+    expect(screen.getByText("FREE MARGIN")).toBeInTheDocument();
+    expect(screen.getByText("MARGIN LEVEL")).toBeInTheDocument();
+    expect(screen.getByText("1:100")).toBeInTheDocument();
+    expect(screen.getByText("EQUITY")).toBeInTheDocument();
     expect(screen.queryByText("Trader")).toBeNull();
+  });
+
+  it("switches Profit between Money and internally calculated Percent", async () => {
+    useWorkspaceStore.setState({ accountMode: "demo", accountModeVersion: 7 });
+    readSystem.mockResolvedValue(systemSettingsResponse("demo"));
+    accountProfile.mockResolvedValue({
+      data: {
+        contract_version: "v1",
+        schema_id: "api.trading.account_profile.v1",
+        account_name: "Rufaro MT5",
+        trade_mode: "DEMO",
+        selected_mode: "demo",
+        mode_compatible: true,
+        environment_label: "Demo Environment",
+        source: "mt5",
+        currency: "USD",
+        balance: "100000.00",
+        equity: "100250.00",
+        profit: "250.00",
+        margin: "0",
+        free_margin: "100250.00",
+        margin_level: null,
+        leverage: "100",
+        retrieved_at: "2026-08-17T00:00:00Z",
+      },
+    });
+    render(<Header />);
+    expect(await screen.findByText("$250.00")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Account metric settings" }));
+    const menu = screen.getByRole("menu", { name: "Account metric settings" });
+    expect(within(menu).getByRole("radio", { name: "Money" })).toBeChecked();
+    fireEvent.click(within(menu).getByRole("radio", { name: "Percent" }));
+    expect(screen.getByText("0.25%")).toBeInTheDocument();
+    expect(within(menu).getByRole("spinbutton", { name: "Leverage" })).toBeDisabled();
+  });
+
+  it("shows unavailable percentage when account balance is zero", async () => {
+    accountProfile.mockResolvedValue({
+      data: {
+        contract_version: "v1",
+        schema_id: "api.trading.account_profile.v1",
+        account_name: "haruquantai",
+        trade_mode: "SIMULATION",
+        selected_mode: "sim",
+        mode_compatible: true,
+        environment_label: "Simulation Environment",
+        source: "simulator",
+        currency: "USD",
+        balance: "0",
+        equity: "5",
+        profit: "5",
+        margin: "0",
+        free_margin: "5",
+        margin_level: null,
+        leverage: null,
+        retrieved_at: "2026-08-17T00:00:00Z",
+      },
+    });
+    render(<Header />);
+    await waitFor(() => expect(screen.getAllByText("$5.00")).not.toHaveLength(0));
+    fireEvent.click(screen.getByRole("button", { name: "Account metric settings" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Percent" }));
+    const profitMetric = screen.getByText("PROFIT").closest('.metric-item');
+    expect(profitMetric).toHaveTextContent("—");
+  });
+
+  it("disables trading globally when selected and platform modes differ", async () => {
+    useWorkspaceStore.setState({ accountMode: "live", accountModeVersion: 7 });
+    readSystem.mockResolvedValue(systemSettingsResponse("live"));
+    accountProfile.mockResolvedValue({
+      data: {
+        contract_version: "v1",
+        schema_id: "api.trading.account_profile.v1",
+        account_name: "Demo Account",
+        trade_mode: "DEMO",
+        selected_mode: "live",
+        mode_compatible: false,
+        environment_label: "Demo Environment",
+        source: "mt5",
+        retrieved_at: "2026-08-17T00:00:00Z",
+      },
+    });
+    render(<Header />);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Trading disabled: selected LIVE, platform DEMO",
+    );
+    expect(useWorkspaceStore.getState().tradingModeCompatible).toBe(false);
   });
 
   it("shows explicit unavailable identity when the provider read fails", async () => {
