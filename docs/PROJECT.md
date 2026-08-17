@@ -521,21 +521,21 @@ certificate identity, scope, validity, and exclusions above are the system-level
 
 ### Consolidated feature inventory
 
-The owning package READMEs collectively register exactly 238 canonical `FEAT-*`
-features. No secondary programme or work-package identifier namespace is active.
+The owning package READMEs collectively contain 240 registered application features.
+No secondary programme or work-package identifier namespace is active. Completion is
+231 of 240 (96.25%).
 
 | Status | Count |
 | --- | ---: |
-| Completed | 228 |
+| Completed | 231 |
 | Pending | 9 |
-| Partial | 1 |
+| Partial | 0 |
 | Missing | 0 |
-| **Total** | **238** |
+| **Total** | **240** |
 
 The nine `Pending` features are `FEAT-UI-08`–`FEAT-UI-13`, `FEAT-UI-15`,
-`FEAT-UI-16`, and `FEAT-UI-17`; `FEAT-UI-06` is `Partial` because its existing
-Trading session behavior is evidenced while its consolidated CFD/forex order-entry
-behavior and focused-folder ownership remain pending in `app/ui/README.md`. These
+`FEAT-UI-16`, and `FEAT-UI-17`; `FEAT-UI-06` is completed with authoritative
+CFD/forex order entry and focused-folder ownership in `app/ui/README.md`. These
 features belong to the primary trading workspace and its enabling foundation,
 specified by `docs/dev/documentation.pdf`. Simulator
 `FEAT-SIM-17` (Empirical Execution Calibration) and `FEAT-SIM-18` (Parity Comparison)

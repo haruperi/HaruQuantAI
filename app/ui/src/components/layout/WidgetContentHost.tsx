@@ -27,7 +27,7 @@ import { PortfolioView } from '../workflow/portfolio';
 import { AgenticView } from '../workflow/agentic';
 import { SimulationView } from '../workflow/simulation';
 import { RiskView } from '../workflow/risk';
-import { TradingView } from '../workflow/trading';
+import { TradingWidget } from '../../features/trading';
 import { SessionRegistryWidget } from '../../features/session-registry';
 import { IndicatorWorkspace } from '../workflow/indicators';
 import type { Widget } from '../../features/workspaces';
@@ -75,7 +75,7 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
     case 'risk':
       return <RiskView />;
     case 'trading':
-      return <TradingView />;
+      return <TradingWidget accountId={widget.accountId} symbol={widget.symbol} />;
     case 'sessions':
       return <SessionRegistryWidget />;
     case 'indicators':

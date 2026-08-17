@@ -8,9 +8,10 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 
 import { AppShell } from "./shell";
+import { useWorkspaceStore } from "@/features/workspaces";
 
 // Mock useAuth for AppShell.
 const authStateMock = vi.fn();
@@ -86,12 +87,17 @@ describe("NFR-API-009: Accessibility structural checks", () => {
     expect(region).toBeTruthy();
   });
 
-  it("TradingView governed actions are keyboard-reachable (button elements)", async () => {
-    const { TradingView } = await import("./trading");
+  it("TradingWidget governed actions are keyboard-reachable (button elements)", async () => {
+    useWorkspaceStore.setState({
+      accountMode: "demo",
+      platformAccountMode: "demo",
+      tradingModeCompatible: true,
+    });
+    const { TradingWidget } = await import("../../features/trading");
     globalThis.fetch = vi.fn(async () => new Response(
       JSON.stringify({
         status: "success", message: "ok",
-        data: { account: {}, positions: [], orders: [] },
+        data: [],
         error: null,
         metadata: {
           contract_version: "v1", schema_id: "api.metadata.v1", request_id: "r",
@@ -102,9 +108,8 @@ describe("NFR-API-009: Accessibility structural checks", () => {
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     )) as unknown as typeof fetch;
-    const { container } = render(<TradingView />);
+    const { container } = render(<TradingWidget accountId="account-1" symbol="EURUSD" />);
     // All interactive controls must be <button> elements (keyboard-reachable).
-    const buttons = container.querySelectorAll("button");
-    expect(buttons.length).toBeGreaterThan(0);
+    await waitFor(() => expect(container.querySelectorAll("button").length).toBeGreaterThan(0));
   });
 });

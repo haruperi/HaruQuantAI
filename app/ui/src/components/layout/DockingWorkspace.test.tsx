@@ -21,20 +21,22 @@ const makeApi = () => {
   const panels: {
     id: string;
     title: string;
-    api: { close: ReturnType<typeof vi.fn>; setTitle: ReturnType<typeof vi.fn>; maximize: ReturnType<typeof vi.fn>; exitMaximized: ReturnType<typeof vi.fn>; isMaximized: () => boolean; moveTo: ReturnType<typeof vi.fn>; group: {} };
+    api: { close: ReturnType<typeof vi.fn>; setTitle: ReturnType<typeof vi.fn>; maximize: ReturnType<typeof vi.fn>; exitMaximized: ReturnType<typeof vi.fn>; isMaximized: () => boolean; moveTo: ReturnType<typeof vi.fn>; group: {}; location: { type: "grid" | "floating" } };
   }[] = [];
   const pushPanel = (id: string, title: string) => {
+    let maximized = false;
     const panel = {
       id,
       title,
       api: {
         close: vi.fn(),
         setTitle: vi.fn(),
-        maximize: vi.fn(),
-        exitMaximized: vi.fn(),
-        isMaximized: () => false,
+        maximize: vi.fn(() => { maximized = true; }),
+        exitMaximized: vi.fn(() => { maximized = false; }),
+        isMaximized: () => maximized,
         moveTo: vi.fn(),
         group: {},
+        location: { type: "floating" as const },
       },
     };
     panels.push(panel);
@@ -62,11 +64,39 @@ const fakeApi = makeApi();
 
 vi.mock("dockview-react", () => ({
   Orientation: { HORIZONTAL: "HORIZONTAL", VERTICAL: "VERTICAL" },
-  DockviewReact: (props: { onReady: (event: { api: unknown }) => void }) => {
+  DockviewReact: (props: {
+    onReady: (event: { api: unknown }) => void;
+    defaultTabComponent?: React.ComponentType<{
+      api: {
+        id: string;
+        isMaximized: () => boolean;
+        maximize: () => void;
+        exitMaximized: () => void;
+      };
+    }>;
+  }) => {
     useEffect(() => {
       props.onReady({ api: fakeApi });
     }, []);
-    return <div data-testid="dockview" />;
+    const Tab = props.defaultTabComponent;
+    return (
+      <div data-testid="dockview">
+        <div className="dv-floating-overlay-host">
+          <div className="dv-resize-container">
+          {Tab && (
+            <Tab
+              api={{
+                id: "a",
+                isMaximized: () => fakeApi.getPanel("a")?.api.isMaximized() ?? false,
+                maximize: () => fakeApi.getPanel("a")?.api.maximize(),
+                exitMaximized: () => fakeApi.getPanel("a")?.api.exitMaximized(),
+              }}
+            />
+          )}
+          </div>
+        </div>
+      </div>
+    );
   },
   DockviewDefaultTab: () => null,
 }));
@@ -155,7 +185,7 @@ describe("registry reconciliation", () => {
     fakeApi.panels.push({
       id: "a",
       title: "Markets",
-      api: { close: vi.fn(), setTitle: vi.fn(), maximize: vi.fn(), exitMaximized: vi.fn(), isMaximized: () => false, moveTo: vi.fn(), group: {} },
+      api: { close: vi.fn(), setTitle: vi.fn(), maximize: vi.fn(), exitMaximized: vi.fn(), isMaximized: () => false, moveTo: vi.fn(), group: {}, location: { type: "floating" } },
     });
     rerender(
       <DockingWorkspace
@@ -166,7 +196,7 @@ describe("registry reconciliation", () => {
       />
     );
     expect(fakeApi.addPanel).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "b", position: { referencePanel: "a", direction: "within" } })
+      expect.objectContaining({ id: "b", floating: expect.objectContaining({ width: 580, height: 440 }) })
     );
   });
 
@@ -203,7 +233,7 @@ describe("FR-UI-007 keyboard panel moves", () => {
     fakeApi.activePanel = {
       id: "a",
       title: "Markets",
-      api: { close: vi.fn(), setTitle: vi.fn(), maximize: vi.fn(), exitMaximized: vi.fn(), isMaximized: () => false, moveTo, group: { g: 1 } },
+      api: { close: vi.fn(), setTitle: vi.fn(), maximize: vi.fn(), exitMaximized: vi.fn(), isMaximized: () => false, moveTo, group: { g: 1 }, location: { type: "grid" } },
     };
     const shell = document.querySelector(".workspace-dock-shell") as HTMLElement;
 
@@ -212,6 +242,71 @@ describe("FR-UI-007 keyboard panel moves", () => {
 
     fireEvent.keyDown(shell, { key: "ArrowRight" });
     expect(moveTo).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("FR-UI-006/008 widget header drag handle and expansion control", () => {
+  it("renders panel tabs with only the explicit Expand control", () => {
+    const dock = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: { a: { id: "a" } } };
+    render(<DockingWorkspace workspace={workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], dock)} />);
+    const tab = document.querySelector(".workspace-dock-tab");
+    expect(tab).not.toBeNull();
+    expect(tab?.className).toContain("widget-header-grab");
+    expect(tab?.getAttribute("title")).toContain("drag tab header to move widget");
+
+    const expandBtn = document.querySelector(".widget-header-expand-btn");
+    const minimizeBtn = document.querySelector(".widget-header-minimize-btn");
+    const closeBtn = document.querySelector(".widget-header-close-btn");
+    expect(expandBtn).not.toBeNull();
+    expect(minimizeBtn).toBeNull();
+    expect(closeBtn).toBeNull();
+  });
+
+  it("expands a floating container from the title-bar control and restores its prior bounds", () => {
+    const workspace = workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], {
+      grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" },
+      panels: { a: { id: "a" } },
+    });
+    act(() => {
+      useWorkspaceStore.setState((state) => ({
+        workspaces: [...state.workspaces, workspace],
+        activeWorkspaceId: workspace.id,
+      }));
+    });
+    render(<DockingWorkspace workspace={workspace} />);
+    const panel = fakeApi.getPanel("a");
+    if (!panel) throw new Error("panel a was not restored");
+
+    fireEvent.click(document.querySelector(".widget-header-expand-btn") as HTMLButtonElement);
+    expect(panel.api.maximize).not.toHaveBeenCalled();
+    expect(document.querySelector(".dv-resize-container")).toHaveClass("workspace-floating-widget--expanded");
+    expect(document.querySelector(".widget-header-expand-btn")).toHaveAttribute("aria-label", "Restore widget");
+
+    fireEvent.click(document.querySelector(".widget-header-expand-btn") as HTMLButtonElement);
+    expect(panel.api.exitMaximized).not.toHaveBeenCalled();
+    expect(document.querySelector(".dv-resize-container")).not.toHaveClass("workspace-floating-widget--expanded");
+    expect(document.querySelector(".widget-header-expand-btn")).toHaveAttribute("aria-label", "Expand widget");
+  });
+
+  it("keeps Dockview native maximize for docked groups", () => {
+    const workspace = workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], {
+      grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" },
+      panels: { a: { id: "a" } },
+    });
+    act(() => {
+      useWorkspaceStore.setState((state) => ({
+        workspaces: [...state.workspaces, workspace],
+        activeWorkspaceId: workspace.id,
+      }));
+    });
+    render(<DockingWorkspace workspace={workspace} />);
+    const panel = fakeApi.getPanel("a");
+    if (!panel) throw new Error("panel a was not restored");
+    panel.api.location = { type: "grid" };
+    document.querySelector(".dv-resize-container")?.classList.remove("dv-resize-container");
+
+    fireEvent.click(document.querySelector(".widget-header-expand-btn") as HTMLButtonElement);
+    expect(panel.api.maximize).toHaveBeenCalledTimes(1);
   });
 });
 

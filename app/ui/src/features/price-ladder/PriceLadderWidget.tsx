@@ -74,6 +74,8 @@ function maxVolume(rows: readonly LadderRow[]): number {
 }
 
 interface Props {
+  /** Standalone owns controls; Trading composition renders synchronized DOM only. */
+  variant?: 'standalone' | 'trading';
   /** Real broker-native instrument symbol. */
   symbol?: string;
   /**
@@ -96,12 +98,14 @@ interface Props {
 }
 
 export const PriceLadderWidget: React.FC<Props> = ({
+  variant = 'standalone',
   symbol = 'EURUSD',
   accountId,
   route: routeOverride,
   portfolioId = null,
   onOpenTicket,
 }) => {
+  const isTradingComposition = variant === 'trading';
   const { orderConfirmationRequired, accountMode, tradingModeCompatible } = useWorkspaceStore();
   // An unresolved mode leaves no route to trade on; order entry is already
   // disabled in that state (FR-UI-021), so the ladder never invents one.
@@ -692,7 +696,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
 
   return (
     <div className="price-ladder-container">
-      <div className="ladder-titlebar">
+      {!isTradingComposition && <div className="ladder-titlebar">
         <span className="ladder-symbol-chip">{symbol}</span>
         <span className="ladder-position-readout">
           Position <b>{netPosition > 0 ? `+${netPosition}` : netPosition}</b>
@@ -710,9 +714,9 @@ export const PriceLadderWidget: React.FC<Props> = ({
         >
           <Settings size={13} />
         </button>
-      </div>
+      </div>}
 
-      {settingsOpen && (
+      {!isTradingComposition && settingsOpen && (
         <div className="ladder-settings-popover">
           <span className="ladder-settings-label">Order type</span>
           <div style={{ display: 'flex', gap: '4px' }}>
@@ -734,7 +738,7 @@ export const PriceLadderWidget: React.FC<Props> = ({
         </div>
       )}
 
-      <div className="ladder-header-controls">
+      {!isTradingComposition && <div className="ladder-header-controls">
         <div className="ladder-action-row">
           <div className="ladder-tif-group">
             <button
@@ -844,7 +848,14 @@ export const PriceLadderWidget: React.FC<Props> = ({
         {(depthError ?? actionError) && (
           <div style={{ fontSize: '11px', color: 'var(--cme-sell-red)' }}>{depthError ?? actionError}</div>
         )}
-      </div>
+      </div>}
+
+      {isTradingComposition && (
+        <div className="ladder-embedded-status" role="status">
+          <span>Depth of market</span>
+          <span>{depthStatus === 'connected' ? 'LIVE' : depthStatus.toUpperCase()}</span>
+        </div>
+      )}
 
       <div style={{ flex: 1, overflowY: 'auto' }} ref={scrollRef}>
         <table className="ladder-table">

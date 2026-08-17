@@ -77,7 +77,7 @@ function emptyBookStream(): AsyncIterable<unknown> {
   })();
 }
 
-describe('PriceLadderWidget — FR-UI-055 through FR-UI-062', () => {
+describe('PriceLadderWidget — FR-UI-055 through FR-UI-062 and FR-UI-228', () => {
   beforeEach(() => {
     orderConfirmationRequired = false;
     depthStreamMock.mockReset();
@@ -103,6 +103,26 @@ describe('PriceLadderWidget — FR-UI-055 through FR-UI-062', () => {
     await waitFor(() => expect(screen.getByText('50')).toBeTruthy());
     expect(screen.getByText('40')).toBeTruthy();
     expect(screen.getAllByText('1.10000').length).toBeGreaterThan(0);
+  });
+
+  it('renders only synchronized DOM controls in the Trading composition', async () => {
+    render(<PriceLadderWidget variant="trading" symbol="EURUSD" accountId="acct-1" />);
+
+    await waitFor(() => expect(screen.getByText('50')).toBeTruthy());
+    expect(screen.getByText('40')).toBeTruthy();
+    expect(screen.getByText('Depth of market')).toBeTruthy();
+    expect(screen.queryByText('EURUSD')).toBeNull();
+    expect(screen.queryByLabelText('Price Ladder settings')).toBeNull();
+    expect(screen.queryByText('MARKET')).toBeNull();
+    expect(screen.queryByText('LIMIT')).toBeNull();
+    expect(screen.queryByText('DAY')).toBeNull();
+    expect(screen.queryByText('GTC')).toBeNull();
+    expect(screen.queryByText('FLATTEN')).toBeNull();
+    expect(screen.queryByText('CANCEL ALL')).toBeNull();
+    expect(screen.queryByText(/BUY MKT/)).toBeNull();
+    expect(screen.queryByText(/SELL MKT/)).toBeNull();
+    expect(screen.queryByText('VOLUME')).toBeNull();
+    expect(screen.getByTitle(/Re-Center Price Ladder/)).toBeTruthy();
   });
 
   it('never submits when the real Risk preflight declines (FR-UI-055 fail-closed)', async () => {

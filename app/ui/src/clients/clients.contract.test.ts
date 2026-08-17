@@ -14,6 +14,7 @@ import {
   ROUTE_CONTRACTS_BY_ID,
   ROUTE_CONTRACT_COUNT,
 } from "./routes";
+import { tradingInstrumentConstraintsSchema } from "./trading";
 
 /** Expected backend-v1 inventory, mirroring `_KNOWN_ROUTE_CONTRACTS`. */
 const EXPECTED: ReadonlyArray<{
@@ -105,6 +106,7 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.risk.decisions", method: "GET", path: "/api/v1/risk/decisions", permission: "risk:read" },
   { id: "api.trading.session", method: "GET", path: "/api/v1/trading/session", permission: "trading:read" },
   { id: "api.trading.account_profile", method: "GET", path: "/api/v1/trading/account-profile", permission: "trading:read" },
+  { id: "api.trading.instrument_constraints", method: "GET", path: "/api/v1/trading/instruments/{symbol}/constraints", permission: "trading:read" },
   { id: "api.trading.execution_sessions", method: "GET", path: "/api/v1/trading/execution-sessions", permission: "trading:read" },
   { id: "api.trading.create_execution_session", method: "POST", path: "/api/v1/trading/execution-sessions", permission: "trading:write" },
   { id: "api.trading.update_execution_session", method: "PATCH", path: "/api/v1/trading/execution-sessions/{session_id}", permission: "trading:write" },
@@ -165,9 +167,9 @@ const EXPECTED: ReadonlyArray<{
 ];
 
 describe("clients match the backend route catalog", () => {
-  it("has exactly the approved 105 typed operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(110);
-    expect(ROUTE_CONTRACTS).toHaveLength(105);
+  it("has exactly the approved 106 typed operations", () => {
+    expect(ROUTE_CONTRACT_COUNT).toBe(111);
+    expect(ROUTE_CONTRACTS).toHaveLength(106);
   });
 
   it("matches every expected id, method, path, and permission", () => {
@@ -263,5 +265,21 @@ describe("clients match the backend route catalog", () => {
     expect(step?.sideEffect).toBe("write");
     expect(step?.governed).toBe(false);
     expect(step?.idempotencyRequired).toBe(false);
+  });
+
+  it("parses authoritative Trading protection-calculator evidence", () => {
+    const parsed = tradingInstrumentConstraintsSchema.parse({
+      contract_version: "v1", schema_id: "api.trading.instrument_constraints.v1",
+      symbol: "EURUSD", source_id: "mt5", quantity_unit: "lots",
+      min_quantity: "0.01", max_quantity: "50", quantity_step: "0.01", price_tick: "0.00001",
+      digits: 5, pip_size: "0.0001", trade_tick_size: "0.00001",
+      trade_tick_value_profit: "1", trade_tick_value_loss: "1",
+      trade_contract_size: "100000", profit_currency: "USD",
+      supported_order_types: ["MARKET"], supported_time_in_force: ["IOC"],
+      supports_stop_loss: true, supports_take_profit: true,
+      retrieved_at: "2026-08-17T12:00:00Z",
+    });
+    expect(parsed.pip_size).toBe("0.0001");
+    expect(parsed.trade_tick_value_loss).toBe("1");
   });
 });

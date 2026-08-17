@@ -26,9 +26,6 @@ export type { SimulationViewProps } from "./simulation";
 export { RiskView } from "./risk";
 export type { RiskViewProps } from "./risk";
 
-export { TradingView } from "./trading";
-export type { TradingViewProps } from "./trading";
-
 export { ResearchWorkspace } from "./research";
 export type { ResearchWorkspaceProps } from "./research";
 
@@ -47,6 +44,5 @@ export type { PlaybackViewProps } from "./playback";
 export { WhatIfView } from "./whatIf";
 export type { WhatIfViewProps } from "./whatIf";
 
-export { OrderTicketModal } from "./OrderTicketModal";
 export { PositionsWidget } from "./PositionsWidget";
 export { TradeLogWidget } from "./TradeLogWidget";

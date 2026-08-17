@@ -546,6 +546,15 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
         response_contract="OrderPreflightResult.v1",
     ),
     _contract(
+        "api.trading.instrument_constraints",
+        "GET",
+        "/api/v1/trading/instruments/{symbol}/constraints",
+        "trading",
+        "trading:read",
+        side_effect=RouteSideEffect.READ,
+        response_contract="TradingInstrumentConstraints.v1",
+    ),
+    _contract(
         "api.trading.submit_order",
         "POST",
         "/api/v1/trading/orders",

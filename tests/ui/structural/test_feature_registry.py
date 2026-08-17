@@ -52,8 +52,8 @@ def test_api_and_ui_have_independent_feature_registries() -> None:
         f"FEAT-API-{number:02d}" for number in range(1, 25)
     }
     assert set(re.findall(r"FEAT-UI-\d{2}", ui_rows)) == {
-        f"FEAT-UI-{number:02d}" for number in range(1, 26)
-    }
+        f"FEAT-UI-{number:02d}" for number in range(1, 27)
+    } - {"FEAT-UI-07"}
     assert "FEAT-UI-" not in api_rows
     assert "app/ui" not in api_rows
 
@@ -64,7 +64,7 @@ def test_market_and_watchlist_ownership_is_reconciled() -> None:
     ui_registry = _registry(_UI_README)
 
     # The API registry stays fully reconciled; the UI records exactly the
-    # eleven primary/foundation features (FEAT-UI-01-17) whose requirement
+    # nine primary/foundation features (FEAT-UI-01-17) whose requirement
     # coverage or focused-folder ownership is not yet evidenced. Naming them
     # keeps the ratchet: no feature can silently regress.
     assert "| Pending |" not in api_registry
@@ -76,6 +76,8 @@ def test_market_and_watchlist_ownership_is_reconciled() -> None:
         "FEAT-UI-03",
         "FEAT-UI-04",
         "FEAT-UI-05",
+        "FEAT-UI-06",
+        "FEAT-UI-07",
         "FEAT-UI-14",
     }
     assert "| `workstation/watchlists/` |" in api_registry
@@ -118,7 +120,7 @@ def test_ui_evidence_exception_and_widget_ownership_are_documented() -> None:
         "app/ui/src/features/chart/ChartWidget.tsx",
         "app/ui/src/features/training-ux/EducationWidget.tsx",
         "app/ui/src/features/instrument-panels/OptionsGridWidget.tsx",
-        "app/ui/src/components/workflow/OrderTicketModal.tsx",
+        "app/ui/src/features/trading/OrderTicket.tsx",
         "app/ui/src/components/workflow/PositionsWidget.tsx",
         "app/ui/src/features/price-ladder/PriceLadderWidget.tsx",
         "app/ui/src/app/workstation/settings/SystemSettingsModal.tsx",
@@ -130,10 +132,9 @@ def test_ui_evidence_exception_and_widget_ownership_are_documented() -> None:
     # Open Decisions records unresolved owner choices only; each must stay present
     # until the owner resolves it into a requirement, boundary, or exclusion.
     for unresolved in (
-        "No owning backend domain for four surfaces",
+        "No owning backend domain for two surfaces",
         "Fixture data reaches production modules",
-        "Order-confirmation governance basis",
-        "Two overlapping presentation paradigms",
+        "Remaining overlapping presentation paradigms",
     ):
         assert unresolved in text
 
@@ -205,10 +206,10 @@ def test_repository_feature_inventory_is_reconciled() -> None:
         statuses.extend(status for status, _feature_id in rows)
         feature_ids.extend(feature_id for _status, feature_id in rows)
 
-    assert len(feature_ids) == len(set(feature_ids)) == 239
-    assert statuses.count("Completed") == 228
-    assert statuses.count("Pending") == 11
+    assert len(feature_ids) == len(set(feature_ids)) == 240
+    assert statuses.count("Completed") == 231
+    assert statuses.count("Pending") == 9
     assert statuses.count("Partial") == 0
     project = _PROJECT_README.read_text(encoding="utf-8")
-    assert "239 registered application features" in project
-    assert "(95.40%)" in project
+    assert "240 registered application features" in project
+    assert "(96.25%)" in project

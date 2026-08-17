@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
+from decimal import Decimal, InvalidOperation
 from typing import Annotated, Any, Literal, cast
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
@@ -13,8 +14,9 @@ from app.services.api.identity import (
     require_human_permission,
     run_idempotent_write_async,
 )
+from app.services.api.workstation.markets import resolve_runtime_source_id
 from app.services.api.workstation.settings.account_mode import resolve_execution_route
-from app.services.api.workstation.trading.schemas import (  # noqa: TC001
+from app.services.api.workstation.trading.schemas import (
     CancelAllPreflightRequest,
     CancelOrderPreflightRequest,
     ExecutionSessionActionRequest,
@@ -22,9 +24,15 @@ from app.services.api.workstation.trading.schemas import (  # noqa: TC001
     ExecutionSessionCreateRequest,
     ExecutionSessionUpdateRequest,
     OrderPreflightRequest,
+    TradingInstrumentConstraintsResponse,
     TradingMutationRequest,
 )
-from app.services.data import list_verified_datasets
+from app.services.brokers import get_broker_capability_catalogue
+from app.services.data import (
+    build_symbol_metadata_request,
+    get_symbol_metadata,
+    list_verified_datasets,
+)
 from app.services.trading import (
     archive_execution_session,
     assign_simulation_session_identity,
@@ -45,6 +53,64 @@ type _SessionSource = Callable[[str, str, str, AuthContext], object | None]
 type _MutationSource = Callable[[str, object, AuthContext], Awaitable[object]]
 type _PreflightSource = Callable[[object, AuthContext], Awaitable[object]]
 type _AccountProfileSource = Callable[[AuthContext], Awaitable[object]]
+
+
+def _positive_decimal_or_none(metadata: object, *names: str) -> Decimal | None:
+    """Read the first positive provider decimal, preserving missingness.
+
+    Args:
+        metadata: Provider-authored metadata object.
+        *names: Candidate provider field names in priority order.
+
+    Returns:
+        The first positive finite decimal, otherwise ``None``.
+    """
+    for name in names:
+        value = getattr(metadata, name, None)
+        if isinstance(value, bool) or value is None:
+            continue
+        try:
+            decimal_value = Decimal(str(value))
+        except InvalidOperation, ValueError:
+            continue
+        if decimal_value.is_finite() and decimal_value > 0:
+            return decimal_value
+    return None
+
+
+def _nonnegative_int_or_none(value: object) -> int | None:
+    """Preserve one provider-authored non-negative integer when valid.
+
+    Args:
+        value: Candidate provider value.
+
+    Returns:
+        The integer, otherwise ``None``.
+    """
+    return (
+        value
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0
+        else None
+    )
+
+
+def _available_text_or_none(value: object) -> str | None:
+    """Preserve one available provider text value when valid.
+
+    Args:
+        value: Candidate provider value.
+
+    Returns:
+        Trimmed provider text, otherwise ``None``.
+    """
+    if (
+        not isinstance(value, str)
+        or not value.strip()
+        or "not available" in value.lower()
+    ):
+        return None
+    return value.strip()
+
 
 router = APIRouter(prefix="/api/v1/trading", tags=["trading"])
 
@@ -572,6 +638,115 @@ async def _get_account_profile(
         }:
             raise
         raise HTTPException(status_code=503, detail=str(error)) from error
+
+
+@router.get("/instruments/{symbol}/constraints", response_model=None)
+def _get_instrument_constraints(
+    symbol: str,
+    auth: Annotated[AuthContext, Depends(require_auth_context)],
+) -> object:
+    """Return provider-authored constraints for one exact trading symbol.
+
+    Returns:
+        Validated browser-facing instrument constraints.
+
+    Raises:
+        HTTPException: If authorization or complete provider evidence is absent.
+    """
+    require_human_permission(auth, "trading:read")
+    request_id = generate_id("req")
+    source_id = resolve_runtime_source_id(request_id=request_id)
+    response = get_symbol_metadata(
+        build_symbol_metadata_request(
+            source_id=source_id,
+            symbol=symbol,
+            request_id=request_id,
+        )
+    )
+    metadata = getattr(response, "data", None)
+    if getattr(response, "status", None) != "success" or metadata is None:
+        raise HTTPException(
+            status_code=503,
+            detail="INSTRUMENT_CONSTRAINTS_UNAVAILABLE",
+        )
+
+    def required_decimal(*names: str) -> Decimal:
+        """Read one positive provider decimal without supplying a fallback.
+
+        Returns:
+            Positive provider-authored decimal value.
+
+        Raises:
+            HTTPException: If none of the named fields contains a positive value.
+        """
+        for name in names:
+            value = getattr(metadata, name, None)
+            if isinstance(value, bool) or value is None:
+                continue
+            try:
+                decimal_value = Decimal(str(value))
+            except InvalidOperation, ValueError:
+                continue
+            if decimal_value.is_finite() and decimal_value > 0:
+                return decimal_value
+        raise HTTPException(status_code=503, detail="INSTRUMENT_CONSTRAINTS_INCOMPLETE")
+
+    catalogue = getattr(get_broker_capability_catalogue(), "data", {})
+    provider = next(
+        (
+            values
+            for key, values in catalogue.items()
+            if str(getattr(key, "value", key)) == source_id
+        ),
+        (),
+    )
+    place_order = next(
+        (
+            item
+            for item in provider
+            if str(getattr(getattr(item, "capability", None), "value", ""))
+            == "place_order"
+        ),
+        None,
+    )
+    order_types = tuple(getattr(place_order, "supported_order_types", ()))
+    if place_order is None or not order_types or source_id != "mt5":
+        raise HTTPException(status_code=503, detail="INSTRUMENT_ROUTE_UNAVAILABLE")
+    stops_level = getattr(metadata, "trade_stops_level", None)
+    supports_protection = isinstance(stops_level, int | float) and not isinstance(
+        stops_level, bool
+    )
+    return TradingInstrumentConstraintsResponse(
+        symbol=str(getattr(metadata, "provider_symbol", symbol)),
+        source_id=source_id,
+        quantity_unit="lots",
+        min_quantity=required_decimal("min_quantity", "volume_min"),
+        max_quantity=required_decimal("max_quantity", "volume_max"),
+        quantity_step=required_decimal("quantity_step", "volume_step"),
+        price_tick=required_decimal("price_step", "trade_tick_size", "point"),
+        digits=_nonnegative_int_or_none(getattr(metadata, "digits", None)),
+        pip_size=_positive_decimal_or_none(metadata, "pip_size"),
+        trade_tick_size=_positive_decimal_or_none(
+            metadata, "trade_tick_size", "price_step", "point"
+        ),
+        trade_tick_value_profit=_positive_decimal_or_none(
+            metadata, "trade_tick_value_profit"
+        ),
+        trade_tick_value_loss=_positive_decimal_or_none(
+            metadata, "trade_tick_value_loss"
+        ),
+        trade_contract_size=_positive_decimal_or_none(metadata, "trade_contract_size"),
+        profit_currency=_available_text_or_none(
+            getattr(metadata, "currency_profit", None)
+        ),
+        supported_order_types=order_types,
+        supported_time_in_force=tuple(
+            getattr(place_order, "supported_time_in_force", ())
+        ),
+        supports_stop_loss=supports_protection,
+        supports_take_profit=supports_protection,
+        retrieved_at=metadata.retrieved_at,
+    )
 
 
 @router.post("/orders", response_model=None)

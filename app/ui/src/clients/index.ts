@@ -101,6 +101,7 @@ export type {
   SubmitOrderInput,
   TradingMutationInput,
   TradingAccountProfile,
+  TradingInstrumentConstraints,
   TradingProjection,
   WorkingOrder,
 } from "./trading";

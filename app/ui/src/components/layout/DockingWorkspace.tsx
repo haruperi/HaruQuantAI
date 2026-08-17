@@ -22,6 +22,7 @@ import {
   type IDockviewPanelProps,
   type SerializedDockview,
 } from 'dockview-react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 import 'dockview-core/dist/styles/dockview.css';
 
 import {
@@ -50,16 +51,55 @@ const DockWidgetPanel: React.FC<IDockviewPanelProps> = ({ params }) => {
   return <WidgetContentHost widget={widget} />;
 };
 
-/** Default tab plus double-click to maximize/restore the group (FR-UI-008). */
+/** Default tab with an explicit Expand/Restore control and double-click shortcut (FR-UI-006, FR-UI-008). */
 const DockWidgetTab: React.FC<IDockviewPanelHeaderProps> = (props) => {
-  const toggleExpandWidget = useWorkspaceStore((state) => state.toggleExpandWidget);
+  const tabRef = useRef<HTMLDivElement | null>(null);
+  const expandedWidgetId = useWorkspaceStore((state) => {
+    const workspace = state.workspaces.find((candidate) => String(candidate.id) === String(state.activeWorkspaceId));
+    return workspace?.expandedWidgetId ?? null;
+  });
+  const switchExpandedWidget = useWorkspaceStore((state) => state.switchExpandedWidget);
+  const contractWidget = useWorkspaceStore((state) => state.contractWidget);
+  const isExpanded = expandedWidgetId === props.api.id;
+
+  useEffect(() => {
+    const floatingContainer = tabRef.current?.closest('.dv-resize-container');
+    if (!(floatingContainer instanceof HTMLElement)) return undefined;
+    floatingContainer.classList.toggle('workspace-floating-widget--expanded', isExpanded);
+    return () => floatingContainer.classList.remove('workspace-floating-widget--expanded');
+  }, [isExpanded]);
+
+  const handleExpand = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const floatingContainer = e.currentTarget.closest('.dv-resize-container');
+    if (!floatingContainer) {
+      if (isExpanded && props.api.isMaximized()) props.api.exitMaximized();
+      else if (!isExpanded && !props.api.isMaximized()) props.api.maximize();
+    }
+    if (isExpanded) contractWidget();
+    else switchExpandedWidget(props.api.id);
+  };
+
   return (
     <div
-      className="workspace-dock-tab"
-      title="Double-click to expand this group to fill the workspace"
-      onDoubleClick={() => toggleExpandWidget(props.api.id)}
+      ref={tabRef}
+      data-workspace-widget-id={props.api.id}
+      className="workspace-dock-tab widget-header-grab"
+      title="Use the expand control or double-click to fill the workspace; drag tab header to move widget"
+      onDoubleClick={handleExpand}
     >
       <DockviewDefaultTab {...props} />
+      <div className="widget-header-actions">
+        <button
+          type="button"
+          className="widget-header-action-btn widget-header-expand-btn"
+          aria-label={isExpanded ? 'Restore widget' : 'Expand widget'}
+          title={isExpanded ? 'Restore widget to its previous size' : 'Expand widget to fill the workspace'}
+          onClick={handleExpand}
+        >
+          {isExpanded ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+        </button>
+      </div>
     </div>
   );
 };
@@ -71,7 +111,6 @@ export const DockingWorkspace: React.FC<{ workspace: Workspace }> = ({ workspace
 
   const setWorkspaceDockLayout = useWorkspaceStore((state) => state.setWorkspaceDockLayout);
   const removeWidget = useWorkspaceStore((state) => state.removeWidget);
-
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Suppress saves while a persisted/factory layout is being loaded, so the
   // restore's own layout-change events cannot feed back into the store.
@@ -123,13 +162,20 @@ export const DockingWorkspace: React.FC<{ workspace: Workspace }> = ({ workspace
         }
       }
       if (!restored) {
-        // Last-resort sequential fallback: one panel per widget.
+        // Last-resort sequential fallback: launch as centered floating panels.
+        const width = 580;
+        const height = 440;
+        const winWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+        const winHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+        const x = Math.max(20, Math.round((winWidth - width) / 2));
+        const y = Math.max(20, Math.round((winHeight - height) / 2));
         for (const widget of ws.widgets) {
           api.addPanel({
             id: widget.id,
             title: widget.title,
             component: DOCK_WIDGET_COMPONENT,
             params: { widgetId: widget.id },
+            floating: { width, height, x, y },
           });
         }
       }
@@ -146,9 +192,8 @@ export const DockingWorkspace: React.FC<{ workspace: Workspace }> = ({ workspace
     [removeWidget, scheduleSave]
   );
 
-  // Registry <-> panel reconciliation: new widgets become panels (docked as a
-  // tab in the active group when one exists), removed widgets' panels close,
-  // and tab titles follow the registry.
+  // Registry <-> panel reconciliation: new widgets become centered floating
+  // panels, removed widgets' panels close, and tab titles follow the registry.
   useEffect(() => {
     const api = apiRef.current;
     if (!api) return undefined;
@@ -156,23 +201,20 @@ export const DockingWorkspace: React.FC<{ workspace: Workspace }> = ({ workspace
 
     for (const widget of workspace.widgets) {
       if (!panelIds.has(widget.id)) {
-        const activeId = api.activePanel?.id;
-        api.addPanel(
-          activeId
-            ? {
-                id: widget.id,
-                title: widget.title,
-                component: DOCK_WIDGET_COMPONENT,
-                params: { widgetId: widget.id },
-                position: { referencePanel: activeId, direction: 'within' },
-              }
-            : {
-                id: widget.id,
-                title: widget.title,
-                component: DOCK_WIDGET_COMPONENT,
-                params: { widgetId: widget.id },
-              }
-        );
+        const width = 580;
+        const height = 440;
+        const winWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+        const winHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+        const x = Math.max(20, Math.round((winWidth - width) / 2));
+        const y = Math.max(20, Math.round((winHeight - height) / 2));
+
+        api.addPanel({
+          id: widget.id,
+          title: widget.title,
+          component: DOCK_WIDGET_COMPONENT,
+          params: { widgetId: widget.id },
+          floating: { width, height, x, y },
+        });
       } else {
         const panel = api.getPanel(widget.id);
         if (panel && panel.title !== widget.title) {
@@ -187,22 +229,6 @@ export const DockingWorkspace: React.FC<{ workspace: Workspace }> = ({ workspace
     }
     return undefined;
   }, [workspace.widgets]);
-
-  // Expanded mode maps to group maximize (FR-UI-008): the maximized group
-  // fills the workspace and every other region is restored on contract.
-  useEffect(() => {
-    const api = apiRef.current;
-    if (!api) return undefined;
-    if (workspace.expandedWidgetId) {
-      const panel = api.getPanel(workspace.expandedWidgetId);
-      if (panel && !panel.api.isMaximized()) panel.api.maximize();
-    } else {
-      for (const panel of api.panels) {
-        if (panel.api.isMaximized()) panel.api.exitMaximized();
-      }
-    }
-    return undefined;
-  }, [workspace.expandedWidgetId]);
 
   // Keyboard layout moves (FR-UI-007): Alt+Arrow on the focused layout moves
   // the active panel left/right/above/below its group, docking or splitting

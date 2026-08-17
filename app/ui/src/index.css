@@ -1324,6 +1324,87 @@ body {
   }
 }
 
+/* FEAT-UI-06: compact cTrader-inspired order entry. */
+.workflow-trading__execution-grid { display: grid; min-height: 520px; grid-template-columns: minmax(480px, 1.05fr) minmax(380px, 0.95fr); gap: 10px; align-items: stretch; }
+.workflow-trading__ticket-pane, .workflow-trading__ladder-pane { min-width: 0; overflow: hidden; border-radius: 10px; }
+.workflow-trading__ladder-pane { min-height: 520px; border: 1px solid rgba(82, 137, 177, 0.32); background: #061725; }
+.workflow-trading__ladder-pane .price-ladder-container { min-height: 520px; }
+.ladder-embedded-status { display: flex; min-height: 31px; align-items: center; justify-content: space-between; padding: 0 10px; border-bottom: 1px solid var(--cme-navy-border); background: var(--cme-navy-dark); color: var(--text-muted-grey); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.ladder-embedded-status span:last-child { color: var(--cme-buy-green); }
+.order-ticket { display: grid; width: 100%; min-height: 520px; grid-template-columns: 130px minmax(0, 1fr); overflow: hidden; border: 1px solid rgba(82, 137, 177, 0.32); border-radius: 10px; background: #071b2d; box-shadow: 0 18px 55px rgba(0, 0, 0, 0.22); color: #d8e8f3; }
+.order-ticket button, .order-ticket input, .order-ticket select, .order-ticket textarea { font: inherit; }
+.order-ticket__types { display: flex; padding: 74px 8px 12px; flex-direction: column; gap: 3px; background: #04111e; }
+.order-ticket__types button { padding: 9px 10px; border: 0; border-radius: 5px; cursor: pointer; background: transparent; color: #9db5c7; text-align: left; text-transform: capitalize; }
+.order-ticket__types button[aria-pressed="true"] { background: #29475f; color: #fff; }
+.order-ticket__types button:focus-visible { outline: 2px solid #54c9ff; outline-offset: 1px; }
+.order-ticket__body { min-width: 0; padding: 18px 20px; background: linear-gradient(145deg, rgba(20, 54, 78, 0.97), rgba(8, 30, 49, 0.98)); }
+.order-ticket__body > header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid rgba(154, 188, 211, 0.2); }
+.order-ticket__body h3 { margin: 0; font-size: 22px; font-weight: 650; text-transform: capitalize; }
+.order-ticket__body > header span { color: #77a6c4; font-size: 10px; font-weight: 800; }
+.order-ticket__selectors, .order-ticket__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.order-ticket__symbol { grid-column: 1 / -1; }
+.order-ticket__symbol-search { position: relative; }
+.order-ticket__symbol-suggestions { position: absolute; z-index: 100; top: calc(100% + 4px); right: 0; left: 0; max-height: 220px; margin: 0; padding: 4px; overflow-y: auto; border: 1px solid rgba(110, 160, 195, 0.45); border-radius: 5px; background: #061725; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.42); list-style: none; }
+.order-ticket__symbol-suggestions [role="option"] { padding: 7px 10px; border-radius: 3px; cursor: pointer; color: #d8e8f3; font-size: 11px; font-weight: 700; }
+.order-ticket__symbol-suggestions [role="option"][aria-selected="true"] { background: #29475f; color: #fff; }
+.order-ticket label { display: flex; min-width: 0; flex-direction: column; gap: 5px; color: #9db5c7; font-size: 10px; font-weight: 700; }
+.order-ticket input, .order-ticket select { width: 100%; height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid rgba(110, 160, 195, 0.35); border-radius: 5px; outline: none; background: #061725; color: #eef7fc; }
+.order-ticket input:focus, .order-ticket select:focus { border-color: #4dc5fb; box-shadow: 0 0 0 2px rgba(77, 197, 251, 0.13); }
+.order-ticket__quotes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.order-ticket__quotes button { min-height: 68px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; background: #071521; color: #fff; }
+.order-ticket__quotes button span, .order-ticket__quotes button strong { display: block; }
+.order-ticket__quotes button strong { margin-top: 3px; font-size: 22px; }
+.order-ticket__sell { color: #ff8a59 !important; }
+.order-ticket__buy { color: #42d58b !important; }
+.order-ticket__sell[aria-pressed="true"] { border-color: #ff7545; background: rgba(127, 45, 20, 0.28); }
+.order-ticket__buy[aria-pressed="true"] { border-color: #20c979; background: rgba(15, 104, 66, 0.28); }
+.order-ticket__freshness { display: block; margin-top: 7px; color: #7897ad; text-align: center; }
+.order-ticket__market-details { margin-top: 14px; }
+.order-ticket__market-top { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(154, 188, 211, 0.2); }
+.order-ticket__pending-top { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(154, 188, 211, 0.2); }
+.order-ticket__pending-top > label:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.order-ticket__market-top > label, .order-ticket__unsupported-control { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
+.order-ticket__input-unit { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; color: #d8e8f3; }
+.order-ticket__market-details small { color: #9db5c7; font-size: 10px; }
+.order-ticket__check { display: flex !important; min-height: 18px; flex-direction: row !important; align-items: center; gap: 6px !important; color: #d8e8f3 !important; font-size: 11px !important; }
+.order-ticket__check input { width: 16px; height: 16px; margin: 0; accent-color: #31c985; }
+.order-ticket__protections { display: grid; grid-template-columns: minmax(0, 1fr) 62px minmax(0, 1fr); align-items: center; gap: 7px 10px; padding: 12px 0; border-bottom: 1px solid rgba(154, 188, 211, 0.2); }
+.order-ticket__protection-label { color: #7897ad; font-size: 10px; font-weight: 700; text-align: center; }
+.order-ticket__calculator-unavailable { display: block; margin-top: 7px; color: #ffadb5 !important; }
+.order-ticket__advanced { display: flex; padding: 11px 0; flex-direction: column; gap: 7px; border-bottom: 1px solid rgba(154, 188, 211, 0.2); }
+.order-ticket__comment { margin-top: 11px; }
+.order-ticket__comment textarea { width: 100%; min-height: 74px; box-sizing: border-box; padding: 9px; resize: vertical; border: 1px solid rgba(110, 160, 195, 0.35); border-radius: 5px; background: #061725; color: #eef7fc; }
+.order-ticket__time-in-force { margin-top: 11px; }
+.order-ticket :disabled { cursor: not-allowed; opacity: 0.45; }
+.order-ticket__body [role="status"], .order-ticket__body [role="alert"] { margin: 12px 0 0; color: #a9c3d5; font-size: 11px; }
+.order-ticket__body [role="alert"] { color: #ffadb5; }
+.order-ticket__submit { width: 100%; min-height: 38px; margin-top: 16px; border: 1px solid rgba(25, 217, 146, 0.45); border-radius: 5px; cursor: pointer; background: #079b69; color: #fff; font-weight: 800; }
+.order-ticket__submit:disabled { cursor: not-allowed; opacity: 0.38; }
+.order-ticket__confirmation { margin-top: 14px; padding: 12px; border: 1px solid rgba(255, 194, 64, 0.32); border-radius: 6px; background: rgba(82, 57, 9, 0.25); }
+.order-ticket__confirmation button, .order-ticket__close { margin: 8px 8px 0 0; padding: 7px 11px; border: 1px solid rgba(116, 163, 195, 0.35); border-radius: 5px; background: #102d43; color: #d8e8f3; }
+.order-ticket__close { width: 100%; margin-top: 10px; }
+
+@media (max-width: 720px) {
+  .workflow-trading__execution-grid { min-height: 0; grid-template-columns: 1fr; }
+  .workflow-trading__ladder-pane, .workflow-trading__ladder-pane .price-ladder-container { min-height: 480px; }
+  .order-ticket { grid-template-columns: 1fr; }
+  .order-ticket__types { padding: 8px; flex-direction: row; overflow-x: auto; }
+  .order-ticket__types button { flex: 0 0 auto; }
+  .order-ticket__body { padding: 14px; }
+}
+
+@media (min-width: 721px) and (max-width: 1100px) {
+  .workflow-trading__execution-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 460px) {
+  .order-ticket__selectors, .order-ticket__fields { grid-template-columns: 1fr; }
+  .order-ticket__market-top { grid-template-columns: 1fr; }
+  .order-ticket__pending-top { grid-template-columns: 1fr; }
+  .order-ticket__pending-top > label:last-child:nth-child(odd) { grid-column: auto; }
+  .order-ticket__symbol { grid-column: auto; }
+}
+
 .workspace-template-card {
   display: flex;
   flex-direction: column;
@@ -1656,10 +1737,29 @@ body {
   background: var(--cme-navy-darkest);
 }
 
-.workspace-dock-shell .dv-tab {
+.workspace-dock-shell .dv-tab,
+.workspace-dock-shell .dv-default-tab,
+.workspace-dock-tab {
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 500;
+  cursor: grab;
+  user-select: none;
+}
+
+.workspace-dock-shell .dv-tab:hover,
+.workspace-dock-shell .dv-default-tab:hover,
+.workspace-dock-tab:hover {
+  cursor: grab;
+}
+
+.workspace-dock-shell .dv-tab:active,
+.workspace-dock-shell .dv-default-tab:active,
+.workspace-dock-shell .dv-tab[aria-selected='true']:active,
+.workspace-dock-shell .dv-tab.dv-active-tab:active,
+.workspace-dock-tab:active,
+.workspace-dock-tab.is-dragging {
+  cursor: grabbing;
 }
 
 .workspace-dock-shell .dv-tab[aria-selected='true'],
@@ -1670,7 +1770,53 @@ body {
 
 .workspace-dock-tab {
   display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   height: 100%;
+  width: 100%;
+  padding-right: 4px;
+}
+
+.widget-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.widget-header-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.widget-header-action-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.workspace-dock-shell .dv-floating-overlay-host {
+  position: absolute !important;
+  inset: 0 !important;
+}
+
+.workspace-dock-shell .dv-resize-container.workspace-floating-widget--expanded {
+  position: absolute !important;
+  z-index: 1000 !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
 }
 
 .workspace-empty-container {
@@ -1805,6 +1951,12 @@ body {
   justify-content: space-between;
   padding: 0 8px;
   position: relative;
+  cursor: grab;
+  user-select: none;
+}
+
+.widget-header:active {
+  cursor: grabbing;
 }
 
 /* Product Code Drag Tab in Upper Left */

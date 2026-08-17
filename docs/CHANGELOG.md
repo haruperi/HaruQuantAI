@@ -2,6 +2,31 @@
 
 ## [Unreleased]
 
+### Complete the authoritative Trading widget
+
+The focused Trading widget now captures CFD/forex orders using provider-authored constraints and real Risk preflight before governed submission.
+
+#### Added (2)
+
+- Added an authenticated read-only Trading instrument-constraints contract backed by Data symbol metadata and Brokers capability evidence.
+- Added a private focused order ticket with explicit side selection, decimal quantity validation, confirmation, Risk preflight, and exactly-once submission.
+
+#### Changed (8)
+
+- Moved the governed Trading cockpit into its registered `src/features/trading/` ownership boundary and retained a single feature-barrel public surface.
+- Refined the ticket into a cTrader-inspired layout with automatic execution context, registered strategies, and provider-symbol autocomplete.
+- Composed the existing Price Ladder into the Trading widget's right-hand pane with synchronized account, route, and exact symbol context.
+- Reduced the embedded Price Ladder to synchronized DOM presentation so the Trading ticket is the combined surface's single symbol and order-entry control.
+- Reduced widget title-bar actions to the single Expand/Restore control by removing the redundant Minimize and Close buttons.
+- Expanded the Market Order ticket with contract-aware quantity and protection controls while keeping unsupported advanced instructions visibly disabled.
+- Connected each enabled Stop Loss and Take Profit column so pips, price, projected balance, and profit recalculate from provider-authored instrument and account evidence.
+- Extended the connected protection calculator to Limit, Stop, and Stop-Limit tickets using each order's intended execution price.
+
+#### Fixed (2)
+
+- Isolated Trading symbol-universe loading from Strategy catalogue failures so provider autocomplete remains available while submission still fails closed.
+- Corrected the Trading strategy selector to project exact registered identities and versions from Strategy catalogue manifests.
+
 ### Restyle the governed Trading workspace
 
 The Trading widget now uses the same responsive execution-cockpit visual language as Trading Sessions while retaining its existing behavior and safety gates.
@@ -24,7 +49,7 @@ Trading sessions now persist independently of process lifetime and can be manage
 - Added verified Data dataset discovery and exact dataset ID/revision/hash binding for SIM sessions.
 - Added a bounded session-filtered live activity console backed by redacted application log files without duplicating streamed lines in the database.
 
-#### Changed (3)
+#### Changed (2)
 
 - Replaced the basic session form with a responsive execution-session cockpit containing mode summaries, session cards, an explicit lifecycle command bar, metadata, event history, editing, confirmations, and complete loading/empty/error states.
 - Added the active/default session name beside the Header mode and made session start fail closed unless the session mode matches the authoritative system mode.
@@ -49,7 +74,7 @@ The Header now presents the active provider account's standard balance and margi
 - Added provider-authored Balance, Profit, Margin, Free Margin, Margin Level, Leverage, and Equity fields to the active account-profile contract and Header.
 - Added an accessible account-metrics settings menu with session-local Profit presentation and mode-owned leverage behavior.
 
-#### Changed (2)
+#### Changed (3)
 
 - Renamed Practice Funds to Balance, Profit/Loss to Profit, and Available to Equity.
 - Replaced the unavailable Pips choice with a session-local Percent display calculated as floating profit divided by balance, with zero or missing balance shown as unavailable.
@@ -109,9 +134,10 @@ SIM now means deterministic historical replay rather than a demo-feed alias: app
 
 The primary trading workspace now has one documented Trading feature target for MT5-routed CFDs, primarily forex, instead of separate futures/options order-ticket and options-chain targets.
 
-#### Changed (2)
+#### Changed (3)
 
 - Changed `FEAT-UI-06` from a futures/options Order Ticket into the target `src/features/trading/` Trading Widget, combining CFD/forex order entry with the existing API-backed Trading session and governed-action presentation.
+- Changed the `FEAT-UI-06` symbol field to expose Chart-style provider-symbol predictions with accessible keyboard and pointer selection while preserving exact-symbol execution gates.
 - Transferred `FR-UI-147` from the generic workflow-view feature to `FEAT-UI-06` and reconciled the package and system feature inventories without claiming the target code move is complete.
 
 #### Removed (1)
@@ -166,9 +192,10 @@ The shell's right-hand header section now mirrors the CME Group Simulator: a seg
 
 The trading workspace now runs on a docking layout engine matching the CME Group Simulator, so widgets fluidly resize, dock as tabs, and split regions instead of snapping to a fixed grid.
 
-#### Changed (3)
+#### Changed (4)
 
 - Replaced the fixed 12-column widget grid with a Dockview-based docking workspace offering pixel-fluid splitters, tab docking, edge splits, automatic refill of vacated regions, double-click group maximize, and Alt+Arrow keyboard panel moves.
+- Restored explicit, accessible Expand and Restore controls to every Dockview widget title bar while retaining the double-click shortcut and prior layout.
 - Migrated persisted workspace layouts to serialized docking trees with deterministic column-cluster/row-band conversion for legacy grid-rectangle layouts and template presets, keyed throughout by stable widget ids.
 - Re-oriented every workspace template preset to the exact panel arrangement of its owner-supplied reference thumbnail in `public/templates/`, including side-by-side columns with independent vertical splits and a full-height ladder or options chain.
 

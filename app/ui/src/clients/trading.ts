@@ -40,6 +40,42 @@ export const tradingAccountProfileSchema = z.object({
 });
 export type TradingAccountProfile = z.infer<typeof tradingAccountProfileSchema>;
 
+export const tradingInstrumentConstraintsSchema = z.object({
+  contract_version: z.literal("v1"),
+  schema_id: z.literal("api.trading.instrument_constraints.v1"),
+  symbol: z.string().min(1),
+  source_id: z.string().min(1),
+  quantity_unit: z.string().min(1),
+  min_quantity: z.union([z.string(), z.number()]),
+  max_quantity: z.union([z.string(), z.number()]),
+  quantity_step: z.union([z.string(), z.number()]),
+  price_tick: z.union([z.string(), z.number()]),
+  digits: z.number().int().nonnegative().nullable(),
+  pip_size: nullableMetricSchema,
+  trade_tick_size: nullableMetricSchema,
+  trade_tick_value_profit: nullableMetricSchema,
+  trade_tick_value_loss: nullableMetricSchema,
+  trade_contract_size: nullableMetricSchema,
+  profit_currency: z.string().nullable(),
+  supported_order_types: z.array(z.enum(["MARKET", "LIMIT", "STOP", "STOP_LIMIT"])),
+  supported_time_in_force: z.array(z.enum(["GTC", "IOC", "FOK", "GTD", "DAY"])),
+  supports_stop_loss: z.boolean(),
+  supports_take_profit: z.boolean(),
+  retrieved_at: z.string(),
+});
+export type TradingInstrumentConstraints = z.infer<typeof tradingInstrumentConstraintsSchema>;
+
+export function instrumentConstraints(
+  symbol: string,
+  options?: RequestOptions,
+): Promise<ApiResponse<TradingInstrumentConstraints>> {
+  return request(tradingRoutes.instrumentConstraints, {
+    schema: tradingInstrumentConstraintsSchema,
+    pathParams: { symbol },
+    ...options,
+  });
+}
+
 export const executionSessionSchema = z.object({
   session_id: z.string(),
   principal_id: z.string(),
@@ -486,6 +522,7 @@ export function closePosition(
 /** Aggregated trading client. */
 export const trading = {
   accountProfile,
+  instrumentConstraints,
   listExecutionSessions,
   createExecutionSession,
   updateExecutionSession,

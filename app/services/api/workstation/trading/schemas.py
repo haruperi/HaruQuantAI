@@ -79,6 +79,34 @@ class TradingAccountProfileResponse(_BaseApiContract):
     retrieved_at: datetime
 
 
+class TradingInstrumentConstraintsResponse(_BaseApiContract):
+    """Provider-authored order-entry constraints for one exact symbol."""
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.trading.instrument_constraints.v1"] = (
+        "api.trading.instrument_constraints.v1"
+    )
+    symbol: str
+    source_id: str
+    quantity_unit: str
+    min_quantity: Decimal
+    max_quantity: Decimal
+    quantity_step: Decimal
+    price_tick: Decimal
+    digits: int | None = None
+    pip_size: Decimal | None = None
+    trade_tick_size: Decimal | None = None
+    trade_tick_value_profit: Decimal | None = None
+    trade_tick_value_loss: Decimal | None = None
+    trade_contract_size: Decimal | None = None
+    profit_currency: str | None = None
+    supported_order_types: tuple[Literal["MARKET", "LIMIT", "STOP", "STOP_LIMIT"], ...]
+    supported_time_in_force: tuple[Literal["GTC", "IOC", "FOK", "GTD", "DAY"], ...]
+    supports_stop_loss: bool
+    supports_take_profit: bool
+    retrieved_at: datetime
+
+
 class TradingMutationRequest(_BaseApiContract):
     """Exact API projection of one governed Trading request."""
 
@@ -241,5 +269,6 @@ __all__ = (
     "OrderPreflightRequest",
     "OrderPreflightResponse",
     "TradingAccountProfileResponse",
+    "TradingInstrumentConstraintsResponse",
     "TradingMutationRequest",
 )
