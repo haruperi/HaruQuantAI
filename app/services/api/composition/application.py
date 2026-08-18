@@ -48,6 +48,12 @@ from app.services.api.middleware.runtime_settings import RuntimeSettingsMiddlewa
 from app.services.api.observability.routes import router as observability_router
 from app.services.api.workstation.agentic.orchestration import build_agentic_source
 from app.services.api.workstation.agentic.routes import router as agentic_router
+from app.services.api.workstation.analytics_workbench.orchestration import (
+    build_analytics_workbench_composition,
+)
+from app.services.api.workstation.analytics_workbench.routes import (
+    router as analytics_workbench_router,
+)
 from app.services.api.workstation.dashboards.routes import router as dashboards_router
 from app.services.api.workstation.data.orchestration import build_dataset_source
 from app.services.api.workstation.data.routes import router as data_router
@@ -94,6 +100,12 @@ from app.services.api.workstation.simulation.orchestration import (
 from app.services.api.workstation.simulation.routes import router as simulation_router
 from app.services.api.workstation.simulation.session_routes import (
     router as simulation_sessions_router,
+)
+from app.services.api.workstation.simulation_workbench.orchestration import (
+    build_simulation_workbench_source,
+)
+from app.services.api.workstation.simulation_workbench.routes import (
+    router as simulation_workbench_router,
 )
 from app.services.api.workstation.simulator.orchestration import (
     build_api_backtest_registry,
@@ -177,6 +189,8 @@ _ROUTERS = (
     simulation_router,
     simulation_sessions_router,
     simulator_router,
+    simulation_workbench_router,
+    analytics_workbench_router,
     portfolio_router,
     risk_router,
     trading_router,
@@ -243,6 +257,10 @@ def _build_canonical_graph(
                 )
             ),
             "simulator.strategy_source": build_simulator_strategy_source(),
+            "simulator.workbench_source": build_simulation_workbench_source(),
+            "analytics.workbench.source": build_analytics_workbench_composition(
+                settings
+            ),
             "strategy.mutation_source": build_strategy_mutation_source(
                 strategy_dependencies
             ),

@@ -22,6 +22,7 @@ def test_provider_manifest_is_exact_and_deterministic() -> None:
     names = get_required_in_process_provider_names()
     assert names == (
         "agentic.source",
+        "analytics.workbench.source",
         "dashboard.source",
         "data.dataset_source",
         "operator.audit_source",
@@ -37,6 +38,7 @@ def test_provider_manifest_is_exact_and_deterministic() -> None:
         "simulation.session_source",
         "simulator.run_source",
         "simulator.strategy_source",
+        "simulator.workbench_source",
         "strategy.mutation_source",
         "trading.account_profile_source",
         "trading.cancel_all_preflight_source",

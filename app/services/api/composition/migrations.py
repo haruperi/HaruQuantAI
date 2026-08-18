@@ -1,6 +1,9 @@
 """Aggregate feature-local API migrations for canonical startup."""
 
 from app.services.api.identity.migrations import get_identity_migration_steps
+from app.services.api.workstation.simulation_workbench.migrations import (
+    get_simulation_workbench_migration_steps,
+)
 from app.services.api.workstation.watchlists.migrations import (
     get_watchlist_migration_steps,
 )
@@ -21,6 +24,7 @@ def get_api_migration_steps() -> tuple[object, ...]:
         *identity_steps[:-1],
         *get_watchlist_migration_steps(),
         identity_steps[-1],
+        *get_simulation_workbench_migration_steps(),
     )
 
 

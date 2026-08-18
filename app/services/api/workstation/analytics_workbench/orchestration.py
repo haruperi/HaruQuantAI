@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import cast
+from typing import Any, cast
 
 from app.services.api.workstation.simulation_workbench.persistence import (
     annotate_simulation_result_record,
@@ -376,6 +376,73 @@ def build_analytics_workbench_source_bundle() -> Mapping[str, object]:
 
 
 __all__ = (
+    "build_analytics_workbench_composition",
     "build_analytics_workbench_source",
     "build_analytics_workbench_source_bundle",
 )
+
+
+def _unavailable_projection(*args: object, **kwargs: object) -> object:
+    """Fail closed until report deserialization is composed.
+
+    Raises:
+        RuntimeError: Always, until the deserialization seam is wired.
+    """
+    del args, kwargs
+    raise RuntimeError("ANALYTICS_WORKBENCH_RUNTIME_UNAVAILABLE")
+
+
+def build_analytics_workbench_composition(settings: object) -> Callable[..., object]:
+    """Build the production Analytics Workbench source from runtime settings.
+
+    Args:
+        settings: API runtime settings owning the simulation artifact root.
+
+    Returns:
+        Dispatch source with catalogue-backed report and result readers.
+    """
+    from pathlib import Path
+
+    typed_settings = cast("Any", settings)
+    artifact_root = Path(typed_settings.simulation_artifact_root)
+
+    def read_report_file(_run_id: str, report_ref: str) -> str:
+        """Read one attached immutable report artifact.
+
+        Returns:
+            Serialized report JSON text.
+
+        Raises:
+            KeyError: When the artifact file is absent.
+        """
+        target = (artifact_root / report_ref).resolve()
+        if artifact_root.resolve() not in target.parents:
+            raise KeyError("ANALYTICS_REPORT_NOT_ATTACHED")
+        if not target.is_file():
+            raise KeyError("ANALYTICS_REPORT_NOT_ATTACHED")
+        return target.read_text(encoding="utf-8")
+
+    def read_canonical_result(run_id: str) -> Mapping[str, object] | None:
+        """Read one canonical Simulation result as a plain mapping.
+
+        Returns:
+            Result mapping, or ``None`` when the run is unknown.
+        """
+        from app.services.simulator import get_simulation_result
+
+        result = get_simulation_result(run_id, artifact_root=artifact_root)
+        if result is None:
+            return None
+        if isinstance(result, Mapping):
+            return result
+        dumper = getattr(result, "model_dump", None)
+        if dumper is None:
+            return None
+        return cast("Mapping[str, object]", dumper(mode="python"))
+
+    return build_analytics_workbench_source(
+        report_reader=read_report_file,
+        result_reader=read_canonical_result,
+        projection_builder=_unavailable_projection,
+        comparator=_unavailable_projection,
+    )
