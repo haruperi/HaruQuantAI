@@ -90,6 +90,13 @@ from app.services.api.workstation.simulation.routes import router as simulation_
 from app.services.api.workstation.simulation.session_routes import (
     router as simulation_sessions_router,
 )
+from app.services.api.workstation.simulator.orchestration import (
+    build_api_backtest_registry,
+    build_data_runtime_context,
+    build_simulator_run_source,
+    build_simulator_strategy_source,
+)
+from app.services.api.workstation.simulator.routes import router as simulator_router
 from app.services.api.workstation.strategies.orchestration import (
     build_strategy_mutation_source,
 )
@@ -164,6 +171,7 @@ _ROUTERS = (
     simulation_live_router,
     simulation_router,
     simulation_sessions_router,
+    simulator_router,
     portfolio_router,
     risk_router,
     trading_router,
@@ -181,6 +189,7 @@ _ROUTERS = (
 def _build_canonical_graph(
     *,
     settings: ApiSettings,
+    simulator_state_provider: Callable[[], object],
     simulation_dependencies: object | None = None,
     trading_dependencies: object | None = None,
     portfolio_dependencies: object | None = None,
@@ -218,6 +227,12 @@ def _build_canonical_graph(
             "simulation.session_source": build_simulation_session_source(
                 simulation_dependencies
             ),
+            "simulator.run_source": build_simulator_run_source(
+                build_api_backtest_registry(
+                    build_data_runtime_context(simulator_state_provider)
+                )
+            ),
+            "simulator.strategy_source": build_simulator_strategy_source(),
             "strategy.mutation_source": build_strategy_mutation_source(
                 strategy_dependencies
             ),
@@ -440,6 +455,7 @@ def create_app(
         )
     graph = in_process_graph or _build_canonical_graph(
         settings=settings,
+        simulator_state_provider=lambda: application.state,
         simulation_dependencies=simulation_dependencies,
         trading_dependencies=trading_dependencies,
         portfolio_dependencies=portfolio_dependencies,

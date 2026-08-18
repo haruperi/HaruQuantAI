@@ -3,7 +3,7 @@
 
 > **Specification location:** `app/services/api/README.md`
 > **Logical runtime package:** FastAPI gateway at `app/services/api`, with canonical ASGI target `app.services.api.composition.application:app`
-> **Status:** API feature-folder migration completed — 24 registered backend features are structurally reconciled; `FEAT-API-15` remains `Partial` only because its pre-existing routes lack a dedicated requirement.
+> **Status:** API feature-folder migration completed — 25 registered backend features are structurally reconciled; `FEAT-API-15` remains `Partial` only because its pre-existing routes lack a dedicated requirement.
 > **Last updated:** `2026-08-12`
 
 > This README is the API domain's **single source of truth** for final requirements,
@@ -223,6 +223,7 @@ Trading-owned migrations are required during canonical API startup. A failure le
 | Completed | `FEAT-API-22` Portfolio Gateway | `workstation/portfolio/` | Complete Portfolio transport boundary | `FR-API-056` | `tests/api/usage/22_portfolio.py`; Portfolio route tests |
 | Completed | `FEAT-API-23` Dashboard Gateway | `workstation/dashboards/` | Read-only owner snapshot routes | `FR-API-032` | `tests/api/usage/23_dashboards.py`; application/route tests |
 | Completed | `FEAT-API-24` Agentic Operator Gateway | `workstation/agentic/` | Reserve/inspect/audit/governance operator tier | `FR-API-068`–`FR-API-072` | `tests/api/usage/24_agentic.py`; Agentic route tests |
+| Completed | `FEAT-API-25` Canonical Backtest Simulator Gateway | `workstation/simulator/` | Registered strategy catalogue plus background canonical backtest run submission, read, cancellation, and ordered progress streaming; composes provider-fact loading and the Data runtime context a background run must re-enter | `FR-API-151`–`FR-API-156` | `tests/api/unit/test_simulator_routes.py`; `tests/api/unit/test_route_catalog.py` |
 
 #### Operational workstation and boundary requirements
 
@@ -296,7 +297,7 @@ preserved. Evidence: `app/services/api/middleware/envelope.py`,
 4. Public liveness and protected dependency readiness remain versioned and secret-safe. Evidence: `app/services/api/health/probes.py:173`.
 5. Injected, non-authoritative metrics and protected exposition remain complete. Evidence: `app/services/api/observability/metrics.py:116`.
 6. Owner events are normalized into ordered secret-safe events with quotas, resume windows, gap detection, terminal backpressure errors, and disconnect cleanup. Evidence: `workstation/event_delivery/events.py`, `workstation/event_delivery/orchestration.py`.
-7. The canonical OpenAPI surface and fresh route registry contain the same 107 operations; excluded workflow families are absent. Evidence: `app/services/api/composition/application.py`, `app/services/api/contracts/catalog.py`, `tests/api/unit/test_route_catalog.py`.
+7. The canonical OpenAPI surface and fresh route registry contain the same 117 operations; excluded workflow families are absent. Evidence: `app/services/api/composition/application.py`, `app/services/api/contracts/catalog.py`, `tests/api/unit/test_route_catalog.py`.
 8. One exact-origin FastAPI composition runs required API migrations, reports optional degradation, closes only owned resources, and exposes the ASGI app at `app.services.api.composition.application:app`. Evidence: `app/services/api/composition/lifecycle.py:28`, `app/services/api/composition/application.py:155`.
 ```text
 app/services/api/
@@ -333,6 +334,7 @@ app/services/api/
     |-- risk/                      # FEAT-API-18
     |-- settings/                  # FEAT-API-07; bootstrap config and limits
     |-- simulation/                # FEAT-API-17
+    |-- simulator/                 # FEAT-API-25
     |-- strategies/                # FEAT-API-16
     |-- trading/                   # FEAT-API-19
     `-- watchlists/                # FEAT-API-11

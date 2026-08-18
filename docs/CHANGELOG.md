@@ -2,6 +2,36 @@
 
 ## [Unreleased]
 
+### Bring canonical backtesting to the workstation
+
+The Simulator widget now runs the full backtest pipeline previously reachable only from `tests/legacy/08_simulator.py`'s `example_07_backtest_simulation()`: genuine provider bars with warm-up, exact tick generation, one canonical `SimulationBacktestRequest`, a run through Simulation authority, and the Analytics performance report.
+
+#### Added (6)
+
+- Added the Simulation-owned canonical backtest recipe (`FEAT-SIM-19`) covering registered strategy descriptors, strategy-driven run dependencies, the end-to-end single-asset pipeline, and bounded background job execution.
+- Added the Simulator API gateway (`FEAT-API-25`) exposing the strategy catalogue plus background run submission, read, cancellation, and ordered progress streaming.
+- Added the Simulator widget (`FEAT-UI-27`) with a registered strategy picker, per-strategy parameters, market and execution configuration, live progress, and the Analytics-owned performance report.
+- Added a typed Simulator frontend client covering the six new route contracts.
+- Added the `btr` trace-identifier prefix so a backtest run carries its own identity kind rather than borrowing an unrelated one.
+- Added six route contracts under `/api/v1/simulator`, taking the registered backend surface from 111 to 117 operations.
+
+#### Changed (3)
+
+- Replaced the `simulation` workspace widget and its run-id lookup view with the `simulator` widget, and repointed the sidebar entry at it.
+- Evaluated backtest strategy signals through the public `evaluate_strategy_signals` boundary instead of an evaluator's private compact helper.
+- Refused an unregistered, unrunnable, or misconfigured strategy at run submission, before any provider connection is attempted.
+
+#### Fixed (4)
+
+- Kept the provider adapter connected after reading backtest facts. MT5 exposes one process-global terminal handle, so disconnecting there tore the session out from under the Data retrieval that ran moments later and every run failed with insufficient history.
+- Rendered Data/Analytics evidence as stable codes instead of re-exporting owner objects. Those objects hold `MappingProxyType`, which `dataclasses.asdict` cannot deep-copy, so every run read returned HTTP 500.
+- Reported each metric from the portfolio-level `all` source context, so `# Trades` describes the whole run instead of whichever directional section was evaluated last, while metrics defined only per-context (the cost totals) are still reported.
+- Settled a run against the authoritative read whenever its progress stream ends without a terminal frame, so a finished run is never presented as still running.
+
+#### Notes (1)
+
+- Only `naive_ma_trend_incremental` runs end to end today. The other seven registered evaluators stay listed in the catalogue and are explicitly disabled with their reason: six consume Indicators-owned series the recipe does not yet supply, and five publish no exit signal. Supplying indicator series to the recipe is tracked as follow-up work.
+
 ### Complete the authoritative Trading widget
 
 The focused Trading widget now captures CFD/forex orders using provider-authored constraints and real Risk preflight before governed submission.

@@ -5,7 +5,7 @@ The Simulation error catalogue uses only the Utils-owned `TRANSIENT`,
 categories. An unconfirmed persistence result is non-retryable.
 
 > **Package:** `app/services/simulator`
-> **Status:** `Completed` for `FEAT-SIM-01`..`18`.
+> **Status:** `Completed` for `FEAT-SIM-01`..`19`.
 > **Last updated:** `2026-08-16`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
@@ -327,6 +327,7 @@ Module folders and files are ordered from lowest dependency to highest dependenc
 | Completed | `FEAT-SIM-16` Effective-Dated Calculation Model | `calculations/` | Exact-Decimal FX conversion, profit and margin calculation over effective-dated specification revisions, offline conformance artifacts, model identity | `FR-SIM-137`–`FR-SIM-145`, `FR-SIM-210`–`FR-SIM-214` | `tests/simulator/usage/features/16_calculations.py` |
 | Completed | `FEAT-SIM-17` Empirical Execution Calibration | `calibration/` | Immutable evidence partitioning, M1 spread and evidenced execution-component fits, artifact validation, temporal eligibility | `FR-SIM-181`–`FR-SIM-186`, `FR-SIM-224`–`FR-SIM-227` | `tests/simulator/usage/features/17_calibration.py` |
 | Completed | `FEAT-SIM-18` Parity Comparison | `parity/` | `get_parity_envelope`, `get_parity_maturity_ladder`, `normalize_parity_evidence`, `compare_parity_evidence` | `FR-SIM-187`–`FR-SIM-193`, `FR-SIM-236`–`FR-SIM-239` | `tests/simulator/usage/features/18_parity.py` |
+| Completed | `FEAT-SIM-19` Canonical Backtest Recipe | `backtest_recipe/` | Registered strategy descriptors, strategy-driven run dependencies, the end-to-end single-asset pipeline (provider bars, tick generation, canonical request, run, Analytics report), and bounded background job execution | `FR-SIM-255`–`FR-SIM-260` | `tests/simulator/unit/test_backtest_recipe.py` |
 
 All registered Simulator features are completed. The sim⇄live parity programme completed its
 bounded L5-MT5-Operational certification gate on 2026-08-16; continuing validity remains governed

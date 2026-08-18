@@ -28,7 +28,7 @@ export const WIDGET_TYPES = [
   "optimization",
   "portfolio",
   "agentic",
-  "simulation",
+  "simulator",
   "risk",
   "trading",
   "sessions",

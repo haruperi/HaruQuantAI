@@ -20,9 +20,6 @@ export type { StrategyWorkspaceProps } from "./strategies";
 export { IndicatorWorkspace } from "./indicators";
 export type { IndicatorWorkspaceProps } from "./indicators";
 
-export { SimulationView } from "./simulation";
-export type { SimulationViewProps } from "./simulation";
-
 export { RiskView } from "./risk";
 export type { RiskViewProps } from "./risk";
 

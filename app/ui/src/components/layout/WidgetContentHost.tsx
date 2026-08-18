@@ -25,7 +25,7 @@ import { ResearchWorkspace } from '../workflow/research';
 import { OptimizationView } from '../workflow/optimization';
 import { PortfolioView } from '../workflow/portfolio';
 import { AgenticView } from '../workflow/agentic';
-import { SimulationView } from '../workflow/simulation';
+import { SimulatorWidget } from '../../features/simulator';
 import { RiskView } from '../workflow/risk';
 import { TradingWidget } from '../../features/trading';
 import { SessionRegistryWidget } from '../../features/session-registry';
@@ -70,8 +70,8 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
       return <PortfolioView />;
     case 'agentic':
       return <AgenticView />;
-    case 'simulation':
-      return <SimulationView />;
+    case 'simulator':
+      return <SimulatorWidget />;
     case 'risk':
       return <RiskView />;
     case 'trading':

@@ -127,9 +127,9 @@ export const Sidebar: React.FC = () => {
           <span>Agentic Operator</span>
         </div>
 
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('simulation', 'Backtest')}>
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('simulator', 'Simulator')}>
           <History size={15} />
-          {!isCollapsed && <span>Backtest</span>}
+          {!isCollapsed && <span>Simulator</span>}
         </div>
 
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('risk', 'Risk')}>

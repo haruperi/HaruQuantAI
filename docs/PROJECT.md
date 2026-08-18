@@ -1,7 +1,7 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 240 registered application features, 230 are implemented and structurally reconciled (95.83%); 9 are `Pending` and 1 is `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Status:** `In Progress` — of 243 registered application features, 234 are implemented and structurally reconciled (96.30%); 9 are `Pending` and 0 are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
 > **Last updated:** `2026-08-17`
 
 > This document is the system-level source of truth.
@@ -521,17 +521,17 @@ certificate identity, scope, validity, and exclusions above are the system-level
 
 ### Consolidated feature inventory
 
-The owning package READMEs collectively contain 240 registered application features.
+The owning package READMEs collectively contain 243 registered application features.
 No secondary programme or work-package identifier namespace is active. Completion is
-231 of 240 (96.25%).
+234 of 243 (96.30%).
 
 | Status | Count |
 | --- | ---: |
-| Completed | 231 |
+| Completed | 234 |
 | Pending | 9 |
 | Partial | 0 |
 | Missing | 0 |
-| **Total** | **240** |
+| **Total** | **243** |
 
 The nine `Pending` features are `FEAT-UI-08`–`FEAT-UI-13`, `FEAT-UI-15`,
 `FEAT-UI-16`, and `FEAT-UI-17`; `FEAT-UI-06` is completed with authoritative

@@ -21,6 +21,7 @@ _WORKSTATION_FEATURES = {
     "risk",
     "settings",
     "simulation",
+    "simulator",
     "strategies",
     "trading",
     "watchlists",

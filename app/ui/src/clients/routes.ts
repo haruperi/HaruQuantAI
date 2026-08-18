@@ -440,6 +440,52 @@ export const simulationRoutes = {
   }),
 } as const;
 
+// --- Simulator canonical backtest runs (6) -------------------------------
+
+export const simulatorRoutes = {
+  strategies: route({
+    id: "api.simulator.strategies",
+    method: "GET",
+    path: "/api/v1/simulator/strategies",
+    permission: "simulation:read",
+  }),
+  startRun: route({
+    id: "api.simulator.start_run",
+    method: "POST",
+    path: "/api/v1/simulator/runs",
+    permission: "simulation:run",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+  runs: route({
+    id: "api.simulator.runs",
+    method: "GET",
+    path: "/api/v1/simulator/runs",
+    permission: "simulation:read",
+  }),
+  run: route({
+    id: "api.simulator.run",
+    method: "GET",
+    path: "/api/v1/simulator/runs/{run_id}",
+    permission: "simulation:read",
+  }),
+  cancelRun: route({
+    id: "api.simulator.cancel_run",
+    method: "DELETE",
+    path: "/api/v1/simulator/runs/{run_id}",
+    permission: "simulation:run",
+    sideEffect: "write",
+  }),
+  runStream: route({
+    id: "api.simulator.run_stream",
+    method: "GET",
+    path: "/api/v1/simulator/runs/{run_id}/stream",
+    permission: "simulation:read",
+    sideEffect: "stream",
+    stream: true,
+  }),
+} as const;
+
 // --- Risk (3) ------------------------------------------------------------
 
 export const riskRoutes = {
@@ -987,6 +1033,12 @@ export const ROUTE_CONTRACTS = [
   simulationRoutes.run,
   simulationRoutes.portfolioRun,
   simulationRoutes.result,
+  simulatorRoutes.strategies,
+  simulatorRoutes.startRun,
+  simulatorRoutes.runs,
+  simulatorRoutes.run,
+  simulatorRoutes.cancelRun,
+  simulatorRoutes.runStream,
   riskRoutes.killSwitch,
   riskRoutes.decisions,
   tradingRoutes.accountProfile,
@@ -1052,7 +1104,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 111;
+export const ROUTE_CONTRACT_COUNT = 117;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

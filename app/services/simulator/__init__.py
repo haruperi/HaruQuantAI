@@ -239,6 +239,147 @@ def build_simulation_run_dependencies(**values: object) -> object:
     return builder(**cast("Any", values))
 
 
+def get_backtest_strategy_catalogue() -> tuple[Mapping[str, object], ...]:
+    """Return every registered backtest strategy as bounded public evidence.
+
+    Each entry declares the strategy's identity, its configuration parameters,
+    and whether the canonical recipe can run it today. A strategy that cannot
+    run stays listed and carries the exact reason.
+
+    Returns:
+        Serializable descriptor projections in stable registration order.
+    """
+    from app.services.simulator.backtest_recipe import (
+        get_backtest_strategy_descriptors,
+    )
+
+    return tuple(
+        {
+            "strategy_id": descriptor.strategy_id,
+            "strategy_version": descriptor.strategy_version,
+            "evaluator_name": descriptor.evaluator_name,
+            "label": descriptor.label,
+            "runnable": descriptor.runnable,
+            "unavailable_reason": descriptor.unavailable_reason,
+            "required_indicators": descriptor.required_indicators,
+            "supports_exits": bool(
+                descriptor.long_exit_signals or descriptor.short_exit_signals
+            ),
+            "parameters": tuple(
+                {
+                    "name": item.name,
+                    "label": item.label,
+                    "kind": item.kind,
+                    "default": item.default,
+                    "minimum": item.minimum,
+                    "maximum": item.maximum,
+                }
+                for item in descriptor.parameters
+            ),
+        }
+        for descriptor in get_backtest_strategy_descriptors()
+    )
+
+
+def create_backtest_provider_facts(**values: object) -> object:
+    """Create one verified provider-facts value for a backtest run.
+
+    Args:
+        **values: ``specification``, ``leverage``, and ``account_currency``.
+
+    Returns:
+        Opaque provider-facts value accepted by the backtest recipe.
+    """
+    from app.services.simulator.backtest_recipe import ProviderFacts
+
+    return ProviderFacts(**cast("Any", values))
+
+
+def create_backtest_run_config(**values: object) -> object:
+    """Create one validated canonical backtest run configuration.
+
+    Args:
+        **values: Operator-chosen run configuration fields.
+
+    Returns:
+        Opaque validated run configuration.
+    """
+    from app.services.simulator.backtest_recipe import BacktestRunConfig
+
+    config = BacktestRunConfig(**cast("Any", values))
+    config.validate()
+    return config
+
+
+def build_backtest_job_registry(**values: object) -> object:
+    """Build one bounded background registry for canonical backtest runs.
+
+    Args:
+        **values: ``facts_loader`` and optional ``max_jobs`` bound.
+
+    Returns:
+        Opaque job registry handle.
+    """
+    from app.services.simulator.backtest_recipe import BacktestJobRegistry
+
+    return BacktestJobRegistry(**cast("Any", values))
+
+
+def execute_backtest_job_operation(
+    registry: object,
+    operation: str,
+    /,
+    *args: object,
+    **kwargs: object,
+) -> object:
+    """Execute one allowlisted operation on a backtest job registry.
+
+    Args:
+        registry: Opaque registry handle.
+        operation: Allowlisted registry operation name.
+        *args: Positional operation arguments.
+        **kwargs: Keyword operation arguments.
+
+    Returns:
+        Exact registry operation response.
+
+    Raises:
+        TypeError: If the handle is not a backtest job registry.
+        ValueError: If the operation is not part of the registry boundary.
+    """
+    from app.services.simulator.backtest_recipe import BacktestJobRegistry
+
+    allowed = {"get", "list_jobs", "stream", "submit"}
+    if not isinstance(registry, BacktestJobRegistry):
+        raise TypeError("registry must be a BacktestJobRegistry")
+    if operation not in allowed:
+        raise ValueError("unsupported backtest job registry operation")
+    return getattr(registry, operation)(*args, **kwargs)
+
+
+def execute_backtest_job_inspection(job: object, operation: str, /) -> object:
+    """Execute one allowlisted read or cancellation on a backtest job.
+
+    Args:
+        job: Opaque job handle returned by the registry.
+        operation: Either ``snapshot`` or ``request_cancel``.
+
+    Returns:
+        Bounded job projection or cancellation outcome.
+
+    Raises:
+        TypeError: If the handle is not a backtest job.
+        ValueError: If the operation is not part of the job boundary.
+    """
+    from app.services.simulator.backtest_recipe import BacktestJob
+
+    if not isinstance(job, BacktestJob):
+        raise TypeError("job must be a BacktestJob")
+    if operation not in {"request_cancel", "snapshot"}:
+        raise ValueError("unsupported backtest job operation")
+    return getattr(job, operation)()
+
+
 def build_simulation_state_store(**values: object) -> object:
     """Build the durable Simulation state adapter.
 
@@ -1987,6 +2128,7 @@ __all__: tuple[str, ...] = (
     "branch_live_simulation",
     "branch_recovery_checkpoint",
     "build_artifact_manifest",
+    "build_backtest_job_registry",
     "build_checklist_definition",
     "build_evaluation_latency",
     "build_fill_model_provider",
@@ -2024,6 +2166,8 @@ __all__: tuple[str, ...] = (
     "complete_simulation_mission",
     "convert_account_currency",
     "convert_fx_amount",
+    "create_backtest_provider_facts",
+    "create_backtest_run_config",
     "create_live_simulation_session",
     "create_realism_stream",
     "create_recovery_checkpoint",
@@ -2041,12 +2185,15 @@ __all__: tuple[str, ...] = (
     "evaluate_protective_exit",
     "evaluate_scenario_triggers",
     "evaluate_simulation_checklist",
+    "execute_backtest_job_inspection",
+    "execute_backtest_job_operation",
     "execute_simulation_handle_operation",
     "execute_simulation_state_store_operation",
     "explicitly_rearm_simulation_session",
     "fit_execution_calibration",
     "fit_spread_calibration",
     "get_approved_tick_models",
+    "get_backtest_strategy_catalogue",
     "get_calculation_model_identity",
     "get_calibration_applicability",
     "get_canonical_artifact_types",

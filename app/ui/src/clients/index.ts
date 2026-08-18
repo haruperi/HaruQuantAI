@@ -1,7 +1,7 @@
 /**
  * Typed frontend client catalog.
  *
- * Aggregates the 18 focused domain clients into one `apiClients` object so
+ * Aggregates the 19 focused domain clients into one `apiClients` object so
  * callers import a single entry point:
  *
  *   import { apiClients, unwrapData, ApiClientError } from "@/clients";
@@ -83,6 +83,17 @@ export type {
   SimulationRunInput,
 } from "./simulation";
 export type {
+  BacktestRun,
+  BacktestRunInput,
+  BacktestStrategy,
+  BacktestStrategyCatalogue,
+  RunProgressEvent,
+  RunReport,
+  RunStatus,
+  StrategyParameter,
+} from "./simulator";
+export { RUN_STATUSES } from "./simulator";
+export type {
   KillSwitchQuery,
   KillSwitchState,
   RiskDecision,
@@ -143,6 +154,7 @@ import { dashboards } from "./dashboards";
 import { operator } from "./operator";
 import { metrics } from "./metrics";
 import { simulation } from "./simulation";
+import { simulator } from "./simulator";
 import { risk } from "./risk";
 import { trading } from "./trading";
 import { portfolio } from "./portfolio";
@@ -166,6 +178,7 @@ export {
   operator,
   metrics,
   simulation,
+  simulator,
   simulationSessions,
   liveSimulation,
   risk,
@@ -196,6 +209,7 @@ export const apiClients = {
   operator,
   metrics,
   simulation,
+  simulator,
   simulationSessions,
   liveSimulation,
   risk,

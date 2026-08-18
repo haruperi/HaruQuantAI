@@ -1,7 +1,7 @@
 # UI
 
 > **Package:** `app/ui/`
-> **Status:** `In Progress` — 24 registered UI features; 14 `Completed`, 9 `Pending`,
+> **Status:** `In Progress` — 25 registered UI features; 15 `Completed`, 9 `Pending`,
 > and 1 `Partial` requirement coverage or focused-folder ownership.
 > **Last updated:** `2026-08-17`
 
@@ -145,6 +145,7 @@ app/ui/
     ├── features/training-ux/             # FEAT-UI-24
     ├── features/market-ticks/            # FEAT-UI-25
     ├── features/session-registry/        # FEAT-UI-26
+    ├── features/simulator/               # FEAT-UI-27
     ├── types/                            # support: shared types
     ├── utils/                            # support: shared helpers
     └── mock/                             # support: test-only fixtures
@@ -179,6 +180,7 @@ app/ui/
 | Completed | `FEAT-UI-24` Training, Replay, and Qualification UX   | `src/features/training-ux/`                                                                               | `TrainingPanel`, `QualificationView`                                        | `FR-UI-180`–`FR-UI-185` | `src/features/training-ux/components.test.tsx`                                                       |
 | Completed | `FEAT-UI-25` MT5 Market Ticks Diagnostic Widget       | `src/features/market-ticks/`                                                                              | `MarketTicksTableWidget`                                                     | `FR-UI-186`–`FR-UI-191`; `FR-UI-193` | `src/features/market-ticks/MarketTicksTableWidget.test.tsx`, `useMarketSnapshots.test.tsx`           |
 | Completed | `FEAT-UI-26` Trading Session Registry Widget | `src/features/session-registry/` | `SessionRegistryWidget`; typed create/list/default/start/stop/archive controls, SIM opening-account and verified-dataset configuration, stopped-only legacy completion, metadata inspection, durable lifecycle history, and safe live activity console | `FR-UI-212`–`FR-UI-224` | `src/features/session-registry/SessionRegistryWidget.test.tsx`; typed client and backend integration tests |
+| Completed | `FEAT-UI-27` Canonical Backtest Simulator Widget | `src/features/simulator/` | `SimulatorWidget`; registered strategy picker with per-strategy parameters, market and execution configuration, background run control, ordered progress, and the Analytics-owned performance report | `FR-UI-234`–`FR-UI-240` | `src/features/simulator/SimulatorWidget.test.tsx`; `src/clients/clients.contract.test.ts` |
 
 **Primary UI.** `FEAT-UI-01`–`FEAT-UI-06` and `FEAT-UI-08`–`FEAT-UI-13` are the trading workspace and widgets
 specified by `docs/dev/documentation.pdf`. `FEAT-UI-14`–`FEAT-UI-17` are the foundation

@@ -11,6 +11,7 @@ from app.utils.errors.exceptions import ValidationError
 SUPPORTED_TRACE_PREFIXES = frozenset(
     {
         "brn",
+        "btr",
         "cau",
         "cor",
         "evt",

@@ -49,10 +49,10 @@ def test_api_and_ui_have_independent_feature_registries() -> None:
     )
 
     assert set(re.findall(r"FEAT-API-\d{2}", api_rows)) == {
-        f"FEAT-API-{number:02d}" for number in range(1, 25)
+        f"FEAT-API-{number:02d}" for number in range(1, 26)
     }
     assert set(re.findall(r"FEAT-UI-\d{2}", ui_rows)) == {
-        f"FEAT-UI-{number:02d}" for number in range(1, 27)
+        f"FEAT-UI-{number:02d}" for number in range(1, 28)
     } - {"FEAT-UI-07"}
     assert "FEAT-UI-" not in api_rows
     assert "app/ui" not in api_rows
@@ -206,10 +206,10 @@ def test_repository_feature_inventory_is_reconciled() -> None:
         statuses.extend(status for status, _feature_id in rows)
         feature_ids.extend(feature_id for _status, feature_id in rows)
 
-    assert len(feature_ids) == len(set(feature_ids)) == 240
-    assert statuses.count("Completed") == 231
+    assert len(feature_ids) == len(set(feature_ids)) == 243
+    assert statuses.count("Completed") == 234
     assert statuses.count("Pending") == 9
     assert statuses.count("Partial") == 0
     project = _PROJECT_README.read_text(encoding="utf-8")
-    assert "240 registered application features" in project
-    assert "(96.25%)" in project
+    assert "243 registered application features" in project
+    assert "(96.30%)" in project

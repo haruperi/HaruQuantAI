@@ -102,6 +102,12 @@ const EXPECTED: ReadonlyArray<{
   { id: "api.simulation.run", method: "POST", path: "/api/v1/simulation/run", permission: "simulation:run" },
   { id: "api.simulation.portfolio_run", method: "POST", path: "/api/v1/simulation/portfolio-run", permission: "simulation:run" },
   { id: "api.simulation.result", method: "GET", path: "/api/v1/simulation/results/{run_id}", permission: "simulation:read" },
+  { id: "api.simulator.strategies", method: "GET", path: "/api/v1/simulator/strategies", permission: "simulation:read" },
+  { id: "api.simulator.start_run", method: "POST", path: "/api/v1/simulator/runs", permission: "simulation:run" },
+  { id: "api.simulator.runs", method: "GET", path: "/api/v1/simulator/runs", permission: "simulation:read" },
+  { id: "api.simulator.run", method: "GET", path: "/api/v1/simulator/runs/{run_id}", permission: "simulation:read" },
+  { id: "api.simulator.cancel_run", method: "DELETE", path: "/api/v1/simulator/runs/{run_id}", permission: "simulation:run" },
+  { id: "api.simulator.run_stream", method: "GET", path: "/api/v1/simulator/runs/{run_id}/stream", permission: "simulation:read" },
   { id: "api.risk.kill_switch", method: "GET", path: "/api/v1/risk/kill-switch", permission: "risk:read" },
   { id: "api.risk.decisions", method: "GET", path: "/api/v1/risk/decisions", permission: "risk:read" },
   { id: "api.trading.session", method: "GET", path: "/api/v1/trading/session", permission: "trading:read" },
@@ -168,8 +174,8 @@ const EXPECTED: ReadonlyArray<{
 
 describe("clients match the backend route catalog", () => {
   it("has exactly the approved 106 typed operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(111);
-    expect(ROUTE_CONTRACTS).toHaveLength(106);
+    expect(ROUTE_CONTRACT_COUNT).toBe(117);
+    expect(ROUTE_CONTRACTS).toHaveLength(112);
   });
 
   it("matches every expected id, method, path, and permission", () => {
