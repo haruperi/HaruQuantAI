@@ -8,6 +8,7 @@ _REMOVED_HORIZONTAL_FOLDERS = {"migrations", "persistence", "routes", "streams"}
 _REMOVED_ROOT_FILES = {"_limits.py", "_settings.py"}
 _WORKSTATION_FEATURES = {
     "agentic",
+    "analytics_workbench",
     "dashboards",
     "data",
     "event_delivery",
