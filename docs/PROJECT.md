@@ -1,7 +1,7 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 249 registered application features, 240 are implemented and structurally reconciled (96.39%); 9 are `Pending` and 0 are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Status:** `In Progress` — of 252 registered application features, 241 are implemented and structurally reconciled (95.63%); 9 are `Pending` and 2 are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
 > **Last updated:** `2026-08-18`
 
 > This document is the system-level source of truth.
@@ -1386,7 +1386,7 @@ The audit matrix is the system-level record of per-domain conformance.
 | 12. Portfolio | Domain package | `app/services/portfolio` |
 | 13. Agentic | Orchestration domain package | `app/agentic` |
 | 14. UI-API | Domain package | `app/services/api` |
-| 15. UI | Frontend application (25 registered features, including the consolidated CFD/forex Trading widget, focused MT5 snapshot diagnostic widget, and online News feed widget) | `app/ui` |
+| 15. UI | Frontend application (26 registered features, including the consolidated CFD/forex Trading widget, focused MT5 snapshot diagnostic widget, online News feed widget, and FX Market Hours widget) | `app/ui` |
 
 #### Status legend
 

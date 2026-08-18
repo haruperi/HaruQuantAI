@@ -894,7 +894,7 @@ None.
 
 **Re-run safety:** Deterministic registration.
 
-#### - [ ] Task `P0-T11` — Register backend capabilities
+#### - [x] Task `P0-T11` — Register backend capabilities
 
 **Traces to:** `FEAT-ANLT-11`, `FEAT-API-27`, `FEAT-API-28`
 **Depends on:** P0-T10
@@ -920,7 +920,7 @@ None.
 
 **Deliverable:** Two runnable workspaces with canonical/advisory status and existing widget preservation.
 
-#### - [ ] Task `P1-T01` — Add typed workbench clients
+#### - [x] Task `P1-T01` — Add typed workbench clients
 
 **Traces to:** `FEAT-UI-31`, `FEAT-UI-32`
 **Depends on:** P0-T10
@@ -940,7 +940,7 @@ Git Commit: `feat(ui): add typed workbench clients`
 
 Re-run safety: Stateless.
 
-#### - [ ] Task `P1-T02` — Build Simulation shell
+#### - [x] Task `P1-T02` — Build Simulation shell
 
 **Files:** `SimulationWorkbench.tsx`, `SimulationStatusBadge.tsx`, `index.ts` (CREATE).
 
@@ -950,7 +950,7 @@ Tests: every state and non-colour badge text.
 
 Git Commit: `feat(ui): build Simulation workbench shell`
 
-#### - [ ] Task `P1-T03` — Add Simulator routes
+#### - [x] Task `P1-T03` — Add Simulator routes
 
 **Files:** simulator root page MODIFY; `new/page.tsx` CREATE; `[...segments]/page.tsx` CREATE.
 
@@ -960,7 +960,7 @@ Tests: exact paths, refresh identity, invalid path, protected layout.
 
 Git Commit: `feat(ui): add Simulator workspace routes`
 
-#### - [ ] Task `P1-T04` — Build Analytics shell
+#### - [x] Task `P1-T04` — Build Analytics shell
 
 **Files:** `AnalyticsWorkspace.tsx`, `AnalyticsNav.tsx`, `index.ts` (CREATE).
 
@@ -970,7 +970,7 @@ Tests: selected route, unavailable section, keyboard navigation, evidence badge.
 
 Git Commit: `feat(ui): build Analytics workbench shell`
 
-#### - [ ] Task `P1-T05` — Add Analytics routes
+#### - [x] Task `P1-T05` — Add Analytics routes
 
 **Files:** analytics root page, compare page, `[runId]/[[...segments]]/page.tsx` (CREATE).
 
@@ -978,7 +978,7 @@ Resolve overview, ten sections, and `trades/{ticket}`; unknown shapes call `notF
 
 Git Commit: `feat(ui): add Analytics workspace routes`
 
-#### - [ ] Task `P1-T06` — Link canonical Analytics
+#### - [x] Task `P1-T06` — Link canonical Analytics
 
 **Files:** `SimulatorWidget.tsx`, its test, and `app/ui/README.md` (MODIFY).
 

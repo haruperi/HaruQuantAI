@@ -181,6 +181,9 @@ describe("SimulatorWidget", () => {
     // CAGR was not calculated and must not render as a number.
     expect(screen.getByRole("row", { name: /CAGR/ })).toHaveTextContent("—");
     expect(screen.getByText("42")).toBeTruthy();
+    expect(
+      screen.getByRole("link", { name: /inspect in analytics workspace/i }),
+    ).toHaveAttribute("href", "/workstation/analytics/sim-9/overview");
   });
 
   it("surfaces a failed run's reason", async () => {

@@ -17,6 +17,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import Link from "next/link";
 import {
   AlertTriangle,
   CircleCheck,
@@ -654,6 +655,20 @@ export function SimulatorWidget({
                   Caveats: {report.caveats.join(", ")}
                 </p>
               )}
+
+              <div className="workflow-simulator__handoff mt-4 flex items-center justify-between p-3 rounded bg-slate-800/90 border border-slate-700">
+                <div className="text-xs text-slate-400">
+                  <span>Comprehensive 18-section breakdown available</span>
+                </div>
+                <Link
+                  href={`/workstation/analytics/${encodeURIComponent(report.run_id)}/overview`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded bg-teal-600 hover:bg-teal-500 text-white shadow"
+                  aria-label="Inspect in Analytics Workspace"
+                >
+                  <FlaskConical size={14} aria-hidden="true" />
+                  <span>Inspect in Analytics</span>
+                </Link>
+              </div>
             </div>
           )}
 

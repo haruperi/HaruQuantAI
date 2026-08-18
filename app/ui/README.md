@@ -148,6 +148,9 @@ app/ui/
     ├── features/simulator/               # FEAT-UI-27
     ├── features/research/                # FEAT-UI-28
     ├── features/news/                    # FEAT-UI-29
+    ├── features/market-hours/            # FEAT-UI-30
+    ├── features/simulation-workbench/    # FEAT-UI-31
+    ├── features/analytics-workbench/     # FEAT-UI-32
     ├── types/                            # support: shared types
     ├── utils/                            # support: shared helpers
     └── mock/                             # support: test-only fixtures
@@ -185,6 +188,10 @@ app/ui/
 | Completed | `FEAT-UI-27` Canonical Backtest Simulator Widget      | `src/features/simulator/`                                                                                 | `SimulatorWidget`; registered strategy picker with per-strategy parameters, market and execution configuration, background run control, ordered progress, and the Analytics-owned performance report                                                   | `FR-UI-234`–`FR-UI-240`                                                                            | `src/features/simulator/SimulatorWidget.test.tsx`; `src/clients/clients.contract.test.ts`                                                                                                                                             |
 | Completed | `FEAT-UI-28` Research Workbench | `src/features/research/`, `src/app/workstation/research/` | `ResearchDashboard`, `ResearchRunBuilder`, `ResearchWorkbench`, `ResearchStageNav`, `ResearchRunHeader`, `ResearchComparison`, `ResearchAutomation`, `ResearchArtifactDrawer`, `ResearchExpectancy`, `ResearchDrift`, and thirteen stage panels; deep-linkable run stages, server-derived stage status, ordered progress streaming, run history and comparison, artifact provenance, permission-gated expectancy governance, and the V2-only Features/Validation/Intelligence/Stress evidence views | `FR-UI-241`–`FR-UI-252` | `src/features/research/ResearchWorkbench.test.tsx`; `src/features/research/ResearchExpectancy.test.tsx`; `src/features/research/research-client.test.ts`; `src/features/research/v1-coverage.test.ts` |
 | Completed | `FEAT-UI-29` News Online Feed Widget | `src/features/news/`, `src/app/workstation/news/` | `NewsWidget`, `NewsCategory`, `NewsLanguage`, `CATEGORY_LABELS`, `LANGUAGE_LABELS` through the feature barrel; `/workstation/news` workstation route | `FR-UI-253`–`FR-UI-258` | `src/features/news/NewsWidget.test.tsx` |
+| Completed | `FEAT-UI-30` FX Market Hours Widget | `src/features/market-hours/`, `src/app/workstation/market-hours/` | `MarketHoursWidget`, `DEFAULT_MARKET_HOURS_CONFIG`, `POPULAR_FX_INSTRUMENTS` through the feature barrel; `/workstation/market-hours` workstation route | `FR-UI-259`–`FR-UI-264` | `src/features/market-hours/MarketHoursWidget.test.tsx` |
+| Partial   | `FEAT-UI-31` Simulation Workbench Shell | `src/features/simulation-workbench/`, `src/app/workstation/simulator/` | `SimulationWorkbench`, `SimulationStatusBadge`, `SimulationMode`; `/workstation/simulator`, `/workstation/simulator/new`, `/workstation/simulator/[...segments]` workstation routes | `FR-UI-265`–`FR-UI-270` | `src/features/simulation-workbench/SimulationWorkbench.test.tsx`; `src/app/workstation/simulator/routes.test.tsx`; `src/clients/simulationWorkbench.test.ts` |
+| Partial   | `FEAT-UI-32` Analytics Workbench Shell  | `src/features/analytics-workbench/`, `src/app/workstation/analytics/`  | `AnalyticsWorkspace`, `AnalyticsNav`, `AnalyticsTab`, `ANALYTICS_TABS`; `/workstation/analytics`, `/workstation/analytics/compare`, `/workstation/analytics/[runId]/[[...segments]]` workstation routes | `FR-UI-271`–`FR-UI-276` | `src/features/analytics-workbench/AnalyticsWorkspace.test.tsx`; `src/app/workstation/analytics/routes.test.tsx`; `src/clients/analyticsWorkbench.test.ts` |
+
 
 **Primary UI.** `FEAT-UI-01`–`FEAT-UI-06` and `FEAT-UI-08`–`FEAT-UI-13` are the trading workspace and widgets
 specified by `docs/dev/documentation.pdf`. `FEAT-UI-14`–`FEAT-UI-17` are the foundation
@@ -1123,6 +1130,40 @@ requiring backend ingestion.
 - External source: `https://freeserv-static.dukascopy.com/2.0/core.js`.
 - Supported categories: `finance`, `forex`, `stocks`, `company_news`, `commodities`.
 - Supported languages: 22 ISO language codes.
+
+---
+
+### 4.28 `src/features/market-hours/` — FX Market Hours Widget
+
+**Purpose:** Present real-time trading session clocks and market data for the Asian, European,
+and North American FX trading sessions, alongside hourly spreads, volatility, and volume indicators
+dynamically from Dukascopy's FX Market Hours Applet within an isolated, sandboxed iframe container without
+requiring backend ingestion.
+
+### Files
+
+| Status    | File                      | Responsibility                                                                                       | Key exports                                                                                       | Dependencies                                                                              |
+| --------- | ------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Completed | `contracts.ts`            | Widget configuration schemas, default CME dark themes, and popular FX instruments                   | `MarketHoursWidgetConfig`, `DEFAULT_MARKET_HOURS_CONFIG`, `POPULAR_FX_INSTRUMENTS`, etc.          | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None           |
+| Completed | `market-hours.module.css` | Dark CME/HaruQuantAI styling for toolbar, title, live sessions indicator, and iframe embed          | CSS module classes                                                                                | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None           |
+| Completed | `MarketHoursWidget.tsx`   | Focused widget component rendering isolated iframe with srcDoc and Dukascopy FX Market Hours applet | `MarketHoursWidget`                                                                               | **Standard library:** None<br>**Required third-party:** React, Lucide<br>**Local:** contracts|
+| Completed | `index.ts`                | Sole public barrel export for the feature                                                            | `MarketHoursWidget`, contracts                                                                    | **Standard library:** None<br>**Required third-party:** None<br>**Local:** contracts, component|
+
+| Status    | Requirement ID | Responsibility                                                                                                                       | Component / Function / Type | Side Effects            | Failure presentation                          | Usage / Test Evidence        |
+| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------- | ----------------------- | --------------------------------------------- | ---------------------------- |
+| Completed | `FR-UI-259`    | Render Dukascopy FX Market Hours feed in an isolated, sandboxed `iframe` with dark theme parameter injection and CSS reset.         | `MarketHoursWidget`         | Iframe script execution | Explicit loading spinner and fallback message | `MarketHoursWidget.test.tsx` |
+| Completed | `FR-UI-260`    | Support configurable instrument default (`EUR/USD`, etc.) and indicator display modes (`0` for spreads/volatility/volume).          | `MarketHoursWidget`         | Iframe configuration    | Default instrument fallback                   | `MarketHoursWidget.test.tsx` |
+| Completed | `FR-UI-261`    | Provide customizable timezone offset configuration defaulting to UTC/GMT (`0`).                                                     | `MarketHoursWidget`         | Iframe configuration    | Fallback to `0` UTC                           | `MarketHoursWidget.test.tsx` |
+| Completed | `FR-UI-262`    | Provide live status badge and loading overlay indicating external online data connectivity.                                          | `MarketHoursWidget`         | Iframe reload           | Visual loading spinner during initialization  | `MarketHoursWidget.test.tsx` |
+| Completed | `FR-UI-263`    | Register the `market-hours` widget type in workspace contracts, allowing docking, splitting, and layout persistence.                | Workspace contracts, host   | Layout persistence      | Registered-type validation                    | `MarketHoursWidget.test.tsx` |
+| Completed | `FR-UI-264`    | Provide a standalone workstation page route (`/workstation/market-hours`) with full-screen layout.                                   | `/workstation/market-hours` | Client routing          | Protected layout                              | `MarketHoursWidget.test.tsx` |
+
+### Configuration and Limits Manifest
+
+- External source: `https://freeserv-static.dukascopy.com/2.0/core.js`.
+- Applet type: `fxmarkethours`.
+- Supported market sessions: Asian (Tokyo/Sydney), European (London/Frankfurt), North American (New York).
+- Supported indicators: Spreads, Volatility, Volume.
 
 ---
 
