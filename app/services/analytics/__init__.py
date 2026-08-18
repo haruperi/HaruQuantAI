@@ -211,6 +211,9 @@ from app.services.analytics.scoring import (
 from app.services.analytics.scoring import (
     parse_scoring_profile_mapping as _parse_scoring_profile_mapping,
 )
+from app.services.analytics.workbench import (
+    build_workbench_payload as _build_workbench_payload,
+)
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
@@ -1269,6 +1272,38 @@ def build_dashboard_payload(
     )
 
 
+def build_analytics_workbench_payload(
+    report: object,
+    simulation_result: Mapping[str, object],
+    *,
+    max_points: int = 5_000,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Project validated owner evidence into a finite workbench payload.
+
+    Args:
+        report: Validated Analytics PerformanceReport instance.
+        simulation_result: Canonical Simulation result mapping.
+        max_points: Maximum retained items per section.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
+    Returns:
+        Standard response containing the workbench payload in ``data``.
+    """
+    return run_analytics_operation(
+        operation="analytics.workbench.build_analytics_workbench_payload",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _build_workbench_payload(
+            cast("PerformanceReport", report),
+            simulation_result,
+            max_points=max_points,
+        ),
+    )
+
+
 def _truncate_transform(
     result: tuple[tuple[Mapping[str, object], ...], Mapping[str, object]],
 ) -> tuple[tuple[Mapping[str, object], ...], Mapping[str, object]]:
@@ -1611,6 +1646,7 @@ __all__: tuple[str, ...] = (
     "analyze_emergency_response",
     "append_player_journal_entry",
     "assess_plan_adherence",
+    "build_analytics_workbench_payload",
     "build_barrier_section",
     "build_closed_trade_equity_curve",
     "build_dashboard_payload",

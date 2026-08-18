@@ -19,6 +19,7 @@ _USAGE_SCRIPTS = (
     "08_behavior.py",
     "09_emergency_response.py",
     "10_qualification.py",
+    "11_workbench.py",
 )
 
 _README_REQUIREMENTS = {
