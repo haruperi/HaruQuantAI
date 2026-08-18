@@ -525,7 +525,7 @@ def build_trading_preflight_source() -> _PreflightOperation:
                 unavailable. Live routing is not refused here; Risk is the
                 sole authority on whether the order may proceed.
         """
-        from app.services.brokers import disconnect_broker
+        from app.services.brokers import create_connected_broker, disconnect_broker
         from app.services.data import (
             build_account_snapshot_request,
             get_account_state_snapshot,
@@ -536,7 +536,6 @@ def build_trading_preflight_source() -> _PreflightOperation:
         )
 
         request = cast("Any", boundary_request)
-        await _require_platform_mode_match(request.route)
 
         replay_time = None
         replay_refs = None
@@ -545,7 +544,9 @@ def build_trading_preflight_source() -> _PreflightOperation:
                 request
             )
         else:
-            adapter = await _connect_mode_broker(request.route)
+            adapter = await create_connected_broker(
+                "mt5", allow_live=(request.route == "live")
+            )
             try:
                 snapshot_response = get_account_state_snapshot(
                     build_account_snapshot_request(
@@ -629,7 +630,7 @@ async def _authorize_cancellation(
             Live routing is not refused here; Risk is the sole authority on
             whether the cancellation may proceed.
     """
-    from app.services.brokers import disconnect_broker
+    from app.services.brokers import create_connected_broker, disconnect_broker
     from app.services.data import (
         build_account_snapshot_request,
         get_account_state_snapshot,
@@ -640,9 +641,8 @@ async def _authorize_cancellation(
     )
 
     request = cast("Any", boundary_request)
-    await _require_platform_mode_match(request.route)
 
-    adapter = await _connect_mode_broker(request.route)
+    adapter = await create_connected_broker("mt5", allow_live=(request.route == "live"))
     try:
         snapshot_response = get_account_state_snapshot(
             build_account_snapshot_request(

@@ -54,17 +54,22 @@ else:
             """Resolve one pandas attribute at the runtime operation boundary.
 
             Args:
-                            name: Requested pandas attribute name.
+                name: Attribute identifier to resolve on the pandas module.
 
             Returns:
-                            The resolved pandas attribute.
-
-            Raises:
-                None.
+                Resolved attribute from the imported pandas package.
             """
             return getattr(import_module("pandas"), name)
 
     pd = _LazyPandas()
+
+_input_checksum_dataset: object = None
+_input_checksum_records: object = None
+_input_checksum_value: str | None = None
+
+_source_frame_dataset: object = None
+_source_frame_records: object = None
+_source_frame_value: object = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -285,6 +290,17 @@ def _input_checksum(data: MarketDataset) -> str:
     Raises:
         None.
     """
+    global _input_checksum_dataset  # noqa: PLW0603
+    global _input_checksum_records  # noqa: PLW0603
+    global _input_checksum_value  # noqa: PLW0603
+
+    records_identity = data.records
+    if (
+        data is _input_checksum_dataset
+        and records_identity is _input_checksum_records
+        and _input_checksum_value is not None
+    ):
+        return _input_checksum_value
     payload = data.model_dump(mode="json")
     records = cast("list[object]", payload.pop("records"))
     digest = hashlib.sha256()
@@ -295,7 +311,11 @@ def _input_checksum(data: MarketDataset) -> str:
         digest.update(b"\x1e")
         chunk = records[start : start + _CHECKSUM_CHUNK_RECORDS]
         digest.update(canonical_json(chunk).encode("utf-8"))
-    return digest.hexdigest()
+    value = digest.hexdigest()
+    _input_checksum_dataset = data
+    _input_checksum_records = records_identity
+    _input_checksum_value = value
+    return value
 
 
 def _serialize_output_cell(value: object) -> object:
@@ -360,11 +380,22 @@ def _project_source_frame(data: MarketDataset) -> pd.DataFrame:
     Raises:
         None.
     """
-    records = cast("tuple[OHLCVRecord, ...]", data.records)
+    global _source_frame_dataset  # noqa: PLW0603
+    global _source_frame_records  # noqa: PLW0603
+    global _source_frame_value  # noqa: PLW0603
+
+    records_identity = data.records
+    if (
+        data is _source_frame_dataset
+        and records_identity is _source_frame_records
+        and _source_frame_value is not None
+    ):
+        return cast("pd.DataFrame", _source_frame_value)
+    records = cast("tuple[OHLCVRecord, ...]", records_identity)
     index = pd.DatetimeIndex(
         [record.timestamp for record in records], name="timestamp", tz="UTC"
     )
-    return pd.DataFrame(
+    frame = pd.DataFrame(
         {
             "symbol": [data.symbol] * len(records),
             "open": [float(record.open) for record in records],
@@ -375,6 +406,10 @@ def _project_source_frame(data: MarketDataset) -> pd.DataFrame:
         },
         index=index,
     )
+    _source_frame_dataset = data
+    _source_frame_records = records_identity
+    _source_frame_value = frame
+    return frame
 
 
 def _validate_finalization_shape(

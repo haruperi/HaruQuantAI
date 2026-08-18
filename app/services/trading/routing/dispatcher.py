@@ -582,7 +582,7 @@ async def _dispatch_order_intent_value(
         "Dispatching Trading intent %s via %s", intent.client_order_id, intent.route
     )
     _validate_dispatch_policy(operation_timeout_seconds)
-    if intent.route.value == "sim":
+    if intent.route.value == "sim" and simulation_execution_source is not None:
         if connection is not None or broker_adapter is not None:
             raise TradingError(
                 "SCOPE_MISMATCH", "Sim route cannot use Broker mutation authority"
@@ -592,6 +592,10 @@ async def _dispatch_order_intent_value(
             simulation_execution_source,
             operation_timeout_seconds=operation_timeout_seconds,
             clock=clock,
+        )
+    if intent.route.value != "sim" and simulation_execution_source is not None:
+        raise TradingError(
+            "SCOPE_MISMATCH", "Non-sim route cannot use Simulator execution authority"
         )
     _validate_route_environment(intent, connection)
     selected_connection, selected_adapter = _validate_broker_selection(

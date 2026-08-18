@@ -11,16 +11,22 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 _SIMULATOR_ROOT = _PROJECT_ROOT / "app" / "services" / "simulator"
 _PERSISTENCE_ROOT = _SIMULATOR_ROOT / "persistence"
 _PERSISTENCE_EXPORTS = {
+    "append_interactive_intent_and_checkpoint",
     "complete_run_record",
+    "create_interactive_intent_record",
+    "create_interactive_session_record",
     "create_recovery_checkpoint_record",
     "create_run_record",
     "create_session_record",
     "create_simulator_persistence_store",
     "read_completed_run_record",
+    "read_interactive_intent_records",
+    "read_interactive_session_record",
     "read_recovery_checkpoint_records",
     "read_result_record",
     "read_run_record",
     "read_session_record",
+    "update_interactive_session_record",
     "update_run_record",
     "update_secured_session_record",
     "update_session_record",

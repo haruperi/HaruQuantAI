@@ -19,6 +19,7 @@ _USAGE_SCRIPTS = (
     "09_reporting.py",
     "10_protective_orders.py",
     "11_trade_ownership.py",
+    "12_session_registry.py",
 )
 
 _README = Path(__file__).parents[3] / "app" / "services" / "trading" / "README.md"
@@ -39,7 +40,7 @@ def test_numbered_usage_registry_is_exact() -> None:
     numbered = tuple(
         sorted(path.name for path in usage_directory.glob("[0-9][0-9]_*.py"))
     )
-    assert feature_ids == {f"{index:02d}" for index in range(1, 12)}
+    assert feature_ids == {f"{index:02d}" for index in range(1, 13)}
     assert numbered == _USAGE_SCRIPTS
     assert not (usage_directory / "features.py").exists()
 

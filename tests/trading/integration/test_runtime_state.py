@@ -556,4 +556,4 @@ def test_migration_004_preserves_existing_order_and_is_idempotent(
         assert _read_rows(
             "SELECT COUNT(*) AS count FROM data_migration_ledger "
             "WHERE domain = 'trading'"
-        ) == ({"count": 5},)
+        ) == ({"count": len(steps)},)

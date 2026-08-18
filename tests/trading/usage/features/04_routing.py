@@ -209,6 +209,44 @@ def fr_trd_094() -> None:
     fr_trd_096()
 
 
+def fr_trd_114() -> None:
+    """FR-TRD-114: Dispatch sim-routed order with explicit simulation authority."""
+    _header("Stage 3: Simulation Dispatch - Dispatch Order Intent (FR-TRD-114)")
+
+    async def source(value: OrderIntent) -> Any:
+        return classify_authority_response(
+            {
+                "receipt_id": "sim-receipt-114",
+                "intent_id": value.source_intent_id,
+                "client_order_id": value.client_order_id,
+                "route": "sim",
+                "authority": "simulator",
+                "provider_order_id": "sim-order-114",
+                "status": "accepted",
+                "requested_quantity": str(value.approved_volume),
+                "filled_quantity": "0",
+                "request_id": value.request_id,
+                "correlation_id": value.correlation_id,
+                "authority_timestamp": NOW.isoformat(),
+                "received_at": NOW.isoformat(),
+            },
+            _capability(),
+        )
+
+    dispatched = asyncio.run(
+        dispatch_order_intent(
+            _intent(),
+            None,
+            None,
+            operation_timeout_seconds=Decimal(10),
+            clock=lambda: NOW,
+            simulation_execution_source=source,
+        )
+    )
+    print(_format_result(dispatched))
+    print(f"Data -> status='{dispatched.status}'")
+
+
 def _emit_requirement_success(function: object) -> object:
     """Wrap one example so direct execution emits its success contract."""
 
@@ -246,6 +284,7 @@ def main() -> None:
     fr_trd_088()
     fr_trd_094()
     fr_trd_096()
+    fr_trd_114()
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 """SYS-WF-003 Optimization through approved Strategy adoption integration."""
 
+import asyncio
 from contextlib import AbstractContextManager
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -123,7 +124,7 @@ def test_sys_wf_003_approved_optimization_adoption(tmp_path: Path) -> None:
     dataset = make_dataset()
     captured: dict[str, object] = {}
 
-    def runner(request, auth_context, dependencies):
+    async def runner(request, auth_context, dependencies):
         """Capture the registered Simulation request and return deterministic output."""
         logger.debug("Running SYS-WF-003 deterministic Simulation fixture")
         captured["request"] = request
@@ -140,7 +141,7 @@ def test_sys_wf_003_approved_optimization_adoption(tmp_path: Path) -> None:
         engine_version="v1",
     )
     adapter._simulation_runner = runner
-    response = run_parameter_sweep(search_request(), adapter)
+    response = asyncio.run(run_parameter_sweep(search_request(), adapter))
     assert response.data is not None
     result = response.data
     parameters = result.ranked_candidates[0]["executable_parameters"]
@@ -204,7 +205,7 @@ def test_sys_wf_003_approved_optimization_adoption(tmp_path: Path) -> None:
 
     simulation_request = captured["request"]
     assert dataset.schema_id == "data.market_dataset.v1"
-    assert simulation_request.schema_id == "simulation.backtest_request.v1"
+    assert simulation_request.schema_id == "simulation.backtest_request.v2"
     assert result.ranked_candidates
     assert result.diagnostics["search"]
     route_paths = {route.path for route in strategies_router.routes}

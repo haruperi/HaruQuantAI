@@ -111,7 +111,7 @@ def test_cancel_order_preflight_returns_the_real_decision_and_verdict_mapping(
         lambda *_a, **_k: SimpleNamespace(status="success", data=snapshot),
     )
 
-    def _fake_config() -> object:
+    def _fake_config(*_args: object, **_kwargs: object) -> object:
         return object()
 
     monkeypatch.setattr(risk_module, "build_personal_account_risk_config", _fake_config)

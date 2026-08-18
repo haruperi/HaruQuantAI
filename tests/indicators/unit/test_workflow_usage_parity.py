@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import contextlib
 from pathlib import Path
 from typing import Any
 
@@ -21,16 +22,18 @@ EXPECTED = {
 }
 
 
-def _assignment(path: Path, name: str) -> Any:
-    """Return one literal module assignment."""
-    tree = ast.parse(path.read_text(encoding="utf-8"))
+def _assignments_and_source(path: Path) -> tuple[dict[str, Any], str]:
+    """Parse one file's source and its top-level literal assignments."""
+    source = path.read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    assignments: dict[str, Any] = {}
     for node in tree.body:
-        if isinstance(node, ast.Assign) and any(
-            isinstance(target, ast.Name) and target.id == name
-            for target in node.targets
-        ):
-            return ast.literal_eval(node.value)
-    raise AssertionError(f"{name} is missing from {path.name}")
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    with contextlib.suppress(ValueError, TypeError):
+                        assignments[target.id] = ast.literal_eval(node.value)
+    return assignments, source
 
 
 def test_indicator_workflow_registry_has_one_complete_program_per_workflow() -> None:
@@ -38,14 +41,13 @@ def test_indicator_workflow_registry_has_one_complete_program_per_workflow() -> 
     readme = README.read_text(encoding="utf-8")
     actual = {path.name for path in WORKFLOW_DIR.glob("wf_*.py")}
     assert actual == set(EXPECTED.values())
-    assert tuple(EXPECTED.values()) == _assignment(
-        WORKFLOW_DIR / "run_all.py", "WORKFLOWS"
-    )
+    run_all_assignments, _ = _assignments_and_source(WORKFLOW_DIR / "run_all.py")
+    assert tuple(EXPECTED.values()) == run_all_assignments["WORKFLOWS"]
     for workflow_id, filename in EXPECTED.items():
         path = WORKFLOW_DIR / filename
-        source = path.read_text(encoding="utf-8")
-        stages = _assignment(path, "STAGES")
-        assert _assignment(path, "WORKFLOW_ID") == workflow_id
+        assignments, source = _assignments_and_source(path)
+        stages = assignments["STAGES"]
+        assert assignments["WORKFLOW_ID"] == workflow_id
         assert source.count("# Stage ") == len(stages)
         assert "'=' * 88" in source
         assert "INPUT BOUNDARY" in source
