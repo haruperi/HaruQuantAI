@@ -43,6 +43,11 @@ from app.services.simulator.backtest_recipe.descriptors import (
     get_backtest_strategy_descriptor,
     resolve_strategy_parameters,
 )
+from app.services.simulator.backtest_recipe.evidence import (
+    BacktestRunEvidence,
+    CompletionSink,
+    sink_backtest_evidence,
+)
 from app.utils import canonical_digest, create_auth_context, generate_id
 
 #: Ordered metric keys reported for a completed run, mirroring the legacy
@@ -590,6 +595,7 @@ async def run_strategy_backtest(
     facts: ProviderFacts,
     progress: ProgressCallback = _noop_progress,
     root: Path | None = None,
+    completion_sink: CompletionSink | None = None,
 ) -> dict[str, Any]:
     """Run one canonical single-asset backtest and build its report.
 
@@ -598,12 +604,17 @@ async def run_strategy_backtest(
         facts: Verified provider facts for this run.
         progress: Sink receiving ``(stage, detail)`` updates.
         root: Isolated run directory; a temporary directory when absent.
+        completion_sink: Optional callable receiving the complete terminal
+            evidence (compact projection, full Simulation result, full
+            Analytics report) exactly once after both owners succeed.
 
     Returns:
         Complete run evidence: metrics, quality, trades, and identities.
 
     Raises:
         ValueError: If configuration, evidence, or the strategy is unusable.
+        BacktestEvidencePersistenceError: If the completion sink fails; the
+            run's terminal evidence could not be retained.
     """
     parameters = config.validate()
     descriptor = get_backtest_strategy_descriptor(config.strategy_id)
@@ -699,7 +710,7 @@ async def run_strategy_backtest(
         )
         progress("analytics", "performance report ready")
 
-    return {
+    projection: dict[str, Any] = {
         "run_id": result.run_id,
         "engine_version": result.engine_version,
         "config_hash": typed_request.config_hash,
@@ -723,6 +734,16 @@ async def run_strategy_backtest(
         ),
         "caveats": _text_tuple(get_analytics_value_field(report, "caveats")),
     }
+    if completion_sink is not None:
+        sink_backtest_evidence(
+            BacktestRunEvidence(
+                projection=projection,
+                simulation_result=result,
+                performance_report=report,
+            ),
+            completion_sink,
+        )
+    return projection
 
 
 def utc_now() -> datetime:

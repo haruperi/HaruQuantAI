@@ -19,13 +19,16 @@ from collections.abc import Callable, Iterator
 from contextlib import AbstractContextManager, nullcontext
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from app.services.simulator.backtest_recipe.pipeline import (
     BacktestRunConfig,
     run_strategy_backtest,
     utc_now,
 )
+
+if TYPE_CHECKING:
+    from app.services.simulator.backtest_recipe.evidence import CompletionSink
 from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
@@ -202,6 +205,7 @@ class BacktestJobRegistry:
         facts_loader: Callable[[BacktestRunConfig], Any],
         runtime_context: Callable[[], AbstractContextManager[Any]] | None = None,
         max_jobs: int = _DEFAULT_MAX_JOBS,
+        completion_sink: CompletionSink | None = None,
     ) -> None:
         """Build one registry bound to a provider-facts loader.
 
@@ -213,10 +217,14 @@ class BacktestJobRegistry:
                 re-entered here.
             max_jobs: Maximum retained jobs before the oldest terminal job is
                 evicted.
+            completion_sink: Optional callable receiving the complete terminal
+                evidence of each successful run exactly once, before registry
+                eviction can discard it.
         """
         self._facts_loader = facts_loader
         self._runtime_context = runtime_context
         self._max_jobs = max_jobs
+        self._completion_sink = completion_sink
         self._jobs: OrderedDict[str, BacktestJob] = OrderedDict()
         self._lock = threading.Lock()
 
@@ -326,7 +334,12 @@ class BacktestJobRegistry:
             with context:
                 facts = self._facts_loader(job.config)
                 result = asyncio.run(
-                    run_strategy_backtest(job.config, facts=facts, progress=progress)
+                    run_strategy_backtest(
+                        job.config,
+                        facts=facts,
+                        progress=progress,
+                        completion_sink=self._completion_sink,
+                    )
                 )
         except BacktestCancelledError:
             job.transition(

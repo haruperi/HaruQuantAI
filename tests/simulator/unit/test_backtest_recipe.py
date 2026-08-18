@@ -257,3 +257,260 @@ def test_a_terminal_snapshot_carries_ordered_progress_events() -> None:
     assert snapshot["strategy_id"] == "naive-ma-trend"
     sequences = [event["sequence"] for event in snapshot["events"]]
     assert sequences == sorted(sequences)
+
+
+class _FakeQualityReport:
+    """Minimal Data quality report stand-in."""
+
+    quality_status = "pass"
+    quality_decision = "accept"
+    quality_score = 1.0
+    issues: tuple[object, ...] = ()
+    warnings: tuple[str, ...] = ()
+
+
+class _FakeDataset:
+    """Minimal retrieved dataset stand-in."""
+
+    def __init__(self, count: int) -> None:
+        class _Record:
+            """One timestamped bar stub."""
+
+            timestamp = _START
+
+        self.records = tuple(_Record() for _ in range(count))
+        self.quality_report = _FakeQualityReport()
+
+
+class _FakeMeasurement:
+    """Minimal measurement-window dataset stand-in."""
+
+    def __init__(self) -> None:
+        class _Record:
+            """One timestamped bar stub."""
+
+            timestamp = _START
+
+        self.records = (_Record(),)
+        self.start = _START
+        self.end = _END
+        self.available_at = _END
+        self.quality_report = _FakeQualityReport()
+
+
+class _FakeTickDataset:
+    """Minimal generated tick dataset stand-in."""
+
+    start = _START
+    end = _END
+
+
+class _FakeRequest:
+    """Minimal canonical Simulation request stand-in."""
+
+    request_id = "req-test"
+    workflow_id = "wf-test"
+    correlation_id = "cor-test"
+    start = _START
+    config_hash = "a" * 64
+    strategy_id = "naive-ma-trend"
+    strategy_version = "v1"
+    symbol = "EURUSD"
+    timeframe = "H1"
+    initial_balance = "10000.00"
+    account_currency = "USD"
+
+
+class _FakeTrade:
+    """One closed-trade stub with the projection's dump surface."""
+
+    def model_dump(
+        self, *, mode: str = "python", warnings: bool = True
+    ) -> dict[str, Any]:
+        """Return the trade's plain mapping form."""
+        del mode, warnings
+        return {"ticket": 1}
+
+
+class _FakeResult:
+    """Minimal canonical Simulation result stand-in."""
+
+    contract_version = "v1"
+    schema_id = "simulation.result.v1"
+    run_id = "run-test"
+    engine_version = "engine-test"
+    closed_trades = (_FakeTrade(),)
+
+
+class _FakeReport:
+    """Opaque Analytics performance report stand-in."""
+
+
+def _patch_pipeline_tail(monkeypatch: pytest.MonkeyPatch) -> object:
+    """Replace every provider, Simulation, and Analytics call in the pipeline.
+
+    Args:
+        monkeypatch: pytest patcher bound to the pipeline module namespace.
+
+    Returns:
+        The report stand-in used for the run, for identity assertions.
+    """
+    from app.services.simulator.backtest_recipe import pipeline
+
+    def _fake_retrieve_bars(config: object, warmup: int) -> object:
+        del config, warmup
+        return _FakeDataset(400)
+
+    def _fake_measurement(dataset: object, config: object) -> object:
+        del dataset, config
+        return _FakeMeasurement()
+
+    def _fake_ticks(
+        measurement: object, *, timeframe: str, spread_points: object
+    ) -> object:
+        del measurement, timeframe, spread_points
+        return _FakeTickDataset()
+
+    def _fake_request(**values: object) -> object:
+        del values
+        return _FakeRequest()
+
+    def _fake_analytics_config(created_at: object) -> object:
+        del created_at
+        return object()
+
+    def _fake_authority(request: object) -> object:
+        del request
+        return object()
+
+    def _fake_field(value: object, name: str) -> object:
+        del value, name
+        return None
+
+    async def _fake_run(request: object, authority: object, deps: object) -> object:
+        del request, authority, deps
+        return _FakeResult()
+
+    def _fake_report(*args: object, **kwargs: object) -> object:
+        del args, kwargs
+        return report
+
+    report = _FakeReport()
+    monkeypatch.setattr(pipeline, "_retrieve_bars", _fake_retrieve_bars)
+    monkeypatch.setattr(pipeline, "_measurement_dataset", _fake_measurement)
+    monkeypatch.setattr(pipeline, "build_run_tick_dataset", _fake_ticks)
+    monkeypatch.setattr(pipeline, "_canonical_request", _fake_request)
+    monkeypatch.setattr(pipeline, "_analytics_config", _fake_analytics_config)
+    monkeypatch.setattr(pipeline, "_authority", _fake_authority)
+    monkeypatch.setattr(pipeline, "get_analytics_value_field", _fake_field)
+    monkeypatch.setattr(pipeline, "run_backtest_async", _fake_run)
+    monkeypatch.setattr(pipeline, "build_performance_report", _fake_report)
+    return report
+
+
+def test_completion_sink_receives_full_evidence_exactly_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Both owner objects survive to the sink while the snapshot stays compact."""
+    import asyncio
+
+    from app.services.simulator.backtest_recipe.pipeline import run_strategy_backtest
+
+    report = _patch_pipeline_tail(monkeypatch)
+    received: list[object] = []
+
+    def sink(evidence: object) -> None:
+        received.append(evidence)
+
+    projection = asyncio.run(
+        run_strategy_backtest(_config(), facts=object(), completion_sink=sink)
+    )
+    assert len(received) == 1
+    evidence = received[0]
+    assert evidence.projection is projection
+    assert evidence.simulation_result.run_id == "run-test"
+    assert evidence.performance_report is report
+    # No full owner object may leak into the HTTP snapshot payload.
+    assert "simulation_result" not in projection
+    assert "performance_report" not in projection
+
+
+def test_sink_failure_fails_the_job_with_the_persistence_code(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A refusing sink turns the run into a terminal persistence failure."""
+    from app.services.simulator.backtest_recipe import jobs as jobs_module
+    from app.services.simulator.backtest_recipe.pipeline import run_strategy_backtest
+
+    _patch_pipeline_tail(monkeypatch)
+
+    def sink(evidence: object) -> None:
+        del evidence
+        raise RuntimeError("catalogue unavailable")
+
+    # Route the registry through the patched pipeline module.
+    monkeypatch.setattr(jobs_module, "run_strategy_backtest", run_strategy_backtest)
+
+    def facts_loader(config: BacktestRunConfig) -> object:
+        del config
+        return object()
+
+    registry = BacktestJobRegistry(facts_loader=facts_loader, completion_sink=sink)
+    job = registry.submit(_config(), principal_id="tester")
+    _wait_for_terminal(job)
+    assert job.status == "failed"
+    assert job.error == "BACKTEST_EVIDENCE_PERSISTENCE_FAILED"
+
+
+def test_cancellation_skips_the_completion_sink(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A cancelled run never hands evidence to the sink."""
+    import asyncio
+
+    from app.services.simulator.backtest_recipe.jobs import BacktestCancelledError
+    from app.services.simulator.backtest_recipe.pipeline import run_strategy_backtest
+
+    _patch_pipeline_tail(monkeypatch)
+    received: list[object] = []
+
+    calls: list[str] = []
+
+    def cancelling_progress(stage: str, detail: str) -> None:
+        calls.append(stage)
+        if len(calls) > 1:
+            raise BacktestCancelledError
+
+    with pytest.raises(BacktestCancelledError):
+        asyncio.run(
+            run_strategy_backtest(
+                _config(),
+                facts=object(),
+                progress=cancelling_progress,
+                completion_sink=received.append,
+            )
+        )
+    assert received == []
+
+
+def test_registry_cancellation_before_the_pipeline_skips_the_sink() -> None:
+    """A job cancelled while queued never reaches the completion sink."""
+    from app.services.simulator.backtest_recipe.jobs import BacktestCancelledError
+
+    received: list[object] = []
+
+    class _HoldingLoader:
+        """Facts loader that only finishes once cancellation was requested."""
+
+        def __call__(self, config: BacktestRunConfig) -> object:
+            del config
+            raise BacktestCancelledError
+
+    registry = BacktestJobRegistry(
+        facts_loader=_HoldingLoader(),
+        completion_sink=received.append,
+    )
+    job = registry.submit(_config(), principal_id="tester")
+    _wait_for_terminal(job)
+    assert job.status == "cancelled"
+    assert received == []
