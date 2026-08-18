@@ -31,6 +31,7 @@ import { TradingWidget } from '../../features/trading';
 import { SessionRegistryWidget } from '../../features/session-registry';
 import { IndicatorWorkspace } from '../workflow/indicators';
 import { NewsWidget } from '../../features/news';
+import { MarketHoursWidget } from '../../features/market-hours';
 import type { Widget } from '../../features/workspaces';
 
 export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
@@ -83,6 +84,8 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
       return <IndicatorWorkspace />;
     case 'news':
       return <NewsWidget />;
+    case 'market-hours':
+      return <MarketHoursWidget />;
     default:
       return <MarketsWidget />;
   }

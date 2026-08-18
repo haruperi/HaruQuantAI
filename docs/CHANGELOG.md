@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add FX Market Hours widget
+
+Operators can now inspect live Asian, European, and North American FX trading session clocks, spreads, volatility, and volume indicators dynamically within the workstation and a standalone route.
+
+#### Added (1)
+
+- Added `FEAT-UI-30` FX Market Hours Widget with isolated sandboxed iframe embed, session indicator controls, timezone parameterization, live connectivity tracking, workspace docking integration, and `/workstation/market-hours` standalone route.
+
 ### Add News online feed widget
 
 Operators can now inspect live financial and market news dynamically within the workstation and a standalone route.

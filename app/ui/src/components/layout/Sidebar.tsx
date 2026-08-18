@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Calendar as CalendarIcon,
   Newspaper,
+  Clock,
   Compass,
   GraduationCap,
   FileSpreadsheet,
@@ -96,6 +97,11 @@ export const Sidebar: React.FC = () => {
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('news', 'News')}>
           <Newspaper size={15} />
           {!isCollapsed && <span>News</span>}
+        </div>
+
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('market-hours', 'Market Hours')}>
+          <Clock size={15} />
+          {!isCollapsed && <span>Market Hours</span>}
         </div>
 
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('dashboard', 'Dashboard')}>
