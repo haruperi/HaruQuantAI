@@ -20,8 +20,20 @@ from app.services.api.workstation.simulation_workbench.persistence.read import (
     read_simulation_session_record,
     read_simulation_sessions,
 )
+from app.services.api.workstation.simulation_workbench.persistence.update import (
+    annotate_simulation_result_record,
+    archive_simulation_result_record,
+    cancel_simulation_batch_item_records,
+    retry_simulation_batch_item_record,
+    transition_simulation_result_completion,
+    update_simulation_batch_record,
+    update_simulation_session_record,
+)
 
 __all__ = (
+    "annotate_simulation_result_record",
+    "archive_simulation_result_record",
+    "cancel_simulation_batch_item_records",
     "create_simulation_batch_item_records",
     "create_simulation_batch_record",
     "create_simulation_result_record",
@@ -32,4 +44,8 @@ __all__ = (
     "read_simulation_results_page",
     "read_simulation_session_record",
     "read_simulation_sessions",
+    "retry_simulation_batch_item_record",
+    "transition_simulation_result_completion",
+    "update_simulation_batch_record",
+    "update_simulation_session_record",
 )

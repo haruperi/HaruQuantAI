@@ -71,6 +71,13 @@ _SIMULATION_WORKBENCH_EXPORTS = {
     "read_simulation_results_page",
     "read_simulation_session_record",
     "read_simulation_sessions",
+    "annotate_simulation_result_record",
+    "archive_simulation_result_record",
+    "cancel_simulation_batch_item_records",
+    "retry_simulation_batch_item_record",
+    "transition_simulation_result_completion",
+    "update_simulation_batch_record",
+    "update_simulation_session_record",
 }
 _SQL_PATTERNS = (
     re.compile(r"^SELECT\s+.+\s+FROM\s+"),
