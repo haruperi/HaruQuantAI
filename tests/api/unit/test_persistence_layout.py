@@ -6,6 +6,9 @@ import re
 from pathlib import Path
 
 from app.services.api.identity import persistence as identity_persistence
+from app.services.api.workstation.simulation_workbench import (
+    persistence as simulation_workbench_persistence,
+)
 from app.services.api.workstation.watchlists import persistence as watchlist_persistence
 from app.utils import get_logger
 
@@ -15,6 +18,7 @@ _API_ROOT = Path(__file__).parents[3] / "app" / "services" / "api"
 _PERSISTENCE_ROOTS = (
     _API_ROOT / "identity" / "persistence",
     _API_ROOT / "workstation" / "watchlists" / "persistence",
+    _API_ROOT / "workstation" / "simulation_workbench" / "persistence",
 )
 _EXPECTED_FILES = {"__init__.py", "create.py", "read.py", "update.py", "delete.py"}
 _IDENTITY_EXPORTS = {
@@ -56,6 +60,18 @@ _WATCHLIST_EXPORTS = {
     "replace_watchlist_items_record",
     "set_default_watchlist_record",
 }
+_SIMULATION_WORKBENCH_EXPORTS = {
+    "create_simulation_batch_item_records",
+    "create_simulation_batch_record",
+    "create_simulation_result_record",
+    "create_simulation_session_record",
+    "read_simulation_batch_items",
+    "read_simulation_batch_record",
+    "read_simulation_result_record",
+    "read_simulation_results_page",
+    "read_simulation_session_record",
+    "read_simulation_sessions",
+}
 _SQL_PATTERNS = (
     re.compile(r"^SELECT\s+.+\s+FROM\s+"),
     re.compile(r"^INSERT\s+(?:OR\s+\w+\s+)?INTO\s+"),
@@ -77,6 +93,7 @@ def test_persistence_boundary_exports_only_crud_functions() -> None:
     boundaries = (
         (identity_persistence, _IDENTITY_EXPORTS),
         (watchlist_persistence, _WATCHLIST_EXPORTS),
+        (simulation_workbench_persistence, _SIMULATION_WORKBENCH_EXPORTS),
     )
     for boundary, expected in boundaries:
         assert set(boundary.__all__) == expected
