@@ -1,7 +1,7 @@
 /**
  * Typed frontend client catalog.
  *
- * Aggregates the 19 focused domain clients into one `apiClients` object so
+ * Aggregates the focused domain clients into one `apiClients` object so
  * callers import a single entry point:
  *
  *   import { apiClients, unwrapData, ApiClientError } from "@/clients";
@@ -165,12 +165,89 @@ export type {
   IndicatorSpec,
 } from "./indicators";
 
+export type {
+  ArchiveState,
+  BatchCreateInput,
+  BatchItem,
+  BatchProjection,
+  BatchRunSpec,
+  CatalogueStatus,
+  CommandReceipt,
+  CommandType,
+  EvidenceClass,
+  LiveSessionBranchInput,
+  LiveSessionCommandInput,
+  LiveSessionCreateInput,
+  LiveSessionProjection,
+  MarketViewport,
+  OriginKind,
+  RunCatalogueEntry,
+  SessionAccount,
+  SessionBranch,
+  SessionDataset,
+  SessionOrder,
+  SessionPosition,
+  SessionRecovery,
+  StateFreshness,
+  ViewportRow,
+} from "./simulationWorkbench";
+export {
+  ARCHIVE_STATES,
+  CATALOGUE_STATUSES,
+  COMMAND_TYPES,
+  EVIDENCE_CLASSES,
+  ORIGIN_KINDS,
+  STATE_FRESHNESS_VALUES,
+  batchProjectionSchema,
+  commandReceiptSchema,
+  liveSessionProjectionSchema,
+  marketViewportSchema,
+  runCatalogueEntrySchema,
+} from "./simulationWorkbench";
+
+export type {
+  AnalyticsAnnotationInput,
+  AnalyticsArchiveInput,
+  AnalyticsCompareInput,
+  AnalyticsPeriodsQuery,
+  AnalyticsTradesQuery,
+  AnalyticsWorkbenchPayload,
+  AnalyticsWorkbenchSection,
+  ArtifactInventory,
+  ClosedTradeRecord,
+  ComparisonEvidence,
+  ComparisonMetric,
+  PeriodDimension,
+  PeriodTablePayload,
+  ReplayAnchorsPayload,
+  RunCataloguePage,
+  TradePage,
+  TradeSide,
+  TradeSort,
+} from "./analyticsWorkbench";
+export {
+  COMPARISON_METRICS,
+  PERIOD_DIMENSIONS,
+  TRADE_SIDES,
+  TRADE_SORTS,
+  analyticsWorkbenchPayloadSchema,
+  analyticsWorkbenchSectionSchema,
+  artifactInventorySchema,
+  closedTradeRecordSchema,
+  comparisonEvidenceSchema,
+  periodTablePayloadSchema,
+  replayAnchorsPayloadSchema,
+  tradePageSchema,
+} from "./analyticsWorkbench";
+
 // Value re-exports (used both as stand-alone exports and inside apiClients).
 export { isApiSuccessResponse } from "./contracts";
 export {
   ROUTE_CONTRACTS,
   ROUTE_CONTRACT_COUNT,
   ROUTE_CONTRACTS_BY_ID,
+  analyticsWorkbenchRoutes,
+  simulationWorkbenchRoutes,
 } from "./routes";
 export {
   ApiClientError,
@@ -192,6 +269,8 @@ import { operator } from "./operator";
 import { metrics } from "./metrics";
 import { simulation } from "./simulation";
 import { simulator } from "./simulator";
+import { simulationWorkbench } from "./simulationWorkbench";
+import { analyticsWorkbench } from "./analyticsWorkbench";
 import { risk } from "./risk";
 import { trading } from "./trading";
 import { portfolio } from "./portfolio";
@@ -216,6 +295,8 @@ export {
   metrics,
   simulation,
   simulator,
+  simulationWorkbench,
+  analyticsWorkbench,
   simulationSessions,
   liveSimulation,
   risk,
@@ -247,6 +328,8 @@ export const apiClients = {
   metrics,
   simulation,
   simulator,
+  simulationWorkbench,
+  analyticsWorkbench,
   simulationSessions,
   liveSimulation,
   risk,

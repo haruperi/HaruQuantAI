@@ -1,7 +1,7 @@
 /**
  * Drift test: the frontend client catalog mirrors the backend route inventory.
  *
- * Asserts that `ROUTE_CONTRACTS` in `routes.ts` contains exactly the 138
+ * Asserts that `ROUTE_CONTRACTS` in `routes.ts` contains exactly the 169
  * approved backend-v1 operations with the expected method/path/permission,
  * matching `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * A backend route add/remove/rename must be reflected here or this test fails.
@@ -450,6 +450,192 @@ const EXPECTED: ReadonlyArray<{
     permission: "simulation:read",
   },
   {
+    id: "api.simulator.workbench.live_session_create",
+    method: "POST",
+    path: "/api/v1/simulator/live-sessions",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.live_sessions",
+    method: "GET",
+    path: "/api/v1/simulator/live-sessions",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.simulator.workbench.live_session",
+    method: "GET",
+    path: "/api/v1/simulator/live-sessions/{session_id}",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.simulator.workbench.live_session_viewport",
+    method: "GET",
+    path: "/api/v1/simulator/live-sessions/{session_id}/viewport",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.simulator.workbench.live_session_step",
+    method: "POST",
+    path: "/api/v1/simulator/live-sessions/{session_id}/step",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.live_session_seek",
+    method: "POST",
+    path: "/api/v1/simulator/live-sessions/{session_id}/seek",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.live_session_command",
+    method: "POST",
+    path: "/api/v1/simulator/live-sessions/{session_id}/commands",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.live_session_branch",
+    method: "POST",
+    path: "/api/v1/simulator/live-sessions/{session_id}/branch",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.live_session_restore",
+    method: "POST",
+    path: "/api/v1/simulator/live-sessions/{session_id}/restore",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.live_session_rearm",
+    method: "POST",
+    path: "/api/v1/simulator/live-sessions/{session_id}/rearm",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.live_session_finalize",
+    method: "POST",
+    path: "/api/v1/simulator/live-sessions/{session_id}/finalize",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.live_session_reproduce",
+    method: "POST",
+    path: "/api/v1/simulator/live-sessions/{session_id}/reproduce",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.live_session_close",
+    method: "DELETE",
+    path: "/api/v1/simulator/live-sessions/{session_id}",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.batch_create",
+    method: "POST",
+    path: "/api/v1/simulator/batches",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.batch",
+    method: "GET",
+    path: "/api/v1/simulator/batches/{batch_id}",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.simulator.workbench.batch_stream",
+    method: "GET",
+    path: "/api/v1/simulator/batches/{batch_id}/stream",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.simulator.workbench.batch_cancel",
+    method: "POST",
+    path: "/api/v1/simulator/batches/{batch_id}/cancel",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulator.workbench.batch_retry_failed",
+    method: "POST",
+    path: "/api/v1/simulator/batches/{batch_id}/retry-failed",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.analytics.workbench.runs",
+    method: "GET",
+    path: "/api/v1/analytics/runs",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.run",
+    method: "GET",
+    path: "/api/v1/analytics/runs/{run_id}",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.simulation_result",
+    method: "GET",
+    path: "/api/v1/analytics/runs/{run_id}/simulation-result",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.report",
+    method: "GET",
+    path: "/api/v1/analytics/runs/{run_id}/report",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.payload",
+    method: "GET",
+    path: "/api/v1/analytics/runs/{run_id}/workbench",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.trades",
+    method: "GET",
+    path: "/api/v1/analytics/runs/{run_id}/trades",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.trade",
+    method: "GET",
+    path: "/api/v1/analytics/runs/{run_id}/trades/{ticket}",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.periods",
+    method: "GET",
+    path: "/api/v1/analytics/runs/{run_id}/periods",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.artifacts",
+    method: "GET",
+    path: "/api/v1/analytics/runs/{run_id}/artifacts",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.replay_anchors",
+    method: "GET",
+    path: "/api/v1/analytics/runs/{run_id}/replay-anchors",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.compare",
+    method: "POST",
+    path: "/api/v1/analytics/compare",
+    permission: "simulation:read",
+  },
+  {
+    id: "api.analytics.workbench.annotate",
+    method: "POST",
+    path: "/api/v1/analytics/runs/{run_id}/annotations",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.analytics.workbench.archive",
+    method: "POST",
+    path: "/api/v1/analytics/runs/{run_id}/archive",
+    permission: "simulation:run",
+  },
+  {
     id: "api.risk.kill_switch",
     method: "GET",
     path: "/api/v1/risk/kill-switch",
@@ -564,6 +750,24 @@ const EXPECTED: ReadonlyArray<{
     permission: "trading:write",
   },
   {
+    id: "api.trading.cancel_order_preflight",
+    method: "POST",
+    path: "/api/v1/trading/orders/{order_id}/preflight",
+    permission: "trading:write",
+  },
+  {
+    id: "api.trading.cancel_all_preflight",
+    method: "POST",
+    path: "/api/v1/trading/orders/cancel-all/preflight",
+    permission: "trading:write",
+  },
+  {
+    id: "api.trading.cancel_all_orders",
+    method: "POST",
+    path: "/api/v1/trading/orders/cancel-all",
+    permission: "trading:write",
+  },
+  {
     id: "api.data.prepare_dataset",
     method: "POST",
     path: "/api/v1/data/datasets/prepare",
@@ -621,6 +825,18 @@ const EXPECTED: ReadonlyArray<{
     id: "api.simulation.live_session_step",
     method: "POST",
     path: "/api/v1/simulation/live-sessions/{session_id}/step",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulation.live_session_restore",
+    method: "POST",
+    path: "/api/v1/simulation/live-sessions/{session_id}/restore",
+    permission: "simulation:run",
+  },
+  {
+    id: "api.simulation.live_session_rearm",
+    method: "POST",
+    path: "/api/v1/simulation/live-sessions/{session_id}/rearm",
     permission: "simulation:run",
   },
   {
@@ -825,8 +1041,8 @@ const EXPECTED: ReadonlyArray<{
 
 describe("clients match the backend route catalog", () => {
   it("has exactly the approved typed operations", () => {
-    expect(ROUTE_CONTRACT_COUNT).toBe(138);
-    expect(ROUTE_CONTRACTS).toHaveLength(133);
+    expect(ROUTE_CONTRACT_COUNT).toBe(169);
+    expect(ROUTE_CONTRACTS).toHaveLength(169);
   });
 
   it("matches every expected id, method, path, and permission", () => {
