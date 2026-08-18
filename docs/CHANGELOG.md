@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Add News online feed widget
+
+Operators can now inspect live financial and market news dynamically within the workstation and a standalone route.
+
+#### Added (1)
+
+- Added `FEAT-UI-29` News Online Feed Widget with isolated sandboxed iframe embed, multi-category filtering, multi-language support, live status tracking, workspace docking integration, and `/workstation/news` standalone route.
+
 ### Consolidate Research Workbench documentation
 
 The delivered Research frontend coverage and contracts now live in their owning package specifications.

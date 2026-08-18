@@ -33,6 +33,7 @@ export const WIDGET_TYPES = [
   "trading",
   "sessions",
   "indicators",
+  "news",
 ] as const;
 
 export type WidgetType = (typeof WIDGET_TYPES)[number];

@@ -93,7 +93,7 @@ export const Sidebar: React.FC = () => {
           {!isCollapsed && <span>Calendar</span>}
         </div>
 
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('commentary', 'News')}>
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('news', 'News')}>
           <Newspaper size={15} />
           {!isCollapsed && <span>News</span>}
         </div>

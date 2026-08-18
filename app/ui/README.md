@@ -1,10 +1,9 @@
-
 # UI
 
 > **Package:** `app/ui/`
-> **Status:** `In Progress` — 25 registered UI features; 15 `Completed`, 9 `Pending`,
+> **Status:** `In Progress` — 26 registered UI features; 16 `Completed`, 9 `Pending`,
 > and 1 `Partial` requirement coverage or focused-folder ownership.
-> **Last updated:** `2026-08-17`
+> **Last updated:** `2026-08-18`
 
 > This README is the package's **single source of truth** for requirements, final
 > structure, implementation sequence, progress, verification evidence, and tests.
@@ -148,6 +147,7 @@ app/ui/
     ├── features/session-registry/        # FEAT-UI-26
     ├── features/simulator/               # FEAT-UI-27
     ├── features/research/                # FEAT-UI-28
+    ├── features/news/                    # FEAT-UI-29
     ├── types/                            # support: shared types
     ├── utils/                            # support: shared helpers
     └── mock/                             # support: test-only fixtures
@@ -184,6 +184,7 @@ app/ui/
 | Completed | `FEAT-UI-26` Trading Session Registry Widget          | `src/features/session-registry/`                                                                          | `SessionRegistryWidget`; typed create/list/default/start/stop/archive controls, SIM opening-account and verified-dataset configuration, stopped-only legacy completion, metadata inspection, durable lifecycle history, and safe live activity console | `FR-UI-212`–`FR-UI-224`                                                                            | `src/features/session-registry/SessionRegistryWidget.test.tsx`; typed client and backend integration tests                                                                                                                              |
 | Completed | `FEAT-UI-27` Canonical Backtest Simulator Widget      | `src/features/simulator/`                                                                                 | `SimulatorWidget`; registered strategy picker with per-strategy parameters, market and execution configuration, background run control, ordered progress, and the Analytics-owned performance report                                                   | `FR-UI-234`–`FR-UI-240`                                                                            | `src/features/simulator/SimulatorWidget.test.tsx`; `src/clients/clients.contract.test.ts`                                                                                                                                             |
 | Completed | `FEAT-UI-28` Research Workbench | `src/features/research/`, `src/app/workstation/research/` | `ResearchDashboard`, `ResearchRunBuilder`, `ResearchWorkbench`, `ResearchStageNav`, `ResearchRunHeader`, `ResearchComparison`, `ResearchAutomation`, `ResearchArtifactDrawer`, `ResearchExpectancy`, `ResearchDrift`, and thirteen stage panels; deep-linkable run stages, server-derived stage status, ordered progress streaming, run history and comparison, artifact provenance, permission-gated expectancy governance, and the V2-only Features/Validation/Intelligence/Stress evidence views | `FR-UI-241`–`FR-UI-252` | `src/features/research/ResearchWorkbench.test.tsx`; `src/features/research/ResearchExpectancy.test.tsx`; `src/features/research/research-client.test.ts`; `src/features/research/v1-coverage.test.ts` |
+| Completed | `FEAT-UI-29` News Online Feed Widget | `src/features/news/`, `src/app/workstation/news/` | `NewsWidget`, `NewsCategory`, `NewsLanguage`, `CATEGORY_LABELS`, `LANGUAGE_LABELS` through the feature barrel; `/workstation/news` workstation route | `FR-UI-253`–`FR-UI-258` | `src/features/news/NewsWidget.test.tsx` |
 
 **Primary UI.** `FEAT-UI-01`–`FEAT-UI-06` and `FEAT-UI-08`–`FEAT-UI-13` are the trading workspace and widgets
 specified by `docs/dev/documentation.pdf`. `FEAT-UI-14`–`FEAT-UI-17` are the foundation
@@ -1090,6 +1091,38 @@ shock content.
 | Completed | `FR-UI-250` | Present point-in-time fundamental and sentiment evidence only when Research declares it applicable and eligible; preserve missingness and refusal reasons. | `IntelligencePanel` | External API call | Not applicable, unavailable, stale, or empty | `ResearchWorkbench.test.tsx` |
 | Completed | `FR-UI-251` | Create draft expectancy only from explicit completed-run measurements and expose lifecycle transitions only to callers with `research:govern`; never decide the transition in the UI. | `ResearchExpectancy` | Governed external API call | Permission, eligibility, conflict, unavailable | `ResearchExpectancy.test.tsx`; `research-client.test.ts` |
 | Completed | `FR-UI-252` | Present drift and registered stress evidence without enacting suspension or accepting browser-authored scenario magnitude, unit, rationale, or assumption reference. | `ResearchDrift`; `StressPanel` | External API call | No evidence, unavailable calibration, unknown scenario | `ResearchWorkbench.test.tsx`; `research-client.test.ts` |
+
+---
+
+### 4.27 `src/features/news/` — News Online Feed Widget
+
+**Purpose:** Present real-time streaming financial and market news dynamically from
+Dukascopy's Online News Applet feed within an isolated, sandboxed iframe container without
+requiring backend ingestion.
+
+### Files
+
+| Status    | File                  | Responsibility                                                                                                   | Key exports                                                                                             | Dependencies                                                                                 |
+| --------- | --------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Completed | `contracts.ts`        | Category, language, filter, and widget configuration contracts                                                   | `NEWS_CATEGORIES`, `NEWS_LANGUAGES`, `CATEGORY_LABELS`, `LANGUAGE_LABELS`, `NewsWidgetProps`, etc.     | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None              |
+| Completed | `news.module.css`     | Dark CME/HaruQuantAI styling for toolbar, iframe embed, loader overlay, and footer                                | CSS module classes                                                                                      | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None              |
+| Completed | `NewsWidget.tsx`      | Focused widget component rendering isolated iframe with srcDoc and Dukascopy Online News applet                  | `NewsWidget`                                                                                            | **Standard library:** None<br>**Required third-party:** React, Lucide<br>**Local:** contracts |
+| Completed | `index.ts`            | Sole public barrel export for the feature                                                                        | `NewsWidget`, contracts                                                                                 | **Standard library:** None<br>**Required third-party:** None<br>**Local:** contracts, component|
+
+| Status    | Requirement ID | Responsibility                                                                                                                       | Component / Function / Type | Side Effects            | Failure presentation                                               | Usage / Test Evidence     |
+| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------- | ----------------------- | ------------------------------------------------------------------ | ------------------------- |
+| Completed | `FR-UI-253`    | Render Dukascopy Online News feed in an isolated, sandboxed `iframe` with dark theme injection, avoiding SPA virtual DOM disruption. | `NewsWidget`                | Iframe script execution | Explicit loading spinner and fallback message                      | `NewsWidget.test.tsx`     |
+| Completed | `FR-UI-254`    | Pass configured categories (`finance`, `forex`, `stocks`, `company_news`, `commodities`) to the Dukascopy applet parameters.        | `NewsWidget`                | Iframe configuration    | Non-empty category fallback                                        | `NewsWidget.test.tsx`     |
+| Completed | `FR-UI-255`    | Support language selection across 22 supported languages defaulting to English (`en`).                                               | `NewsWidget`                | Iframe configuration    | Fallback to `en` on invalid choice                                 | `NewsWidget.test.tsx`     |
+| Completed | `FR-UI-256`    | Provide an explicit live status badge and loading overlay during iframe initialization.                                              | `NewsWidget`                | Iframe reload           | Visual loading spinner during refresh                              | `NewsWidget.test.tsx`     |
+| Completed | `FR-UI-257`    | Register the `news` widget type in workspace contracts, allowing docking, splitting, and persistence within workspace layouts.       | Workspace contracts, host   | Layout persistence      | Registered-type validation                                         | `NewsWidget.test.tsx`     |
+| Completed | `FR-UI-258`    | Provide a standalone workstation page route (`/workstation/news`) with full-screen layout.                                           | `/workstation/news`         | Client routing          | Protected layout                                                   | `NewsWidget.test.tsx`     |
+
+### Configuration and Limits Manifest
+
+- External source: `https://freeserv-static.dukascopy.com/2.0/core.js`.
+- Supported categories: `finance`, `forex`, `stocks`, `company_news`, `commodities`.
+- Supported languages: 22 ISO language codes.
 
 ---
 

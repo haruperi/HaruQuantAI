@@ -30,6 +30,7 @@ import { RiskView } from '../workflow/risk';
 import { TradingWidget } from '../../features/trading';
 import { SessionRegistryWidget } from '../../features/session-registry';
 import { IndicatorWorkspace } from '../workflow/indicators';
+import { NewsWidget } from '../../features/news';
 import type { Widget } from '../../features/workspaces';
 
 export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
@@ -80,6 +81,8 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
       return <SessionRegistryWidget />;
     case 'indicators':
       return <IndicatorWorkspace />;
+    case 'news':
+      return <NewsWidget />;
     default:
       return <MarketsWidget />;
   }
