@@ -1,8 +1,7 @@
 /**
- * Simulator route (FEAT-UI-31).
+ * New simulation run route (FEAT-UI-31).
  *
- * Hosts the Simulation Workbench in canonical backtest mode, rendering
- * the SimulatorWidget for configuration, progress streaming, and results.
+ * Dedicated route for configuring and submitting a new canonical backtest run.
  */
 
 "use client";
@@ -13,7 +12,7 @@ import { ProtectedLayout } from "@/app/protected-layout";
 import { SimulationWorkbench } from "@/features/simulation-workbench";
 import { SimulatorWidget } from "@/features/simulator";
 
-export default function SimulatorPage(): ReactNode {
+export default function NewSimulationPage(): ReactNode {
   return (
     <ProtectedLayout>
       <SimulationWorkbench initialMode="canonical">
