@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from itertools import pairwise
+from typing import TYPE_CHECKING, TypedDict, cast
 
 import pandas as pd
 
@@ -26,6 +27,17 @@ if TYPE_CHECKING:
 type JSONValue = (
     None | bool | int | float | str | list["JSONValue"] | Mapping[str, "JSONValue"]
 )
+
+_MAX_GEOMETRY_POINTS = 256
+
+
+class _SwingPoint(TypedDict):
+    """Typed internal swing candidate before JSON projection."""
+
+    position: int
+    timestamp: str
+    kind: str
+    price: float
 
 
 def _atr(data: pd.DataFrame, period: int) -> float:
@@ -121,6 +133,116 @@ def _strategy_fit(verdict_label: str, score: float) -> Mapping[str, JSONValue]:
     }
 
 
+def _timestamp(value: object) -> str:
+    """Return a stable timestamp label for one frame index value.
+
+    Args:
+        value: DataFrame index value.
+
+    Returns:
+        ISO timestamp when supported, otherwise its bounded string form.
+    """
+    isoformat = getattr(value, "isoformat", None)
+    return str(isoformat()) if callable(isoformat) else str(value)
+
+
+def _collapse_swing_candidate(
+    points: list[_SwingPoint], candidate: _SwingPoint
+) -> None:
+    """Append an alternating swing or retain the more extreme same-kind point.
+
+    Exact ties retain the later candidate so every collapse is deterministic.
+
+    Args:
+        points: Mutable ordered swing series.
+        candidate: Candidate high or low point.
+    """
+    if not points or points[-1]["kind"] != candidate["kind"]:
+        points.append(candidate)
+        return
+    previous_price = float(points[-1]["price"])
+    candidate_price = float(candidate["price"])
+    more_extreme = (
+        candidate_price >= previous_price
+        if candidate["kind"] == "high"
+        else candidate_price <= previous_price
+    )
+    if more_extreme:
+        points[-1] = candidate
+
+
+def _swing_points(data: pd.DataFrame, *, radius: int) -> list[_SwingPoint]:
+    """Detect confirmed centered-window swing highs and lows.
+
+    Centered confirmation deliberately uses later observations. These points
+    are descriptive Research evidence and must not be treated as online trading
+    signals.
+
+    Args:
+        data: Ordered OHLC frame.
+        radius: Bars required on each side of a confirmed extremum.
+
+    Returns:
+        Ordered alternating swing-point records.
+    """
+    window = 2 * radius + 1
+    high = data["high"].astype("float64")
+    low = data["low"].astype("float64")
+    rolling_high = high.rolling(window, center=True, min_periods=window).max()
+    rolling_low = low.rolling(window, center=True, min_periods=window).min()
+    points: list[_SwingPoint] = []
+    for position in range(radius, len(data) - radius):
+        is_high = bool(high.iloc[position] == rolling_high.iloc[position])
+        is_low = bool(low.iloc[position] == rolling_low.iloc[position])
+        if is_high == is_low:
+            continue
+        kind = "high" if is_high else "low"
+        price = high.iloc[position] if is_high else low.iloc[position]
+        _collapse_swing_candidate(
+            points,
+            {
+                "position": position,
+                "timestamp": _timestamp(data.index[position]),
+                "kind": kind,
+                "price": float(price),
+            },
+        )
+    return points
+
+
+def _trend_legs(points: list[_SwingPoint], *, atr_value: float) -> list[JSONValue]:
+    """Connect consecutive alternating swings into directional legs.
+
+    Args:
+        points: Ordered bounded swing series.
+        atr_value: Profile ATR used only for normalized magnitude evidence.
+
+    Returns:
+        Ordered directional leg records.
+    """
+    legs: list[JSONValue] = []
+    for start, end in pairwise(points):
+        start_price = float(start["price"])
+        end_price = float(end["price"])
+        change = end_price - start_price
+        legs.append(
+            {
+                "start_position": int(start["position"]),
+                "end_position": int(end["position"]),
+                "start_timestamp": str(start["timestamp"]),
+                "end_timestamp": str(end["timestamp"]),
+                "start_price": start_price,
+                "end_price": end_price,
+                "direction": "up" if change > 0 else "down",
+                "bar_count": int(end["position"]) - int(start["position"]),
+                "price_change": change,
+                "absolute_change": abs(change),
+                "atr_multiple": abs(change) / atr_value if atr_value > 0 else None,
+            }
+        )
+    return legs
+
+
 def build_market_structure_profile(
     prepared: PreparedDataset,
     *,
@@ -154,6 +276,9 @@ def build_market_structure_profile(
     if len(close) < swing_window:
         return _insufficient_profile(prepared)
     atr_value = _atr(prepared.data, atr_period)
+    detected_points = _swing_points(prepared.data, radius=swing_window)
+    geometry_total_points = len(detected_points)
+    swing_points = detected_points[-_MAX_GEOMETRY_POINTS:]
     net_displacement = abs(float(close.iloc[-1] - close.iloc[0]))
     total_path = float(close.diff().abs().sum())
     efficiency_ratio = net_displacement / total_path if total_path > 0 else 0.0
@@ -170,6 +295,11 @@ def build_market_structure_profile(
         "efficiency_ratio": efficiency_ratio,
         "trend_threshold": trend_threshold,
         "range_threshold": range_threshold,
+        "swing_points": [cast("JSONValue", dict(point)) for point in swing_points],
+        "trend_legs": _trend_legs(swing_points, atr_value=atr_value),
+        "geometry_point_limit": _MAX_GEOMETRY_POINTS,
+        "geometry_total_points": geometry_total_points,
+        "geometry_truncated": geometry_total_points > len(swing_points),
     }
     return MarketStructureProfile(
         "v1",

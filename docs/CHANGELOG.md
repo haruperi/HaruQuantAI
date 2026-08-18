@@ -2,6 +2,70 @@
 
 ## [Unreleased]
 
+### Consolidate Research Workbench documentation
+
+The delivered Research frontend coverage and contracts now live in their owning package specifications.
+
+#### Changed (1)
+
+- Defined the Research Workbench API/UI requirements, retained its executable V1 coverage contract, and retired the temporary implementation, coverage, and handoff documents.
+
+### Create governed Research evidence
+
+Reviewers can now create draft expectancy profiles and immutable stress evidence from approved, traceable inputs.
+
+#### Added (1)
+
+- Added idempotent `research:govern` creation workflows for completed-run-bound draft expectancy profiles and five owner-approved reasoned stress scenarios.
+
+### Require idempotent Research job creation
+
+Research run and automation-batch submissions now reserve durable request keys before queuing work.
+
+#### Changed (1)
+
+- Required `Idempotency-Key` on both Research job-creation routes and aligned the typed frontend transport with those contracts.
+
+### Publish market-structure geometry
+
+Research reports now carry bounded confirmed swing points and directional trend legs for the workbench Geometry tab.
+
+#### Added (1)
+
+- Added the most-recent 256 market-structure swings, derived legs, ATR-normalized magnitude, and explicit total/truncation evidence.
+
+### Retire the V1 Research placeholder
+
+The V2 Research dashboard now handles the remaining Research widget entry point.
+
+#### Removed (1)
+
+- Removed the superseded synchronous `ResearchWorkspace` component and routed persisted Research widgets to `FEAT-UI-28`.
+
+### Connect workstation intelligence to canonical sources
+
+The Research Workbench now presents point-in-time fundamental and sentiment evidence from Data-owned Research source records.
+
+#### Changed (1)
+
+- Scoped Research intelligence queries to each run's symbol and persisted dataset availability instant, with explicit model, coverage, decision-time, and source-unavailable states.
+
+### Persist Research workbench runs
+
+Research experiments, run lifecycle evidence, reports, and automation batches now survive application restarts through the Research-owned ledger.
+
+#### Changed (1)
+
+- Added principal-scoped lazy recovery to the Research Workbench registry while preserving in-memory operation and valid evidence when its optional durable store is unavailable.
+
+### Govern Research expectancy transitions
+
+Authorized reviewers can now advance expectancy profiles through a typed, idempotent Research-owned governance workflow.
+
+#### Added (1)
+
+- Added the `research:govern` expectancy-transition route and permission-gated workstation control while retaining Research as the sole lifecycle-policy and persistence authority.
+
 ### Bring canonical backtesting to the workstation
 
 The Simulator widget now runs the full backtest pipeline previously reachable only from `tests/legacy/08_simulator.py`'s `example_07_backtest_simulation()`: genuine provider bars with warm-up, exact tick generation, one canonical `SimulationBacktestRequest`, a run through Simulation authority, and the Analytics performance report.

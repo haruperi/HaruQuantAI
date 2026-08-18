@@ -11,6 +11,7 @@ from app.services.api.workstation.data.routes import _dataset_source
 from app.services.api.workstation.operator.routes import _audit_source, _event_source
 from app.services.api.workstation.optimization.routes import _optimization_source
 from app.services.api.workstation.portfolio.routes import _portfolio_source
+from app.services.api.workstation.research.routes import _research_source
 from app.services.api.workstation.risk.routes import _risk_command_source, _risk_source
 from app.services.api.workstation.simulation.live_routes import _live_source
 from app.services.api.workstation.simulation.routes import (
@@ -43,6 +44,7 @@ _ROUTE_DEPENDENCIES: Mapping[str, Callable[..., object]] = MappingProxyType(
         "operator.event_source": _event_source,
         "optimization.source": _optimization_source,
         "portfolio.source": _portfolio_source,
+        "research.source": _research_source,
         "risk.command_source": _risk_command_source,
         "risk.source": _risk_source,
         "simulation.live_source": _live_source,

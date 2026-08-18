@@ -14,7 +14,7 @@ def test_every_openapi_operation_has_exactly_one_contract() -> None:
     }
     declarations = {(item.method, item.path) for item in registry.all()}
     assert operations == declarations
-    assert registry.size == 117
+    assert registry.size == 138
     assert registry.get("GET", "/api/v1/data/bars") is not None
     assert registry.get("GET", "/api/v1/workstation") is not None
     assert registry.get("POST", "/api/v1/workstation/commands") is not None
@@ -69,6 +69,8 @@ def test_every_openapi_operation_has_exactly_one_contract() -> None:
     assert registry.get("GET", "/api/v1/simulator/runs/concrete-id") is not None
     assert registry.get("DELETE", "/api/v1/simulator/runs/concrete-id") is not None
     assert registry.get("GET", "/api/v1/simulator/runs/concrete-id/stream") is not None
+    assert registry.get("POST", "/api/v1/research/expectancy") is not None
+    assert registry.get("POST", "/api/v1/research/stress-scenarios") is not None
 
 
 def test_excluded_workflow_routes_are_absent() -> None:

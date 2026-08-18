@@ -105,7 +105,12 @@ def fr_res_075() -> None:
     profile = build_market_structure_profile(
         _prepared(), config=_config(), limits=_limits()
     )
-    print(f"FR-RES-075 verdict={profile.verdict} score={profile.score}")
+    print(
+        f"FR-RES-075 verdict={profile.verdict} score={profile.score} "
+        f"swings={len(profile.structure['swing_points'])} "
+        f"legs={len(profile.structure['trend_legs'])} "
+        f"truncated={profile.structure['geometry_truncated']}"
+    )
 
 
 def fr_res_076() -> None:

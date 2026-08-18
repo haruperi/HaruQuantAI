@@ -110,6 +110,14 @@ from app.services.research.profiles import (
     render_research_report,
     run_edge_lab_profile,
 )
+from app.services.research.runs import (
+    load_research_experiments,
+    load_research_run_batches,
+    load_research_runs,
+    persist_research_experiment,
+    persist_research_run,
+    persist_research_run_batch,
+)
 from app.services.research.seasonality import (
     active_sessions_for_hour,
     run_seasonality,
@@ -133,9 +141,11 @@ from app.services.research.statistics import (
 )
 from app.services.research.stress_evidence import (
     build_reasoned_stress_shock,
+    build_registered_stress_scenario,
     build_stress_calibration_provider,
     build_stress_scenario_evidence,
     derive_historical_stress_shock,
+    get_stress_scenario_catalog,
     load_latest_stress_scenario_evidence,
     parse_stress_scenario_evidence,
     persist_stress_scenario_evidence,
@@ -182,6 +192,7 @@ __all__ = (
     "build_performance_drift_evidence",
     "build_profile_summary",
     "build_reasoned_stress_shock",
+    "build_registered_stress_scenario",
     "build_research_feature_frame",
     "build_research_migration_request",
     "build_research_profile_snapshot",
@@ -221,6 +232,7 @@ __all__ = (
     "get_min_reward_risk_override",
     "get_public_api_classifications",
     "get_research_value_field",
+    "get_stress_scenario_catalog",
     "holm_bonferroni",
     "hurst_exponent",
     "identify_pca_risk_factors",
@@ -232,6 +244,9 @@ __all__ = (
     "load_expectancy_profile",
     "load_latest_performance_drift_evidence",
     "load_latest_stress_scenario_evidence",
+    "load_research_experiments",
+    "load_research_run_batches",
+    "load_research_runs",
     "log_returns",
     "mask_research_artifact",
     "monitor_performance_drift",
@@ -246,6 +261,9 @@ __all__ = (
     "permutation_test",
     "persist_expectancy_profile",
     "persist_performance_drift_evidence",
+    "persist_research_experiment",
+    "persist_research_run",
+    "persist_research_run_batch",
     "persist_stress_scenario_evidence",
     "prepare_research_dataset",
     "project_intelligence_evidence",

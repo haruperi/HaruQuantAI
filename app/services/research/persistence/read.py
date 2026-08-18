@@ -178,6 +178,89 @@ def read_latest_governed_evidence(
     return rows[0] if rows else None
 
 
+_RUN_SELECT = (
+    "SELECT run_id, experiment_id, principal_id, batch_id, status, hypothesis, "
+    "symbol, timeframe, preset, selected_stages_json, reason, force_rerun, "
+    "request_json, report_json, dataset_json, configuration_json, "
+    "artifacts_json, error_json, created_at, started_at, completed_at "
+    "FROM research_runs WHERE principal_id = ? ORDER BY created_at DESC LIMIT ?"
+)
+
+
+def read_research_experiment_rows(
+    *, principal_id: str, request_id: str, max_rows: int
+) -> tuple[Mapping[str, Any], ...]:
+    """Return every experiment row owned by one principal, newest first.
+
+    Args:
+        principal_id: Owning authenticated principal.
+        request_id: Request trace identifier.
+        max_rows: Maximum accepted result rows.
+
+    Returns:
+        Ordered normalized experiment rows.
+    """
+    logger.info("Reading Research experiment ledger")
+    _confirm_migration(request_id)
+    return _read_rows(
+        "SELECT experiment_id, principal_id, name, hypothesis, notes, "
+        "tags_json, created_at FROM research_experiments "
+        "WHERE principal_id = ? ORDER BY created_at DESC LIMIT ?",
+        (principal_id, max_rows),
+        request_id=request_id,
+        max_rows=max_rows,
+    )
+
+
+def read_research_run_rows(
+    *, principal_id: str, request_id: str, max_rows: int
+) -> tuple[Mapping[str, Any], ...]:
+    """Return every run row owned by one principal, newest first.
+
+    Args:
+        principal_id: Owning authenticated principal.
+        request_id: Request trace identifier.
+        max_rows: Maximum accepted result rows.
+
+    Returns:
+        Ordered normalized run rows, including failed and cancelled runs.
+    """
+    logger.info("Reading Research run ledger")
+    _confirm_migration(request_id)
+    return _read_rows(
+        _RUN_SELECT,
+        (principal_id, max_rows),
+        request_id=request_id,
+        max_rows=max_rows,
+    )
+
+
+def read_research_run_batch_rows(
+    *, principal_id: str, request_id: str, max_rows: int
+) -> tuple[Mapping[str, Any], ...]:
+    """Return every automation batch row owned by one principal, newest first.
+
+    Args:
+        principal_id: Owning authenticated principal.
+        request_id: Request trace identifier.
+        max_rows: Maximum accepted result rows.
+
+    Returns:
+        Ordered normalized batch rows.
+    """
+    logger.info("Reading Research batch ledger")
+    _confirm_migration(request_id)
+    return _read_rows(
+        "SELECT batch_id, experiment_id, principal_id, symbols_json, trigger, "
+        "reason, request_json, rejections_json, created_at "
+        "FROM research_run_batches WHERE principal_id = ? "
+        "ORDER BY created_at DESC LIMIT ?",
+        (principal_id, max_rows),
+        request_id=request_id,
+        max_rows=max_rows,
+    )
+
+
 __all__ = (
     "read_approved_expectancy_profile",
     "read_eligible_expectancy_profile",

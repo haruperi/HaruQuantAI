@@ -126,11 +126,13 @@ Data owns the shared database connection, locking, and migration execution frame
 | Status | State / Store | Read access (via contract) | Migration definitions |
 |---|---|---|---|
 | Completed | Research artifact metadata and versioned JSON/Markdown artifacts | `UI/API` via `ResearchReport v1` | `{DATA_DIR}/artifacts/research/` plus `research_artifacts` metadata table; migrations at `app/services/research/migrations/definitions.py`. |
+| Completed | Principal-scoped Research experiments, run lifecycle/report projections, and automation batches | `persist_research_experiment`, `load_research_experiments`, `persist_research_run`, `load_research_runs`, `persist_research_run_batch`, `load_research_run_batches` | `research_experiments`, `research_runs`, and `research_run_batches`; migration `004_research_runs_v1` in `app/services/research/migrations/definitions.py`. |
 
 The documented non-feature `persistence/` support package contains exactly
 `__init__.py`, `create.py`, `read.py`, `update.py`, and `delete.py`. It owns only
-artifact-manifest SQL construction and Data transaction delegation; read, update,
-and delete are intentionally unsupported with empty literal `__all__` declarations.
+Research-record CRUD statement construction and Data transaction delegation.
+Update owns expectancy governance only; delete is intentionally unsupported with
+an empty literal `__all__` declaration.
 
 ### Four-level structure
 
@@ -235,7 +237,7 @@ remain external.
 | Completed | `FEAT-RES-13` Fundamental and Sentiment Source Evidence | `intelligence/` | `assess_intelligence_applicability`, `build_fundamental_source_evidence`, `build_sentiment_source_evidence`, `project_intelligence_evidence`; internal evidence values remain opaque | `FR-RES-099`–`104` | `tests/research/usage/features/13_intelligence.py` |
 | Completed | `FEAT-RES-14` Approved Expectancy Profile and Governance | `expectancy/` | Versioned profile contract, lifecycle state machine, exact eligibility, atomic projection/history persistence, and injected Strategy/Risk adapters | `FR-RES-107`..`FR-RES-111` | `tests/research/usage/features/14_expectancy.py` |
 | Completed | `FEAT-RES-15` Performance Drift Evidence | `drift/` | Drift contract, threshold monitoring, advisory suspension, and immutable persistence/retrieval | `FR-RES-112`..`FR-RES-114` | `tests/research/usage/features/15_drift.py` |
-| Completed | `FEAT-RES-16` Stress-Scenario Evidence | `stress_evidence/` | Historical/reasoned shock derivation, unit/basis validation, immutable persistence, and injected Optimization calibration adapter | `FR-RES-115`..`FR-RES-120` | `tests/research/usage/features/16_stress_evidence.py` |
+| Completed | `FEAT-RES-16` Stress-Scenario Evidence | `stress_evidence/` | Historical/reasoned shock derivation, five approved immutable reasoned scenarios, unit/basis validation, immutable persistence, and injected Optimization calibration adapter | `FR-RES-115`..`FR-RES-120` | `tests/research/usage/features/16_stress_evidence.py` |
 
 ```text
 research/
@@ -1182,6 +1184,11 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 | Completed | `FR-RES-073` | Define immutable optional calendar, session, symbol, and hour filters without embedding session definitions. | `SeasonalityFilters(years: tuple[int, ...] = (), months: tuple[int, ...] = (), weekdays: tuple[int, ...] = (), hours: tuple[int, ...] = (), sessions: tuple[str, ...] = ())` | None | Pending taxonomy: invalid range/filter | **Usage:** `08_seasonality.py::fr_res_073()`<br>**Unit:** `test_analysis.py::test_filters_reject_invalid_month()` |
 | Completed | `FR-RES-074` | Compute calendar/session/hour summaries, sparse-bucket warnings, opportunity windows, and extremes from supplied data and filters. | `run_seasonality(prepared: PreparedDataset, *, sessions: SessionConfig, filters: SeasonalityFilters, limits: ResearchResourceLimits) -> Mapping[str, JSONValue]` | Read-only | invalid session/data/resource | **Usage:** `08_seasonality.py::fr_res_074`<br>**Unit:** `test_analysis.py::test_seasonality_warns_sparse_bucket` |
 
+The returned evidence includes per-hour buckets, an hour-by-weekday matrix,
+year/month/day-of-month/day-of-week calendar buckets, daily high/low session
+ownership, and best/dead-hour opportunity windows. These values are computed by
+Research and projected by API/UI without presentation-side inference.
+
 ### Feature usage examples
 
 `tests/research/usage/08_seasonality.py` contains the six mapped examples.
@@ -1217,12 +1224,18 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-RES-075` | Build swings, directional legs, range/distribution/excursion/regime evidence, canonical score/verdict, warnings, hashes, and advisory fit. | `build_market_structure_profile(prepared: PreparedDataset, *, config: MarketStructureConfig, limits: ResearchResourceLimits) -> MarketStructureProfile` | Read-only | Pending taxonomy/resource: invalid/insufficient data or limit | **Usage:** `09_market_structure.py::fr_res_075()`<br>**Unit:** `test_metric_profile.py::test_profile_reuses_canonical_score()` |
+| Completed | `FR-RES-075` | Build centered-window confirmed swing points and directional legs, range/distribution/excursion/regime evidence, canonical score/verdict, warnings, hashes, and advisory fit. Publish at most the most-recent 256 swing points plus total count and truncation state; centered swings are descriptive evidence and are not online signals. | `build_market_structure_profile(prepared: PreparedDataset, *, config: MarketStructureConfig, limits: ResearchResourceLimits) -> MarketStructureProfile` | Read-only | Invalid/insufficient OHLC data or resource limit | **Usage:** `09_market_structure.py::fr_res_075()`<br>**Unit:** `test_market_structure_profile.py::test_profile_publishes_confirmed_swings_and_directional_legs`; `test_market_structure_profile.py::test_profile_caps_geometry_and_reports_truncation()` |
 | Completed | `FR-RES-076` | Run bounded temporal stability and parameter robustness only when enabled and record windows, variants, duration, and warnings. | `evaluate_market_structure_quality(prepared: PreparedDataset, *, config: MarketStructureConfig, limits: ResearchResourceLimits) -> MarketStructureQualityReport` | Read-only | Pending taxonomy/resource: disabled/invalid/budget exceeded | **Usage:** `09_market_structure.py::fr_res_076()`<br>**Unit:** `test_quality.py::test_quality_is_opt_in_and_bounded()` |
 | Completed | `FR-RES-077` | Label later bars as trend/reversion/mixed under one approved horizon/truth policy and return insufficiency as structured evidence. | `label_realized_market_behavior(data: DataFrame, *, symbol: str, timeframe: str, config: MarketStructureConfig) -> Mapping[str, JSONValue]` | Read-only | invalid truth policy or data | **Usage:** `09_market_structure.py::fr_res_077`<br>**Unit:** `test_data_validation.py::test_label_behavior_uses_approved_horizon` |
 | Completed | `FR-RES-078` | Aggregate prediction evidence by confidence, verdict, symbol, and timeframe with sample counts and warnings. | `build_validation_summary(rows: Sequence[Mapping[str, JSONValue]]) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: malformed/insufficient rows | **Usage:** `09_market_structure.py::fr_res_078()`<br>**Unit:** `test_data_validation.py::test_summary_preserves_sample_counts()` |
 | Completed | `FR-RES-079` | Build and rank a bounded candidate grid against approved validation truth using the same canonical score, recording parameters, criteria, window, stability, and warnings. | `calibrate_market_structure(run_rows: Sequence[Mapping[str, JSONValue]], validation_rows: Sequence[Mapping[str, JSONValue]], *, config: MarketStructureConfig, limits: ResearchResourceLimits) -> Mapping[str, JSONValue]` | Read-only | invalid truth/candidate/resource | **Usage:** `09_market_structure.py::fr_res_079`<br>**Unit:** `test_calibration.py::test_calibration_uses_profile_score` |
 | Completed | `FR-RES-080` | Rank advisory strategy archetypes from profile evidence without mutating or approving Strategy, Risk, or Trading state. | `build_strategy_fit(profile: MarketStructureProfile) -> Mapping[str, JSONValue]` | Read-only | Pending taxonomy: malformed/insufficient profile | **Usage:** `09_market_structure.py::fr_res_080()`<br>**Unit:** `test_fit.py::test_strategy_fit_is_advisory_only()` |
+
+The canonical workflow publishes the profile together with optional quality,
+calibration, and later-behavior validation evidence. Geometry is bounded to the
+most-recent 256 confirmed swing points and derived directional legs, with total
+count and truncation state; centered swings remain descriptive evidence rather
+than online signals.
 
 **Implementation notes:**
 
@@ -1326,6 +1339,9 @@ requires at least 80 points and nonzero evidence in every row; otherwise it is
 - Merge V1 scorecard/snapshot/reporting behavior around one schema.
 - `print_result_summary` and separate save functions are removed.
 - `run_edge_lab_profile()` is stage orchestration only; UI/API remains the cross-domain coordinator.
+- The profiles stage publishes score rows, snapshot identity and generation
+  time, and scorecard warnings alongside the final score and readiness so every
+  displayed conclusion retains its Research-authored evidence.
 
 ### Feature usage examples
 
@@ -1428,13 +1444,20 @@ language coverage.
 
 ### 4.16 `stress_evidence/` â€” Stress-Scenario Evidence
 
+The approved reasoned catalogue is versioned domain content: broad market
+dislocation (`HQA-STRESS-ASSUMPTION-001-v1`), severe FX repricing (`002-v1`),
+liquidity withdrawal (`003-v1`), venue/connectivity disruption (`004-v1`), and
+the extreme combined tail (`005-v1`). Callers select a key; they cannot alter
+the registered magnitudes, units, references, or rationale. Every result stays
+advisory-only and performs no market, portfolio, or execution mutation.
+
 **Status:** `Completed`
 
 | Status | Requirement ID | Responsibility | Public operations | Evidence |
 |---|---|---|---|---|
 | Completed | `FR-RES-115` | Build and parse canonical stress-scenario evidence over the closed shock taxonomy. | `build_stress_scenario_evidence`, `parse_stress_scenario_evidence` | `tests/research/unit/test_stress.py` |
 | Completed | `FR-RES-116` | Derive bounded shock magnitudes from cited historical observations. | `derive_historical_stress_shock` | `tests/research/unit/test_stress.py` |
-| Completed | `FR-RES-117` | Represent reasoned shocks with explicit magnitude, unit, rationale, and durable assumption reference. | `build_reasoned_stress_shock` | `tests/research/unit/test_stress.py` |
+| Completed | `FR-RES-117` | Represent reasoned shocks with explicit magnitude, unit, rationale, and durable assumption reference; expose the owner-approved five-scenario catalogue as detached evidence and build only registered scenarios. | `build_reasoned_stress_shock`, `get_stress_scenario_catalog`, `build_registered_stress_scenario` | `tests/research/unit/test_stress.py`; `tests/research/unit/test_stress_scenarios.py` |
 | Completed | `FR-RES-118` | Reject unsupported units, non-finite magnitudes, empty rationale, or absent/fabricated basis evidence. | `validate_shock_basis` and contract validation | `tests/research/unit/test_stress.py` |
 | Completed | `FR-RES-119` | Append and retrieve immutable stress evidence through Data's transaction authority. | `persist_stress_scenario_evidence`, `load_latest_stress_scenario_evidence` | `tests/research/integration/test_stress_persistence.py` |
 | Completed | `FR-RES-120` | Supply an injected Optimization-compatible stress calibration provider. | `build_stress_calibration_provider` | `tests/research/integration/test_stress_provider.py`; `tests/research/usage/features/16_stress_evidence.py` |

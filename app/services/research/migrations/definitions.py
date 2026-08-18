@@ -27,6 +27,7 @@ _DOMAIN = "research"
 _MIGRATION_ID = "001_research_artifacts_v1"
 _EXPECTANCY_MIGRATION_ID = "002_research_expectancy_profiles_v1"
 _GOVERNED_EVIDENCE_MIGRATION_ID = "003_research_governed_evidence_v1"
+_RUN_STORE_MIGRATION_ID = "004_research_runs_v1"
 
 _CREATE_STATEMENT = (
     "CREATE TABLE IF NOT EXISTS research_artifacts ("
@@ -147,6 +148,100 @@ _GOVERNED_EVIDENCE_STATEMENTS = (
 )
 
 
+# ``research_experiments``, ``research_runs``, and ``research_run_batches`` own
+# the workbench ledger (``FEAT-API-26``). A Research run is expensive evidence,
+# so it outlives the process that produced it: without these tables a restart
+# would discard every experiment, run, and report while their artifacts stayed
+# on disk with nothing pointing at them.
+#
+# Rows are principal-scoped and append-mostly: a run row is inserted when the
+# run is queued and updated in place only as its own lifecycle advances.
+_CREATE_EXPERIMENTS_STATEMENT = (
+    "CREATE TABLE IF NOT EXISTS research_experiments ("
+    "experiment_id TEXT PRIMARY KEY, "
+    "principal_id TEXT NOT NULL, "
+    "name TEXT NOT NULL, "
+    "hypothesis TEXT NOT NULL, "
+    "notes TEXT NOT NULL DEFAULT '', "
+    "tags_json TEXT NOT NULL CHECK (json_valid(tags_json)), "
+    "created_at TEXT NOT NULL DEFAULT "
+    "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
+    ") STRICT"
+)
+
+_CREATE_RUNS_STATEMENT = (
+    "CREATE TABLE IF NOT EXISTS research_runs ("
+    "run_id TEXT PRIMARY KEY, "
+    "experiment_id TEXT NOT NULL, "
+    "principal_id TEXT NOT NULL, "
+    "batch_id TEXT NOT NULL DEFAULT '', "
+    "status TEXT NOT NULL CHECK (status IN "
+    "('queued','running','completed','failed','cancelled')), "
+    "hypothesis TEXT NOT NULL, "
+    "symbol TEXT NOT NULL, "
+    "timeframe TEXT NOT NULL, "
+    "preset TEXT NOT NULL, "
+    "selected_stages_json TEXT NOT NULL "
+    "CHECK (json_valid(selected_stages_json)), "
+    "reason TEXT NOT NULL DEFAULT '', "
+    "force_rerun INTEGER NOT NULL DEFAULT 0, "
+    "request_json TEXT NOT NULL CHECK (json_valid(request_json)), "
+    "report_json TEXT NOT NULL DEFAULT '' , "
+    "dataset_json TEXT NOT NULL DEFAULT '', "
+    "configuration_json TEXT NOT NULL DEFAULT '', "
+    "artifacts_json TEXT NOT NULL DEFAULT '', "
+    "error_json TEXT NOT NULL DEFAULT '', "
+    "created_at TEXT NOT NULL, "
+    "started_at TEXT NOT NULL DEFAULT '', "
+    "completed_at TEXT NOT NULL DEFAULT '', "
+    "FOREIGN KEY (experiment_id) REFERENCES research_experiments(experiment_id)"
+    ") STRICT"
+)
+
+_CREATE_RUN_BATCHES_STATEMENT = (
+    "CREATE TABLE IF NOT EXISTS research_run_batches ("
+    "batch_id TEXT PRIMARY KEY, "
+    "experiment_id TEXT NOT NULL, "
+    "principal_id TEXT NOT NULL, "
+    "symbols_json TEXT NOT NULL CHECK (json_valid(symbols_json)), "
+    "trigger TEXT NOT NULL, "
+    "reason TEXT NOT NULL DEFAULT '', "
+    "request_json TEXT NOT NULL CHECK (json_valid(request_json)), "
+    "rejections_json TEXT NOT NULL CHECK (json_valid(rejections_json)), "
+    "created_at TEXT NOT NULL"
+    ") STRICT"
+)
+
+_EXPERIMENT_OWNER_INDEX_STATEMENT = (
+    "CREATE INDEX IF NOT EXISTS idx_research_experiments_owner "
+    "ON research_experiments (principal_id, created_at)"
+)
+
+_RUN_OWNER_INDEX_STATEMENT = (
+    "CREATE INDEX IF NOT EXISTS idx_research_runs_owner "
+    "ON research_runs (principal_id, created_at)"
+)
+
+_RUN_EXPERIMENT_INDEX_STATEMENT = (
+    "CREATE INDEX IF NOT EXISTS idx_research_runs_experiment "
+    "ON research_runs (experiment_id, created_at)"
+)
+
+_RUN_BATCH_INDEX_STATEMENT = (
+    "CREATE INDEX IF NOT EXISTS idx_research_runs_batch ON research_runs (batch_id)"
+)
+
+_RUN_STORE_STATEMENTS = (
+    _CREATE_EXPERIMENTS_STATEMENT,
+    _CREATE_RUNS_STATEMENT,
+    _CREATE_RUN_BATCHES_STATEMENT,
+    _EXPERIMENT_OWNER_INDEX_STATEMENT,
+    _RUN_OWNER_INDEX_STATEMENT,
+    _RUN_EXPERIMENT_INDEX_STATEMENT,
+    _RUN_BATCH_INDEX_STATEMENT,
+)
+
+
 def _checksum(statements: tuple[str, ...]) -> str:
     """Compute a stable sha256 checksum over canonical joined statements.
 
@@ -178,6 +273,12 @@ RESEARCH_MIGRATION_STEPS: tuple[object, ...] = (
         migration_id=_GOVERNED_EVIDENCE_MIGRATION_ID,
         checksum=_checksum(_GOVERNED_EVIDENCE_STATEMENTS),
         statements=_GOVERNED_EVIDENCE_STATEMENTS,
+    ),
+    build_migration_step(
+        domain=_DOMAIN,
+        migration_id=_RUN_STORE_MIGRATION_ID,
+        checksum=_checksum(_RUN_STORE_STATEMENTS),
+        statements=_RUN_STORE_STATEMENTS,
     ),
 )
 

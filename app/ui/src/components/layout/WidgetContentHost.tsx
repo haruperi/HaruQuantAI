@@ -21,7 +21,7 @@ import { PositionsWidget, TradeLogWidget } from '../workflow';
 import { DashboardView } from '../workflow/dashboard';
 import { DataWorkspace } from '../workflow/data';
 import { StrategyWorkspace } from '../workflow/strategies';
-import { ResearchWorkspace } from '../workflow/research';
+import { ResearchDashboard } from '../../features/research';
 import { OptimizationView } from '../workflow/optimization';
 import { PortfolioView } from '../workflow/portfolio';
 import { AgenticView } from '../workflow/agentic';
@@ -63,7 +63,7 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
     case 'strategies':
       return <StrategyWorkspace />;
     case 'research':
-      return <ResearchWorkspace />;
+      return <ResearchDashboard />;
     case 'optimization':
       return <OptimizationView />;
     case 'portfolio':

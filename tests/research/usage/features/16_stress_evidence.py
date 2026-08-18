@@ -10,9 +10,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.data import build_data_settings, data_settings_context
 from app.services.research import (
     build_reasoned_stress_shock,
+    build_registered_stress_scenario,
     build_stress_calibration_provider,
     build_stress_scenario_evidence,
     derive_historical_stress_shock,
+    get_stress_scenario_catalog,
     load_latest_stress_scenario_evidence,
     parse_stress_scenario_evidence,
     persist_stress_scenario_evidence,
@@ -38,6 +40,13 @@ def main() -> None:
         ),
     )
     assert validate_shock_basis(shocks) == ()
+    assert len(get_stress_scenario_catalog()) == 5
+    registered = build_registered_stress_scenario(
+        scenario_key="broad_market_dislocation",
+        hypothesis="approved catalogue demonstration",
+        generated_at_utc=datetime(2026, 1, 1, tzinfo=UTC),
+    )
+    assert registered["advisory_only"] is True
     evidence = build_stress_scenario_evidence(
         scenario_id="scenario-demo",
         hypothesis="combined disruption",

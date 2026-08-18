@@ -41,6 +41,7 @@ def test_research_migration_runs_idempotently_through_data(tmp_path: Path) -> No
         "001_research_artifacts_v1",
         "002_research_expectancy_profiles_v1",
         "003_research_governed_evidence_v1",
+        "004_research_runs_v1",
     )
     assert second.status == "success"
     assert second.data is not None
@@ -48,6 +49,7 @@ def test_research_migration_runs_idempotently_through_data(tmp_path: Path) -> No
         "001_research_artifacts_v1",
         "002_research_expectancy_profiles_v1",
         "003_research_governed_evidence_v1",
+        "004_research_runs_v1",
     )
 
 

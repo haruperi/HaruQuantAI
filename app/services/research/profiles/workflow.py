@@ -29,7 +29,12 @@ from app.services.research.leakage import (
     enforce_time_split,
     validate_no_lookahead_features,
 )
-from app.services.research.market_structure import build_market_structure_profile
+from app.services.research.market_structure import (
+    build_market_structure_profile,
+    build_validation_summary,
+    evaluate_market_structure_quality,
+    label_realized_market_behavior,
+)
 from app.services.research.metrics import (
     build_core_metric_profile,
     build_default_registry,
@@ -348,6 +353,8 @@ class _RunState:
     config: EdgeLabConfig
     performance: object | None
     prepared: PreparedDataset
+    symbol: str
+    timeframe: str
     warnings: list[ResearchWarning]
     stages: dict[str, Mapping[str, JSONValue]]
     feature_frame: pd.DataFrame | None = None
@@ -418,12 +425,19 @@ def _build_state(
             "record_count": len(prepared.data),
             "checks": _strings(prepared.quality.checks),
             "cleaning_actions": cleaning_actions,
+            "fatal_issues": [dict(issue) for issue in prepared.quality.fatal_issues],
+            "warnings": _warning_values(prepared.quality.warnings),
+            "dataset_hash": prepared.dataset_hash,
+            "configuration_hash": prepared.configuration_hash,
+            "source_references": _strings(prepared.source_references),
         },
     }
     return _RunState(
         config=config,
         performance=performance,
         prepared=prepared,
+        symbol=str(dataset.symbol),
+        timeframe=str(dataset.timeframe or "unspecified"),
         warnings=list(prepared.quality.warnings),
         stages=stages,
         edges=[],
@@ -551,7 +565,7 @@ def _stage_seasonality(state: _RunState) -> None:
 
 
 def _stage_market_structure(state: _RunState) -> None:
-    """Execute canonical market-structure profiling."""
+    """Execute canonical market-structure profiling and its quality evidence."""
     profile = build_market_structure_profile(
         state.prepared,
         config=state.config.market_structure,
@@ -559,7 +573,51 @@ def _stage_market_structure(state: _RunState) -> None:
     )
     state.market_structure = profile
     state.warnings.extend(profile.warnings)
-    state.stages["market_structure"] = _structure_value(profile)
+    evidence = dict(_structure_value(profile))
+
+    quality = evaluate_market_structure_quality(
+        state.prepared,
+        config=state.config.market_structure,
+        limits=state.config.limits,
+    )
+    state.warnings.extend(quality.warnings)
+    evidence["quality"] = {
+        "schema_version": quality.schema_version,
+        "enabled": state.config.market_structure.enable_quality,
+        "stability": quality.stability,
+        "robustness": quality.robustness,
+        "duration_ms": quality.duration_ms,
+        "warnings": _warning_values(quality.warnings),
+    }
+    evidence["calibration"] = quality.calibration
+
+    realized = label_realized_market_behavior(
+        state.prepared.data,
+        symbol=state.symbol,
+        timeframe=state.timeframe,
+        config=state.config.market_structure,
+    )
+    validation: Mapping[str, JSONValue] = {
+        "schema_version": "v1",
+        "realized": realized,
+        "summary": {},
+    }
+    if str(realized.get("verdict")) != "insufficient":
+        validation = {
+            "schema_version": "v1",
+            "realized": realized,
+            "summary": build_validation_summary(
+                [
+                    {
+                        "symbol": state.symbol,
+                        "verdict": profile.verdict,
+                        "confidence": profile.score / 100.0,
+                    }
+                ]
+            ),
+        }
+    evidence["validation"] = validation
+    state.stages["market_structure"] = evidence
 
 
 def _stage_modeling(state: _RunState) -> None:
@@ -596,12 +654,27 @@ def _stage_profiles(state: _RunState) -> None:
         configuration_hash=state.prepared.configuration_hash,
     )
     state.warnings.extend(scorecard.warnings)
+    snapshot_id = (
+        "research-snapshot-"
+        + canonical_digest(
+            {
+                "dataset_hash": snapshot.dataset_hash,
+                "configuration_hash": snapshot.configuration_hash,
+                "score": scorecard.final_score,
+                "readiness": scorecard.readiness,
+            }
+        )[:24]
+    )
     state.stages["profiles"] = {
         "schema_version": snapshot.schema_version,
         "score": scorecard.final_score,
         "readiness": scorecard.readiness,
         "reasons": _strings(scorecard.reasons),
+        "score_rows": [dict(row) for row in scorecard.score_rows],
         "stage_count": len(snapshot.stages),
+        "snapshot_id": snapshot_id,
+        "snapshot_generated_at": snapshot.generated_at.isoformat(),
+        "warnings": _warning_values(scorecard.warnings),
         "advisory_only": scorecard.advisory_only,
     }
 

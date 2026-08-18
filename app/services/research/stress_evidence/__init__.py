@@ -16,12 +16,18 @@ from app.services.research.stress_evidence.persistence import (
 from app.services.research.stress_evidence.providers import (
     build_stress_calibration_provider,
 )
+from app.services.research.stress_evidence.scenarios import (
+    build_registered_stress_scenario,
+    get_stress_scenario_catalog,
+)
 
 __all__ = (
     "build_reasoned_stress_shock",
+    "build_registered_stress_scenario",
     "build_stress_calibration_provider",
     "build_stress_scenario_evidence",
     "derive_historical_stress_shock",
+    "get_stress_scenario_catalog",
     "load_latest_stress_scenario_evidence",
     "parse_stress_scenario_evidence",
     "persist_stress_scenario_evidence",

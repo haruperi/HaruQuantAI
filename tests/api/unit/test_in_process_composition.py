@@ -28,6 +28,7 @@ def test_provider_manifest_is_exact_and_deterministic() -> None:
         "operator.event_source",
         "optimization.source",
         "portfolio.source",
+        "research.source",
         "risk.command_source",
         "risk.source",
         "simulation.live_source",

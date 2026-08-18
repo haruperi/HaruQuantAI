@@ -1,5 +1,7 @@
 """Integration evidence for WF-RES-006: market-structure profile and fit."""
 
+import math
+
 import pandas as pd
 from app.services.research import (
     build_market_structure_profile,
@@ -17,7 +19,11 @@ _HASH = "e" * 64
 def _prepared() -> object:
     """Build a PreparedDataset with trending OHLCVS data."""
     idx = pd.date_range("2026-01-05", periods=30, freq="h", tz="UTC")
-    close = pd.Series([100.0 + i * 0.5 for i in range(30)], index=idx, dtype="float64")
+    close = pd.Series(
+        [100.0 + 5.0 * math.sin(2.0 * math.pi * i / 12.0) for i in range(30)],
+        index=idx,
+        dtype="float64",
+    )
     frame = pd.DataFrame(
         {
             "open": close,
@@ -72,3 +78,8 @@ def test_profile_and_fit_share_canonical_score() -> None:
     assert profile.strategy_fit["advisory_only"] is True
     assert fit["advisory_only"] is True
     assert fit["score"] == profile.score
+    assert profile.structure["swing_points"]
+    assert (
+        len(profile.structure["trend_legs"])
+        == len(profile.structure["swing_points"]) - 1
+    )

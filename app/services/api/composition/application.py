@@ -67,6 +67,11 @@ from app.services.api.workstation.optimization.routes import (
 )
 from app.services.api.workstation.portfolio.orchestration import build_portfolio_source
 from app.services.api.workstation.portfolio.routes import router as portfolio_router
+from app.services.api.workstation.research.orchestration import (
+    build_research_registry,
+    build_research_runtime_context,
+    build_research_source,
+)
 from app.services.api.workstation.research.routes import router as research_router
 from app.services.api.workstation.risk.orchestration import build_risk_command_source
 from app.services.api.workstation.risk.routes import router as risk_router
@@ -212,6 +217,11 @@ def _build_canonical_graph(
             "operator.event_source": read_trading_events,
             "optimization.source": build_optimization_source(optimization_dependencies),
             "portfolio.source": build_portfolio_source(portfolio_dependencies),
+            "research.source": build_research_source(
+                build_research_registry(
+                    build_research_runtime_context(simulator_state_provider)
+                )
+            ),
             "risk.command_source": build_risk_command_source(risk_dependencies),
             "risk.source": read_risk_state,
             "simulation.live_source": build_live_simulation_source(

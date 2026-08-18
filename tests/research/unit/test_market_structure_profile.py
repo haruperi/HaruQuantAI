@@ -1,5 +1,7 @@
 """Unit tests for Research market-structure profile (FR-RES-075)."""
 
+import math
+
 import pandas as pd
 import pytest
 from app.services.research import (
@@ -25,6 +27,36 @@ def _prepared(rows: int = 30) -> object:
             "open": close,
             "high": close + 1,
             "low": close - 1,
+            "close": close,
+            "volume": 100.0,
+            "spread": 0.1,
+        },
+        index=idx,
+    )
+    return create_research_value(
+        "PreparedDataset",
+        frame,
+        "v1",
+        create_research_value("DataQualityReport", (), (), ("schema",), ()),
+        _HASH,
+        _HASH,
+        ("fixture",),
+    )
+
+
+def _oscillating_prepared(rows: int = 90) -> object:
+    """Build a PreparedDataset with repeated confirmed swing geometry."""
+    idx = pd.date_range("2026-01-01", periods=rows, freq="h", tz="UTC")
+    close = pd.Series(
+        [100.0 + 10.0 * math.sin(2.0 * math.pi * i / 12.0) for i in range(rows)],
+        index=idx,
+        dtype="float64",
+    )
+    frame = pd.DataFrame(
+        {
+            "open": close,
+            "high": close + 0.5,
+            "low": close - 0.5,
             "close": close,
             "volume": 100.0,
             "spread": 0.1,
@@ -75,6 +107,42 @@ def test_profile_reuses_canonical_score() -> None:
     assert 0.0 <= profile.score <= 100.0
     assert profile.verdict in ("trending", "ranging", "mixed")
     assert profile.strategy_fit["advisory_only"] is True
+
+
+def test_profile_publishes_confirmed_swings_and_directional_legs() -> None:
+    """FR-RES-075: geometry is ordered, alternating, and ATR-normalized."""
+    profile = build_market_structure_profile(
+        _oscillating_prepared(), config=_config(), limits=_limits()
+    )
+    points = list(profile.structure["swing_points"])
+    legs = list(profile.structure["trend_legs"])
+
+    assert len(points) > 4
+    assert len(legs) == len(points) - 1
+    assert all(
+        points[index]["kind"] != points[index + 1]["kind"]
+        for index in range(len(points) - 1)
+    )
+    assert all(
+        points[index]["position"] < points[index + 1]["position"]
+        for index in range(len(points) - 1)
+    )
+    assert {leg["direction"] for leg in legs} == {"up", "down"}
+    assert all(leg["bar_count"] > 0 for leg in legs)
+    assert all(leg["atr_multiple"] is not None for leg in legs)
+
+
+def test_profile_caps_geometry_and_reports_truncation() -> None:
+    """FR-RES-075: large geometry remains bounded without hiding omissions."""
+    profile = build_market_structure_profile(
+        _oscillating_prepared(2_000), config=_config(), limits=_limits()
+    )
+
+    assert len(profile.structure["swing_points"]) == 256
+    assert len(profile.structure["trend_legs"]) == 255
+    assert profile.structure["geometry_point_limit"] == 256
+    assert profile.structure["geometry_total_points"] > 256
+    assert profile.structure["geometry_truncated"] is True
 
 
 def test_profile_rejects_oversized_input() -> None:

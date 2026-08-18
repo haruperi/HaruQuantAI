@@ -1,5 +1,5 @@
 /**
- * Frozen typed route contracts for the 87 registered backend-v1 operations.
+ * Frozen typed route contracts for the 138 registered backend-v1 operations.
  *
  * Source of truth: `app/services/api/contracts/catalog.py` (`_KNOWN_ROUTE_CONTRACTS`).
  * The drift test in `clients.contract.test.ts` asserts that this module
@@ -24,7 +24,7 @@ export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
  */
 export interface RouteContract<
   TMethod extends HttpMethod = HttpMethod,
-  TPath extends string = string
+  TPath extends string = string,
 > {
   readonly id: string;
   readonly method: TMethod;
@@ -63,7 +63,7 @@ function route<TMethod extends HttpMethod, TPath extends string>(config: {
     method: config.method,
     path: config.path,
     permission: config.permission ?? null,
-    authRequired: config.authRequired ?? (config.permission !== undefined),
+    authRequired: config.authRequired ?? config.permission !== undefined,
     sideEffect: config.sideEffect ?? "read",
     governed: config.governed ?? false,
     idempotencyRequired: config.idempotencyRequired ?? false,
@@ -321,7 +321,7 @@ export const strategiesRoutes = {
   }),
 } as const;
 
-// --- Research (1) --------------------------------------------------------
+// --- Research (20) -------------------------------------------------------
 
 export const researchRoutes = {
   run: route({
@@ -330,6 +330,150 @@ export const researchRoutes = {
     path: "/api/v1/research/run",
     permission: "research:run",
     sideEffect: "read",
+  }),
+  presets: route({
+    id: "api.research.presets",
+    method: "GET",
+    path: "/api/v1/research/presets",
+    permission: "research:read",
+  }),
+  dashboard: route({
+    id: "api.research.dashboard",
+    method: "GET",
+    path: "/api/v1/research/dashboard",
+    permission: "research:read",
+  }),
+  createExperiment: route({
+    id: "api.research.create_experiment",
+    method: "POST",
+    path: "/api/v1/research/experiments",
+    permission: "research:run",
+    sideEffect: "write",
+  }),
+  experiments: route({
+    id: "api.research.experiments",
+    method: "GET",
+    path: "/api/v1/research/experiments",
+    permission: "research:read",
+  }),
+  experiment: route({
+    id: "api.research.experiment",
+    method: "GET",
+    path: "/api/v1/research/experiments/{experiment_id}",
+    permission: "research:read",
+  }),
+  createRun: route({
+    id: "api.research.create_run",
+    method: "POST",
+    path: "/api/v1/research/experiments/{experiment_id}/runs",
+    permission: "research:run",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+  runs: route({
+    id: "api.research.runs",
+    method: "GET",
+    path: "/api/v1/research/runs",
+    permission: "research:read",
+  }),
+  compareRuns: route({
+    id: "api.research.compare_runs",
+    method: "POST",
+    path: "/api/v1/research/runs/compare",
+    permission: "research:read",
+    sideEffect: "write",
+  }),
+  runDetail: route({
+    id: "api.research.run_detail",
+    method: "GET",
+    path: "/api/v1/research/runs/{run_id}",
+    permission: "research:read",
+  }),
+  runReport: route({
+    id: "api.research.run_report",
+    method: "GET",
+    path: "/api/v1/research/runs/{run_id}/report",
+    permission: "research:read",
+  }),
+  runStage: route({
+    id: "api.research.run_stage",
+    method: "GET",
+    path: "/api/v1/research/runs/{run_id}/stages/{stage}",
+    permission: "research:read",
+  }),
+  runArtifacts: route({
+    id: "api.research.run_artifacts",
+    method: "GET",
+    path: "/api/v1/research/runs/{run_id}/artifacts",
+    permission: "research:read",
+  }),
+  cancelRun: route({
+    id: "api.research.cancel_run",
+    method: "POST",
+    path: "/api/v1/research/runs/{run_id}/cancel",
+    permission: "research:run",
+    sideEffect: "write",
+  }),
+  runEvents: route({
+    id: "api.research.run_events",
+    method: "GET",
+    path: "/api/v1/research/runs/{run_id}/events",
+    permission: "research:read",
+    sideEffect: "stream",
+    stream: true,
+  }),
+  createAutomation: route({
+    id: "api.research.create_automation",
+    method: "POST",
+    path: "/api/v1/research/automation",
+    permission: "research:run",
+    sideEffect: "write",
+    idempotencyRequired: true,
+  }),
+  automationBatch: route({
+    id: "api.research.automation_batch",
+    method: "GET",
+    path: "/api/v1/research/automation/{batch_id}",
+    permission: "research:read",
+  }),
+  expectancy: route({
+    id: "api.research.expectancy",
+    method: "GET",
+    path: "/api/v1/research/expectancy",
+    permission: "research:read",
+  }),
+  createExpectancy: route({
+    id: "api.research.create_expectancy",
+    method: "POST",
+    path: "/api/v1/research/expectancy",
+    permission: "research:govern",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  transitionExpectancy: route({
+    id: "api.research.transition_expectancy",
+    method: "POST",
+    path: "/api/v1/research/expectancy/{profile_id}/transition",
+    permission: "research:govern",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
+  drift: route({
+    id: "api.research.drift",
+    method: "GET",
+    path: "/api/v1/research/drift",
+    permission: "research:read",
+  }),
+  createStressScenario: route({
+    id: "api.research.create_stress_scenario",
+    method: "POST",
+    path: "/api/v1/research/stress-scenarios",
+    permission: "research:govern",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
   }),
 } as const;
 
@@ -818,7 +962,7 @@ export const portfolioRoutes = {
  * The analysis routes are reads and are declared individually. */
 function optimizationRun<TPath extends string>(
   id: string,
-  path: TPath
+  path: TPath,
 ): RouteContract<"POST", TPath> {
   return route({
     id,
@@ -833,19 +977,19 @@ function optimizationRun<TPath extends string>(
 export const optimizationRoutes = {
   parameterSweep: optimizationRun(
     "api.optimization.parameter_sweep",
-    "/api/v1/optimization/parameter-sweep"
+    "/api/v1/optimization/parameter-sweep",
   ),
   walkForward: optimizationRun(
     "api.optimization.walk_forward",
-    "/api/v1/optimization/walk-forward"
+    "/api/v1/optimization/walk-forward",
   ),
   walkForwardMatrix: optimizationRun(
     "api.optimization.walk_forward_matrix",
-    "/api/v1/optimization/walk-forward-matrix"
+    "/api/v1/optimization/walk-forward-matrix",
   ),
   robustness: optimizationRun(
     "api.optimization.robustness",
-    "/api/v1/optimization/robustness"
+    "/api/v1/optimization/robustness",
   ),
   compare: route({
     id: "api.optimization.compare",
@@ -984,8 +1128,21 @@ export const indicatorsRoutes = {
  * The count is exported for the drift test so a structural mismatch fails CI.
  */
 export const workstationRoutes = {
-  read: route({ id: "api.workstation.read", method: "GET", path: "/api/v1/workstation", permission: "workstation:read" }),
-  command: route({ id: "api.workstation.command", method: "POST", path: "/api/v1/workstation/commands", permission: "workstation:command", sideEffect: "governed_write", governed: true, idempotencyRequired: true }),
+  read: route({
+    id: "api.workstation.read",
+    method: "GET",
+    path: "/api/v1/workstation",
+    permission: "workstation:read",
+  }),
+  command: route({
+    id: "api.workstation.command",
+    method: "POST",
+    path: "/api/v1/workstation/commands",
+    permission: "workstation:command",
+    sideEffect: "governed_write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
 } as const;
 
 export const ROUTE_CONTRACTS = [
@@ -1020,6 +1177,27 @@ export const ROUTE_CONTRACTS = [
   strategiesRoutes.catalogue,
   strategiesRoutes.versions,
   researchRoutes.run,
+  researchRoutes.presets,
+  researchRoutes.dashboard,
+  researchRoutes.createExperiment,
+  researchRoutes.experiments,
+  researchRoutes.experiment,
+  researchRoutes.createRun,
+  researchRoutes.runs,
+  researchRoutes.compareRuns,
+  researchRoutes.runDetail,
+  researchRoutes.runReport,
+  researchRoutes.runStage,
+  researchRoutes.runArtifacts,
+  researchRoutes.cancelRun,
+  researchRoutes.runEvents,
+  researchRoutes.createAutomation,
+  researchRoutes.automationBatch,
+  researchRoutes.expectancy,
+  researchRoutes.createExpectancy,
+  researchRoutes.transitionExpectancy,
+  researchRoutes.drift,
+  researchRoutes.createStressScenario,
   dashboardRoutes.broker,
   dashboardRoutes.equityCurve,
   dashboardRoutes.summary,
@@ -1104,7 +1282,7 @@ export const ROUTE_CONTRACTS = [
 ] as const;
 
 /** Exact approved backend-v1 operation count. Drift here must fail CI. */
-export const ROUTE_CONTRACT_COUNT = 117;
+export const ROUTE_CONTRACT_COUNT = 138;
 
 /** Map of route id -> contract, for fast lookup and drift verification. */
 export const ROUTE_CONTRACTS_BY_ID: Readonly<Record<string, RouteContract>> =

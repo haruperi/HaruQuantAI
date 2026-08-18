@@ -67,7 +67,44 @@ export { BAR_TIMEFRAMES } from "./data";
 export { openStream } from "./stream";
 export type { StreamTransportOptions } from "./stream";
 export type { StrategyCatalogue, StrategyVersion } from "./strategies";
-export type { ResearchReport, ResearchRunInput } from "./research";
+export type {
+  BarPreview,
+  DatasetIdentity,
+  EffectiveConfiguration,
+  Overview,
+  Provenance,
+  Readiness as ResearchReadiness,
+  ResearchArtifact,
+  ResearchArtifactList,
+  ResearchAutomationBatch,
+  ResearchAutomationInput,
+  ResearchComparison,
+  ResearchComparisonEntry,
+  ResearchDashboard,
+  ResearchDatasetSelection,
+  ResearchDrift,
+  ResearchExpectancy,
+  ResearchExpectancyTransition,
+  ResearchExpectancyTransitionInput,
+  ResearchExperimentCreateInput,
+  ResearchExperimentDetail,
+  ResearchExperimentSummary,
+  ResearchPreset,
+  ResearchPresetCatalogue,
+  ResearchReport,
+  ResearchRunCreateInput,
+  ResearchRunDetail,
+  ResearchRunInput,
+  ResearchRunReport,
+  ResearchRunStatus,
+  ResearchRunSummary,
+  ResearchStageView,
+  ResearchWarning,
+  Scorecard,
+  StageState,
+  StageView,
+} from "./research";
+export { RESEARCH_RUN_STATUSES, STAGE_STATES, STAGE_VIEWS } from "./research";
 export type { DashboardSnapshot } from "./dashboards";
 export type {
   ApprovalRecord,

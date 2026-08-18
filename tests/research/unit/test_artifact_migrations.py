@@ -17,6 +17,7 @@ def test_research_migration_is_stable_and_owned() -> None:
         "001_research_artifacts_v1",
         "002_research_expectancy_profiles_v1",
         "003_research_governed_evidence_v1",
+        "004_research_runs_v1",
     )
     assert all(step.domain == "research" for step in request.steps)
     assert all(step.statements for step in request.steps)

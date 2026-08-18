@@ -137,6 +137,130 @@ def _session_summaries(
     return rows, warnings
 
 
+def _bucket_row(
+    label_key: str,
+    label: JSONValue,
+    frame: pd.DataFrame,
+    returns: pd.Series,
+) -> Mapping[str, JSONValue] | None:
+    """Summarize one seasonality bucket.
+
+    Args:
+        label_key: Field name identifying the bucket.
+        label: Bucket identity value.
+        frame: Rows belonging to the bucket.
+        returns: Aligned log-return series for the same rows.
+
+    Returns:
+        Bucket summary row, or ``None`` when the bucket is too sparse.
+    """
+    values = returns.dropna().to_numpy(dtype="float64")
+    if values.size < _MIN_BUCKET_SAMPLES:
+        return None
+    row: dict[str, JSONValue] = {
+        label_key: label,
+        "sample_count": int(values.size),
+        "mean_return": float(values.mean()),
+        "win_rate": float(np.mean(values > 0)),
+        "std_return": float(values.std(ddof=0)),
+    }
+    if "high" in frame and "low" in frame:
+        span = (
+            frame["high"].astype("float64") - frame["low"].astype("float64")
+        ).dropna()
+        row["mean_range"] = float(span.mean()) if not span.empty else None
+    if "volume" in frame:
+        volume = frame["volume"].astype("float64").dropna()
+        row["mean_volume"] = float(volume.mean()) if not volume.empty else None
+    if "spread" in frame:
+        spread = frame["spread"].astype("float64").dropna()
+        row["mean_spread"] = float(spread.mean()) if not spread.empty else None
+    return row
+
+
+def _grouped_rows(
+    filtered: pd.DataFrame,
+    returns: pd.Series,
+    *,
+    label_key: str,
+    labels: np.ndarray,
+) -> list[Mapping[str, JSONValue]]:
+    """Summarize every bucket produced by one grouping key.
+
+    Args:
+        filtered: Filtered frame.
+        returns: Aligned log-return series.
+        label_key: Field name identifying each bucket.
+        labels: Per-row bucket labels.
+
+    Returns:
+        Ordered bucket summaries; sparse buckets are omitted.
+    """
+    rows: list[Mapping[str, JSONValue]] = []
+    for label in sorted({int(value) for value in labels}):
+        mask = labels == label
+        row = _bucket_row(label_key, label, filtered[mask], returns[mask])
+        if row is not None:
+            rows.append(row)
+    return rows
+
+
+def _hour_weekday_rows(
+    filtered: pd.DataFrame, returns: pd.Series
+) -> list[Mapping[str, JSONValue]]:
+    """Summarize the hour-by-weekday matrix.
+
+    Args:
+        filtered: Filtered frame.
+        returns: Aligned log-return series.
+
+    Returns:
+        One row per populated weekday/hour cell.
+    """
+    index = filtered.index
+    weekdays = np.asarray(index.weekday)
+    hours = np.asarray(index.hour)
+    rows: list[Mapping[str, JSONValue]] = []
+    for weekday in sorted(set(weekdays.tolist())):
+        for hour in sorted(set(hours[weekdays == weekday].tolist())):
+            mask = (weekdays == weekday) & (hours == hour)
+            row = _bucket_row("hour", int(hour), filtered[mask], returns[mask])
+            if row is not None:
+                rows.append({**row, "weekday": int(weekday)})
+    return rows
+
+
+def _daily_extreme_rows(filtered: pd.DataFrame) -> Mapping[str, JSONValue]:
+    """Compute which session owns each day's high and low.
+
+    Args:
+        filtered: Filtered frame carrying a ``session`` column.
+
+    Returns:
+        Session ownership counts for daily highs and lows.
+    """
+    if "high" not in filtered or "low" not in filtered or filtered.empty:
+        return {"day_count": 0, "high_ownership": [], "low_ownership": []}
+    frame = filtered.assign(
+        _day=filtered.index.normalize(),
+        _high=filtered["high"].astype("float64"),
+        _low=filtered["low"].astype("float64"),
+    )
+    high_owner = frame.loc[frame.groupby("_day")["_high"].idxmax(), "session"]
+    low_owner = frame.loc[frame.groupby("_day")["_low"].idxmin(), "session"]
+    return {
+        "day_count": int(frame["_day"].nunique()),
+        "high_ownership": [
+            {"session": str(name), "days": int(count)}
+            for name, count in high_owner.value_counts().items()
+        ],
+        "low_ownership": [
+            {"session": str(name), "days": int(count)}
+            for name, count in low_owner.value_counts().items()
+        ],
+    }
+
+
 def _warning_values(
     warnings: list[ResearchWarning],
 ) -> list[JSONValue]:
@@ -232,6 +356,18 @@ def run_seasonality(
             "row_count": len(filtered),
             "sessions": [],
             "hours": [],
+            "hour_by_weekday": [],
+            "calendar": {
+                "year": [],
+                "month": [],
+                "day_of_month": [],
+                "day_of_week": [],
+            },
+            "daily_extremes": {
+                "day_count": 0,
+                "high_ownership": [],
+                "low_ownership": [],
+            },
             "opportunity": {},
             "extremes": {},
             "warnings": _warning_values(warnings),
@@ -248,12 +384,53 @@ def run_seasonality(
         "min_return": float(returns.min()) if len(returns) else None,
     }
     session_values: list[JSONValue] = [dict(row) for row in session_rows]
+    index = filtered.index
+    hour_rows = _grouped_rows(
+        filtered, returns, label_key="hour", labels=np.asarray(index.hour)
+    )
+    calendar: Mapping[str, JSONValue] = {
+        "year": _grouped_rows(
+            filtered, returns, label_key="year", labels=np.asarray(index.year)
+        ),
+        "month": _grouped_rows(
+            filtered, returns, label_key="month", labels=np.asarray(index.month)
+        ),
+        "day_of_month": _grouped_rows(
+            filtered, returns, label_key="day_of_month", labels=np.asarray(index.day)
+        ),
+        "day_of_week": _grouped_rows(
+            filtered,
+            returns,
+            label_key="day_of_week",
+            labels=np.asarray(index.weekday),
+        ),
+    }
+    if hour_rows:
+        best_hour = max(hour_rows, key=lambda row: _row_number(row, "mean_return"))
+        dead_hour = min(hour_rows, key=lambda row: _row_number(row, "mean_return"))
+        opportunity = {
+            **(opportunity if isinstance(opportunity, dict) else {}),
+            "best_hour": best_hour["hour"],
+            "best_hour_mean_return": best_hour["mean_return"],
+            "dead_hour": dead_hour["hour"],
+            "dead_hour_mean_return": dead_hour["mean_return"],
+        }
+    if session_rows:
+        worst = min(session_rows, key=lambda row: _row_number(row, "mean_return"))
+        opportunity = {
+            **(opportunity if isinstance(opportunity, dict) else {}),
+            "dead_session": worst["session"],
+            "dead_session_mean_return": worst["mean_return"],
+        }
     return {
         "schema_version": "v1",
         "adr_period": _ADR_PERIOD,
         "row_count": len(filtered),
         "sessions": session_values,
-        "hours": [],
+        "hours": hour_rows,
+        "hour_by_weekday": _hour_weekday_rows(filtered, returns),
+        "calendar": calendar,
+        "daily_extremes": _daily_extreme_rows(filtered),
         "opportunity": opportunity,
         "extremes": extremes,
         "warnings": _warning_values(warnings),
