@@ -37,6 +37,7 @@ _EXPECTED: dict[str, tuple[str, ...]] = {
     ),
     "app.services.simulator": (
         "admit_calibrated_realism",
+        "attach_analytics_report_artifact",
         "bind_realism_stream_to_scheduler",
         "branch_live_simulation",
         "branch_recovery_checkpoint",

@@ -1018,6 +1018,38 @@ def build_artifact_manifest(
     )(*args, **kwargs)
 
 
+def attach_analytics_report_artifact(
+    run_id: str,
+    report_json: str,
+    *,
+    request_id: str,
+) -> StandardResponse[object]:
+    """Attach one immutable Analytics report artifact to a completed run.
+
+    Args:
+        run_id: Completed canonical Simulation run identity.
+        report_json: Serialized Analytics performance report JSON text.
+        request_id: Trace identifier for the attachment operation.
+
+    Returns:
+        Attachment projection with artifact reference, checksum, and size.
+
+    Raises:
+        SimulationError: If the run is unknown, the payload is invalid, or a
+            different report is already attached.
+    """
+    return _guarded(
+        _operation(
+            "app.services.simulator.reporting.artifacts",
+            "attach_analytics_report_artifact",
+        ),
+        operation="simulation.reporting.attach_analytics_report_artifact",
+        risk_level="medium",
+        read_only=False,
+        writes_file=True,
+    )(run_id, report_json, request_id=request_id)
+
+
 def build_json_report(*args: object, **kwargs: object) -> StandardResponse[str]:
     """Build a deterministic canonical JSON report."""
     return cast(
@@ -2124,6 +2156,7 @@ def evaluate_emergency_controls(*args: object, **kwargs: object) -> Mapping[str,
 
 __all__: tuple[str, ...] = (
     "admit_calibrated_realism",
+    "attach_analytics_report_artifact",
     "bind_realism_stream_to_scheduler",
     "branch_live_simulation",
     "branch_recovery_checkpoint",

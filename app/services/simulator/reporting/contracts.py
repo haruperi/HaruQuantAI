@@ -21,6 +21,7 @@ logger = get_logger(__name__)
 ExecutionReceipt = Any
 
 CANONICAL_ARTIFACT_TYPES = ("journal.jsonl", "result.json", "report.md")
+ANALYTICS_REPORT_ARTIFACT_NAME = "analytics-report.json"
 REPORT_SCHEMA_VERSION = "v1"
 _HASH_LENGTH = 64
 _MINIMUM_COMMON_RETURN_OBSERVATIONS = 30
@@ -525,6 +526,7 @@ class FastResearchResult(_Contract):
 
 
 __all__ = [
+    "ANALYTICS_REPORT_ARTIFACT_NAME",
     "CANONICAL_ARTIFACT_TYPES",
     "REPORT_SCHEMA_VERSION",
     "AccountingSummary",

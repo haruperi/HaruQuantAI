@@ -6,6 +6,7 @@ Demonstrates FEAT-SIM-09 simulation result construction, trade records, artifact
 from __future__ import annotations
 
 import asyncio
+import os
 import sys
 import tempfile
 from datetime import UTC, datetime, timedelta
@@ -18,6 +19,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from app.services.simulator import (
+    attach_analytics_report_artifact,
     build_artifact_manifest,
     build_json_report,
     build_markdown_report,
@@ -272,6 +274,47 @@ def fr_sim_028() -> None:
     )
 
 
+def attach_analytics_report() -> None:
+    """Demonstrate immutable Analytics report artifact attachment.
+
+    A completed run's canonical result artifact is staged under the default
+    artifact root, then the serialized Analytics report is attached once,
+    re-attached idempotently with identical bytes, and a conflicting payload
+    is refused.
+    """
+    _header("Attachment - Attach Analytics Report Artifact")
+    result = _result()
+    run_id = str(get_simulation_value_field(result, "run_id"))
+    previous = Path.cwd()
+    with tempfile.TemporaryDirectory(prefix="sim-analytics-attach-") as directory:
+        os.chdir(directory)
+        try:
+            run_root = Path("artifacts") / "simulation" / run_id
+            run_root.mkdir(parents=True)
+            report_json = '{"schema_id": "analytics.report.v1", "non_binding": true}'
+            (run_root / "result.json").write_text(report_json, encoding="utf-8")
+            first = unwrap_simulation_response(
+                attach_analytics_report_artifact(
+                    run_id, report_json, request_id="req-attach-1"
+                ),
+                operation="usage.reporting.attach",
+            )
+            print(_format_result(first))
+            second = unwrap_simulation_response(
+                attach_analytics_report_artifact(
+                    run_id, report_json, request_id="req-attach-2"
+                ),
+                operation="usage.reporting.attach",
+            )
+            print(
+                f"Data -> first_status='{first['status']}', "
+                f"idempotent_status='{second['status']}', "
+                f"sha256={str(second['sha256'])[:12]}..."
+            )
+        finally:
+            os.chdir(previous)
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -291,6 +334,7 @@ def main() -> None:
     fr_sim_026()
     fr_sim_027()
     fr_sim_028()
+    attach_analytics_report()
 
 
 if __name__ == "__main__":

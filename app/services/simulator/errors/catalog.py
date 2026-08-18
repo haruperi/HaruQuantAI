@@ -80,6 +80,9 @@ _GROUPS: dict[str, tuple[str, ...]] = {
         "SIM_PLAYBACK_CURSOR_INVALID",
         "SIM_CHECKLIST_BYPASS_DENIED",
         "SIM_RECOVERY_REWIND_DENIED",
+        "SIMULATION_RESULT_NOT_FOUND",
+        "ANALYTICS_REPORT_INVALID",
+        "ANALYTICS_REPORT_CONFLICT",
     ),
     "portfolio": (
         "SIM_COMPONENT_INCOMPLETE",

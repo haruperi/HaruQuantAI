@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+import json
+import os
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from hashlib import sha256
 from pathlib import Path
+from types import MappingProxyType
 
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.reporting.contracts import (
+    ANALYTICS_REPORT_ARTIFACT_NAME,
     CANONICAL_ARTIFACT_TYPES,
     ArtifactEntry,
     ArtifactManifest,
@@ -21,7 +25,12 @@ _MEDIA_TYPES = {
     "journal.jsonl": "application/x-ndjson",
     "result.json": "application/json",
     "report.md": "text/markdown",
+    ANALYTICS_REPORT_ARTIFACT_NAME: "application/json",
 }
+
+#: Default artifact root mirroring the API bootstrap's simulation artifact
+#: directory; the composition root owns the configured absolute location.
+_DEFAULT_ARTIFACT_ROOT = Path("artifacts/simulation")
 
 
 def _resolve_artifacts(root: Path, paths: Sequence[Path]) -> dict[str, Path]:
@@ -91,4 +100,94 @@ def build_artifact_manifest(
     return ArtifactManifest(artifacts=entries, created_at=created_at)
 
 
-__all__ = ["build_artifact_manifest"]
+__all__ = ["attach_analytics_report_artifact", "build_artifact_manifest"]
+
+
+def attach_analytics_report_artifact(
+    run_id: str,
+    report_json: str,
+    *,
+    request_id: str,
+) -> Mapping[str, object]:
+    """Atomically attach one immutable Analytics report to a completed run.
+
+    The attachment never alters the three canonical manifest entries; the
+    report is written beside them as an immutable owner reference. Identical
+    bytes are idempotent and different bytes fail closed.
+
+    Args:
+        run_id: Completed canonical Simulation run identity.
+        report_json: Serialized Analytics performance report JSON text.
+        request_id: Trace identifier for the attachment operation.
+
+    Returns:
+        Immutable attachment projection with reference, checksum, and size.
+
+    Raises:
+        SimulationError: ``SIMULATION_RESULT_NOT_FOUND`` when no completed
+            result artifact exists for the run, ``ANALYTICS_REPORT_INVALID``
+            when the payload is not JSON, or ``ANALYTICS_REPORT_CONFLICT``
+            when different bytes were already attached.
+    """
+    if not run_id or run_id != run_id.strip() or "/" in run_id or "\\" in run_id:
+        raise SimulationError("SIM_INVALID_CONFIG", "Run identity is invalid")
+    if not request_id:
+        raise SimulationError("SIM_INVALID_CONFIG", "Request identity is invalid")
+    try:
+        json.loads(report_json)
+    except (TypeError, ValueError) as error:
+        raise SimulationError(
+            "ANALYTICS_REPORT_INVALID", "Report payload is not valid JSON"
+        ) from error
+    payload = report_json.encode("utf-8")
+    digest = sha256(payload).hexdigest()
+    root = _DEFAULT_ARTIFACT_ROOT.resolve()
+    run_root = (root / run_id).resolve()
+    if root not in run_root.parents:
+        raise SimulationError("SIM_PERSISTENCE_FAILED", "Run path is unsafe")
+    if not (run_root / "result.json").exists():
+        raise SimulationError(
+            "SIMULATION_RESULT_NOT_FOUND", "Completed Simulation run was not found"
+        )
+    target = run_root / ANALYTICS_REPORT_ARTIFACT_NAME
+    if target.exists():
+        if target.read_bytes() == payload:
+            logger.info(
+                "Analytics report artifact already attached to run %s (%s)",
+                run_id,
+                digest,
+            )
+            return MappingProxyType(
+                {
+                    "run_id": run_id,
+                    "artifact_ref": f"{run_id}/{ANALYTICS_REPORT_ARTIFACT_NAME}",
+                    "sha256": digest,
+                    "size_bytes": len(payload),
+                    "status": "already_attached",
+                }
+            )
+        raise SimulationError(
+            "ANALYTICS_REPORT_CONFLICT",
+            "A different Analytics report is already attached to this run",
+        )
+    try:
+        temporary = run_root / f"{ANALYTICS_REPORT_ARTIFACT_NAME}.tmp"
+        with temporary.open("wb") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(target)
+    except OSError as error:
+        raise SimulationError(
+            "SIM_PERSISTENCE_FAILED", "Analytics report attachment failed"
+        ) from error
+    logger.info("Attached Analytics report artifact to run %s (%s)", run_id, digest)
+    return MappingProxyType(
+        {
+            "run_id": run_id,
+            "artifact_ref": f"{run_id}/{ANALYTICS_REPORT_ARTIFACT_NAME}",
+            "sha256": digest,
+            "size_bytes": len(payload),
+            "status": "attached",
+        }
+    )
