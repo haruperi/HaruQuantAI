@@ -720,6 +720,7 @@ __all__ = [
     "read_provider_specification_revision_as_of",
     "read_provider_specification_revision_interval",
     "read_provider_specification_revisions",
+    "read_ready_dataset_catalog_records",
     "read_recent_source_attempt_records",
     "read_research_observation_records",
     "read_research_source_records",

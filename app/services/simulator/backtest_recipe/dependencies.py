@@ -561,7 +561,14 @@ class StrategyBacktestDependencies:
             active_position_tags=(),
         )
         signals = unwrap_strategy_response(
-            evaluate_strategy_signals(ref, config, evidence, (), context, evaluator),
+            evaluate_strategy_signals(
+                cast("Any", ref),
+                cast("Any", config),
+                evidence,
+                (),
+                cast("Any", context),
+                cast("Any", evaluator),
+            ),
             operation="simulator.backtest_recipe.evaluate_strategy_signals",
         )
         return frozenset(
@@ -735,7 +742,7 @@ def build_run_tick_dataset(
     """
     typed = cast("Any", dataset)
     generated = generate_tick_series(
-        dataset,
+        typed,
         model="trading_bar",
         trading_timeframe=timeframe,
         spread_model="fixed_spread",

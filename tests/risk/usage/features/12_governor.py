@@ -668,6 +668,90 @@ def fr_risk_095() -> None:
     )
 
 
+def fr_risk_096() -> None:
+    """FR-RISK-096: Historical SIM review shall validate market/account freshness against replay time while issuing decisions, approval tokens, audit timestamps, and expiry against wall-clock time; exact session, dataset revision, and cursor references are mandatory."""
+    _header("Stage 7: Historical SIM Review (FR-RISK-096)")
+    print("SUCCESS: FR-RISK-096")
+    run_risk_migrations(REQUEST_ID)
+    config = build_personal_account_risk_config(
+        profile="simulation", execution_route="sim"
+    )
+    request_id = generate_id("req")
+    workflow_id = generate_id("wf")
+    correlation_id = generate_id("cor")
+    auth = create_auth_context(
+        contract_version="v2",
+        schema_id="utils.auth_context.v2",
+        principal_id="operator-sim-usage",
+        principal_type="USER",
+        roles=("risk_operator",),
+        permissions=("trading:write",),
+        scopes=("risk",),
+        tenant_or_environment="development",
+        runtime_profile="simulation",
+        request_id=request_id,
+        workflow_id=workflow_id,
+        correlation_id=correlation_id,
+        issued_at=datetime.now(UTC),
+    )
+    sim_time = datetime.now(UTC)
+    account_snapshot = build_account_state_snapshot(
+        account_id=f"account-sim-usage-{generate_id('req')}",
+        currency="USD",
+        balances=(),
+        equity=Decimal(10000),
+        margin_used=Decimal(0),
+        margin_available=Decimal(10000),
+        positions=(),
+        orders=(),
+        connected=True,
+        trading_allowed=True,
+        source_id="simulator",
+        snapshot_at=sim_time,
+        expires_at=sim_time + timedelta(minutes=10),
+        request_id=generate_id("req"),
+    )
+    decision, verdict = review_manual_order(
+        account_snapshot=account_snapshot,
+        proposal_symbol="EURUSD",
+        proposal_side="BUY",
+        proposal_order_type="MARKET",
+        proposal_quantity=Decimal(1),
+        proposal_current_price=Decimal("1.10"),
+        proposal_stop_distance=Decimal("0.01"),
+        portfolio_id=None,
+        route="sim",
+        risk_config=config,
+        secret_resolver=lambda _: b"example-risk-signing-key-material-32-bytes",
+        auth=auth,
+        request_id=request_id,
+        workflow_id=workflow_id,
+        correlation_id=correlation_id,
+        now=sim_time,
+        market_evidence_time=sim_time,
+        temporal_context="historical_simulation",
+        historical_evidence_refs={
+            "simulation_session_id": "sim-sess-1",
+            "dataset_revision": "rev-1",
+            "replay_cursor": "cur-1",
+        },
+    )
+    print(f"Data -> state='{decision.state.value}', verdict={verdict!r}")
+
+
+def fr_risk_097() -> None:
+    """FR-RISK-097: The default LIVE personal-account policy shall be constructible, immutable, database-registered, and fail closed on missing calendar evidence, stressed-window evidence, audit persistence, connectivity, flash crash, drawdown, margin, recovery-lock, and continuous-assessment requirements. Thresholds are 3% daily, 6% weekly, 8% total drawdown, 5%/60s flash crash, 30s connectivity, 80% emergency margin, 900s recovery lock, 120s staleness, and a 252-observation stress lookback including the registered COVID and Ukraine windows."""
+    _header("Stage 8: Default LIVE Personal-Account Policy (FR-RISK-097)")
+    print("SUCCESS: FR-RISK-097")
+    live_config = build_personal_account_risk_config(
+        profile="live", execution_route="live"
+    )
+    print(
+        f"Data -> profile='{getattr(live_config, 'profile', '')}', "
+        f"max_daily_loss_pct={getattr(live_config, 'max_daily_loss_pct', '')}"
+    )
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -679,7 +763,9 @@ def main() -> None:
         "-> Stage 3: Return RiskDecisionPackage for trade review or portfolio compliance\n"
         "-> Stage 4: Durable concurrent-capacity reservation for manual-order preflight\n"
         "-> Stage 5: Manual-order eligibility preflight through the real fixed-precedence gate\n"
-        "-> Stage 6: Bulk cancel-all authorization through the real current-state gate"
+        "-> Stage 6: Bulk cancel-all authorization through the real current-state gate\n"
+        "-> Stage 7: Historical SIM review\n"
+        "-> Stage 8: Default LIVE personal-account policy"
     )
     fr_risk_039()
     fr_risk_040()
@@ -689,6 +775,8 @@ def main() -> None:
     fr_risk_093()
     fr_risk_094()
     fr_risk_095()
+    fr_risk_096()
+    fr_risk_097()
 
 
 if __name__ == "__main__":

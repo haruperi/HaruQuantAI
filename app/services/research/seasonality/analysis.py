@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import pandas as pd
@@ -184,7 +184,7 @@ def _grouped_rows(
     *,
     label_key: str,
     labels: np.ndarray,
-) -> list[Mapping[str, JSONValue]]:
+) -> list[JSONValue]:
     """Summarize every bucket produced by one grouping key.
 
     Args:
@@ -196,7 +196,7 @@ def _grouped_rows(
     Returns:
         Ordered bucket summaries; sparse buckets are omitted.
     """
-    rows: list[Mapping[str, JSONValue]] = []
+    rows: list[JSONValue] = []
     for label in sorted({int(value) for value in labels}):
         mask = labels == label
         row = _bucket_row(label_key, label, filtered[mask], returns[mask])
@@ -205,9 +205,7 @@ def _grouped_rows(
     return rows
 
 
-def _hour_weekday_rows(
-    filtered: pd.DataFrame, returns: pd.Series
-) -> list[Mapping[str, JSONValue]]:
+def _hour_weekday_rows(filtered: pd.DataFrame, returns: pd.Series) -> list[JSONValue]:
     """Summarize the hour-by-weekday matrix.
 
     Args:
@@ -220,7 +218,7 @@ def _hour_weekday_rows(
     index = filtered.index
     weekdays = np.asarray(index.weekday)
     hours = np.asarray(index.hour)
-    rows: list[Mapping[str, JSONValue]] = []
+    rows: list[JSONValue] = []
     for weekday in sorted(set(weekdays.tolist())):
         for hour in sorted(set(hours[weekdays == weekday].tolist())):
             mask = (weekdays == weekday) & (hours == hour)
@@ -406,8 +404,9 @@ def run_seasonality(
         ),
     }
     if hour_rows:
-        best_hour = max(hour_rows, key=lambda row: _row_number(row, "mean_return"))
-        dead_hour = min(hour_rows, key=lambda row: _row_number(row, "mean_return"))
+        hour_maps = [cast("Mapping[str, JSONValue]", row) for row in hour_rows]
+        best_hour = max(hour_maps, key=lambda row: _row_number(row, "mean_return"))
+        dead_hour = min(hour_maps, key=lambda row: _row_number(row, "mean_return"))
         opportunity = {
             **(opportunity if isinstance(opportunity, dict) else {}),
             "best_hour": best_hour["hour"],

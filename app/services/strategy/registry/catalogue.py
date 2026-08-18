@@ -83,8 +83,8 @@ _BUILTIN_DESCRIPTORS: tuple[_BuiltinStrategyDescriptor, ...] = (
         required_indicators=("ema",),
         required_data=("EURUSD:H1",),
         requires_account_snapshot=False,
-        source_hash="c4cae5c0953770f89288a5fa0a0221cea71b86fa97de2f5864ee367c699938a8",  # pragma: allowlist secret  # noqa: E501
-        artifact_hash="c4cae5c0953770f89288a5fa0a0221cea71b86fa97de2f5864ee367c699938a8",  # pragma: allowlist secret  # noqa: E501
+        source_hash="94da7dd1d7c9727ed66c28660852b0e4b65bbe6d2b11558e78009c45ce77b8a3",  # pragma: allowlist secret  # noqa: E501
+        artifact_hash="94da7dd1d7c9727ed66c28660852b0e4b65bbe6d2b11558e78009c45ce77b8a3",  # pragma: allowlist secret  # noqa: E501
         dependency_hash=_DEPENDENCY_HASH,
     ),
     _BuiltinStrategyDescriptor(

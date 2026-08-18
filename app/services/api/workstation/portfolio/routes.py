@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable
-from typing import Annotated, Any, cast
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
@@ -252,7 +252,10 @@ async def _delegate_async(
         RuntimeError: If Portfolio reports an unexpected runtime failure.
     """
     try:
-        return await cast("Any", source(operation, *args))
+        result = source(operation, *args)
+        if inspect.isawaitable(result):
+            return await result
+        return result
     except RuntimeError as error:
         if str(error) not in {
             "PORTFOLIO_RUNTIME_UNAVAILABLE",

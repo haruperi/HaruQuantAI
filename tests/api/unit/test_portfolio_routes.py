@@ -674,14 +674,16 @@ def test_lifecycle_operations_fail_closed_without_dependencies() -> None:
             source(operation, object(), _auth(), "key-1")
 
 
-def test_activation_requires_composed_workflow_handle() -> None:
+@pytest.mark.anyio
+async def test_activation_requires_composed_workflow_handle() -> None:
     """A service handle without its workflow handle cannot activate."""
     source = portfolio_dependencies.build_portfolio_source("service-only")
     with pytest.raises(RuntimeError, match="PORTFOLIO_RUNTIME_UNAVAILABLE"):
-        source("activate", object(), _auth(), "key-1")
+        await source("activate", object(), _auth(), "key-1")
 
 
-def test_activation_chain_constructs_reviews_then_activates(
+@pytest.mark.anyio
+async def test_activation_chain_constructs_reviews_then_activates(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Activation runs construct, coordinate_review, then activate, in order."""
@@ -729,7 +731,7 @@ def test_activation_chain_constructs_reviews_then_activates(
     source = portfolio_dependencies.build_portfolio_source(
         {"service": "svc", "workflows": "wf"}
     )
-    result = source("activate", _Boundary(), _auth(), "key-1")
+    result = await source("activate", _Boundary(), _auth(), "key-1")
     assert calls == ["construct", "coordinate_review"]
     assert result == "allocation"
     assert captured["candidate"] == "candidate"
@@ -738,7 +740,8 @@ def test_activation_chain_constructs_reviews_then_activates(
     assert captured["kw"]["idempotency_key"] == "key-1"  # type: ignore[index]
 
 
-def test_rollback_chain_forwards_target_version(
+@pytest.mark.anyio
+async def test_rollback_chain_forwards_target_version(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Rollback reaches the owner boundary carrying its prior version."""
@@ -776,7 +779,7 @@ def test_rollback_chain_forwards_target_version(
     source = portfolio_dependencies.build_portfolio_source(
         {"service": "svc", "workflows": "wf"}
     )
-    assert source("rollback", _Boundary(), _auth(), "key-2") == "rolled-back"
+    assert await source("rollback", _Boundary(), _auth(), "key-2") == "rolled-back"
     assert captured["rollback_of_version"] == "v0"
     assert captured["expected_revision"] == 3
 

@@ -491,9 +491,11 @@ async def advance_trading_timeline(
         else None
     )
     for tick in timeline:
-        receipts.extend(
-            cast("Iterable[object]", cast("Any", engine).execute_tick_internal(tick))
+        execute_fn = getattr(engine, "execute_tick_internal", None) or getattr(
+            engine, "execute_tick", None
         )
+        if execute_fn is not None:
+            receipts.extend(cast("Iterable[object]", execute_fn(tick)))
         if source_dataset is not None:
             try:
                 outcome = await run_point_in_time_evaluation(

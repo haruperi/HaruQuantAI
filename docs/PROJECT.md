@@ -1,8 +1,8 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 243 registered application features, 234 are implemented and structurally reconciled (96.30%); 9 are `Pending` and 0 are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
-> **Last updated:** `2026-08-17`
+> **Status:** `In Progress` — of 245 registered application features, 236 are implemented and structurally reconciled (96.33%); 9 are `Pending` and 0 are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Last updated:** `2026-08-18`
 
 > This document is the system-level source of truth.
 > It defines how domains fit together, how cross-domain workflows operate, which rules apply system-wide, and how the complete system is verified.

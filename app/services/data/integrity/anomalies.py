@@ -581,7 +581,18 @@ def detect_unexpected_gaps(
     policy: QualityPolicy | None = None,
     limit: int = QUALITY_SAMPLE_LIMIT,
 ) -> QualityIssue | None:
-    """Return the first ordinary unexpected-gap issue for compatibility."""
+    """Return the first ordinary unexpected-gap issue for compatibility.
+
+    Args:
+        records: Bounded sequence of canonical market data records.
+        timeframe: Bar timeframe or None for tick data.
+        sessions: Optional registered trading sessions.
+        policy: Optional active quality policy.
+        limit: Maximum sample records to examine.
+
+    Returns:
+        First detected gap issue or None if no gaps are detected.
+    """
     issues = _detect_gap_issues(
         records,
         timeframe,

@@ -239,7 +239,7 @@ async def _events(
         item = await asyncio.to_thread(next, iterator, sentinel)
         if item is sentinel:
             return
-        payload = dict(item)  # type: ignore[arg-type]
+        payload = dict(cast("Any", item))
         kind = str(payload.pop("kind", "progress"))
         event_type = "heartbeat" if kind == "heartbeat" else "payload"
         yield _frame(

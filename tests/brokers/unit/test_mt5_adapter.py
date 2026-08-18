@@ -115,23 +115,53 @@ class _FakeTransport:
                 {
                     "name": "GBPUSD",
                     "digits": 5,
+                    "point": 0.00001,
+                    "trade_tick_size": 0.00001,
+                    "trade_contract_size": 100000.0,
                     "volume_step": 0.01,
                     "volume_min": 0.01,
-                    "volume_max": 100,
+                    "volume_max": 100.0,
+                    "trade_mode": 4,
+                    "swap_mode": 1,
+                    "swap_long": -0.2,
+                    "swap_short": -1.2,
+                    "currency_base": "GBP",
+                    "currency_profit": "USD",
+                    "currency_margin": "USD",
                 },
                 {
                     "name": "EURUSD",
                     "digits": 5,
+                    "point": 0.00001,
+                    "trade_tick_size": 0.00001,
+                    "trade_contract_size": 100000.0,
                     "volume_step": 0.01,
                     "volume_min": 0.01,
-                    "volume_max": 100,
+                    "volume_max": 100.0,
+                    "trade_mode": 4,
+                    "swap_mode": 1,
+                    "swap_long": -0.2,
+                    "swap_short": -1.2,
+                    "currency_base": "EUR",
+                    "currency_profit": "USD",
+                    "currency_margin": "USD",
                 },
                 {
                     "name": "XAUUSD",
                     "digits": 2,
+                    "point": 0.01,
+                    "trade_tick_size": 0.01,
+                    "trade_contract_size": 100.0,
                     "volume_step": 0.01,
                     "volume_min": 0.01,
-                    "volume_max": 100,
+                    "volume_max": 100.0,
+                    "trade_mode": 4,
+                    "swap_mode": 1,
+                    "swap_long": -0.2,
+                    "swap_short": -1.2,
+                    "currency_base": "XAU",
+                    "currency_profit": "USD",
+                    "currency_margin": "USD",
                 },
             ),
             "symbols_total": 3,
@@ -1000,20 +1030,7 @@ def test_adapter_get_positions_invalid_limit() -> None:
 
 def test_adapter_get_symbol_info_success() -> None:
     """Successfully retrieving symbol info returns a valid mapped BrokerSymbolInfo."""
-
-    class _SymbolTransport(_FakeTransport):
-        async def call(self, name: str, *args: object, **kwargs: object) -> object:
-            if name == "symbol_info":
-                return {
-                    "name": "EURUSD",
-                    "digits": 5,
-                    "volume_step": 0.01,
-                    "volume_min": 0.01,
-                    "volume_max": 100,
-                }
-            return await super().call(name, *args, **kwargs)
-
-    adapter = MT5BrokerAdapter(_config(), transport=_SymbolTransport())
+    adapter = MT5BrokerAdapter(_config(), transport=_FakeTransport())
 
     async def exercise() -> None:
         await adapter.connect()

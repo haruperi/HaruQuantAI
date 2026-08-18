@@ -704,7 +704,7 @@ def review_manual_order(
         stop_distance=proposal_stop_distance,
         market_as_of=evidence_now,
         expires_at=checked_now + timedelta(minutes=5),
-        risk_profile=route,
+        risk_profile="simulation" if route == "sim" else route,
         evidence_refs={
             "account": account.account_id,
             "market": proposal_symbol,
@@ -725,7 +725,7 @@ def review_manual_order(
     # guarantee against a second, independent `datetime.now(UTC)` call. One
     # instant is captured here and frozen into the clock closure for this
     # single review's audit/approval/governor bookkeeping instead.
-    governor_now = checked_now if now is not None else datetime.now(UTC)
+    governor_now = checked_now
     clock = lambda: governor_now  # noqa: E731 - frozen shared clock, not a named def
     audit = create_risk_audit_chain(
         config, cast("Any", build_risk_state_store()), clock, canonical_json

@@ -16,7 +16,6 @@ import math
 from collections.abc import Mapping
 from dataclasses import dataclass
 from importlib import import_module
-from threading import Lock
 from typing import TYPE_CHECKING, Final, Literal, cast
 
 from app.services.indicators.core.errors import (
@@ -33,14 +32,6 @@ logger = get_logger(__name__)
 # each call near 3,750 items — a wide margin that survives future record fields
 # while still amortizing call overhead across long histories.
 _CHECKSUM_CHUNK_RECORDS: Final[int] = 250
-_INPUT_CHECKSUM_LOCK = Lock()
-_input_checksum_dataset: object | None = None
-_input_checksum_records: object | None = None
-_input_checksum_value: str | None = None
-_SOURCE_FRAME_LOCK = Lock()
-_source_frame_dataset: object | None = None
-_source_frame_records: object | None = None
-_source_frame_value: object | None = None
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -273,9 +264,10 @@ def _parameter_hash(config: IndicatorConfig) -> str:
 
 
 def _input_checksum(data: MarketDataset) -> str:
-    """Compute the canonical SHA-256 input-dataset digest.
+    """Compute the deterministic SHA-256 digest of one input dataset.
 
-        The digest folds one ``canonical_json`` call for the dataset-level fields
+    Note:
+        The canonical JSON digest is computed in chunks — one for metadata,
         and one per fixed-size record chunk, in exact record order, rather than
         canonicalizing the whole dataset in a single call.
         ``app.utils.canonical_json`` enforces a cumulative 10,000-item traversal
@@ -285,43 +277,25 @@ def _input_checksum(data: MarketDataset) -> str:
         order-sensitive.
 
     Args:
-            data: One normalized ``MarketDataset v1``.
+        data: One normalized ``MarketDataset v1``.
 
     Returns:
-            Lowercase 64-character SHA-256 hexadecimal digest.
+        Lowercase 64-character SHA-256 hexadecimal digest.
 
     Raises:
         None.
     """
-    global _input_checksum_dataset  # noqa: PLW0603
-    global _input_checksum_records  # noqa: PLW0603
-    global _input_checksum_value  # noqa: PLW0603
-
-    records_identity = data.records
-    with _INPUT_CHECKSUM_LOCK:
-        if (
-            data is _input_checksum_dataset
-            and records_identity is _input_checksum_records
-            and _input_checksum_value is not None
-        ):
-            return _input_checksum_value
-        payload = data.model_dump(mode="json")
-        records = cast("list[object]", payload.pop("records"))
-        digest = hashlib.sha256()
-        digest.update(canonical_json(payload).encode("utf-8"))
-        for start in range(0, len(records), _CHECKSUM_CHUNK_RECORDS):
-            # ASCII record separator cannot appear unescaped inside JSON text, so
-            # concatenated chunk payloads stay unambiguous.
-            digest.update(b"\x1e")
-            chunk = records[start : start + _CHECKSUM_CHUNK_RECORDS]
-            digest.update(canonical_json(chunk).encode("utf-8"))
-        value = digest.hexdigest()
-        # Retaining one immutable dataset bounds memory while sharing its exact
-        # checksum across sibling calculations and their canonical joins.
-        _input_checksum_dataset = data
-        _input_checksum_records = records_identity
-        _input_checksum_value = value
-        return value
+    payload = data.model_dump(mode="json")
+    records = cast("list[object]", payload.pop("records"))
+    digest = hashlib.sha256()
+    digest.update(canonical_json(payload).encode("utf-8"))
+    for start in range(0, len(records), _CHECKSUM_CHUNK_RECORDS):
+        # ASCII record separator cannot appear unescaped inside JSON text, so
+        # concatenated chunk payloads stay unambiguous.
+        digest.update(b"\x1e")
+        chunk = records[start : start + _CHECKSUM_CHUNK_RECORDS]
+        digest.update(canonical_json(chunk).encode("utf-8"))
+    return digest.hexdigest()
 
 
 def _serialize_output_cell(value: object) -> object:
@@ -377,46 +351,30 @@ def _project_source_frame(data: MarketDataset) -> pd.DataFrame:
     """Privately project one ``MarketDataset`` into its canonical columns.
 
     Args:
-            data: One normalized ``MarketDataset v1`` of bar records.
+        data: One normalized ``MarketDataset v1`` of bar records.
 
     Returns:
-            A UTC-indexed DataFrame with the dataset's symbol and OHLCV
-            columns, in dataset row order.
+        A UTC-indexed DataFrame with the dataset's symbol and OHLCV
+        columns, in dataset row order.
 
     Raises:
         None.
     """
-    global _source_frame_dataset  # noqa: PLW0603
-    global _source_frame_records  # noqa: PLW0603
-    global _source_frame_value  # noqa: PLW0603
-
-    records_identity = data.records
-    with _SOURCE_FRAME_LOCK:
-        if (
-            data is _source_frame_dataset
-            and records_identity is _source_frame_records
-            and _source_frame_value is not None
-        ):
-            return cast("pd.DataFrame", _source_frame_value)
-        records = cast("tuple[OHLCVRecord, ...]", records_identity)
-        index = pd.DatetimeIndex(
-            [record.timestamp for record in records], name="timestamp", tz="UTC"
-        )
-        frame = pd.DataFrame(
-            {
-                "symbol": [data.symbol] * len(records),
-                "open": [float(record.open) for record in records],
-                "high": [float(record.high) for record in records],
-                "low": [float(record.low) for record in records],
-                "close": [float(record.close) for record in records],
-                "volume": [float(record.volume) for record in records],
-            },
-            index=index,
-        )
-        _source_frame_dataset = data
-        _source_frame_records = records_identity
-        _source_frame_value = frame
-        return frame
+    records = cast("tuple[OHLCVRecord, ...]", data.records)
+    index = pd.DatetimeIndex(
+        [record.timestamp for record in records], name="timestamp", tz="UTC"
+    )
+    return pd.DataFrame(
+        {
+            "symbol": [data.symbol] * len(records),
+            "open": [float(record.open) for record in records],
+            "high": [float(record.high) for record in records],
+            "low": [float(record.low) for record in records],
+            "close": [float(record.close) for record in records],
+            "volume": [float(record.volume) for record in records],
+        },
+        index=index,
+    )
 
 
 def _validate_finalization_shape(

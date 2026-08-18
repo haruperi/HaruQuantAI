@@ -13,7 +13,7 @@ the composition root, which keeps Brokers out of the Simulation domain.
 from __future__ import annotations
 
 import tempfile
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -471,8 +471,15 @@ def _report_metrics(report: object) -> dict[str, str]:
     """
     preferred: dict[str, str] = {}
     fallback: dict[str, str] = {}
-    for section in get_analytics_value_field(report, "sections"):
-        for metric in get_analytics_value_field(section, "metrics"):
+    sections = cast(
+        "Iterable[object]", get_analytics_value_field(report, "sections") or ()
+    )
+    for section in sections:
+        metrics = cast(
+            "Iterable[object]",
+            get_analytics_value_field(section, "metrics") or (),
+        )
+        for metric in metrics:
             if get_analytics_value_field(metric, "status") != "calculated":
                 continue
             key = str(get_analytics_value_field(metric, "metric_key"))
@@ -685,7 +692,7 @@ async def run_strategy_backtest(
                 created_at=cast("Any", measurement).end,
                 initial_balance=typed_request.initial_balance,
                 account_currency=typed_request.account_currency,
-                config=_analytics_config(cast("Any", measurement).end),
+                config=cast("Any", _analytics_config(cast("Any", measurement).end)),
                 benchmark=measurement,
             ),
             operation="build_performance_report",

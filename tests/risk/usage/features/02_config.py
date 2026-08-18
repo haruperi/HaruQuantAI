@@ -379,7 +379,7 @@ def fr_risk_079() -> None:
 
 
 def fr_risk_080() -> None:
-    """FR-RISK-080: Register both defaults idempotently through the immutable policy-version boundary."""
+    """FR-RISK-080: Register the sim, demo, live, and prop-firm defaults idempotently through the immutable policy-version boundary."""
     _header("Stage 3: Register Default Policies (FR-RISK-080)")
     print("SUCCESS: FR-RISK-080")
     with tempfile.TemporaryDirectory() as directory:

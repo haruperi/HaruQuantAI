@@ -23,7 +23,14 @@ class CalendarClosureEvidence:
 
 
 def _is_holiday(event: object) -> tuple[bool, str]:
-    """Return whether persisted evidence explicitly or legibly names a holiday."""
+    """Return whether persisted evidence explicitly or legibly names a holiday.
+
+    Args:
+        event: Persisted calendar event record.
+
+    Returns:
+        Tuple of (is_holiday_flag, classification_basis).
+    """
     event_type = str(getattr(event, "event_type", "") or "").strip().lower()
     if event_type == "holiday":
         return True, "provider_event_type"

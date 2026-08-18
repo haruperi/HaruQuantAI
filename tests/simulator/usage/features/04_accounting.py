@@ -113,7 +113,7 @@ def fr_sim_008() -> None:
     """
     FR-SIM-008: Stage 2 — Calculate execution costs deterministically.
 
-    The system shall calculate configured Phase 1 commission and swap deterministically and return an itemized fixed-precision cost mapping.
+    The system shall calculate configured Phase 1 commission and signed swap cash effects deterministically and return an itemized fixed-precision mapping; negative swap is a debit and positive swap is a credit.
     """
     _header("Stage 2: Cost Calculation - Calculate Execution Costs (FR-SIM-008)")
     cost_input = create_simulation_value(

@@ -21,6 +21,10 @@ class _Engine:
         self.ticks.append(tick)
         return ()
 
+    def execute_tick_internal(self, tick: object) -> tuple[object, ...]:
+        """Record and accept one deterministic internal tick."""
+        return self.execute_tick(tick)
+
 
 @pytest.mark.anyio
 async def test_v2_requests_enter_only_through_async_trading_action() -> None:

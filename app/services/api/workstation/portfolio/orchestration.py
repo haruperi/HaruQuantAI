@@ -14,6 +14,7 @@ honours "No Live Action by Default".
 
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from typing import Any, cast
@@ -341,16 +342,18 @@ async def _activation(
     simulation_request = create_simulation_value(
         "PortfolioBacktestRequest", **_dump(boundary.simulation)
     )
-    review = await cast(
-        "Any",
-        execute_portfolio_handle_operation(
-            workflows,
-            "coordinate_review",
-            candidate,
-            simulation_request,
-            evidence,
-            approval_refs=tuple(boundary.approval_refs),
-        ),
+    review_result = execute_portfolio_handle_operation(
+        workflows,
+        "coordinate_review",
+        candidate,
+        simulation_request,
+        evidence,
+        approval_refs=tuple(boundary.approval_refs),
+    )
+    review = (
+        await cast("Any", review_result)
+        if inspect.isawaitable(review_result)
+        else review_result
     )
     attestation = _risk_value("approval_attestation", boundary.approval_attestation)
     validation = _risk_value("approval_validation", boundary.approval_validation)
