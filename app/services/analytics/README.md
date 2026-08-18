@@ -176,6 +176,7 @@ The order is the implementation sequence.
 | Completed | `FEAT-ANLT-08` Plan-Adherence and Behavioral Analytics | `behavior/` | `assess_plan_adherence`, `detect_behavior_patterns`; exact plan and threshold versions | `FR-ANLT-070`..`FR-ANLT-072` | `tests/analytics/usage/features/08_behavior.py` |
 | Completed | `FEAT-ANLT-09` Emergency-Response Analytics | `emergency_response/` | `analyze_emergency_response`; sequence, timing, completeness, and survival evidence | `FR-ANLT-073`..`FR-ANLT-074` | `tests/analytics/usage/features/09_emergency_response.py` |
 | Completed | `FEAT-ANLT-10` Player Qualification | `qualification/` | `evaluate_player_qualification`; prerequisites, attempts, remediation, expiry, and eligibility | `FR-ANLT-075`..`FR-ANLT-078` | `tests/analytics/usage/features/10_qualification.py` |
+| Completed | `FEAT-ANLT-11` Workbench Projection | `workbench/` | `build_analytics_workbench_payload`; finite owner-produced 17-section non-binding workbench projection with exact unavailability reasons, preserved source contexts, Decimal-safe values, and explicit 5,000-item truncation | `FR-ANLT-079` | `tests/analytics/usage/features/11_workbench.py`; `tests/analytics/unit/test_workbench_projections.py` |
 
 #### Player evidence requirements
 
@@ -193,6 +194,7 @@ The order is the implementation sequence.
 | Completed | `FR-ANLT-076` | Evaluate checkrides against exact mission, scoring, and integrity evidence. | `app/services/analytics/qualification/service.py`; `tests/analytics/usage/features/10_qualification.py::fr_anlt_076` |
 | Completed | `FR-ANLT-077` | Require remediation after failed or disqualifying evidence. | `app/services/analytics/qualification/service.py`; `tests/analytics/usage/features/10_qualification.py::fr_anlt_077` |
 | Completed | `FR-ANLT-078` | Derive recurrent validity and leaderboard eligibility from attempts, expiry, and integrity breaches. | `app/services/analytics/qualification/service.py`; `tests/analytics/usage/features/10_qualification.py::fr_anlt_078` |
+| Completed | `FR-ANLT-079` | Project one validated PerformanceReport and canonical Simulation result into the finite non-binding workbench payload with stable sections, exact unavailability reasons, preserved source contexts, and explicit truncation. | `app/services/analytics/workbench/projections.py`; `tests/analytics/usage/features/11_workbench.py::fr_anlt_079` |
 
 Work outside Analytics ownership has no `FEAT-*` registration and consumes no
 feature ordinal.
@@ -241,10 +243,14 @@ analytics/
 │   ├── portfolio.py                    # Focus: currency-safe portfolio aggregation
 │   ├── allocation.py                   # Focus: PortfolioAllocationEvidence v1 projection
 │   └── builder.py                      # Focus: canonical PerformanceReport orchestration
-└── dashboards/                         # Feature: UI/API-ready report projection
-    ├── __init__.py
-    ├── truncation.py                   # Focus: deterministic bounded series
-    └── payloads.py                     # Focus: DashboardPayload projection
+├── dashboards/                         # Feature: UI/API-ready report projection
+│   ├── __init__.py
+│   ├── truncation.py                   # Focus: deterministic bounded series
+│   └── payloads.py                     # Focus: DashboardPayload projection
+├── workbench/                          # Feature: FEAT-ANLT-11 workbench projection
+│   ├── __init__.py
+│   ├── contracts.py                    # Focus: internal payload contracts
+│   └── projections.py                  # Focus: finite owner-produced projection
 └── scoring/                            # Feature: process-first scoring
     ├── __init__.py
     ├── models.py                       # Focus: immutable scoring contracts

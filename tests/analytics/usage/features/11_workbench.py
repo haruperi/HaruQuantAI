@@ -116,6 +116,25 @@ def explicit_truncation() -> None:
     )
 
 
+def fr_anlt_079() -> None:
+    """
+    FR-ANLT-079: Stage 3 — Expose the finite Analytics workbench projection.
+
+    The system shall project one validated PerformanceReport and canonical
+    Simulation result into the bounded non-binding workbench payload with
+    stable sections, preserved source contexts, exact unavailability
+    reasons, and explicit truncation evidence, without persistence or
+    recalculation outside Analytics.
+    """
+    build_payload()
+    unavailable_truth()
+    payload = unwrap(build_analytics_workbench_payload(_report(), _SIMULATION_RESULT))
+    print(_format_result(payload))
+    print(
+        f"Data -> section_count={len(payload.__dataclass_fields__)}, non_binding={payload.non_binding}"
+    )
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -128,8 +147,7 @@ def main() -> None:
         "-> Stage 2: Owner-only projection with preserved source contexts\n"
         "-> Stage 3: Unavailable-section truth and explicit bounds"
     )
-    build_payload()
-    unavailable_truth()
+    fr_anlt_079()
     explicit_truncation()
 
 

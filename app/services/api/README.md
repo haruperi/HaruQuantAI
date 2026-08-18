@@ -225,6 +225,8 @@ Trading-owned migrations are required during canonical API startup. A failure le
 | Completed | `FEAT-API-24` Agentic Operator Gateway | `workstation/agentic/` | Reserve/inspect/audit/governance operator tier | `FR-API-068`–`FR-API-072` | `tests/api/usage/24_agentic.py`; Agentic route tests |
 | Completed | `FEAT-API-25` Canonical Backtest Simulator Gateway | `workstation/simulator/` | Registered strategy catalogue plus background canonical backtest run submission, read, cancellation, and ordered progress streaming; composes provider-fact loading and the Data runtime context a background run must re-enter | `FR-API-151`–`FR-API-156` | `tests/api/unit/test_simulator_routes.py`; `tests/api/unit/test_route_catalog.py` |
 | Completed | `FEAT-API-26` Research Workbench Gateway | `workstation/research/` | Server-owned presets and stress catalogue, durable principal-scoped experiment/run/batch ledger, idempotency-required jobs, governed draft-expectancy and registered stress-scenario creation, ordered progress/cancellation, report projections, point-in-time intelligence, history, comparison, artifacts, expectancy/drift reads, and governed expectancy transitions | `FR-API-157`–`FR-API-164` | `tests/api/unit/test_research_workbench_routes.py`; `tests/api/unit/test_route_catalog.py` |
+| Completed | `FEAT-API-27` Simulation Workbench Gateway | `workstation/simulation_workbench/` | Durable principal-scoped run catalogue (`api_simulation_results` et al., migration `api-0011`), typed live-session projections with backwards-only viewport, batch coordination with failed-only retry and once-only cancellation, metadata-only annotations and archive; interactive authorities fail closed until the interactive-session tasks compose them | `FR-API-165` | `tests/api/usage/27_simulation_workbench.py`; `tests/api/unit/test_simulation_workbench_routes.py`; `tests/api/unit/test_route_catalog.py` |
+| Completed | `FEAT-API-28` Analytics Workbench Gateway | `workstation/analytics_workbench/` | Read-mostly Analytics gateway: catalogue discovery, attached report reads, delegated workbench projection, trade pagination, owner comparison delegation, exact period query enums, and metadata-only annotations/archive | `FR-API-166` | `tests/api/usage/28_analytics_workbench.py`; `tests/api/unit/test_analytics_workbench_routes.py`; `tests/api/unit/test_route_catalog.py` |
 
 #### Operational workstation and boundary requirements
 
@@ -336,6 +338,8 @@ app/services/api/
     |-- settings/                  # FEAT-API-07; bootstrap config and limits
     |-- simulation/                # FEAT-API-17
     |-- simulator/                 # FEAT-API-25
+    |-- simulation_workbench/      # FEAT-API-27
+    |-- analytics_workbench/       # FEAT-API-28
     |-- strategies/                # FEAT-API-16
     |-- trading/                   # FEAT-API-19
     `-- watchlists/                # FEAT-API-11
