@@ -198,7 +198,9 @@ def build_catalogue_completion_sink(
     """Build the completion sink retaining canonical evidence durably.
 
     The immutable report artifact is attached before the catalogue row is
-    transitioned, so a completed row can never reference an absent report.
+    registered at all, so a failed attachment leaves no half-written run
+    stranded in ``queued`` and the Simulator reports the retention failure
+    as the run's terminal outcome.
 
     Args:
         registry: Catalogue transition registry owning row transitions.
@@ -238,16 +240,16 @@ def build_catalogue_completion_sink(
         principal_id = str(projection["principal_id"])
         timestamp = format_utc_timestamp(now())
         request_id = next_request_id()
-        origin = provenance(str(projection.get("job_id", ""))) if provenance else None
-        registry.register_run(
-            build_catalogue_run_values(projection, created_at=timestamp, origin=origin),
-            request_id=request_id,
-        )
         report_json = (serializer or _serialize_owner_report)(performance_report)
         attachment = _unwrap(
             (attach_report or _default_attacher())(
                 run_id, report_json, request_id=request_id
             )
+        )
+        origin = provenance(str(projection.get("job_id", ""))) if provenance else None
+        registry.register_run(
+            build_catalogue_run_values(projection, created_at=timestamp, origin=origin),
+            request_id=request_id,
         )
         report = performance_report
         registry.complete_run(

@@ -9,7 +9,7 @@ behind one dispatch source consumed by the routes.
 from __future__ import annotations
 
 import json
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -213,8 +213,10 @@ def _page_runs(_context: _WorkbenchContext, **kwargs: object) -> object:
     principal_id, request_id = _common(kwargs)
     limit = min(int(str(kwargs.get("limit", DEFAULT_PAGE_SIZE))), MAX_PAGE_SIZE)
     offset = max(int(str(kwargs.get("offset", 0))), 0)
-    return read_simulation_results_page(
-        principal_id, limit=limit, offset=offset, request_id=request_id
+    return project_catalogue_rows(
+        read_simulation_results_page(
+            principal_id, limit=limit, offset=offset, request_id=request_id
+        )
     )
 
 
@@ -226,7 +228,7 @@ def _get_run(_context: _WorkbenchContext, run_id: str, **kwargs: object) -> obje
     """
     principal_id, request_id = _common(kwargs)
     rows = read_simulation_result_record(run_id, principal_id, request_id=request_id)
-    return rows[0] if rows else None
+    return project_catalogue_row(rows[0]) if rows else None
 
 
 def _register_run(
@@ -631,6 +633,63 @@ def build_simulation_workbench_source_bundle() -> Mapping[str, object]:
     }
 
 
+def deserialize_json_list(value: object) -> tuple[str, ...]:
+    """Decode one durable JSON text column into its contract tuple.
+
+    The catalogue stores ``symbols`` and ``tags`` as JSON text, but
+    ``RunCatalogueEntry`` publishes both as arrays. Rows must therefore be
+    projected back into contract shape before they cross the boundary.
+
+    Args:
+        value: Durable JSON text, an already-decoded sequence, or ``None``.
+
+    Returns:
+        Decoded string tuple; empty when the column holds nothing usable.
+    """
+    if value is None:
+        return ()
+    if isinstance(value, str):
+        try:
+            decoded = json.loads(value)
+        except ValueError:
+            return ()
+    else:
+        decoded = value
+    if not isinstance(decoded, list | tuple):
+        return ()
+    return tuple(str(item) for item in cast("Sequence[object]", decoded))
+
+
+def project_catalogue_row(row: Mapping[str, object]) -> Mapping[str, object]:
+    """Project one durable catalogue row into its published contract shape.
+
+    Args:
+        row: Exact durable ``api_simulation_results`` row.
+
+    Returns:
+        The same row with its JSON text columns decoded into arrays.
+    """
+    return {
+        **row,
+        "symbols": deserialize_json_list(row.get("symbols")),
+        "tags": deserialize_json_list(row.get("tags")),
+    }
+
+
+def project_catalogue_rows(
+    rows: Sequence[Mapping[str, object]],
+) -> tuple[Mapping[str, object], ...]:
+    """Project every durable catalogue row into published contract shape.
+
+    Args:
+        rows: Ordered durable catalogue rows.
+
+    Returns:
+        Ordered rows with their JSON text columns decoded into arrays.
+    """
+    return tuple(project_catalogue_row(row) for row in rows)
+
+
 def serialize_tags(tags: object) -> str:
     """Serialize one bounded tag tuple for catalogue storage.
 
@@ -649,5 +708,8 @@ __all__ = (
     "build_simulation_workbench_live_authority",
     "build_simulation_workbench_source",
     "build_simulation_workbench_source_bundle",
+    "deserialize_json_list",
+    "project_catalogue_row",
+    "project_catalogue_rows",
     "serialize_tags",
 )

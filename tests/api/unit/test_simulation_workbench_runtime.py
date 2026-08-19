@@ -399,3 +399,45 @@ def test_provenance_index_is_bounded() -> None:
     index.record("job-3", {"origin_kind": "batch"})
     assert index.resolve("job-1") == {}
     assert index.resolve("job-3") == {"origin_kind": "batch"}
+
+
+def test_catalogue_rows_cross_the_boundary_in_contract_shape() -> None:
+    """Durable JSON text columns are published as the declared arrays."""
+    from app.services.api.workstation.simulation_workbench.orchestration import (
+        deserialize_json_list,
+        project_catalogue_row,
+    )
+
+    row = project_catalogue_row(
+        {"run_id": "run-1", "symbols": '["EURUSD", "GBPUSD"]', "tags": '["baseline"]'}
+    )
+    assert row["symbols"] == ("EURUSD", "GBPUSD")
+    assert row["tags"] == ("baseline",)
+    assert deserialize_json_list(None) == ()
+    assert deserialize_json_list("not json") == ()
+    assert deserialize_json_list('{"not": "a list"}') == ()
+    assert deserialize_json_list(("EURUSD",)) == ("EURUSD",)
+
+
+def test_failed_attachment_leaves_no_stranded_catalogue_row(principal: str) -> None:
+    """A run whose report cannot be attached is never half-recorded."""
+
+    def refuse(run_id: str, report_json: str, *, request_id: str) -> object:
+        """Refuse the attachment the way an absent result artifact does."""
+        del run_id, report_json, request_id
+        raise RuntimeError("SIMULATION_RESULT_NOT_FOUND")
+
+    sink = build_catalogue_completion_sink(
+        SimulationWorkbenchRegistry(clock=lambda: _NOW),
+        attach_report=refuse,
+        serializer=lambda _report: '{"report_id": "rep-1"}',
+        clock=lambda: _NOW,
+    )
+    with pytest.raises(RuntimeError, match="SIMULATION_RESULT_NOT_FOUND"):
+        sink(_Evidence("run-stranded", "job-stranded"))
+    assert (
+        read_simulation_result_record(
+            "run-stranded", principal, request_id=generate_id("req")
+        )
+        == ()
+    )

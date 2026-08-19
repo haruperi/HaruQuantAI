@@ -699,3 +699,50 @@
   padding: 0.5rem 0;
   border-bottom: 1px solid rgba(148, 163, 184, 0.2);
 }
+
+/* --- Run catalogue (history mode) ---------------------------------------- */
+
+.simulation-catalogue {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.simulation-catalogue__note {
+  font-size: 0.78rem;
+  color: #7a94a2;
+}
+
+.simulation-catalogue__error {
+  font-size: 0.78rem;
+  color: #f87171;
+}
+
+.simulation-catalogue__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  display: block;
+  overflow-x: auto;
+}
+
+.simulation-catalogue__table th,
+.simulation-catalogue__table td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.35rem 0.6rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.simulation-catalogue__table th {
+  color: #7a94a2;
+  font-weight: 600;
+}
+
+.simulation-catalogue__pager {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+}

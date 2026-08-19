@@ -68,16 +68,22 @@ export function RunCataloguePanel({
   }, [load, page]);
 
   return (
-    <section className={className} aria-label="Run catalogue">
+    <section
+      className={`simulation-catalogue ${className}`.trim()}
+      aria-label="Run catalogue"
+    >
       <h3>Run catalogue</h3>
       {error ? (
-        <p role="alert">{error}</p>
+        <p className="simulation-catalogue__error" role="alert">
+          {error}
+        </p>
       ) : loading ? (
-        <p>Loading recorded runs…</p>
+        <p className="simulation-catalogue__note">Loading recorded runs…</p>
       ) : runs.length === 0 ? (
-        <p>No runs have been recorded yet.</p>
+        <p className="simulation-catalogue__note">No runs have been recorded yet.</p>
       ) : (
-        <table>
+        <table className="simulation-catalogue__table">
+          <caption className="sr-only">Recorded simulation run catalogue</caption>
           <thead>
             <tr>
               <th scope="col">Run</th>
@@ -93,7 +99,7 @@ export function RunCataloguePanel({
           <tbody>
             {runs.map((entry) => (
               <tr key={entry.run_id}>
-                <td>{entry.run_id}</td>
+                <td className="font-mono">{entry.run_id}</td>
                 <td>{entry.strategy_label ?? entry.strategy_id}</td>
                 <td>{entry.symbols.join(", ")}</td>
                 <td>
@@ -114,7 +120,7 @@ export function RunCataloguePanel({
           </tbody>
         </table>
       )}
-      <nav aria-label="Run catalogue pages">
+      <nav className="simulation-catalogue__pager" aria-label="Run catalogue pages">
         <button
           type="button"
           onClick={() => setPage((current) => Math.max(1, current - 1))}

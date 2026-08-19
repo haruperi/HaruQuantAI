@@ -13,6 +13,10 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, cast
 
+from app.services.api.workstation.simulation_workbench.orchestration import (
+    project_catalogue_row,
+    project_catalogue_rows,
+)
 from app.services.api.workstation.simulation_workbench.persistence import (
     annotate_simulation_result_record,
     archive_simulation_result_record,
@@ -81,7 +85,7 @@ def _require_run(
     rows = read_simulation_result_record(run_id, principal_id, request_id=request_id)
     if not rows:
         raise KeyError("ANALYTICS_RUN_NOT_FOUND")
-    return rows[0]
+    return project_catalogue_row(rows[0])
 
 
 def _list_runs(_context: _AnalyticsContext, **kwargs: object) -> object:
@@ -93,8 +97,10 @@ def _list_runs(_context: _AnalyticsContext, **kwargs: object) -> object:
     principal_id, request_id = _identities(kwargs)
     limit = min(int(str(kwargs.get("limit", DEFAULT_PAGE_SIZE))), MAX_PAGE_SIZE)
     offset = max(int(str(kwargs.get("offset", 0))), 0)
-    return read_simulation_results_page(
-        principal_id, limit=limit, offset=offset, request_id=request_id
+    return project_catalogue_rows(
+        read_simulation_results_page(
+            principal_id, limit=limit, offset=offset, request_id=request_id
+        )
     )
 
 
