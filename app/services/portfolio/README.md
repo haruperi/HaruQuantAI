@@ -41,6 +41,18 @@ Portfolio owns the deterministic construction, versioning, activation, drift ass
 - Authentication, HTTP/WebSocket presentation, or human-approval capture: UI/API owns them.
 - Advanced allocation methods such as mean-variance optimization, Black-Litterman, or CVaR optimization.
 
+### Public boundary resolution
+
+`app/services/portfolio/__init__.py` is the sole public import boundary and
+stays function-only. Its 45 exports resolve lazily: `_EXPORTS` maps each public
+name to the module and attribute that owns it, and a PEP 562 module
+`__getattr__` imports that module on first access. Consumers still import from
+the package root unchanged (for example `activate_portfolio`); importing the
+boundary no longer loads every Portfolio feature.
+
+An `if typing.TYPE_CHECKING:` block keeps the explicit imports so type checking
+stays exact, and `__all__` is unchanged from the eager boundary.
+
 ### Shared contracts
 
 | Direction    | Contract                                                              | Owner      | Purpose                                                                             |

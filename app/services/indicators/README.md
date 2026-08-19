@@ -34,6 +34,18 @@ Indicators converts normalized market datasets into deterministic, vectorized de
 - Runtime custom registration, incremental/streaming state, chunking, out-of-core execution, acceleration, composition graphs, proprietary controls, or release engineering.
 - Retrospective SMC/FVG/swing/BOS/CHoCH labels in the production indicator surface.
 
+### Public boundary resolution
+
+`app/services/indicators/__init__.py` is the sole public import boundary and
+stays function-only. Its 86 exports resolve lazily: `_EXPORTS` maps each public
+name to the module and attribute that owns it, and a PEP 562 module
+`__getattr__` imports that module on first access. Consumers still import from
+the package root unchanged (for example `adr`); importing the boundary no
+longer loads every Indicators feature.
+
+An `if typing.TYPE_CHECKING:` block keeps the explicit imports so type checking
+stays exact, and `__all__` is unchanged from the eager boundary.
+
 ### Shared contracts
 
 Contract definitions must match the name, version, and owner recorded in `docs/PROJECT.md`.

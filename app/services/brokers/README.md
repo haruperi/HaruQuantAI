@@ -140,6 +140,18 @@ The Brokers domain is HaruQuantAI's only direct integration boundary to real bro
 - HTTP/UI DTOs, performance analytics, or any import from a higher business domain.
 - Canonical/friendly market identity, provider or cross-provider alias mappings, or alias resolution. Data converts its identities to exact provider-native symbols before calling Brokers.
 
+### Public boundary resolution
+
+`app/services/brokers/__init__.py` is the sole public import boundary and stays
+function-only. Its 150 exports resolve lazily: `_EXPORTS` maps each public name
+to the module and attribute that owns it, and a PEP 562 module `__getattr__`
+imports that module on first access. Consumers still import from the package
+root unchanged (for example `acquire_metatrader_snapshot_symbols`); importing
+the boundary no longer loads every Brokers feature.
+
+An `if typing.TYPE_CHECKING:` block keeps the explicit imports so type checking
+stays exact, and `__all__` is unchanged from the eager boundary.
+
 ### Shared contracts
 
 Contract definitions match `docs/PROJECT.md`. Commands/requests received and results/channels produced by Brokers are owned here at contract version `v1`.

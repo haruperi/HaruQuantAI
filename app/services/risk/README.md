@@ -52,6 +52,18 @@ Drawdown-aware tightening is already owned by `FEAT-RISK-07`: its equal-or-stric
 regime modifiers cap the final requested size in `FEAT-RISK-12`. The excluded legacy
 step-down subsystem is not required to obtain that safety outcome.
 
+### Public boundary resolution
+
+`app/services/risk/__init__.py` is the sole public import boundary and stays
+function-only. Its 96 exports resolve lazily: `_EXPORTS` maps each public name
+to the module and attribute that owns it, and a PEP 562 module `__getattr__`
+imports that module on first access. Consumers still import from the package
+root unchanged (for example `activate_allocation_budget`); importing the
+boundary no longer loads every Risk feature.
+
+An `if typing.TYPE_CHECKING:` block keeps the explicit imports so type checking
+stays exact, and `__all__` is unchanged from the eager boundary.
+
 ### Shared contracts
 
 Contract names, versions, and owners follow `docs/PROJECT.md`. The package path is `app/services/risk`, matching the top-level registry.

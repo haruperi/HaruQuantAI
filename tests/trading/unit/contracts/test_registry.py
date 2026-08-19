@@ -5,6 +5,7 @@ import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import pytest
 from app.services import trading
 from app.services.trading import (
     create_trading_action_draft,
@@ -56,7 +57,11 @@ def test_domain_root_exports_are_explicit_and_import_safe() -> None:
     assert "build_trading_report" in trading.__all__
     assert "create_live_session" in trading.__all__
     assert all(callable(getattr(trading, name)) for name in trading.__all__)
-    assert not hasattr(trading, "__getattr__")
+    # Resolution may be lazy, but the surface must stay declared: every public
+    # name comes from an explicit table, and nothing outside it resolves.
+    assert set(trading.__all__) == set(trading._EXPORTS)
+    with pytest.raises(AttributeError):
+        trading.definitely_not_a_trading_export  # noqa: B018
 
 
 def test_domain_import_has_no_external_or_persistent_side_effect() -> None:

@@ -150,6 +150,19 @@ Package
         └── Class / Function / Method
 ```
 
+### Public boundary resolution
+
+`app/services/research/__init__.py` is the sole public import boundary and stays
+function-only. Its exports resolve lazily: `_EXPORTS` maps each public name to the
+module and attribute that owns it, and a PEP 562 module `__getattr__` imports that
+module on first access. Consumers still write `from app.services.research import
+build_candidate_profile`; importing the boundary no longer loads every Research
+feature, which cut a cold `import app.services.research` from roughly 2.2s to 0.3s.
+
+An `if TYPE_CHECKING:` block keeps the explicit imports so type checking stays exact,
+and `tests/research/unit/test_public_boundary.py` resolves every declared export so a
+broken export fails in CI rather than at first runtime access.
+
 ### Package capability map
 
 ```mermaid
@@ -241,7 +254,7 @@ remain external.
 
 ```text
 research/
-├── __init__.py                         # Explicit function-only domain API
+├── __init__.py                         # Function-only domain API, lazily resolved
 ├── README.md
 ├── contracts/                          # Versioned configurations and result contracts
 │   ├── __init__.py

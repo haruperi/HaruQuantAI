@@ -498,7 +498,7 @@ checksum, lock, transaction, retention, and recovery rules.
 
 ### Package-Root Export Gate & Public API Surface Rules
 
-1. **Package-Root Export Gate**: `app/services/[DOMAIN]/__init__.py` is a domain's sole public boundary. Symbols not re-exported in `__init__.py` and declared in `__all__` are strictly internal.
+1. **Package-Root Export Gate**: `app/services/[DOMAIN]/__init__.py` is a domain's sole public boundary. Symbols not re-exported in `__init__.py` and declared in `__all__` are strictly internal. A domain may satisfy this gate eagerly, importing each public symbol at module level, or lazily, mapping each `__all__` name to its owning module and resolving it on first access through a PEP 562 module `__getattr__`. Both forms expose the same declared `__all__` surface. A lazy boundary must also keep an `if TYPE_CHECKING:` import block so type checking stays exact, and a boundary test that resolves every declared export so a broken export fails in CI rather than at first access. The owning package README records which form that domain uses.
 2. **Domain-Root Imports Only**: Cross-domain consumers, usage examples, workflows, and integration tests must import strictly from `app.services.[DOMAIN]`. Deep imports (e.g., `from app.services.[DOMAIN].[submodule] import Name`) are prohibited.
 3. **Function-Only Public Surface**: Public APIs expose only standalone functions (`def func(...)`). Classes and constants remain internal:
    - Constants are accessed via public getter functions (`get_...()`).
@@ -1094,7 +1094,7 @@ interpreted without the parent**. Everywhere else, the reference is a soft key
 | Child | → Parent | Cardinality | Reason |
 |---|---|---|---|
 | `data_partition_files.dataset_id` | `data_datasets.dataset_id` | N:1 | A file without its dataset has no schema and no semantics. |
-| `data_datasets.symbol_id` | `data_symbols.symbol_id` | N:1 | A price dataset without its instrument spec is uninterpretable. |
+| `data_datasets.symbol_id` | `data_instruments.symbol_id` | N:1 | A price dataset without its instrument spec is uninterpretable. |
 | `data_fetch_log.dataset_id` | `data_datasets.dataset_id` | N:1 | Materialisation must name where it landed. |
 | `research_feature_materializations.feature_id` | `research_features.feature_id` | N:1 | Same. |
 | `strategy_configs.version_id` | `strategy_versions.version_id` | N:1 | Config binds to exactly one code version. |
@@ -1990,8 +1990,10 @@ account for, and each would have to be preserved or explicitly retired.
 `data_economic_events` · `data_economic_calendar_coverage` ·
 `data_economic_event_definitions` · `data_research_sources` ·
 `data_research_observations` · `data_verified_research_sources` ·
-`data_runtime_records` · `data_symbols` · `data_providers` ·
-`data_market_sessions` · `data_datasets` · `data_partition_files` ·
+`data_runtime_records` · `data_instruments` · `data_brokers` ·
+`data_sessions` · `data_session_elements` · `data_market_series` ·
+`data_broker_stocks` · `data_stock_groups` · `data_stock_members` ·
+`data_datasets` · `data_partition_files` ·
 `data_fetch_log` · `data_quality_events` · `data_write_locks` ·
 `data_migration_ledger`
 

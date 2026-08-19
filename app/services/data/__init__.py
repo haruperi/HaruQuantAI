@@ -6,364 +6,1342 @@ dataclasses, pydantic models, enums, protocols, and raw constants remain interna
 implementation details and are never exported through a public Data boundary.
 """
 
+import typing
+
 # Import order is dependency order, not lexical order.
 
-from app.services.data._settings import (
-    data_provider_connection_resolver_context,
-    data_provider_settings_context,
-    data_settings_context,
-)
-from app.services.data._shared.operations import (
-    build_account_order,
-    build_account_snapshot_request,
-    build_account_state_snapshot,
-    build_active_market_sessions_request,
-    build_auction_payload,
-    build_audit_event_page,
-    build_audit_event_query,
-    build_availability_request,
-    build_backup_target,
-    build_cache_clear_request,
-    build_cache_read_request,
-    build_cache_write_request,
-    build_calendar_scrape_provider,
-    build_column_mapping,
-    build_corporate_action_payload,
-    build_data_error,
-    build_data_gap,
-    build_data_quality_report,
-    build_data_range,
-    build_data_settings,
-    build_dataset_load_request,
-    build_dataset_save_request,
-    build_depth_update_payload,
-    build_economic_event,
-    build_economic_event_store,
-    build_error_definition,
-    build_event_impact,
-    build_exchange_session_request,
-    build_external_import_request,
-    build_feed_config,
-    build_feed_status_request,
-    build_firecrawl_calendar_transport,
-    build_fx_conversion_evidence,
-    build_fx_conversion_request,
-    build_fx_rate_leg,
-    build_halt_payload,
-    build_job_definition,
-    build_job_status_request,
-    build_level1_snapshot_request,
-    build_local_market_data_source,
-    build_market_context_evidence,
-    build_market_context_request,
-    build_market_data_request,
-    build_market_dataset,
-    build_market_hours_request,
-    build_market_schedule,
-    build_market_snapshot_request,
-    build_migration_request,
-    build_migration_step,
-    build_ohlcv_record,
-    build_quality_issue,
-    build_raw_feed_event,
-    build_read_only_broker_proxy,
-    build_reader_calendar_transport,
-    build_reconnect_policy,
-    build_research_source_ingest_request,
-    build_research_source_policy,
-    build_research_source_query,
-    build_schedule_request,
-    build_scrape_options,
-    build_scrape_result,
-    build_session_window,
-    build_source_descriptor,
-    build_source_identity,
-    build_source_license_policy,
-    build_source_policy_config,
-    build_source_promotion_request,
-    build_source_read_request,
-    build_spread_record,
-    build_statement_plan,
-    build_symbol_list_request,
-    build_symbol_metadata,
-    build_symbol_metadata_request,
-    build_synthetic_request,
-    build_tick_record,
-    build_trade_payload,
-    build_transaction_request,
-    build_venue_state_payload,
-    build_verified_research_source,
-    build_volume_request,
-    build_weekly_holiday,
-    build_weekly_schedule_definition,
-    build_weekly_schedule_provider,
-    get_account_snapshot_schema,
-    get_audit_query_hard_max_limit,
-    get_calendar_sites,
-    get_data_error_manifest,
-    get_data_migration_steps,
-    get_default_minimum_impact,
-    get_display_asset_classes,
-    get_forex_named_sessions,
-    get_fx_conversion_evidence_schema,
-    get_market_context_schema,
-    get_market_dataset_schema,
-    get_normalization_version,
-    get_operation_traits,
-    get_precision_policies,
-    get_quality_sample_limit,
-    get_read_only_broker_methods,
-    get_research_source_value_field,
-    get_symbol_event_profiles,
-    get_timeframe_manifest,
-    get_workflow_contexts,
-    is_account_state_snapshot,
-    is_data_error,
-    is_fx_conversion_evidence,
-    is_market_context_evidence,
-    is_market_dataset,
-    is_ohlcv_record,
-    is_read_only_broker_proxy,
-    is_research_source_value,
-    is_tick_record,
-)
-from app.services.data.alignment import align_datasets, align_multitimeframe_data
-from app.services.data.contracts.responses import (
-    build_data_response,
-    build_exception_response,
-    data_start_time,
-    resolve_operation_request_id,
-    run_data_operation,
-    run_data_operation_async,
-    unwrap_data_response,
-)
-from app.services.data.data_jobs import (
-    derive_backfill_key,
-    execute_backfill_chunk,
-    read_update_job_status,
-    recover_update_jobs,
-    schedule_update_job,
-)
-from app.services.data.data_jobs.job import (
-    create_data_update_job,
-    get_data_update_job_status,
-    run_data_update_job_once,
-    start_data_update_job,
-    stop_data_update_job,
-)
-from app.services.data.datasets import (
-    get_catalog_evidence,
-    get_catalog_table_lifecycles,
-    get_provider_specification_revision,
-    get_provider_specification_revisions,
-    get_verified_research_source,
-    list_verified_datasets,
-    load_csv,
-    load_dataset,
-    load_local_dataset,
-    load_parquet,
-    reconcile_data_catalog,
-    record_catalog_fetch,
-    record_catalog_quality_event,
-    register_catalog_artifact,
-    register_provider_specification_revision,
-    sync_catalog_reference,
-    verify_manifest_compatibility,
-)
-from app.services.data.economic_calendar import (
-    backfill_forexfactory_history,
-    calendar_state_provenance,
-    crawl_forexfactory_event_definitions,
-    derive_calendar_state,
-    deserialize_scrape_result,
-    evaluate_calendar_state,
-    from_row,
-    get_calendar_value_field,
-    get_economic_events,
-    get_persisted_events,
-    get_symbol_economic_events,
-    get_symbol_event_profile,
-    import_economic_calendar_csv,
-    is_event_visible_at,
-    is_news_restricted,
-    is_news_restricted_events,
-    persist_economic_events,
-    populate_market_context_calendar,
-    project_calendar_state,
-    project_economic_event,
-    save_scrape_result,
-    scrape_economic_calendar,
-    scrape_result_to_dataframe,
-    serialize_scrape_result,
-    sync_current_week_economic_calendar,
-)
-from app.services.data.economic_calendar.dashboard import (
-    get_calendar_dashboard_snapshot,
-)
-from app.services.data.evidence.account_state import get_account_state_snapshot
-from app.services.data.evidence.audit_query import query_audit_events
-from app.services.data.evidence.audit_store import persist_audit_event
-from app.services.data.evidence.fx_conversion import get_fx_conversion_evidence
-from app.services.data.evidence.market_context import get_market_context_evidence
-from app.services.data.integrity import (
-    aggregate_flags,
-    detect_clock_drift,
-    detect_extreme_spread_widening,
-    detect_flatline_periods,
-    detect_out_of_order_records,
-    detect_price_jumps,
-    detect_source_disagreement,
-    detect_stale_quote,
-    detect_timestamp_gaps,
-    detect_zero_volume_bars,
-    get_quality_policy,
-    inspect_data_quality,
-    inspect_dataset_quality,
-    inspect_records_quality,
-    summarize_quality_remediation,
-    validate_symbol_metadata,
-)
-from app.services.data.market_data import (
-    build_market_directory_request,
-    build_symbols_quote_request,
-    classify_symbol,
-    discover_symbols,
-    fetch_historical_volume,
-    fetch_market_dataset,
-    fetch_symbol_metadata,
-    get_data_availability,
-    get_historical_volume,
-    get_level1_snapshot,
-    get_market_data,
-    get_market_snapshot,
-    get_spread_data,
-    get_symbol_metadata,
-    get_symbols_quotes,
-    get_tick_data,
-    inspect_availability,
-    list_market_directory,
-    list_symbols,
-)
-from app.services.data.market_events import (
-    build_market_depth_stream_request,
-    build_market_snapshot_stream_request,
-    build_market_stream_request,
-    ingest_feed_event,
-    read_feed_status,
-    reconcile_feed_gap,
-    reconnect_feed,
-    start_internal_feed,
-    stream_market_data,
-    stream_market_depth,
-    stream_market_snapshots,
-)
-from app.services.data.market_events.status import get_feed_status
-from app.services.data.persistence import (
-    acquire_write_lock,
-    clear_cache_entry,
-    clear_data_cache,
-    create_backup,
-    describe_import_dialects,
-    enforce_retention_policy,
-    execute_transaction,
-    get_cache_entry,
-    import_external_dataset,
-    put_cache_entry,
-    restore_from_backup,
-    run_data_migrations,
-    run_domain_migrations,
-    save_dataset,
-    save_market_data,
-)
-from app.services.data.replay import (
-    build_replay_package,
-    export_replay_evidence,
-    parse_replay_package,
-    stream_replay_events,
-)
-from app.services.data.runtime_stores import (
-    build_agentic_runtime_store,
-    build_portfolio_runtime_store,
-    build_risk_runtime_store,
-    build_simulator_runtime_store,
-    build_trading_runtime_store,
-    execute_runtime_store_operation,
-    execute_runtime_store_transition,
-    get_runtime_store_migration_steps,
-    run_runtime_store_migrations,
-)
-from app.services.data.sources import (
-    close_data_provider_sessions,
-    compute_source_trust_score,
-    ensure_source,
-    ensure_source_access,
-    evaluate_source_policy,
-    get_source_descriptor,
-    list_composable_sources,
-    list_registered_sources,
-    promote_source,
-    register_source,
-    register_source_policy,
-    resolve_source,
-)
-from app.services.data.sources.read_only import (
-    verify_read_only_call,
-    wrap_broker_client,
-)
-from app.services.data.sources.research_ingestion import ingest_research_source
-from app.services.data.sources.research_normalization import (
-    normalize_research_provider_payload,
-)
-from app.services.data.sources.research_observations import (
-    persist_research_source_observations,
-    project_research_source_observation,
-    query_research_source_observations,
-)
-from app.services.data.sources.research_policy import (
-    assess_research_source_eligibility,
-    validate_research_source_policy,
-)
-from app.services.data.sources.research_providers import (
-    persist_research_provider_records,
-)
-from app.services.data.sources.research_queries import (
-    project_research_source_evidence,
-    query_research_sources,
-)
-from app.services.data.sources.research_transport import (
-    retrieve_research_provider_payload,
-)
-from app.services.data.sources.verified_research import persist_verified_research_source
-from app.services.data.synthetic_data import (
-    generate_synthetic_bars,
-    generate_synthetic_dataset,
-    generate_synthetic_ticks,
-)
-from app.services.data.time_sessions import (
-    apply_venue_halt,
-    classify_gap,
-    get_active_market_sessions,
-    get_current_schedule,
-    get_exchange_sessions,
-    get_market_hours,
-    get_timeframe_spec,
-    get_trading_sessions,
-    require_utc,
-    validate_resample_target,
-)
-from app.services.data.time_sessions.dashboard import (
-    get_market_hours_dashboard_snapshot,
-)
-from app.services.data.transformation import (
-    aggregate_ticks,
-    aggregate_ticks_to_bars,
-    generate_tick_series,
-    generate_tick_series_to_parquet,
-    resample_dataset,
-    resample_ohlcv,
-    to_ohlcv_dataframe,
-    to_tick_dataframe,
-)
+
+# Explicit imports keep type checking exact; runtime stays lazy.
+if typing.TYPE_CHECKING:
+    from app.services.data._settings import (
+        data_provider_connection_resolver_context,
+        data_provider_settings_context,
+        data_settings_context,
+    )
+    from app.services.data._shared.operations import (
+        build_account_order,
+        build_account_snapshot_request,
+        build_account_state_snapshot,
+        build_active_market_sessions_request,
+        build_auction_payload,
+        build_audit_event_page,
+        build_audit_event_query,
+        build_availability_request,
+        build_backup_target,
+        build_cache_clear_request,
+        build_cache_read_request,
+        build_cache_write_request,
+        build_calendar_scrape_provider,
+        build_column_mapping,
+        build_corporate_action_payload,
+        build_data_error,
+        build_data_gap,
+        build_data_quality_report,
+        build_data_range,
+        build_data_settings,
+        build_dataset_load_request,
+        build_dataset_save_request,
+        build_depth_update_payload,
+        build_economic_event,
+        build_economic_event_store,
+        build_error_definition,
+        build_event_impact,
+        build_exchange_session_request,
+        build_external_import_request,
+        build_feed_config,
+        build_feed_status_request,
+        build_firecrawl_calendar_transport,
+        build_fx_conversion_evidence,
+        build_fx_conversion_request,
+        build_fx_rate_leg,
+        build_halt_payload,
+        build_job_definition,
+        build_job_status_request,
+        build_level1_snapshot_request,
+        build_local_market_data_source,
+        build_market_context_evidence,
+        build_market_context_request,
+        build_market_data_request,
+        build_market_dataset,
+        build_market_hours_request,
+        build_market_schedule,
+        build_market_snapshot_request,
+        build_migration_request,
+        build_migration_step,
+        build_ohlcv_record,
+        build_quality_issue,
+        build_raw_feed_event,
+        build_read_only_broker_proxy,
+        build_reader_calendar_transport,
+        build_reconnect_policy,
+        build_research_source_ingest_request,
+        build_research_source_policy,
+        build_research_source_query,
+        build_schedule_request,
+        build_scrape_options,
+        build_scrape_result,
+        build_session_window,
+        build_source_descriptor,
+        build_source_identity,
+        build_source_license_policy,
+        build_source_policy_config,
+        build_source_promotion_request,
+        build_source_read_request,
+        build_spread_record,
+        build_statement_plan,
+        build_symbol_list_request,
+        build_symbol_metadata,
+        build_symbol_metadata_request,
+        build_synthetic_request,
+        build_tick_record,
+        build_trade_payload,
+        build_transaction_request,
+        build_venue_state_payload,
+        build_verified_research_source,
+        build_volume_request,
+        build_weekly_holiday,
+        build_weekly_schedule_definition,
+        build_weekly_schedule_provider,
+        get_account_snapshot_schema,
+        get_audit_query_hard_max_limit,
+        get_calendar_sites,
+        get_data_error_manifest,
+        get_data_migration_steps,
+        get_default_minimum_impact,
+        get_display_asset_classes,
+        get_forex_named_sessions,
+        get_fx_conversion_evidence_schema,
+        get_market_context_schema,
+        get_market_dataset_schema,
+        get_normalization_version,
+        get_operation_traits,
+        get_precision_policies,
+        get_quality_sample_limit,
+        get_read_only_broker_methods,
+        get_research_source_value_field,
+        get_symbol_event_profiles,
+        get_timeframe_manifest,
+        get_workflow_contexts,
+        is_account_state_snapshot,
+        is_data_error,
+        is_fx_conversion_evidence,
+        is_market_context_evidence,
+        is_market_dataset,
+        is_ohlcv_record,
+        is_read_only_broker_proxy,
+        is_research_source_value,
+        is_tick_record,
+    )
+    from app.services.data.alignment import align_datasets, align_multitimeframe_data
+    from app.services.data.contracts.responses import (
+        build_data_response,
+        build_exception_response,
+        data_start_time,
+        resolve_operation_request_id,
+        run_data_operation,
+        run_data_operation_async,
+        unwrap_data_response,
+    )
+    from app.services.data.data_jobs import (
+        derive_backfill_key,
+        execute_backfill_chunk,
+        read_update_job_status,
+        recover_update_jobs,
+        schedule_update_job,
+    )
+    from app.services.data.data_jobs.job import (
+        create_data_update_job,
+        get_data_update_job_status,
+        run_data_update_job_once,
+        start_data_update_job,
+        stop_data_update_job,
+    )
+    from app.services.data.datasets import (
+        get_catalog_evidence,
+        get_catalog_table_lifecycles,
+        get_instrument_spec,
+        get_provider_specification_revision,
+        get_provider_specification_revisions,
+        get_verified_research_source,
+        list_brokers,
+        list_instruments,
+        list_market_series,
+        list_verified_datasets,
+        load_csv,
+        load_dataset,
+        load_local_dataset,
+        load_parquet,
+        reconcile_data_catalog,
+        record_catalog_fetch,
+        record_catalog_quality_event,
+        register_catalog_artifact,
+        register_provider_specification_revision,
+        sync_catalog_reference,
+        update_instrument_spec,
+        update_market_series,
+        verify_manifest_compatibility,
+    )
+    from app.services.data.economic_calendar import (
+        backfill_forexfactory_history,
+        calendar_state_provenance,
+        crawl_forexfactory_event_definitions,
+        derive_calendar_state,
+        deserialize_scrape_result,
+        evaluate_calendar_state,
+        from_row,
+        get_calendar_value_field,
+        get_economic_events,
+        get_persisted_events,
+        get_symbol_economic_events,
+        get_symbol_event_profile,
+        import_economic_calendar_csv,
+        is_event_visible_at,
+        is_news_restricted,
+        is_news_restricted_events,
+        persist_economic_events,
+        populate_market_context_calendar,
+        project_calendar_state,
+        project_economic_event,
+        save_scrape_result,
+        scrape_economic_calendar,
+        scrape_result_to_dataframe,
+        serialize_scrape_result,
+        sync_current_week_economic_calendar,
+    )
+    from app.services.data.economic_calendar.dashboard import (
+        get_calendar_dashboard_snapshot,
+    )
+    from app.services.data.evidence.account_state import get_account_state_snapshot
+    from app.services.data.evidence.audit_query import query_audit_events
+    from app.services.data.evidence.audit_store import persist_audit_event
+    from app.services.data.evidence.fx_conversion import get_fx_conversion_evidence
+    from app.services.data.evidence.market_context import get_market_context_evidence
+    from app.services.data.integrity import (
+        aggregate_flags,
+        detect_clock_drift,
+        detect_extreme_spread_widening,
+        detect_flatline_periods,
+        detect_out_of_order_records,
+        detect_price_jumps,
+        detect_source_disagreement,
+        detect_stale_quote,
+        detect_timestamp_gaps,
+        detect_zero_volume_bars,
+        get_quality_policy,
+        inspect_data_quality,
+        inspect_dataset_quality,
+        inspect_records_quality,
+        summarize_quality_remediation,
+        validate_symbol_metadata,
+    )
+    from app.services.data.market_data import (
+        build_market_directory_request,
+        build_symbols_quote_request,
+        classify_symbol,
+        discover_symbols,
+        fetch_historical_volume,
+        fetch_market_dataset,
+        fetch_symbol_metadata,
+        get_data_availability,
+        get_historical_volume,
+        get_level1_snapshot,
+        get_market_data,
+        get_market_snapshot,
+        get_spread_data,
+        get_symbol_metadata,
+        get_symbols_quotes,
+        get_tick_data,
+        inspect_availability,
+        list_market_directory,
+        list_symbols,
+    )
+    from app.services.data.market_events import (
+        build_market_depth_stream_request,
+        build_market_snapshot_stream_request,
+        build_market_stream_request,
+        ingest_feed_event,
+        read_feed_status,
+        reconcile_feed_gap,
+        reconnect_feed,
+        start_internal_feed,
+        stream_market_data,
+        stream_market_depth,
+        stream_market_snapshots,
+    )
+    from app.services.data.market_events.status import get_feed_status
+    from app.services.data.persistence import (
+        acquire_write_lock,
+        clear_cache_entry,
+        clear_data_cache,
+        create_backup,
+        describe_import_dialects,
+        enforce_retention_policy,
+        execute_transaction,
+        get_cache_entry,
+        import_external_dataset,
+        put_cache_entry,
+        restore_from_backup,
+        run_data_migrations,
+        run_domain_migrations,
+        save_dataset,
+        save_market_data,
+    )
+    from app.services.data.replay import (
+        build_replay_package,
+        export_replay_evidence,
+        parse_replay_package,
+        stream_replay_events,
+    )
+    from app.services.data.runtime_stores import (
+        build_agentic_runtime_store,
+        build_portfolio_runtime_store,
+        build_risk_runtime_store,
+        build_simulator_runtime_store,
+        build_trading_runtime_store,
+        execute_runtime_store_operation,
+        execute_runtime_store_transition,
+        get_runtime_store_migration_steps,
+        run_runtime_store_migrations,
+    )
+    from app.services.data.sources import (
+        close_data_provider_sessions,
+        compute_source_trust_score,
+        ensure_source,
+        ensure_source_access,
+        evaluate_source_policy,
+        get_source_descriptor,
+        list_composable_sources,
+        list_registered_sources,
+        promote_source,
+        register_source,
+        register_source_policy,
+        resolve_source,
+    )
+    from app.services.data.sources.read_only import (
+        verify_read_only_call,
+        wrap_broker_client,
+    )
+    from app.services.data.sources.research_ingestion import ingest_research_source
+    from app.services.data.sources.research_normalization import (
+        normalize_research_provider_payload,
+    )
+    from app.services.data.sources.research_observations import (
+        persist_research_source_observations,
+        project_research_source_observation,
+        query_research_source_observations,
+    )
+    from app.services.data.sources.research_policy import (
+        assess_research_source_eligibility,
+        validate_research_source_policy,
+    )
+    from app.services.data.sources.research_providers import (
+        persist_research_provider_records,
+    )
+    from app.services.data.sources.research_queries import (
+        project_research_source_evidence,
+        query_research_sources,
+    )
+    from app.services.data.sources.research_transport import (
+        retrieve_research_provider_payload,
+    )
+    from app.services.data.sources.verified_research import (
+        persist_verified_research_source,
+    )
+    from app.services.data.synthetic_data import (
+        generate_synthetic_bars,
+        generate_synthetic_dataset,
+        generate_synthetic_ticks,
+    )
+    from app.services.data.time_sessions import (
+        apply_venue_halt,
+        classify_gap,
+        get_active_market_sessions,
+        get_current_schedule,
+        get_exchange_sessions,
+        get_market_hours,
+        get_timeframe_spec,
+        get_trading_sessions,
+        require_utc,
+        validate_resample_target,
+    )
+    from app.services.data.time_sessions.dashboard import (
+        get_market_hours_dashboard_snapshot,
+    )
+    from app.services.data.transformation import (
+        aggregate_ticks,
+        aggregate_ticks_to_bars,
+        generate_tick_series,
+        generate_tick_series_to_parquet,
+        resample_dataset,
+        resample_ohlcv,
+        to_ohlcv_dataframe,
+        to_tick_dataframe,
+    )
+
+# Public export name to the module and attribute that owns it. Resolved on
+# first access so importing this boundary never loads every feature.
+_EXPORTS: dict[str, tuple[str, str]] = {
+    "acquire_write_lock": ("app.services.data.persistence", "acquire_write_lock"),
+    "aggregate_flags": ("app.services.data.integrity", "aggregate_flags"),
+    "aggregate_ticks": ("app.services.data.transformation", "aggregate_ticks"),
+    "aggregate_ticks_to_bars": (
+        "app.services.data.transformation",
+        "aggregate_ticks_to_bars",
+    ),
+    "align_datasets": ("app.services.data.alignment", "align_datasets"),
+    "align_multitimeframe_data": (
+        "app.services.data.alignment",
+        "align_multitimeframe_data",
+    ),
+    "apply_venue_halt": ("app.services.data.time_sessions", "apply_venue_halt"),
+    "assess_research_source_eligibility": (
+        "app.services.data.sources.research_policy",
+        "assess_research_source_eligibility",
+    ),
+    "backfill_forexfactory_history": (
+        "app.services.data.economic_calendar",
+        "backfill_forexfactory_history",
+    ),
+    "build_account_order": (
+        "app.services.data._shared.operations",
+        "build_account_order",
+    ),
+    "build_account_snapshot_request": (
+        "app.services.data._shared.operations",
+        "build_account_snapshot_request",
+    ),
+    "build_account_state_snapshot": (
+        "app.services.data._shared.operations",
+        "build_account_state_snapshot",
+    ),
+    "build_active_market_sessions_request": (
+        "app.services.data._shared.operations",
+        "build_active_market_sessions_request",
+    ),
+    "build_agentic_runtime_store": (
+        "app.services.data.runtime_stores",
+        "build_agentic_runtime_store",
+    ),
+    "build_auction_payload": (
+        "app.services.data._shared.operations",
+        "build_auction_payload",
+    ),
+    "build_audit_event_page": (
+        "app.services.data._shared.operations",
+        "build_audit_event_page",
+    ),
+    "build_audit_event_query": (
+        "app.services.data._shared.operations",
+        "build_audit_event_query",
+    ),
+    "build_availability_request": (
+        "app.services.data._shared.operations",
+        "build_availability_request",
+    ),
+    "build_backup_target": (
+        "app.services.data._shared.operations",
+        "build_backup_target",
+    ),
+    "build_cache_clear_request": (
+        "app.services.data._shared.operations",
+        "build_cache_clear_request",
+    ),
+    "build_cache_read_request": (
+        "app.services.data._shared.operations",
+        "build_cache_read_request",
+    ),
+    "build_cache_write_request": (
+        "app.services.data._shared.operations",
+        "build_cache_write_request",
+    ),
+    "build_calendar_scrape_provider": (
+        "app.services.data._shared.operations",
+        "build_calendar_scrape_provider",
+    ),
+    "build_column_mapping": (
+        "app.services.data._shared.operations",
+        "build_column_mapping",
+    ),
+    "build_corporate_action_payload": (
+        "app.services.data._shared.operations",
+        "build_corporate_action_payload",
+    ),
+    "build_data_error": ("app.services.data._shared.operations", "build_data_error"),
+    "build_data_gap": ("app.services.data._shared.operations", "build_data_gap"),
+    "build_data_quality_report": (
+        "app.services.data._shared.operations",
+        "build_data_quality_report",
+    ),
+    "build_data_range": ("app.services.data._shared.operations", "build_data_range"),
+    "build_data_response": (
+        "app.services.data.contracts.responses",
+        "build_data_response",
+    ),
+    "build_data_settings": (
+        "app.services.data._shared.operations",
+        "build_data_settings",
+    ),
+    "build_dataset_load_request": (
+        "app.services.data._shared.operations",
+        "build_dataset_load_request",
+    ),
+    "build_dataset_save_request": (
+        "app.services.data._shared.operations",
+        "build_dataset_save_request",
+    ),
+    "build_depth_update_payload": (
+        "app.services.data._shared.operations",
+        "build_depth_update_payload",
+    ),
+    "build_economic_event": (
+        "app.services.data._shared.operations",
+        "build_economic_event",
+    ),
+    "build_economic_event_store": (
+        "app.services.data._shared.operations",
+        "build_economic_event_store",
+    ),
+    "build_error_definition": (
+        "app.services.data._shared.operations",
+        "build_error_definition",
+    ),
+    "build_event_impact": (
+        "app.services.data._shared.operations",
+        "build_event_impact",
+    ),
+    "build_exception_response": (
+        "app.services.data.contracts.responses",
+        "build_exception_response",
+    ),
+    "build_exchange_session_request": (
+        "app.services.data._shared.operations",
+        "build_exchange_session_request",
+    ),
+    "build_external_import_request": (
+        "app.services.data._shared.operations",
+        "build_external_import_request",
+    ),
+    "build_feed_config": ("app.services.data._shared.operations", "build_feed_config"),
+    "build_feed_status_request": (
+        "app.services.data._shared.operations",
+        "build_feed_status_request",
+    ),
+    "build_firecrawl_calendar_transport": (
+        "app.services.data._shared.operations",
+        "build_firecrawl_calendar_transport",
+    ),
+    "build_fx_conversion_evidence": (
+        "app.services.data._shared.operations",
+        "build_fx_conversion_evidence",
+    ),
+    "build_fx_conversion_request": (
+        "app.services.data._shared.operations",
+        "build_fx_conversion_request",
+    ),
+    "build_fx_rate_leg": ("app.services.data._shared.operations", "build_fx_rate_leg"),
+    "build_halt_payload": (
+        "app.services.data._shared.operations",
+        "build_halt_payload",
+    ),
+    "build_job_definition": (
+        "app.services.data._shared.operations",
+        "build_job_definition",
+    ),
+    "build_job_status_request": (
+        "app.services.data._shared.operations",
+        "build_job_status_request",
+    ),
+    "build_level1_snapshot_request": (
+        "app.services.data._shared.operations",
+        "build_level1_snapshot_request",
+    ),
+    "build_local_market_data_source": (
+        "app.services.data._shared.operations",
+        "build_local_market_data_source",
+    ),
+    "build_market_context_evidence": (
+        "app.services.data._shared.operations",
+        "build_market_context_evidence",
+    ),
+    "build_market_context_request": (
+        "app.services.data._shared.operations",
+        "build_market_context_request",
+    ),
+    "build_market_data_request": (
+        "app.services.data._shared.operations",
+        "build_market_data_request",
+    ),
+    "build_market_dataset": (
+        "app.services.data._shared.operations",
+        "build_market_dataset",
+    ),
+    "build_market_depth_stream_request": (
+        "app.services.data.market_events",
+        "build_market_depth_stream_request",
+    ),
+    "build_market_directory_request": (
+        "app.services.data.market_data",
+        "build_market_directory_request",
+    ),
+    "build_market_hours_request": (
+        "app.services.data._shared.operations",
+        "build_market_hours_request",
+    ),
+    "build_market_schedule": (
+        "app.services.data._shared.operations",
+        "build_market_schedule",
+    ),
+    "build_market_snapshot_request": (
+        "app.services.data._shared.operations",
+        "build_market_snapshot_request",
+    ),
+    "build_market_snapshot_stream_request": (
+        "app.services.data.market_events",
+        "build_market_snapshot_stream_request",
+    ),
+    "build_market_stream_request": (
+        "app.services.data.market_events",
+        "build_market_stream_request",
+    ),
+    "build_migration_request": (
+        "app.services.data._shared.operations",
+        "build_migration_request",
+    ),
+    "build_migration_step": (
+        "app.services.data._shared.operations",
+        "build_migration_step",
+    ),
+    "build_ohlcv_record": (
+        "app.services.data._shared.operations",
+        "build_ohlcv_record",
+    ),
+    "build_portfolio_runtime_store": (
+        "app.services.data.runtime_stores",
+        "build_portfolio_runtime_store",
+    ),
+    "build_quality_issue": (
+        "app.services.data._shared.operations",
+        "build_quality_issue",
+    ),
+    "build_raw_feed_event": (
+        "app.services.data._shared.operations",
+        "build_raw_feed_event",
+    ),
+    "build_read_only_broker_proxy": (
+        "app.services.data._shared.operations",
+        "build_read_only_broker_proxy",
+    ),
+    "build_reader_calendar_transport": (
+        "app.services.data._shared.operations",
+        "build_reader_calendar_transport",
+    ),
+    "build_reconnect_policy": (
+        "app.services.data._shared.operations",
+        "build_reconnect_policy",
+    ),
+    "build_replay_package": ("app.services.data.replay", "build_replay_package"),
+    "build_research_source_ingest_request": (
+        "app.services.data._shared.operations",
+        "build_research_source_ingest_request",
+    ),
+    "build_research_source_policy": (
+        "app.services.data._shared.operations",
+        "build_research_source_policy",
+    ),
+    "build_research_source_query": (
+        "app.services.data._shared.operations",
+        "build_research_source_query",
+    ),
+    "build_risk_runtime_store": (
+        "app.services.data.runtime_stores",
+        "build_risk_runtime_store",
+    ),
+    "build_schedule_request": (
+        "app.services.data._shared.operations",
+        "build_schedule_request",
+    ),
+    "build_scrape_options": (
+        "app.services.data._shared.operations",
+        "build_scrape_options",
+    ),
+    "build_scrape_result": (
+        "app.services.data._shared.operations",
+        "build_scrape_result",
+    ),
+    "build_session_window": (
+        "app.services.data._shared.operations",
+        "build_session_window",
+    ),
+    "build_simulator_runtime_store": (
+        "app.services.data.runtime_stores",
+        "build_simulator_runtime_store",
+    ),
+    "build_source_descriptor": (
+        "app.services.data._shared.operations",
+        "build_source_descriptor",
+    ),
+    "build_source_identity": (
+        "app.services.data._shared.operations",
+        "build_source_identity",
+    ),
+    "build_source_license_policy": (
+        "app.services.data._shared.operations",
+        "build_source_license_policy",
+    ),
+    "build_source_policy_config": (
+        "app.services.data._shared.operations",
+        "build_source_policy_config",
+    ),
+    "build_source_promotion_request": (
+        "app.services.data._shared.operations",
+        "build_source_promotion_request",
+    ),
+    "build_source_read_request": (
+        "app.services.data._shared.operations",
+        "build_source_read_request",
+    ),
+    "build_spread_record": (
+        "app.services.data._shared.operations",
+        "build_spread_record",
+    ),
+    "build_statement_plan": (
+        "app.services.data._shared.operations",
+        "build_statement_plan",
+    ),
+    "build_symbol_list_request": (
+        "app.services.data._shared.operations",
+        "build_symbol_list_request",
+    ),
+    "build_symbol_metadata": (
+        "app.services.data._shared.operations",
+        "build_symbol_metadata",
+    ),
+    "build_symbol_metadata_request": (
+        "app.services.data._shared.operations",
+        "build_symbol_metadata_request",
+    ),
+    "build_symbols_quote_request": (
+        "app.services.data.market_data",
+        "build_symbols_quote_request",
+    ),
+    "build_synthetic_request": (
+        "app.services.data._shared.operations",
+        "build_synthetic_request",
+    ),
+    "build_tick_record": ("app.services.data._shared.operations", "build_tick_record"),
+    "build_trade_payload": (
+        "app.services.data._shared.operations",
+        "build_trade_payload",
+    ),
+    "build_trading_runtime_store": (
+        "app.services.data.runtime_stores",
+        "build_trading_runtime_store",
+    ),
+    "build_transaction_request": (
+        "app.services.data._shared.operations",
+        "build_transaction_request",
+    ),
+    "build_venue_state_payload": (
+        "app.services.data._shared.operations",
+        "build_venue_state_payload",
+    ),
+    "build_verified_research_source": (
+        "app.services.data._shared.operations",
+        "build_verified_research_source",
+    ),
+    "build_volume_request": (
+        "app.services.data._shared.operations",
+        "build_volume_request",
+    ),
+    "build_weekly_holiday": (
+        "app.services.data._shared.operations",
+        "build_weekly_holiday",
+    ),
+    "build_weekly_schedule_definition": (
+        "app.services.data._shared.operations",
+        "build_weekly_schedule_definition",
+    ),
+    "build_weekly_schedule_provider": (
+        "app.services.data._shared.operations",
+        "build_weekly_schedule_provider",
+    ),
+    "calendar_state_provenance": (
+        "app.services.data.economic_calendar",
+        "calendar_state_provenance",
+    ),
+    "classify_gap": ("app.services.data.time_sessions", "classify_gap"),
+    "classify_symbol": ("app.services.data.market_data", "classify_symbol"),
+    "clear_cache_entry": ("app.services.data.persistence", "clear_cache_entry"),
+    "clear_data_cache": ("app.services.data.persistence", "clear_data_cache"),
+    "close_data_provider_sessions": (
+        "app.services.data.sources",
+        "close_data_provider_sessions",
+    ),
+    "compute_source_trust_score": (
+        "app.services.data.sources",
+        "compute_source_trust_score",
+    ),
+    "crawl_forexfactory_event_definitions": (
+        "app.services.data.economic_calendar",
+        "crawl_forexfactory_event_definitions",
+    ),
+    "create_backup": ("app.services.data.persistence", "create_backup"),
+    "create_data_update_job": (
+        "app.services.data.data_jobs.job",
+        "create_data_update_job",
+    ),
+    "data_provider_connection_resolver_context": (
+        "app.services.data._settings",
+        "data_provider_connection_resolver_context",
+    ),
+    "data_provider_settings_context": (
+        "app.services.data._settings",
+        "data_provider_settings_context",
+    ),
+    "data_settings_context": ("app.services.data._settings", "data_settings_context"),
+    "data_start_time": ("app.services.data.contracts.responses", "data_start_time"),
+    "derive_backfill_key": ("app.services.data.data_jobs", "derive_backfill_key"),
+    "derive_calendar_state": (
+        "app.services.data.economic_calendar",
+        "derive_calendar_state",
+    ),
+    "describe_import_dialects": (
+        "app.services.data.persistence",
+        "describe_import_dialects",
+    ),
+    "deserialize_scrape_result": (
+        "app.services.data.economic_calendar",
+        "deserialize_scrape_result",
+    ),
+    "detect_clock_drift": ("app.services.data.integrity", "detect_clock_drift"),
+    "detect_extreme_spread_widening": (
+        "app.services.data.integrity",
+        "detect_extreme_spread_widening",
+    ),
+    "detect_flatline_periods": (
+        "app.services.data.integrity",
+        "detect_flatline_periods",
+    ),
+    "detect_out_of_order_records": (
+        "app.services.data.integrity",
+        "detect_out_of_order_records",
+    ),
+    "detect_price_jumps": ("app.services.data.integrity", "detect_price_jumps"),
+    "detect_source_disagreement": (
+        "app.services.data.integrity",
+        "detect_source_disagreement",
+    ),
+    "detect_stale_quote": ("app.services.data.integrity", "detect_stale_quote"),
+    "detect_timestamp_gaps": ("app.services.data.integrity", "detect_timestamp_gaps"),
+    "detect_zero_volume_bars": (
+        "app.services.data.integrity",
+        "detect_zero_volume_bars",
+    ),
+    "discover_symbols": ("app.services.data.market_data", "discover_symbols"),
+    "enforce_retention_policy": (
+        "app.services.data.persistence",
+        "enforce_retention_policy",
+    ),
+    "ensure_source": ("app.services.data.sources", "ensure_source"),
+    "ensure_source_access": ("app.services.data.sources", "ensure_source_access"),
+    "evaluate_calendar_state": (
+        "app.services.data.economic_calendar",
+        "evaluate_calendar_state",
+    ),
+    "evaluate_source_policy": ("app.services.data.sources", "evaluate_source_policy"),
+    "execute_backfill_chunk": ("app.services.data.data_jobs", "execute_backfill_chunk"),
+    "execute_runtime_store_operation": (
+        "app.services.data.runtime_stores",
+        "execute_runtime_store_operation",
+    ),
+    "execute_runtime_store_transition": (
+        "app.services.data.runtime_stores",
+        "execute_runtime_store_transition",
+    ),
+    "execute_transaction": ("app.services.data.persistence", "execute_transaction"),
+    "export_replay_evidence": ("app.services.data.replay", "export_replay_evidence"),
+    "fetch_historical_volume": (
+        "app.services.data.market_data",
+        "fetch_historical_volume",
+    ),
+    "fetch_market_dataset": ("app.services.data.market_data", "fetch_market_dataset"),
+    "fetch_symbol_metadata": ("app.services.data.market_data", "fetch_symbol_metadata"),
+    "from_row": ("app.services.data.economic_calendar", "from_row"),
+    "generate_synthetic_bars": (
+        "app.services.data.synthetic_data",
+        "generate_synthetic_bars",
+    ),
+    "generate_synthetic_dataset": (
+        "app.services.data.synthetic_data",
+        "generate_synthetic_dataset",
+    ),
+    "generate_synthetic_ticks": (
+        "app.services.data.synthetic_data",
+        "generate_synthetic_ticks",
+    ),
+    "generate_tick_series": (
+        "app.services.data.transformation",
+        "generate_tick_series",
+    ),
+    "generate_tick_series_to_parquet": (
+        "app.services.data.transformation",
+        "generate_tick_series_to_parquet",
+    ),
+    "get_account_snapshot_schema": (
+        "app.services.data._shared.operations",
+        "get_account_snapshot_schema",
+    ),
+    "get_account_state_snapshot": (
+        "app.services.data.evidence.account_state",
+        "get_account_state_snapshot",
+    ),
+    "get_active_market_sessions": (
+        "app.services.data.time_sessions",
+        "get_active_market_sessions",
+    ),
+    "get_audit_query_hard_max_limit": (
+        "app.services.data._shared.operations",
+        "get_audit_query_hard_max_limit",
+    ),
+    "get_cache_entry": ("app.services.data.persistence", "get_cache_entry"),
+    "get_calendar_dashboard_snapshot": (
+        "app.services.data.economic_calendar.dashboard",
+        "get_calendar_dashboard_snapshot",
+    ),
+    "get_calendar_sites": (
+        "app.services.data._shared.operations",
+        "get_calendar_sites",
+    ),
+    "get_calendar_value_field": (
+        "app.services.data.economic_calendar",
+        "get_calendar_value_field",
+    ),
+    "get_catalog_evidence": ("app.services.data.datasets", "get_catalog_evidence"),
+    "get_catalog_table_lifecycles": (
+        "app.services.data.datasets",
+        "get_catalog_table_lifecycles",
+    ),
+    "get_current_schedule": ("app.services.data.time_sessions", "get_current_schedule"),
+    "get_data_availability": ("app.services.data.market_data", "get_data_availability"),
+    "get_data_error_manifest": (
+        "app.services.data._shared.operations",
+        "get_data_error_manifest",
+    ),
+    "get_data_migration_steps": (
+        "app.services.data._shared.operations",
+        "get_data_migration_steps",
+    ),
+    "get_data_update_job_status": (
+        "app.services.data.data_jobs.job",
+        "get_data_update_job_status",
+    ),
+    "get_default_minimum_impact": (
+        "app.services.data._shared.operations",
+        "get_default_minimum_impact",
+    ),
+    "get_display_asset_classes": (
+        "app.services.data._shared.operations",
+        "get_display_asset_classes",
+    ),
+    "get_economic_events": (
+        "app.services.data.economic_calendar",
+        "get_economic_events",
+    ),
+    "get_exchange_sessions": (
+        "app.services.data.time_sessions",
+        "get_exchange_sessions",
+    ),
+    "get_feed_status": ("app.services.data.market_events.status", "get_feed_status"),
+    "get_forex_named_sessions": (
+        "app.services.data._shared.operations",
+        "get_forex_named_sessions",
+    ),
+    "get_fx_conversion_evidence": (
+        "app.services.data.evidence.fx_conversion",
+        "get_fx_conversion_evidence",
+    ),
+    "get_fx_conversion_evidence_schema": (
+        "app.services.data._shared.operations",
+        "get_fx_conversion_evidence_schema",
+    ),
+    "get_historical_volume": ("app.services.data.market_data", "get_historical_volume"),
+    "get_level1_snapshot": ("app.services.data.market_data", "get_level1_snapshot"),
+    "get_market_context_evidence": (
+        "app.services.data.evidence.market_context",
+        "get_market_context_evidence",
+    ),
+    "get_market_context_schema": (
+        "app.services.data._shared.operations",
+        "get_market_context_schema",
+    ),
+    "get_market_data": ("app.services.data.market_data", "get_market_data"),
+    "get_market_dataset_schema": (
+        "app.services.data._shared.operations",
+        "get_market_dataset_schema",
+    ),
+    "get_market_hours": ("app.services.data.time_sessions", "get_market_hours"),
+    "get_market_hours_dashboard_snapshot": (
+        "app.services.data.time_sessions.dashboard",
+        "get_market_hours_dashboard_snapshot",
+    ),
+    "get_market_snapshot": ("app.services.data.market_data", "get_market_snapshot"),
+    "get_normalization_version": (
+        "app.services.data._shared.operations",
+        "get_normalization_version",
+    ),
+    "get_operation_traits": (
+        "app.services.data._shared.operations",
+        "get_operation_traits",
+    ),
+    "get_persisted_events": (
+        "app.services.data.economic_calendar",
+        "get_persisted_events",
+    ),
+    "get_precision_policies": (
+        "app.services.data._shared.operations",
+        "get_precision_policies",
+    ),
+    "get_provider_specification_revision": (
+        "app.services.data.datasets",
+        "get_provider_specification_revision",
+    ),
+    "get_provider_specification_revisions": (
+        "app.services.data.datasets",
+        "get_provider_specification_revisions",
+    ),
+    "get_quality_policy": ("app.services.data.integrity", "get_quality_policy"),
+    "get_quality_sample_limit": (
+        "app.services.data._shared.operations",
+        "get_quality_sample_limit",
+    ),
+    "get_read_only_broker_methods": (
+        "app.services.data._shared.operations",
+        "get_read_only_broker_methods",
+    ),
+    "get_research_source_value_field": (
+        "app.services.data._shared.operations",
+        "get_research_source_value_field",
+    ),
+    "get_runtime_store_migration_steps": (
+        "app.services.data.runtime_stores",
+        "get_runtime_store_migration_steps",
+    ),
+    "get_source_descriptor": ("app.services.data.sources", "get_source_descriptor"),
+    "get_spread_data": ("app.services.data.market_data", "get_spread_data"),
+    "get_symbol_economic_events": (
+        "app.services.data.economic_calendar",
+        "get_symbol_economic_events",
+    ),
+    "get_symbol_event_profile": (
+        "app.services.data.economic_calendar",
+        "get_symbol_event_profile",
+    ),
+    "get_symbol_event_profiles": (
+        "app.services.data._shared.operations",
+        "get_symbol_event_profiles",
+    ),
+    "get_symbol_metadata": ("app.services.data.market_data", "get_symbol_metadata"),
+    "get_symbols_quotes": ("app.services.data.market_data", "get_symbols_quotes"),
+    "get_tick_data": ("app.services.data.market_data", "get_tick_data"),
+    "get_timeframe_manifest": (
+        "app.services.data._shared.operations",
+        "get_timeframe_manifest",
+    ),
+    "get_timeframe_spec": ("app.services.data.time_sessions", "get_timeframe_spec"),
+    "get_trading_sessions": ("app.services.data.time_sessions", "get_trading_sessions"),
+    "get_verified_research_source": (
+        "app.services.data.datasets",
+        "get_verified_research_source",
+    ),
+    "get_workflow_contexts": (
+        "app.services.data._shared.operations",
+        "get_workflow_contexts",
+    ),
+    "import_economic_calendar_csv": (
+        "app.services.data.economic_calendar",
+        "import_economic_calendar_csv",
+    ),
+    "import_external_dataset": (
+        "app.services.data.persistence",
+        "import_external_dataset",
+    ),
+    "ingest_feed_event": ("app.services.data.market_events", "ingest_feed_event"),
+    "ingest_research_source": (
+        "app.services.data.sources.research_ingestion",
+        "ingest_research_source",
+    ),
+    "inspect_availability": ("app.services.data.market_data", "inspect_availability"),
+    "inspect_data_quality": ("app.services.data.integrity", "inspect_data_quality"),
+    "inspect_dataset_quality": (
+        "app.services.data.integrity",
+        "inspect_dataset_quality",
+    ),
+    "inspect_records_quality": (
+        "app.services.data.integrity",
+        "inspect_records_quality",
+    ),
+    "is_account_state_snapshot": (
+        "app.services.data._shared.operations",
+        "is_account_state_snapshot",
+    ),
+    "is_data_error": ("app.services.data._shared.operations", "is_data_error"),
+    "is_event_visible_at": (
+        "app.services.data.economic_calendar",
+        "is_event_visible_at",
+    ),
+    "is_fx_conversion_evidence": (
+        "app.services.data._shared.operations",
+        "is_fx_conversion_evidence",
+    ),
+    "is_market_context_evidence": (
+        "app.services.data._shared.operations",
+        "is_market_context_evidence",
+    ),
+    "is_market_dataset": ("app.services.data._shared.operations", "is_market_dataset"),
+    "is_news_restricted": ("app.services.data.economic_calendar", "is_news_restricted"),
+    "is_news_restricted_events": (
+        "app.services.data.economic_calendar",
+        "is_news_restricted_events",
+    ),
+    "is_ohlcv_record": ("app.services.data._shared.operations", "is_ohlcv_record"),
+    "is_read_only_broker_proxy": (
+        "app.services.data._shared.operations",
+        "is_read_only_broker_proxy",
+    ),
+    "is_research_source_value": (
+        "app.services.data._shared.operations",
+        "is_research_source_value",
+    ),
+    "is_tick_record": ("app.services.data._shared.operations", "is_tick_record"),
+    "list_brokers": ("app.services.data.datasets", "list_brokers"),
+    "list_composable_sources": ("app.services.data.sources", "list_composable_sources"),
+    "list_instruments": ("app.services.data.datasets", "list_instruments"),
+    "list_market_directory": ("app.services.data.market_data", "list_market_directory"),
+    "list_market_series": ("app.services.data.datasets", "list_market_series"),
+    "get_instrument_spec": ("app.services.data.datasets", "get_instrument_spec"),
+    "list_registered_sources": ("app.services.data.sources", "list_registered_sources"),
+    "list_symbols": ("app.services.data.market_data", "list_symbols"),
+    "list_verified_datasets": ("app.services.data.datasets", "list_verified_datasets"),
+    "load_csv": ("app.services.data.datasets", "load_csv"),
+    "load_dataset": ("app.services.data.datasets", "load_dataset"),
+    "load_local_dataset": ("app.services.data.datasets", "load_local_dataset"),
+    "load_parquet": ("app.services.data.datasets", "load_parquet"),
+    "normalize_research_provider_payload": (
+        "app.services.data.sources.research_normalization",
+        "normalize_research_provider_payload",
+    ),
+    "parse_replay_package": ("app.services.data.replay", "parse_replay_package"),
+    "persist_audit_event": (
+        "app.services.data.evidence.audit_store",
+        "persist_audit_event",
+    ),
+    "persist_economic_events": (
+        "app.services.data.economic_calendar",
+        "persist_economic_events",
+    ),
+    "persist_research_provider_records": (
+        "app.services.data.sources.research_providers",
+        "persist_research_provider_records",
+    ),
+    "persist_research_source_observations": (
+        "app.services.data.sources.research_observations",
+        "persist_research_source_observations",
+    ),
+    "persist_verified_research_source": (
+        "app.services.data.sources.verified_research",
+        "persist_verified_research_source",
+    ),
+    "populate_market_context_calendar": (
+        "app.services.data.economic_calendar",
+        "populate_market_context_calendar",
+    ),
+    "project_calendar_state": (
+        "app.services.data.economic_calendar",
+        "project_calendar_state",
+    ),
+    "project_economic_event": (
+        "app.services.data.economic_calendar",
+        "project_economic_event",
+    ),
+    "project_research_source_evidence": (
+        "app.services.data.sources.research_queries",
+        "project_research_source_evidence",
+    ),
+    "project_research_source_observation": (
+        "app.services.data.sources.research_observations",
+        "project_research_source_observation",
+    ),
+    "promote_source": ("app.services.data.sources", "promote_source"),
+    "put_cache_entry": ("app.services.data.persistence", "put_cache_entry"),
+    "query_audit_events": (
+        "app.services.data.evidence.audit_query",
+        "query_audit_events",
+    ),
+    "query_research_source_observations": (
+        "app.services.data.sources.research_observations",
+        "query_research_source_observations",
+    ),
+    "query_research_sources": (
+        "app.services.data.sources.research_queries",
+        "query_research_sources",
+    ),
+    "read_feed_status": ("app.services.data.market_events", "read_feed_status"),
+    "read_update_job_status": ("app.services.data.data_jobs", "read_update_job_status"),
+    "reconcile_data_catalog": ("app.services.data.datasets", "reconcile_data_catalog"),
+    "reconcile_feed_gap": ("app.services.data.market_events", "reconcile_feed_gap"),
+    "reconnect_feed": ("app.services.data.market_events", "reconnect_feed"),
+    "record_catalog_fetch": ("app.services.data.datasets", "record_catalog_fetch"),
+    "record_catalog_quality_event": (
+        "app.services.data.datasets",
+        "record_catalog_quality_event",
+    ),
+    "recover_update_jobs": ("app.services.data.data_jobs", "recover_update_jobs"),
+    "register_catalog_artifact": (
+        "app.services.data.datasets",
+        "register_catalog_artifact",
+    ),
+    "register_provider_specification_revision": (
+        "app.services.data.datasets",
+        "register_provider_specification_revision",
+    ),
+    "register_source": ("app.services.data.sources", "register_source"),
+    "register_source_policy": ("app.services.data.sources", "register_source_policy"),
+    "require_utc": ("app.services.data.time_sessions", "require_utc"),
+    "resample_dataset": ("app.services.data.transformation", "resample_dataset"),
+    "resample_ohlcv": ("app.services.data.transformation", "resample_ohlcv"),
+    "resolve_operation_request_id": (
+        "app.services.data.contracts.responses",
+        "resolve_operation_request_id",
+    ),
+    "resolve_source": ("app.services.data.sources", "resolve_source"),
+    "restore_from_backup": ("app.services.data.persistence", "restore_from_backup"),
+    "retrieve_research_provider_payload": (
+        "app.services.data.sources.research_transport",
+        "retrieve_research_provider_payload",
+    ),
+    "run_data_migrations": ("app.services.data.persistence", "run_data_migrations"),
+    "run_data_operation": (
+        "app.services.data.contracts.responses",
+        "run_data_operation",
+    ),
+    "run_data_operation_async": (
+        "app.services.data.contracts.responses",
+        "run_data_operation_async",
+    ),
+    "run_data_update_job_once": (
+        "app.services.data.data_jobs.job",
+        "run_data_update_job_once",
+    ),
+    "run_domain_migrations": ("app.services.data.persistence", "run_domain_migrations"),
+    "run_runtime_store_migrations": (
+        "app.services.data.runtime_stores",
+        "run_runtime_store_migrations",
+    ),
+    "save_dataset": ("app.services.data.persistence", "save_dataset"),
+    "save_market_data": ("app.services.data.persistence", "save_market_data"),
+    "save_scrape_result": ("app.services.data.economic_calendar", "save_scrape_result"),
+    "schedule_update_job": ("app.services.data.data_jobs", "schedule_update_job"),
+    "scrape_economic_calendar": (
+        "app.services.data.economic_calendar",
+        "scrape_economic_calendar",
+    ),
+    "scrape_result_to_dataframe": (
+        "app.services.data.economic_calendar",
+        "scrape_result_to_dataframe",
+    ),
+    "serialize_scrape_result": (
+        "app.services.data.economic_calendar",
+        "serialize_scrape_result",
+    ),
+    "start_data_update_job": (
+        "app.services.data.data_jobs.job",
+        "start_data_update_job",
+    ),
+    "start_internal_feed": ("app.services.data.market_events", "start_internal_feed"),
+    "stop_data_update_job": ("app.services.data.data_jobs.job", "stop_data_update_job"),
+    "stream_market_data": ("app.services.data.market_events", "stream_market_data"),
+    "stream_market_depth": ("app.services.data.market_events", "stream_market_depth"),
+    "stream_market_snapshots": (
+        "app.services.data.market_events",
+        "stream_market_snapshots",
+    ),
+    "stream_replay_events": ("app.services.data.replay", "stream_replay_events"),
+    "summarize_quality_remediation": (
+        "app.services.data.integrity",
+        "summarize_quality_remediation",
+    ),
+    "sync_catalog_reference": ("app.services.data.datasets", "sync_catalog_reference"),
+    "sync_current_week_economic_calendar": (
+        "app.services.data.economic_calendar",
+        "sync_current_week_economic_calendar",
+    ),
+    "to_ohlcv_dataframe": ("app.services.data.transformation", "to_ohlcv_dataframe"),
+    "to_tick_dataframe": ("app.services.data.transformation", "to_tick_dataframe"),
+    "unwrap_data_response": (
+        "app.services.data.contracts.responses",
+        "unwrap_data_response",
+    ),
+    "update_market_series": (
+        "app.services.data.datasets",
+        "update_market_series",
+    ),
+    "update_instrument_spec": (
+        "app.services.data.datasets",
+        "update_instrument_spec",
+    ),
+    "validate_resample_target": (
+        "app.services.data.time_sessions",
+        "validate_resample_target",
+    ),
+    "validate_research_source_policy": (
+        "app.services.data.sources.research_policy",
+        "validate_research_source_policy",
+    ),
+    "validate_symbol_metadata": (
+        "app.services.data.integrity",
+        "validate_symbol_metadata",
+    ),
+    "verify_manifest_compatibility": (
+        "app.services.data.datasets",
+        "verify_manifest_compatibility",
+    ),
+    "verify_read_only_call": (
+        "app.services.data.sources.read_only",
+        "verify_read_only_call",
+    ),
+    "wrap_broker_client": ("app.services.data.sources.read_only", "wrap_broker_client"),
+}
+
+
+def __getattr__(name: str) -> object:
+    """Resolve one public export on first access.
+
+    Args:
+        name: Public export name.
+
+    Returns:
+        The resolved public function.
+
+    Raises:
+        AttributeError: If the name is not part of the public boundary.
+    """
+    target = _EXPORTS.get(name)
+    if target is None:
+        message = f"module {__name__!r} has no attribute {name!r}"
+        raise AttributeError(message)
+    from importlib import import_module
+
+    return getattr(import_module(target[0]), target[1])
+
+
+def __dir__() -> list[str]:
+    """List the public export surface.
+
+    Returns:
+        Sorted public export names.
+    """
+    return sorted(_EXPORTS)
+
 
 __all__ = (
     "acquire_write_lock",
@@ -542,6 +1520,7 @@ __all__ = (
     "get_fx_conversion_evidence",
     "get_fx_conversion_evidence_schema",
     "get_historical_volume",
+    "get_instrument_spec",
     "get_level1_snapshot",
     "get_market_context_evidence",
     "get_market_context_schema",
@@ -594,8 +1573,11 @@ __all__ = (
     "is_read_only_broker_proxy",
     "is_research_source_value",
     "is_tick_record",
+    "list_brokers",
     "list_composable_sources",
+    "list_instruments",
     "list_market_directory",
+    "list_market_series",
     "list_registered_sources",
     "list_symbols",
     "list_verified_datasets",
@@ -665,6 +1647,8 @@ __all__ = (
     "to_ohlcv_dataframe",
     "to_tick_dataframe",
     "unwrap_data_response",
+    "update_instrument_spec",
+    "update_market_series",
     "validate_resample_target",
     "validate_research_source_policy",
     "validate_symbol_metadata",

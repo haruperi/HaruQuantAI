@@ -46,6 +46,18 @@ Optimization orchestrates bounded, reproducible searches over approved strategy 
 - Bayesian, genetic, Sobol, Latin Hypercube, Optuna, scikit-optimize, CPCV, PBO, topology, or specialized scenario execution in the initial implementation.
 - Arbitrary strategy-file loading, direct report rendering, or claims that a result was persisted when only a request was packaged.
 
+### Public boundary resolution
+
+`app/services/optimization/__init__.py` is the sole public import boundary and
+stays function-only. Its 78 exports resolve lazily: `_EXPORTS` maps each public
+name to the module and attribute that owns it, and a PEP 562 module
+`__getattr__` imports that module on first access. Consumers still import from
+the package root unchanged (for example `apply_execution_cost_stress`);
+importing the boundary no longer loads every Optimization feature.
+
+An `if typing.TYPE_CHECKING:` block keeps the explicit imports so type checking
+stays exact, and `__all__` is unchanged from the eager boundary.
+
 ### Shared contracts
 
 Contract definitions match the name, version, and owner recorded in `docs/PROJECT.md`.

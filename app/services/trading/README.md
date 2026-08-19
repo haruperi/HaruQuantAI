@@ -39,6 +39,22 @@ Trading orchestrates live and demo evaluation, converts independently approved r
 - API authentication, UI behavior, operator presentation, or infrastructure persistence engines.
 - Shadow comparison, performance snapshot caches, or generalized automatic compensation in the initial build.
 
+### Public boundary resolution
+
+`app/services/trading/__init__.py` is the sole public import boundary and stays
+function-only. Its 127 exports resolve lazily: `_EXPORTS` maps each public name
+to the module and attribute that owns it, and a PEP 562 module `__getattr__`
+imports that module on first access. Consumers still import from the package
+root unchanged (for example `apply_execution_event`); importing the boundary no
+longer loads every Trading feature.
+
+An `if typing.TYPE_CHECKING:` block keeps the explicit imports so type checking
+stays exact, and `__all__` is unchanged from the eager boundary.
+
+Trading's `persistence/` no longer imports `state/` at module import time; that
+collaborator resolves inside `update_event_projection_records`. This removes an
+import cycle the eager boundary had masked.
+
 ### Shared contracts
 
 Contract definitions match `docs/PROJECT.md`. Commands are owned by their receiver; results by their producer.

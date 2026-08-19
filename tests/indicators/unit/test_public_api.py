@@ -128,7 +128,9 @@ def test_root_and_feature_exports_are_exact() -> None:
         assert list(module.__all__) == sorted(expected)
         for name in expected:
             assert hasattr(module, name)
-        assert _public_non_module_attrs(module) == set(expected)
+        # A lazily-resolved boundary binds nothing until access, so resolving the
+        # documented surface first is what makes "no undocumented symbols" testable.
+        assert _public_non_module_attrs(module) <= set(expected)
 
 
 def test_retired_bundled_modules_are_not_public_symbols() -> None:

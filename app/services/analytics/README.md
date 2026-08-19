@@ -52,6 +52,18 @@ compatibility, currency conversion, or finite numeric validity cannot be proven.
 - Strategy quality scoring is outside Analytics ownership because no approved
   diagnostic-threshold or recommendation-language contract exists.
 
+### Public boundary resolution
+
+`app/services/analytics/__init__.py` is the sole public import boundary and
+stays function-only. It is a wrapper boundary: its public functions are defined
+here and import their collaborators inside the function body, so importing the
+boundary no longer loads every Analytics feature. The 88 names it exposes as
+module attributes are declared in `_EXPORTS` and resolved on first access
+through a PEP 562 module `__getattr__`.
+
+An `if typing.TYPE_CHECKING:` block keeps the explicit imports so type checking
+stays exact, and `__all__` is unchanged from the eager boundary.
+
 ### Shared contracts
 
 Contract definitions match the names, versions, and owners in

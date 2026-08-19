@@ -37,6 +37,19 @@ Strategy turns normalized market state, point-in-time indicator values, validate
 - Arbitrary Python source, archive, or filesystem-path execution. A sandbox is not part of the initial package.
 - External artifact build, signing, vulnerability scanning, or approval workflows. Strategy stores and validates their immutable references only.
 
+### Public boundary resolution
+
+`app/services/strategy/__init__.py` is the sole public import boundary and
+stays function-only. Its 101 exports resolve lazily: `_EXPORTS` maps each
+public name to the module and attribute that owns it, and a PEP 562 module
+`__getattr__` imports that module on first access. Consumers still import from
+the package root unchanged (for example
+`adopt_approved_optimization_parameters`); importing the boundary no longer
+loads every Strategy feature.
+
+An `if typing.TYPE_CHECKING:` block keeps the explicit imports so type checking
+stays exact, and `__all__` is unchanged from the eager boundary.
+
 ### Shared contracts
 
 Contract names, versions, and owners match `docs/PROJECT.md`. Commands and requests are owned by their receiver; events and results are owned by their producer. `contract_version` is the compatibility value (for example, `v1`) and `schema_id` is the stable namespaced wire identifier (for example, `strategy.trade_intent.v1`). Consumers evaluate compatibility only from `contract_version` and never parse `schema_id`.
