@@ -351,3 +351,69 @@
   color: #7a94a2;
   margin-right: 0.5rem;
 }
+
+/* --- Chart primitives (P3-T03) ------------------------------------------- */
+
+.analytics-chart,
+.analytics-heatmap,
+.analytics-distribution {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: #cde0ea;
+}
+
+.analytics-chart figcaption,
+.analytics-heatmap figcaption,
+.analytics-distribution figcaption {
+  font-weight: 600;
+}
+
+.analytics-chart__declaration {
+  font-size: 0.72rem;
+  color: #7a94a2;
+}
+
+.analytics-chart__svg {
+  width: 100%;
+  height: 12rem;
+  color: #5eead4;
+}
+
+.analytics-chart__table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  display: block;
+  max-height: 18rem;
+  overflow: auto;
+}
+
+.analytics-chart__table th,
+.analytics-chart__table td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+}
+
+.analytics-heatmap__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.analytics-heatmap__cell {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 2px;
+  background: #14b8a6;
+}
+
+.analytics-heatmap__cell.is-unavailable {
+  background: transparent;
+  border: 1px dashed rgba(148, 163, 184, 0.5);
+}

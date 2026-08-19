@@ -51,3 +51,19 @@ export {
   AnalyticsArtifactDrawer,
   type AnalyticsArtifactDrawerProps,
 } from "./AnalyticsArtifactDrawer";
+
+export {
+  TimeSeriesChart,
+  toSeriesPoints,
+  type TimeSeriesChartProps,
+} from "./TimeSeriesChart";
+
+export {
+  CalendarHeatmap,
+  type CalendarHeatmapProps,
+} from "./CalendarHeatmap";
+
+export {
+  DistributionChart,
+  type DistributionChartProps,
+} from "./DistributionChart";
