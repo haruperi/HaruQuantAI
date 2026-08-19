@@ -636,7 +636,7 @@ None.
 - [x] Phase 3 — P3-T01 through P3-T04
 - [x] Phase 4 — P4-T01 through P4-T05
 - [x] Phase 5 — P5-T01
-- [ ] Phase 6 — P6-T01 through P6-T03
+- [x] Phase 6 — P6-T01 through P6-T03
 - [ ] Phase 7 — P7-T01 through P7-T02
 - [ ] Phase 8 — P8-T01 through P8-T02
 
@@ -1108,7 +1108,7 @@ Git Commit: `feat(ui): build immutable trade playback`
 
 ### Phase 6 — Advanced Analytics parity
 
-#### - [ ] Task `P6-T01` — Build returns risk statistics
+#### - [x] Task `P6-T01` — Build returns risk statistics
 
 **Files:** `ReturnsPanel.tsx`, `RiskPanel.tsx`, `DistributionPanel.tsx` (CREATE).
 
@@ -1116,7 +1116,7 @@ Unsupported metrics render exactly `Not available in the current authoritative V
 
 Git Commit: `feat(ui): build advanced Analytics evidence`
 
-#### - [ ] Task `P6-T02` — Build period benchmark views
+#### - [x] Task `P6-T02` — Build period benchmark views
 
 **Files:** `PeriodsPanel.tsx`, `BenchmarkPanel.tsx`, `ChartsPanel.tsx` (CREATE).
 
@@ -1124,7 +1124,7 @@ Encode all period dimensions in query parameters; do not duplicate routes.
 
 Git Commit: `feat(ui): build period benchmark views`
 
-#### - [ ] Task `P6-T03` — Build run comparison
+#### - [x] Task `P6-T03` — Build run comparison
 
 **Files:** `AnalyticsComparison.tsx`, `analytics-store.ts`, `analytics-selectors.ts` (CREATE).
 
