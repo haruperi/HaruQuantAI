@@ -794,3 +794,9 @@ data/database/*.bak_*
 # The source-package exception above must not re-admit generated Python bytecode.
 app/services/data/datasets/**/__pycache__/
 app/services/data/datasets/**/*.py[cod]
+
+# Playwright browser-test output (snapshots under e2e/__screenshots__ are committed)
+app/ui/test-results/
+app/ui/playwright-report/
+app/ui/blob-report/
+app/ui/.playwright/

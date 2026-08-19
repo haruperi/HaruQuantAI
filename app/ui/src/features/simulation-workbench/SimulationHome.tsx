@@ -73,7 +73,10 @@ function PracticeMonitor({ sessionId }: { sessionId?: string }): ReactNode {
   }
 
   return (
-    <InteractiveSimulationWorkspace sessionId={sessionId}>
+    <InteractiveSimulationWorkspace
+      sessionId={sessionId}
+      onSessionChange={setSession}
+    >
       <SessionStatePanels session={session} />
       <ManualCommandPanel
         sessionId={sessionId}

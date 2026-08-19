@@ -52,6 +52,14 @@ function failureMessage(cause: unknown): string {
 /** Props accepted by `InteractiveSimulationWorkspace`. */
 export interface InteractiveSimulationWorkspaceProps {
   sessionId: string;
+  /**
+   * Called with every authoritative session projection this workspace reads.
+   *
+   * The docked panels must render the same server truth the header does, so
+   * the workspace publishes its state rather than letting each panel keep its
+   * own copy and drift.
+   */
+  onSessionChange?: (session: LiveSessionProjection) => void;
   children?: ReactNode;
   className?: string;
 }
@@ -59,6 +67,7 @@ export interface InteractiveSimulationWorkspaceProps {
 /** Live practice workspace with server-authoritative pacing. */
 export function InteractiveSimulationWorkspace({
   sessionId,
+  onSessionChange,
   children,
   className = "",
 }: InteractiveSimulationWorkspaceProps): ReactNode {
@@ -74,6 +83,14 @@ export function InteractiveSimulationWorkspace({
     playingRef.current = false;
     setPlaying(false);
   }, []);
+
+  const publish = useCallback(
+    (next: LiveSessionProjection) => {
+      setSession(next);
+      onSessionChange?.(next);
+    },
+    [onSessionChange],
+  );
 
   const loadViewport = useCallback(async (id: string) => {
     const response = await apiClients.simulationWorkbench.getViewport(id, {
@@ -95,7 +112,7 @@ export function InteractiveSimulationWorkspace({
           stopPlaying();
           return;
         }
-        setSession(response.data);
+        publish(response.data);
         await loadViewport(id);
       } catch (cause) {
         setError(failureMessage(cause));
@@ -104,7 +121,7 @@ export function InteractiveSimulationWorkspace({
         setLoading(false);
       }
     },
-    [loadViewport, stopPlaying],
+    [loadViewport, stopPlaying, publish],
   );
 
   useEffect(() => {
@@ -126,7 +143,7 @@ export function InteractiveSimulationWorkspace({
           stopPlaying();
           return false;
         }
-        setSession(response.data);
+        publish(response.data);
         await loadViewport(sessionId);
         return true;
       } catch (cause) {
@@ -137,7 +154,7 @@ export function InteractiveSimulationWorkspace({
         setBusy(false);
       }
     },
-    [sessionId, loadViewport, stopPlaying],
+    [sessionId, loadViewport, stopPlaying, publish],
   );
 
   const seek = useCallback(
@@ -153,7 +170,7 @@ export function InteractiveSimulationWorkspace({
           setError(response.error.message);
           return;
         }
-        setSession(response.data);
+        publish(response.data);
         await loadViewport(sessionId);
       } catch (cause) {
         setError(failureMessage(cause));
@@ -161,7 +178,7 @@ export function InteractiveSimulationWorkspace({
         setBusy(false);
       }
     },
-    [sessionId, loadViewport],
+    [sessionId, loadViewport, publish],
   );
 
   // Pacing scheduler: one bounded advance per beat while playing.
