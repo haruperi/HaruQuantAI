@@ -417,3 +417,58 @@
   background: transparent;
   border: 1px dashed rgba(148, 163, 184, 0.5);
 }
+
+/* --- Realism and provenance (P3-T04) ------------------------------------- */
+
+.analytics-realism,
+.analytics-provenance {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+  color: #cde0ea;
+  font-size: 0.85rem;
+}
+
+.analytics-realism__note,
+.analytics-provenance__note {
+  font-size: 0.75rem;
+  color: #7a94a2;
+}
+
+.analytics-realism__grid,
+.analytics-provenance__grid {
+  display: grid;
+  grid-template-columns: minmax(11rem, auto) 1fr;
+  gap: 0.25rem 1rem;
+  margin: 0;
+}
+
+.analytics-realism__row,
+.analytics-provenance__row {
+  display: contents;
+}
+
+.analytics-realism__grid dt,
+.analytics-provenance__grid dt {
+  color: #7a94a2;
+}
+
+.analytics-realism__grid dd,
+.analytics-provenance__grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.analytics-provenance__manifest {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.analytics-provenance__manifest th,
+.analytics-provenance__manifest td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+}

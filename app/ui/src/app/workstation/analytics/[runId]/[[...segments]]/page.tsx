@@ -7,6 +7,7 @@
  * - /workstation/analytics/[runId]/returns -> returns tab
  * - /workstation/analytics/[runId]/drawdown -> drawdown tab
  * - /workstation/analytics/[runId]/trades -> trades tab
+ * - /workstation/analytics/[runId]/trades/[ticket] -> one trade detail
  * - /workstation/analytics/[runId]/grouped -> grouped tab
  * - /workstation/analytics/[runId]/benchmark -> benchmark tab
  * - /workstation/analytics/[runId]/artifacts -> artifacts tab
@@ -18,7 +19,13 @@ import { use, type ReactNode } from "react";
 
 import { ProtectedLayout } from "@/app/protected-layout";
 import {
+  AnalyticsArtifactDrawer,
   AnalyticsWorkspace,
+  OverviewPanel,
+  ProvenancePanel,
+  RealismPanel,
+  TradeDetailPanel,
+  TradesPanel,
   type AnalyticsTab,
 } from "@/features/analytics-workbench";
 
@@ -38,6 +45,34 @@ const VALID_TABS = new Set<AnalyticsTab>([
   "artifacts",
 ]);
 
+/** Resolve the panel that owns one Analytics tab. */
+function panelFor(
+  tab: AnalyticsTab,
+  runId: string,
+  ticket: string | undefined,
+): ReactNode {
+  if (tab === "trades") {
+    return ticket ? (
+      <TradeDetailPanel runId={runId} ticket={ticket} />
+    ) : (
+      <TradesPanel runId={runId} />
+    );
+  }
+  if (tab === "artifacts") {
+    return (
+      <>
+        <AnalyticsArtifactDrawer runId={runId} />
+        <ProvenancePanel runId={runId} />
+        <RealismPanel runId={runId} />
+      </>
+    );
+  }
+  if (tab === "overview") {
+    return <OverviewPanel runId={runId} />;
+  }
+  return undefined;
+}
+
 export default function AnalyticsRunPage({
   params,
 }: AnalyticsRunPageProps): ReactNode {
@@ -47,12 +82,16 @@ export default function AnalyticsRunPage({
     : (params as { runId: string; segments?: string[] });
 
   const runId = resolved?.runId ?? "";
-  const rawTab = resolved?.segments?.[0]?.toLowerCase() as AnalyticsTab;
+  const segments = resolved?.segments ?? [];
+  const rawTab = segments[0]?.toLowerCase() as AnalyticsTab;
   const activeTab: AnalyticsTab = VALID_TABS.has(rawTab) ? rawTab : "overview";
+  const ticket = activeTab === "trades" ? segments[1] : undefined;
 
   return (
     <ProtectedLayout>
-      <AnalyticsWorkspace runId={runId} activeTab={activeTab} />
+      <AnalyticsWorkspace runId={runId} activeTab={activeTab}>
+        {panelFor(activeTab, runId, ticket)}
+      </AnalyticsWorkspace>
     </ProtectedLayout>
   );
 }

@@ -67,3 +67,15 @@ export {
   DistributionChart,
   type DistributionChartProps,
 } from "./DistributionChart";
+
+export {
+  RealismPanel,
+  REALISM_BLOCKS,
+  type RealismPanelProps,
+} from "./RealismPanel";
+
+export {
+  ProvenancePanel,
+  PROVENANCE_ROWS,
+  type ProvenancePanelProps,
+} from "./ProvenancePanel";
