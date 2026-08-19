@@ -177,6 +177,26 @@ The canonical Python runtime tree remains under `app/services/api/`; there is no
 top-level `api/` package and no temporary compatibility import. Frontend ownership is
 specified independently in `app/ui/README.md`.
 
+### Capability declaration and resolution
+
+Each optional workstation capability declares itself in
+`widgets/<id>/capability.py`: its identifier, the import packages it owns, and
+the capability identifiers it cannot operate without. The declaration carries
+data only and imports nothing from the capability, so composition reads it
+without loading the feature.
+
+`composition/capabilities.py` discovers those declarations under the widgets
+namespace and resolves which capabilities can be composed. A capability whose
+packages are missing is `CAPABILITY_ABSENT`; one whose requirement is inactive
+is `REQUIREMENT_UNAVAILABLE`. Both are recorded in
+`app.state.api_optional_degraded`, and neither blocks startup. A widget without
+a declaration is required and fails closed.
+
+Composition keeps one registry of expected optional identifiers, because a
+declaration is deleted along with the capability it describes: knowing a
+capability is missing needs a record that it was expected. Analytics is
+required rather than optional, because `simulator` imports it.
+
 ### Feature Registry
 
 The API domain is `Completed`. All twelve backend features own focused production
@@ -203,7 +223,7 @@ invariant rather than outstanding scope.
 | Completed | `FEAT-API-05` Operational Telemetry and Exposition | `observability/` | `record_metric`, `validate_metric_labels`, `build_metric_snapshot`, `export_prometheus_metrics`, `get_metrics`, `create_in_process_metric_sink` | `FR-API-060`â€“`FR-API-063` | `tests/api/usage/05_observability.py` |
 | Completed | `FEAT-API-06` Ordered Event Delivery | `widgets/event_delivery/` | `normalize_stream_event`, `create_stream_manager` through the package root | `FR-API-020`–`FR-API-021` | `tests/api/usage/06_streams.py`; `tests/api/unit/test_streams.py` |
 | Completed | `FEAT-API-07` Settings Boundary | `widgets/settings/` | API bootstrap configuration, shared boundary limits, authenticated user/global settings, and credential-status routes | `FR-API-023`, support for `FR-API-035`–`FR-API-036`, route portion of `FR-API-077` | `tests/api/usage/07_settings.py`; `tests/api/unit/test_application.py`; `tests/api/integration/test_auth_settings.py` |
-| Completed | `FEAT-API-08` Canonical Application Lifecycle | `composition/` | `create_api_app`, dependency-bundle builders, exact twelve-provider graph, and canonical `app.services.api.composition.application:app` | `FR-API-035`–`FR-API-037`, `FR-API-058` | `tests/api/usage/08_composition.py`; `tests/api/unit/test_application.py`; `tests/api/unit/test_in_process_composition.py` |
+| Completed | `FEAT-API-08` Canonical Application Lifecycle | `composition/` | `create_api_app`, dependency-bundle builders, a declared provider surface resolved through capability declarations that each workstation capability owns (`widgets/<id>/capability.py`) and `capabilities.py` discovers and resolves, and canonical `app.services.api.composition.application:app` | `FR-API-035`–`FR-API-037`, `FR-API-058` | `tests/api/usage/08_composition.py`; `tests/api/unit/test_application.py`; `tests/api/unit/test_in_process_composition.py`; `tests/api/unit/test_capability_absence.py` |
 
 | Completed | `FEAT-API-09` Critical Operational Alert Delivery | `alerts/` | `CriticalAlertTrigger`, `CriticalOperationalAlert`, `CriticalAlertDeliveryResult`, `CriticalAlertError`, `CriticalAlertSink`, `build_kill_switch_activation_alert`, `build_unknown_broker_state_alert`, `deliver_critical_alert` | `FR-API-064`–`FR-API-067` | `tests/api/usage/09_alerts.py` |
 | Completed | `FEAT-API-10` Operational Read Model and Command API | `widgets/operational/` | `build_workstation_read_model`, `execute_workstation_command`; `GET /api/v1/workstation`, `POST /api/v1/workstation/commands` | `FR-API-078`..`FR-API-083` | `tests/api/usage/10_workstation.py` |
@@ -987,7 +1007,7 @@ CSRF for cookie-authenticated browser requests.
 | `settings.py` | `GET /api/v1/settings`; `PUT /api/v1/settings` | Authenticated owner; API-owned state | Read/write; PUT durable HTTP idempotency required |
 | `workstation/watchlists/routes.py` | `GET /api/v1/watchlists`; `POST /api/v1/watchlists`; `PATCH /api/v1/watchlists/{watchlist_id}`; `DELETE /api/v1/watchlists/{watchlist_id}` | Authenticated owner; API-owned state | List seeds the default on first read; POST/PATCH/DELETE all require a durable HTTP idempotency key |
 | `workstation/markets/routes.py` | `GET /api/v1/data/markets`; `GET /api/v1/data/quotes` | Authenticated; Data and Indicators | Read-only directory/quote orchestration; source configuration fails closed |
-| `data.py` | `GET /api/v1/data/symbols`; `GET /api/v1/data/bars`; `POST /api/v1/data/datasets/prepare`; `GET /api/v1/data/imports/dialects`; `POST /api/v1/data/imports` | Authenticated; Data | Read-only bounded discovery and bar history; governed preparation and import with required idempotency |
+| `data.py` | `GET /api/v1/data/symbols`; `GET /api/v1/data/series`; `PATCH /api/v1/data/series/{series_id}`; `GET /api/v1/data/instruments`; `GET /api/v1/data/instruments/{instrument}`; `GET /api/v1/data/brokers`; `GET /api/v1/data/bars`; `POST /api/v1/data/datasets/prepare`; `GET /api/v1/data/imports/dialects`; `POST /api/v1/data/imports` | Authenticated; Data | Read-only bounded discovery, series/instrument/broker reference catalogues, and bar history; governed series edit, preparation, and import with required idempotency |
 | `data_stream.py` | `GET /api/v1/data/stream?symbol=&mode=&timeframe=` | Authenticated `data:read`; Data owns acquisition and stream semantics | SSE transport bridge, quota admission, `Last-Event-ID`, and cleanup only |
 | `workstation/indicators/routes.py` | Catalogue/specification reads; `GET /api/v1/indicators/{indicator_id}/series` | Authenticated `indicators:read`; Data owns bars and Indicators owns calculations | Read-only uncached EMA/RSI orchestration; null warm-up evidence is preserved |
 | `strategies.py` | `GET /api/v1/strategies`; `GET /api/v1/strategies/{strategy_id}/versions`; `POST /api/v1/strategies`; `PATCH /api/v1/strategies/{strategy_id}/parameters` | Authenticated exact permission; Strategy | Read-only catalogue/version evidence; governed mutations with required idempotency |
@@ -1046,8 +1066,8 @@ router registration → canonical ASGI app.
 
 | Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Completed | `FR-API-035` | Initialize required API storage/migrations, load the global settings snapshot, activate its validated `LOG_LEVEL`, install its validated provider snapshot for the complete Data runtime context, probe every supplied required in-process provider before readiness, surface explicit optional degradation, close lifespan-composed Data provider sessions while their configuration remains active, and then close graph/gateway-owned resources in reverse acquisition order. | `lifespan(app: FastAPI) -> AsyncIterator[None]` | Local state mutation; persistence setup; logging/provider configuration; provider-session shutdown | `StartupError`: required dependency or persisted runtime policy cannot initialize | **Usage:** `tests/api/usage/08_composition.py`<br>**Unit:** `tests/api/unit/test_application.py::test_lifespan_closes_data_sessions_before_graph_resources()`<br>**Integration:** `tests/api/integration/test_auth_settings.py::test_persisted_provider_settings_reach_data_composition()` |
-| Completed | `FR-API-036` | Construct one canonical FastAPI app with exact-origin CORS, redaction/context middleware, required/optional routers, liveness, readiness, and one validated named in-process owner graph. | `create_app(config: ApiSettings, *, in_process_graph: object | None = None) -> FastAPI`; `build_in_process_api_graph`; `get_required_in_process_provider_names` | Local state mutation | `ValueError` / `TypeError`: unsafe, incomplete, unknown, or mixed composition | **Usage:** `tests/api/usage/08_composition.py`<br>**Unit:** `tests/api/unit/test_in_process_composition.py`<br>**Integration:** `tests/api/integration/test_in_process_boundary.py` |
+| Completed | `FR-API-035` | Initialize required API storage/migrations, load the global settings snapshot, activate its validated `LOG_LEVEL`, install its validated provider snapshot for the complete Data runtime context, probe every supplied required in-process provider before readiness, surface explicit optional degradation for absent optional capabilities, failed optional Analytics/Optimization/Portfolio migrations, and failed optional probes, close lifespan-composed Data provider sessions while their configuration remains active, and then close graph/gateway-owned resources in reverse acquisition order. | `lifespan(app: FastAPI) -> AsyncIterator[None]` | Local state mutation; persistence setup; logging/provider configuration; provider-session shutdown | `StartupError`: required dependency or persisted runtime policy cannot initialize | **Usage:** `tests/api/usage/08_composition.py`<br>**Unit:** `tests/api/unit/test_application.py::test_lifespan_closes_data_sessions_before_graph_resources()`<br>**Integration:** `tests/api/integration/test_auth_settings.py::test_persisted_provider_settings_reach_data_composition()` |
+| Completed | `FR-API-036` | Construct one canonical FastAPI app with exact-origin CORS, redaction/context middleware, required routers plus optional routers omitted when their capability is absent, liveness, readiness, and one validated named in-process owner graph. | `create_app(config: ApiSettings, *, in_process_graph: object | None = None) -> FastAPI`; `build_in_process_api_graph`; `get_required_in_process_provider_names` | Local state mutation | `ValueError` / `TypeError`: unsafe, incomplete, unknown, or mixed composition | **Usage:** `tests/api/usage/08_composition.py`<br>**Unit:** `tests/api/unit/test_in_process_composition.py`<br>**Integration:** `tests/api/integration/test_in_process_boundary.py` |
 | Completed | `FR-API-037` | Expose the canonical ASGI application without violating the package root-file rule. | `app.services.api.composition.application:app` | Multiple boundary effects | `StartupError`: required initialization fails | **Usage:** `tests/api/usage/08_composition.py`<br>**Unit:** `tests/api/unit/test_application.py::test_canonical_app_has_exact_cors_and_route_catalog()` |
 
 **Configuration and Limits Manifest**

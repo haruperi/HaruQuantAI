@@ -4,7 +4,7 @@ from collections.abc import Callable, Mapping
 from functools import partial
 from typing import Any, cast
 
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import APIRouter, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.services.api.composition.broker_config import (
@@ -597,7 +597,7 @@ def create_app(
         *owned_resource_closers,
     )
     for router in _ROUTERS:
-        application.include_router(router)
+        application.include_router(cast("APIRouter", router))
     application.dependency_overrides[require_auth_context] = _request_auth_context
     for dependency, override in (
         graph_overrides or dict(dependency_overrides or {})

@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from app.services.api import create_api_app, get_canonical_route_contract_registry
+from app.services.api.composition.adapters import get_absent_capability_ids
 
 _SNAPSHOT = Path(__file__).with_name("snapshots") / "openapi.v1.json"
 
@@ -30,6 +31,10 @@ def test_openapi_v1_contains_no_excluded_routes() -> None:
     assert not any("/backtest/" in path for path in paths)
     assert "/api/v1/risk/kill-switch" in paths
     assert "/api/v1/trading/session" in paths
-    assert "/api/v1/optimization/parameter-sweep" in paths
-    assert "/api/v1/portfolio/construct" in paths
-    assert any("/agentic/" in path for path in paths)
+    absent = set(get_absent_capability_ids())
+    if "optimization" not in absent:
+        assert "/api/v1/optimization/parameter-sweep" in paths
+    if "portfolio" not in absent:
+        assert "/api/v1/portfolio/construct" in paths
+    if "agentic" not in absent:
+        assert any("/agentic/" in path for path in paths)

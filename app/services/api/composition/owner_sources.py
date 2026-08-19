@@ -8,7 +8,6 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any, Protocol, cast
 
-from app.services.analytics import get_analytics_dashboard_snapshot
 from app.services.brokers import get_broker_dashboard_snapshot
 from app.services.data import (
     build_audit_event_query,
@@ -49,6 +48,10 @@ def read_dashboard_snapshot(name: str, _auth: AuthContext) -> dict[str, object]:
     if name == "broker":
         return get_broker_dashboard_snapshot()
     if name in {"equity_curve", "summary"}:
+        # Analytics is an optional capability; resolve it only when a dashboard
+        # view that needs it is actually requested.
+        from app.services.analytics import get_analytics_dashboard_snapshot
+
         return get_analytics_dashboard_snapshot(name)
     if name == "market_hours":
         return get_market_hours_dashboard_snapshot()

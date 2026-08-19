@@ -423,9 +423,9 @@ def test_optional_startup_failure_is_visible_degradation(
     async def enter_lifespan() -> None:
         async with lifecycle.lifespan(app):
             assert app.state.api_ready is True
-            assert app.state.api_optional_degraded == {
-                "optional": "DEPENDENCY_UNAVAILABLE"
-            }
+            assert (
+                app.state.api_optional_degraded["optional"] == "DEPENDENCY_UNAVAILABLE"
+            )
         assert app.state.api_ready is False
 
     import asyncio

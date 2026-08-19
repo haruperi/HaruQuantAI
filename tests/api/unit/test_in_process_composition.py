@@ -16,6 +16,8 @@ from app.services.api.composition.capabilities import (
 # Capabilities that must always compose; absence fails closed per AGENTS.md.
 _REQUIRED_CAPABILITIES = frozenset(
     {
+        # Analytics is required: `simulator` imports it, so it can never be absent.
+        "analytics",
         "dashboard",
         "data",
         "operator",

@@ -6,11 +6,11 @@ from typing import Any, Protocol, cast
 
 from fastapi import FastAPI
 
-from app.services.api.composition.adapters import get_absent_capability_ids
 from app.services.api.composition.broker_config import (
     build_system_broker_connection_config,
 )
 from app.services.api.composition.capabilities import (
+    get_inactive_capabilities,
     import_capability_attribute,
 )
 from app.services.api.composition.migrations import run_api_migrations
@@ -224,9 +224,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         if trading_result.status != "success" or trading_result.data is None:
             app.state.api_ready = False
             raise StartupError("TRADING_STORAGE_INITIALIZATION_FAILED")
-        degraded: dict[str, str] = dict.fromkeys(
-            get_absent_capability_ids(), "CAPABILITY_ABSENT"
-        )
+        degraded: dict[str, str] = dict(get_inactive_capabilities())
         _run_optional_migrations(degraded)
         required_probes: Mapping[str, Callable[[], object]] = getattr(
             app.state,

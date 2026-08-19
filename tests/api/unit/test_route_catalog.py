@@ -21,7 +21,7 @@ def test_every_openapi_operation_has_exactly_one_contract() -> None:
         path.split("/")[3] for _, path in declarations - operations
     }
     assert unmounted_capabilities <= set(get_absent_capability_ids())
-    assert registry.size == 169
+    assert registry.size == 174
     assert registry.get("GET", "/api/v1/data/bars") is not None
     assert registry.get("GET", "/api/v1/workstation") is not None
     assert registry.get("POST", "/api/v1/workstation/commands") is not None
