@@ -638,7 +638,7 @@ None.
 - [x] Phase 5 — P5-T01
 - [x] Phase 6 — P6-T01 through P6-T03
 - [x] Phase 7 — P7-T01 through P7-T02
-- [ ] Phase 8 — P8-T01 through P8-T02
+- [x] Phase 8 — P8-T01 through P8-T02
 
 ## 11. PHASES
 
@@ -1156,7 +1156,7 @@ Git Commit: `feat(ui): add portfolio Simulation destination`
 
 ### Phase 8 — Hardening
 
-#### - [ ] Task `P8-T01` — Install browser test runner
+#### - [x] Task `P8-T01` — Install browser test runner
 
 **Files:** `package.json`, `package-lock.json` MODIFY; `playwright.config.ts` CREATE.
 
@@ -1168,7 +1168,7 @@ Rollback: Revert package/config; optional `npx playwright uninstall` for local c
 
 Git Commit: `test(ui): add workbench browser coverage`
 
-#### - [ ] Task `P8-T02` — Publish completed workbenches
+#### - [x] Task `P8-T02` — Publish completed workbenches
 
 **Files:** `app/ui/README.md`, `docs/PROJECT.md`, `docs/CHANGELOG.md` (MODIFY).
 
