@@ -99,12 +99,16 @@ def _load_provider_facts(source_id: str, symbol: str) -> object:
 
 def build_api_backtest_registry(
     runtime_context: Callable[[], AbstractContextManager[Any]] | None = None,
+    *,
+    completion_sink: Callable[[Any], None] | None = None,
 ) -> object:
     """Build the gateway-composed background backtest registry.
 
     Args:
         runtime_context: Factory for the Data runtime context a background run
             must re-enter, since it executes outside any request task.
+        completion_sink: Retention callable receiving complete terminal
+            evidence exactly once per finished run.
 
     Returns:
         Opaque Simulation-owned job registry.
@@ -120,7 +124,9 @@ def build_api_backtest_registry(
         return _load_provider_facts(typed.source_id, typed.symbol)
 
     return build_backtest_job_registry(
-        facts_loader=facts_loader, runtime_context=runtime_context
+        facts_loader=facts_loader,
+        runtime_context=runtime_context,
+        completion_sink=completion_sink,
     )
 
 

@@ -576,6 +576,17 @@ def finalize_live_simulation_session(
     )(session_id, request_id=request_id)
 
 
+def read_live_simulation_request(session_id: str) -> StandardResponse[object]:
+    """Read one durable session's immutable canonical request."""
+    return _guarded(
+        _operation("app.services.simulator.state", "read_live_simulation_request"),
+        operation="simulation.state.read_live_simulation_request",
+        risk_level="low",
+        read_only=True,
+        modifies_database=False,
+    )(session_id)
+
+
 def read_live_simulation_state(session_id: str) -> StandardResponse[object]:
     """Read one live what-if session projection."""
     return _guarded(
@@ -2342,6 +2353,7 @@ __all__: tuple[str, ...] = (
     "project_execution_views",
     "project_latency_timestamps",
     "pump_simulation_scheduler_once",
+    "read_live_simulation_request",
     "read_live_simulation_state",
     "read_live_simulation_viewport",
     "read_simulation_session",

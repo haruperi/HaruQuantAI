@@ -8,9 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import pytest
-from app.services.api.workstation.analytics_workbench.orchestration import (
-    build_analytics_workbench_source,
-)
+from app.services.api import build_analytics_workbench_source
 from app.services.api.workstation.analytics_workbench.schemas import (
     AnalyticsAnnotationRequest,
     AnalyticsArchiveRequest,
@@ -102,6 +100,15 @@ def main() -> None:
         del args, kwargs
         return 1
 
+    def _build_periods(*args: object, **kwargs: object) -> dict[str, object]:
+        """Replay one delegated period aggregation."""
+        del args
+        return {
+            "rows": (),
+            "dimension": kwargs.get("dimension"),
+            "context": kwargs.get("context"),
+        }
+
     monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setattr(orchestration, "read_simulation_result_record", read_run)
     monkeypatch.setattr(orchestration, "read_simulation_results_page", page_runs)
@@ -115,6 +122,7 @@ def main() -> None:
             result_reader=_read_result,
             projection_builder=_build_projection,
             comparator=_compare,
+            period_builder=_build_periods,
         )
         listed = source("list_runs", principal_id="principal-usage")
         report = source("report", "run-usage", principal_id="principal-usage")

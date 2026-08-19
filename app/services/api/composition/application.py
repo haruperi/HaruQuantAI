@@ -101,9 +101,25 @@ from app.services.api.workstation.simulation.routes import router as simulation_
 from app.services.api.workstation.simulation.session_routes import (
     router as simulation_sessions_router,
 )
+from app.services.api.workstation.simulation_workbench.batching import (
+    build_batch_runner,
+)
+from app.services.api.workstation.simulation_workbench.completion import (
+    build_catalogue_completion_sink,
+)
 from app.services.api.workstation.simulation_workbench.orchestration import (
     build_simulation_workbench_live_authority,
     build_simulation_workbench_source,
+)
+from app.services.api.workstation.simulation_workbench.provenance import (
+    RunProvenanceIndex,
+)
+from app.services.api.workstation.simulation_workbench.registry import (
+    SimulationWorkbenchRegistry,
+    build_simulation_workbench_registry,
+)
+from app.services.api.workstation.simulation_workbench.reproduction import (
+    build_reproduction_runner,
 )
 from app.services.api.workstation.simulation_workbench.routes import (
     router as simulation_workbench_router,
@@ -223,6 +239,18 @@ def _build_canonical_graph(
     Returns:
         Validated in-process graph containing all retained owner sources.
     """
+    provenance = RunProvenanceIndex()
+    workbench_registry = cast(
+        "SimulationWorkbenchRegistry", build_simulation_workbench_registry()
+    )
+    runtime_context = build_data_runtime_context(simulator_state_provider)
+    backtest_registry = build_api_backtest_registry(
+        runtime_context,
+        completion_sink=build_catalogue_completion_sink(
+            workbench_registry, provenance=provenance.resolve
+        ),
+    )
+    simulator_run_source = build_simulator_run_source(backtest_registry)
     return build_in_process_graph(
         {
             "agentic.source": build_agentic_source(agentic_dependencies),
@@ -252,16 +280,21 @@ def _build_canonical_graph(
             "simulation.session_source": build_simulation_session_source(
                 simulation_dependencies
             ),
-            "simulator.run_source": build_simulator_run_source(
-                build_api_backtest_registry(
-                    build_data_runtime_context(simulator_state_provider)
-                )
-            ),
+            "simulator.run_source": simulator_run_source,
             "simulator.strategy_source": build_simulator_strategy_source(),
             "simulator.workbench_source": build_simulation_workbench_source(
+                registry=workbench_registry,
                 live_authority=build_simulation_workbench_live_authority(
-                    simulation_dependencies
-                )
+                    simulation_dependencies,
+                    reproduction_runner=build_reproduction_runner(
+                        simulator_run_source, provenance=provenance.record
+                    ),
+                ),
+                batch_runner=build_batch_runner(
+                    simulator_run_source,
+                    provenance=provenance.record,
+                    runtime_context=runtime_context,
+                ),
             ),
             "analytics.workbench.source": build_analytics_workbench_composition(
                 settings

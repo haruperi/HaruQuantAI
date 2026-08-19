@@ -147,16 +147,18 @@ def _get_simulation_result(
     auth: Annotated[AuthContext, Depends(require_auth_context)],
     source: Annotated[_AnalyticsSource, Depends(_analytics_workbench_source)],
 ) -> object:
-    """Read the canonical Simulation result reference for one run.
+    """Read the canonical Simulation result content owned by one run.
 
     Returns:
-        Owner result evidence.
+        Canonical ``SimulationResult.v1`` owner evidence.
 
     Raises:
-        HTTPException: If the run is unknown or foreign-owned.
+        HTTPException: If the run or its result evidence is missing.
     """
     _read_permission(auth)
-    return _dispatch(source, "get_run", run_id, principal_id=auth.principal_id)
+    return _dispatch(
+        source, "simulation_result", run_id, principal_id=auth.principal_id
+    )
 
 
 @router.get("/runs/{run_id}/report", response_model=None)
@@ -263,13 +265,19 @@ def _get_periods(
         HTTPException: If the run or its evidence is missing.
     """
     _read_permission(auth)
-    payload = _dispatch(source, "workbench", run_id, principal_id=auth.principal_id)
-    data = getattr(payload, "data", payload)
+    section = _dispatch(
+        source,
+        "periods",
+        run_id,
+        principal_id=auth.principal_id,
+        dimension=dimension,
+        context=context,
+    )
     return {
         "run_id": run_id,
         "dimension": dimension,
         "context": context,
-        "section": getattr(data, "period_tables", None),
+        "section": getattr(section, "data", section),
     }
 
 

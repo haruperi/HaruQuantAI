@@ -219,11 +219,18 @@ class LiveSessionBranchRequest(_BaseApiContract):
 
 
 class BatchRunSpec(_BaseApiContract):
-    """One run specification inside a batch request."""
+    """One run specification inside a batch request.
+
+    Every item declares its own measurement window because a batch executes
+    genuine canonical runs; the gateway never invents a window on a
+    caller's behalf.
+    """
 
     symbol: str = Field(min_length=1, max_length=32)
     timeframe: str = Field(min_length=1, max_length=8)
     strategy_id: str = Field(min_length=1, max_length=100)
+    start: datetime
+    end: datetime
     parameters: Mapping[str, str] = Field(default_factory=dict)
 
 

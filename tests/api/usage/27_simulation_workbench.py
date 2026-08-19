@@ -5,22 +5,22 @@ from __future__ import annotations
 import json
 import sys
 import tempfile
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from app.services.api import register_api_user, run_api_migrations
+from app.services.api import (
+    build_simulation_workbench_registry,
+    build_simulation_workbench_source,
+    register_api_user,
+    run_api_migrations,
+)
 from app.services.api.workstation.simulation_workbench.migrations import (
     get_simulation_workbench_migration_steps,
 )
-from app.services.api.workstation.simulation_workbench.orchestration import (
-    build_simulation_workbench_source,
-)
 from app.services.api.workstation.simulation_workbench.persistence import (
     create_simulation_result_record,
-)
-from app.services.api.workstation.simulation_workbench.registry import (
-    build_simulation_workbench_registry,
 )
 from app.services.api.workstation.simulation_workbench.schemas import (
     BatchCreateRequest,
@@ -68,7 +68,13 @@ def main() -> None:
     command = LiveSessionCommandRequest(command="submit_order", symbol="EURUSD")
     batch = BatchCreateRequest(
         items=(
-            BatchRunSpec(symbol="EURUSD", timeframe="H1", strategy_id="naive-ma-trend"),
+            BatchRunSpec(
+                symbol="EURUSD",
+                timeframe="H1",
+                strategy_id="naive-ma-trend",
+                start=datetime(2026, 1, 1, tzinfo=UTC),
+                end=datetime(2026, 2, 1, tzinfo=UTC),
+            ),
         ),
         concurrency=2,
     )

@@ -32,6 +32,9 @@ type _ReportReader = Callable[[str, str], str]
 type _ResultReader = Callable[[str], Mapping[str, object] | None]
 type _ProjectionBuilder = Callable[..., object]
 type _Comparator = Callable[..., object]
+type _PeriodBuilder = Callable[..., object]
+
+MIN_COMPARISON_RUNS = 2
 
 
 @dataclass(frozen=True, slots=True)
@@ -42,6 +45,7 @@ class _AnalyticsContext:
     result_reader: _ResultReader
     projection_builder: _ProjectionBuilder
     comparator: _Comparator
+    period_builder: _PeriodBuilder
 
 
 def _identities(kwargs: dict[str, object]) -> tuple[str, str]:
@@ -291,12 +295,53 @@ def _archive(_context: _AnalyticsContext, run_id: str, **kwargs: object) -> obje
     return {"run_id": run_id, "archived": changed == 1}
 
 
+def _get_simulation_result(
+    context: _AnalyticsContext, run_id: str, **kwargs: object
+) -> object:
+    """Read the canonical Simulation result content owned by one run.
+
+    Returns:
+        Canonical ``SimulationResult.v1`` mapping.
+
+    Raises:
+        KeyError: When the run or its result evidence is missing.
+    """
+    principal_id, request_id = _identities(kwargs)
+    _, _, result = _require_evidence(
+        context, run_id, principal_id, request_id=request_id
+    )
+    return result
+
+
+def _get_periods(deps: _AnalyticsContext, run_id: str, **kwargs: object) -> object:
+    """Delegate one period-table aggregation to Analytics.
+
+    Returns:
+        Owner period rows for the exact requested dimension and context.
+
+    Raises:
+        KeyError: When the run or its evidence is missing.
+    """
+    principal_id, request_id = _identities(kwargs)
+    _, report_json, result = _require_evidence(
+        deps, run_id, principal_id, request_id=request_id
+    )
+    return deps.period_builder(
+        report_json,
+        result,
+        dimension=str(kwargs.get("dimension", "month")),
+        context=str(kwargs.get("context", "all")),
+        request_id=request_id,
+    )
+
+
 def build_analytics_workbench_source(
     *,
     report_reader: _ReportReader,
     result_reader: _ResultReader,
     projection_builder: _ProjectionBuilder,
     comparator: _Comparator,
+    period_builder: _PeriodBuilder,
 ) -> Callable[..., object]:
     """Build the dispatch source covering every Analytics Workbench read.
 
@@ -306,6 +351,7 @@ def build_analytics_workbench_source(
             mapping`` or ``None``.
         projection_builder: Analytics ``build_analytics_workbench_payload``.
         comparator: Analytics ``compare_performance_reports``.
+        period_builder: Analytics ``build_analytics_period_tables``.
 
     Returns:
         Callable dispatching one allowlisted Analytics Workbench operation.
@@ -315,6 +361,7 @@ def build_analytics_workbench_source(
         result_reader=result_reader,
         projection_builder=projection_builder,
         comparator=comparator,
+        period_builder=period_builder,
     )
     routed: dict[str, Callable[..., object]] = {
         "list_runs": _list_runs,
@@ -324,6 +371,8 @@ def build_analytics_workbench_source(
         "trades": _page_trades,
         "trade": _get_trade,
         "compare": _compare,
+        "periods": _get_periods,
+        "simulation_result": _get_simulation_result,
         "annotate": _annotate,
         "archive": _archive,
     }
@@ -371,6 +420,7 @@ def build_analytics_workbench_source_bundle() -> Mapping[str, object]:
             result_reader=cast("_ResultReader", _unavailable),
             projection_builder=cast("_ProjectionBuilder", _unavailable),
             comparator=cast("_Comparator", _unavailable),
+            period_builder=cast("_PeriodBuilder", _unavailable),
         ),
     }
 
@@ -382,14 +432,124 @@ __all__ = (
 )
 
 
-def _unavailable_projection(*args: object, **kwargs: object) -> object:
-    """Fail closed until report deserialization is composed.
+def _rebuild_report(report_json: str, *, request_id: str) -> object:
+    """Rebuild one canonical report from its immutable artifact text.
+
+    Args:
+        report_json: Serialized report JSON read from the attached artifact.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Validated Analytics ``PerformanceReport``.
+    """
+    from app.services.analytics import deserialize_analytics_performance_report
+
+    return _unwrap_owner(
+        deserialize_analytics_performance_report(report_json, request_id=request_id)
+    )
+
+
+def _unwrap_owner(response: object) -> object:
+    """Return the owner payload carried by one Analytics standard response.
+
+    Args:
+        response: Analytics standard response or raw owner value.
+
+    Returns:
+        The owner evidence itself.
+    """
+    return getattr(response, "data", response)
+
+
+def _build_projection(
+    report_json: str, result: Mapping[str, object], *, request_id: str
+) -> object:
+    """Project one attached report and its result into the workbench payload.
+
+    Args:
+        report_json: Serialized report JSON read from the attached artifact.
+        result: Canonical Simulation result mapping.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Analytics standard response carrying the workbench payload.
+    """
+    from app.services.analytics import build_analytics_workbench_payload
+
+    return build_analytics_workbench_payload(
+        _rebuild_report(report_json, request_id=request_id),
+        result,
+        request_id=request_id,
+    )
+
+
+def _build_periods(
+    report_json: str,
+    result: Mapping[str, object],
+    *,
+    dimension: str,
+    context: str,
+    request_id: str,
+) -> object:
+    """Aggregate the canonical ledger for one exact dimension and context.
+
+    Args:
+        report_json: Serialized report JSON read from the attached artifact.
+        result: Canonical Simulation result mapping.
+        dimension: Requested period dimension.
+        context: Requested source context.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Analytics standard response carrying owner-safe period rows.
+    """
+    from app.services.analytics import build_analytics_period_tables
+
+    return build_analytics_period_tables(
+        _rebuild_report(report_json, request_id=request_id),
+        result,
+        dimension=dimension,
+        context=context,
+        request_id=request_id,
+    )
+
+
+def _compare_reports(
+    reports: Sequence[str], *, request_id: str
+) -> Mapping[str, object]:
+    """Compare each candidate report against the first reference report.
+
+    Args:
+        reports: Serialized report JSON texts in caller-requested order.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Ordered pairwise owner comparison evidence.
 
     Raises:
-        RuntimeError: Always, until the deserialization seam is wired.
+        ValueError: When fewer than two reports were requested.
     """
-    del args, kwargs
-    raise RuntimeError("ANALYTICS_WORKBENCH_RUNTIME_UNAVAILABLE")
+    if len(reports) < MIN_COMPARISON_RUNS:
+        raise ValueError("ANALYTICS_COMPARISON_REQUIRES_TWO_RUNS")
+    from app.services.analytics import compare_performance_reports
+
+    rebuilt = tuple(
+        _rebuild_report(report_json, request_id=request_id) for report_json in reports
+    )
+    reference = rebuilt[0]
+    return {
+        "reference_index": 0,
+        "comparisons": tuple(
+            _unwrap_owner(
+                compare_performance_reports(
+                    cast("Any", reference),
+                    cast("Any", candidate),
+                    request_id=request_id,
+                )
+            )
+            for candidate in rebuilt[1:]
+        ),
+    }
 
 
 def build_analytics_workbench_composition(settings: object) -> Callable[..., object]:
@@ -443,6 +603,7 @@ def build_analytics_workbench_composition(settings: object) -> Callable[..., obj
     return build_analytics_workbench_source(
         report_reader=read_report_file,
         result_reader=read_canonical_result,
-        projection_builder=_unavailable_projection,
-        comparator=_unavailable_projection,
+        projection_builder=_build_projection,
+        comparator=_compare_reports,
+        period_builder=_build_periods,
     )

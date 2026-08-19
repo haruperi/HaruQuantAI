@@ -52,6 +52,8 @@ type AuthContext = Any
 
 __all__ = (
     "authenticate_api_user",
+    "build_analytics_workbench_composition",
+    "build_analytics_workbench_source",
     "build_api_agentic_dependencies",
     "build_api_error",
     "build_api_metadata",
@@ -79,6 +81,9 @@ __all__ = (
     "build_route_contract",
     "build_route_contract_registry",
     "build_secret_redaction_middleware",
+    "build_simulation_workbench_live_authority",
+    "build_simulation_workbench_registry",
+    "build_simulation_workbench_source",
     "build_stream_event",
     "build_system_broker_connection_config",
     "build_unknown_broker_state_alert",
@@ -490,6 +495,80 @@ def build_secret_redaction_middleware(
         redaction_policy=cast("Any", redaction_policy),
         event_emitter=event_emitter,
     )
+
+
+def build_simulation_workbench_source(**values: object) -> object:
+    """Build the Simulation Workbench dispatch source.
+
+    Returns:
+        Callable dispatching one allowlisted workbench operation.
+    """
+    from app.services.api.workstation.simulation_workbench.orchestration import (
+        build_simulation_workbench_source as _build,
+    )
+
+    return _build(**cast("Any", values))
+
+
+def build_simulation_workbench_live_authority(
+    dependencies: object | None = None, **values: object
+) -> object:
+    """Build the interactive live-session authority for the workbench.
+
+    Args:
+        dependencies: Composed Simulator run dependency bundle.
+        **values: Optional ``reproduction_runner`` composition seam.
+
+    Returns:
+        Callable dispatching one named interactive operation.
+    """
+    from app.services.api.workstation.simulation_workbench.orchestration import (
+        build_simulation_workbench_live_authority as _build,
+    )
+
+    return _build(dependencies, **cast("Any", values))
+
+
+def build_simulation_workbench_registry(**values: object) -> object:
+    """Build the Simulation Workbench catalogue transition registry.
+
+    Returns:
+        Opaque registry consumed by the gateway orchestration.
+    """
+    from app.services.api.workstation.simulation_workbench.registry import (
+        build_simulation_workbench_registry as _build,
+    )
+
+    return _build(**cast("Any", values))
+
+
+def build_analytics_workbench_source(**values: object) -> object:
+    """Build the Analytics Workbench dispatch source.
+
+    Returns:
+        Callable dispatching one allowlisted Analytics Workbench operation.
+    """
+    from app.services.api.workstation.analytics_workbench.orchestration import (
+        build_analytics_workbench_source as _build,
+    )
+
+    return _build(**cast("Any", values))
+
+
+def build_analytics_workbench_composition(settings: object) -> object:
+    """Build the production Analytics Workbench source from runtime settings.
+
+    Args:
+        settings: API runtime settings owning the simulation artifact root.
+
+    Returns:
+        Dispatch source with catalogue-backed report and result readers.
+    """
+    from app.services.api.workstation.analytics_workbench.orchestration import (
+        build_analytics_workbench_composition as _build,
+    )
+
+    return _build(settings)
 
 
 def build_api_settings(**values: object) -> object:

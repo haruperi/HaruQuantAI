@@ -356,11 +356,57 @@ def retry_simulation_batch_item_record(
     return result.affected_rows
 
 
+def transition_simulation_batch_item_record(
+    batch_id: str,
+    position: int,
+    *,
+    status: str,
+    run_id: str | None,
+    error: str | None,
+    updated_at: str,
+    request_id: str,
+) -> int:
+    """Move exactly one non-terminal batch item to its observed outcome.
+
+    Args:
+        batch_id: Canonical batch identity.
+        position: Ordered item position.
+        status: Observed item status (``running``, ``completed``, or
+            ``failed``).
+        run_id: Canonical run identity once the item produced one.
+        error: Safe failure detail when the item failed.
+        updated_at: UTC transition timestamp.
+        request_id: Canonical operation request identifier.
+
+    Returns:
+        Affected row count (zero once the item is already terminal).
+    """
+    result = _execute_write(
+        (
+            "UPDATE api_simulation_batch_items SET status = ?, "
+            "run_id = COALESCE(?, run_id), error = ?, updated_at = ? "
+            "WHERE batch_id = ? AND position = ? "
+            "AND status IN ('queued', 'running')",
+        ),
+        ((status, run_id, error, updated_at, batch_id, position),),
+        request_id=request_id,
+    )
+    logger.info(
+        "Transitioned Simulation workbench batch item %s/%d to %s (rows %s)",
+        batch_id,
+        position,
+        status,
+        result.affected_rows,
+    )
+    return result.affected_rows
+
+
 __all__ = (
     "annotate_simulation_result_record",
     "archive_simulation_result_record",
     "cancel_simulation_batch_item_records",
     "retry_simulation_batch_item_record",
+    "transition_simulation_batch_item_record",
     "transition_simulation_result_completion",
     "update_simulation_batch_record",
     "update_simulation_session_record",

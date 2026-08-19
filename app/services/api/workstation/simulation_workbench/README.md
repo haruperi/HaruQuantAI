@@ -1,6 +1,6 @@
 # Simulation Workbench — `app/services/api/workstation/simulation_workbench/`
 
-Feature ID: `FEAT-API-27` — Status: **In Progress** (Phase 0 backend build).
+Feature ID: `FEAT-API-27` — Status: **Completed**.
 
 Owns the durable principal-scoped Simulation run catalogue, typed
 live-session projections, and batch coordination behind
@@ -10,7 +10,7 @@ live-session projections, and batch coordination behind
 
 | Status | Feature | Module ownership | Public API | Contracts | Requirements | Usage evidence |
 |---|---|---|---|---|---|---|
-| In Progress | `FEAT-API-27` Simulation Workbench gateway | `schemas.py` (contracts), `migrations/` (schema), `persistence/` (CRUD), `registry.py` (coordination), `orchestration.py` (composition), `routes.py` (HTTP) | Routes under `/api/v1/simulator` (P0-T08) | `RunCatalogueEntry v1`, live-session projection `v1`, command discriminators (§3.3–3.5 of the work orders) | Work orders P0-T05–P0-T08, P4-T01–P4-T02 | Pending `tests/api/usage/27_simulation_workbench.py` |
+| Completed | `FEAT-API-27` Simulation Workbench gateway | `schemas.py` (contracts), `migrations/` (schema), `persistence/` (CRUD), `registry.py` (coordination), `completion.py` (catalogue retention), `batching.py` (bounded batch execution), `reproduction.py` (canonical reproduction), `provenance.py` (gateway run origin), `orchestration.py` (composition), `routes.py` (HTTP) | Routes under `/api/v1/simulator`; `build_simulation_workbench_source`, `build_simulation_workbench_live_authority`, `build_simulation_workbench_registry` re-exported from `app.services.api` | `RunCatalogueEntry v1`, `BatchCreateRequest v1`, live-session projection `v1`, command discriminators | `FR-API-165`, `FR-API-167`–`FR-API-169` | `tests/api/usage/27_simulation_workbench.py`; `tests/api/unit/test_simulation_workbench_runtime.py` |
 
 ## Persistence - Database
 

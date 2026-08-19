@@ -1145,6 +1145,28 @@ def reset_live_simulation_sessions() -> None:
     _SESSIONS.clear()
 
 
+def read_live_simulation_request(session_id: str) -> Mapping[str, object] | None:
+    """Read one durable session's immutable canonical request.
+
+    The stored request is the exact evidence a reproduction must re-execute,
+    so it is returned verbatim and never merged with live session state.
+
+    Args:
+        session_id: Durable interactive session identity.
+
+    Returns:
+        Immutable canonical request mapping, or ``None`` when the durable
+        record or its request is absent.
+    """
+    record = read_interactive_session_record(_store(), session_id)
+    if record is None:
+        return None
+    request = record.get("request")
+    if not isinstance(request, Mapping):
+        return None
+    return request
+
+
 __all__ = (
     "COMMAND_TYPES",
     "branch_live_simulation",
@@ -1153,6 +1175,7 @@ __all__ = (
     "execute_live_simulation_command",
     "finalize_live_simulation_session",
     "list_live_simulation_sessions",
+    "read_live_simulation_request",
     "read_live_simulation_state",
     "read_live_simulation_viewport",
     "rearm_live_simulation_session",

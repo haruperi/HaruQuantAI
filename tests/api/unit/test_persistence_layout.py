@@ -75,6 +75,7 @@ _SIMULATION_WORKBENCH_EXPORTS = {
     "archive_simulation_result_record",
     "cancel_simulation_batch_item_records",
     "retry_simulation_batch_item_record",
+    "transition_simulation_batch_item_record",
     "transition_simulation_result_completion",
     "update_simulation_batch_record",
     "update_simulation_session_record",

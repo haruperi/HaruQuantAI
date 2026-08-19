@@ -107,6 +107,16 @@ def _build_projection(*args: object, **kwargs: object) -> dict[str, str]:
     return {"payload": "workbench"}
 
 
+def _build_periods(*args: object, **kwargs: object) -> dict[str, object]:
+    """Replay one delegated period aggregation."""
+    del args
+    return {
+        "rows": (),
+        "dimension": kwargs.get("dimension"),
+        "context": kwargs.get("context"),
+    }
+
+
 def _compare_reports(reports: object, **kwargs: object) -> dict[str, int]:
     """Replay one delegated comparison."""
     del kwargs
@@ -181,6 +191,7 @@ def _source(
         result_reader=_make_result_reader(result),
         projection_builder=_build_projection,
         comparator=_compare_reports,
+        period_builder=_build_periods,
     )
 
 

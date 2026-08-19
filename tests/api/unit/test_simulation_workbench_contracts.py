@@ -133,19 +133,31 @@ def test_command_discriminators_are_the_exact_six() -> None:
         LiveSessionCommandRequest(command="invent_fill")
 
 
+def _batch_item() -> BatchRunSpec:
+    """Build one bounded batch item carrying its measurement window.
+
+    Returns:
+        Validated batch run specification.
+    """
+    return BatchRunSpec(
+        symbol="EURUSD",
+        timeframe="H1",
+        strategy_id="s",
+        start=datetime(2026, 1, 1, tzinfo=UTC),
+        end=datetime(2026, 2, 1, tzinfo=UTC),
+    )
+
+
 def test_batch_request_bounds() -> None:
     """Batch items and concurrency are bounded."""
     assert MAX_BATCH_ITEMS == 100
     assert MAX_BATCH_CONCURRENCY == 8
-    item = BatchRunSpec(symbol="EURUSD", timeframe="H1", strategy_id="s")
+    item = _batch_item()
     request = BatchCreateRequest(items=(item,), concurrency=4)
     assert request.concurrency == 4
     with pytest.raises(ValidationError):
         BatchCreateRequest(
-            items=tuple(
-                BatchRunSpec(symbol="EURUSD", timeframe="H1", strategy_id="s")
-                for _ in range(MAX_BATCH_ITEMS + 1)
-            )
+            items=tuple(_batch_item() for _ in range(MAX_BATCH_ITEMS + 1))
         )
     with pytest.raises(ValidationError):
         BatchCreateRequest(items=(item,), concurrency=MAX_BATCH_CONCURRENCY + 1)
