@@ -54,4 +54,19 @@ describe("TradingWidget — FR-UI-147/208/225/226", () => {
     render(<TradingWidget />);
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("registry offline"));
   });
+
+  it("renders only the order ticket in ticketHostOnly mode without mounting the cockpit", async () => {
+    render(<TradingWidget ticketHostOnly />);
+    expect(await screen.findByTestId("ticket")).toHaveTextContent("acct-42");
+    expect(screen.queryByRole("region", { name: "Trading" })).toBeNull();
+    expect(screen.queryByTestId("ladder")).toBeNull();
+  });
+
+  it("delegates to order ticket in ticketHostOnly mode even when no session is configured", async () => {
+    listExecutionSessions.mockResolvedValue({ status: "success", data: [] });
+    render(<TradingWidget ticketHostOnly />);
+    expect(await screen.findByTestId("ticket")).toBeTruthy();
+    expect(screen.queryByRole("region", { name: "Trading" })).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
 });

@@ -207,6 +207,27 @@ export const Header: React.FC = () => {
         if (!cancelled) setAccountProfileLoading(false);
       });
     };
+
+    // Automatically start the session named "Default" (or is_default session) for the active mode on load if no session is running.
+    void apiClients.trading.listExecutionSessions?.()
+      .then(async (response) => {
+        if (cancelled || !response) return;
+        const sessions = unwrapData(response);
+        const active = sessions.find((s) => s.is_active && s.lifecycle_state === 'running');
+        if (!active) {
+          const target = sessions.find(
+            (s) => s.mode === accountMode && (s.name.toLowerCase() === 'default' || s.is_default)
+          );
+          if (target && target.lifecycle_state !== 'running') {
+            await apiClients.trading.actOnExecutionSession?.('start', target);
+            if (!cancelled) refreshProfile();
+          }
+        }
+      })
+      .catch(() => {
+        // Non-fatal if session registry is unavailable
+      });
+
     refreshProfile();
     const timer = window.setInterval(refreshProfile, ACCOUNT_PROFILE_REFRESH_MS);
     return () => {
@@ -237,11 +258,31 @@ export const Header: React.FC = () => {
         { ...systemSettings, [ACCOUNT_MODE_SETTING_KEY]: mode },
         previousVersion,
       )
-      .then((response) => {
+      .then(async (response) => {
         const updated = unwrapData(response);
         setSystemSettings(updated.settings);
         applyAccountMode(mode, updated.version);
         showWorkspaceToast(`Account mode: ${mode.toUpperCase()}`);
+
+        // Coordinate session transition: stop former session if mode changed and start new mode's default session
+        try {
+          const sessionsRes = await apiClients.trading.listExecutionSessions?.();
+          if (sessionsRes) {
+            const sessions = unwrapData(sessionsRes);
+            const active = sessions.find((s) => s.is_active);
+            if (active && active.mode !== mode) {
+              await apiClients.trading.actOnExecutionSession?.('stop', active);
+            }
+            const target = sessions.find(
+              (s) => s.mode === mode && (s.name.toLowerCase() === 'default' || s.is_default)
+            );
+            if (target && target.lifecycle_state !== 'running') {
+              await apiClients.trading.actOnExecutionSession?.('start', target);
+            }
+          }
+        } catch {
+          // Non-fatal if session transition fails
+        }
       })
       .catch(() => {
         applyAccountMode(previousMode === 'unknown' ? 'sim' : previousMode, previousVersion);

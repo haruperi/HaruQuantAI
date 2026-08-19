@@ -69,24 +69,10 @@ export function mapRuntimeProfileToAccountMode(profile?: string): AccountMode {
 const DEFAULT_WORKSPACES: Workspace[] = [
   {
     id: 1,
-    name: "HaruQuantAI Workspace",
-    expandedWidgetId: null,
-    widgets: [
-      { id: "markets-1", type: "markets", title: "Markets", col: 1, row: 1, colSpan: 6, rowSpan: 2 },
-      { id: "chart-1", type: "chart", title: "EURUSD Chart", symbol: "EURUSD", col: 7, row: 1, colSpan: 6, rowSpan: 2 },
-      { id: "ladder-1", type: "priceLadder", title: "ESU5 DOM", symbol: "ESU5", col: 1, row: 3, colSpan: 4, rowSpan: 2 },
-      { id: "positions-1", type: "positions", title: "Positions & Orders", col: 5, row: 3, colSpan: 8, rowSpan: 2 },
-    ],
-  },
-  {
-    id: 2,
     name: "New Workspace-1",
     expandedWidgetId: null,
-    widgets: [
-      { id: "watchlist-1", type: "watchlist", title: "Watchlist", col: 1, row: 1, colSpan: 6, rowSpan: 2 },
-      { id: "options-1", type: "optionsGrid", title: "ESU5 Options", symbol: "ESU5", col: 7, row: 1, colSpan: 6, rowSpan: 2 },
-      { id: "data-1", type: "data", title: "Data Capabilities", col: 1, row: 3, colSpan: 12, rowSpan: 3 },
-    ],
+    widgets: [],
+    templateChoicePending: true,
   },
 ];
 
@@ -464,7 +450,7 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         if (!parsed.success) return currentState;
         return { ...currentState, ...parsed.data };
       },
-      version: 2,
+      version: 3,
     }
   )
 );

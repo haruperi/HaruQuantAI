@@ -44,7 +44,7 @@ export function TradingWidget({ className, accountId: configuredAccountId, symbo
       ? `No active or default ${accountMode.toUpperCase()} execution session is configured.`
       : !accountId ? "The selected execution session has no provider account reference." : null;
 
-  if (ticketHostOnly && accountId) return <OrderTicket accountId={accountId} symbol={activeSymbol} />;
+  if (ticketHostOnly) return <OrderTicket accountId={accountId} symbol={activeSymbol} />;
   return <section className={`workflow-trading ${className ?? ""}`.trim()} role="region" aria-label="Trading">
     <header className="workflow-trading__hero"><div><span className="workflow-trading__eyebrow"><ShieldCheck size={14} /> Governed execution</span><h2>New order</h2><p>Execution route and broker account follow the active system session automatically.</p></div><span className={`workflow-trading__route workflow-trading__route--${accountMode}`}>{accountMode === "unknown" ? "Mode unavailable" : `${accountMode.toUpperCase()} · ${session?.name ?? "No session"}`}</span></header>
     {loading && <div className="workflow-trading__state" role="status"><LoaderCircle className="is-spinning" size={22} /><strong>Resolving execution context</strong></div>}

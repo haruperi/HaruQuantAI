@@ -21,11 +21,12 @@ beforeEach(() => {
 });
 
 describe("FR-UI-001 default workspace", () => {
-  it("provides at least one workspace with the registered widget set on first load", () => {
+  it("provides an initial pending workspace presenting the template picker on first load", () => {
     const { workspaces, defaultWorkspaceId } = useWorkspaceStore.getState();
     expect(workspaces.length).toBeGreaterThan(0);
     expect(workspaces.some((ws) => ws.id === defaultWorkspaceId)).toBe(true);
-    expect(workspaces[0].widgets.length).toBeGreaterThan(0);
+    expect(workspaces[0].templateChoicePending).toBe(true);
+    expect(workspaces[0].widgets).toEqual([]);
   });
 });
 
@@ -54,12 +55,13 @@ describe("FR-UI-004 rename/duplicate/delete", () => {
   });
 
   it("duplicates a workspace with fresh widget ids and a dock tree keyed by the new ids", () => {
+    useWorkspaceStore.getState().applyWorkspaceTemplate("haruquant");
     const before = useWorkspaceStore.getState().workspaces.length;
     useWorkspaceStore.getState().duplicateWorkspace(1);
     const state = useWorkspaceStore.getState();
     expect(state.workspaces.length).toBe(before + 1);
     const copy = state.workspaces[state.workspaces.length - 1];
-    expect(copy.name).toBe("HaruQuantAI Workspace Copy");
+    expect(copy.name).toBe("HaruQuant Copy");
     expect(copy.widgets.map((w) => w.type)).toEqual(state.workspaces[0].widgets.map((w) => w.type));
     expect(copy.widgets.every((w) => !state.workspaces[0].widgets.some((orig) => orig.id === w.id))).toBe(true);
     const copyIds = copy.widgets.map((w) => w.id);
@@ -81,24 +83,24 @@ describe("FR-UI-004 rename/duplicate/delete", () => {
 
 describe("FR-UI-005 default workspace designation", () => {
   it("allows designating a different workspace as default", () => {
-    useWorkspaceStore.getState().setDefaultWorkspace(2);
-    expect(useWorkspaceStore.getState().defaultWorkspaceId).toBe(2);
+    useWorkspaceStore.getState().addWorkspace();
+    const nextId = useWorkspaceStore.getState().workspaces[1].id;
+    useWorkspaceStore.getState().setDefaultWorkspace(nextId);
+    expect(useWorkspaceStore.getState().defaultWorkspaceId).toBe(nextId);
   });
 });
 
 describe("FR-UI-008 expand/contract retains the prior layout", () => {
   it("sets and clears the expanded widget without touching widget identity", () => {
-    useWorkspaceStore.getState().expandWidget("markets-1");
-    expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.expandedWidgetId).toBe("markets-1");
+    useWorkspaceStore.getState().applyWorkspaceTemplate("haruquant");
+    const initialWidgetIds = useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.widgets.map((w) => w.id);
+    const firstWidgetId = initialWidgetIds[0];
+    useWorkspaceStore.getState().expandWidget(firstWidgetId);
+    expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.expandedWidgetId).toBe(firstWidgetId);
 
     useWorkspaceStore.getState().contractWidget();
     expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.expandedWidgetId).toBeNull();
-    expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.widgets.map((w) => w.id)).toEqual([
-      "markets-1",
-      "chart-1",
-      "ladder-1",
-      "positions-1",
-    ]);
+    expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === 1)!.widgets.map((w) => w.id)).toEqual(initialWidgetIds);
   });
 });
 
@@ -251,6 +253,24 @@ describe("FR-UI-029 no fixture data", () => {
 });
 
 describe("symbol-bound widget headings follow the charted symbol", () => {
+  beforeEach(() => {
+    useWorkspaceStore.setState((state) => ({
+      workspaces: state.workspaces.map((ws) =>
+        ws.id === 1
+          ? {
+              ...ws,
+              templateChoicePending: false,
+              widgets: [
+                { id: "chart-1", type: "chart", title: "EURUSD Chart", symbol: "EURUSD" },
+                { id: "ladder-1", type: "priceLadder", title: "ESU5 DOM", symbol: "ESU5" },
+                { id: "positions-1", type: "positions", title: "Positions & Orders", symbol: "EURUSD" },
+              ],
+            }
+          : ws
+      ),
+    }));
+  });
+
   it("retitles and repoints a chart widget when its symbol changes", () => {
     useWorkspaceStore.getState().setWidgetSymbol("chart-1", "GBPJPY");
 
@@ -387,11 +407,13 @@ describe("FR-UI-199 unknown template ids are rejected", () => {
 
 describe("FR-UI-201 docking layout persistence", () => {
   it("records a serialized dock layout for the addressed workspace only", () => {
+    useWorkspaceStore.getState().addWorkspace();
+    const secondWsId = useWorkspaceStore.getState().workspaces[1].id;
     const layout = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: {} };
     useWorkspaceStore.getState().setWorkspaceDockLayout(1, layout);
     const state = useWorkspaceStore.getState();
     expect(state.workspaces.find((w) => w.id === 1)!.dock).toEqual(layout);
-    expect(state.workspaces.find((w) => w.id === 2)!.dock).toBeUndefined();
+    expect(state.workspaces.find((w) => w.id === secondWsId)!.dock).toBeUndefined();
   });
 
   it("ignores an identical serialized layout so restore events cannot loop", () => {

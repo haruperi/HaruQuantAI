@@ -12,17 +12,19 @@ import { Header } from "./Header";
 import { useTradingStore } from "../../store/useTradingStore";
 import { useWorkspaceStore } from "../../features/workspaces";
 
-const { readSystem, updateSystem, accountProfile, logout } = vi.hoisted(() => ({
+const { readSystem, updateSystem, accountProfile, listExecutionSessions, actOnExecutionSession, logout } = vi.hoisted(() => ({
   readSystem: vi.fn(),
   updateSystem: vi.fn(),
   accountProfile: vi.fn(),
+  listExecutionSessions: vi.fn(),
+  actOnExecutionSession: vi.fn(),
   logout: vi.fn(),
 }));
 
 vi.mock("@/clients", () => ({
   apiClients: {
     settings: { readSystem, updateSystem },
-    trading: { accountProfile },
+    trading: { accountProfile, listExecutionSessions, actOnExecutionSession },
   },
   unwrapData: (response: { data: unknown }) => response.data,
 }));
@@ -44,6 +46,8 @@ const systemSettingsResponse = (accountMode: string, version = 7) => ({
 beforeEach(() => {
   vi.clearAllMocks();
   readSystem.mockResolvedValue(systemSettingsResponse("sim"));
+  listExecutionSessions.mockResolvedValue({ data: [] });
+  actOnExecutionSession.mockResolvedValue({ data: {} });
   accountProfile.mockResolvedValue({
     data: {
       contract_version: "v1",
@@ -91,6 +95,28 @@ describe("header profile section rendering", () => {
   it("shows the selected mode and active session name together", async () => {
     render(<Header />);
     expect(await screen.findByRole("status")).toHaveTextContent("SIM : Research SIM");
+  });
+
+  it("automatically starts the session named Default on initial load when no session is running", async () => {
+    listExecutionSessions.mockResolvedValueOnce({
+      data: [
+        {
+          session_id: "sess-default-1",
+          name: "Default",
+          mode: "sim",
+          is_active: false,
+          is_default: true,
+          lifecycle_state: "stopped",
+        },
+      ],
+    });
+    render(<Header />);
+    await waitFor(() => {
+      expect(actOnExecutionSession).toHaveBeenCalledWith(
+        "start",
+        expect.objectContaining({ name: "Default", mode: "sim" }),
+      );
+    });
   });
 
   it("shows an explicit no-session state", async () => {
