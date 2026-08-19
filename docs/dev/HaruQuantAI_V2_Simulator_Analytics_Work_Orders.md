@@ -633,7 +633,7 @@ None.
 - [x] Phase 0 — P0-T01 through P0-T11
 - [x] Phase 1 — P1-T01 through P1-T06
 - [x] Phase 2 — P2-T01 through P2-T02
-- [ ] Phase 3 — P3-T01 through P3-T04
+- [x] Phase 3 — P3-T01 through P3-T04
 - [ ] Phase 4 — P4-T01 through P4-T05
 - [ ] Phase 5 — P5-T01
 - [ ] Phase 6 — P6-T01 through P6-T03
@@ -1012,7 +1012,7 @@ Git Commit: `feat(ui): build batch run monitor`
 
 ### Phase 3 — Analytics MVP
 
-#### - [ ] Task `P3-T01` — Build library overview
+#### - [x] Task `P3-T01` — Build library overview
 
 **Files:** `AnalyticsLibrary.tsx`, `OverviewPanel.tsx`, `AnalyticsEvidenceState.tsx` (CREATE).
 
@@ -1020,7 +1020,7 @@ Render source §§14.1–14.2 only from server fields. Test pagination, archive,
 
 Git Commit: `feat(ui): build Analytics library overview`
 
-#### - [ ] Task `P3-T02` — Build trade analysis
+#### - [x] Task `P3-T02` — Build trade analysis
 
 **Files:** `TradesPanel.tsx`, `TradeDetailPanel.tsx`, `AnalyticsArtifactDrawer.tsx` (CREATE).
 
@@ -1028,7 +1028,7 @@ Use server pagination/filters. Replay URL carries exact encoded return context.
 
 Git Commit: `feat(ui): build Analytics trade analysis`
 
-#### - [ ] Task `P3-T03` — Build Analytics charts
+#### - [x] Task `P3-T03` — Build Analytics charts
 
 **Files:** `TimeSeriesChart.tsx`, `CalendarHeatmap.tsx`, `DistributionChart.tsx` (CREATE).
 
@@ -1036,7 +1036,7 @@ Render owner series only; expose unit, count, truncation, unavailable reason, an
 
 Git Commit: `feat(ui): build Analytics chart primitives`
 
-#### - [ ] Task `P3-T04` — Build evidence context
+#### - [x] Task `P3-T04` — Build evidence context
 
 **Files:** `RealismPanel.tsx`, `ProvenancePanel.tsx` (CREATE).
 
