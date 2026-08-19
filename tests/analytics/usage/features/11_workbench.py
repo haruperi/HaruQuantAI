@@ -161,6 +161,68 @@ def fr_anlt_079() -> None:
     )
 
 
+def _ledger_result() -> dict[str, object]:
+    """Build one canonical result carrying a real closed-trade ledger.
+
+    Returns:
+        Canonical Simulation result with owner ledger evidence.
+    """
+    source = _source_with_profit(Decimal(25))
+    trades = source["closed_trades"]
+    first = trades[0]  # type: ignore[index]
+    return {
+        **_SIMULATION_RESULT,
+        "closed_trades": (
+            first,
+            {**first, "ticket": "ticket-2", "profit": Decimal(-5)},
+        ),
+    }
+
+
+def fr_anlt_080() -> None:
+    """
+    FR-ANLT-080: Stage 2 — Project report-owned presentation evidence.
+
+    The system shall project report-owned equity presentation evidence into
+    drawdown and monthly-return series for the workbench and dashboard
+    without recalculating any report metric.
+    """
+    _header("Presentation - Report-Owned Drawdown and Monthly Series")
+    payload = unwrap(build_analytics_workbench_payload(_report(), _ledger_result()))
+    print(_format_result(payload))
+    print(
+        f"Data -> drawdown_curve='{payload.drawdown_curve.status}' "
+        f"points={payload.drawdown_curve.sample_count}, "
+        f"monthly_returns='{payload.monthly_returns.status}' "
+        f"rows={payload.monthly_returns.sample_count}, "
+        f"period_tables='{payload.period_tables.status}'"
+    )
+
+
+def fr_anlt_081() -> None:
+    """
+    FR-ANLT-081: Stage 2 — Rebuild one canonical report from its artifact.
+
+    The system shall rebuild one canonical PerformanceReport from its
+    serialized JSON artifact, failing closed as a validation error on
+    malformed or tampered input.
+    """
+    _header("Deserialization - Canonical Report Round Trip")
+    artifact = unwrap(
+        serialize_report(_report(), format_name="json", config=_configured())
+    )
+    response = deserialize_analytics_performance_report(artifact)
+    rebuilt = unwrap(response)
+    print(_format_result(rebuilt))
+    print(
+        f"Data -> report_id='{rebuilt.report_id}', "
+        f"schema_id='{rebuilt.schema_id}', "
+        f"sections={len(rebuilt.sections)}"
+    )
+    refusal = deserialize_analytics_performance_report('{"not": "a report"}')
+    print(f"Data -> malformed_status='{refusal.status}'")
+
+
 def main() -> None:
     """Run all feature examples in sequential module flow order."""
     _feature_header(
@@ -174,6 +236,8 @@ def main() -> None:
         "-> Stage 3: Unavailable-section truth and explicit bounds"
     )
     fr_anlt_079()
+    fr_anlt_080()
+    fr_anlt_081()
     explicit_truncation()
 
 

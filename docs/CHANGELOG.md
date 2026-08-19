@@ -2,6 +2,60 @@
 
 ## [Unreleased]
 
+### Close the workbench evidence and runtime gaps
+
+The workbenches shipped with sections that could never carry data and with
+gateway seams that always refused service. Both now do what their registry
+rows say they do.
+
+#### Added (6)
+
+- Added report-owned presentation series and workbench presentation builders,
+  so the drawdown curve, returns series, VAMI, monthly returns, period tables,
+  trade calendar, streaks, histogram, outliers, excursions, and duration
+  sections carry real owner evidence instead of a permanent unavailable reason.
+- Added a strict `PerformanceReport` deserializer that rebuilds one canonical
+  report from its immutable artifact and fails closed on malformed or tampered
+  input.
+- Added catalogue retention of finished canonical runs: the completion sink
+  attaches the immutable serialized report before completing the row, so a
+  completed run can never reference a report that is not there.
+- Added bounded batch execution with durable per-item transitions and
+  synchronized batch counts, and canonical reproduction that re-executes a
+  finalized session's exact immutable request through the deterministic engine.
+- Added gateway-owned run provenance, so a catalogue row records whether a run
+  exists because of a batch, a reproduction, or a direct canonical job.
+- Added the historical run catalogue to the Simulation workspace, replacing the
+  staged-rollout placeholder that stood inside a Completed feature.
+
+#### Changed (4)
+
+- Composed the Analytics Workbench projection, comparison, and period
+  aggregation against the real owner report; those three routes previously
+  refused service at runtime despite a Completed registry row.
+- Returned canonical `SimulationResult` content from the analytics
+  simulation-result route, which had been returning the catalogue row instead.
+- Required a measurement window on each batch item, because a batch executes
+  genuine canonical runs and the gateway will not invent a window.
+- Re-exported the five workbench builders from `app.services.api` rather than
+  leaving consumers to deep-import them.
+
+#### Fixed (3)
+
+- Corrected the dashboard drawdown chart and monthly returns table, which were
+  skipped sections rather than the completed payloads the dashboard promised.
+- Corrected an unrecognized Analytics run segment, which silently fell back to
+  the overview tab instead of saying the section does not exist.
+- Corrected both workbench module READMEs, which still read `In Progress`
+  (Phase 0 backend build) while their registry rows read Completed.
+
+#### Testing (2)
+
+- Added runtime coverage for the completion sink, bounded batch execution,
+  canonical reproduction, and run provenance.
+- Added coverage for the report deserializer round trip, the data-bearing
+  workbench sections, the run catalogue panel, and the unknown-section route.
+
 ### Deliver the Simulation and Analytics workbenches
 
 Operators can now run a canonical backtest, practise interactively, replay a
@@ -17,7 +71,7 @@ recorded trade, and read the resulting evidence without leaving the workstation.
   attached report artifact, workbench projection, paginated canonical trades,
   period tables, artifacts, replay anchors, comparison, annotation, and archive
   operations under `/api/v1/analytics`.
-- Added `FEAT-ANLT-11` Analytics workbench projection producing eighteen bounded
+- Added `FEAT-ANLT-11` Analytics workbench projection producing seventeen bounded
   owner sections with explicit unavailable reasons, so a metric the report did
   not calculate is never presented as zero.
 - Added `FEAT-UI-31` Simulation Workbench: the eight-stage run builder, canonical

@@ -124,9 +124,12 @@ def fr_anlt_045() -> None:
     )
 
 
-def fr_anlt_046() -> None:
-    """FR-ANLT-046: Stage 3 — Project PerformanceReport into bounded DashboardPayload v1."""
-    _header("Stage 3: Dashboard Projection - Build Dashboard Payload (FR-ANLT-046)")
+def _report() -> Any:
+    """Build one validated report from bounded single-trade evidence.
+
+    Returns:
+        Validated Analytics performance report.
+    """
     config = _config()
     trade = _trade()
     source = {
@@ -144,7 +147,7 @@ def fr_anlt_046() -> None:
         "quality_metadata": {},
         "source_metadata": {},
     }
-    report = unwrap(
+    return unwrap(
         build_performance_report(
             source,
             source_contract="simulation.result",
@@ -156,11 +159,35 @@ def fr_anlt_046() -> None:
             config=config,
         )
     )
-    payload_resp = build_dashboard_payload(report)
+
+
+def fr_anlt_046() -> None:
+    """FR-ANLT-046: Stage 3 — Project PerformanceReport into bounded DashboardPayload v1."""
+    _header("Stage 3: Dashboard Projection - Build Dashboard Payload (FR-ANLT-046)")
+    payload_resp = build_dashboard_payload(_report())
     payload_dto = unwrap(payload_resp)
     payload = DashboardPayload(**dict(payload_dto.__dict__))
     print(_format_result(payload_resp))
     print(f"Data -> schema_id='{payload.schema_id}', non_binding={payload.non_binding}")
+
+
+def fr_anlt_082() -> None:
+    """FR-ANLT-082: Stage 3 — Complete the drawdown and monthly payload sections."""
+    _header(
+        "Stage 3: Presentation Sections - Drawdown and Monthly Returns (FR-ANLT-082)"
+    )
+    payload_resp = build_dashboard_payload(_report())
+    payload = unwrap(payload_resp)
+    sections = {
+        str(section["payload_class"]): str(section["status"])
+        for section in payload.sections
+    }
+    print(_format_result(payload_resp))
+    print(
+        f"Data -> drawdown_chart='{sections['drawdown_chart']}', "
+        f"monthly_returns_table='{sections['monthly_returns_table']}', "
+        f"truncation_rows={len(payload.truncation_metadata)}"
+    )
 
 
 def main() -> None:
@@ -178,6 +205,7 @@ def main() -> None:
     # Stage 3: Series truncation & Dashboard payload projection
     fr_anlt_045()
     fr_anlt_046()
+    fr_anlt_082()
 
 
 if __name__ == "__main__":

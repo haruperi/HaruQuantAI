@@ -170,13 +170,13 @@ The order is the implementation sequence.
 | Completed | `FEAT-ANLT-02` Approved Upstream Result Mapping       | `adapters/`   | Exact declarations: Section 4.2                                                                                          | Section 4.2 functional requirements | `tests/analytics/usage/features/02_adapters.py`   |
 | Completed | `FEAT-ANLT-03` Internal Pure Analytical Evidence      | `metrics/`    | Exact declarations: Section 4.3                                                                                          | Section 4.3 functional requirements | `tests/analytics/usage/features/03_metrics.py`    |
 | Completed | `FEAT-ANLT-04` Canonical Reporting                    | `reports/`    | Exact declarations and report contracts: Section 4.4                                                                     | Section 4.4 functional requirements | `tests/analytics/usage/features/04_reports.py`    |
-| Completed | `FEAT-ANLT-05` Bounded Report Projection              | `dashboards/` | Exact declarations,`DashboardPayload`, and explicit context-required `get_analytics_dashboard_snapshot`: Section 4.6 | Section 4.6 functional requirements | `tests/analytics/usage/features/05_dashboards.py` |
+| Completed | `FEAT-ANLT-05` Bounded Report Projection              | `dashboards/` | Exact declarations,`DashboardPayload`, and explicit context-required `get_analytics_dashboard_snapshot`: Section 4.6 | Section 4.6 functional requirements including `FR-ANLT-082` | `tests/analytics/usage/features/05_dashboards.py` |
 | Completed | `FEAT-ANLT-06` Process Scoring | `scoring/` | process-first scoring, critical-failure override, score reproducibility, comparative scoring, no-trade scoring | Section 4.7 functional requirements | `tests/analytics/usage/features/06_scoring.py` |
 | Completed | `FEAT-ANLT-07` Player Trade Journal | `journal/` | `append_player_journal_entry`, `read_player_journal_entry`; immutable canonical hash and evidence references | `FR-ANLT-067`..`FR-ANLT-069` | `tests/analytics/usage/features/07_journal.py` |
 | Completed | `FEAT-ANLT-08` Plan-Adherence and Behavioral Analytics | `behavior/` | `assess_plan_adherence`, `detect_behavior_patterns`; exact plan and threshold versions | `FR-ANLT-070`..`FR-ANLT-072` | `tests/analytics/usage/features/08_behavior.py` |
 | Completed | `FEAT-ANLT-09` Emergency-Response Analytics | `emergency_response/` | `analyze_emergency_response`; sequence, timing, completeness, and survival evidence | `FR-ANLT-073`..`FR-ANLT-074` | `tests/analytics/usage/features/09_emergency_response.py` |
 | Completed | `FEAT-ANLT-10` Player Qualification | `qualification/` | `evaluate_player_qualification`; prerequisites, attempts, remediation, expiry, and eligibility | `FR-ANLT-075`..`FR-ANLT-078` | `tests/analytics/usage/features/10_qualification.py` |
-| Completed | `FEAT-ANLT-11` Workbench Projection | `workbench/` | `build_analytics_workbench_payload`; finite owner-produced 17-section non-binding workbench projection with exact unavailability reasons, preserved source contexts, Decimal-safe values, and explicit 5,000-item truncation; report-owned presentation series and the strict report deserializer | `FR-ANLT-079`..`FR-ANLT-082` | `tests/analytics/usage/features/11_workbench.py`; `tests/analytics/unit/test_workbench_projections.py` |
+| Completed | `FEAT-ANLT-11` Workbench Projection | `workbench/` | `build_analytics_workbench_payload`; finite owner-produced 17-section non-binding workbench projection with exact unavailability reasons, preserved source contexts, Decimal-safe values, and explicit 5,000-item truncation; report-owned presentation series and the strict report deserializer | `FR-ANLT-079`..`FR-ANLT-081` | `tests/analytics/usage/features/11_workbench.py`; `tests/analytics/unit/test_workbench_projections.py` |
 
 #### Player evidence requirements
 
@@ -197,7 +197,7 @@ The order is the implementation sequence.
 | Completed | `FR-ANLT-079` | Project one validated PerformanceReport and canonical Simulation result into the finite non-binding workbench payload with stable sections, exact unavailability reasons, preserved source contexts, and explicit truncation. | `app/services/analytics/workbench/projections.py`; `tests/analytics/usage/features/11_workbench.py::fr_anlt_079` |
 | Completed | `FR-ANLT-080` | Project report-owned equity presentation evidence into drawdown and monthly-return series for the workbench and dashboard without recalculating report metrics. | `app/services/analytics/workbench/presentations.py`; `app/services/analytics/reports/presentation.py`; `tests/analytics/unit/test_workbench_projections.py`; `tests/analytics/usage/features/11_workbench.py` |
 | Completed | `FR-ANLT-081` | Rebuild one canonical PerformanceReport from its serialized JSON artifact, failing closed as a validation error on malformed or tampered input. | `app/services/analytics/reports/deserialization.py`; `tests/analytics/unit/test_report_deserialization.py`; `tests/analytics/usage/features/11_workbench.py::report_deserialization` |
-| Completed | `FR-ANLT-082` | Project report-owned drawdown and monthly-return series into completed bounded dashboard payload sections with explicit truncation metadata. | `app/services/analytics/dashboards/payloads.py`; `tests/analytics/component/test_payloads.py` |
+| Completed | `FR-ANLT-082` | Project report-owned drawdown and monthly-return series into completed bounded dashboard payload sections with explicit truncation metadata. | `app/services/analytics/dashboards/payloads.py`; `tests/analytics/component/test_payloads.py`; `tests/analytics/usage/features/05_dashboards.py::fr_anlt_082` |
 
 Work outside Analytics ownership has no `FEAT-*` registration and consumes no
 feature ordinal.
@@ -1291,7 +1291,7 @@ The strict canonical-report deserializer lives in `reports/deserialization.py`
 (`deserialize_performance_report`, inbound to serialize_report) and is exercised
 in `tests/analytics/unit/test_report_deserialization.py`.
 
-**Requirements:** `FR-ANLT-079`..`FR-ANLT-082` (see the evidence rows above).
+**Requirements:** `FR-ANLT-079`..`FR-ANLT-081` (see the evidence rows above).
 **Rules:** Workbench builders never recalculate report metrics, never fabricate
 points, and never substitute zero for absent evidence; derived rows carry only
 counts, sums, owner values, and timestamp arithmetic.
