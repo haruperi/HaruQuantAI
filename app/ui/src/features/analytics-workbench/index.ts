@@ -79,3 +79,24 @@ export {
   PROVENANCE_ROWS,
   type ProvenancePanelProps,
 } from "./ProvenancePanel";
+
+export {
+  ReturnsPanel,
+  RETURNS_METRICS,
+  UNSUPPORTED_RETURNS_METRICS,
+  UnsupportedMetrics,
+  summaryRow,
+  type AdvancedPanelProps,
+} from "./ReturnsPanel";
+
+export {
+  RiskPanel,
+  RISK_METRICS,
+  UNSUPPORTED_RISK_METRICS,
+} from "./RiskPanel";
+
+export {
+  DistributionPanel,
+  DISTRIBUTION_METRICS,
+  UNSUPPORTED_DISTRIBUTION_METRICS,
+} from "./DistributionPanel";
