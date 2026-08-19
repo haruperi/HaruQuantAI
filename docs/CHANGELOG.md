@@ -2,6 +2,55 @@
 
 ## [Unreleased]
 
+### Deliver the Simulation and Analytics workbenches
+
+Operators can now run a canonical backtest, practise interactively, replay a
+recorded trade, and read the resulting evidence without leaving the workstation.
+
+#### Added (5)
+
+- Added `FEAT-API-27` Simulation Workbench gateway with a durable
+  principal-scoped run catalogue, typed live-session projections, bounded
+  backwards-only viewports, manual command receipts, advisory finalization, and
+  bounded batch coordination under `/api/v1/simulator`.
+- Added `FEAT-API-28` Analytics Workbench gateway exposing the run catalogue,
+  attached report artifact, workbench projection, paginated canonical trades,
+  period tables, artifacts, replay anchors, comparison, annotation, and archive
+  operations under `/api/v1/analytics`.
+- Added `FEAT-ANLT-11` Analytics workbench projection producing eighteen bounded
+  owner sections with explicit unavailable reasons, so a metric the report did
+  not calculate is never presented as zero.
+- Added `FEAT-UI-31` Simulation Workbench: the eight-stage run builder, canonical
+  and batch monitors, the interactive practice workspace with server-authoritative
+  pacing, manual command and what-if panels, recovery and advisory finalization,
+  immutable trade playback, scenario/checklist/mission evidence, and the explicit
+  portfolio destination.
+- Added `FEAT-UI-32` Analytics Workbench: the run library, overview, trade ledger
+  and detail, chart primitives, realism and provenance evidence, advanced returns,
+  risk and distribution views, period and benchmark views, and owner-delegated run
+  comparison.
+
+#### Changed (4)
+
+- Retained the complete `SimulationResult` and `PerformanceReport` until the API
+  completion sink records their references, and attached the serialized Analytics
+  report as an immutable Simulation run artifact, so terminal evidence survives
+  job-registry eviction.
+- Extended Simulator live-session authority with listing, forward-only seek,
+  manual command execution, bounded viewport reads, and advisory finalization.
+  Seek refuses a rewind, and a finalized session accepts no further mutation.
+- Added engine and `SimTrader` support for cancelling and modifying a resting
+  order, which the frozen manual command set requires.
+- Corrected typed-client catalogue enums that had drifted from the gateway
+  contract: command discriminators, origin kinds, catalogue statuses, and
+  evidence classes now mirror the values the gateway accepts.
+
+#### Testing (1)
+
+- Added Chromium browser coverage for the ten required workbench journeys plus
+  two committed visual snapshots, running against stubbed responses and a frozen
+  clock so no journey depends on a live provider.
+
 ### Add FX Market Hours widget
 
 Operators can now inspect live Asian, European, and North American FX trading session clocks, spreads, volatility, and volume indicators dynamically within the workstation and a standalone route.

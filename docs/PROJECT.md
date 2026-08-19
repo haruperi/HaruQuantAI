@@ -1,7 +1,7 @@
 # HaruQuantAI
 
 > **System path:** `HaruQuantAI/`
-> **Status:** `In Progress` — of 252 registered application features, 241 are implemented and structurally reconciled (95.63%); 9 are `Pending` and 2 are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
+> **Status:** `In Progress` — of 252 registered application features, 243 are implemented and structurally reconciled (96.43%); 9 are `Pending` and none are `Partial`. Deployment, external-provider readiness, and separately registered system workflows remain distinct runtime concerns.
 > **Last updated:** `2026-08-18`
 
 > This document is the system-level source of truth.
@@ -70,6 +70,17 @@ satisfied.
 - These domains are not rebuilt phase-by-phase. Data's applicable Google-style
   docstrings are structurally enforced; remaining repository-wide cleanup is tracked
   separately from functional domain completion.
+- The Simulation and Analytics workbenches are delivered end to end. A canonical
+  run submitted from the eight-stage builder reaches an Analytics overview; a
+  trade opens its immutable replay and returns to the exact trade it left; a
+  practice session steps, seeks, takes manual commands, branches, restores,
+  rearms, and finalizes as advisory evidence; and a partially failed batch opens
+  its successful members. `FEAT-API-27`, `FEAT-API-28`, and `FEAT-ANLT-11` own
+  the durable catalogue, the typed live-session and Analytics gateways, and the
+  workbench projection; `FEAT-UI-31` and `FEAT-UI-32` own the two workspaces.
+  Every metric, cursor, receipt, and status shown is server-authoritative, and
+  evidence the owner did not calculate stays explicitly unavailable rather than
+  rendering as zero.
 - Indicators is built as one domain before Strategy, covering all approved
   Core, trend, volatility, momentum, volume, and candle-pattern indicators.
   Later roadmap allocations for those completed features become regression gates
@@ -341,7 +352,7 @@ the current input contract rather than represented by unusable stubs.
 * **Owns**: Frontend pages, layouts, widgets, typed clients, session/page context, interaction state, accessibility, formatting, and loading/empty/stale/error presentation.
 * **Boundaries**: UI never becomes authoritative for backend policy, safety, calculations, persistence, or execution. Client checks are advisory. `FEAT-UI-*` uses executable component/integration evidence instead of standalone usage programs. Markets and Watchlists reside in focused `src/features/markets/` and `src/features/watchlists/` folders.
 * **Key Limits**: No invented evidence; unavailable values remain explicit; governed actions remain backend-authorized.
-* **Documentation**: `app/ui/README.md`
+* **Documentation**: `app/ui/README.md`; the Simulation and Analytics workbench handoff is registered there as `FEAT-UI-31` and `FEAT-UI-32`, with browser evidence in `app/ui/e2e/workbench-journeys.spec.ts`.
 
 ### 2.2 Domain ownership rule
 
