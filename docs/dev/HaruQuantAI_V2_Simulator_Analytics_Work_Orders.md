@@ -635,7 +635,7 @@ None.
 - [x] Phase 2 — P2-T01 through P2-T02
 - [x] Phase 3 — P3-T01 through P3-T04
 - [x] Phase 4 — P4-T01 through P4-T05
-- [ ] Phase 5 — P5-T01
+- [x] Phase 5 — P5-T01
 - [ ] Phase 6 — P6-T01 through P6-T03
 - [ ] Phase 7 — P7-T01 through P7-T02
 - [ ] Phase 8 — P8-T01 through P8-T02
@@ -1096,7 +1096,7 @@ Git Commit: `feat(ui): build recovery finalization flow`
 
 ### Phase 5 — Replay and round-trip review
 
-#### - [ ] Task `P5-T01` — Build immutable playback
+#### - [x] Task `P5-T01` — Build immutable playback
 
 **Files:** `SimulationPlaybackWorkspace.tsx` CREATE; playback client MODIFY; simulator catch-all page MODIFY.
 
