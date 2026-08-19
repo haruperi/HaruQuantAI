@@ -18,50 +18,64 @@ vi.mock("@/app/protected-layout", () => ({
   ),
 }));
 
-vi.mock("@/features/simulator", () => ({
-  SimulatorWidget: () => <div data-testid="simulator-widget">Simulator Widget Mock</div>,
+vi.mock("@/features/simulation-workbench", () => ({
+  SimulationHome: (props: {
+    initialMode?: string;
+    initialRunId?: string;
+    initialSessionId?: string;
+    initialBatchId?: string;
+  }) => {
+    const mode = props.initialMode ?? "canonical";
+    return (
+      <div data-testid="simulation-home">
+        <span>Mode: {mode}</span>
+        {props.initialRunId ? <span>Run: {props.initialRunId}</span> : null}
+        {props.initialSessionId ? (
+          <span>Session: {props.initialSessionId}</span>
+        ) : null}
+        {props.initialBatchId ? <span>Batch: {props.initialBatchId}</span> : null}
+      </div>
+    );
+  },
 }));
 
 describe("Simulator Routes", () => {
-  it("SimulatorPage renders Workbench in canonical mode with SimulatorWidget", () => {
+  it("SimulatorPage renders canonical SimulationHome", () => {
     render(<SimulatorPage />);
     expect(screen.getByTestId("protected-layout")).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: /simulation workbench/i })).toBeInTheDocument();
-    expect(screen.getByTestId("simulator-widget")).toBeInTheDocument();
+    expect(screen.getByText(/mode: canonical/i)).toBeInTheDocument();
   });
 
-  it("NewSimulationPage renders Workbench with new run builder", () => {
+  it("NewSimulationPage renders canonical SimulationHome", () => {
     render(<NewSimulationPage />);
-    expect(screen.getByRole("region", { name: /simulation workbench/i })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /canonical run/i })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText(/mode: canonical/i)).toBeInTheDocument();
   });
 
   it("SimulatorSegmentsPage handles practice mode without sessionId", () => {
     render(<SimulatorSegmentsPage params={{ segments: ["practice"] }} />);
-    expect(screen.getByRole("tab", { name: /live practice/i })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByRole("heading", { name: /live practice/i })).toBeInTheDocument();
+    expect(screen.getByText(/mode:\s*practice/i)).toBeInTheDocument();
   });
 
   it("SimulatorSegmentsPage handles practice mode with sessionId", () => {
     render(<SimulatorSegmentsPage params={{ segments: ["practice", "sess-abc-123"] }} />);
-    expect(screen.getByRole("tab", { name: /live practice/i })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText(/active session: sess-abc-123/i)).toBeInTheDocument();
+    expect(screen.getByText(/mode:\s*practice/i)).toBeInTheDocument();
+    expect(screen.getByText(/session: sess-abc-123/i)).toBeInTheDocument();
   });
 
   it("SimulatorSegmentsPage handles batch mode with batchId", () => {
     render(<SimulatorSegmentsPage params={{ segments: ["batch", "batch-grid-999"] }} />);
-    expect(screen.getByRole("tab", { name: /batch grid/i })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText(/active batch: batch-grid-999/i)).toBeInTheDocument();
+    expect(screen.getByText(/mode: batch/i)).toBeInTheDocument();
+    expect(screen.getByText(/batch: batch-grid-999/i)).toBeInTheDocument();
   });
 
   it("SimulatorSegmentsPage handles history mode", () => {
     render(<SimulatorSegmentsPage params={{ segments: ["history"] }} />);
-    expect(screen.getByRole("tab", { name: /run catalogue/i })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText(/mode:\s*history/i)).toBeInTheDocument();
   });
 
   it("SimulatorSegmentsPage handles runs/[runId] mode", () => {
     render(<SimulatorSegmentsPage params={{ segments: ["runs", "run-canon-456"] }} />);
-    expect(screen.getByRole("tab", { name: /canonical run/i })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText(/active run: run-canon-456/i)).toBeInTheDocument();
+    expect(screen.getByText(/mode: canonical/i)).toBeInTheDocument();
+    expect(screen.getByText(/run: run-canon-456/i)).toBeInTheDocument();
   });
 });

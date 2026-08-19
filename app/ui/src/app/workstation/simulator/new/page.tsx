@@ -9,15 +9,12 @@
 import type { ReactNode } from "react";
 
 import { ProtectedLayout } from "@/app/protected-layout";
-import { SimulationWorkbench } from "@/features/simulation-workbench";
-import { SimulatorWidget } from "@/features/simulator";
+import { SimulationHome } from "@/features/simulation-workbench";
 
 export default function NewSimulationPage(): ReactNode {
   return (
     <ProtectedLayout>
-      <SimulationWorkbench initialMode="canonical">
-        <SimulatorWidget />
-      </SimulationWorkbench>
+      <SimulationHome initialMode="canonical" />
     </ProtectedLayout>
   );
 }

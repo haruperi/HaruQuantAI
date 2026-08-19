@@ -234,3 +234,91 @@
   font-weight: 600;
   color: #cde0ea;
 }
+
+/* --- Run builder (P2-T01) ------------------------------------------------ */
+
+.simulation-run-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  color: #cde0ea;
+}
+
+.simulation-run-builder__stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.simulation-run-builder__stage-btn {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.simulation-run-builder__stage-btn[aria-current="step"] {
+  background: rgba(20, 184, 166, 0.18);
+  border-color: rgba(20, 184, 166, 0.6);
+  color: #99f6e4;
+}
+
+.simulation-run-builder fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.simulation-run-builder legend {
+  font-weight: 600;
+  color: #e2e8f0;
+  padding: 0 0.4rem;
+}
+
+.simulation-run-builder input,
+.simulation-run-builder select,
+.simulation-run-builder textarea {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.3rem;
+  color: inherit;
+  padding: 0.35rem 0.5rem;
+}
+
+.simulation-run-builder__option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.simulation-run-builder__review {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) 1fr;
+  gap: 0.35rem 1rem;
+  font-size: 0.875rem;
+}
+
+.simulation-run-builder__review dt {
+  color: #7a94a2;
+}
+
+.simulation-run-builder__review dd {
+  margin: 0;
+}
+
+.workflow-simulator__handoff {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #5eead4;
+  text-decoration: underline;
+}

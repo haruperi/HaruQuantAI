@@ -16,10 +16,9 @@ import { use, type ReactNode } from "react";
 
 import { ProtectedLayout } from "@/app/protected-layout";
 import {
-  SimulationWorkbench,
+  SimulationHome,
   type SimulationMode,
 } from "@/features/simulation-workbench";
-import { SimulatorWidget } from "@/features/simulator";
 
 export interface SimulatorSegmentsPageProps {
   params: { segments?: string[] } | Promise<{ segments?: string[] }>;
@@ -57,14 +56,12 @@ export default function SimulatorSegmentsPage({
 
   return (
     <ProtectedLayout>
-      <SimulationWorkbench
+      <SimulationHome
         initialMode={mode}
         initialRunId={runId}
         initialSessionId={sessionId}
         initialBatchId={batchId}
-      >
-        {mode === "canonical" && !runId ? <SimulatorWidget /> : undefined}
-      </SimulationWorkbench>
+      />
     </ProtectedLayout>
   );
 }
