@@ -634,7 +634,7 @@ None.
 - [x] Phase 1 — P1-T01 through P1-T06
 - [x] Phase 2 — P2-T01 through P2-T02
 - [x] Phase 3 — P3-T01 through P3-T04
-- [ ] Phase 4 — P4-T01 through P4-T05
+- [x] Phase 4 — P4-T01 through P4-T05
 - [ ] Phase 5 — P5-T01
 - [ ] Phase 6 — P6-T01 through P6-T03
 - [ ] Phase 7 — P7-T01 through P7-T02
@@ -1048,7 +1048,7 @@ Git Commit: `feat(ui): build Analytics evidence context`
 
 ### Phase 4 — Interactive visual and manual simulation
 
-#### - [ ] Task `P4-T01` — Extend live-session authority
+#### - [x] Task `P4-T01` — Extend live-session authority
 
 **Files:** Simulator live-session implementation, state barrel, package root (MODIFY).
 
@@ -1060,7 +1060,7 @@ Rollback: New actions disappear; existing records remain readable.
 
 Git Commit: `feat(simulator): extend live-session authority`
 
-#### - [ ] Task `P4-T02` — Complete session routes
+#### - [x] Task `P4-T02` — Complete session routes
 
 **Files:** simulation-workbench schemas, orchestration, routes (MODIFY).
 
@@ -1068,7 +1068,7 @@ Wire all session routes. Reproduction creates a distinct canonical job only afte
 
 Git Commit: `feat(api): complete interactive session routes`
 
-#### - [ ] Task `P4-T03` — Build interactive workspace
+#### - [x] Task `P4-T03` — Build interactive workspace
 
 **Files:** `InteractiveSimulationWorkspace.tsx`, `SimulationSessionHeader.tsx`, `MarketViewport.tsx` (CREATE).
 
@@ -1076,7 +1076,7 @@ Pause stops scheduler; visibility loss pauses; reconnect reads first; failures n
 
 Git Commit: `feat(ui): build interactive Simulation workspace`
 
-#### - [ ] Task `P4-T04` — Build manual command panels
+#### - [x] Task `P4-T04` — Build manual command panels
 
 **Files:** `ManualCommandPanel.tsx`, `SessionStatePanels.tsx`, `WhatIfPanel.tsx` (CREATE).
 
@@ -1084,7 +1084,7 @@ Render authoritative state and receipts; never optimistically mutate or invent f
 
 Git Commit: `feat(ui): build manual Simulation controls`
 
-#### - [ ] Task `P4-T05` — Build recovery finalization
+#### - [x] Task `P4-T05` — Build recovery finalization
 
 **Files:** `SimulationRecoveryPanel.tsx`, `SimulationFinalizeDialog.tsx` (CREATE).
 
