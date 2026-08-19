@@ -30,6 +30,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime, timedelta
+from decimal import Decimal
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, cast
 
@@ -70,6 +71,19 @@ logger = get_logger(__name__)
 _MAX_LIVE_SESSIONS = 16
 _LIVE_SESSION_TTL = timedelta(seconds=1_800)
 _MAX_STEP_TICKS = 10_000
+_MAX_SEEK_TICKS = 100_000
+DEFAULT_VIEWPORT_BEFORE = 300
+MAX_VIEWPORT_BEFORE = 5_000
+VIEWPORT_AFTER = 0
+
+COMMAND_TYPES: tuple[str, ...] = (
+    "submit_order",
+    "modify_pending_order",
+    "cancel_pending_order",
+    "close_position",
+    "reduce_position",
+    "close_all_practice_exposure",
+)
 
 
 class _LiveSession:
@@ -82,6 +96,7 @@ class _LiveSession:
         "cursor",
         "divergence_index",
         "durable",
+        "finalized_at",
         "last_used_at",
         "receipts",
         "recovery_generation",
@@ -123,6 +138,7 @@ class _LiveSession:
         self.branch_of = branch_of
         self.divergence_index = divergence_index
         self.durable = durable
+        self.finalized_at: datetime | None = None
         self.recovery_generation = 0
         self.recovery_run_id: str | None = None
         self.recovery_state = "running"
@@ -204,6 +220,54 @@ def _require(session_id: str) -> _LiveSession:
     return session
 
 
+def _permitted_actions(session: _LiveSession) -> tuple[str, ...]:
+    """Return the actions this session currently accepts.
+
+    A finalized session is sealed: it may still be read and closed, but it
+    accepts no further advance, command, or branch. A recovered session accepts
+    only rearm until an operator approves it explicitly.
+
+    Args:
+        session: Live session to describe.
+
+    Returns:
+        Ordered tuple of permitted action names.
+    """
+    if session.finalized_at is not None:
+        return ("read", "reproduce", "close")
+    if session.recovery_state != "running":
+        return ("read", "rearm", "close")
+    if session.cursor >= len(session.context.timeline):
+        return ("read", "finalize", "branch", "close")
+    return ("read", "step", "seek", "command", "branch", "finalize", "close")
+
+
+def _require_active(session_id: str) -> _LiveSession:
+    """Return one live session that still accepts mutating operations.
+
+    Args:
+        session_id: Session identity.
+
+    Returns:
+        The bound live session.
+
+    Raises:
+        SimulationError: `SIMULATION_SESSION_FINALIZED` when the session was
+            sealed, or `SIM_RECOVERY_STATE_INVALID` when it awaits rearm.
+    """
+    session = _require(session_id)
+    if session.finalized_at is not None:
+        raise SimulationError(
+            "SIMULATION_SESSION_FINALIZED",
+            "Finalized session accepts no further mutation",
+        )
+    if session.recovery_state != "running":
+        raise SimulationError(
+            "SIM_RECOVERY_STATE_INVALID", "Recovered session requires explicit rearm"
+        )
+    return session
+
+
 def _project(session: _LiveSession) -> Mapping[str, object]:
     """Build one immutable non-secret session projection.
 
@@ -241,7 +305,15 @@ def _project(session: _LiveSession) -> Mapping[str, object]:
             "advisory": True,
             "durable": session.durable,
             "recovery_state": session.recovery_state,
-            "exposure_blocked": session.recovery_state != "running",
+            "exposure_blocked": session.recovery_state != "running"
+            or session.finalized_at is not None,
+            "finalized": session.finalized_at is not None,
+            "finalized_at": (
+                None
+                if session.finalized_at is None
+                else format_utc_timestamp(session.finalized_at)
+            ),
+            "permitted_actions": _permitted_actions(session),
             "account_state": account_state,
         }
     )
@@ -323,11 +395,7 @@ async def submit_live_simulation_order(session_id: str, intent: object) -> objec
         SimulationError: If the session is absent, complete, or the intent is
             not bound to the selected session.
     """
-    session = _require(session_id)
-    if session.recovery_state != "running":
-        raise SimulationError(
-            "SIM_RECOVERY_STATE_INVALID", "Recovered session requires explicit rearm"
-        )
+    session = _require_active(session_id)
     if session.cursor >= len(session.context.timeline):
         raise SimulationError(
             "SIM_UNSUPPORTED_OPERATION", "Completed session cannot accept orders"
@@ -591,11 +659,7 @@ def step_live_simulation(session_id: str, ticks: int) -> Mapping[str, object]:
             "SIM_INVALID_CONFIG",
             "Step size must be a positive bounded tick count",
         )
-    session = _require(session_id)
-    if session.recovery_state != "running":
-        raise SimulationError(
-            "SIM_RECOVERY_STATE_INVALID", "Recovered session requires explicit rearm"
-        )
+    session = _require_active(session_id)
     context = session.context
     if session.cursor == 0:
         _submit_due_before_first_tick(session)
@@ -751,6 +815,326 @@ def close_live_simulation_session(session_id: str) -> Mapping[str, object]:
     return state
 
 
+def list_live_simulation_sessions() -> tuple[Mapping[str, object], ...]:
+    """Return every live session this process currently holds.
+
+    Expired sessions are evicted first, so the listing describes sessions that
+    can actually be acted on rather than identities that would fail on use.
+
+    Returns:
+        Ordered tuple of immutable session projections, oldest first.
+    """
+    _evict_expired(utc_now())
+    return tuple(
+        _project(session)
+        for session in sorted(_SESSIONS.values(), key=lambda item: item.created_at)
+    )
+
+
+def read_live_simulation_viewport(
+    session_id: str, *, before: int = DEFAULT_VIEWPORT_BEFORE
+) -> Mapping[str, object]:
+    """Return a bounded backwards-only market viewport for one live session.
+
+    The viewport ends at the authoritative cursor and never includes a row the
+    session has not reached. A visual practice surface that could see even one
+    future bar would no longer be practising the decision it claims to.
+
+    Args:
+        session_id: Session identity.
+        before: Number of rows to return ending at the cursor.
+
+    Returns:
+        Immutable viewport carrying only rows at or before the cursor.
+
+    Raises:
+        SimulationError: If the session is unknown, or `SIM_INVALID_CONFIG`
+            when the row count is outside the bounded range.
+    """
+    if before < 1 or before > MAX_VIEWPORT_BEFORE:
+        raise SimulationError(
+            "SIM_INVALID_CONFIG", "Viewport row count is outside the bounded range"
+        )
+    session = _require(session_id)
+    timeline = session.context.timeline
+    end = session.cursor
+    start = max(0, end - before)
+    rows = tuple(
+        MappingProxyType(
+            {
+                "timestamp": getattr(tick, "timestamp", None),
+                "bid": getattr(tick, "bid", None),
+                "ask": getattr(tick, "ask", None),
+                "volume": getattr(tick, "volume", None),
+                "sequence": getattr(tick, "sequence", index),
+                "forming": False,
+            }
+        )
+        for index, tick in enumerate(timeline[start:end], start=start)
+    )
+    return MappingProxyType(
+        {
+            "session_id": session.session_id,
+            "cursor": end,
+            "before": before,
+            "after": VIEWPORT_AFTER,
+            "tick_count": len(timeline),
+            "rows": rows,
+        }
+    )
+
+
+def seek_live_simulation(session_id: str, target_cursor: int) -> Mapping[str, object]:
+    """Advance one live session forward to an absolute cursor.
+
+    Seeking is forward-only. A simulation that could move backwards would let a
+    later decision be taken with knowledge of an outcome that has already been
+    observed, so a target behind the current cursor is refused rather than
+    silently reinterpreted as a branch.
+
+    Args:
+        session_id: Session identity.
+        target_cursor: Absolute tick index to advance to.
+
+    Returns:
+        Immutable session state after advancing.
+
+    Raises:
+        SimulationError: `SIMULATION_SEEK_REWIND_FORBIDDEN` for a target behind
+            the cursor, `SIMULATION_SEEK_LIMIT_EXCEEDED` for a delta above the
+            bound, or `SIM_INVALID_CONFIG` for a target beyond the timeline.
+    """
+    session = _require_active(session_id)
+    total = len(session.context.timeline)
+    if target_cursor < session.cursor:
+        raise SimulationError(
+            "SIMULATION_SEEK_REWIND_FORBIDDEN",
+            "Seek target is behind the authoritative cursor",
+        )
+    delta = target_cursor - session.cursor
+    if delta > _MAX_SEEK_TICKS:
+        raise SimulationError(
+            "SIMULATION_SEEK_LIMIT_EXCEEDED",
+            "Seek distance exceeds the bounded tick limit",
+        )
+    if target_cursor > total:
+        raise SimulationError(
+            "SIM_INVALID_CONFIG", "Seek target is beyond the session timeline"
+        )
+    if delta == 0:
+        return _project(session)
+
+    context = session.context
+    if session.cursor == 0:
+        _submit_due_before_first_tick(session)
+    session.cursor = advance_run_timeline(
+        context.engine,
+        context.timeline,
+        session.unsent,
+        session.receipts,
+        start_index=session.cursor,
+        max_ticks=delta,
+    )
+    _checkpoint(session, request_id=generate_id("req"))
+    return _project(session)
+
+
+def _decimal_or_none(value: object) -> Decimal | None:
+    """Coerce one supplied level to an exact decimal.
+
+    Args:
+        value: Candidate level.
+
+    Returns:
+        Exact decimal, or None when the caller supplied no level.
+
+    Raises:
+        SimulationError: `SIM_INVALID_PRICE` when the level cannot be read
+            exactly.
+    """
+    if value is None:
+        return None
+    try:
+        return Decimal(str(value))
+    except (ArithmeticError, ValueError) as error:
+        raise SimulationError(
+            "SIM_INVALID_PRICE", "Command level is not an exact decimal"
+        ) from error
+
+
+def _require_command_field(command: Mapping[str, object], field: str) -> object:
+    """Return one required command field.
+
+    Args:
+        command: Manual command mapping.
+        field: Required field name.
+
+    Returns:
+        The supplied field value.
+
+    Raises:
+        SimulationError: `SIM_INVALID_CONFIG` when the field is absent.
+    """
+    value = command.get(field)
+    if value is None:
+        raise SimulationError(
+            "SIM_INVALID_CONFIG", f"Command requires the {field} field"
+        )
+    return value
+
+
+def _close_all_practice_exposure(trader: SimTrader) -> list[object]:
+    """Close every open practice position at the authoritative tick.
+
+    Args:
+        trader: Session-bound simulated trading facade.
+
+    Returns:
+        Ordered close evidence, one entry per closed position.
+    """
+    snapshot = unwrap_simulation_response(
+        trader.snapshot(),
+        operation="simulation.state.execute_live_simulation_command.snapshot",
+    )
+    positions = cast("tuple[Mapping[str, object], ...]", snapshot.get("positions", ()))
+    closed: list[object] = []
+    for position in positions:
+        volume = Decimal(str(position["volume"]))
+        if volume <= 0:
+            continue
+        closed.append(
+            unwrap_simulation_response(
+                trader.close_position(str(position["position_id"]), volume),
+                operation="simulation.state.execute_live_simulation_command",
+            )
+        )
+    return closed
+
+
+async def execute_live_simulation_command(
+    session_id: str, command: Mapping[str, object]
+) -> Mapping[str, object]:
+    """Execute one manual command against an active practice session.
+
+    Every command resolves to an engine operation that produces a real receipt.
+    Nothing here fabricates a fill: a command the engine refuses raises, and a
+    command that changes only order levels returns a receipt with no filled
+    quantity.
+
+    Args:
+        session_id: Active session identity.
+        command: Manual command carrying a supported ``command`` discriminator.
+
+    Returns:
+        Mapping of the owner receipt evidence and the refreshed session state.
+
+    Raises:
+        SimulationError: `SIM_UNSUPPORTED_OPERATION` for an unknown
+            discriminator or a completed session, `SIM_INVALID_CONFIG` for a
+            missing field, or any engine code raised while executing.
+    """
+    session = _require_active(session_id)
+    discriminator = command.get("command")
+    if discriminator not in COMMAND_TYPES:
+        raise SimulationError(
+            "SIM_UNSUPPORTED_OPERATION", "Unknown manual command discriminator"
+        )
+    if session.cursor >= len(session.context.timeline):
+        raise SimulationError(
+            "SIM_UNSUPPORTED_OPERATION", "Completed session accepts no command"
+        )
+
+    trader = SimTrader(session.context.engine)
+    receipts: list[object] = []
+
+    if discriminator == "submit_order":
+        intent = _require_command_field(command, "intent")
+        if getattr(intent, "simulation_session_id", None) != session_id:
+            raise SimulationError(
+                "SIM_INVALID_CONFIG", "Order is not bound to the active session"
+            )
+        receipts.append(
+            unwrap_simulation_response(
+                await trader.submit_order(intent),
+                operation="simulation.state.execute_live_simulation_command",
+            )
+        )
+    elif discriminator == "cancel_pending_order":
+        receipts.append(
+            unwrap_simulation_response(
+                trader.cancel_pending_order(
+                    str(_require_command_field(command, "order_id"))
+                ),
+                operation="simulation.state.execute_live_simulation_command",
+            )
+        )
+    elif discriminator == "modify_pending_order":
+        receipts.append(
+            unwrap_simulation_response(
+                trader.modify_pending_order(
+                    str(_require_command_field(command, "order_id")),
+                    price=_decimal_or_none(command.get("price")),
+                    stop_loss=_decimal_or_none(command.get("stop_loss")),
+                    take_profit=_decimal_or_none(command.get("take_profit")),
+                ),
+                operation="simulation.state.execute_live_simulation_command",
+            )
+        )
+    elif discriminator in {"close_position", "reduce_position"}:
+        position_id = str(_require_command_field(command, "position_id"))
+        volume = _decimal_or_none(_require_command_field(command, "volume"))
+        if volume is None or volume <= 0:
+            raise SimulationError(
+                "SIM_INVALID_VOLUME", "Close volume must be a positive decimal"
+            )
+        receipts.append(
+            unwrap_simulation_response(
+                trader.close_position(position_id, volume),
+                operation="simulation.state.execute_live_simulation_command",
+            )
+        )
+    else:
+        receipts.extend(_close_all_practice_exposure(trader))
+
+    session.receipts.extend(receipts)
+    _checkpoint(session, request_id=generate_id("req"))
+    return MappingProxyType(
+        {
+            "receipts": tuple(receipts),
+            "session": _project(session),
+        }
+    )
+
+
+def finalize_live_simulation_session(
+    session_id: str, *, request_id: str
+) -> Mapping[str, object]:
+    """Seal one session advisory journal.
+
+    Finalization records that a practice session is complete and stops further
+    mutation. It stays advisory: a sealed practice session is still not an
+    official run, and reproducing it creates a separate canonical job rather
+    than promoting this evidence.
+
+    Args:
+        session_id: Session identity.
+        request_id: Trace identity for the durable checkpoint.
+
+    Returns:
+        Immutable sealed session state.
+
+    Raises:
+        SimulationError: `SIMULATION_SESSION_FINALIZED` when the session was
+            already sealed, or `SIM_RECOVERY_STATE_INVALID` when it awaits
+            rearm.
+    """
+    session = _require_active(session_id)
+    session.finalized_at = utc_now()
+    _checkpoint(session, request_id=request_id)
+    logger.info("Finalized advisory Simulation session %s", session_id)
+    return _project(session)
+
+
 def reset_live_simulation_sessions() -> None:
     """Drop every live session.
 
@@ -762,13 +1146,19 @@ def reset_live_simulation_sessions() -> None:
 
 
 __all__ = (
+    "COMMAND_TYPES",
     "branch_live_simulation",
     "close_live_simulation_session",
     "create_live_simulation_session",
+    "execute_live_simulation_command",
+    "finalize_live_simulation_session",
+    "list_live_simulation_sessions",
     "read_live_simulation_state",
+    "read_live_simulation_viewport",
     "rearm_live_simulation_session",
     "reset_live_simulation_sessions",
     "restore_live_simulation_session",
+    "seek_live_simulation",
     "step_live_simulation",
     "submit_live_simulation_order",
 )

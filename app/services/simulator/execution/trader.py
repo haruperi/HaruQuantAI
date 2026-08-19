@@ -102,6 +102,68 @@ class SimTrader:
         )
 
     @operation_guard(
+        operation="simulation.execution.sim_trader.cancel_pending_order",
+        risk_level="medium",
+        read_only=False,
+    )
+    def cancel_pending_order(self, client_order_id: str) -> ExecutionReceipt:
+        """Cancel one resting simulated order.
+
+        Args:
+            client_order_id: Trading-owned resting order identity.
+
+        Returns:
+            Trading-owned cancelled receipt carrying no fill.
+
+        Raises:
+            SimulationError: `SIM_ORDER_NOT_FOUND` when no such order rests.
+        """
+        logger.info("Cancelling pending order through SimTrader")
+        return unwrap_simulation_response(
+            self._engine.cancel_pending_order(client_order_id),
+            operation="simulation.execution.sim_trader.cancel_pending_order",
+        )
+
+    @operation_guard(
+        operation="simulation.execution.sim_trader.modify_pending_order",
+        risk_level="medium",
+        read_only=False,
+    )
+    def modify_pending_order(
+        self,
+        client_order_id: str,
+        *,
+        price: Decimal | None = None,
+        stop_loss: Decimal | None = None,
+        take_profit: Decimal | None = None,
+    ) -> ExecutionReceipt:
+        """Revise the levels of one resting simulated order.
+
+        Args:
+            client_order_id: Trading-owned resting order identity.
+            price: Replacement limit or stop trigger price.
+            stop_loss: Replacement protective stop level.
+            take_profit: Replacement protective target level.
+
+        Returns:
+            Trading-owned accepted receipt carrying no fill.
+
+        Raises:
+            SimulationError: `SIM_ORDER_NOT_FOUND` when no such order rests, or
+                `SIM_INVALID_CONFIG` when no level was supplied.
+        """
+        logger.info("Modifying pending order through SimTrader")
+        return unwrap_simulation_response(
+            self._engine.modify_pending_order(
+                client_order_id,
+                price=price,
+                stop_loss=stop_loss,
+                take_profit=take_profit,
+            ),
+            operation="simulation.execution.sim_trader.modify_pending_order",
+        )
+
+    @operation_guard(
         operation="simulation.execution.sim_trader.snapshot",
         risk_level="medium",
         read_only=True,

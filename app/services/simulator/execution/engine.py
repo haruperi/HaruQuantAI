@@ -852,6 +852,173 @@ class EventDrivenExecutionEngine:
         return self._close(position_id, quantity, self._current_tick, "REQUESTED")
 
     @operation_guard(
+        operation=(
+            "simulation.execution.event_driven_execution_engine.cancel_pending_order"
+        ),
+        risk_level="medium",
+        read_only=False,
+    )
+    def cancel_pending_order(self, client_order_id: str) -> ExecutionReceipt:
+        """Cancel one pending order that has not matched.
+
+        Cancellation removes the resting order and records a cancelled receipt.
+        It never produces a fill: an order that already matched is no longer
+        pending and cannot be cancelled.
+
+        Args:
+            client_order_id: Trading-owned resting order identity.
+
+        Returns:
+            Trading-owned cancelled receipt.
+
+        Raises:
+            SimulationError: `SIM_ORDER_NOT_FOUND` when no such order rests.
+        """
+        logger.info("Cancelling pending Simulation order %s", client_order_id)
+        resting = self._pending.pop(client_order_id, None)
+        if resting is None:
+            raise SimulationError(
+                "SIM_ORDER_NOT_FOUND", "No pending order matches that identity"
+            )
+        intent, _armed = resting
+        authority_tick = self._current_tick
+        authority_time = (
+            intent.created_at if authority_tick is None else authority_tick.timestamp
+        )
+        authority_sequence = 0 if authority_tick is None else authority_tick.sequence
+        unwrap_simulation_response(
+            self._journal.append(
+                "order_cancelled",
+                {"client_order_id": intent.client_order_id},
+                authority_time,
+                intent.source_intent_id,
+            ),
+            operation=(
+                "simulation.execution.event_driven_execution_engine"
+                ".cancel_pending_order"
+            ),
+        )
+        receipt = create_execution_receipt(
+            receipt_id=_receipt_id(intent, "cancelled", authority_sequence),
+            intent_id=intent.source_intent_id,
+            client_order_id=intent.client_order_id,
+            route=intent.route,
+            authority="simulation",
+            provider_order_id=f"sim-order-{intent.client_order_id}",
+            provider_deal_ids=(),
+            status="cancelled",
+            requested_quantity=intent.approved_volume,
+            filled_quantity=Decimal(0),
+            average_price=None,
+            authority_timestamp=authority_time,
+            received_at=authority_time,
+            response_classification="simulation_cancelled",
+            retry_safe=True,
+            reconciliation_required=False,
+            request_id=intent.request_id,
+            correlation_id=intent.correlation_id,
+        )
+        self._orders[intent.client_order_id] = receipt
+        return receipt
+
+    @operation_guard(
+        operation=(
+            "simulation.execution.event_driven_execution_engine.modify_pending_order"
+        ),
+        risk_level="medium",
+        read_only=False,
+    )
+    def modify_pending_order(
+        self,
+        client_order_id: str,
+        *,
+        price: Decimal | None = None,
+        stop_loss: Decimal | None = None,
+        take_profit: Decimal | None = None,
+    ) -> ExecutionReceipt:
+        """Revise the levels of one resting order without refilling it.
+
+        Only price and protective levels change. Volume is Risk-approved and is
+        never re-sized here, and the revision produces an accepted receipt with
+        no filled quantity: a modification is not a fill.
+
+        Args:
+            client_order_id: Trading-owned resting order identity.
+            price: Replacement limit or stop trigger price.
+            stop_loss: Replacement protective stop level.
+            take_profit: Replacement protective target level.
+
+        Returns:
+            Trading-owned accepted receipt for the revised order.
+
+        Raises:
+            SimulationError: `SIM_ORDER_NOT_FOUND` when no such order rests, or
+                `SIM_INVALID_CONFIG` when no level was supplied.
+        """
+        logger.info("Modifying pending Simulation order %s", client_order_id)
+        resting = self._pending.get(client_order_id)
+        if resting is None:
+            raise SimulationError(
+                "SIM_ORDER_NOT_FOUND", "No pending order matches that identity"
+            )
+        if price is None and stop_loss is None and take_profit is None:
+            raise SimulationError(
+                "SIM_INVALID_CONFIG", "A modification must supply at least one level"
+            )
+        intent, armed = resting
+        updates: dict[str, object] = {}
+        if price is not None:
+            updates["price"] = price
+        if stop_loss is not None:
+            updates["stop_loss"] = stop_loss
+        if take_profit is not None:
+            updates["take_profit"] = take_profit
+        revised = intent.model_copy(update=updates)
+        authority_tick = self._current_tick
+        authority_time = (
+            intent.created_at if authority_tick is None else authority_tick.timestamp
+        )
+        authority_sequence = 0 if authority_tick is None else authority_tick.sequence
+        unwrap_simulation_response(
+            self._journal.append(
+                "order_modified",
+                {
+                    "client_order_id": intent.client_order_id,
+                    "modified_fields": tuple(sorted(updates)),
+                },
+                authority_time,
+                intent.source_intent_id,
+            ),
+            operation=(
+                "simulation.execution.event_driven_execution_engine"
+                ".modify_pending_order"
+            ),
+        )
+        self._pending[client_order_id] = (revised, armed)
+        receipt = create_execution_receipt(
+            receipt_id=_receipt_id(revised, "accepted", authority_sequence + 1),
+            intent_id=revised.source_intent_id,
+            client_order_id=revised.client_order_id,
+            route=revised.route,
+            authority="simulation",
+            provider_order_id=f"sim-order-{revised.client_order_id}",
+            provider_deal_ids=(),
+            status="accepted",
+            requested_quantity=revised.approved_volume,
+            filled_quantity=Decimal(0),
+            average_price=None,
+            authority_timestamp=authority_time,
+            received_at=authority_time,
+            response_classification="simulation_modified",
+            retry_safe=False,
+            reconciliation_required=False,
+            request_id=revised.request_id,
+            correlation_id=revised.correlation_id,
+        )
+        self._orders[revised.client_order_id] = receipt
+        return receipt
+
+    @operation_guard(
         operation="simulation.execution.event_driven_execution_engine.snapshot",
         risk_level="medium",
         read_only=True,

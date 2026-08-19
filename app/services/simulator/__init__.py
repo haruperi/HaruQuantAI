@@ -521,6 +521,61 @@ async def submit_live_simulation_order(
     )(session_id, intent)
 
 
+def list_live_simulation_sessions() -> StandardResponse[object]:
+    """List every live what-if session this process currently holds."""
+    return _guarded(
+        _operation("app.services.simulator.state", "list_live_simulation_sessions"),
+        operation="simulation.state.list_live_simulation_sessions",
+        risk_level="low",
+        read_only=True,
+        modifies_database=False,
+    )()
+
+
+def seek_live_simulation(
+    session_id: str, target_cursor: int
+) -> StandardResponse[object]:
+    """Advance one live what-if session forward to an absolute cursor."""
+    return _guarded(
+        _operation("app.services.simulator.state", "seek_live_simulation"),
+        operation="simulation.state.seek_live_simulation",
+        risk_level="low",
+        read_only=False,
+        modifies_database=False,
+    )(session_id, target_cursor)
+
+
+async def execute_live_simulation_command(
+    session_id: str, command: object
+) -> StandardResponse[object]:
+    """Execute one manual command and return its receipt and refreshed state."""
+    return await _guarded_async(
+        cast(
+            "Any",
+            _operation(
+                "app.services.simulator.state", "execute_live_simulation_command"
+            ),
+        ),
+        operation="simulation.state.execute_live_simulation_command",
+        risk_level="medium",
+        read_only=False,
+        modifies_database=False,
+    )(session_id, command)
+
+
+def finalize_live_simulation_session(
+    session_id: str, *, request_id: str
+) -> StandardResponse[object]:
+    """Seal one live what-if session advisory journal."""
+    return _guarded(
+        _operation("app.services.simulator.state", "finalize_live_simulation_session"),
+        operation="simulation.state.finalize_live_simulation_session",
+        risk_level="medium",
+        read_only=False,
+        modifies_database=True,
+    )(session_id, request_id=request_id)
+
+
 def read_live_simulation_state(session_id: str) -> StandardResponse[object]:
     """Read one live what-if session projection."""
     return _guarded(
@@ -530,6 +585,19 @@ def read_live_simulation_state(session_id: str) -> StandardResponse[object]:
         read_only=True,
         modifies_database=False,
     )(session_id)
+
+
+def read_live_simulation_viewport(
+    session_id: str, *, before: int = 300
+) -> StandardResponse[object]:
+    """Read one bounded backwards-only market viewport for a live session."""
+    return _guarded(
+        _operation("app.services.simulator.state", "read_live_simulation_viewport"),
+        operation="simulation.state.read_live_simulation_viewport",
+        risk_level="low",
+        read_only=True,
+        modifies_database=False,
+    )(session_id, before=before)
 
 
 def branch_live_simulation(
@@ -2220,9 +2288,11 @@ __all__: tuple[str, ...] = (
     "evaluate_simulation_checklist",
     "execute_backtest_job_inspection",
     "execute_backtest_job_operation",
+    "execute_live_simulation_command",
     "execute_simulation_handle_operation",
     "execute_simulation_state_store_operation",
     "explicitly_rearm_simulation_session",
+    "finalize_live_simulation_session",
     "fit_execution_calibration",
     "fit_spread_calibration",
     "get_approved_tick_models",
@@ -2253,6 +2323,7 @@ __all__: tuple[str, ...] = (
     "group_simulation_alerts",
     "is_provider_session_open",
     "is_simulation_value",
+    "list_live_simulation_sessions",
     "load_calculation_conformance_artifact",
     "load_calibration_artifact",
     "load_recovery_checkpoints",
@@ -2272,6 +2343,7 @@ __all__: tuple[str, ...] = (
     "project_latency_timestamps",
     "pump_simulation_scheduler_once",
     "read_live_simulation_state",
+    "read_live_simulation_viewport",
     "read_simulation_session",
     "rearm_live_simulation_session",
     "recover_simulation_unknown_outcome",
@@ -2298,6 +2370,7 @@ __all__: tuple[str, ...] = (
     "schedule_simulation_event",
     "schedule_simulation_rollover",
     "secure_simulation_session",
+    "seek_live_simulation",
     "serialize_realism_stream",
     "serialize_simulation_scheduler",
     "serialize_transaction_ledger",
