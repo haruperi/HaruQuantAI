@@ -206,6 +206,15 @@ export {
 } from "./simulationWorkbench";
 
 export type {
+  JournalFrame,
+  SimulationSession,
+} from "./simulationSessions";
+export {
+  journalFrameSchema,
+  simulationSessionSchema,
+} from "./simulationSessions";
+
+export type {
   AnalyticsAnnotationInput,
   AnalyticsArchiveInput,
   AnalyticsCompareInput,

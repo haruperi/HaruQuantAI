@@ -16,9 +16,46 @@ import type { ApiResponse } from "./contracts";
 import { simulationSessionRoutes } from "./routes";
 import { request, type RequestOptions } from "./request";
 
-/** Opaque Simulator-owned session record. */
-export const simulationSessionSchema = z.record(z.string(), z.unknown());
+/**
+ * Simulator-owned playback session record.
+ *
+ * The strict fields are the ones playback presentation depends on; the record
+ * stays open because the Simulator owns the journal contract and may carry
+ * additional evidence that this client must forward untouched rather than
+ * silently drop.
+ */
+export const simulationSessionSchema = z
+  .object({
+    session_id: z.string(),
+    run_id: z.string().optional(),
+    cursor: z.number().optional(),
+    frame_count: z.number().optional(),
+    journal_ref: z.string().nullable().optional(),
+    journal_hash: z.string().nullable().optional(),
+    result_hash: z.string().nullable().optional(),
+    engine_version: z.string().nullable().optional(),
+    read_only: z.boolean().optional(),
+  })
+  .catchall(z.unknown());
 export type SimulationSession = z.infer<typeof simulationSessionSchema>;
+
+/**
+ * One ordered immutable journal frame.
+ *
+ * A frame is finalized evidence: playback renders it and never edits, reorders,
+ * or synthesises one.
+ */
+export const journalFrameSchema = z
+  .object({
+    sequence: z.number(),
+    at: z.string().optional(),
+    event_type: z.string().optional(),
+    detail: z.record(z.string(), z.unknown()).optional(),
+    frame_hash: z.string().nullable().optional(),
+    previous_hash: z.string().nullable().optional(),
+  })
+  .catchall(z.unknown());
+export type JournalFrame = z.infer<typeof journalFrameSchema>;
 
 /**
  * Create one durable playback session for a completed run (requires

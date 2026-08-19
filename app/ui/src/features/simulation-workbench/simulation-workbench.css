@@ -572,3 +572,57 @@
   font-size: 0.78rem;
   color: #fbbf24;
 }
+
+/* --- Immutable playback (P5-T01) ----------------------------------------- */
+
+.simulation-playback {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: #cde0ea;
+  font-size: 0.85rem;
+}
+
+.simulation-playback__note {
+  font-size: 0.75rem;
+  color: #7a94a2;
+}
+
+.simulation-playback__return {
+  color: #5eead4;
+  text-decoration: underline;
+}
+
+.simulation-playback__facts {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) 1fr;
+  gap: 0.2rem 1rem;
+  margin: 0;
+}
+
+.simulation-playback__facts dt {
+  color: #7a94a2;
+}
+
+.simulation-playback__facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.simulation-playback__frames {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.76rem;
+  display: block;
+  max-height: 26rem;
+  overflow: auto;
+}
+
+.simulation-playback__frames th,
+.simulation-playback__frames td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}

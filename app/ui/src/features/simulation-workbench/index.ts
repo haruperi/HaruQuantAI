@@ -82,3 +82,11 @@ export {
   FINALIZE_ADVISORY_NOTICE,
   type SimulationFinalizeDialogProps,
 } from "./SimulationFinalizeDialog";
+
+export {
+  SimulationPlaybackWorkspace,
+  MAX_RETAINED_FRAMES,
+  SUPPRESSED_FRAME_FIELDS,
+  withoutOrderTickets,
+  type SimulationPlaybackWorkspaceProps,
+} from "./SimulationPlaybackWorkspace";

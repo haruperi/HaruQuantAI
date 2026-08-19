@@ -37,6 +37,23 @@ vi.mock("@/features/simulation-workbench", () => ({
       </div>
     );
   },
+  SimulationPlaybackWorkspace: (props: {
+    runId: string;
+    ticket?: string;
+    returnHref?: string;
+  }) => (
+    <div data-testid="simulation-playback">
+      <span>Replay run: {props.runId}</span>
+      {props.ticket ? <span>Ticket: {props.ticket}</span> : null}
+      {props.returnHref ? <span>Return: {props.returnHref}</span> : null}
+    </div>
+  ),
+}));
+
+let mockSearchParams = new URLSearchParams();
+
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => mockSearchParams,
 }));
 
 describe("Simulator Routes", () => {
@@ -77,5 +94,22 @@ describe("Simulator Routes", () => {
     render(<SimulatorSegmentsPage params={{ segments: ["runs", "run-canon-456"] }} />);
     expect(screen.getByText(/mode: canonical/i)).toBeInTheDocument();
     expect(screen.getByText(/run: run-canon-456/i)).toBeInTheDocument();
+  });
+
+  it("SimulatorSegmentsPage renders immutable playback with its return context", () => {
+    mockSearchParams = new URLSearchParams(
+      "ticket=1001&return=%2Fworkstation%2Fanalytics%2Fcanonical-1%2Ftrades%2F1001",
+    );
+    render(
+      <SimulatorSegmentsPage params={{ segments: ["replay", "canonical-1"] }} />,
+    );
+    expect(screen.getByTestId("simulation-playback")).toBeInTheDocument();
+    expect(screen.getByText("Replay run: canonical-1")).toBeInTheDocument();
+    expect(screen.getByText("Ticket: 1001")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Return: /workstation/analytics/canonical-1/trades/1001",
+      ),
+    ).toBeInTheDocument();
   });
 });
