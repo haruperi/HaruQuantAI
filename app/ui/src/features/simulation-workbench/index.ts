@@ -114,3 +114,12 @@ export {
   type MissionPanelProps,
   type QualificationLink,
 } from "./MissionPanel";
+
+export {
+  PortfolioSimulationPanel,
+  NO_PORTFOLIO_INFERENCE,
+  MAX_PORTFOLIO_COMPONENTS,
+  type PortfolioComponent,
+  type PortfolioSimulationRequest,
+  type PortfolioSimulationPanelProps,
+} from "./PortfolioSimulationPanel";

@@ -20,16 +20,15 @@ import { openStream, type StreamTransportOptions } from "./stream";
 
 export const ORIGIN_KINDS = [
   "canonical_job",
-  "batch_item",
-  "live_session",
-  "branch_session",
-  "advisory_finalized",
-  "reproduced_job",
+  "batch",
+  "practice",
+  "reproduction",
+  "portfolio",
 ] as const;
 export type OriginKind = (typeof ORIGIN_KINDS)[number];
 
 export const CATALOGUE_STATUSES = [
-  "pending",
+  "queued",
   "running",
   "completed",
   "failed",
@@ -39,10 +38,10 @@ export type CatalogueStatus = (typeof CATALOGUE_STATUSES)[number];
 
 export const EVIDENCE_CLASSES = [
   "canonical",
-  "batch_member",
   "practice",
   "advisory",
-  "reproduced",
+  "playback",
+  "fast_research",
 ] as const;
 export type EvidenceClass = (typeof EVIDENCE_CLASSES)[number];
 

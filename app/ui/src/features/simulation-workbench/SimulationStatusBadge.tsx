@@ -106,7 +106,7 @@ function StatusPill({ status }: { status: string }): ReactNode {
           Cancelled
         </span>
       );
-    case "pending":
+    case "queued":
     default:
       return (
         <span
@@ -135,15 +135,15 @@ function EvidenceClassPill({ evidenceClass }: { evidenceClass: string }): ReactN
           Canonical
         </span>
       );
-    case "batch_member":
+    case "playback":
       return (
         <span
-          className="simulation-badge simulation-badge--evidence-batch_member"
-          aria-label="Evidence: Batch Member"
-          title="Member of parameter grid or matrix batch"
+          className="simulation-badge simulation-badge--evidence-playback"
+          aria-label="Evidence: Playback"
+          title="Read-only replay of a finalized immutable journal"
         >
           <Layers className="w-3.5 h-3.5" aria-hidden="true" />
-          Batch Item
+          Playback
         </span>
       );
     case "practice":
@@ -168,15 +168,15 @@ function EvidenceClassPill({ evidenceClass }: { evidenceClass: string }): ReactN
           Advisory
         </span>
       );
-    case "reproduced":
+    case "fast_research":
       return (
         <span
-          className="simulation-badge simulation-badge--evidence-reproduced"
-          aria-label="Evidence: Reproduced"
-          title="Re-executed from finalized advisory journal"
+          className="simulation-badge simulation-badge--evidence-fast_research"
+          aria-label="Evidence: Fast Research"
+          title="Bounded fast research evidence, not a canonical run"
         >
           <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
-          Reproduced
+          Fast Research
         </span>
       );
     default:

@@ -267,7 +267,7 @@ export function CanonicalRunMonitor({
         {run ? (
           <SimulationStatusBadge status={run.status} evidenceClass="canonical" />
         ) : (
-          <SimulationStatusBadge status="pending" evidenceClass="canonical" />
+          <SimulationStatusBadge status="queued" evidenceClass="canonical" />
         )}
       </header>
 

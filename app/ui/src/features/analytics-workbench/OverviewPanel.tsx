@@ -173,7 +173,17 @@ export function OverviewPanel({
             </dd>
             <dt>Evidence class</dt>
             <dd>{entry.evidence_class}</dd>
+            <dt>Origin</dt>
+            <dd>{entry.origin_kind}</dd>
           </dl>
+
+          {entry.origin_kind === "batch" ? (
+            <p role="note">
+              This run is one member of a batch. A batch is a set of
+              independent runs, so its members carry no aggregate portfolio
+              result.
+            </p>
+          ) : null}
         </section>
       ) : null}
 

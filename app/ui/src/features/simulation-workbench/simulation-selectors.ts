@@ -17,7 +17,7 @@ export const ACTIVE_RUN_STATUSES: ReadonlySet<string> = new Set(["queued", "runn
 
 /** Batch lifecycle states that still need polling or operator action. */
 export const ACTIVE_BATCH_STATUSES: ReadonlySet<string> = new Set([
-  "pending",
+  "queued",
   "running",
 ]);
 

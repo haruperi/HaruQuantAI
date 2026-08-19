@@ -115,7 +115,7 @@ export function SimulationWorkbench({
         <div className="simulation-workbench__meta">
           <SimulationStatusBadge
             status={status}
-            evidenceClass={evidenceClass ?? (activeMode === "canonical" ? "canonical" : activeMode === "practice" ? "practice" : activeMode === "batch" ? "batch_member" : undefined)}
+            evidenceClass={evidenceClass ?? (activeMode === "canonical" ? "canonical" : activeMode === "practice" ? "practice" : activeMode === "batch" ? "canonical" : undefined)}
             archiveState={archiveState}
           />
         </div>

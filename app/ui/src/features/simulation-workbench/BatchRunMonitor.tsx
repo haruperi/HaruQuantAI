@@ -52,7 +52,7 @@ function looksLikeBatchProjection(payload: BatchStreamPayload): payload is Batch
 
 function isKnownBatchItemStatus(value: unknown): value is BatchItem["status"] {
   return (
-    value === "pending" ||
+    value === "queued" ||
     value === "running" ||
     value === "completed" ||
     value === "failed" ||

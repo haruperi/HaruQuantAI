@@ -38,11 +38,11 @@ describe("SimulationStatusBadge", () => {
     rerender(<SimulationStatusBadge evidenceClass="advisory" />);
     expect(screen.getByLabelText(/evidence: advisory/i)).toBeInTheDocument();
 
-    rerender(<SimulationStatusBadge evidenceClass="batch_member" />);
-    expect(screen.getByLabelText(/evidence: batch member/i)).toBeInTheDocument();
+    rerender(<SimulationStatusBadge evidenceClass="playback" />);
+    expect(screen.getByLabelText(/evidence: playback/i)).toBeInTheDocument();
 
-    rerender(<SimulationStatusBadge evidenceClass="reproduced" />);
-    expect(screen.getByLabelText(/evidence: reproduced/i)).toBeInTheDocument();
+    rerender(<SimulationStatusBadge evidenceClass="fast_research" />);
+    expect(screen.getByLabelText(/evidence: fast research/i)).toBeInTheDocument();
   });
 
   it("renders archived badge when archiveState is archived", () => {

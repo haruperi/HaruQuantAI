@@ -22,6 +22,7 @@ import {
   apiClients,
   type BacktestStrategy,
 } from "@/clients";
+import { PortfolioSimulationPanel } from "./PortfolioSimulationPanel";
 
 /** Ordered builder stages exactly as specified for the workbench. */
 export const BUILDER_STAGES = [
@@ -740,7 +741,14 @@ export function SimulationRunBuilder({
         </fieldset>
       ) : null}
 
-      {stage === "review" ? (
+      {stage === "review" && mode === "portfolio" ? (
+        <fieldset>
+          <legend>Stage 8 — Review</legend>
+          <PortfolioSimulationPanel />
+        </fieldset>
+      ) : null}
+
+      {stage === "review" && mode !== "portfolio" ? (
         <fieldset>
           <legend>Stage 8 — Review</legend>
           <dl className="simulation-run-builder__review">
