@@ -47,6 +47,63 @@ class DatasetImportRequest(_BaseApiContract):
     payload: Mapping[str, object]
 
 
+class SeriesUpdateRequest(_BaseApiContract):
+    """Governed market-series edit command.
+
+    Carries the editable series fields and the linked instrument
+    specification fields. Data validates and applies both atomically; the
+    bar-type reference is invariant and therefore not part of the contract.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.series_update_request.v1"] = "api.series_update_request.v1"
+    symbol: str
+    instrument: str
+    broker_id: int | None = None
+    timeframe: str | None = None
+    timezone: str | None = None
+    date_from: int | None = None
+    date_to: int | None = None
+    data_type: int | None = None
+    decimals: int | None = None
+    source: int | None = None
+    row_count: int | None = None
+    remove_weekends: int = 0
+    show: int = 1
+    description: str | None = None
+    point_value: float | None = None
+    tick_size: float | None = None
+    tick_step: float | None = None
+    default_spread: float | None = None
+    default_slippage: float | None = None
+    min_distance: float | None = None
+    order_size_multiplier: float | None = None
+    order_size_step: float | None = None
+
+
+class InstrumentUpdateRequest(_BaseApiContract):
+    """Governed instrument specification edit command.
+
+    Carries the editable instrument fields; Data validates and applies the
+    single-row update. The instrument identity itself is immutable and lives
+    in the route path.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.instrument_update_request.v1"] = (
+        "api.instrument_update_request.v1"
+    )
+    description: str | None = None
+    point_value: float | None = None
+    tick_size: float | None = None
+    tick_step: float | None = None
+    default_spread: float | None = None
+    default_slippage: float | None = None
+    min_distance: float | None = None
+    order_size_multiplier: float | None = None
+    order_size_step: float | None = None
+
+
 def _number(value: object) -> float | None:
     """Project one Data-owned decimal price or volume as a JSON number.
 
@@ -165,5 +222,7 @@ __all__ = (
     "BarTimeframe",
     "DatasetImportRequest",
     "DatasetPrepareRequest",
+    "InstrumentUpdateRequest",
+    "SeriesUpdateRequest",
     "build_bar_series_response",
 )

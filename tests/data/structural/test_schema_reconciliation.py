@@ -19,6 +19,16 @@ def test_readme_declares_every_live_data_table() -> None:
         for path in sources
         for match in pattern.finditer(path.read_text(encoding="utf-8"))
     }
+    # Later steps may drop tables created by immutable earlier steps; the
+    # README documents the live target model, so dropped tables are excluded.
+    dropped = {
+        match.group(1)
+        for path in sources
+        for match in re.finditer(
+            r"DROP TABLE IF EXISTS (data_[a-z_]+)", path.read_text()
+        )
+    }
+    declared -= dropped
     readme = Path("app/services/data/README.md").read_text(encoding="utf-8")
     documented = set(pattern.findall(readme))
 

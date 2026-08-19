@@ -116,11 +116,9 @@ def test_reference_fetch_quality_and_verified_source_are_reachable(
 
     with closing(sqlite3.connect(database)) as connection:
         counts = (
-            connection.execute("SELECT COUNT(*) FROM data_symbols").fetchone()[0],
-            connection.execute("SELECT COUNT(*) FROM data_providers").fetchone()[0],
-            connection.execute("SELECT COUNT(*) FROM data_market_sessions").fetchone()[
-                0
-            ],
+            connection.execute("SELECT COUNT(*) FROM data_instruments").fetchone()[0],
+            connection.execute("SELECT COUNT(*) FROM data_brokers").fetchone()[0],
+            connection.execute("SELECT COUNT(*) FROM data_sessions").fetchone()[0],
             connection.execute("SELECT COUNT(*) FROM data_fetch_log").fetchone()[0],
             connection.execute("SELECT COUNT(*) FROM data_quality_events").fetchone()[
                 0

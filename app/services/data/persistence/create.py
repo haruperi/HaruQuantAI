@@ -24,7 +24,7 @@ INSERT INTO data_provider_specification_revisions (
 """.strip()
 
 _UPSERT_CATALOG_SYMBOL = """
-INSERT INTO data_symbols (
+INSERT INTO data_instruments (
     symbol_id, canonical_symbol, asset_class, base_currency, quote_currency,
     digits, tick_size_decimal, min_volume_decimal, max_volume_decimal,
     volume_step_decimal, contract_size_decimal, spec_json, state,
@@ -50,7 +50,7 @@ ON CONFLICT(symbol_id) DO UPDATE SET
 """.strip()
 
 _UPSERT_CATALOG_PROVIDER = """
-INSERT INTO data_providers (
+INSERT INTO data_brokers (
     provider_id, provider_code, provider_kind, priority, trust_tier,
     rate_limit, rate_window_seconds, license_json, enabled,
     request_id, correlation_id, created_at, updated_at
@@ -70,7 +70,7 @@ ON CONFLICT(provider_id) DO UPDATE SET
 """.strip()
 
 _UPSERT_CATALOG_SESSION = """
-INSERT INTO data_market_sessions (
+INSERT INTO data_sessions (
     session_id, symbol_id, session_name, day_of_week, open_time_utc,
     close_time_utc, is_trading, effective_from, effective_to,
     request_id, correlation_id, created_at, updated_at

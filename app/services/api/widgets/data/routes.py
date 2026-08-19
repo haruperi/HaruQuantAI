@@ -26,6 +26,8 @@ from app.services.api.widgets.data.schemas import (
     BarTimeframe,  # noqa: TC001 - FastAPI resolves runtime annotations.
     DatasetImportRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     DatasetPrepareRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
+    InstrumentUpdateRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
+    SeriesUpdateRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
 from app.services.api.widgets.markets import resolve_runtime_source_id
 from app.services.api.widgets.settings.limits import (
@@ -36,7 +38,13 @@ from app.services.api.widgets.settings.limits import (
 )
 from app.services.data import (
     build_symbol_list_request,
+    get_instrument_spec,
+    list_brokers,
+    list_instruments,
+    list_market_series,
     list_symbols,
+    update_instrument_spec,
+    update_market_series,
 )
 from app.utils import generate_id
 
@@ -167,6 +175,305 @@ def _list_data_capabilities(
             route="/api/v1/data/capabilities",
             operation="api.data.capabilities",
             side_effect="read",
+        ),
+    )
+
+
+@router.get("/series", response_model=None)
+def _list_market_series(
+    context: Annotated[AuthContext, Depends(require_auth_context)],
+    limit: Annotated[
+        int,
+        Query(ge=1, le=API_MAX_PAGE_SIZE),
+    ] = API_DEFAULT_PAGE_SIZE,
+) -> object:
+    """Return the bounded market-data series reference surface.
+
+    Args:
+        context: Authenticated API request context.
+        limit: Bounded maximum series rows.
+
+    Returns:
+        Successful API response containing series summaries.
+
+    Raises:
+        HTTPException: If the caller lacks Data read permission.
+    """
+    require_permission(context, "data:read")
+    request_id = generate_id("req")
+    return build_api_response(
+        status="success",
+        message="Market series retrieved",
+        data={"series": list_market_series(request_id=request_id, limit=limit)},
+        metadata=build_api_metadata(
+            request_id=request_id,
+            route="/api/v1/data/series",
+            operation="api.data.series",
+            side_effect="read",
+        ),
+    )
+
+
+@router.get("/instruments", response_model=None)
+def _list_instruments(
+    context: Annotated[AuthContext, Depends(require_auth_context)],
+    limit: Annotated[
+        int,
+        Query(ge=1, le=API_MAX_PAGE_SIZE),
+    ] = API_DEFAULT_PAGE_SIZE,
+) -> object:
+    """Return the bounded instrument specification surface.
+
+    Args:
+        context: Authenticated API request context.
+        limit: Bounded maximum instrument rows.
+
+    Returns:
+        Successful API response containing instrument summaries.
+
+    Raises:
+        HTTPException: If the caller lacks Data read permission.
+    """
+    require_permission(context, "data:read")
+    request_id = generate_id("req")
+    return build_api_response(
+        status="success",
+        message="Instruments retrieved",
+        data={"instruments": list_instruments(request_id=request_id, limit=limit)},
+        metadata=build_api_metadata(
+            request_id=request_id,
+            route="/api/v1/data/instruments",
+            operation="api.data.instruments",
+            side_effect="read",
+        ),
+    )
+
+
+@router.get("/brokers", response_model=None)
+def _list_brokers(
+    context: Annotated[AuthContext, Depends(require_auth_context)],
+    limit: Annotated[
+        int,
+        Query(ge=1, le=API_MAX_PAGE_SIZE),
+    ] = API_DEFAULT_PAGE_SIZE,
+) -> object:
+    """Return the bounded broker profile surface.
+
+    Args:
+        context: Authenticated API request context.
+        limit: Bounded maximum broker rows.
+
+    Returns:
+        Successful API response containing broker summaries.
+
+    Raises:
+        HTTPException: If the caller lacks Data read permission.
+    """
+    require_permission(context, "data:read")
+    request_id = generate_id("req")
+    return build_api_response(
+        status="success",
+        message="Brokers retrieved",
+        data={"brokers": list_brokers(request_id=request_id, limit=limit)},
+        metadata=build_api_metadata(
+            request_id=request_id,
+            route="/api/v1/data/brokers",
+            operation="api.data.brokers",
+            side_effect="read",
+        ),
+    )
+
+
+@router.get("/instruments/{instrument}", response_model=None)
+def _get_instrument(
+    instrument: str,
+    context: Annotated[AuthContext, Depends(require_auth_context)],
+) -> object:
+    """Return one full instrument specification by identity.
+
+    Args:
+        instrument: Instrument identity (the Data ``symbol_id``).
+        context: Authenticated API request context.
+
+    Returns:
+        Successful API response containing the instrument specification.
+
+    Raises:
+        HTTPException: If the caller lacks Data read permission or the
+            instrument is unknown.
+    """
+    require_permission(context, "data:read")
+    request_id = generate_id("req")
+    return build_api_response(
+        status="success",
+        message="Instrument retrieved",
+        data=get_instrument_spec(instrument.strip(), request_id=request_id),
+        metadata=build_api_metadata(
+            request_id=request_id,
+            route="/api/v1/data/instruments/{instrument}",
+            operation="api.data.instrument",
+            side_effect="read",
+        ),
+    )
+
+
+@router.patch("/series/{series_id}", response_model=None)
+def _update_series(
+    series_id: int,
+    request: SeriesUpdateRequest,
+    context: Annotated[AuthContext, Depends(require_auth_context)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> object:
+    """Update one series row and its linked instrument specification.
+
+    Args:
+        series_id: Series identity to update.
+        request: Governed edit payload carrying series and instrument fields.
+        context: Authenticated API request context.
+        idempotency_key: Required durable HTTP idempotency key.
+
+    Returns:
+        Successful API response containing the updated series summary.
+
+    Raises:
+        HTTPException: If authentication, authorization, idempotency, or the
+            owner validation fails.
+    """
+    require_human_permission(context, "data:write")
+    if (
+        idempotency_key is None
+        or not idempotency_key.strip()
+        or len(idempotency_key) > _MAX_IDEMPOTENCY_KEY_LENGTH
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="IDEMPOTENCY_KEY_REQUIRED",
+        )
+    request_id = generate_id("req")
+    body = request.model_dump(mode="json")
+    try:
+        series = update_market_series(
+            series_id,
+            symbol=body["symbol"],
+            instrument=body["instrument"],
+            broker_id=body["broker_id"],
+            timeframe=body["timeframe"],
+            timezone=body["timezone"],
+            date_from=body["date_from"],
+            date_to=body["date_to"],
+            data_type=body["data_type"],
+            decimals=body["decimals"],
+            source=body["source"],
+            row_count=body["row_count"],
+            remove_weekends=body["remove_weekends"],
+            show=body["show"],
+            instrument_description=body["description"],
+            point_value=body["point_value"],
+            tick_size=body["tick_size"],
+            tick_step=body["tick_step"],
+            default_spread=body["default_spread"],
+            default_slippage=body["default_slippage"],
+            min_distance=body["min_distance"],
+            order_size_multiplier=body["order_size_multiplier"],
+            order_size_step=body["order_size_step"],
+            request_id=request_id,
+        )
+    except Exception as error:
+        # Data signals typed owner failures through the error code attribute;
+        # anything without one is an unexpected failure and re-raises.
+        code = str(getattr(error, "code", "") or "")
+        if code in {"SERIES_NOT_FOUND", "INSTRUMENT_NOT_FOUND"}:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=code
+            ) from error
+        if code:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=code
+            ) from error
+        raise
+    return build_api_response(
+        status="success",
+        message="Market series updated",
+        data=series,
+        metadata=build_api_metadata(
+            request_id=request_id,
+            route="/api/v1/data/series/{series_id}",
+            operation="api.data.series_update",
+            side_effect="write",
+        ),
+    )
+
+
+@router.patch("/instruments/{instrument}", response_model=None)
+def _update_instrument(
+    instrument: str,
+    request: InstrumentUpdateRequest,
+    context: Annotated[AuthContext, Depends(require_auth_context)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> object:
+    """Update exactly one instrument specification.
+
+    Args:
+        instrument: Instrument identity (the Data ``symbol_id``).
+        request: Governed edit payload carrying the instrument fields.
+        context: Authenticated API request context.
+        idempotency_key: Required durable HTTP idempotency key.
+
+    Returns:
+        Successful API response containing the updated specification.
+
+    Raises:
+        HTTPException: If authentication, authorization, idempotency, or the
+            owner validation fails.
+    """
+    require_human_permission(context, "data:write")
+    if (
+        idempotency_key is None
+        or not idempotency_key.strip()
+        or len(idempotency_key) > _MAX_IDEMPOTENCY_KEY_LENGTH
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="IDEMPOTENCY_KEY_REQUIRED",
+        )
+    request_id = generate_id("req")
+    body = request.model_dump(mode="json")
+    try:
+        spec = update_instrument_spec(
+            instrument.strip(),
+            description=body["description"],
+            point_value=body["point_value"],
+            tick_size=body["tick_size"],
+            tick_step=body["tick_step"],
+            default_spread=body["default_spread"],
+            default_slippage=body["default_slippage"],
+            min_distance=body["min_distance"],
+            order_size_multiplier=body["order_size_multiplier"],
+            order_size_step=body["order_size_step"],
+            request_id=request_id,
+        )
+    except Exception as error:
+        # Data signals typed owner failures through the error code attribute;
+        # anything without one is an unexpected failure and re-raises.
+        code = str(getattr(error, "code", "") or "")
+        if code == "INSTRUMENT_NOT_FOUND":
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=code
+            ) from error
+        if code:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=code
+            ) from error
+        raise
+    return build_api_response(
+        status="success",
+        message="Instrument updated",
+        data=spec,
+        metadata=build_api_metadata(
+            request_id=request_id,
+            route="/api/v1/data/instruments/{instrument}",
+            operation="api.data.instrument_update",
+            side_effect="write",
         ),
     )
 

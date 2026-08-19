@@ -61,6 +61,220 @@ export function capabilities(
   });
 }
 
+/** One market-data series reference row (Data-owned summary). */
+export const marketSeriesRowSchema = z.object({
+  series_id: z.number().int(),
+  symbol: z.string().min(1),
+  instrument: z.string().nullable(),
+  document: z.string().nullable(),
+  broker_id: z.number().int().nullable(),
+  usymbol: z.string().nullable(),
+  timeframe: z.string().nullable(),
+  timezone: z.string().nullable(),
+  date_from: z.number().int().nullable(),
+  date_to: z.number().int().nullable(),
+  total_days: z.number().int().nullable(),
+  row_count: z.number().int().nullable(),
+  decimals: z.number().int().nullable(),
+  source: z.number().int().nullable(),
+  /** Bar timestamp reference; invariant "start_of_bar" for stored series. */
+  bar_type: z.literal("start_of_bar"),
+  data_type: z.number().int().nullable(),
+  /** Legacy visibility flag inverted: 0 means hidden from workspaces. */
+  show: z.number().int().nullable(),
+  remove_weekends: z.number().int().nullable(),
+});
+export type MarketSeriesRow = z.infer<typeof marketSeriesRowSchema>;
+
+/** Bounded market-data series catalogue page. */
+export const marketSeriesSchema = z.object({
+  series: z.array(marketSeriesRowSchema),
+});
+export type MarketSeries = z.infer<typeof marketSeriesSchema>;
+
+/** Query parameters for the market series catalogue. */
+export interface MarketSeriesQuery {
+  /** Page size 1..200; defaults to the backend `API_DEFAULT_PAGE_SIZE`. */
+  limit?: number;
+}
+
+/** List the market-data series reference catalogue (requires `data:read`). */
+export function marketSeries(
+  params: MarketSeriesQuery = {},
+  options?: RequestOptions
+): Promise<ApiResponse<MarketSeries>> {
+  const query: Record<string, QueryValue> = {};
+  if (params.limit !== undefined) query.limit = params.limit;
+  return request<MarketSeries>(dataRoutes.series, {
+    schema: marketSeriesSchema,
+    query,
+    ...options,
+  });
+}
+
+/** One instrument specification row (Data-owned summary). */
+export const instrumentRowSchema = z.object({
+  instrument: z.string().min(1),
+  description: z.string().nullable(),
+  broker_id: z.number().int().nullable(),
+  point_value: z.number().nullable(),
+  tick_size: z.number().nullable(),
+  tick_step: z.number().nullable(),
+  default_spread: z.number().nullable(),
+  default_slippage: z.number().nullable(),
+  data_type: z.number().int().nullable(),
+  order_size_multiplier: z.number().nullable(),
+  order_size_step: z.number().nullable(),
+});
+export type InstrumentRow = z.infer<typeof instrumentRowSchema>;
+
+/** Bounded instrument specification page. */
+export const instrumentsSchema = z.object({
+  instruments: z.array(instrumentRowSchema),
+});
+export type Instruments = z.infer<typeof instrumentsSchema>;
+
+/** List instrument specifications (requires `data:read`). */
+export function instruments(
+  options?: RequestOptions
+): Promise<ApiResponse<Instruments>> {
+  return request<Instruments>(dataRoutes.instruments, {
+    schema: instrumentsSchema,
+    ...options,
+  });
+}
+
+/** One broker profile row with its customized-instrument count. */
+export const brokerRowSchema = z.object({
+  broker_id: z.number().int().nullable(),
+  name: z.string().nullable(),
+  description: z.string().nullable(),
+  postfix: z.string().nullable(),
+  timezone: z.string().nullable(),
+  customized_instruments: z.number().int().nullable(),
+});
+export type BrokerRow = z.infer<typeof brokerRowSchema>;
+
+/** Bounded broker profile page. */
+export const brokersSchema = z.object({
+  brokers: z.array(brokerRowSchema),
+});
+export type Brokers = z.infer<typeof brokersSchema>;
+
+/** List broker profiles (requires `data:read`). */
+export function brokers(options?: RequestOptions): Promise<ApiResponse<Brokers>> {
+  return request<Brokers>(dataRoutes.brokers, {
+    schema: brokersSchema,
+    ...options,
+  });
+}
+
+/** Editable governed payload for one series and its instrument spec. */
+export interface SeriesUpdateBody {
+  symbol: string;
+  instrument: string;
+  broker_id?: number | null;
+  timeframe?: string | null;
+  timezone?: string | null;
+  date_from?: number | null;
+  date_to?: number | null;
+  data_type?: number | null;
+  decimals?: number | null;
+  source?: number | null;
+  row_count?: number | null;
+  remove_weekends: number;
+  show: number;
+  description?: string | null;
+  point_value?: number | null;
+  tick_size?: number | null;
+  tick_step?: number | null;
+  default_spread?: number | null;
+  default_slippage?: number | null;
+  min_distance?: number | null;
+  order_size_multiplier?: number | null;
+  order_size_step?: number | null;
+}
+
+/** Updated series summary returned by the governed edit. */
+export const updatedSeriesSchema = z.object({
+  series_id: z.number().int(),
+  symbol: z.string().min(1),
+  instrument: z.string().min(1),
+  bar_type: z.literal("start_of_bar"),
+});
+export type UpdatedSeries = z.infer<typeof updatedSeriesSchema>;
+
+/** Governed edit of one series and its linked instrument (requires `data:write`). */
+export function updateSeries(
+  seriesId: number,
+  body: SeriesUpdateBody,
+  options?: RequestOptions
+): Promise<ApiResponse<UpdatedSeries>> {
+  return request<UpdatedSeries>(dataRoutes.updateSeries, {
+    schema: updatedSeriesSchema,
+    body,
+    pathParams: { series_id: seriesId },
+    ...options,
+  });
+}
+
+/** Editable governed payload for one instrument specification. */
+export interface InstrumentUpdateBody {
+  description?: string | null;
+  point_value?: number | null;
+  tick_size?: number | null;
+  tick_step?: number | null;
+  default_spread?: number | null;
+  default_slippage?: number | null;
+  min_distance?: number | null;
+  order_size_multiplier?: number | null;
+  order_size_step?: number | null;
+}
+
+/** Governed edit of one instrument specification (requires `data:write`). */
+export function updateInstrument(
+  instrumentId: string,
+  body: InstrumentUpdateBody,
+  options?: RequestOptions
+): Promise<ApiResponse<InstrumentSpec>> {
+  return request<InstrumentSpec>(dataRoutes.updateInstrument, {
+    schema: instrumentSpecSchema,
+    body,
+    pathParams: { instrument: instrumentId },
+    ...options,
+  });
+}
+
+/** Full instrument specification including the raw swap rule text. */
+export const instrumentSpecSchema = z.object({
+  instrument: z.string().min(1),
+  description: z.string().nullable(),
+  broker_id: z.number().int().nullable(),
+  point_value: z.number().nullable(),
+  tick_size: z.number().nullable(),
+  tick_step: z.number().nullable(),
+  default_spread: z.number().nullable(),
+  default_slippage: z.number().nullable(),
+  data_type: z.number().int().nullable(),
+  order_size_multiplier: z.number().nullable(),
+  order_size_step: z.number().nullable(),
+  min_distance: z.number().nullable(),
+  swap: z.string().nullable(),
+});
+export type InstrumentSpec = z.infer<typeof instrumentSpecSchema>;
+
+/** Read one full instrument specification (requires `data:read`). */
+export function instrument(
+  instrumentId: string,
+  options?: RequestOptions
+): Promise<ApiResponse<InstrumentSpec>> {
+  return request<InstrumentSpec>(dataRoutes.instrument, {
+    schema: instrumentSpecSchema,
+    pathParams: { instrument: instrumentId },
+    ...options,
+  });
+}
+
 /** Query parameters for symbol discovery. */
 export interface SymbolsQuery {
   source_id?: string;
@@ -420,6 +634,12 @@ export function importDataset(
 export const data = {
   capabilities,
   symbols,
+  marketSeries,
+  instruments,
+  brokers,
+  instrument,
+  updateSeries,
+  updateInstrument,
   markets,
   quotes,
   bars,

@@ -197,7 +197,11 @@ _PLANNED_CODES = frozenset(
         "DATA_QUALITY_FAILED",
         "DATA_NOT_FOUND",
         "EMPTY_RESULT",
+        "DATE_RANGE_INVALID",
+        "FLAG_INVALID",
+        "INSTRUMENT_NOT_FOUND",
         "LIMIT_EXCEEDED",
+        "SERIES_NOT_FOUND",
         "UNSUPPORTED_SOURCE",
         "UNSUPPORTED_TIMEFRAME",
         "UNSUPPORTED_OPERATION",
@@ -233,9 +237,9 @@ _PLANNED_CODES = frozenset(
 
 
 def test_every_current_data_code_appears_exactly_once() -> None:
-    """All 36 planned Data codes appear exactly once in the catalogue."""
+    """All 40 planned Data codes appear exactly once in the catalogue."""
     assert set(DATA_ERROR_MANIFEST) == _PLANNED_CODES
-    assert len(_PLANNED_CODES) == 36
+    assert len(_PLANNED_CODES) == 40
 
 
 def test_unapproved_code_is_rejected() -> None:

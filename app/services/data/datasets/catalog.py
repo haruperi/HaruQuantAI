@@ -18,16 +18,23 @@ from app.services.data.persistence import (
     create_fetch_log_record,
     create_provider_specification_revision,
     create_quality_event_record,
+    read_broker_records,
     read_catalog_coverage,
     read_catalog_event_records,
     read_catalog_files_for_range,
     read_catalog_reference_records,
     read_catalog_unverified_count,
+    read_instrument_records,
+    read_instrument_spec_record,
+    read_market_series_exists,
+    read_market_series_records,
     read_provider_specification_revision_as_of,
     read_provider_specification_revision_interval,
     read_provider_specification_revisions,
     read_ready_dataset_catalog_records,
     read_verified_research_source_record,
+    update_market_series_records,
+    update_instrument_spec_record,
     update_provider_specification_revision,
 )
 from app.services.data.persistence.contracts import StorageManifest
@@ -104,6 +111,346 @@ def list_verified_datasets(
     return tuple(result)
 
 
+def list_market_series(
+    *, request_id: str, limit: int = 500
+) -> tuple[dict[str, object], ...]:
+    """List bounded market-data series reference summaries.
+
+    Args:
+        request_id: Caller trace identifier.
+        limit: Maximum series rows returned.
+
+    Returns:
+        Series summaries with derived total-day coverage. ``bar_type`` is the
+        constant ``start_of_bar`` because every stored series uses bar-open
+        timestamps.
+
+    Raises:
+        DataError: If the requested bound is invalid.
+    """
+    if limit <= 0 or limit > _MAX_CATALOG_ROWS:
+        raise DataError("LIMIT_EXCEEDED", request_id=request_id)
+    rows = read_market_series_records(request_id=request_id, limit=limit).rows
+    return tuple(
+        {
+            "series_id": row.get("series_id"),
+            "symbol": row.get("symbol"),
+            "instrument": row.get("instrument"),
+            "document": row.get("filename"),
+            "broker_id": row.get("broker_id"),
+            "usymbol": row.get("usymbol"),
+            "timeframe": row.get("timeframe"),
+            "timezone": row.get("timezone"),
+            "date_from": row.get("date_from"),
+            "date_to": row.get("date_to"),
+            "total_days": row.get("total_days"),
+            "row_count": row.get("row_count"),
+            "decimals": row.get("decimals"),
+            "source": row.get("source"),
+            "bar_type": "start_of_bar",
+            "data_type": row.get("data_type"),
+            "show": row.get("show"),
+            "remove_weekends": row.get("remove_weekends"),
+        }
+        for row in rows
+    )
+
+
+def get_instrument_spec(instrument: str, *, request_id: str) -> dict[str, object]:
+    """Read one instrument specification exactly.
+
+    Args:
+        instrument: Instrument identity (the ``symbol_id``).
+        request_id: Caller trace identifier.
+
+    Returns:
+        The full editable instrument specification, including the raw swap
+        rule text which the workstation renders read-only.
+
+    Raises:
+        DataError: If the instrument identity is blank or unknown.
+    """
+    identity = _text(instrument, "instrument")
+    rows = read_instrument_spec_record(identity, request_id=request_id).rows
+    if not rows:
+        raise DataError("INSTRUMENT_NOT_FOUND", request_id=request_id)
+    row = rows[0]
+    return {
+        "instrument": row.get("instrument"),
+        "description": row.get("description"),
+        "broker_id": row.get("broker_id"),
+        "point_value": row.get("point_value"),
+        "tick_size": row.get("tick_size"),
+        "tick_step": row.get("tick_step"),
+        "default_spread": row.get("default_spread"),
+        "default_slippage": row.get("default_slippage"),
+        "data_type": row.get("data_type"),
+        "order_size_multiplier": row.get("order_size_multiplier"),
+        "order_size_step": row.get("order_size_step"),
+        "min_distance": row.get("min_distance"),
+        "swap": row.get("swap"),
+    }
+
+
+def update_instrument_spec(
+    instrument: str,
+    *,
+    description: str | None,
+    point_value: float | None,
+    tick_size: float | None,
+    tick_step: float | None,
+    default_spread: float | None,
+    default_slippage: float | None,
+    min_distance: float | None,
+    order_size_multiplier: float | None,
+    order_size_step: float | None,
+    request_id: str,
+) -> dict[str, object]:
+    """Update exactly one instrument specification.
+
+    Args:
+        instrument: Instrument identity (the ``symbol_id``).
+        description: New instrument description.
+        point_value: New instrument point value.
+        tick_size: New instrument pip/tick size.
+        tick_step: New instrument pip/tick step.
+        default_spread: New instrument default spread.
+        default_slippage: New instrument default slippage.
+        min_distance: New instrument minimum stop distance.
+        order_size_multiplier: New instrument order-size multiplier.
+        order_size_step: New instrument order-size step.
+        request_id: Caller trace identifier.
+
+    Returns:
+        The updated instrument specification.
+
+    Raises:
+        DataError: If the instrument identity is blank or unknown.
+    """
+    identity = _text(instrument, "instrument")
+    # Fail closed on unknown identities before executing any statement.
+    get_instrument_spec(identity, request_id=request_id)
+    update_instrument_spec_record(
+        (
+            description,
+            point_value,
+            tick_size,
+            tick_step,
+            default_spread,
+            default_slippage,
+            min_distance,
+            order_size_multiplier,
+            order_size_step,
+            identity,
+        ),
+        request_id=request_id,
+    )
+    logger.info("Updated instrument %s specification", identity)
+    return get_instrument_spec(identity, request_id=request_id)
+
+
+def update_market_series(
+    series_id: int,
+    *,
+    symbol: str,
+    instrument: str,
+    broker_id: int | None,
+    timeframe: str | None,
+    timezone: str | None,
+    date_from: int | None,
+    date_to: int | None,
+    data_type: int | None,
+    decimals: int | None,
+    source: int | None,
+    row_count: int | None,
+    remove_weekends: int,
+    show: int,
+    instrument_description: str | None,
+    point_value: float | None,
+    tick_size: float | None,
+    tick_step: float | None,
+    default_spread: float | None,
+    default_slippage: float | None,
+    min_distance: float | None,
+    order_size_multiplier: float | None,
+    order_size_step: float | None,
+    request_id: str,
+) -> dict[str, object]:
+    """Update one series row and its linked instrument spec atomically.
+
+    Args:
+        series_id: Identity of the series row to update.
+        symbol: New series symbol name.
+        instrument: New linked instrument identity.
+        broker_id: New broker profile identity.
+        timeframe: New canonical timeframe key.
+        timezone: New timezone name.
+        date_from: New inclusive epoch-seconds range start.
+        date_to: New inclusive epoch-seconds range end.
+        data_type: New numeric data-type code.
+        decimals: New price digits.
+        source: New numeric source code.
+        row_count: New stored record count.
+        remove_weekends: Weekend removal flag (0 or 1).
+        show: Visibility flag (0 or 1).
+        instrument_description: New instrument description.
+        point_value: New instrument point value.
+        tick_size: New instrument pip/tick size.
+        tick_step: New instrument pip/tick step.
+        default_spread: New instrument default spread.
+        default_slippage: New instrument default slippage.
+        min_distance: New instrument minimum stop distance.
+        order_size_multiplier: New instrument order-size multiplier.
+        order_size_step: New instrument order-size step.
+        request_id: Caller trace identifier.
+
+    Returns:
+        The updated series summary including the refreshed total-day range.
+
+    Raises:
+        DataError: If any bound is invalid, the series is unknown, or the
+            date range is inverted.
+    """
+    name = _text(symbol, "symbol")
+    identity = _text(instrument, "instrument")
+    if date_from is not None and date_to is not None and date_to < date_from:
+        raise DataError("DATE_RANGE_INVALID", request_id=request_id)
+    if remove_weekends not in (0, 1) or show not in (0, 1):
+        raise DataError("FLAG_INVALID", request_id=request_id)
+    series_parameters = (
+        name,
+        identity,
+        broker_id,
+        timeframe,
+        timezone,
+        date_from,
+        date_to,
+        data_type,
+        decimals,
+        source,
+        row_count,
+        remove_weekends,
+        show,
+        utc_now().isoformat(),
+        series_id,
+    )
+    instrument_parameters = (
+        instrument_description,
+        point_value,
+        tick_size,
+        tick_step,
+        default_spread,
+        default_slippage,
+        min_distance,
+        order_size_multiplier,
+        order_size_step,
+        identity,
+    )
+    existing = read_market_series_exists(series_id, request_id=request_id)
+    if not existing.rows:
+        raise DataError("SERIES_NOT_FOUND", request_id=request_id)
+    update_market_series_records(
+        series_parameters,
+        instrument_parameters,
+        request_id=request_id,
+    )
+    logger.info(
+        "Updated market series %s and instrument %s specification",
+        series_id,
+        identity,
+    )
+    updated = get_instrument_spec(identity, request_id=request_id)
+    return {
+        "series_id": series_id,
+        "symbol": name,
+        "instrument": identity,
+        "broker_id": broker_id,
+        "timeframe": timeframe,
+        "timezone": timezone,
+        "date_from": date_from,
+        "date_to": date_to,
+        "total_days": (
+            (date_to - date_from) // 86400
+            if date_from is not None and date_to is not None
+            else None
+        ),
+        "row_count": row_count,
+        "decimals": decimals,
+        "source": source,
+        "bar_type": "start_of_bar",
+        "data_type": data_type,
+        "show": show,
+        "remove_weekends": remove_weekends,
+        "instrument_spec": updated,
+    }
+
+
+def list_instruments(
+    *, request_id: str, limit: int = 500
+) -> tuple[dict[str, object], ...]:
+    """List bounded instrument specification summaries.
+
+    Args:
+        request_id: Caller trace identifier.
+        limit: Maximum instrument rows returned.
+
+    Returns:
+        Instrument specification summaries ordered by identity.
+
+    Raises:
+        DataError: If the requested bound is invalid.
+    """
+    if limit <= 0 or limit > _MAX_CATALOG_ROWS:
+        raise DataError("LIMIT_EXCEEDED", request_id=request_id)
+    rows = read_instrument_records(request_id=request_id, limit=limit).rows
+    return tuple(
+        {
+            "instrument": row.get("instrument"),
+            "description": row.get("description"),
+            "broker_id": row.get("broker_id"),
+            "point_value": row.get("point_value"),
+            "tick_size": row.get("tick_size"),
+            "tick_step": row.get("tick_step"),
+            "default_spread": row.get("default_spread"),
+            "default_slippage": row.get("default_slippage"),
+            "data_type": row.get("data_type"),
+            "order_size_multiplier": row.get("order_size_multiplier"),
+            "order_size_step": row.get("order_size_step"),
+        }
+        for row in rows
+    )
+
+
+def list_brokers(*, request_id: str, limit: int = 500) -> tuple[dict[str, object], ...]:
+    """List bounded broker profile summaries with instrument counts.
+
+    Args:
+        request_id: Caller trace identifier.
+        limit: Maximum broker rows returned.
+
+    Returns:
+        Broker profile summaries ordered by name. The instrument count is a
+        correlated subquery over ``data_instruments`` by legacy broker id.
+
+    Raises:
+        DataError: If the requested bound is invalid.
+    """
+    if limit <= 0 or limit > _MAX_CATALOG_ROWS:
+        raise DataError("LIMIT_EXCEEDED", request_id=request_id)
+    rows = read_broker_records(request_id=request_id, limit=limit).rows
+    return tuple(
+        {
+            "broker_id": row.get("broker_id"),
+            "name": row.get("name"),
+            "description": row.get("description"),
+            "postfix": row.get("postfix"),
+            "timezone": row.get("mt_timezone"),
+            "customized_instruments": row.get("customized_instruments"),
+        }
+        for row in rows
+    )
+
+
 def _provider_identity(
     broker: str,
     server: str,
@@ -136,6 +483,7 @@ def _provider_identity(
 _CATALOG_TABLE_LIFECYCLES: Mapping[str, tuple[str, ...]] = {
     "data_audit_events": ("persist_audit_event", "query_audit_events"),
     "data_backfill_checkpoints": ("run_data_update_job_once", "recover_update_jobs"),
+    "data_brokers": ("sync_catalog_reference", "get_catalog_evidence"),
     "data_cache": ("get_cache_entry", "put_cache_entry", "clear_data_cache"),
     "data_datasets": ("register_catalog_artifact", "get_catalog_evidence"),
     "data_economic_events": ("scrape_economic_calendar", "get_economic_events"),
@@ -150,7 +498,8 @@ _CATALOG_TABLE_LIFECYCLES: Mapping[str, tuple[str, ...]] = {
     ),
     "data_feeds": ("start_internal_feed", "get_feed_status"),
     "data_fetch_log": ("record_catalog_fetch", "get_catalog_evidence"),
-    "data_market_sessions": ("sync_catalog_reference", "get_catalog_evidence"),
+    "data_instruments": ("sync_catalog_reference", "get_catalog_evidence"),
+    "data_market_series": ("list_market_series",),
     "data_migration_ledger": ("run_data_migrations",),
     "data_partition_files": ("register_catalog_artifact", "get_catalog_evidence"),
     "data_provider_specification_revisions": (
@@ -158,7 +507,6 @@ _CATALOG_TABLE_LIFECYCLES: Mapping[str, tuple[str, ...]] = {
         "get_provider_specification_revision",
         "get_provider_specification_revisions",
     ),
-    "data_providers": ("sync_catalog_reference", "get_catalog_evidence"),
     "data_quality_events": ("record_catalog_quality_event", "get_catalog_evidence"),
     "data_research_observations": (
         "persist_research_source_observations",
@@ -166,9 +514,9 @@ _CATALOG_TABLE_LIFECYCLES: Mapping[str, tuple[str, ...]] = {
     ),
     "data_research_sources": ("ingest_research_source", "query_research_sources"),
     "data_runtime_records": ("execute_runtime_store_operation",),
+    "data_sessions": ("sync_catalog_reference", "get_catalog_evidence"),
     "data_source_attempts": ("evaluate_source_policy",),
     "data_source_state": ("promote_source", "get_source_descriptor"),
-    "data_symbols": ("sync_catalog_reference", "get_catalog_evidence"),
     "data_update_jobs": ("create_data_update_job", "run_data_update_job_once"),
     "data_verified_research_sources": (
         "persist_verified_research_source",

@@ -109,6 +109,30 @@ _ERROR_DEFINITIONS = (
         operator_action="Verify the requested identity or range",
     ),
     _definition(
+        "SERIES_NOT_FOUND",
+        "PERMANENT",
+        safe_message="The market series was not found",
+        operator_action="Verify the series identity and refresh the catalogue",
+    ),
+    _definition(
+        "INSTRUMENT_NOT_FOUND",
+        "PERMANENT",
+        safe_message="The instrument was not found",
+        operator_action="Verify the instrument identity and refresh the catalogue",
+    ),
+    _definition(
+        "DATE_RANGE_INVALID",
+        "PERMANENT",
+        safe_message="The requested date range is inverted",
+        operator_action="Supply a start at or before the end",
+    ),
+    _definition(
+        "FLAG_INVALID",
+        "PERMANENT",
+        safe_message="A boolean flag was not 0 or 1",
+        operator_action="Supply the flag as 0 or 1",
+    ),
+    _definition(
         "EMPTY_RESULT",
         "PERMANENT",
         safe_message="The request returned no records",

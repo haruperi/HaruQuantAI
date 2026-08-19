@@ -19,6 +19,23 @@ UPDATE data_provider_specification_revisions
 SET effective_to = ?
 WHERE revision_id = ? AND effective_to IS NULL AND effective_from < ?
 """.strip()
+
+_UPDATE_MARKET_SERIES = """
+UPDATE data_market_series SET
+    symbol = ?, instrument = ?, broker_id = ?, timeframe = ?, timezone = ?,
+    date_from = ?, date_to = ?, data_type = ?, decimals = ?, source = ?,
+    row_count = ?, remove_weekends = ?, show = ?, updated_at = ?
+WHERE series_id = ?
+""".strip()
+
+_UPDATE_INSTRUMENT_SPEC = """
+UPDATE data_instruments SET
+    description = ?, point_value = ?, tick_size = ?, tick_step = ?,
+    default_spread = ?, default_slippage = ?, min_distance = ?,
+    order_size_multiplier = ?, order_size_step = ?
+WHERE symbol_id = ?
+""".strip()
+
 _INSERT_PROVIDER_SPECIFICATION_REVISION = """
 INSERT INTO data_provider_specification_revisions (
     revision_id, broker, server, environment, account_digest, provider_symbol,
@@ -305,6 +322,54 @@ def update_cache_record(
     logger.debug("Updating Data cache persistence record")
     return _execute_update(
         (_PUT_CACHE_ENTRY,),
+        (parameters,),
+        request_id=request_id,
+    )
+
+
+def update_market_series_records(
+    series_parameters: tuple[Any, ...],
+    instrument_parameters: tuple[Any, ...],
+    *,
+    request_id: str,
+) -> TransactionResult:
+    """Update one series row and its linked instrument spec atomically.
+
+    Args:
+        series_parameters: Bindings for the series-row update, including the
+            trailing ``series_id`` key.
+        instrument_parameters: Bindings for the instrument-spec update,
+            including the trailing ``symbol_id`` key.
+        request_id: Caller trace identity.
+
+    Returns:
+        The result produced by the operation.
+    """
+    logger.debug("Updating Data market series and instrument specification")
+    return _execute_update(
+        (_UPDATE_MARKET_SERIES, _UPDATE_INSTRUMENT_SPEC),
+        (series_parameters, instrument_parameters),
+        request_id=request_id,
+        max_rows=2,
+    )
+
+
+def update_instrument_spec_record(
+    parameters: tuple[Any, ...], *, request_id: str
+) -> TransactionResult:
+    """Update exactly one instrument specification row.
+
+    Args:
+        parameters: Bindings for the instrument-spec update, including the
+            trailing ``symbol_id`` key.
+        request_id: Caller trace identity.
+
+    Returns:
+        The result produced by the operation.
+    """
+    logger.debug("Updating Data instrument specification")
+    return _execute_update(
+        (_UPDATE_INSTRUMENT_SPEC,),
         (parameters,),
         request_id=request_id,
     )
@@ -727,6 +792,8 @@ __all__ = [
     "update_job_run_success",
     "update_job_start",
     "update_job_stop",
+    "update_market_series_records",
+    "update_instrument_spec_record",
     "update_provider_specification_revision",
     "update_runtime_compare_and_swap_record",
     "update_runtime_transition_records",

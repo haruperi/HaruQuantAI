@@ -815,7 +815,7 @@ def read_ready_dataset_catalog_records(
         "d.normalization_version, d.state, d.file_count, d.total_rows, "
         "s.canonical_symbol, f.artifact_id, f.content_hash, f.source_revision, "
         "f.verify_state FROM data_datasets AS d "
-        "LEFT JOIN data_symbols AS s ON s.symbol_id=d.symbol_id "
+        "LEFT JOIN data_instruments AS s ON s.symbol_id=d.symbol_id "
         "JOIN data_partition_files AS f ON f.dataset_id=d.dataset_id "
         "WHERE d.state='ready' ORDER BY d.dataset_id, f.artifact_id",
         (),
@@ -918,9 +918,9 @@ def read_catalog_reference_records(
 SELECT s.symbol_id, s.canonical_symbol, s.state,
        p.provider_id, p.provider_code, p.enabled,
        m.session_id, m.day_of_week, m.open_time_utc, m.close_time_utc
-FROM data_symbols s
-JOIN data_providers p ON p.provider_id = ?
-LEFT JOIN data_market_sessions m
+FROM data_instruments s
+JOIN data_brokers p ON p.provider_id = ?
+LEFT JOIN data_sessions m
   ON m.symbol_id = s.symbol_id AND m.effective_to IS NULL
 WHERE s.symbol_id = ? AND s.deleted_at IS NULL
 ORDER BY m.day_of_week, m.open_time_utc
@@ -958,6 +958,145 @@ ORDER BY record_id
     return _execute_read(
         statement,
         (symbol_id, symbol_id),
+        request_id=request_id,
+        max_rows=limit,
+    )
+
+
+_SELECT_MARKET_SERIES = """
+SELECT series_id, symbol, instrument, filename, broker_id, usymbol, timeframe,
+       timezone, date_from, date_to,
+       CAST((date_to - date_from) / 86400 AS INTEGER) AS total_days,
+       row_count, decimals, source, data_type, show, remove_weekends
+FROM data_market_series
+ORDER BY symbol, timeframe
+""".strip()
+
+
+def read_market_series_records(*, request_id: str, limit: int) -> TransactionResult:
+    """Read bounded market-data series reference rows.
+
+    Args:
+        request_id: Caller trace identity.
+        limit: Bounded maximum series rows.
+
+    Returns:
+        Transaction result carrying series rows ordered by symbol and timeframe.
+    """
+    logger.debug("Reading Data market series reference rows")
+    return _execute_read(
+        _SELECT_MARKET_SERIES,
+        (),
+        request_id=request_id,
+        max_rows=limit,
+    )
+
+
+_SELECT_MARKET_SERIES_ONE = """
+SELECT series_id FROM data_market_series WHERE series_id = ?
+""".strip()
+
+
+def read_market_series_exists(series_id: int, *, request_id: str) -> TransactionResult:
+    """Check whether one series identity exists.
+
+    Args:
+        series_id: Series identity.
+        request_id: Caller trace identity.
+
+    Returns:
+        Transaction result carrying the identity row when it exists.
+    """
+    logger.debug("Checking Data market series identity")
+    return _execute_read(
+        _SELECT_MARKET_SERIES_ONE,
+        (series_id,),
+        request_id=request_id,
+        max_rows=1,
+    )
+
+
+_SELECT_INSTRUMENTS = """
+SELECT symbol_id AS instrument, description, broker_id, point_value, tick_size,
+       tick_step, default_spread, default_slippage, data_type,
+       order_size_multiplier, order_size_step, min_distance, swap
+FROM data_instruments
+ORDER BY symbol_id
+""".strip()
+
+
+_SELECT_INSTRUMENT_ONE = """
+SELECT symbol_id AS instrument, description, broker_id, point_value, tick_size,
+       tick_step, default_spread, default_slippage, data_type,
+       order_size_multiplier, order_size_step, min_distance, swap
+FROM data_instruments
+WHERE symbol_id = ?
+""".strip()
+
+
+def read_instrument_spec_record(
+    instrument: str, *, request_id: str
+) -> TransactionResult:
+    """Read exactly one instrument specification row by identity.
+
+    Args:
+        instrument: Instrument identity (the ``symbol_id``).
+        request_id: Caller trace identity.
+
+    Returns:
+        Transaction result carrying at most one instrument row.
+    """
+    logger.debug("Reading one Data instrument specification row")
+    return _execute_read(
+        _SELECT_INSTRUMENT_ONE,
+        (instrument,),
+        request_id=request_id,
+        max_rows=1,
+    )
+
+
+def read_instrument_records(*, request_id: str, limit: int) -> TransactionResult:
+    """Read bounded instrument specification rows.
+
+    Args:
+        request_id: Caller trace identity.
+        limit: Bounded maximum instrument rows.
+
+    Returns:
+        Transaction result carrying instrument rows ordered by identity.
+    """
+    logger.debug("Reading Data instrument reference rows")
+    return _execute_read(
+        _SELECT_INSTRUMENTS,
+        (),
+        request_id=request_id,
+        max_rows=limit,
+    )
+
+
+_SELECT_BROKERS = """
+SELECT b.broker_id, b.name, b.description, b.postfix, b.mt_timezone,
+       (SELECT COUNT(*) FROM data_instruments i
+        WHERE i.broker_id = b.broker_id) AS customized_instruments
+FROM data_brokers b
+ORDER BY b.name
+""".strip()
+
+
+def read_broker_records(*, request_id: str, limit: int) -> TransactionResult:
+    """Read bounded broker profile rows with customized-instrument counts.
+
+    Args:
+        request_id: Caller trace identity.
+        limit: Bounded maximum broker rows.
+
+    Returns:
+        Transaction result carrying broker rows ordered by name.
+    """
+    logger.debug("Reading Data broker reference rows")
+    return _execute_read(
+        _SELECT_BROKERS,
+        (),
         request_id=request_id,
         max_rows=limit,
     )

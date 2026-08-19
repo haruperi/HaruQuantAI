@@ -98,6 +98,247 @@ def test_capability_catalog_surfaces_all_data_features() -> None:
     ]
 
 
+def test_market_series_returns_owner_rows_in_the_canonical_envelope(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The series route delegates to Data and wraps the owner rows."""
+    monkeypatch.setattr(
+        data,
+        "list_market_series",
+        lambda **_kwargs: (
+            {
+                "symbol": "EURJPY_M1",
+                "document": "EURJPY_M1.csv",
+                "broker_id": 1,
+                "usymbol": None,
+                "timeframe": "M1",
+                "timezone": "UTC",
+                "date_from": 1609459200,
+                "date_to": 1640908800,
+                "total_days": 364,
+                "row_count": 250000,
+                "source": 2,
+                "bar_type": "start_of_bar",
+                "data_type": 1,
+                "show": 1,
+            },
+        ),
+    )
+
+    status_code, body = get_json(_app(lambda *_args: None), "/api/v1/data/series")
+
+    assert status_code == 200
+    assert body["status"] == "success"
+    series = body["data"]["series"]
+    assert len(series) == 1
+    assert series[0]["symbol"] == "EURJPY_M1"
+    assert series[0]["bar_type"] == "start_of_bar"
+    assert body["metadata"]["operation"] == "api.data.series"
+
+
+def test_market_series_requires_read_permission() -> None:
+    """A caller without data:read is refused before touching Data."""
+    app = _app(lambda *_args: None, permissions=())
+    app.dependency_overrides[require_auth_context] = lambda: _auth(permissions=())
+
+    status_code, body = get_json(app, "/api/v1/data/series")
+
+    assert status_code == 403
+    assert body["detail"] == "AUTHORIZATION_DENIED"
+
+
+def test_instruments_return_owner_rows_in_the_canonical_envelope(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The instruments route delegates to Data and wraps the owner rows."""
+    monkeypatch.setattr(
+        data,
+        "list_instruments",
+        lambda **_kwargs: (
+            {
+                "instrument": "EURJPY",
+                "description": "Euro vs Japanese Yen",
+                "broker_id": 1,
+                "point_value": 1,
+                "tick_size": 0.001,
+                "tick_step": 0.001,
+                "default_spread": 0.002,
+                "default_slippage": 0,
+                "data_type": 1,
+                "order_size_multiplier": 1,
+                "order_size_step": 0,
+            },
+        ),
+    )
+
+    status_code, body = get_json(_app(lambda *_args: None), "/api/v1/data/instruments")
+
+    assert status_code == 200
+    instruments = body["data"]["instruments"]
+    assert len(instruments) == 1
+    assert instruments[0]["instrument"] == "EURJPY"
+    assert body["metadata"]["operation"] == "api.data.instruments"
+
+
+def test_brokers_return_owner_rows_in_the_canonical_envelope(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The brokers route delegates to Data and wraps the owner rows."""
+    monkeypatch.setattr(
+        data,
+        "list_brokers",
+        lambda **_kwargs: (
+            {
+                "broker_id": 1,
+                "name": "MetaTrader 5",
+                "description": "Default MT5 broker",
+                "postfix": "_r",
+                "timezone": "EET",
+                "customized_instruments": 30,
+            },
+        ),
+    )
+
+    status_code, body = get_json(_app(lambda *_args: None), "/api/v1/data/brokers")
+
+    assert status_code == 200
+    brokers = body["data"]["brokers"]
+    assert len(brokers) == 1
+    assert brokers[0]["name"] == "MetaTrader 5"
+    assert brokers[0]["customized_instruments"] == 30
+    assert body["metadata"]["operation"] == "api.data.brokers"
+
+
+def test_instrument_spec_returns_one_owner_row(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The instrument route returns the full specification by identity."""
+    monkeypatch.setattr(
+        data,
+        "get_instrument_spec",
+        lambda *_args, **_kwargs: {
+            "instrument": "EURJPY",
+            "description": "Euro vs Japanese Yen",
+            "broker_id": 1,
+            "point_value": 1,
+            "tick_size": 0.001,
+            "tick_step": 0.001,
+            "default_spread": 0.002,
+            "default_slippage": 0,
+            "data_type": 1,
+            "order_size_multiplier": 1,
+            "order_size_step": 0,
+            "min_distance": 0,
+            "swap": None,
+        },
+    )
+
+    status_code, body = get_json(
+        _app(lambda *_args: None), "/api/v1/data/instruments/EURJPY"
+    )
+
+    assert status_code == 200
+    assert body["data"]["instrument"] == "EURJPY"
+    assert body["metadata"]["operation"] == "api.data.instrument"
+
+
+def test_series_update_requires_idempotency_key() -> None:
+    """A governed edit without a durable key is refused with 422."""
+    status_code, body = post_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/series/7",
+        {"symbol": "EURJPY_M1", "instrument": "EURJPY"},
+        headers={},
+        method="PATCH",
+    )
+
+    assert status_code == 422
+    assert body["detail"] == "IDEMPOTENCY_KEY_REQUIRED"
+
+
+def test_series_update_requires_write_permission() -> None:
+    """A read-only caller cannot edit a series."""
+    app = _app(lambda *_args: None, permissions=("data:read",))
+
+    status_code, _body = post_json(
+        app,
+        "/api/v1/data/series/7",
+        {"symbol": "EURJPY_M1", "instrument": "EURJPY"},
+        headers={"Idempotency-Key": _key()},
+        method="PATCH",
+    )
+
+    assert status_code == 403
+
+
+def test_series_update_delegates_to_the_owner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The governed edit forwards the full payload and wraps the summary."""
+    captured: dict[str, Any] = {}
+
+    def _capture(series_id: int, **kwargs: Any) -> dict[str, Any]:
+        captured.update(kwargs)
+        captured["series_id"] = series_id
+        return {
+            "series_id": series_id,
+            "symbol": kwargs["symbol"],
+            "instrument": kwargs["instrument"],
+            "bar_type": "start_of_bar",
+        }
+
+    monkeypatch.setattr(data, "update_market_series", _capture)
+
+    payload = {
+        "symbol": "EDITED_M1",
+        "instrument": "EURJPY",
+        "timezone": "UTC",
+        "remove_weekends": 1,
+        "show": 0,
+        "tick_size": 0.002,
+    }
+    status_code, body = post_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/series/7",
+        payload,
+        headers={"Idempotency-Key": _key()},
+        method="PATCH",
+    )
+
+    assert status_code == 200
+    assert body["data"]["symbol"] == "EDITED_M1"
+    assert captured["series_id"] == 7
+    assert captured["remove_weekends"] == 1
+    assert captured["show"] == 0
+    assert captured["tick_size"] == 0.002
+    assert body["metadata"]["operation"] == "api.data.series_update"
+
+
+def test_series_update_translates_owner_not_found(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An unknown series identity fails closed with 404."""
+
+    class _NotFoundError(Exception):
+        code = "SERIES_NOT_FOUND"
+
+    def _raise(*_args: Any, **_kwargs: Any) -> None:
+        raise _NotFoundError
+
+    monkeypatch.setattr(data, "update_market_series", _raise)
+
+    status_code, body = post_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/series/999",
+        {"symbol": "X", "instrument": "Y"},
+        headers={"Idempotency-Key": _key()},
+        method="PATCH",
+    )
+
+    assert status_code == 404
+    assert body["detail"] == "SERIES_NOT_FOUND"
+
+
 def test_symbol_directory_returns_canonical_api_envelope(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

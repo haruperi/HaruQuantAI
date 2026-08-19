@@ -25,6 +25,9 @@ from app.services.data.migrations.economic_calendar import (
 from app.services.data.migrations.economic_event_definitions import (
     ECONOMIC_EVENT_DEFINITIONS_MIGRATION_STEP,
 )
+from app.services.data.migrations.market_reference import (
+    MARKET_REFERENCE_MIGRATION_STEP,
+)
 from app.services.data.migrations.research_sources import (
     RESEARCH_PROVIDER_MIGRATION_STEP,
     RESEARCH_SOURCE_MIGRATION_STEP,
@@ -459,4 +462,5 @@ DATA_MIGRATION_STEPS = (
     DATA_JOBS_ENVIRONMENT_MIGRATION_STEP,
     ECONOMIC_EVENT_DEFINITIONS_MIGRATION_STEP,
     PROVIDER_SPECIFICATION_MIGRATION_STEP,
+    MARKET_REFERENCE_MIGRATION_STEP,
 )
