@@ -312,11 +312,29 @@ def test_package_root_has_no_runtime_side_effect_statements() -> None:
         ast.Assign,
         ast.AnnAssign,
     )
-    unexpected = [
-        type(node).__name__
-        for node in root_module.body
-        if not isinstance(node, permitted)
-    ]
+    # The lazy boundary adds a `typing.TYPE_CHECKING` guard and the two dunder
+    # resolvers. Both are declarations, not side effects, so they are permitted
+    # in exactly that shape and nothing else.
+    allowed_functions = {"__getattr__", "__dir__"}
+    unexpected: list[str] = []
+    for node in root_module.body:
+        if isinstance(node, permitted):
+            continue
+        if isinstance(node, ast.FunctionDef) and node.name in allowed_functions:
+            continue
+        if isinstance(node, ast.If):
+            test = node.test
+            guarded = (
+                isinstance(test, ast.Attribute)
+                and test.attr == "TYPE_CHECKING"
+                and isinstance(test.value, ast.Name)
+                and test.value.id == "typing"
+            )
+            if guarded and all(
+                isinstance(stmt, (ast.Import, ast.ImportFrom)) for stmt in node.body
+            ):
+                continue
+        unexpected.append(type(node).__name__)
     assert not unexpected, f"Unexpected package-root statements: {unexpected}"
 
 

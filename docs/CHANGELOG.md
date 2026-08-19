@@ -2,6 +2,131 @@
 
 ## [Unreleased]
 
+### Add the governed series edit dialog
+
+Clicking a Symbol in the Data tab opens a prepopulated edit dialog covering
+the series row and its linked instrument specification; saving persists both
+atomically through a governed PATCH.
+
+#### Added (6)
+
+- Added the public Data operations `update_market_series` (atomic two-table
+  series + instrument-spec update with fail-closed validation) and
+  `get_instrument_spec` (one full specification read).
+- Added gateway routes `PATCH /api/v1/data/series/{series_id}` (governed
+  write, required idempotency, owner errors mapped to 404/422) and
+  `GET /api/v1/data/instruments/{instrument}`.
+- Added typed frontend clients `updateSeries` and `instrument` with Zod
+  contracts and route entries.
+- Added the themed edit dialog with Series fields (symbol, instrument,
+  broker profile, timeframe, timezone, date range, data type, decimals,
+  source, total records, remove-weekends and hide flags, read-only
+  Start-of-Bar bar type) and Instrument specification fields (description,
+  point value, pip/tick size and step, default spread and slippage, min
+  distance, order-size multiplier and step; swap rules shown read-only).
+- Added `series_id` and `decimals`/`remove_weekends` to the series catalogue
+  rows so rows are addressable and fully prepopulatable.
+- Added four manifest-backed Data error codes (`SERIES_NOT_FOUND`,
+  `INSTRUMENT_NOT_FOUND`, `DATE_RANGE_INVALID`, `FLAG_INVALID`).
+
+#### Changed (1)
+
+- Refreshed the frozen OpenAPI contract snapshot for the two new operations
+  (172 to 174 operations).
+
+### Add the Instruments and Broker Profiles reference tabs
+
+The Data Explorer is now a three-tab workspace over the market-reference
+tables: Data, Instruments, and Broker Profiles.
+
+#### Added (6)
+
+- Added the public Data operations `list_instruments` and `list_brokers`;
+  the broker read derives each profile's customized-instrument count.
+- Added gateway routes `GET /api/v1/data/instruments` and
+  `GET /api/v1/data/brokers` returning bounded owner rows in the canonical
+  envelope (requires `data:read`).
+- Added the typed frontend clients `instruments` and `brokers` with Zod row
+  contracts and route entries, keeping backend/frontend route parity.
+- Added the Instruments table (Instrument, Description, Broker profile, Point
+  value, Pip/Tick size, Pip/Tick step, Default spread, Default slippage,
+  Data type, Order size mult., Order size step) and the Broker Profiles table
+  (ID, Name, Description, Postfix, Timezone, Customized instruments) with
+  loading, empty, and error states.
+- Added the Instrument column to the Data tab's series table.
+- Added accessible tablist/tab/tabpanel switching with lazy per-tab loading
+  and a Refresh button bound to the active tab.
+
+#### Changed (1)
+
+- Refreshed the frozen OpenAPI contract snapshot for the two new operations
+  (170 to 172 operations).
+
+### Serve the market series catalogue to the Data Explorer
+
+The Data Explorer widget now renders the market-data series reference table
+backed by `data_market_series`, with the invariant bar-open timestamp
+reference shown as its Bar type column.
+
+#### Added (4)
+
+- Added the public Data operation `list_market_series`, giving
+  `data_market_series` its first lifecycle trigger and removing it from the
+  structural pending-feature exemption.
+- Added gateway route `GET /api/v1/data/series` returning bounded owner rows
+  in the canonical envelope (requires `data:read`).
+- Added the typed frontend client `marketSeries` with its Zod row contract
+  and route entry, keeping backend/frontend route parity.
+- Added the fourteen-column market series table (Symbol, Document, Broker
+  profile, Underlying Symbol, Timeframe, Timezone, Date from, Date to, Total
+  Days, Total Records, Source, Bar type, Data type, Hide) to the Data
+  Explorer widget with loading, empty, and error states.
+
+#### Changed (2)
+
+- Removed the static Data capabilities card grid from the Data Explorer
+  widget; the workspace now shows only the market series table, rendered
+  with its header row even when empty.
+- Refreshed the frozen OpenAPI contract snapshot for the new operation
+  (169 to 170 operations).
+
+### Replace the Data reference catalog with the market-reference schema
+
+The empty step-006 reference tables are superseded by a consolidated
+market-reference catalog that also carries the legacy instrument, broker, and
+session definitions. The artifact catalog (FEAT-DATA-02) keeps working against
+the merged tables.
+
+#### Added (6)
+
+- Added migration step `011_market_reference_v1` creating eight
+  house-convention reference tables: `data_instruments`, `data_brokers`,
+  `data_sessions`, `data_session_elements`, `data_market_series`,
+  `data_broker_stocks`, `data_stock_groups`, and `data_stock_members`.
+- Added legacy instrument contract-specification columns (point value, tick
+  size/step, spreads, commissions, swaps, order sizing) to `data_instruments`.
+- Added legacy broker platform settings and the integer `broker_id` identity
+  to `data_brokers`.
+- Added legacy session definitions with broker scoping to `data_sessions`.
+- Added component tests verifying the step replaces the old reference tables
+  and enforces STRICT typing with check constraints.
+- Added lookup indexes for series, broker-stock, stock-member, and
+  session-element access patterns.
+
+#### Changed (3)
+
+- Repointed the artifact-catalog persistence upserts and reference reads from
+  `data_symbols`, `data_providers`, and `data_market_sessions` to the merged
+  `data_instruments`, `data_brokers`, and `data_sessions` tables.
+- Renamed the catalog lifecycle entries for the merged reference tables.
+- Documented the pending-feature exemption for the five schema-only reference
+  tables in the structural reachability test and the owning README.
+
+#### Removed (1)
+
+- Dropped the empty `data_symbols`, `data_providers`, and
+  `data_market_sessions` tables and their indexes.
+
 ### Close the workbench evidence and runtime gaps
 
 The workbenches shipped with sections that could never carry data and with
@@ -28,7 +153,7 @@ rows say they do.
 - Added the historical run catalogue to the Simulation workspace, replacing the
   staged-rollout placeholder that stood inside a Completed feature.
 
-#### Changed (4)
+#### Changed (14)
 
 - Composed the Analytics Workbench projection, comparison, and period
   aggregation against the real owner report; those three routes previously
@@ -39,6 +164,36 @@ rows say they do.
   genuine canonical runs and the gateway will not invent a window.
 - Re-exported the five workbench builders from `app.services.api` rather than
   leaving consumers to deep-import them.
+- Composed the gateway from a declared provider surface rather than eager
+  imports, so an absent Agentic, Analytics, Optimization, Portfolio, or
+  Research capability unmounts its routes and is reported degraded instead of
+  preventing the application from starting.
+- Classified the Analytics, Optimization, and Portfolio startup migrations as
+  optional; Trading, Brokers, Indicators, Simulator, and API storage failures
+  still block readiness.
+- Resolved the Research public boundary lazily, so importing the domain no
+  longer loads every Research feature; a cold import fell from roughly 2.2s to
+  0.3s and the public export surface is unchanged.
+- Resolved the Research `profiles` package lazily, so reaching the report
+  renderer no longer loads the nine sibling features the Edge Lab workflow
+  composes; that resolution fell from roughly 2.1s to 0.4s.
+- Resolved the Brokers, Trading, Strategy, Risk, Indicators, Optimization,
+  Portfolio, and Analytics public boundaries lazily on the same pattern, so a
+  consumer loads only the features it names; every `__all__` is unchanged.
+- Moved coverage out of the default pytest options into the CI script and the
+  pre-push hook, so a targeted `pytest <path>` run is fast and no longer fails
+  the repository-wide 80% gate.
+- Resolved the Data public boundary and its `persistence`/`time_sessions`
+  package roots lazily, which also broke two latent import cycles that eager
+  boundaries had masked; a cold Data import fell to roughly 0.3s.
+- Routed the Risk manual-preflight strategy version and identifier through the
+  Strategy package root, removing the last deep cross-domain import.
+- Deferred the Data-to-Brokers collaborators to first use, so importing Data no
+  longer imports Brokers and the composition matches its documented lazy design.
+- Composed optional API capabilities from declarations each capability owns,
+  discovered under the widgets namespace, so an absent capability is reported
+  with a reason instead of preventing startup; Analytics is now classified
+  required because Simulator imports it.
 
 #### Fixed (3)
 

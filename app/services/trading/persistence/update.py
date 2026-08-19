@@ -12,7 +12,6 @@ from app.services.trading.persistence.create import (
     _require_store,
     _ReservationValue,
 )
-from app.services.trading.state.materializations import build_materialization_batch
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -485,6 +484,7 @@ def update_event_projection_records(
         ValueError: If mapping or transactional persistence fails.
     """
     from app.services.trading.state.events import TradingEvent
+    from app.services.trading.state.materializations import build_materialization_batch
     from app.services.trading.state.projections import TradingProjection
 
     if not isinstance(event, TradingEvent) or not isinstance(
