@@ -58,6 +58,9 @@ describe("SimulationHome", () => {
   it("renders placeholders for empty practice and history modes", () => {
     const first = render(<SimulationHome initialMode="practice" />);
     expect(screen.getByRole("heading", { name: /^Live practice$/i })).toBeInTheDocument();
+    expect(
+      screen.getByText("No practice session identifier was provided."),
+    ).toBeInTheDocument();
     first.unmount();
 
     render(<SimulationHome initialMode="history" />);

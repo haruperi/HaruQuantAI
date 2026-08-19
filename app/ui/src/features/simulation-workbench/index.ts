@@ -70,3 +70,15 @@ export {
   parseOverrides,
   type WhatIfPanelProps,
 } from "./WhatIfPanel";
+
+export {
+  SimulationRecoveryPanel,
+  INTEGRITY_VERIFIED,
+  type SimulationRecoveryPanelProps,
+} from "./SimulationRecoveryPanel";
+
+export {
+  SimulationFinalizeDialog,
+  FINALIZE_ADVISORY_NOTICE,
+  type SimulationFinalizeDialogProps,
+} from "./SimulationFinalizeDialog";
