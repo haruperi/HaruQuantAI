@@ -51,10 +51,11 @@ export type ArchiveState = (typeof ARCHIVE_STATES)[number];
 
 export const COMMAND_TYPES = [
   "submit_order",
-  "cancel_order",
+  "modify_pending_order",
+  "cancel_pending_order",
   "close_position",
-  "modify_order",
-  "modify_position",
+  "reduce_position",
+  "close_all_practice_exposure",
 ] as const;
 export type CommandType = (typeof COMMAND_TYPES)[number];
 

@@ -437,3 +437,92 @@
   text-align: left;
   white-space: nowrap;
 }
+
+/* --- Manual controls and state panels (P4-T04) --------------------------- */
+
+.simulation-command-panel,
+.simulation-whatif {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.simulation-command-panel input,
+.simulation-command-panel select,
+.simulation-whatif input,
+.simulation-whatif textarea {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.3rem;
+  color: inherit;
+  padding: 0.25rem 0.5rem;
+}
+
+.simulation-command-panel__receipt,
+.simulation-whatif__result {
+  display: grid;
+  grid-template-columns: minmax(7rem, auto) 1fr;
+  gap: 0.2rem 1rem;
+  margin: 0.5rem 0 0;
+}
+
+.simulation-command-panel__receipt dt,
+.simulation-whatif__result dt {
+  color: #7a94a2;
+}
+
+.simulation-command-panel__receipt dd,
+.simulation-whatif__result dd {
+  margin: 0;
+}
+
+.simulation-whatif__note {
+  font-size: 0.75rem;
+  color: #7a94a2;
+}
+
+.simulation-state-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  font-size: 0.82rem;
+}
+
+.simulation-state-panels table {
+  width: 100%;
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+}
+
+.simulation-state-panels th,
+.simulation-state-panels td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.simulation-state-panels__account {
+  display: grid;
+  grid-template-columns: minmax(7rem, auto) 1fr;
+  gap: 0.2rem 1rem;
+  margin: 0;
+}
+
+.simulation-state-panels__account dt {
+  color: #7a94a2;
+}
+
+.simulation-state-panels__account dd {
+  margin: 0;
+}
+
+.simulation-state-panels__note {
+  font-size: 0.75rem;
+  color: #7a94a2;
+}
