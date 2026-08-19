@@ -113,6 +113,23 @@ describe("Analytics Routes", () => {
     ).toBeInTheDocument();
   });
 
+  it("AnalyticsRunPage states an unknown section instead of silently falling back", async () => {
+    await renderSettled(
+      <AnalyticsRunPage
+        params={{ runId: "run-anlt-100", segments: ["not-a-section"] }}
+      />,
+    );
+    expect(
+      screen.getByRole("region", { name: /unknown analytics section/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/has no section named "not-a-section"/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: /canonical trade ledger/i }),
+    ).not.toBeInTheDocument();
+  });
+
   it("AnalyticsRunPage selects correct tab based on segment parameter", async () => {
     const { rerender } = await renderSettled(
       <AnalyticsRunPage params={{ runId: "run-anlt-100", segments: ["returns"] }} />,

@@ -99,7 +99,8 @@ export default function AnalyticsRunPage({
   const runId = resolved?.runId ?? "";
   const segments = resolved?.segments ?? [];
   const rawTab = segments[0]?.toLowerCase() as AnalyticsTab;
-  const activeTab: AnalyticsTab = VALID_TABS.has(rawTab) ? rawTab : "overview";
+  const unknownSection = segments.length > 0 && !VALID_TABS.has(rawTab);
+  const activeTab: AnalyticsTab = unknownSection || !rawTab ? "overview" : rawTab;
   const ticket = activeTab === "trades" ? segments[1] : undefined;
 
   const searchParams = useSearchParams();
@@ -116,7 +117,17 @@ export default function AnalyticsRunPage({
   const { payload, loading, error } = useWorkbenchPayload(runId, needsPayload);
 
   let panel: ReactNode;
-  if (activeTab === "overview") {
+  if (unknownSection) {
+    panel = (
+      <section aria-label="Unknown analytics section">
+        <h2>Unknown analytics section</h2>
+        <p>
+          This run has no section named &quot;{segments[0]}&quot;. Choose one of
+          the sections above to read its evidence.
+        </p>
+      </section>
+    );
+  } else if (activeTab === "overview") {
     panel = <OverviewPanel runId={runId} />;
   } else if (activeTab === "trades") {
     panel = ticket ? (

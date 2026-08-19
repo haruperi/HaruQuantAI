@@ -18,6 +18,7 @@ import { SimulationRunBuilder } from "./SimulationRunBuilder";
 import type { RunBuilderSubmission } from "./SimulationRunBuilder";
 import { CanonicalRunMonitor } from "./CanonicalRunMonitor";
 import { BatchRunMonitor } from "./BatchRunMonitor";
+import { RunCataloguePanel } from "./RunCataloguePanel";
 import { InteractiveSimulationWorkspace } from "./InteractiveSimulationWorkspace";
 import { SessionStatePanels } from "./SessionStatePanels";
 import { ManualCommandPanel } from "./ManualCommandPanel";
@@ -105,16 +106,6 @@ function PracticeMonitor({ sessionId }: { sessionId?: string }): ReactNode {
   );
 }
 
-/** Small placeholder for historical catalogue mode while still validating tab state. */
-function HistoryMonitor(): ReactNode {
-  return (
-    <section>
-      <h3>Run catalogue</h3>
-      <p>Run evidence catalogue is in staged rollout.</p>
-    </section>
-  );
-}
-
 /** Route-aware workbench shell with mode-specific render panels. */
 export function SimulationHome({
   initialMode = "canonical",
@@ -156,7 +147,7 @@ export function SimulationHome({
     if (activeMode === "practice") {
       return <PracticeMonitor sessionId={initialSessionId} />;
     }
-    return <HistoryMonitor />;
+    return <RunCataloguePanel />;
   })();
 
   return (

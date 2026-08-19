@@ -26,6 +26,10 @@ vi.mock("./BatchRunMonitor", () => ({
   ),
 }));
 
+vi.mock("./RunCataloguePanel", () => ({
+  RunCataloguePanel: () => <div data-testid="run-catalogue" />,
+}));
+
 import { SimulationHome } from "./SimulationHome";
 
 describe("SimulationHome", () => {
@@ -55,7 +59,7 @@ describe("SimulationHome", () => {
     expect(screen.getByTestId("batch-monitor")).toBeInTheDocument();
   });
 
-  it("renders placeholders for empty practice and history modes", () => {
+  it("renders the practice placeholder and the real history catalogue", () => {
     const first = render(<SimulationHome initialMode="practice" />);
     expect(screen.getByRole("heading", { name: /^Live practice$/i })).toBeInTheDocument();
     expect(
@@ -64,7 +68,8 @@ describe("SimulationHome", () => {
     first.unmount();
 
     render(<SimulationHome initialMode="history" />);
-    expect(screen.getByRole("heading", { name: /run catalogue/i })).toBeInTheDocument();
+    expect(screen.getByTestId("run-catalogue")).toBeInTheDocument();
+    expect(screen.queryByText(/staged rollout/i)).not.toBeInTheDocument();
   });
 
   it("hands a submitted run off to the canonical monitor", () => {
