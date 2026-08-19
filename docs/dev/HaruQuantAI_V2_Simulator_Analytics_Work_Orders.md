@@ -631,8 +631,8 @@ None.
 ## 10. PROGRESS DASHBOARD
 
 - [x] Phase 0 — P0-T01 through P0-T11
-- [ ] Phase 1 — P1-T01 through P1-T06
-- [ ] Phase 2 — P2-T01 through P2-T02
+- [x] Phase 1 — P1-T01 through P1-T06
+- [x] Phase 2 — P2-T01 through P2-T02
 - [ ] Phase 3 — P3-T01 through P3-T04
 - [ ] Phase 4 — P4-T01 through P4-T05
 - [ ] Phase 5 — P5-T01
@@ -990,7 +990,7 @@ Git Commit: `feat(ui): link canonical Analytics handoff`
 
 ### Phase 2 — Canonical batch end to end
 
-#### - [ ] Task `P2-T01` — Build canonical run views
+#### - [x] Task `P2-T01` — Build canonical run views
 
 **Files:** `SimulationHome.tsx`, `SimulationRunBuilder.tsx`, `CanonicalRunMonitor.tsx` (CREATE).
 
@@ -1000,7 +1000,7 @@ Tests: mode, parameters, validation, idempotency, ordered progress, disconnect-n
 
 Git Commit: `feat(ui): build canonical run workflow`
 
-#### - [ ] Task `P2-T02` — Build batch monitor
+#### - [x] Task `P2-T02` — Build batch monitor
 
 **Files:** `BatchRunMonitor.tsx`, `simulation-store.ts`, `simulation-selectors.ts` (CREATE).
 
