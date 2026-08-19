@@ -20,6 +20,7 @@ export {
   type SimulationRunBuilderProps,
 } from "./SimulationRunBuilder";
 export { CanonicalRunMonitor } from "./CanonicalRunMonitor";
+export { BatchRunMonitor } from "./BatchRunMonitor";
 export { useSimulationWorkbenchStore } from "./simulation-store";
 export type { SimulationWorkbenchStore } from "./simulation-store";
 export {
