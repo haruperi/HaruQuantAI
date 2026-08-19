@@ -24,6 +24,25 @@ import { ManualCommandPanel } from "./ManualCommandPanel";
 import { WhatIfPanel } from "./WhatIfPanel";
 import { SimulationRecoveryPanel } from "./SimulationRecoveryPanel";
 import { SimulationFinalizeDialog } from "./SimulationFinalizeDialog";
+import { ScenarioPanel, type ScenarioEvidence } from "./ScenarioPanel";
+import { ChecklistPanel, type ChecklistEvidence } from "./ChecklistPanel";
+import { MissionPanel, type MissionOutcomeEvidence } from "./MissionPanel";
+
+/**
+ * Read one optional owner evidence block from a session projection.
+ *
+ * Scenario, checklist, and mission evidence is Simulator-owned and only
+ * present on sessions the owner runs as a mission. Reading it defensively lets
+ * the panels say plainly that nothing was supplied instead of implying an
+ * empty scenario is a scenario with nothing in it.
+ */
+function ownerEvidence<T>(
+  session: LiveSessionProjection | null,
+  key: string,
+): T | null {
+  const value = (session as Record<string, unknown> | null)?.[key];
+  return value && typeof value === "object" ? (value as T) : null;
+}
 
 /** Route-provided context passed into the workbench home. */
 export interface SimulationHomeProps {
@@ -62,6 +81,13 @@ function PracticeMonitor({ sessionId }: { sessionId?: string }): ReactNode {
         onSessionRefreshed={setSession}
       />
       <WhatIfPanel sessionId={sessionId} session={session} />
+      <ScenarioPanel scenario={ownerEvidence<ScenarioEvidence>(session, "scenario")} />
+      <ChecklistPanel
+        checklist={ownerEvidence<ChecklistEvidence>(session, "checklist")}
+      />
+      <MissionPanel
+        outcome={ownerEvidence<MissionOutcomeEvidence>(session, "mission_outcome")}
+      />
       <SimulationRecoveryPanel
         sessionId={sessionId}
         session={session}
