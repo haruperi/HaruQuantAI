@@ -162,3 +162,99 @@
   font-weight: 600;
   color: #cde0ea;
 }
+
+/* --- Evidence state and library (P3-T01) --------------------------------- */
+
+.analytics-evidence__meta {
+  font-size: 0.75rem;
+  color: #7a94a2;
+  margin-bottom: 0.5rem;
+}
+
+.analytics-evidence__unavailable {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.analytics-evidence__unit {
+  color: #7a94a2;
+}
+
+.analytics-evidence__error {
+  color: #fca5a5;
+}
+
+.analytics-library {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: #cde0ea;
+}
+
+.analytics-library__note {
+  font-size: 0.75rem;
+  color: #7a94a2;
+}
+
+.analytics-library__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  display: block;
+  overflow-x: auto;
+}
+
+.analytics-library__table th,
+.analytics-library__table td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.analytics-library__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.analytics-library__pager {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.analytics-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem;
+  color: #cde0ea;
+}
+
+.analytics-overview__identity,
+.analytics-overview__metrics {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) 1fr;
+  gap: 0.3rem 1rem;
+  font-size: 0.85rem;
+}
+
+.analytics-overview__metric {
+  display: contents;
+}
+
+.analytics-overview__identity dt,
+.analytics-overview__metrics dt {
+  color: #7a94a2;
+}
+
+.analytics-overview__identity dd,
+.analytics-overview__metrics dd {
+  margin: 0;
+}
+
+.analytics-overview__context {
+  color: #7a94a2;
+  font-size: 0.75rem;
+}
