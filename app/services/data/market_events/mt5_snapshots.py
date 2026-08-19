@@ -9,11 +9,6 @@ from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from app.services.brokers import (
-    acquire_metatrader_snapshot_symbols,
-    release_metatrader_snapshot_symbols,
-    stream_metatrader_snapshots,
-)
 from app.services.data.contracts import DataError
 
 _MAX_SYMBOLS = 200
@@ -129,6 +124,12 @@ async def stream_market_snapshots(request: object) -> AsyncIterator[object]:
     Raises:
         DataError: If the request type or upstream snapshot is invalid.
     """
+    from app.services.brokers import (
+        acquire_metatrader_snapshot_symbols,
+        release_metatrader_snapshot_symbols,
+        stream_metatrader_snapshots,
+    )
+
     if not isinstance(request, _SnapshotRequest):
         raise DataError("INVALID_INPUT", safe_details={"contract": "snapshot"})
     requested = set(request.symbols)

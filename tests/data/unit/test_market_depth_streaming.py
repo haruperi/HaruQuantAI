@@ -7,6 +7,7 @@ from collections.abc import AsyncGenerator
 from datetime import UTC, datetime
 from decimal import Decimal
 
+import app.services.brokers as brokers_root
 import pytest
 from app.services.data import (
     build_market_depth_stream_request,
@@ -55,9 +56,13 @@ def test_depth_stream_filters_atomically_without_synthesizing_missing_levels(
         async def release(consumer_id: str) -> None:
             released.append(consumer_id)
 
-        monkeypatch.setattr(mt5_depth, "stream_metatrader_book_snapshots", source)
-        monkeypatch.setattr(mt5_depth, "acquire_metatrader_snapshot_symbols", acquire)
-        monkeypatch.setattr(mt5_depth, "release_metatrader_snapshot_symbols", release)
+        monkeypatch.setattr(brokers_root, "stream_metatrader_book_snapshots", source)
+        monkeypatch.setattr(
+            brokers_root, "acquire_metatrader_snapshot_symbols", acquire
+        )
+        monkeypatch.setattr(
+            brokers_root, "release_metatrader_snapshot_symbols", release
+        )
         request = build_market_depth_stream_request(
             symbols=("EURUSD", "USDJPY"),
             request_id=generate_id("req"),
@@ -108,9 +113,13 @@ def test_depth_stream_skips_a_frame_with_nothing_for_requested_symbols(
         async def release(_consumer_id: str) -> None:
             return None
 
-        monkeypatch.setattr(mt5_depth, "stream_metatrader_book_snapshots", source)
-        monkeypatch.setattr(mt5_depth, "acquire_metatrader_snapshot_symbols", acquire)
-        monkeypatch.setattr(mt5_depth, "release_metatrader_snapshot_symbols", release)
+        monkeypatch.setattr(brokers_root, "stream_metatrader_book_snapshots", source)
+        monkeypatch.setattr(
+            brokers_root, "acquire_metatrader_snapshot_symbols", acquire
+        )
+        monkeypatch.setattr(
+            brokers_root, "release_metatrader_snapshot_symbols", release
+        )
         request = build_market_depth_stream_request(
             symbols=("EURUSD",),
             request_id=generate_id("req"),
@@ -155,9 +164,13 @@ def test_depth_stream_fails_bounded_when_no_requested_symbol_ever_arrives(
         async def release(consumer_id: str) -> None:
             released.append(consumer_id)
 
-        monkeypatch.setattr(mt5_depth, "stream_metatrader_book_snapshots", source)
-        monkeypatch.setattr(mt5_depth, "acquire_metatrader_snapshot_symbols", acquire)
-        monkeypatch.setattr(mt5_depth, "release_metatrader_snapshot_symbols", release)
+        monkeypatch.setattr(brokers_root, "stream_metatrader_book_snapshots", source)
+        monkeypatch.setattr(
+            brokers_root, "acquire_metatrader_snapshot_symbols", acquire
+        )
+        monkeypatch.setattr(
+            brokers_root, "release_metatrader_snapshot_symbols", release
+        )
         monkeypatch.setattr(mt5_depth, "_FIRST_EVENT_TIMEOUT_SECONDS", 0.05)
         request = build_market_depth_stream_request(
             symbols=("EURUSD",),
@@ -193,9 +206,13 @@ def test_depth_stream_surfaces_a_bounded_upstream_book_timeout(monkeypatch) -> N
         async def release(consumer_id: str) -> None:
             released.append(consumer_id)
 
-        monkeypatch.setattr(mt5_depth, "stream_metatrader_book_snapshots", source)
-        monkeypatch.setattr(mt5_depth, "acquire_metatrader_snapshot_symbols", acquire)
-        monkeypatch.setattr(mt5_depth, "release_metatrader_snapshot_symbols", release)
+        monkeypatch.setattr(brokers_root, "stream_metatrader_book_snapshots", source)
+        monkeypatch.setattr(
+            brokers_root, "acquire_metatrader_snapshot_symbols", acquire
+        )
+        monkeypatch.setattr(
+            brokers_root, "release_metatrader_snapshot_symbols", release
+        )
         request = build_market_depth_stream_request(
             symbols=("EURUSD",),
             request_id=generate_id("req"),

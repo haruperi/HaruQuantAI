@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
+import app.services.brokers as brokers_root
 import pytest
 from app.services.data import (
     build_auction_payload,
@@ -114,9 +115,13 @@ def test_mt5_tick_producer_uses_tcp_snapshots_without_python_calls(
                     ),
                 }
 
-        monkeypatch.setattr(mt5_ticks, "stream_metatrader_snapshots", snapshots)
-        monkeypatch.setattr(mt5_ticks, "acquire_metatrader_snapshot_symbols", acquire)
-        monkeypatch.setattr(mt5_ticks, "release_metatrader_snapshot_symbols", release)
+        monkeypatch.setattr(brokers_root, "stream_metatrader_snapshots", snapshots)
+        monkeypatch.setattr(
+            brokers_root, "acquire_metatrader_snapshot_symbols", acquire
+        )
+        monkeypatch.setattr(
+            brokers_root, "release_metatrader_snapshot_symbols", release
+        )
         stream = mt5_ticks.iter_mt5_ticks(
             symbol="EURUSD",
             request_id=generate_id("req"),
@@ -157,7 +162,7 @@ def test_mt5_tick_producer_fails_when_symbol_demand_is_rejected(
         raise ValueError("rejected")
 
     async def scenario() -> None:
-        monkeypatch.setattr(mt5_ticks, "acquire_metatrader_snapshot_symbols", reject)
+        monkeypatch.setattr(brokers_root, "acquire_metatrader_snapshot_symbols", reject)
         stream = mt5_ticks.iter_mt5_ticks(
             symbol="UNKNOWN",
             request_id=generate_id("req"),

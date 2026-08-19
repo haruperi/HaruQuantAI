@@ -56,10 +56,10 @@ from app.services.risk.persistence import (
 )
 from app.services.risk.portfolio import build_portfolio_risk_snapshot
 from app.services.risk.regimes import assess_risk_regime
-from app.services.strategy import create_trade_intent_value
-from app.services.strategy.discretionary import (
+from app.services.strategy import (
+    create_trade_intent_value,
+    discretionary_strategy_version_for,
     get_discretionary_strategy_id,
-    strategy_version_for,
 )
 from app.utils import canonical_json, derive_stable_id, get_logger
 
@@ -588,7 +588,7 @@ def review_manual_order(
             raise ValueError("historical simulation evidence identity is incomplete")
     environment = "LIVE" if route == "live" else "SIM" if route == "sim" else "DEMO"
     strategy_id = get_discretionary_strategy_id()
-    strategy_version = strategy_version_for(environment)
+    strategy_version = discretionary_strategy_version_for(environment)
     # account_snapshot/risk_config/auth are intentionally opaque at this
     # function's own boundary (Function-Only Public API Surface); their real
     # shapes are Data's AccountStateSnapshot, Risk's RiskConfig, and the

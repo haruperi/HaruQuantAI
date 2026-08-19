@@ -12,10 +12,6 @@ from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
 from pydantic import ValidationError
 
-from app.services.brokers import (
-    create_broker_adapter,
-    resolve_provider_connection_config,
-)
 from app.services.data._settings import (
     LOCAL_SYMBOL_MANIFEST_NAME,
     get_data_provider_connection_resolver,
@@ -247,6 +243,8 @@ class _LazyBrokerSession:
             DataError: If credentials are missing, the environment is live, or
                 the broker identifier is unsupported.
         """
+        from app.services.brokers import resolve_provider_connection_config
+
         resolver = get_data_provider_connection_resolver()
         if resolver is not None:
             return resolver(self._source_id, request_id)
@@ -285,6 +283,8 @@ class _LazyBrokerSession:
         Raises:
             DataError: If credentials, configuration, or connection are invalid.
         """
+        from app.services.brokers import create_broker_adapter
+
         config = self._provider_config(settings, request_id)
         adapter: Any = _require_broker_result(
             create_broker_adapter(config.broker_id, config),
@@ -328,6 +328,8 @@ class _LazyBrokerSession:
         Raises:
             DataError: If credentials, configuration, or connection are invalid.
         """
+        from app.services.brokers import create_broker_adapter
+
         config = self._provider_config(settings, request_id)
         adapter: Any = _require_broker_result(
             create_broker_adapter(config.broker_id, config),
@@ -453,6 +455,8 @@ class _LazyBrokerSession:
             DataError: If credentials are required, or construction or connection
                 fails.
         """
+        from app.services.brokers import create_broker_adapter
+
         if self._source_id not in _CREDENTIAL_FREE_PROVIDERS:
             logger.info(
                 "Provider %s requires composition-root credentials", self._source_id

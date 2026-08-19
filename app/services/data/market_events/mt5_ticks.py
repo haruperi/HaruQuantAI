@@ -7,11 +7,6 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any, cast
 
-from app.services.brokers import (
-    acquire_metatrader_snapshot_symbols,
-    release_metatrader_snapshot_symbols,
-    stream_metatrader_snapshots,
-)
 from app.services.data.contracts import DataError, TickRecord
 from app.utils import get_logger
 
@@ -68,6 +63,12 @@ async def iter_mt5_ticks(
     Raises:
         DataError: If the EA cannot apply the requested symbol.
     """
+    from app.services.brokers import (
+        acquire_metatrader_snapshot_symbols,
+        release_metatrader_snapshot_symbols,
+        stream_metatrader_snapshots,
+    )
+
     logger.info("Opening MT5 TCP snapshot stream for %s (%s)", symbol, request_id)
     try:
         consumer_id = await acquire_metatrader_snapshot_symbols((symbol,))

@@ -10,11 +10,6 @@ from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from app.services.brokers import (
-    acquire_metatrader_snapshot_symbols,
-    release_metatrader_snapshot_symbols,
-    stream_metatrader_book_snapshots,
-)
 from app.services.data.contracts import DataError
 
 _MAX_SYMBOLS = 200
@@ -180,6 +175,12 @@ async def stream_market_depth(request: object) -> AsyncIterator[object]:
         DataError: If the request type or upstream book read is invalid, or if
             no requested symbol produces an event within the first-read bound.
     """
+    from app.services.brokers import (
+        acquire_metatrader_snapshot_symbols,
+        release_metatrader_snapshot_symbols,
+        stream_metatrader_book_snapshots,
+    )
+
     if not isinstance(request, _DepthRequest):
         raise DataError("INVALID_INPUT", safe_details={"contract": "depth"})
     requested = set(request.symbols)

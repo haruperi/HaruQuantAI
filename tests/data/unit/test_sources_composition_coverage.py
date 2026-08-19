@@ -124,7 +124,7 @@ def test_credential_free_adapters_and_sources() -> None:
     mock_adapter.connect.side_effect = _mock_connect
     mock_result = MagicMock(error=None, data=mock_adapter)
     with patch(
-        "app.services.data.sources.composition.create_broker_adapter",
+        "app.services.brokers.create_broker_adapter",
         return_value=mock_result,
     ):
         for source_id in ("yahoo", "binance_spot", "dukascopy"):
@@ -215,7 +215,7 @@ def test_ensure_source_and_access_dukascopy() -> None:
     mock_provider_settings = BrokerProviderSettings(dukascopy_enabled=True)
     with (
         patch(
-            "app.services.data.sources.composition.create_broker_adapter",
+            "app.services.brokers.create_broker_adapter",
             return_value=mock_result,
         ),
         patch(

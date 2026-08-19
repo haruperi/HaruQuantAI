@@ -7,11 +7,11 @@ from collections.abc import AsyncGenerator
 from datetime import UTC, datetime
 from decimal import Decimal
 
+import app.services.brokers as brokers_root
 from app.services.data import (
     build_market_snapshot_stream_request,
     stream_market_snapshots,
 )
-from app.services.data.market_events import mt5_snapshots
 from app.utils import generate_id
 
 
@@ -62,12 +62,12 @@ def test_snapshot_stream_filters_atomically_and_calculates_spread(
         async def release(consumer_id: str) -> None:
             released.append(consumer_id)
 
-        monkeypatch.setattr(mt5_snapshots, "stream_metatrader_snapshots", source)
+        monkeypatch.setattr(brokers_root, "stream_metatrader_snapshots", source)
         monkeypatch.setattr(
-            mt5_snapshots, "acquire_metatrader_snapshot_symbols", acquire
+            brokers_root, "acquire_metatrader_snapshot_symbols", acquire
         )
         monkeypatch.setattr(
-            mt5_snapshots, "release_metatrader_snapshot_symbols", release
+            brokers_root, "release_metatrader_snapshot_symbols", release
         )
         request = build_market_snapshot_stream_request(
             symbols=("GBPUSD",),

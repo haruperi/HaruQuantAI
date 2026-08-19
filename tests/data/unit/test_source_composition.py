@@ -11,6 +11,7 @@ from types import SimpleNamespace
 from typing import Any
 from unittest.mock import MagicMock
 
+import app.services.brokers as brokers_root
 import pytest
 from app.services.brokers import (
     build_broker_value,
@@ -250,7 +251,7 @@ def test_lazy_mt5_session_builds_connects_and_caches_adapter(
         captured["config"] = config
         return SimpleNamespace(error=None, data=adapter)
 
-    monkeypatch.setattr(_runtime, "create_broker_adapter", create)
+    monkeypatch.setattr(brokers_root, "create_broker_adapter", create)
     session = _runtime._LazyBrokerSession("mt5")
 
     assert session.adapter(request_id) is adapter
@@ -296,7 +297,7 @@ def test_lazy_mt5_session_serializes_concurrent_reads_on_one_event_loop(
         lambda *_args: SimpleNamespace(broker_id=get_broker_id("mt5")),
     )
     monkeypatch.setattr(
-        _runtime,
+        brokers_root,
         "create_broker_adapter",
         lambda *_args: SimpleNamespace(error=None, data=adapter),
     )
@@ -352,7 +353,7 @@ def test_close_data_provider_sessions_releases_mt5_runtime(
         lambda *_args: SimpleNamespace(broker_id=get_broker_id("mt5")),
     )
     monkeypatch.setattr(
-        _runtime,
+        brokers_root,
         "create_broker_adapter",
         lambda *_args: SimpleNamespace(error=None, data=adapter),
     )
@@ -389,7 +390,7 @@ def test_lazy_yahoo_session_uses_sandbox_and_explicit_probe(
         captured["config"] = config
         return SimpleNamespace(error=None, data=adapter)
 
-    monkeypatch.setattr(_runtime, "create_broker_adapter", create)
+    monkeypatch.setattr(brokers_root, "create_broker_adapter", create)
     session = _runtime._LazyBrokerSession("yahoo")
     settings = BrokerProviderSettings(yahoo_enabled=True)
 
@@ -431,7 +432,7 @@ def test_lazy_binance_session_uses_one_loop_and_anonymous_profile(
         captured["config"] = config
         return SimpleNamespace(error=None, data=adapter)
 
-    monkeypatch.setattr(_runtime, "create_broker_adapter", create)
+    monkeypatch.setattr(brokers_root, "create_broker_adapter", create)
     session = _runtime._LazyBrokerSession("binance_spot")
     settings = BrokerProviderSettings(binance_enabled=True)
 
