@@ -47,7 +47,16 @@ def main() -> None:
         (["ruff", "format", "--check", "."], "Ruff Format Check"),
         (["ruff", "check", "."], "Ruff Lint Check"),
         (["mypy", "."], "Mypy Type Check"),
-        (["pytest"], "Pytest & Coverage"),
+        (
+            [
+                "pytest",
+                "--cov=app",
+                "--cov-report=term-missing",
+                "--cov-report=html",
+                "--cov-fail-under=80",
+            ],
+            "Pytest & Coverage",
+        ),
     ]
 
     for command, name in steps:

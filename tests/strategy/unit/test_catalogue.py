@@ -1,6 +1,9 @@
 """Unit tests for Strategy built-in catalogue and hash provenance."""
 
 import hashlib
+import re
+import shutil
+import subprocess
 from pathlib import Path
 
 from app.services.strategy import (
@@ -57,19 +60,47 @@ def test_builtin_evaluator_source_hashes_match_files() -> None:
         )
 
 
-def test_builtin_dependency_hash_matches_uv_lock() -> None:
-    """Verify SHA-256 dependency hash matches repository uv.lock.
+def _locked_runtime_dependency_hash() -> str:
+    """Return the SHA-256 of the locked runtime dependency closure.
 
-    Args:
-        None.
+    Development tooling is excluded, so upgrading a linter or test plugin does
+    not invalidate recorded strategy provenance.
+
+    Returns:
+        Hex SHA-256 digest of the sorted runtime pins.
+    """
+    uv_executable = shutil.which("uv")
+    assert uv_executable is not None, "uv executable not found on PATH"
+    exported = subprocess.run(  # noqa: S603
+        [
+            uv_executable,
+            "export",
+            "--no-dev",
+            "--format",
+            "requirements-txt",
+            "--no-emit-project",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    pins = sorted(
+        match.group(1)
+        for line in exported.splitlines()
+        if (match := re.match(r"^([A-Za-z0-9][A-Za-z0-9._-]*==[^\s;]+)", line))
+    )
+    assert pins, "uv export produced no runtime pins"
+    return hashlib.sha256("\n".join(pins).encode("utf-8")).hexdigest()
+
+
+def test_builtin_dependency_hash_matches_locked_runtime_closure() -> None:
+    """Verify the recorded dependency hash matches the locked runtime closure.
 
     Returns:
         None.
     """
-    lock_path = Path("uv.lock")
-    assert lock_path.exists(), "uv.lock file missing"
-    expected_lock_hash = hashlib.sha256(lock_path.read_bytes()).hexdigest()
+    expected = _locked_runtime_dependency_hash()
     for desc in _BUILTIN_DESCRIPTORS:
-        assert desc.dependency_hash == expected_lock_hash, (
+        assert desc.dependency_hash == expected, (
             f"Dependency hash mismatch for {desc.evaluator_key}"
         )

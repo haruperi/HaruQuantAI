@@ -37,11 +37,14 @@ def pytest_runtest_makereport(
     outcome = yield
     report = outcome.get_result()
     # Coverage tracing measures instrumentation overhead rather than the unit's
-    # runtime budget. The normal untraced unit command remains the NFR authority.
+    # runtime budget. Distributed workers contend for CPU, so their wall-clock
+    # duration is not the unit's budget either. The normal untraced, serial unit
+    # command remains the NFR authority.
     if (
         report.when == "call"
         and sys.gettrace() is None
         and not item.config.pluginmanager.hasplugin("_cov")
+        and not hasattr(item.config, "workerinput")
         and report.duration > _MAX_UNIT_CALL_SECONDS
     ):
         report.outcome = "failed"

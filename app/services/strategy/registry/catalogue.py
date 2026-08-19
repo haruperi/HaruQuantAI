@@ -30,7 +30,10 @@ if TYPE_CHECKING:
 
 logger = get_logger(__name__)
 
-_DEPENDENCY_HASH = "195aaf3639445f171bdd4750734edd197d71b4d7819a9f4c181329521eafb48b"  # pragma: allowlist secret  # noqa: E501
+# SHA-256 of the sorted locked runtime dependency pins (`uv export --no-dev`).
+# Development tooling is excluded so a linter or test-plugin bump cannot
+# invalidate recorded strategy provenance.
+_DEPENDENCY_HASH = "97c1b5c67bcb9c1d90cdbaf88cde630ac8ea10e305615e6f7def6a9722ca20de"  # pragma: allowlist secret  # noqa: E501
 
 
 class _BuiltinStrategyDescriptor(BaseModel):
