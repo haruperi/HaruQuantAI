@@ -258,3 +258,96 @@
   color: #7a94a2;
   font-size: 0.75rem;
 }
+
+/* --- Trades, detail, and artifacts (P3-T02) ------------------------------ */
+
+.analytics-trades,
+.analytics-trade-detail,
+.analytics-artifacts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: #cde0ea;
+}
+
+.analytics-trades__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.analytics-trades__filters input,
+.analytics-trades__filters select {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.3rem;
+  color: inherit;
+  padding: 0.25rem 0.5rem;
+}
+
+.analytics-trades__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  display: block;
+  overflow-x: auto;
+}
+
+.analytics-trades__table th,
+.analytics-trades__table td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.35rem 0.55rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.analytics-trades__count,
+.analytics-artifacts__note {
+  font-size: 0.75rem;
+  color: #7a94a2;
+}
+
+.analytics-trades__pager {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.analytics-trade-detail__grid {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) 1fr;
+  gap: 0.3rem 1rem;
+  font-size: 0.85rem;
+}
+
+.analytics-trade-detail__grid dt {
+  color: #7a94a2;
+}
+
+.analytics-trade-detail__grid dd {
+  margin: 0;
+}
+
+.analytics-trade-detail__replay {
+  color: #5eead4;
+  text-decoration: underline;
+}
+
+.analytics-artifacts__list,
+.analytics-artifacts__anchors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.analytics-artifacts__kind {
+  color: #7a94a2;
+  margin-right: 0.5rem;
+}

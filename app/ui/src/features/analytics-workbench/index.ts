@@ -34,3 +34,20 @@ export {
   METRIC_GROUPS,
   type OverviewPanelProps,
 } from "./OverviewPanel";
+
+export {
+  TradesPanel,
+  TRADES_PAGE_SIZE,
+  type TradesPanelProps,
+} from "./TradesPanel";
+
+export {
+  TradeDetailPanel,
+  buildReplayHref,
+  type TradeDetailPanelProps,
+} from "./TradeDetailPanel";
+
+export {
+  AnalyticsArtifactDrawer,
+  type AnalyticsArtifactDrawerProps,
+} from "./AnalyticsArtifactDrawer";
