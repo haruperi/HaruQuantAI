@@ -37,3 +37,19 @@ export {
   SimulationStatusBadge,
   type SimulationStatusBadgeProps,
 } from "./SimulationStatusBadge";
+
+export {
+  InteractiveSimulationWorkspace,
+  PLAY_TICKS_PER_BEAT,
+  PLAY_INTERVAL_MS,
+  VIEWPORT_ROWS,
+  type InteractiveSimulationWorkspaceProps,
+} from "./InteractiveSimulationWorkspace";
+
+export {
+  SimulationSessionHeader,
+  STEP_SIZES,
+  type SimulationSessionHeaderProps,
+} from "./SimulationSessionHeader";
+
+export { MarketViewport, type MarketViewportProps } from "./MarketViewport";
