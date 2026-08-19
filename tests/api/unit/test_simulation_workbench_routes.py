@@ -120,7 +120,8 @@ def test_viewport_rejects_future_rows() -> None:
     assert raised.value.detail == "SIMULATION_VIEWPORT_INVALID"
 
 
-def test_command_requires_idempotency_and_returns_owner_truth() -> None:
+@pytest.mark.anyio
+async def test_command_requires_idempotency_and_returns_owner_truth() -> None:
     """Commands need an idempotency key and never invent fills."""
     context = _context("simulation:run")
     source = _RecordingSource(
@@ -132,7 +133,7 @@ def test_command_requires_idempotency_and_returns_owner_truth() -> None:
         }
     )
     with pytest.raises(HTTPException) as raised:
-        _submit_command(
+        await _submit_command(
             "session-1",
             LiveSessionCommandRequest(command="close_position"),
             context,
@@ -140,7 +141,7 @@ def test_command_requires_idempotency_and_returns_owner_truth() -> None:
         )
     assert raised.value.status_code == 422
     assert raised.value.detail == "IDEMPOTENCY_KEY_REQUIRED"
-    result = _submit_command(
+    result = await _submit_command(
         "session-1",
         LiveSessionCommandRequest(command="close_position"),
         context,
@@ -150,6 +151,29 @@ def test_command_requires_idempotency_and_returns_owner_truth() -> None:
     assert result["receipt"]["receipt_id"] == "r-1"
     assert result["session"]["session_id"] == "session-1"
     assert source.calls[0][0] == "command"
+
+
+@pytest.mark.anyio
+async def test_command_awaits_an_asynchronous_live_authority() -> None:
+    """A live authority that returns an awaitable is resolved, not returned."""
+
+    async def _pending() -> dict[str, object]:
+        return {
+            "receipts": ({"receipt_id": "r-2", "filled_quantity": "0"},),
+            "session": {"session_id": "session-1"},
+        }
+
+    context = _context("simulation:run")
+    source = _RecordingSource(results={"command": _pending()})
+    result = await _submit_command(
+        "session-1",
+        LiveSessionCommandRequest(command="cancel_pending_order", order_id="order-7"),
+        context,
+        source,
+        idempotency_key=generate_id("req"),
+    )
+    assert result["receipts"][0]["receipt_id"] == "r-2"
+    assert result["session"]["session_id"] == "session-1"
 
 
 def test_step_requires_permission_and_delegates() -> None:

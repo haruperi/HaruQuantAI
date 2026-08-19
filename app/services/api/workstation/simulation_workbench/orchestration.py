@@ -36,6 +36,18 @@ from app.services.api.workstation.simulation_workbench.schemas import (
     MAX_VIEWPORT_BEFORE,
     VIEWPORT_AFTER,
 )
+from app.services.simulator import (
+    branch_live_simulation,
+    close_live_simulation_session,
+    execute_live_simulation_command,
+    finalize_live_simulation_session,
+    read_live_simulation_state,
+    read_live_simulation_viewport,
+    rearm_live_simulation_session,
+    restore_live_simulation_session,
+    seek_live_simulation,
+    step_live_simulation,
+)
 from app.utils import format_utc_timestamp, generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
@@ -367,6 +379,171 @@ def _interactive(name: str) -> Callable[..., object]:
     return handler
 
 
+def _unwrap(response: object) -> object:
+    """Return the payload of one Simulator response envelope.
+
+    Args:
+        response: Simulator ``StandardResponse`` or a raw payload.
+
+    Returns:
+        The owner payload.
+
+    Raises:
+        ValueError: If the Simulator reported a failure.
+    """
+    status_value = getattr(response, "status", None)
+    if status_value is None:
+        return response
+    if str(status_value) != "success":
+        error = getattr(response, "error", None)
+        raise ValueError(str(getattr(error, "code", "SIMULATION_OPERATION_FAILED")))
+    return getattr(response, "data", None)
+
+
+def _session_is_finalized(session: object) -> bool:
+    """Return whether one Simulator session projection is sealed.
+
+    Args:
+        session: Simulator-owned session projection.
+
+    Returns:
+        True when the owner marked the session finalized.
+    """
+    return isinstance(session, Mapping) and bool(session.get("finalized", False))
+
+
+async def _run_command(session_id: str, kwargs: Mapping[str, object]) -> object:
+    """Execute one manual command and return receipt plus refreshed state.
+
+    Args:
+        session_id: Owned session identity.
+        kwargs: Route keyword arguments carrying the command mapping.
+
+    Returns:
+        Owner receipt evidence and refreshed session projection.
+    """
+    command = cast("Mapping[str, object]", kwargs.get("command", {}))
+    return _unwrap(await execute_live_simulation_command(session_id, command))
+
+
+def _self_contained_handlers() -> Mapping[str, Callable[..., object]]:
+    """Build handlers that need no composed Simulator dependency bundle.
+
+    Returns:
+        Mapping of operation name to delegating handler.
+    """
+    return {
+        "viewport": lambda session_id, kwargs: _unwrap(
+            read_live_simulation_viewport(
+                session_id,
+                before=int(str(kwargs.get("before", DEFAULT_VIEWPORT_BEFORE))),
+            )
+        ),
+        "step": lambda session_id, kwargs: _unwrap(
+            step_live_simulation(session_id, int(str(kwargs.get("ticks", 1))))
+        ),
+        "seek": lambda session_id, kwargs: _unwrap(
+            seek_live_simulation(session_id, int(str(kwargs.get("target_cursor", 0))))
+        ),
+        "command": _run_command,
+        "close_session": lambda session_id, _kwargs: _unwrap(
+            close_live_simulation_session(session_id)
+        ),
+        "finalize": lambda session_id, kwargs: _unwrap(
+            finalize_live_simulation_session(
+                session_id, request_id=str(kwargs.get("request_id", ""))
+            )
+        ),
+        "rearm": lambda session_id, kwargs: _unwrap(
+            rearm_live_simulation_session(
+                session_id,
+                approved=bool(kwargs.get("approved", False)),
+                request_id=str(kwargs.get("request_id", "")),
+            )
+        ),
+    }
+
+
+def build_simulation_workbench_live_authority(
+    dependencies: object | None,
+    *,
+    reproduction_runner: Callable[..., object] | None = None,
+) -> _LiveAuthority:
+    """Build the interactive live-session authority for the workbench routes.
+
+    The gateway owns none of this behaviour: each operation delegates to the
+    Simulator's public live-session surface and returns the owner projection
+    unchanged. The one rule the gateway does enforce is that reproduction
+    requires finalized evidence, because reproducing a session that is still
+    moving would capture a state no one reviewed.
+
+    Args:
+        dependencies: Composed Simulator run dependency bundle.
+        reproduction_runner: Callable submitting one canonical job from a
+            finalized session projection.
+
+    Returns:
+        Callable dispatching one named interactive operation.
+    """
+
+    def _reproduce(session_id: str, kwargs: Mapping[str, object]) -> object:
+        """Submit one canonical job reproducing a finalized session.
+
+        Returns:
+            Canonical job projection produced by the reproduction runner.
+
+        Raises:
+            ValueError: If the session is not finalized, or if no reproduction
+                runner is composed.
+        """
+        session = _unwrap(read_live_simulation_state(session_id))
+        if not _session_is_finalized(session):
+            raise ValueError("SIMULATION_SESSION_NOT_FINALIZED")
+        if reproduction_runner is None:
+            raise ValueError("SIMULATION_REPRODUCTION_UNAVAILABLE")
+        return reproduction_runner(
+            session,
+            request_id=str(kwargs.get("request_id", "")),
+            principal_id=str(kwargs.get("principal_id", "")),
+        )
+
+    handlers: dict[str, Callable[..., object]] = dict(_self_contained_handlers())
+    handlers["branch"] = lambda session_id, kwargs: _unwrap(
+        branch_live_simulation(
+            session_id,
+            cast("Mapping[str, object]", kwargs.get("overrides", {})),
+            dependencies,
+            request_id=str(kwargs.get("request_id", "")),
+        )
+    )
+    handlers["restore"] = lambda session_id, kwargs: _unwrap(
+        restore_live_simulation_session(
+            session_id, dependencies, request_id=str(kwargs.get("request_id", ""))
+        )
+    )
+    handlers["reproduce"] = _reproduce
+    requires_bundle = frozenset({"branch", "restore", "reproduce"})
+
+    def authority(operation: str, session_id: str, **kwargs: object) -> object:
+        """Delegate one interactive operation to the Simulator.
+
+        Returns:
+            Simulator-owned projection, or an awaitable for manual commands.
+
+        Raises:
+            RuntimeError: If a required Simulator dependency bundle is absent.
+            ValueError: If the operation is unsupported.
+        """
+        handler = handlers.get(operation)
+        if handler is None:
+            raise ValueError("unsupported interactive Simulation operation")
+        if operation in requires_bundle and dependencies is None:
+            raise RuntimeError("SIMULATION_WORKBENCH_RUNTIME_UNAVAILABLE")
+        return handler(session_id, kwargs)
+
+    return authority
+
+
 def build_simulation_workbench_source(
     *,
     registry: SimulationWorkbenchRegistry | None = None,
@@ -469,6 +646,7 @@ def serialize_tags(tags: object) -> str:
 
 
 __all__ = (
+    "build_simulation_workbench_live_authority",
     "build_simulation_workbench_source",
     "build_simulation_workbench_source_bundle",
     "serialize_tags",

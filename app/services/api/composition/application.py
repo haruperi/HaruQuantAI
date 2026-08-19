@@ -102,6 +102,7 @@ from app.services.api.workstation.simulation.session_routes import (
     router as simulation_sessions_router,
 )
 from app.services.api.workstation.simulation_workbench.orchestration import (
+    build_simulation_workbench_live_authority,
     build_simulation_workbench_source,
 )
 from app.services.api.workstation.simulation_workbench.routes import (
@@ -257,7 +258,11 @@ def _build_canonical_graph(
                 )
             ),
             "simulator.strategy_source": build_simulator_strategy_source(),
-            "simulator.workbench_source": build_simulation_workbench_source(),
+            "simulator.workbench_source": build_simulation_workbench_source(
+                live_authority=build_simulation_workbench_live_authority(
+                    simulation_dependencies
+                )
+            ),
             "analytics.workbench.source": build_analytics_workbench_composition(
                 settings
             ),

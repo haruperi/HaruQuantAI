@@ -7,6 +7,7 @@ finalize, and reproduce request requires an idempotency key.
 
 from __future__ import annotations
 
+from inspect import isawaitable
 from typing import Annotated, Any
 
 from fastapi import (
@@ -23,6 +24,7 @@ from app.services.api.identity import (
     require_human_permission,
     require_permission,
     run_idempotent_write,
+    run_idempotent_write_async,
 )
 from app.services.api.workstation.simulation_workbench.registry import (
     SimulationWorkbenchConflictError,
@@ -290,7 +292,7 @@ def _seek_live_session(
 
 
 @router.post("/live-sessions/{session_id}/commands", response_model=None)
-def _submit_command(
+async def _submit_command(
     session_id: str,
     request: LiveSessionCommandRequest,
     auth: Annotated[AuthContext, Depends(require_auth_context)],
@@ -309,14 +311,14 @@ def _submit_command(
     """
     require_human_permission(auth, "simulation:run")
     key = _require_idempotency(idempotency_key)
-    return run_idempotent_write(
-        principal_id=auth.principal_id,
-        method="POST",
-        route=f"/api/v1/simulator/live-sessions/{session_id}/commands",
-        key=key,
-        request_material=request.model_dump(mode="json"),
-        request_id=generate_id("req"),
-        operation=lambda: _require(
+
+    async def _execute() -> object:
+        """Execute the manual command through the composed live authority.
+
+        Returns:
+            Owner receipt evidence and refreshed session projection.
+        """
+        pending = _require(
             _dispatch(
                 source,
                 "command",
@@ -325,7 +327,19 @@ def _submit_command(
                 command=request.model_dump(),
             ),
             "SIMULATION_SESSION_NOT_FOUND",
-        ),
+        )
+        if isawaitable(pending):
+            return _require(await pending, "SIMULATION_SESSION_NOT_FOUND")
+        return pending
+
+    return await run_idempotent_write_async(
+        principal_id=auth.principal_id,
+        method="POST",
+        route=f"/api/v1/simulator/live-sessions/{session_id}/commands",
+        key=key,
+        request_material=request.model_dump(mode="json"),
+        request_id=generate_id("req"),
+        operation=_execute,
     )
 
 
