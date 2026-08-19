@@ -8,10 +8,12 @@
 
 import { Suspense, useMemo, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
-import { Layers } from "lucide-react";
 
 import { ProtectedLayout } from "@/app/protected-layout";
-import { AnalyticsWorkspace } from "@/features/analytics-workbench";
+import {
+  AnalyticsComparison,
+  AnalyticsWorkspace,
+} from "@/features/analytics-workbench";
 
 function AnalyticsCompareContent(): ReactNode {
   const searchParams = useSearchParams();
@@ -25,21 +27,7 @@ function AnalyticsCompareContent(): ReactNode {
 
   return (
     <AnalyticsWorkspace compareRunIds={runIds}>
-      <div className="flex flex-col items-center justify-center p-12 text-center gap-4">
-        <div className="p-3 rounded-full bg-slate-800/80 border border-slate-700/60">
-          <Layers className="w-8 h-8 text-teal-400" aria-hidden="true" />
-        </div>
-        <h2 className="text-lg font-semibold text-white">Multi-Run Comparison</h2>
-        {runIds.length > 0 ? (
-          <p className="text-sm text-slate-400 font-mono">
-            Comparing {runIds.length} run{runIds.length === 1 ? "" : "s"}: {runIds.join(", ")}
-          </p>
-        ) : (
-          <p className="text-sm text-slate-400">
-            No run IDs selected. Add runs via query parameter (e.g. ?runs=run1,run2).
-          </p>
-        )}
-      </div>
+      <AnalyticsComparison initialRunIds={runIds} />
     </AnalyticsWorkspace>
   );
 }

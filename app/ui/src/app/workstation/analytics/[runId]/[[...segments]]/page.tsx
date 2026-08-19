@@ -11,23 +11,36 @@
  * - /workstation/analytics/[runId]/grouped -> grouped tab
  * - /workstation/analytics/[runId]/benchmark -> benchmark tab
  * - /workstation/analytics/[runId]/artifacts -> artifacts tab
+ *
+ * Period dimension and source context travel as query parameters on the
+ * grouped tab rather than as routes of their own.
  */
 
 "use client";
 
-import { use, type ReactNode } from "react";
+import { use, useCallback, useEffect, useState, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { ProtectedLayout } from "@/app/protected-layout";
+import { apiClients, type AnalyticsWorkbenchPayload } from "@/clients";
 import {
   AnalyticsArtifactDrawer,
   AnalyticsWorkspace,
+  BenchmarkPanel,
+  ChartsPanel,
+  DistributionPanel,
   OverviewPanel,
+  PeriodsPanel,
   ProvenancePanel,
   RealismPanel,
+  ReturnsPanel,
+  RiskPanel,
   TradeDetailPanel,
   TradesPanel,
   type AnalyticsTab,
+  type PeriodContext,
 } from "@/features/analytics-workbench";
+import type { PeriodDimension } from "@/clients";
 
 export interface AnalyticsRunPageProps {
   params:
@@ -45,32 +58,34 @@ const VALID_TABS = new Set<AnalyticsTab>([
   "artifacts",
 ]);
 
-/** Resolve the panel that owns one Analytics tab. */
-function panelFor(
-  tab: AnalyticsTab,
+/** Read the owner workbench projection once per run for the payload tabs. */
+function useWorkbenchPayload(
   runId: string,
-  ticket: string | undefined,
-): ReactNode {
-  if (tab === "trades") {
-    return ticket ? (
-      <TradeDetailPanel runId={runId} ticket={ticket} />
-    ) : (
-      <TradesPanel runId={runId} />
-    );
-  }
-  if (tab === "artifacts") {
-    return (
-      <>
-        <AnalyticsArtifactDrawer runId={runId} />
-        <ProvenancePanel runId={runId} />
-        <RealismPanel runId={runId} />
-      </>
-    );
-  }
-  if (tab === "overview") {
-    return <OverviewPanel runId={runId} />;
-  }
-  return undefined;
+  enabled: boolean,
+): { payload: AnalyticsWorkbenchPayload | null; loading: boolean; error: string | null } {
+  const [payload, setPayload] = useState<AnalyticsWorkbenchPayload | null>(null);
+  const [loading, setLoading] = useState(enabled);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    if (!enabled) return;
+    setLoading(true);
+    setError(null);
+    const response =
+      await apiClients.analyticsWorkbench.getWorkbenchPayload(runId);
+    if (response.status === "error") {
+      setError(response.error.message);
+    } else {
+      setPayload(response.data);
+    }
+    setLoading(false);
+  }, [runId, enabled]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return { payload, loading, error };
 }
 
 export default function AnalyticsRunPage({
@@ -87,10 +102,67 @@ export default function AnalyticsRunPage({
   const activeTab: AnalyticsTab = VALID_TABS.has(rawTab) ? rawTab : "overview";
   const ticket = activeTab === "trades" ? segments[1] : undefined;
 
+  const searchParams = useSearchParams();
+  const dimension =
+    (searchParams?.get("dimension") as PeriodDimension | null) ?? "month";
+  const context =
+    (searchParams?.get("context") as PeriodContext | null) ?? "all";
+
+  const needsPayload =
+    activeTab === "returns" ||
+    activeTab === "drawdown" ||
+    activeTab === "grouped" ||
+    activeTab === "benchmark";
+  const { payload, loading, error } = useWorkbenchPayload(runId, needsPayload);
+
+  let panel: ReactNode;
+  if (activeTab === "overview") {
+    panel = <OverviewPanel runId={runId} />;
+  } else if (activeTab === "trades") {
+    panel = ticket ? (
+      <TradeDetailPanel runId={runId} ticket={ticket} />
+    ) : (
+      <TradesPanel runId={runId} />
+    );
+  } else if (activeTab === "returns") {
+    panel = (
+      <>
+        <ReturnsPanel payload={payload} loading={loading} error={error} />
+        <ChartsPanel payload={payload} />
+      </>
+    );
+  } else if (activeTab === "drawdown") {
+    panel = (
+      <>
+        <RiskPanel payload={payload} loading={loading} error={error} />
+        <DistributionPanel payload={payload} loading={loading} error={error} />
+      </>
+    );
+  } else if (activeTab === "grouped") {
+    panel = (
+      <PeriodsPanel
+        runId={runId}
+        payload={payload}
+        dimension={dimension}
+        context={context}
+      />
+    );
+  } else if (activeTab === "benchmark") {
+    panel = <BenchmarkPanel payload={payload} loading={loading} error={error} />;
+  } else {
+    panel = (
+      <>
+        <AnalyticsArtifactDrawer runId={runId} />
+        <ProvenancePanel runId={runId} />
+        <RealismPanel runId={runId} />
+      </>
+    );
+  }
+
   return (
     <ProtectedLayout>
       <AnalyticsWorkspace runId={runId} activeTab={activeTab}>
-        {panelFor(activeTab, runId, ticket)}
+        {panel}
       </AnalyticsWorkspace>
     </ProtectedLayout>
   );

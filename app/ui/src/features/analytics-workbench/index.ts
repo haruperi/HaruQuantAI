@@ -119,3 +119,22 @@ export {
   CHART_GROUPS,
   type ChartsPanelProps,
 } from "./ChartsPanel";
+
+export {
+  AnalyticsComparison,
+  type AnalyticsComparisonProps,
+} from "./AnalyticsComparison";
+
+export {
+  useAnalyticsWorkbenchStore,
+  type AnalyticsWorkbenchStore,
+} from "./analytics-store";
+
+export {
+  MAX_COMPARISON_RUNS,
+  MIN_COMPARISON_RUNS,
+  isComparable,
+  toComparisonRows,
+  toggleSelection,
+  type ComparisonRow,
+} from "./analytics-selectors";

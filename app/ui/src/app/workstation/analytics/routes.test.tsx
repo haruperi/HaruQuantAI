@@ -35,6 +35,8 @@ vi.mock("@/clients", async (importOriginal) => {
     apiClients: {
       analyticsWorkbench: {
         getRun: unavailable,
+        getPeriods: unavailable,
+        compareRuns: unavailable,
         getWorkbenchPayload: unavailable,
         getTrades: unavailable,
         getTrade: unavailable,
@@ -68,11 +70,14 @@ describe("Analytics Routes", () => {
     );
   });
 
-  it("AnalyticsComparePage parses runs query parameter", () => {
+  it("AnalyticsComparePage seeds the comparison from the runs query parameter", async () => {
     mockSearchParams = new URLSearchParams("runs=run-alpha,run-beta");
-    render(<AnalyticsComparePage />);
+    await renderSettled(<AnalyticsComparePage />);
 
-    expect(screen.getByText(/comparing 2 runs: run-alpha, run-beta/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: /run comparison/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/2 of 8 selected/)).toBeInTheDocument();
   });
 
   it("AnalyticsRunPage defaults to overview tab when no segments provided", async () => {
