@@ -11,6 +11,7 @@ from app.services.api import (
     get_required_in_process_provider_names,
 )
 from app.services.api.composition import application, lifecycle, runtime_settings
+from app.services.api.composition.adapters import get_absent_capability_ids
 from app.services.api.composition.owner_sources import (
     read_audit_events,
     read_dashboard_snapshot,
@@ -40,9 +41,11 @@ def _stub_lifecycle_storage_dependencies(monkeypatch: pytest.MonkeyPatch) -> Non
     monkeypatch.setattr(lifecycle, "run_broker_migrations", success)
     monkeypatch.setattr(lifecycle, "run_simulator_migrations", success)
     monkeypatch.setattr(lifecycle, "run_trading_migrations", success)
-    monkeypatch.setattr(lifecycle, "run_analytics_migrations", success)
-    monkeypatch.setattr(lifecycle, "run_optimization_migrations", success)
-    monkeypatch.setattr(lifecycle, "run_portfolio_migrations", success)
+    monkeypatch.setattr(
+        lifecycle,
+        "import_capability_attribute",
+        lambda *_args, **_kwargs: success,
+    )
     monkeypatch.setattr(
         lifecycle,
         "load_runtime_settings_snapshot",
@@ -157,15 +160,17 @@ def test_canonical_app_has_exact_cors_and_route_catalog() -> None:
     assert "/api/v1/auth/login" in paths
     assert "/api/v1/auth/me" in paths
     assert "/api/v1/indicators" in paths
-    assert len(paths) == 154
     assert "/api/v1/data/bars" in paths
-    assert "/api/v1/portfolio/{portfolio_id}/activate" in paths
-    assert "/api/v1/portfolio/{portfolio_id}/rollback" in paths
-    assert "/api/v1/portfolio/{portfolio_id}/drift" in paths
-    assert "/api/v1/portfolio/rebalance" in paths
-    assert "/api/v1/portfolio/measurement/recompute" in paths
-    assert "/api/v1/portfolio/{portfolio_id}/definitions" in paths
-    assert "/api/v1/portfolio/{portfolio_id}/definitions/{portfolio_version}" in paths
+    if "portfolio" not in get_absent_capability_ids():
+        assert "/api/v1/portfolio/{portfolio_id}/activate" in paths
+        assert "/api/v1/portfolio/{portfolio_id}/rollback" in paths
+        assert "/api/v1/portfolio/{portfolio_id}/drift" in paths
+        assert "/api/v1/portfolio/rebalance" in paths
+        assert "/api/v1/portfolio/measurement/recompute" in paths
+        assert "/api/v1/portfolio/{portfolio_id}/definitions" in paths
+        assert (
+            "/api/v1/portfolio/{portfolio_id}/definitions/{portfolio_version}" in paths
+        )
     assert "/api/v1/data/datasets/prepare" in paths
     assert "/api/v1/data/imports" in paths
     assert "/api/v1/simulation/live-sessions" in paths
@@ -428,34 +433,37 @@ def test_optional_startup_failure_is_visible_degradation(
     asyncio.run(enter_lifespan())
 
 
-def test_analytics_storage_failure_blocks_startup(
+def test_optional_storage_failure_degrades_without_blocking_startup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Analytics migration failure blocks API readiness fail closed."""
+    """Optional-capability migration failure degrades instead of failing startup."""
     monkeypatch.setattr(
         lifecycle,
         "run_api_migrations",
         lambda _: SimpleNamespace(status="success", data=object()),
     )
-    monkeypatch.setattr(
-        lifecycle,
-        "run_analytics_migrations",
-        lambda _: SimpleNamespace(status="error", data=None),
-    )
+
+    def resolve(_module_path: str, _attribute: str, *, capability_id: str) -> object:
+        """Fail the Analytics migration and succeed for every other capability."""
+        if capability_id == "analytics":
+            return lambda _: SimpleNamespace(status="error", data=None)
+        return lambda _: SimpleNamespace(status="success", data=object())
+
+    monkeypatch.setattr(lifecycle, "import_capability_attribute", resolve)
     app = create_api_app(build_api_settings())
 
     async def enter_lifespan() -> None:
+        """Enter the canonical lifespan and observe readiness."""
         async with lifecycle.lifespan(app):
-            raise AssertionError("startup failure must prevent serving")
+            assert app.state.api_ready is True
 
     import asyncio
 
-    with pytest.raises(
-        lifecycle.StartupError,
-        match="ANALYTICS_STORAGE_INITIALIZATION_FAILED",
-    ):
-        asyncio.run(enter_lifespan())
-    assert app.state.api_ready is False
+    asyncio.run(enter_lifespan())
+    assert (
+        app.state.api_optional_degraded["analytics"]
+        == "ANALYTICS_STORAGE_INITIALIZATION_FAILED"
+    )
 
 
 def test_required_provider_failure_blocks_readiness(

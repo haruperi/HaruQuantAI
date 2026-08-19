@@ -6,9 +6,12 @@ from typing import Any, Protocol, cast
 
 from fastapi import FastAPI
 
-from app.services.analytics import run_analytics_migrations
+from app.services.api.composition.adapters import get_absent_capability_ids
 from app.services.api.composition.broker_config import (
     build_system_broker_connection_config,
+)
+from app.services.api.composition.capabilities import (
+    import_capability_attribute,
 )
 from app.services.api.composition.migrations import run_api_migrations
 from app.services.api.composition.runtime_settings import (
@@ -32,13 +35,64 @@ from app.services.data import (
     data_settings_context,
 )
 from app.services.indicators import run_indicators_migrations
-from app.services.optimization import run_optimization_migrations
-from app.services.portfolio import run_portfolio_migrations
 from app.services.simulator import run_simulator_migrations
 from app.services.trading import run_trading_migrations
 from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
+
+# Optional-capability migrations resolve tolerantly. An absent capability
+# supplies no migration and is reported degraded; required domain migrations
+# (api, brokers, indicators, simulator, trading) stay fatal per AGENTS.md
+# section 3.
+_OPTIONAL_MIGRATIONS: tuple[tuple[str, str, str, str], ...] = (
+    (
+        "analytics",
+        "app.services.analytics",
+        "run_analytics_migrations",
+        "ANALYTICS_STORAGE_INITIALIZATION_FAILED",
+    ),
+    (
+        "optimization",
+        "app.services.optimization",
+        "run_optimization_migrations",
+        "OPTIMIZATION_STORAGE_INITIALIZATION_FAILED",
+    ),
+    (
+        "portfolio",
+        "app.services.portfolio",
+        "run_portfolio_migrations",
+        "PORTFOLIO_STORAGE_INITIALIZATION_FAILED",
+    ),
+)
+
+
+def _run_optional_migrations(degraded: dict[str, str]) -> None:
+    """Apply optional-capability migrations without blocking startup.
+
+    Args:
+        degraded: Mutable record of capability identifier to degradation reason.
+    """
+    for capability_id, module_path, attribute, reason in _OPTIONAL_MIGRATIONS:
+        migration = import_capability_attribute(
+            module_path,
+            attribute,
+            capability_id=capability_id,
+        )
+        if migration is None:
+            degraded[capability_id] = "CAPABILITY_ABSENT"
+            continue
+        try:
+            result = cast(
+                "_MigrationResponse", cast("Any", migration)(generate_id("req"))
+            )
+        except Exception:  # Optional storage degrades without changing truth.
+            logger.exception("Optional capability migration failed: %s", capability_id)
+            degraded[capability_id] = reason
+            continue
+        if result.status != "success" or result.data is None:
+            logger.warning("Optional capability storage unavailable: %s", capability_id)
+            degraded[capability_id] = reason
 
 
 class StartupError(RuntimeError):
@@ -170,27 +224,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         if trading_result.status != "success" or trading_result.data is None:
             app.state.api_ready = False
             raise StartupError("TRADING_STORAGE_INITIALIZATION_FAILED")
-        analytics_result = cast(
-            "_MigrationResponse",
-            run_analytics_migrations(generate_id("req")),
+        degraded: dict[str, str] = dict.fromkeys(
+            get_absent_capability_ids(), "CAPABILITY_ABSENT"
         )
-        if analytics_result.status != "success" or analytics_result.data is None:
-            app.state.api_ready = False
-            raise StartupError("ANALYTICS_STORAGE_INITIALIZATION_FAILED")
-        optimization_result = cast(
-            "_MigrationResponse",
-            run_optimization_migrations(generate_id("req")),
-        )
-        if optimization_result.status != "success" or optimization_result.data is None:
-            app.state.api_ready = False
-            raise StartupError("OPTIMIZATION_STORAGE_INITIALIZATION_FAILED")
-        portfolio_result = cast(
-            "_MigrationResponse",
-            run_portfolio_migrations(generate_id("req")),
-        )
-        if portfolio_result.status != "success" or portfolio_result.data is None:
-            app.state.api_ready = False
-            raise StartupError("PORTFOLIO_STORAGE_INITIALIZATION_FAILED")
+        _run_optional_migrations(degraded)
         required_probes: Mapping[str, Callable[[], object]] = getattr(
             app.state,
             "api_required_startup_probes",
@@ -214,7 +251,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
             "api_optional_startup_probes",
             {},
         )
-        degraded: dict[str, str] = {}
         for name, probe in optional_probes.items():
             try:
                 probe()

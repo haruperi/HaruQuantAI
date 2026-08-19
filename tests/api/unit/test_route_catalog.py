@@ -1,6 +1,7 @@
 """Drift checks between canonical OpenAPI routes and route contracts."""
 
 from app.services.api import create_api_app, get_canonical_route_contract_registry
+from app.services.api.composition.adapters import get_absent_capability_ids
 
 
 def test_every_openapi_operation_has_exactly_one_contract() -> None:
@@ -13,7 +14,13 @@ def test_every_openapi_operation_has_exactly_one_contract() -> None:
         for method in path_item
     }
     declarations = {(item.method, item.path) for item in registry.all()}
-    assert operations == declarations
+    # Every mounted operation is covered by exactly one contract, and every
+    # uncovered declaration belongs to a capability absent from this build.
+    assert operations <= declarations
+    unmounted_capabilities = {
+        path.split("/")[3] for _, path in declarations - operations
+    }
+    assert unmounted_capabilities <= set(get_absent_capability_ids())
     assert registry.size == 169
     assert registry.get("GET", "/api/v1/data/bars") is not None
     assert registry.get("GET", "/api/v1/workstation") is not None

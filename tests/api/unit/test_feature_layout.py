@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+from app.services.api.composition.capabilities import get_optional_capability_ids
+
 _API_ROOT = Path(__file__).parents[3] / "app" / "services" / "api"
 _WIDGETS_ROOT = _API_ROOT / "widgets"
 _REMOVED_HORIZONTAL_FOLDERS = {"migrations", "persistence", "routes", "streams"}
@@ -58,7 +60,14 @@ def test_every_workstation_feature_has_the_standard_surface() -> None:
         for path in _WIDGETS_ROOT.iterdir()
         if path.is_dir() and path.name != "__pycache__"
     }
-    assert present == _WIDGET_FEATURES
+    # Optional capabilities may be removed; every other widget must be present.
+    optional = {
+        feature
+        for feature in _WIDGET_FEATURES
+        if feature in get_optional_capability_ids()
+    }
+    assert present <= _WIDGET_FEATURES
+    assert _WIDGET_FEATURES - optional <= present
     for feature in present:
         files = {path.name for path in (_WIDGETS_ROOT / feature).iterdir()}
         assert files >= _STANDARD_FILES

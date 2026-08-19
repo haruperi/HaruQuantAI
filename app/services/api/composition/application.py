@@ -10,6 +10,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.services.api.composition.broker_config import (
     build_system_broker_connection_config,
 )
+from app.services.api.composition.capabilities import (
+    get_capability_attribute,
+    import_capability_module,
+)
 from app.services.api.composition.in_process import (
     build_in_process_graph,
     get_graph_closers,
@@ -46,14 +50,6 @@ from app.services.api.middleware.rate_limits import RateLimitMiddleware
 from app.services.api.middleware.redaction import SecretRedactionMiddleware
 from app.services.api.middleware.runtime_settings import RuntimeSettingsMiddleware
 from app.services.api.observability.routes import router as observability_router
-from app.services.api.widgets.agentic.orchestration import build_agentic_source
-from app.services.api.widgets.agentic.routes import router as agentic_router
-from app.services.api.widgets.analytics.orchestration import (
-    build_analytics_workbench_composition,
-)
-from app.services.api.widgets.analytics.routes import (
-    router as analytics_workbench_router,
-)
 from app.services.api.widgets.dashboards.routes import router as dashboards_router
 from app.services.api.widgets.data.orchestration import build_dataset_source
 from app.services.api.widgets.data.routes import router as data_router
@@ -65,20 +61,6 @@ from app.services.api.widgets.indicators.routes import router as indicators_rout
 from app.services.api.widgets.markets.routes import router as markets_router
 from app.services.api.widgets.operational.routes import router as workstation_router
 from app.services.api.widgets.operator.routes import router as operator_router
-from app.services.api.widgets.optimization.orchestration import (
-    build_optimization_source,
-)
-from app.services.api.widgets.optimization.routes import (
-    router as optimization_router,
-)
-from app.services.api.widgets.portfolio.orchestration import build_portfolio_source
-from app.services.api.widgets.portfolio.routes import router as portfolio_router
-from app.services.api.widgets.research.orchestration import (
-    build_research_registry,
-    build_research_runtime_context,
-    build_research_source,
-)
-from app.services.api.widgets.research.routes import router as research_router
 from app.services.api.widgets.risk.orchestration import build_risk_command_source
 from app.services.api.widgets.risk.routes import router as risk_router
 from app.services.api.widgets.settings.account_mode import resolve_runtime_profile
@@ -192,33 +174,98 @@ async def _connect_trading_account_profile_broker(route: str) -> object:
 
 
 _SESSION_COOKIE = "hq_session"
-_ROUTERS = (
-    auth_router,
-    health_router,
-    indicators_router,
-    markets_router,
-    settings_router,
-    data_router,
-    data_stream_router,
-    strategies_router,
-    research_router,
-    simulation_live_router,
-    simulation_router,
-    simulation_sessions_router,
-    simulator_router,
-    simulation_workbench_router,
-    analytics_workbench_router,
-    portfolio_router,
-    risk_router,
-    trading_router,
-    trading_activity_router,
-    optimization_router,
-    dashboards_router,
-    operator_router,
-    observability_router,
-    agentic_router,
-    watchlists_router,
-    workstation_router,
+# Optional capabilities resolve tolerantly: when one is absent its module is
+# ``None``, its router is not mounted, and its provider is never declared, so
+# the gateway loses that capability instead of failing to compose.
+_AGENTIC_ORCHESTRATION = import_capability_module(
+    "app.services.api.widgets.agentic.orchestration", capability_id="agentic"
+)
+_AGENTIC_ROUTES = import_capability_module(
+    "app.services.api.widgets.agentic.routes", capability_id="agentic"
+)
+_ANALYTICS_ORCHESTRATION = import_capability_module(
+    "app.services.api.widgets.analytics.orchestration", capability_id="analytics"
+)
+_ANALYTICS_ROUTES = import_capability_module(
+    "app.services.api.widgets.analytics.routes", capability_id="analytics"
+)
+_OPTIMIZATION_ORCHESTRATION = import_capability_module(
+    "app.services.api.widgets.optimization.orchestration", capability_id="optimization"
+)
+_OPTIMIZATION_ROUTES = import_capability_module(
+    "app.services.api.widgets.optimization.routes", capability_id="optimization"
+)
+_PORTFOLIO_ORCHESTRATION = import_capability_module(
+    "app.services.api.widgets.portfolio.orchestration", capability_id="portfolio"
+)
+_PORTFOLIO_ROUTES = import_capability_module(
+    "app.services.api.widgets.portfolio.routes", capability_id="portfolio"
+)
+_RESEARCH_ORCHESTRATION = import_capability_module(
+    "app.services.api.widgets.research.orchestration", capability_id="research"
+)
+_RESEARCH_ROUTES = import_capability_module(
+    "app.services.api.widgets.research.routes", capability_id="research"
+)
+
+agentic_router = get_capability_attribute(_AGENTIC_ROUTES, "router")
+analytics_workbench_router = get_capability_attribute(_ANALYTICS_ROUTES, "router")
+optimization_router = get_capability_attribute(_OPTIMIZATION_ROUTES, "router")
+portfolio_router = get_capability_attribute(_PORTFOLIO_ROUTES, "router")
+research_router = get_capability_attribute(_RESEARCH_ROUTES, "router")
+
+
+def _capability_builder(module: object | None, attribute: str) -> Callable[..., Any]:
+    """Return one required builder from a resolved optional capability module.
+
+    Args:
+        module: Resolved capability module.
+        attribute: Builder attribute name.
+
+    Returns:
+        Callable builder owned by the present capability.
+
+    Raises:
+        RuntimeError: If the capability is absent and the builder is requested.
+    """
+    builder = get_capability_attribute(cast("Any", module), attribute)
+    if builder is None:
+        message = f"capability builder unavailable: {attribute}"
+        raise RuntimeError(message)
+    return cast("Callable[..., Any]", builder)
+
+
+_ROUTERS = tuple(
+    router
+    for router in (
+        auth_router,
+        health_router,
+        indicators_router,
+        markets_router,
+        settings_router,
+        data_router,
+        data_stream_router,
+        strategies_router,
+        research_router,
+        simulation_live_router,
+        simulation_router,
+        simulation_sessions_router,
+        simulator_router,
+        simulation_workbench_router,
+        analytics_workbench_router,
+        portfolio_router,
+        risk_router,
+        trading_router,
+        trading_activity_router,
+        optimization_router,
+        dashboards_router,
+        operator_router,
+        observability_router,
+        agentic_router,
+        watchlists_router,
+        workstation_router,
+    )
+    if router is not None
 )
 
 
@@ -251,73 +298,83 @@ def _build_canonical_graph(
         ),
     )
     simulator_run_source = build_simulator_run_source(backtest_registry)
-    return build_in_process_graph(
-        {
-            "agentic.source": build_agentic_source(agentic_dependencies),
-            "dashboard.source": read_dashboard_snapshot,
-            "data.dataset_source": build_dataset_source(),
-            "operator.audit_source": read_audit_events,
-            "operator.event_source": read_trading_events,
-            "optimization.source": build_optimization_source(optimization_dependencies),
-            "portfolio.source": build_portfolio_source(portfolio_dependencies),
-            "research.source": build_research_source(
-                build_research_registry(
-                    build_research_runtime_context(simulator_state_provider)
-                )
-            ),
-            "risk.command_source": build_risk_command_source(risk_dependencies),
-            "risk.source": read_risk_state,
-            "simulation.live_source": build_live_simulation_source(
-                simulation_dependencies
-            ),
-            "simulation.result_source": partial(
-                read_simulation_result,
-                artifact_root=settings.simulation_artifact_root,
-            ),
-            "simulation.run_source": build_simulation_run_source(
-                simulation_dependencies
-            ),
-            "simulation.session_source": build_simulation_session_source(
-                simulation_dependencies
-            ),
-            "simulator.run_source": simulator_run_source,
-            "simulator.strategy_source": build_simulator_strategy_source(),
-            "simulator.workbench_source": build_simulation_workbench_source(
-                registry=workbench_registry,
-                live_authority=build_simulation_workbench_live_authority(
-                    simulation_dependencies,
-                    reproduction_runner=build_reproduction_runner(
-                        simulator_run_source, provenance=provenance.record
-                    ),
-                ),
-                batch_runner=build_batch_runner(
-                    simulator_run_source,
-                    provenance=provenance.record,
-                    runtime_context=runtime_context,
+    providers: dict[str, object] = {
+        "dashboard.source": read_dashboard_snapshot,
+        "data.dataset_source": build_dataset_source(),
+        "operator.audit_source": read_audit_events,
+        "operator.event_source": read_trading_events,
+        "risk.command_source": build_risk_command_source(risk_dependencies),
+        "risk.source": read_risk_state,
+        "simulation.live_source": build_live_simulation_source(simulation_dependencies),
+        "simulation.result_source": partial(
+            read_simulation_result,
+            artifact_root=settings.simulation_artifact_root,
+        ),
+        "simulation.run_source": build_simulation_run_source(simulation_dependencies),
+        "simulation.session_source": build_simulation_session_source(
+            simulation_dependencies
+        ),
+        "simulator.run_source": simulator_run_source,
+        "simulator.strategy_source": build_simulator_strategy_source(),
+        "simulator.workbench_source": build_simulation_workbench_source(
+            registry=workbench_registry,
+            live_authority=build_simulation_workbench_live_authority(
+                simulation_dependencies,
+                reproduction_runner=build_reproduction_runner(
+                    simulator_run_source, provenance=provenance.record
                 ),
             ),
-            "analytics.workbench.source": build_analytics_workbench_composition(
-                settings
+            batch_runner=build_batch_runner(
+                simulator_run_source,
+                provenance=provenance.record,
+                runtime_context=runtime_context,
             ),
-            "strategy.mutation_source": build_strategy_mutation_source(
-                strategy_dependencies
-            ),
-            "trading.account_profile_source": build_trading_account_profile_source(
-                _connect_trading_account_profile_broker
-            ),
-            "trading.cancel_all_preflight_source": (
-                build_trading_cancel_all_preflight_source()
-            ),
-            "trading.cancel_order_preflight_source": (
-                build_trading_cancel_order_preflight_source()
-            ),
-            "trading.mutation_source": build_trading_mutation_source(
-                trading_dependencies, runtime_policy=settings
-            ),
-            "trading.preflight_source": build_trading_preflight_source(),
-            "trading.session_source": read_trading_session,
-        }
-    )
+        ),
+        "strategy.mutation_source": build_strategy_mutation_source(
+            strategy_dependencies
+        ),
+        "trading.account_profile_source": build_trading_account_profile_source(
+            _connect_trading_account_profile_broker
+        ),
+        "trading.cancel_all_preflight_source": (
+            build_trading_cancel_all_preflight_source()
+        ),
+        "trading.cancel_order_preflight_source": (
+            build_trading_cancel_order_preflight_source()
+        ),
+        "trading.mutation_source": build_trading_mutation_source(
+            trading_dependencies, runtime_policy=settings
+        ),
+        "trading.preflight_source": build_trading_preflight_source(),
+        "trading.session_source": read_trading_session,
+    }
+    if _AGENTIC_ORCHESTRATION is not None:
+        providers["agentic.source"] = _capability_builder(
+            _AGENTIC_ORCHESTRATION, "build_agentic_source"
+        )(agentic_dependencies)
+    if _ANALYTICS_ORCHESTRATION is not None:
+        providers["analytics.workbench.source"] = _capability_builder(
+            _ANALYTICS_ORCHESTRATION, "build_analytics_workbench_composition"
+        )(settings)
+    if _OPTIMIZATION_ORCHESTRATION is not None:
+        providers["optimization.source"] = _capability_builder(
+            _OPTIMIZATION_ORCHESTRATION, "build_optimization_source"
+        )(optimization_dependencies)
+    if _PORTFOLIO_ORCHESTRATION is not None:
+        providers["portfolio.source"] = _capability_builder(
+            _PORTFOLIO_ORCHESTRATION, "build_portfolio_source"
+        )(portfolio_dependencies)
+    if _RESEARCH_ORCHESTRATION is not None:
+        build_registry = _capability_builder(
+            _RESEARCH_ORCHESTRATION, "build_research_registry"
+        )
+        build_runtime_context = _capability_builder(
+            _RESEARCH_ORCHESTRATION, "build_research_runtime_context"
+        )
+        providers["research.source"] = _capability_builder(
+            _RESEARCH_ORCHESTRATION, "build_research_source"
+        )(build_registry(build_runtime_context(simulator_state_provider)))
+    return build_in_process_graph(providers)
 
 
 def _bearer_or_cookie(request: Request) -> str:

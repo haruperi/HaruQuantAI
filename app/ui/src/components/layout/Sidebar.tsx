@@ -1,196 +1,349 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { useWorkspaceStore, type WidgetType } from '../../widgets/workspaces';
 import {
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Globe,
   Bookmark,
+  Activity,
   LineChart,
   AlignJustify,
   Layers,
   ListOrdered,
-  MessageSquare,
-  Calendar as CalendarIcon,
-  Newspaper,
   Clock,
-  Compass,
-  GraduationCap,
+  Newspaper,
+  Database,
   FileSpreadsheet,
-  History,
-  LayoutDashboard,
-  FlaskConical,
-  TrendingUp,
   AlertTriangle,
-  PieChart,
+  TrendingUp,
+  History,
   BarChart2,
+  Sliders,
+  FlaskConical,
+  PieChart,
+  Bot,
+  LayoutDashboard,
+  GraduationCap,
+  Compass,
   Settings,
+  type LucideIcon,
 } from 'lucide-react';
+
+export interface WidgetItemConfig {
+  type?: WidgetType;
+  action?: 'settings';
+  label: string;
+  title?: string;
+  symbol?: string;
+  icon: LucideIcon;
+}
+
+export interface DomainGroupConfig {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  items: WidgetItemConfig[];
+}
+
+export const DOMAIN_GROUPS: DomainGroupConfig[] = [
+  {
+    id: 'data',
+    label: 'Data',
+    icon: Database,
+    items: [
+      { type: 'markets', label: 'Markets', title: 'Markets', icon: Globe },
+      { type: 'watchlist', label: 'Watchlists', title: 'Watchlists', icon: Bookmark },
+      { type: 'marketTicks', label: 'Market Ticks', title: 'Market Ticks', icon: Activity },
+      { type: 'market-hours', label: 'Market Hours', title: 'Market Hours', icon: Clock },
+      { type: 'news', label: 'News', title: 'News', icon: Newspaper },
+      { type: 'data', label: 'Data Explorer', title: 'Data Explorer', icon: Database },
+    ],
+  },
+  {
+    id: 'indicators',
+    label: 'Indicators',
+    icon: LineChart,
+    items: [
+      { type: 'chart', label: 'Chart', title: 'EURUSD Chart', symbol: 'EURUSD', icon: LineChart },
+      { type: 'indicators', label: 'Indicators Studio', title: 'Indicators', icon: TrendingUp },
+      { type: 'priceLadder', label: 'Price Ladder', title: 'ESU6 DOM', icon: AlignJustify },
+      { type: 'optionsGrid', label: 'Options Grid', title: 'Options Grid', icon: Layers },
+    ],
+  },
+  {
+    id: 'strategy',
+    label: 'Strategy',
+    icon: FileSpreadsheet,
+    items: [
+      { type: 'strategies', label: 'Strategies', title: 'Strategies', icon: FileSpreadsheet },
+    ],
+  },
+  {
+    id: 'risk',
+    label: 'Risk',
+    icon: AlertTriangle,
+    items: [
+      { type: 'risk', label: 'Risk Governance', title: 'Risk', icon: AlertTriangle },
+    ],
+  },
+  {
+    id: 'trading',
+    label: 'Trading',
+    icon: TrendingUp,
+    items: [
+      { type: 'trading', label: 'Trading Cockpit', title: 'Trading', icon: TrendingUp },
+      { type: 'positions', label: 'Positions & Orders', title: 'Positions & Orders', icon: ListOrdered },
+      { type: 'tradeLog', label: 'Trade Log', title: 'Trade Log', icon: History },
+      { type: 'sessions', label: 'Trading Sessions', title: 'Trading Sessions', icon: Clock },
+    ],
+  },
+  {
+    id: 'simulation',
+    label: 'Simulation',
+    icon: History,
+    items: [
+      { type: 'simulator', label: 'Simulator', title: 'Simulator', icon: History },
+    ],
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    icon: BarChart2,
+    items: [
+      { type: 'analytics', label: 'Analytics', title: 'Analytics', icon: BarChart2 },
+    ],
+  },
+  {
+    id: 'optimization',
+    label: 'Optimization',
+    icon: Sliders,
+    items: [
+      { type: 'optimization', label: 'Optimization', title: 'Optimization', icon: Sliders },
+    ],
+  },
+  {
+    id: 'research',
+    label: 'Research',
+    icon: FlaskConical,
+    items: [
+      { type: 'research', label: 'Edge Lab', title: 'Edge Lab', icon: FlaskConical },
+    ],
+  },
+  {
+    id: 'portfolio',
+    label: 'Portfolio',
+    icon: PieChart,
+    items: [
+      { type: 'portfolio', label: 'Portfolio', title: 'Portfolio', icon: PieChart },
+    ],
+  },
+  {
+    id: 'agentic',
+    label: 'Agentic',
+    icon: Bot,
+    items: [
+      { type: 'agentic', label: 'Agentic Operator', title: 'Agentic Operator', icon: Bot },
+    ],
+  },
+  {
+    id: 'resources',
+    label: 'Resources',
+    icon: LayoutDashboard,
+    items: [
+      { type: 'dashboard', label: 'Dashboard', title: 'Dashboard', icon: LayoutDashboard },
+      { type: 'education', label: 'Education', title: 'Education Resources', icon: GraduationCap },
+      { type: 'challenges', label: 'Challenges', title: 'Challenges Dashboard', icon: Compass },
+      { type: 'tradePlan', label: 'Trade Plan', title: 'My Trade Plan', icon: FileSpreadsheet },
+      { action: 'settings', label: 'System Settings', icon: Settings },
+    ],
+  },
+];
 
 export const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [openDomains, setOpenDomains] = useState<Record<string, boolean>>({
+    data: true,
+    indicators: true,
+    trading: true,
+    simulation: true,
+    analytics: true,
+  });
+  const [activeFlyout, setActiveFlyout] = useState<string | null>(null);
+  const flyoutRef = useRef<HTMLDivElement | null>(null);
+
   const { openSettings } = useTradingStore();
   const { addWidgetToWorkspace } = useWorkspaceStore();
 
-  const handleAddWidget = (type: string, title: string) => {
-    addWidgetToWorkspace(type as WidgetType, title);
+  const toggleDomain = (domainId: string) => {
+    setOpenDomains((prev) => ({
+      ...prev,
+      [domainId]: !prev[domainId],
+    }));
   };
 
+  const handleItemClick = (item: WidgetItemConfig) => {
+    if (item.action === 'settings') {
+      openSettings();
+    } else if (item.type) {
+      addWidgetToWorkspace(item.type, item.title || item.label, item.symbol);
+    }
+    setActiveFlyout(null);
+  };
+
+  // Close flyout on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (flyoutRef.current && !flyoutRef.current.contains(e.target as Node)) {
+        setActiveFlyout(null);
+      }
+    };
+    if (activeFlyout) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeFlyout]);
+
   return (
-    <aside className={`cme-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <aside
+      className={`cme-sidebar ${isCollapsed ? 'collapsed' : ''}`}
+      aria-label="Sidebar navigation"
+    >
       {/* Sidebar Header Toggle */}
-      <div className="sidebar-toggle-btn" onClick={() => setIsCollapsed(!isCollapsed)}>
+      <div
+        className="sidebar-toggle-btn"
+        onClick={() => {
+          setIsCollapsed(!isCollapsed);
+          setActiveFlyout(null);
+        }}
+        data-testid="sidebar-toggle-btn"
+        role="button"
+        tabIndex={0}
+        title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+      >
         {!isCollapsed && <span>HIDE MENU</span>}
         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </div>
 
-      {/* Section 1: ADD WIDGETS */}
-      <div className="sidebar-section">
-        {!isCollapsed && <div className="sidebar-section-title">ADD WIDGETS</div>}
+      {/* Domain Groups Container */}
+      <div className="sidebar-domains-container" ref={flyoutRef}>
+        {DOMAIN_GROUPS.map((domain) => {
+          const DomainIcon = domain.icon;
+          const isOpen = Boolean(openDomains[domain.id]);
+          const isFlyoutOpen = activeFlyout === domain.id;
 
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('markets', 'Markets')}>
-          <Globe size={15} />
-          {!isCollapsed && <span>Markets</span>}
-        </div>
+          if (isCollapsed) {
+            return (
+              <div
+                key={domain.id}
+                className={`sidebar-collapsed-domain-wrapper ${isFlyoutOpen ? 'active' : ''}`}
+                data-testid={`domain-collapsed-${domain.id}`}
+              >
+                <div
+                  className="sidebar-collapsed-domain-btn"
+                  onClick={() => setActiveFlyout(isFlyoutOpen ? null : domain.id)}
+                  title={`${domain.label} Widgets`}
+                  data-testid={`domain-icon-${domain.id}`}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <DomainIcon size={16} />
+                </div>
 
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('watchlist', 'Watchlists')}>
-          <Bookmark size={15} />
-          {!isCollapsed && <span>Watchlists</span>}
-        </div>
+                {/* Collapsed Mode Flyout Dropdown */}
+                {isFlyoutOpen && (
+                  <div
+                    className="sidebar-flyout-menu"
+                    data-testid={`flyout-${domain.id}`}
+                  >
+                    <div className="sidebar-flyout-header">
+                      <DomainIcon size={14} />
+                      <span>{domain.label.toUpperCase()}</span>
+                    </div>
+                    <div className="sidebar-flyout-items">
+                      {domain.items.map((item) => {
+                        const ItemIcon = item.icon;
+                        const itemKey = item.type || item.action || item.label;
+                        return (
+                          <div
+                            key={itemKey}
+                            className="sidebar-flyout-item"
+                            onClick={() => handleItemClick(item)}
+                            data-testid={`widget-${itemKey}`}
+                            role="button"
+                            tabIndex={0}
+                          >
+                            <ItemIcon size={14} />
+                            <span>{item.label}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          }
 
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('chart', 'EURUSD Chart')}>
-          <LineChart size={15} />
-          {!isCollapsed && <span>Chart</span>}
-        </div>
+          return (
+            <div
+              key={domain.id}
+              className={`sidebar-domain-group ${isOpen ? 'open' : 'closed'}`}
+              data-testid={`domain-group-${domain.id}`}
+            >
+              {/* Domain Header / Accordion Toggle */}
+              <div
+                className={`sidebar-domain-header ${isOpen ? 'active' : ''}`}
+                onClick={() => toggleDomain(domain.id)}
+                data-testid={`domain-header-${domain.id}`}
+                role="button"
+                tabIndex={0}
+                aria-expanded={isOpen}
+              >
+                <div className="sidebar-domain-title-left">
+                  <DomainIcon size={14} className="sidebar-domain-icon" />
+                  <span className="sidebar-domain-title">{domain.label.toUpperCase()}</span>
+                </div>
+                <ChevronDown
+                  size={14}
+                  className={`sidebar-domain-chevron ${isOpen ? 'open' : ''}`}
+                />
+              </div>
 
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('priceLadder', 'ESU6 DOM')}>
-          <AlignJustify size={15} />
-          {!isCollapsed && <span>Price Ladder</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('optionsGrid', 'Options Grid')}>
-          <Layers size={15} />
-          {!isCollapsed && <span>Options</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('positions', 'Positions & Orders')}>
-          <ListOrdered size={15} />
-          {!isCollapsed && <span>Positions</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('positions', 'Orders Window')}>
-          <ListOrdered size={15} />
-          {!isCollapsed && <span>Orders</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('commentary', 'Commentary')}>
-          <MessageSquare size={15} />
-          {!isCollapsed && <span>Commentary</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('calendar', 'Calendar')}>
-          <CalendarIcon size={15} />
-          {!isCollapsed && <span>Calendar</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('news', 'News')}>
-          <Newspaper size={15} />
-          {!isCollapsed && <span>News</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('market-hours', 'Market Hours')}>
-          <Clock size={15} />
-          {!isCollapsed && <span>Market Hours</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('dashboard', 'Dashboard')}>
-          <LayoutDashboard size={15} />
-          {!isCollapsed && <span>Dashboard</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('strategies', 'Strategies')}>
-          <FileSpreadsheet size={15} />
-          {!isCollapsed && <span>Strategies</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('research', 'Edge Lab')}>
-          <FlaskConical size={15} />
-          {!isCollapsed && <span>Edge Lab</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('optimization', 'Optimization')}>
-          <FlaskConical size={15} />
-          {!isCollapsed && <span>Optimization</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('portfolio', 'Portfolio')}>
-          <PieChart size={15} />
-          {!isCollapsed && <span>Portfolio</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('agentic', 'Agentic Operator')}>
-          <span>Agentic Operator</span>
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('simulator', 'Simulator')}>
-          <History size={15} />
-          {!isCollapsed && <span>Simulator</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('analytics', 'Analytics')}>
-          <BarChart2 size={15} />
-          {!isCollapsed && <span>Analytics</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('risk', 'Risk')}>
-          <AlertTriangle size={15} />
-          {!isCollapsed && <span>Risk</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('trading', 'Trading')}>
-          <TrendingUp size={15} />
-          {!isCollapsed && <span>Trading</span>}
-        </div>
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('sessions', 'Trading Sessions')}>
-          {!isCollapsed && <span>Sessions</span>}
-        </div>
-      </div>
-
-      {/* Section 2: CHALLENGE */}
-      <div className="sidebar-section">
-        {!isCollapsed && <div className="sidebar-section-title">CHALLENGE</div>}
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('challenges', 'Challenges Dashboard')}>
-          <Compass size={15} />
-          {!isCollapsed && <span>Discover</span>}
-        </div>
-      </div>
-
-      {/* Section 3: RESOURCES */}
-      <div className="sidebar-section">
-        {!isCollapsed && <div className="sidebar-section-title">RESOURCES</div>}
-
-        <div className="sidebar-menu-item" onClick={openSettings}>
-          <Settings size={15} />
-          {!isCollapsed && <span>System Settings</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('education', 'Education Resources')}>
-          <GraduationCap size={15} />
-          {!isCollapsed && <span>Education</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('tradePlan', 'My Trade Plan')}>
-          <FileSpreadsheet size={15} />
-          {!isCollapsed && <span>Trade Plan</span>}
-        </div>
-
-        <div className="sidebar-menu-item" onClick={() => handleAddWidget('tradeLog', 'Trade Log')}>
-          <History size={15} />
-          {!isCollapsed && <span>Trade Log</span>}
-        </div>
+              {/* Collapsible Child Widgets */}
+              {isOpen && (
+                <div
+                  className="sidebar-domain-items"
+                  data-testid={`domain-items-${domain.id}`}
+                >
+                  {domain.items.map((item) => {
+                    const ItemIcon = item.icon;
+                    const itemKey = item.type || item.action || item.label;
+                    return (
+                      <div
+                        key={itemKey}
+                        className="sidebar-menu-item sidebar-widget-item"
+                        onClick={() => handleItemClick(item)}
+                        data-testid={`widget-${itemKey}`}
+                        role="button"
+                        tabIndex={0}
+                        title={`Add ${item.label} widget`}
+                      >
+                        <ItemIcon size={14} />
+                        <span>{item.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </aside>
   );

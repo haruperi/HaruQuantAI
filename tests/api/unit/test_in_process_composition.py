@@ -7,6 +7,25 @@ from app.services.api import (
     create_api_app,
     get_required_in_process_provider_names,
 )
+from app.services.api.composition.adapters import get_route_dependency_bindings
+from app.services.api.composition.capabilities import (
+    get_capability_id,
+    get_optional_capability_ids,
+)
+
+# Capabilities that must always compose; absence fails closed per AGENTS.md.
+_REQUIRED_CAPABILITIES = frozenset(
+    {
+        "dashboard",
+        "data",
+        "operator",
+        "risk",
+        "simulation",
+        "simulator",
+        "strategy",
+        "trading",
+    }
+)
 
 
 def _providers() -> dict[str, object]:
@@ -17,38 +36,19 @@ def _providers() -> dict[str, object]:
     }
 
 
-def test_provider_manifest_is_exact_and_deterministic() -> None:
-    """Expose one stable provider manifest without duplicate route bindings."""
+def test_provider_manifest_is_consistent_and_deterministic() -> None:
+    """Expose one deterministic manifest covering every required capability."""
     names = get_required_in_process_provider_names()
-    assert names == (
-        "agentic.source",
-        "analytics.workbench.source",
-        "dashboard.source",
-        "data.dataset_source",
-        "operator.audit_source",
-        "operator.event_source",
-        "optimization.source",
-        "portfolio.source",
-        "research.source",
-        "risk.command_source",
-        "risk.source",
-        "simulation.live_source",
-        "simulation.result_source",
-        "simulation.run_source",
-        "simulation.session_source",
-        "simulator.run_source",
-        "simulator.strategy_source",
-        "simulator.workbench_source",
-        "strategy.mutation_source",
-        "trading.account_profile_source",
-        "trading.cancel_all_preflight_source",
-        "trading.cancel_order_preflight_source",
-        "trading.mutation_source",
-        "trading.preflight_source",
-        "trading.session_source",
-    )
     assert len(set(names)) == len(names)
     assert names == tuple(sorted(names))
+    assert all(name == name.strip() and "." in name for name in names)
+    capabilities = {get_capability_id(name) for name in names}
+    # Required capabilities must always compose; optional ones may be absent.
+    assert capabilities >= _REQUIRED_CAPABILITIES
+    assert capabilities - _REQUIRED_CAPABILITIES <= get_optional_capability_ids()
+    bindings = get_route_dependency_bindings()
+    assert set(names) == set(bindings)
+    assert all(callable(binding) for binding in bindings.values())
 
 
 def test_graph_rejects_missing_unknown_and_invalid_values() -> None:

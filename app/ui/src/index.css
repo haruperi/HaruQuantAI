@@ -1889,6 +1889,195 @@ body {
   letter-spacing: 1px;
 }
 
+.sidebar-domains-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-bottom: 16px;
+}
+
+.sidebar-domain-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-domain-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 28px;
+  padding: 4px 10px;
+  cursor: pointer;
+  color: #9cb3c9;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  user-select: none;
+  transition: all 0.15s ease;
+  border-left: 2px solid transparent;
+}
+
+.sidebar-domain-header:hover {
+  background: #0f2d52;
+  color: #ffffff;
+}
+
+.sidebar-domain-header.active {
+  color: #ffffff;
+  border-left-color: #0088ff;
+  background: rgba(0, 136, 255, 0.08);
+}
+
+.sidebar-domain-title-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-domain-icon {
+  flex-shrink: 0;
+  color: #6a8ba8;
+  transition: color 0.15s ease;
+}
+
+.sidebar-domain-header:hover .sidebar-domain-icon,
+.sidebar-domain-header.active .sidebar-domain-icon {
+  color: #38bdf8;
+}
+
+.sidebar-domain-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.sidebar-domain-chevron {
+  flex-shrink: 0;
+  color: #587997;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-domain-chevron.open {
+  transform: rotate(180deg);
+}
+
+.sidebar-domain-items {
+  display: flex;
+  flex-direction: column;
+  padding-left: 8px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-widget-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 27px;
+  padding: 3px 12px;
+  color: #c5d4e4;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.sidebar-widget-item:hover {
+  background: #112b4a;
+  color: #ffffff;
+  padding-left: 14px;
+}
+
+.sidebar-collapsed-domain-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.sidebar-collapsed-domain-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8da4be;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.sidebar-collapsed-domain-btn:hover,
+.sidebar-collapsed-domain-wrapper.active .sidebar-collapsed-domain-btn {
+  background: #112b4a;
+  color: #38bdf8;
+}
+
+.sidebar-flyout-menu {
+  position: absolute;
+  left: 42px;
+  top: 0;
+  width: 190px;
+  background: #0c2444;
+  border: 1px solid #1a3d66;
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  overflow: hidden;
+  animation: flyoutSlideIn 0.15s ease-out;
+}
+
+@keyframes flyoutSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sidebar-flyout-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #081d37;
+  border-bottom: 1px solid #1a3d66;
+  color: #38bdf8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.sidebar-flyout-items {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+.sidebar-flyout-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 4px 12px;
+  color: #c5d4e4;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.sidebar-flyout-item:hover {
+  background: #153c6c;
+  color: #ffffff;
+}
+
 .sidebar-menu-item {
   display: flex;
   align-items: center;
