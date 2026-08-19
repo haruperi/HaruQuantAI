@@ -185,6 +185,9 @@ from app.services.analytics.reports import (
     compute_reproducibility_hashes as _compute_reproducibility_hashes,
 )
 from app.services.analytics.reports import (
+    deserialize_performance_report as _deserialize_performance_report,
+)
+from app.services.analytics.reports import (
     serialize_report as _serialize_report,
 )
 from app.services.analytics.scoring import (
@@ -210,6 +213,9 @@ from app.services.analytics.scoring import (
 )
 from app.services.analytics.scoring import (
     parse_scoring_profile_mapping as _parse_scoring_profile_mapping,
+)
+from app.services.analytics.workbench import (
+    build_period_tables as _build_period_tables,
 )
 from app.services.analytics.workbench import (
     build_workbench_payload as _build_workbench_payload,
@@ -1304,6 +1310,69 @@ def build_analytics_workbench_payload(
     )
 
 
+def build_analytics_period_tables(
+    report: object,
+    simulation_result: Mapping[str, object],
+    *,
+    dimension: str = "month",
+    context: str = "all",
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Aggregate the canonical closed-trade ledger by one period dimension.
+
+    Args:
+        report: Validated Analytics PerformanceReport instance.
+        simulation_result: Canonical Simulation result mapping.
+        dimension: One of year, quarter, month, week, day, day_of_week,
+            hour.
+        context: ``all``, ``long``, or ``short`` source context.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
+    Returns:
+        Standard response containing owner-safe period rows in ``data``.
+
+    Raises:
+        AnalyticsValidationError: If the report is not a PerformanceReport.
+    """
+    if not isinstance(report, PerformanceReport):
+        raise AnalyticsValidationError("period table source must be PerformanceReport")
+    return run_analytics_operation(
+        operation="analytics.workbench.build_analytics_period_tables",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _build_period_tables(
+            simulation_result, dimension=dimension, context=context
+        ),
+    )
+
+
+def deserialize_analytics_performance_report(
+    report_json: str,
+    *,
+    request_id: str | None = None,
+    correlation_id: str | None = None,
+) -> StandardResponse[object]:
+    """Rebuild one canonical report from its serialized JSON artifact.
+
+    Args:
+        report_json: Canonical JSON text produced by ``serialize_report``.
+        request_id: Optional request id.
+        correlation_id: Optional correlation id.
+
+    Returns:
+        Standard response containing the validated PerformanceReport in
+        ``data``.
+    """
+    return run_analytics_operation(
+        operation="analytics.reports.deserialize_performance_report",
+        request_id=request_id,
+        correlation_id=correlation_id,
+        raw=lambda: _deserialize_performance_report(report_json),
+    )
+
+
 def _truncate_transform(
     result: tuple[tuple[Mapping[str, object], ...], Mapping[str, object]],
 ) -> tuple[tuple[Mapping[str, object], ...], Mapping[str, object]]:
@@ -1646,6 +1715,7 @@ __all__: tuple[str, ...] = (
     "analyze_emergency_response",
     "append_player_journal_entry",
     "assess_plan_adherence",
+    "build_analytics_period_tables",
     "build_analytics_workbench_payload",
     "build_barrier_section",
     "build_closed_trade_equity_curve",
@@ -1680,6 +1750,7 @@ __all__: tuple[str, ...] = (
     "create_process_scoring_profile",
     "create_risk_free_rate_evidence",
     "create_statistical_validation_config",
+    "deserialize_analytics_performance_report",
     "detect_behavior_patterns",
     "evaluate_player_qualification",
     "get_analytics_dashboard_snapshot",

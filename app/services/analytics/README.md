@@ -176,7 +176,7 @@ The order is the implementation sequence.
 | Completed | `FEAT-ANLT-08` Plan-Adherence and Behavioral Analytics | `behavior/` | `assess_plan_adherence`, `detect_behavior_patterns`; exact plan and threshold versions | `FR-ANLT-070`..`FR-ANLT-072` | `tests/analytics/usage/features/08_behavior.py` |
 | Completed | `FEAT-ANLT-09` Emergency-Response Analytics | `emergency_response/` | `analyze_emergency_response`; sequence, timing, completeness, and survival evidence | `FR-ANLT-073`..`FR-ANLT-074` | `tests/analytics/usage/features/09_emergency_response.py` |
 | Completed | `FEAT-ANLT-10` Player Qualification | `qualification/` | `evaluate_player_qualification`; prerequisites, attempts, remediation, expiry, and eligibility | `FR-ANLT-075`..`FR-ANLT-078` | `tests/analytics/usage/features/10_qualification.py` |
-| Completed | `FEAT-ANLT-11` Workbench Projection | `workbench/` | `build_analytics_workbench_payload`; finite owner-produced 17-section non-binding workbench projection with exact unavailability reasons, preserved source contexts, Decimal-safe values, and explicit 5,000-item truncation | `FR-ANLT-079` | `tests/analytics/usage/features/11_workbench.py`; `tests/analytics/unit/test_workbench_projections.py` |
+| Completed | `FEAT-ANLT-11` Workbench Projection | `workbench/` | `build_analytics_workbench_payload`; finite owner-produced 17-section non-binding workbench projection with exact unavailability reasons, preserved source contexts, Decimal-safe values, and explicit 5,000-item truncation; report-owned presentation series and the strict report deserializer | `FR-ANLT-079`..`FR-ANLT-082` | `tests/analytics/usage/features/11_workbench.py`; `tests/analytics/unit/test_workbench_projections.py` |
 
 #### Player evidence requirements
 
@@ -195,6 +195,9 @@ The order is the implementation sequence.
 | Completed | `FR-ANLT-077` | Require remediation after failed or disqualifying evidence. | `app/services/analytics/qualification/service.py`; `tests/analytics/usage/features/10_qualification.py::fr_anlt_077` |
 | Completed | `FR-ANLT-078` | Derive recurrent validity and leaderboard eligibility from attempts, expiry, and integrity breaches. | `app/services/analytics/qualification/service.py`; `tests/analytics/usage/features/10_qualification.py::fr_anlt_078` |
 | Completed | `FR-ANLT-079` | Project one validated PerformanceReport and canonical Simulation result into the finite non-binding workbench payload with stable sections, exact unavailability reasons, preserved source contexts, and explicit truncation. | `app/services/analytics/workbench/projections.py`; `tests/analytics/usage/features/11_workbench.py::fr_anlt_079` |
+| Completed | `FR-ANLT-080` | Project report-owned equity presentation evidence into drawdown and monthly-return series for the workbench and dashboard without recalculating report metrics. | `app/services/analytics/workbench/presentations.py`; `app/services/analytics/reports/presentation.py`; `tests/analytics/unit/test_workbench_projections.py`; `tests/analytics/usage/features/11_workbench.py` |
+| Completed | `FR-ANLT-081` | Rebuild one canonical PerformanceReport from its serialized JSON artifact, failing closed as a validation error on malformed or tampered input. | `app/services/analytics/reports/deserialization.py`; `tests/analytics/unit/test_report_deserialization.py`; `tests/analytics/usage/features/11_workbench.py::report_deserialization` |
+| Completed | `FR-ANLT-082` | Project report-owned drawdown and monthly-return series into completed bounded dashboard payload sections with explicit truncation metadata. | `app/services/analytics/dashboards/payloads.py`; `tests/analytics/component/test_payloads.py` |
 
 Work outside Analytics ownership has no `FEAT-*` registration and consumes no
 feature ordinal.
@@ -242,6 +245,7 @@ analytics/
 │   ├── comparison.py                   # Focus: compatible report comparison
 │   ├── portfolio.py                    # Focus: currency-safe portfolio aggregation
 │   ├── allocation.py                   # Focus: PortfolioAllocationEvidence v1 projection
+│   ├── deserialization.py              # Focus: strict inbound canonical report reconstruction
 │   └── builder.py                      # Focus: canonical PerformanceReport orchestration
 ├── dashboards/                         # Feature: UI/API-ready report projection
 │   ├── __init__.py
@@ -250,6 +254,7 @@ analytics/
 ├── workbench/                          # Feature: FEAT-ANLT-11 workbench projection
 │   ├── __init__.py
 │   ├── contracts.py                    # Focus: internal payload contracts
+│   ├── presentations.py                # Focus: owner-evidence series section builders
 │   └── projections.py                  # Focus: finite owner-produced projection
 └── scoring/                            # Feature: process-first scoring
     ├── __init__.py
@@ -1257,6 +1262,39 @@ name throughout.
 `tests/analytics/usage/features/04_reports.py` contains one directly callable
 `fr_anlt_NNN()` function for `FR-ANLT-039` through `FR-ANLT-043`,
 `FR-ANLT-048`, and `FR-ANLT-052`.
+
+---
+
+### 4.5 `workbench/` — Owner-Evidence Workbench Projection
+
+**Purpose:** Project one validated performance report and one canonical Simulation
+result into the finite 17-section non-binding workbench payload without metric
+recalculation, and rebuild canonical reports from their serialized artifacts.
+
+**Module flow:**
+
+```text
+PerformanceReport + SimulationResult
+  → distributions/presentations/closed-trade ledger
+  → 17-section workbench payload (completed or explicit unavailable)
+reports/deserialization.py  → canonical JSON ⇒ PerformanceReport (fail closed)
+```
+
+#### Files
+
+| Status    | File                 | Responsibility                                                                                                                                 | Key exports                                                              | Dependencies |
+| --------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------ |
+| Completed | `projections.py`     | Build the finite owner-produced workbench payload; series sections use owner evidence and degrade to exact unavailability reasons when absent.   | `build_workbench_payload`, `WORKBENCH_MAX_POINTS`                         | `contracts/`, `workbench/presentations.py`, `contracts.evidence` |
+| Completed | `presentations.py`   | Owner-evidence builders for the series workbench sections (drawdown, returns, VAMI, monthly, period tables, calendar, streaks, histogram, outliers, excursions, duration). | `build_drawdown_curve`, `build_monthly_returns`, `build_period_tables`, and friends | `contracts.evidence` (JSON-safe conversion) |
+
+The strict canonical-report deserializer lives in `reports/deserialization.py`
+(`deserialize_performance_report`, inbound to serialize_report) and is exercised
+in `tests/analytics/unit/test_report_deserialization.py`.
+
+**Requirements:** `FR-ANLT-079`..`FR-ANLT-082` (see the evidence rows above).
+**Rules:** Workbench builders never recalculate report metrics, never fabricate
+points, and never substitute zero for absent evidence; derived rows carry only
+counts, sums, owner values, and timestamp arithmetic.
 
 ---
 

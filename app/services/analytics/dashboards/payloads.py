@@ -96,6 +96,27 @@ def _equity_points(report: PerformanceReport) -> Sequence[Mapping[str, object]]:
     return points
 
 
+def _presentation_points(
+    report: PerformanceReport, key: str
+) -> Sequence[Mapping[str, object]] | None:
+    """Read one optional report-owned presentation series.
+
+    Args:
+        report: Validated source report.
+        key: Presentation series key.
+
+    Returns:
+        Presentation rows, or None when the report carries no such series.
+    """
+    presentation = report.precision_metadata.get("presentation_series")
+    if not isinstance(presentation, Mapping):
+        return None
+    points = presentation.get(key)
+    if not isinstance(points, Sequence) or isinstance(points, (str, bytes, bytearray)):
+        return None
+    return points or None
+
+
 def _evidence_sections(report: PerformanceReport) -> tuple[Mapping[str, object], ...]:
     """Project warning and quality-flag evidence as visible payload classes.
 
@@ -139,6 +160,54 @@ def build_dashboard_payload(report: PerformanceReport) -> DashboardPayload:
         _equity_points(report),
         max_points=DASHBOARD_MAX_POINTS,
     )
+    drawdown_series = _presentation_points(report, "drawdown_curve")
+    if drawdown_series is not None:
+        drawdown_points, drawdown_truncation = truncate_series(
+            drawdown_series,
+            max_points=DASHBOARD_MAX_POINTS,
+        )
+        drawdown_section: Mapping[str, object] = {
+            "payload_class": "drawdown_chart",
+            "status": "completed",
+            "points": drawdown_points,
+        }
+        drawdown_truncation_row: Mapping[str, object] | None = {
+            "payload_class": "drawdown_chart",
+            **drawdown_truncation,
+        }
+    else:
+        drawdown_section = {
+            "payload_class": "drawdown_chart",
+            "status": "skipped",
+            "reason": "report_has_no_presentation_drawdown_series",
+        }
+        drawdown_truncation_row = None
+    monthly_rows = _presentation_points(report, "monthly_returns")
+    if monthly_rows is not None:
+        monthly_total = len(monthly_rows)
+        monthly_retained = monthly_rows[:DASHBOARD_MAX_POINTS]
+        monthly_section: Mapping[str, object] = {
+            "payload_class": "monthly_returns_table",
+            "status": "completed",
+            "rows": monthly_retained,
+        }
+        monthly_truncation_row: Mapping[str, object] | None = (
+            {
+                "payload_class": "monthly_returns_table",
+                "sample_count": len(monthly_retained),
+                "total_count": monthly_total,
+                "policy": "first_n_owner_ordered_items",
+            }
+            if len(monthly_retained) < monthly_total
+            else None
+        )
+    else:
+        monthly_section = {
+            "payload_class": "monthly_returns_table",
+            "status": "skipped",
+            "reason": "report_has_no_presentation_monthly_returns",
+        }
+        monthly_truncation_row = None
     sections: tuple[Mapping[str, object], ...] = (
         {
             "payload_class": "summary_table",
@@ -150,16 +219,8 @@ def build_dashboard_payload(report: PerformanceReport) -> DashboardPayload:
             "status": "completed",
             "points": equity_points,
         },
-        {
-            "payload_class": "drawdown_chart",
-            "status": "skipped",
-            "reason": "report_has_no_presentation_drawdown_series",
-        },
-        {
-            "payload_class": "monthly_returns_table",
-            "status": "skipped",
-            "reason": "outside_initial_payload_set",
-        },
+        drawdown_section,
+        monthly_section,
         *_evidence_sections(report),
     )
     projected_classes = {
@@ -179,7 +240,15 @@ def build_dashboard_payload(report: PerformanceReport) -> DashboardPayload:
         warnings=report.caveats,
         quality_flags=report.quality_flags,
         units=_units(report),
-        truncation_metadata=({"payload_class": "equity_curve", **truncation},),
+        truncation_metadata=tuple(
+            row
+            for row in (
+                {"payload_class": "equity_curve", **truncation},
+                drawdown_truncation_row,
+                monthly_truncation_row,
+            )
+            if row is not None
+        ),
     )
     logger.info("Completed bounded Analytics dashboard payload")
     return payload

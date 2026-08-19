@@ -34,3 +34,31 @@ def test_dashboard_payload_does_not_recompute_metrics() -> None:
         report.precision_metadata["presentation_series"]["equity_curve"]
     )
     assert payload.report_id == report.report_id
+
+
+def test_drawdown_and_monthly_payload_sections_are_completed() -> None:
+    """Drawdown and monthly-returns projections are completed from owner series."""
+    report, _ = _report()
+    payload = build_dashboard_payload(report)
+    drawdown = next(
+        section
+        for section in payload.sections
+        if section["payload_class"] == "drawdown_chart"
+    )
+    monthly = next(
+        section
+        for section in payload.sections
+        if section["payload_class"] == "monthly_returns_table"
+    )
+    assert drawdown["status"] == "completed"
+    assert monthly["status"] == "completed"
+    assert tuple(drawdown["points"]) == tuple(
+        report.precision_metadata["presentation_series"]["drawdown_curve"]
+    )
+    assert tuple(monthly["rows"]) == tuple(
+        report.precision_metadata["presentation_series"]["monthly_returns"]
+    )
+    assert any(
+        row.get("payload_class") == "equity_curve"
+        for row in payload.truncation_metadata
+    )

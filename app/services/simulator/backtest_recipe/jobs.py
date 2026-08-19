@@ -19,16 +19,17 @@ from collections.abc import Callable, Iterator
 from contextlib import AbstractContextManager, nullcontext
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Literal
+from typing import Any, Literal
 
+from app.services.simulator.backtest_recipe.evidence import (
+    BacktestRunEvidence,
+    CompletionSink,
+)
 from app.services.simulator.backtest_recipe.pipeline import (
     BacktestRunConfig,
     run_strategy_backtest,
     utc_now,
 )
-
-if TYPE_CHECKING:
-    from app.services.simulator.backtest_recipe.evidence import CompletionSink
 from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
@@ -303,6 +304,41 @@ class BacktestJobRegistry:
                 # Nothing terminal to reclaim; drop the oldest entry outright.
                 self._jobs.popitem(last=False)
 
+    def _sink_for(self, job: BacktestJob) -> CompletionSink | None:
+        """Bind job identity onto the completion sink for attribution.
+
+        The evidence projection built inside the pipeline carries no job or
+        principal identity because the pipeline only sees the run config, so
+        downstream durable catalogues could not attribute terminal evidence
+        to its owning job and principal without this enrichment.
+
+        Args:
+            job: Registered job whose evidence the sink will receive.
+
+        Returns:
+            A sink enriching the evidence projection with ``job_id`` and
+            ``principal_id``, or None when no sink is configured.
+        """
+        if self._completion_sink is None:
+            return None
+        base_sink = self._completion_sink
+
+        def sink_with_job_identity(evidence: BacktestRunEvidence) -> None:
+            enriched_projection = {
+                **evidence.projection,
+                "job_id": job.job_id,
+                "principal_id": job.principal_id,
+            }
+            base_sink(
+                BacktestRunEvidence(
+                    projection=enriched_projection,
+                    simulation_result=evidence.simulation_result,
+                    performance_report=evidence.performance_report,
+                )
+            )
+
+        return sink_with_job_identity
+
     def _execute(self, job: BacktestJob) -> None:
         """Run one job to completion on its own event loop.
 
@@ -338,7 +374,7 @@ class BacktestJobRegistry:
                         job.config,
                         facts=facts,
                         progress=progress,
-                        completion_sink=self._completion_sink,
+                        completion_sink=self._sink_for(job),
                     )
                 )
         except BacktestCancelledError:

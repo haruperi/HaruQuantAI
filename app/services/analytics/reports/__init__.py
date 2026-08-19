@@ -11,6 +11,9 @@ from app.services.analytics.reports.barrier import (
 )
 from app.services.analytics.reports.builder import build_performance_report
 from app.services.analytics.reports.comparison import compare_performance_reports
+from app.services.analytics.reports.deserialization import (
+    deserialize_performance_report,
+)
 from app.services.analytics.reports.hashes import compute_reproducibility_hashes
 from app.services.analytics.reports.portfolio import build_portfolio_performance_report
 from app.services.analytics.reports.serialization import serialize_report
@@ -25,5 +28,6 @@ __all__ = (
     "build_worst_day_distribution",
     "compare_performance_reports",
     "compute_reproducibility_hashes",
+    "deserialize_performance_report",
     "serialize_report",
 )

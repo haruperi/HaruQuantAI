@@ -514,3 +514,32 @@ def test_registry_cancellation_before_the_pipeline_skips_the_sink() -> None:
     _wait_for_terminal(job)
     assert job.status == "cancelled"
     assert received == []
+
+
+def test_registry_sink_receives_job_and_principal_attribution(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The registry enriches sink evidence with job and principal identity."""
+    from app.services.simulator.backtest_recipe import jobs as jobs_module
+    from app.services.simulator.backtest_recipe.pipeline import run_strategy_backtest
+
+    _patch_pipeline_tail(monkeypatch)
+    received: list[object] = []
+    monkeypatch.setattr(jobs_module, "run_strategy_backtest", run_strategy_backtest)
+
+    def facts_loader(config: BacktestRunConfig) -> object:
+        del config
+        return object()
+
+    registry = BacktestJobRegistry(
+        facts_loader=facts_loader, completion_sink=received.append
+    )
+    job = registry.submit(_config(), principal_id="tester")
+    _wait_for_terminal(job)
+    assert job.status == "succeeded"
+    assert len(received) == 1
+    projection = received[0].projection  # type: ignore[attr-defined]
+    assert projection["job_id"] == job.job_id
+    assert projection["principal_id"] == "tester"
+    # The compact HTTP snapshot itself must stay free of identity enrichment.
+    assert "job_id" not in job.result

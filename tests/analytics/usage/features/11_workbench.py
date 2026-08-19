@@ -18,6 +18,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from app.services.analytics import (
     build_analytics_workbench_payload,
     build_performance_report,
+    deserialize_analytics_performance_report,
+    serialize_report,
 )
 from app.utils import generate_id
 from tests.analytics._support import NOW, _configured, _source_with_profit, unwrap
@@ -91,14 +93,37 @@ def build_payload() -> None:
 
 
 def unavailable_truth() -> None:
-    """Demonstrate unavailable sections carrying the exact owner reason."""
+    """Demonstrate unavailable sections never substitute zero.
+
+    Report-owned presentation series (drawdown, monthly returns) are now
+    completed from owner evidence; ledger-owned workbench sections remain
+    unavailable with their exact reason because ``_SIMULATION_RESULT`` carries
+    no ``closed_trades`` ledger here.
+    """
     _header("Truth - Unavailable Sections Never Substitute Zero")
     payload = unwrap(build_analytics_workbench_payload(_report(), _SIMULATION_RESULT))
     print(
         f"Data -> drawdown_curve='{payload.drawdown_curve.status}' "
         f"reason='{payload.drawdown_curve.reason}', "
         f"monthly_returns='{payload.monthly_returns.status}' "
-        f"reason='{payload.monthly_returns.reason}'"
+        f"reason='{payload.monthly_returns.reason}', "
+        f"period_tables='{payload.period_tables.status}' "
+        f"reason='{payload.period_tables.reason}'"
+    )
+
+
+def report_deserialization() -> None:
+    """Demonstrate the strict report deserializer over a serialized report."""
+    _header("Deserialization - Canonical Report Round Trip")
+    report = _report()
+    artifact = unwrap(
+        serialize_report(report, format_name="json", config=_configured())
+    )
+    rebuilt = unwrap(deserialize_analytics_performance_report(artifact))
+    print(
+        f"Data -> report_id='{rebuilt.report_id}', "
+        f"schema_id='{rebuilt.schema_id}', "
+        f"section_keys={[s.section_key for s in rebuilt.sections]}"
     )
 
 
@@ -128,6 +153,7 @@ def fr_anlt_079() -> None:
     """
     build_payload()
     unavailable_truth()
+    report_deserialization()
     payload = unwrap(build_analytics_workbench_payload(_report(), _SIMULATION_RESULT))
     print(_format_result(payload))
     print(

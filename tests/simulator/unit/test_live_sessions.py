@@ -20,7 +20,9 @@ from app.services.simulator.state.live_sessions import (
     close_live_simulation_session,
     create_live_simulation_session,
     read_live_simulation_state,
+    rearm_live_simulation_session,
     reset_live_simulation_sessions,
+    restore_live_simulation_session,
     step_live_simulation,
 )
 
@@ -335,3 +337,85 @@ def test_closing_releases_the_session() -> None:
     assert closed["session_id"] == session_id
     with pytest.raises(SimulationError):
         read_live_simulation_state(session_id)
+
+
+@pytest.mark.usefixtures("_prepared")
+def test_durable_restore_verifies_and_requires_explicit_rearm(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A restarted durable session restores to a verified, blocked state."""
+    store: dict[str, dict[str, object]] = {}
+    monkeypatch.setattr(live_sessions, "_store", lambda: store)
+    monkeypatch.setattr(
+        live_sessions,
+        "create_interactive_session_record",
+        lambda _handle, value, **_kwargs: store.__setitem__(
+            str(value["session_id"]), dict(value)
+        ),
+    )
+
+    def _update(_handle: object, **values: object) -> bool:
+        store[str(values["session_id"])].update(values)
+        return True
+
+    monkeypatch.setattr(live_sessions, "update_interactive_session_record", _update)
+
+    def _read(_handle: object, session_id: str) -> dict[str, object] | None:
+        record = store.get(session_id)
+        if record is None:
+            return None
+        return {"recovery_generation": 0, "recovery_run_id": None, **record}
+
+    monkeypatch.setattr(live_sessions, "read_interactive_session_record", _read)
+    monkeypatch.setattr(
+        live_sessions, "read_interactive_intent_records", lambda *_a, **_k: ()
+    )
+
+    class _StoredRequest:
+        """Stand-in for the canonical request reconstructed from storage."""
+
+        @classmethod
+        def model_validate(cls, data: dict[str, object]) -> _Request:
+            """Rebuild the request stub from its persisted mapping.
+
+            Args:
+                data: Persisted request fields.
+
+            Returns:
+                Request stand-in exposing the dataset-identity contract.
+            """
+            return _Request(**data)
+
+    monkeypatch.setattr(
+        "app.services.simulator.run.contracts.SimulationBacktestRequest", _StoredRequest
+    )
+
+    created = create_live_simulation_session(
+        _Request(), object(), request_id="req-recovery", durable=True
+    )
+    session_id = str(created["session_id"])
+    step_live_simulation(session_id, 2)
+    # A restart drops the in-memory engine; only the durable record remains.
+    live_sessions._SESSIONS.pop(session_id)
+
+    restored = restore_live_simulation_session(
+        session_id, object(), request_id="req-restore"
+    )
+    assert restored["cursor"] == 2
+    assert restored["recovery_state"] == "verified"
+    assert restored["exposure_blocked"] is True
+    assert restored["permitted_actions"] == ("read", "rearm", "close")
+    assert store[session_id]["recovery_generation"] == 1
+    assert store[session_id]["recovery_run_id"] == f"recovery-{session_id}-1"
+    with pytest.raises(SimulationError):
+        step_live_simulation(session_id, 1)
+    with pytest.raises(SimulationError):
+        rearm_live_simulation_session(
+            session_id, approved=False, request_id="req-rearm"
+        )
+
+    rearmed = rearm_live_simulation_session(
+        session_id, approved=True, request_id="req-rearm"
+    )
+    assert rearmed["recovery_state"] == "running"
+    assert step_live_simulation(session_id, 1)["cursor"] == 3

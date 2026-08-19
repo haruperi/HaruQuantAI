@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 from decimal import Decimal
 from typing import Any
 
 from app.services.analytics import (
+    build_analytics_period_tables,
     build_analytics_workbench_payload,
     build_performance_report,
 )
@@ -25,6 +27,8 @@ def _two_trade_source() -> dict[str, object]:
     second = {
         **first,
         "ticket": "ticket-2",
+        "entry_time": NOW + timedelta(hours=1),
+        "exit_time": NOW + timedelta(hours=2),
         "exit_price": Decimal("1.10"),
         "profit": Decimal(-5),
         "commission": Decimal(-1),
@@ -59,6 +63,28 @@ _SIMULATION_RESULT: dict[str, object] = {
 }
 
 
+def _ledger_result(source: dict[str, object]) -> dict[str, object]:
+    """Build a canonical Simulation mapping carrying the source ledger.
+
+    Args:
+        source: Producer-neutral source evidence.
+
+    Returns:
+        Canonical result mapping whose closed-trade ledger mirrors the
+        report's own trades plus owner excursion values.
+    """
+    return {
+        "contract_version": "v1",
+        "schema_id": "simulation.result.v1",
+        "run_id": "run-workbench",
+        "status": "completed",
+        "closed_trades": [
+            {**dict(trade), "mae": Decimal("-0.005"), "mfe": Decimal("0.008")}
+            for trade in source["closed_trades"]  # type: ignore[union-attr]
+        ],
+    }
+
+
 def test_two_trade_projection_is_deterministic() -> None:
     """Identical owner evidence projects to identical payloads."""
     report = _report_from(_two_trade_source())
@@ -73,18 +99,81 @@ def test_two_trade_projection_is_deterministic() -> None:
     assert first.lineage["simulation_run_id"] == "run-workbench"
 
 
-def test_drawdown_and_monthly_sections_stay_unavailable() -> None:
-    """Missing owner evidence is never substituted with zero values."""
+def test_equity_derived_sections_carry_owner_series() -> None:
+    """Drawdown, returns, VAMI, and monthly rows project from owner evidence."""
     payload = unwrap(
         build_analytics_workbench_payload(
             _report_from(_two_trade_source()), _SIMULATION_RESULT
         )
     )
-    for section in (payload.drawdown_curve, payload.monthly_returns):
+    for section in (
+        payload.drawdown_curve,
+        payload.returns_series,
+        payload.vami,
+        payload.monthly_returns,
+    ):
+        assert section.status == "completed"
+        assert section.items
+    drawdowns = [Decimal(str(row["drawdown"])) for row in payload.drawdown_curve.items]
+    assert all(value <= 0 for value in drawdowns)
+    months = [str(row["month"]) for row in payload.monthly_returns.items]
+    assert months == sorted(months)
+
+
+def test_trade_ledger_sections_require_the_canonical_ledger() -> None:
+    """Missing ledger evidence is never substituted with zero values."""
+    payload = unwrap(
+        build_analytics_workbench_payload(
+            _report_from(_two_trade_source()), _SIMULATION_RESULT
+        )
+    )
+    for section in (
+        payload.period_tables,
+        payload.trade_calendar,
+        payload.streaks,
+        payload.excursions,
+        payload.duration,
+    ):
         assert section.status == "unavailable"
         assert section.reason == "authoritative_evidence_unavailable"
         assert section.items == ()
         assert section.sample_count == 0
+
+
+def test_trade_ledger_sections_project_owner_rows() -> None:
+    """Ledger-backed sections carry owner counts, sums, and durations."""
+    source = _two_trade_source()
+    payload = unwrap(
+        build_analytics_workbench_payload(_report_from(source), _ledger_result(source))
+    )
+    streak_outcomes = [str(row["outcome"]) for row in payload.streaks.items]
+    assert streak_outcomes == ["win", "loss"]
+    streak_counts = [int(row["streak"]) for row in payload.streaks.items]
+    assert streak_counts == [1, -1]
+    calendar_count = sum(
+        int(row["trade_count"]) for row in payload.trade_calendar.items
+    )
+    assert calendar_count == 2
+    period_count = sum(int(row["trade_count"]) for row in payload.period_tables.items)
+    assert period_count == 2
+    durations = [int(row["duration_seconds"]) for row in payload.duration.items]
+    assert durations == [0, 3600]
+    excursions = payload.excursions.items
+    assert all(row["mae"] is not None and row["mfe"] is not None for row in excursions)
+
+
+def test_period_tables_honour_dimension_and_context() -> None:
+    """The dedicated period projection filters by dimension and context."""
+    source = _two_trade_source()
+    report = _report_from(source)
+    long_rows = unwrap(
+        build_analytics_period_tables(report, _ledger_result(source), context="long")
+    )
+    assert sum(int(row["trade_count"]) for row in long_rows) == 2
+    short_rows = unwrap(
+        build_analytics_period_tables(report, _ledger_result(source), context="short")
+    )
+    assert short_rows == ()
 
 
 def test_equity_curve_truncation_is_explicit() -> None:

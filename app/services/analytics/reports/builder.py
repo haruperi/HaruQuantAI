@@ -27,6 +27,10 @@ from app.services.analytics.metrics.trades import (
     MIN_METRIC_SAMPLES,
 )
 from app.services.analytics.reports.hashes import compute_reproducibility_hashes
+from app.services.analytics.reports.presentation import (
+    build_drawdown_series,
+    build_monthly_return_rows,
+)
 from app.utils import canonical_json, derive_stable_id, get_logger, validate_id
 
 logger = get_logger(__name__)
@@ -253,7 +257,15 @@ def _build_performance_report(
             "measurement_end": result.window_end,
             "diagnostic_partial_mode": diagnostic_partial_mode,
             "optional_sections": OPTIONAL_REPORT_SECTIONS,
-            "presentation_series": {"equity_curve": result.equity_curve},
+            "presentation_series": {
+                "equity_curve": result.equity_curve,
+                "drawdown_curve": build_drawdown_series(
+                    result.equity_curve, initial_balance=initial_balance
+                ),
+                "monthly_returns": build_monthly_return_rows(
+                    result.equity_curve, initial_balance=initial_balance
+                ),
+            },
         },
     )
     report = _replace_hashes(report, compute_reproducibility_hashes(result, report))

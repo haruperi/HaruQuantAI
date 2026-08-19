@@ -3,18 +3,21 @@
 Every calculation stays inside Analytics. The projection reads only a
 validated ``PerformanceReport`` and a canonical Simulation result mapping;
 it never recalculates metrics, never substitutes zero for missing evidence,
-and never persists anything. Sections without authoritative owner evidence
-are returned as unavailable with the exact owner reason.
+and never persists anything. Series sections are projected from owner
+evidence (report presentation series, owner distribution metrics, and the
+canonical closed-trade ledger); when that evidence is absent the section
+is returned as unavailable with the exact owner reason.
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any, cast
 
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import to_report_json_safe
 from app.services.analytics.contracts.models import PerformanceReport
+from app.services.analytics.workbench import presentations
 from app.services.analytics.workbench.contracts import (
     AnalyticsWorkbenchPayload,
     AnalyticsWorkbenchSection,
@@ -35,20 +38,15 @@ _METRIC_SECTION_SOURCES: Mapping[str, str] = {
     "cost_efficiency": "costs",
 }
 
-#: Workbench sections with no owner series evidence in the V1 report.
-_SERIES_SECTIONS_WITHOUT_OWNER_EVIDENCE = (
-    "drawdown_curve",
-    "returns_series",
-    "vami",
-    "monthly_returns",
-    "period_tables",
-    "trade_calendar",
-    "streaks",
-    "histogram",
-    "outliers",
-    "excursions",
-    "duration",
-)
+#: Consistent units for series sections whose rows share one unit.
+_SERIES_UNITS: Mapping[str, str] = {
+    "drawdown_curve": "ratio",
+    "returns_series": "ratio",
+    "vami": "index",
+    "monthly_returns": "ratio",
+    "histogram": "count",
+    "duration": "seconds",
+}
 
 
 def _unavailable(key: str) -> AnalyticsWorkbenchSection:
@@ -210,6 +208,52 @@ def _truncation_row(section: AnalyticsWorkbenchSection) -> Mapping[str, object] 
     }
 
 
+def _build_series_sections(
+    report: PerformanceReport,
+    simulation_result: Mapping[str, object],
+    *,
+    max_points: int,
+) -> dict[str, AnalyticsWorkbenchSection]:
+    """Build every owner-evidence series section.
+
+    Args:
+        report: Canonical validated Analytics performance report.
+        simulation_result: Canonical Simulation result mapping.
+        max_points: Maximum retained items per section.
+
+    Returns:
+        Section per series key, completed when owner evidence exists and
+        explicitly unavailable otherwise.
+    """
+    series_builders: Mapping[str, Callable[[], tuple[dict[str, object], ...]]] = {
+        "drawdown_curve": lambda: presentations.build_drawdown_curve(report),
+        "returns_series": lambda: presentations.build_returns_series(report),
+        "vami": lambda: presentations.build_vami_series(report),
+        "monthly_returns": lambda: presentations.build_monthly_returns(report),
+        "period_tables": lambda: presentations.build_period_tables(simulation_result),
+        "trade_calendar": lambda: presentations.build_trade_calendar(simulation_result),
+        "streaks": lambda: presentations.build_streaks(simulation_result),
+        "histogram": lambda: presentations.build_histogram(report),
+        "outliers": lambda: presentations.build_outliers(simulation_result, report),
+        "excursions": lambda: presentations.build_excursions(simulation_result),
+        "duration": lambda: presentations.build_duration(simulation_result),
+    }
+    sections: dict[str, AnalyticsWorkbenchSection] = {}
+    for key, builder in series_builders.items():
+        rows = builder()
+        if rows:
+            sections[key] = _completed(
+                key,
+                rows,
+                unit=_SERIES_UNITS.get(key),
+                source_context="all",
+                max_points=max_points,
+            )
+        else:
+            sections[key] = _unavailable(key)
+    return sections
+
+
 def build_workbench_payload(
     report: PerformanceReport,
     simulation_result: Mapping[str, object],
@@ -287,8 +331,9 @@ def build_workbench_payload(
             max_points=max_points,
         ),
     }
-    for key in _SERIES_SECTIONS_WITHOUT_OWNER_EVIDENCE:
-        built[key] = _unavailable(key)
+    built.update(
+        _build_series_sections(report, simulation_result, max_points=max_points)
+    )
     for source, key in _METRIC_SECTION_SOURCES.items():
         rows = metric_rows[key]
         if source in sections and rows:
@@ -309,10 +354,21 @@ def build_workbench_payload(
             for key in (
                 "summary",
                 "equity_curve",
+                "drawdown_curve",
+                "returns_series",
+                "vami",
+                "monthly_returns",
+                "period_tables",
+                "trade_calendar",
+                "streaks",
                 "distribution",
+                "histogram",
+                "outliers",
+                "excursions",
+                "duration",
+                "grouped_performance",
                 "benchmark",
                 "costs",
-                "grouped_performance",
             )
         )
         if row is not None

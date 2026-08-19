@@ -5,9 +5,10 @@ performance report and one canonical Simulation result. All calculations
 stay inside Analytics; nothing is persisted.
 """
 
+from app.services.analytics.workbench.presentations import build_period_tables
 from app.services.analytics.workbench.projections import (
     WORKBENCH_MAX_POINTS,
     build_workbench_payload,
 )
 
-__all__ = ("WORKBENCH_MAX_POINTS", "build_workbench_payload")
+__all__ = ("WORKBENCH_MAX_POINTS", "build_period_tables", "build_workbench_payload")
