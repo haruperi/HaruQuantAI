@@ -17,7 +17,7 @@ import {
   SELECTABLE_ACCOUNT_MODES,
   type AccountMode,
   type SelectableAccountMode,
-} from '../../features/workspaces';
+} from '../../widgets/workspaces';
 
 /** Props for the profile dropdown menu. */
 export interface ProfileDropdownProps {

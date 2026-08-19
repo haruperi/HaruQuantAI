@@ -12,8 +12,8 @@ import asyncio
 from types import SimpleNamespace
 
 import pytest
-from app.services.api.workstation.trading import orchestration, routes
-from app.services.api.workstation.trading.schemas import ExecutionSessionActionRequest
+from app.services.api.widgets.trading import orchestration, routes
+from app.services.api.widgets.trading.schemas import ExecutionSessionActionRequest
 from app.services.risk import build_personal_account_risk_config
 from fastapi import HTTPException
 

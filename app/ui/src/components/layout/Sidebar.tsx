@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
-import { useWorkspaceStore, type WidgetType } from '../../features/workspaces';
+import { useWorkspaceStore, type WidgetType } from '../../widgets/workspaces';
 import {
   ChevronLeft,
   ChevronRight,
@@ -25,6 +25,7 @@ import {
   TrendingUp,
   AlertTriangle,
   PieChart,
+  BarChart2,
   Settings,
 } from 'lucide-react';
 
@@ -136,6 +137,11 @@ export const Sidebar: React.FC = () => {
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('simulator', 'Simulator')}>
           <History size={15} />
           {!isCollapsed && <span>Simulator</span>}
+        </div>
+
+        <div className="sidebar-menu-item" onClick={() => handleAddWidget('analytics', 'Analytics')}>
+          <BarChart2 size={15} />
+          {!isCollapsed && <span>Analytics</span>}
         </div>
 
         <div className="sidebar-menu-item" onClick={() => handleAddWidget('risk', 'Risk')}>

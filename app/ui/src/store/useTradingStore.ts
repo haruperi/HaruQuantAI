@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { initialProducts } from '../mock/productsData';
+import { initialProducts } from './productsData';
 import type { TradingStoreState } from '../types/store';
 import type { Position, TradeLogEntry, Order } from '../types/market';
 

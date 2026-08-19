@@ -13,14 +13,14 @@ from app.services.api.observability.metrics import (
     record_metric,
     validate_metric_labels,
 )
-from app.services.api.workstation.agentic.schemas import (
+from app.services.api.widgets.agentic.schemas import (
     AgenticRunSubmitRequest,
 )
-from app.services.api.workstation.event_delivery.events import (
+from app.services.api.widgets.event_delivery.events import (
     StreamValidationError,
     _assert_secret_free,
 )
-from app.services.api.workstation.indicators.schemas import (
+from app.services.api.widgets.indicators.schemas import (
     _json_value,
 )
 

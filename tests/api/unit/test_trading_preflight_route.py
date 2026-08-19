@@ -8,7 +8,7 @@ from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
-from app.services.api.workstation.trading.orchestration import (
+from app.services.api.widgets.trading.orchestration import (
     build_trading_preflight_source,
 )
 

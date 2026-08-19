@@ -3,8 +3,8 @@
 from typing import Any
 
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.operator import routes as operator
-from app.services.api.workstation.operator.routes import router
+from app.services.api.widgets.operator import routes as operator
+from app.services.api.widgets.operator.routes import router
 from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI
 

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from app.services.api import build_research_run_request
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.research.routes import router
+from app.services.api.widgets.research.routes import router
 from fastapi import FastAPI
 
 from tests.api._support import post_json

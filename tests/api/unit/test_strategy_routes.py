@@ -4,8 +4,8 @@ from typing import Any
 
 import pytest
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.strategies import routes as strategies
-from app.services.api.workstation.strategies.routes import router
+from app.services.api.widgets.strategies import routes as strategies
+from app.services.api.widgets.strategies.routes import router
 from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI
 

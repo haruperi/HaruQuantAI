@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
-from app.services.api.workstation.strategies.routes import router as strategies_router
+from app.services.api.widgets.strategies.routes import router as strategies_router
 from app.services.data import (
     build_data_quality_report,
     build_data_settings,

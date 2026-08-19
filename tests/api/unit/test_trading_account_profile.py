@@ -9,7 +9,7 @@ from types import MappingProxyType, SimpleNamespace
 
 import pytest
 from app.services import brokers
-from app.services.api.workstation.trading import orchestration
+from app.services.api.widgets.trading import orchestration
 
 _AUTH = SimpleNamespace(
     principal_id="profile-user",

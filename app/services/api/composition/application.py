@@ -46,107 +46,107 @@ from app.services.api.middleware.rate_limits import RateLimitMiddleware
 from app.services.api.middleware.redaction import SecretRedactionMiddleware
 from app.services.api.middleware.runtime_settings import RuntimeSettingsMiddleware
 from app.services.api.observability.routes import router as observability_router
-from app.services.api.workstation.agentic.orchestration import build_agentic_source
-from app.services.api.workstation.agentic.routes import router as agentic_router
-from app.services.api.workstation.analytics_workbench.orchestration import (
+from app.services.api.widgets.agentic.orchestration import build_agentic_source
+from app.services.api.widgets.agentic.routes import router as agentic_router
+from app.services.api.widgets.analytics.orchestration import (
     build_analytics_workbench_composition,
 )
-from app.services.api.workstation.analytics_workbench.routes import (
+from app.services.api.widgets.analytics.routes import (
     router as analytics_workbench_router,
 )
-from app.services.api.workstation.dashboards.routes import router as dashboards_router
-from app.services.api.workstation.data.orchestration import build_dataset_source
-from app.services.api.workstation.data.routes import router as data_router
-from app.services.api.workstation.data.stream_routes import router as data_stream_router
-from app.services.api.workstation.event_delivery.orchestration import (
+from app.services.api.widgets.dashboards.routes import router as dashboards_router
+from app.services.api.widgets.data.orchestration import build_dataset_source
+from app.services.api.widgets.data.routes import router as data_router
+from app.services.api.widgets.data.stream_routes import router as data_stream_router
+from app.services.api.widgets.event_delivery.orchestration import (
     create_stream_connection_manager,
 )
-from app.services.api.workstation.indicators.routes import router as indicators_router
-from app.services.api.workstation.markets.routes import router as markets_router
-from app.services.api.workstation.operational.routes import router as workstation_router
-from app.services.api.workstation.operator.routes import router as operator_router
-from app.services.api.workstation.optimization.orchestration import (
+from app.services.api.widgets.indicators.routes import router as indicators_router
+from app.services.api.widgets.markets.routes import router as markets_router
+from app.services.api.widgets.operational.routes import router as workstation_router
+from app.services.api.widgets.operator.routes import router as operator_router
+from app.services.api.widgets.optimization.orchestration import (
     build_optimization_source,
 )
-from app.services.api.workstation.optimization.routes import (
+from app.services.api.widgets.optimization.routes import (
     router as optimization_router,
 )
-from app.services.api.workstation.portfolio.orchestration import build_portfolio_source
-from app.services.api.workstation.portfolio.routes import router as portfolio_router
-from app.services.api.workstation.research.orchestration import (
+from app.services.api.widgets.portfolio.orchestration import build_portfolio_source
+from app.services.api.widgets.portfolio.routes import router as portfolio_router
+from app.services.api.widgets.research.orchestration import (
     build_research_registry,
     build_research_runtime_context,
     build_research_source,
 )
-from app.services.api.workstation.research.routes import router as research_router
-from app.services.api.workstation.risk.orchestration import build_risk_command_source
-from app.services.api.workstation.risk.routes import router as risk_router
-from app.services.api.workstation.settings.account_mode import resolve_runtime_profile
-from app.services.api.workstation.settings.bootstrap import (
+from app.services.api.widgets.research.routes import router as research_router
+from app.services.api.widgets.risk.orchestration import build_risk_command_source
+from app.services.api.widgets.risk.routes import router as risk_router
+from app.services.api.widgets.settings.account_mode import resolve_runtime_profile
+from app.services.api.widgets.settings.bootstrap import (
     ApiSettings,
     get_api_settings,
 )
-from app.services.api.workstation.settings.routes import router as settings_router
-from app.services.api.workstation.simulation.live_orchestration import (
+from app.services.api.widgets.settings.routes import router as settings_router
+from app.services.api.widgets.simulation.live_orchestration import (
     build_live_simulation_source,
 )
-from app.services.api.workstation.simulation.live_routes import (
+from app.services.api.widgets.simulation.live_routes import (
     router as simulation_live_router,
 )
-from app.services.api.workstation.simulation.orchestration import (
+from app.services.api.widgets.simulation.orchestration import (
     build_simulation_run_source,
     build_simulation_session_source,
 )
-from app.services.api.workstation.simulation.routes import router as simulation_router
-from app.services.api.workstation.simulation.session_routes import (
+from app.services.api.widgets.simulation.routes import router as simulation_router
+from app.services.api.widgets.simulation.session_routes import (
     router as simulation_sessions_router,
 )
-from app.services.api.workstation.simulation_workbench.batching import (
+from app.services.api.widgets.simulator.batching import (
     build_batch_runner,
 )
-from app.services.api.workstation.simulation_workbench.completion import (
+from app.services.api.widgets.simulator.completion import (
     build_catalogue_completion_sink,
 )
-from app.services.api.workstation.simulation_workbench.orchestration import (
-    build_simulation_workbench_live_authority,
-    build_simulation_workbench_source,
-)
-from app.services.api.workstation.simulation_workbench.provenance import (
-    RunProvenanceIndex,
-)
-from app.services.api.workstation.simulation_workbench.registry import (
-    SimulationWorkbenchRegistry,
-    build_simulation_workbench_registry,
-)
-from app.services.api.workstation.simulation_workbench.reproduction import (
-    build_reproduction_runner,
-)
-from app.services.api.workstation.simulation_workbench.routes import (
-    router as simulation_workbench_router,
-)
-from app.services.api.workstation.simulator.orchestration import (
+from app.services.api.widgets.simulator.orchestration import (
     build_api_backtest_registry,
     build_data_runtime_context,
     build_simulator_run_source,
     build_simulator_strategy_source,
 )
-from app.services.api.workstation.simulator.routes import router as simulator_router
-from app.services.api.workstation.strategies.orchestration import (
+from app.services.api.widgets.simulator.provenance import (
+    RunProvenanceIndex,
+)
+from app.services.api.widgets.simulator.registry import (
+    SimulationWorkbenchRegistry,
+    build_simulation_workbench_registry,
+)
+from app.services.api.widgets.simulator.reproduction import (
+    build_reproduction_runner,
+)
+from app.services.api.widgets.simulator.routes import router as simulator_router
+from app.services.api.widgets.simulator.workbench_orchestration import (
+    build_simulation_workbench_live_authority,
+    build_simulation_workbench_source,
+)
+from app.services.api.widgets.simulator.workbench_routes import (
+    router as simulation_workbench_router,
+)
+from app.services.api.widgets.strategies.orchestration import (
     build_strategy_mutation_source,
 )
-from app.services.api.workstation.strategies.routes import router as strategies_router
-from app.services.api.workstation.trading.activity import (
+from app.services.api.widgets.strategies.routes import router as strategies_router
+from app.services.api.widgets.trading.activity import (
     router as trading_activity_router,
 )
-from app.services.api.workstation.trading.orchestration import (
+from app.services.api.widgets.trading.orchestration import (
     build_trading_account_profile_source,
     build_trading_cancel_all_preflight_source,
     build_trading_cancel_order_preflight_source,
     build_trading_mutation_source,
     build_trading_preflight_source,
 )
-from app.services.api.workstation.trading.routes import router as trading_router
-from app.services.api.workstation.watchlists.routes import router as watchlists_router
+from app.services.api.widgets.trading.routes import router as trading_router
+from app.services.api.widgets.watchlists.routes import router as watchlists_router
 from app.utils import generate_id, utc_now
 
 

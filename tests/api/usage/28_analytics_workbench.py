@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import pytest
 from app.services.api import build_analytics_workbench_source
-from app.services.api.workstation.analytics_workbench.schemas import (
+from app.services.api.widgets.analytics.schemas import (
     AnalyticsAnnotationRequest,
     AnalyticsArchiveRequest,
     AnalyticsCompareRequest,
@@ -79,7 +79,7 @@ def main() -> None:
     assert AnalyticsArchiveRequest(archive_state="archived").archive_state == "archived"
 
     rows = _store_rows()
-    from app.services.api.workstation.analytics_workbench import orchestration
+    from app.services.api.widgets.analytics import orchestration
 
     def read_run(run_id: str, principal_id: str, *, request_id: str) -> tuple:
         row = rows.get((run_id, principal_id))

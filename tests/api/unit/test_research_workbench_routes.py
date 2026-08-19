@@ -18,14 +18,14 @@ import app.services.data as data_service
 import app.services.research as research_service
 import pytest
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.research import orchestration
-from app.services.api.workstation.research import routes as research_routes
-from app.services.api.workstation.research.projections import project_report
-from app.services.api.workstation.research.registry import (
+from app.services.api.widgets.research import orchestration
+from app.services.api.widgets.research import routes as research_routes
+from app.services.api.widgets.research.projections import project_report
+from app.services.api.widgets.research.registry import (
     ResearchRun,
     ResearchWorkbenchRegistry,
 )
-from app.services.api.workstation.research.routes import _research_source, router
+from app.services.api.widgets.research.routes import _research_source, router
 from app.services.research import run_edge_lab_profile
 from fastapi import FastAPI
 

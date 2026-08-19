@@ -13,10 +13,10 @@ from uuid import uuid4
 
 import pytest
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.simulation import (
+from app.services.api.widgets.simulation import (
     live_orchestration as live_simulation_dependencies,
 )
-from app.services.api.workstation.simulation import live_routes as simulation_live
+from app.services.api.widgets.simulation import live_routes as simulation_live
 from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI
 

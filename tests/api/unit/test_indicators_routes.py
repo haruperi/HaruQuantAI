@@ -5,11 +5,11 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.indicators import (
+from app.services.api.widgets.indicators import (
     orchestration as indicator_orchestration,
 )
-from app.services.api.workstation.indicators import routes as indicator_routes
-from app.services.api.workstation.indicators.routes import router
+from app.services.api.widgets.indicators import routes as indicator_routes
+from app.services.api.widgets.indicators.routes import router
 from fastapi import FastAPI
 
 from tests.api._support import get_json

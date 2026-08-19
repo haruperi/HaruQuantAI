@@ -78,12 +78,13 @@ def test_market_and_watchlist_ownership_is_reconciled() -> None:
         "FEAT-UI-05",
         "FEAT-UI-06",
         "FEAT-UI-07",
+        "FEAT-UI-13",
         "FEAT-UI-14",
     }
-    assert "| `workstation/watchlists/` |" in api_registry
-    assert "| `workstation/markets/` |" in api_registry
-    assert re.search(r"\|\s*`src/features/markets/`\s*\|", ui_registry) is not None
-    assert re.search(r"\|\s*`src/features/watchlists/`\s*\|", ui_registry) is not None
+    assert "| `widgets/watchlists/` |" in api_registry
+    assert "| `widgets/markets/` |" in api_registry
+    assert re.search(r"\|\s*`src/widgets/markets/`\s*\|", ui_registry) is not None
+    assert re.search(r"\|\s*`src/widgets/watchlists/`\s*\|", ui_registry) is not None
     assert not (_REPOSITORY_ROOT / "app/services/api/markets_source.py").exists()
     for retired in ("markets", "watchlists"):
         retired_directory = _REPOSITORY_ROOT / "app/services/api" / retired
@@ -94,7 +95,7 @@ def test_market_and_watchlist_ownership_is_reconciled() -> None:
     assert not (_REPOSITORY_ROOT / "app/services/api/routes/workstation.py").exists()
     assert not (_REPOSITORY_ROOT / "app/ui/src/components/widgets").exists()
 
-    workstation = _REPOSITORY_ROOT / "app/services/api/workstation"
+    workstation = _REPOSITORY_ROOT / "app/services/api/widgets"
     for feature in ("operational", "watchlists", "markets"):
         feature_directory = workstation / feature
         assert feature_directory.is_dir()
@@ -116,16 +117,16 @@ def test_ui_evidence_exception_and_widget_ownership_are_documented() -> None:
     )
     assert "Production UI is not verification evidence" in text
     owned_widgets = (
-        "app/ui/src/features/training-ux/ChallengesWidget.tsx",
-        "app/ui/src/features/chart/ChartWidget.tsx",
-        "app/ui/src/features/training-ux/EducationWidget.tsx",
-        "app/ui/src/features/instrument-panels/OptionsGridWidget.tsx",
-        "app/ui/src/features/trading/OrderTicket.tsx",
+        "app/ui/src/widgets/training-ux/ChallengesWidget.tsx",
+        "app/ui/src/widgets/chart/ChartWidget.tsx",
+        "app/ui/src/widgets/training-ux/EducationWidget.tsx",
+        "app/ui/src/widgets/instrument-panels/OptionsGridWidget.tsx",
+        "app/ui/src/widgets/trading/OrderTicket.tsx",
         "app/ui/src/components/workflow/PositionsWidget.tsx",
-        "app/ui/src/features/price-ladder/PriceLadderWidget.tsx",
-        "app/ui/src/app/workstation/settings/SystemSettingsModal.tsx",
+        "app/ui/src/widgets/price-ladder/PriceLadderWidget.tsx",
+        "app/ui/src/widgets/system-settings/SystemSettingsModal.tsx",
         "app/ui/src/components/workflow/TradeLogWidget.tsx",
-        "app/ui/src/features/planning/TradePlanWidget.tsx",
+        "app/ui/src/widgets/planning/TradePlanWidget.tsx",
     )
     assert all((_REPOSITORY_ROOT / path).exists() for path in owned_widgets)
     assert "Widget ownership is resolved in the Feature Registry" in text
@@ -207,9 +208,9 @@ def test_repository_feature_inventory_is_reconciled() -> None:
         feature_ids.extend(feature_id for _status, feature_id in rows)
 
     assert len(feature_ids) == len(set(feature_ids)) == 252
-    assert statuses.count("Completed") == 243
-    assert statuses.count("Pending") == 9
+    assert statuses.count("Completed") == 244
+    assert statuses.count("Pending") == 8
     assert statuses.count("Partial") == 0
     project = _PROJECT_README.read_text(encoding="utf-8")
     assert "252 registered application features" in project
-    assert "(96.43%)" in project
+    assert "(96.83%)" in project

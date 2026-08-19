@@ -13,10 +13,10 @@ from uuid import uuid4
 
 import pytest
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.data import orchestration as data_dependencies
-from app.services.api.workstation.data import routes as data
-from app.services.api.workstation.markets import orchestration as markets_orchestration
-from app.services.api.workstation.markets import routes as markets
+from app.services.api.widgets.data import orchestration as data_dependencies
+from app.services.api.widgets.data import routes as data
+from app.services.api.widgets.markets import orchestration as markets_orchestration
+from app.services.api.widgets.markets import routes as markets
 from app.utils import create_auth_context, generate_id, utc_now
 from fastapi import FastAPI
 

@@ -1,6 +1,6 @@
 """Genuine MT5 usage evidence for the Data API feature (FEAT-DATA-01).
 
-The workstation ``data`` gateway (``app/services/api/workstation/data``) is a
+The workstation ``data`` gateway (``app/services/api/widgets/data``) is a
 thin transport boundary: it authenticates and delegates every market-data read
 to the Data domain public API (``app.services.data``), which drives the
 configured broker adapter for the ``mt5`` source. This standalone program

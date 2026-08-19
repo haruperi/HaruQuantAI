@@ -5,7 +5,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 
 import { IndicatorWorkspace } from "./indicators";
 import { WorkspaceGrid } from "../layout/WorkspaceGrid";
-import { useWorkspaceStore } from "../../features/workspaces";
+import { useWorkspaceStore } from "../../widgets/workspaces";
 
 function successEnvelope(data: unknown, route: string, operation: string): Response {
   return new Response(

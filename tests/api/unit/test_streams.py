@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 from app.services.api import create_stream_manager, normalize_stream_event
-from app.services.api.workstation.event_delivery import StreamGapError, StreamLimitError
+from app.services.api.widgets.event_delivery import StreamGapError, StreamLimitError
 
 
 def _event(sequence: int) -> object:

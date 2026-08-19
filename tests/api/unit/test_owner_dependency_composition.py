@@ -5,10 +5,10 @@ from types import SimpleNamespace
 
 import pytest
 from app.services.api.composition import broker_session
-from app.services.api.workstation.simulation import (
+from app.services.api.widgets.simulation import (
     orchestration as simulation_dependencies,
 )
-from app.services.api.workstation.trading import orchestration as trading_dependencies
+from app.services.api.widgets.trading import orchestration as trading_dependencies
 
 
 def test_simulation_source_converts_and_delegates(

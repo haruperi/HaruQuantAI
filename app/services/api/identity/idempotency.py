@@ -18,7 +18,7 @@ from app.services.api.identity.persistence import (
     finalize_idempotency_record,
     read_idempotency_record,
 )
-from app.services.api.workstation.settings.limits import (
+from app.services.api.widgets.settings.limits import (
     HTTP_IDEMPOTENCY_RETENTION_SECONDS,
 )
 from app.utils import canonical_json, get_logger, utc_now

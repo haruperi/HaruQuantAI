@@ -16,8 +16,8 @@ from app.services.api.composition.owner_sources import (
     read_dashboard_snapshot,
     read_trading_events,
 )
-from app.services.api.workstation.dashboards.routes import _dashboard_source
-from app.services.api.workstation.operator.routes import _audit_source, _event_source
+from app.services.api.widgets.dashboards.routes import _dashboard_source
+from app.services.api.widgets.operator.routes import _audit_source, _event_source
 from fastapi.testclient import TestClient
 
 from tests.api._support import get_json, post_json

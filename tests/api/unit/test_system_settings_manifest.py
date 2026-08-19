@@ -12,7 +12,7 @@ from app.services.api.identity import (
     validate_credential_material,
     validate_system_settings,
 )
-from app.services.api.workstation.settings.bootstrap import ApiSettings
+from app.services.api.widgets.settings.bootstrap import ApiSettings
 from pydantic import SecretStr
 
 _LEGACY_PATHS = {

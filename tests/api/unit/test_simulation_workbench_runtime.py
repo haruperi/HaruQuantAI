@@ -14,28 +14,28 @@ from typing import Any
 
 import pytest
 from app.services.api import register_api_user, run_api_migrations
-from app.services.api.workstation.simulation_workbench.batching import (
+from app.services.api.widgets.simulator.batching import (
     build_batch_runner,
 )
-from app.services.api.workstation.simulation_workbench.completion import (
+from app.services.api.widgets.simulator.completion import (
     build_catalogue_completion_sink,
     build_catalogue_run_values,
 )
-from app.services.api.workstation.simulation_workbench.migrations import (
+from app.services.api.widgets.simulator.migrations import (
     get_simulation_workbench_migration_steps,
 )
-from app.services.api.workstation.simulation_workbench.persistence import (
+from app.services.api.widgets.simulator.persistence import (
     read_simulation_batch_items,
     read_simulation_batch_record,
     read_simulation_result_record,
 )
-from app.services.api.workstation.simulation_workbench.provenance import (
+from app.services.api.widgets.simulator.provenance import (
     RunProvenanceIndex,
 )
-from app.services.api.workstation.simulation_workbench.registry import (
+from app.services.api.widgets.simulator.registry import (
     SimulationWorkbenchRegistry,
 )
-from app.services.api.workstation.simulation_workbench.reproduction import (
+from app.services.api.widgets.simulator.reproduction import (
     build_reproduction_runner,
 )
 from app.services.data import (
@@ -403,7 +403,7 @@ def test_provenance_index_is_bounded() -> None:
 
 def test_catalogue_rows_cross_the_boundary_in_contract_shape() -> None:
     """Durable JSON text columns are published as the declared arrays."""
-    from app.services.api.workstation.simulation_workbench.orchestration import (
+    from app.services.api.widgets.simulator.workbench_orchestration import (
         deserialize_json_list,
         project_catalogue_row,
     )

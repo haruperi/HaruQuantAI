@@ -7,10 +7,10 @@ from typing import Any
 
 import pytest
 from app.services.api.identity import build_auth_context
-from app.services.api.workstation.analytics_workbench.orchestration import (
+from app.services.api.widgets.analytics.orchestration import (
     build_analytics_workbench_source,
 )
-from app.services.api.workstation.analytics_workbench.routes import (
+from app.services.api.widgets.analytics.routes import (
     _analytics_workbench_source,
     _annotate_run,
     _archive_run,
@@ -21,7 +21,7 @@ from app.services.api.workstation.analytics_workbench.routes import (
     _get_workbench,
     _list_runs,
 )
-from app.services.api.workstation.analytics_workbench.schemas import (
+from app.services.api.widgets.analytics.schemas import (
     AnalyticsAnnotationRequest,
     AnalyticsArchiveRequest,
     AnalyticsCompareRequest,
@@ -130,7 +130,7 @@ def _source(
     result: object = _RESULT,
 ) -> Any:
     """Build one dispatch source over the fake store."""
-    from app.services.api.workstation.analytics_workbench import orchestration
+    from app.services.api.widgets.analytics import orchestration
 
     def read_run(run_id: str, principal_id: str, *, request_id: str) -> tuple:
         row = store.rows.get((run_id, principal_id))

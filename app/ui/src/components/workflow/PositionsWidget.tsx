@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
-import { selectTradingActivityDisabled, useWorkspaceStore } from '../../features/workspaces';
+import { selectTradingActivityDisabled, useWorkspaceStore } from '../../widgets/workspaces';
 
 export const PositionsWidget: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'positions' | 'orders'>('positions');

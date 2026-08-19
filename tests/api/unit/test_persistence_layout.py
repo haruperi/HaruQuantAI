@@ -6,10 +6,10 @@ import re
 from pathlib import Path
 
 from app.services.api.identity import persistence as identity_persistence
-from app.services.api.workstation.simulation_workbench import (
+from app.services.api.widgets.simulator import (
     persistence as simulation_workbench_persistence,
 )
-from app.services.api.workstation.watchlists import persistence as watchlist_persistence
+from app.services.api.widgets.watchlists import persistence as watchlist_persistence
 from app.utils import get_logger
 
 logger = get_logger(__name__)
@@ -17,8 +17,8 @@ logger = get_logger(__name__)
 _API_ROOT = Path(__file__).parents[3] / "app" / "services" / "api"
 _PERSISTENCE_ROOTS = (
     _API_ROOT / "identity" / "persistence",
-    _API_ROOT / "workstation" / "watchlists" / "persistence",
-    _API_ROOT / "workstation" / "simulation_workbench" / "persistence",
+    _API_ROOT / "widgets" / "watchlists" / "persistence",
+    _API_ROOT / "widgets" / "simulator" / "persistence",
 )
 _EXPECTED_FILES = {"__init__.py", "create.py", "read.py", "update.py", "delete.py"}
 _IDENTITY_EXPORTS = {

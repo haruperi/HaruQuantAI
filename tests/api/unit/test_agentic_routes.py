@@ -13,9 +13,9 @@ from typing import Any
 
 import pytest
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.agentic import orchestration as agentic_dependencies
-from app.services.api.workstation.agentic import routes as agentic
-from app.services.api.workstation.agentic.schemas import (
+from app.services.api.widgets.agentic import orchestration as agentic_dependencies
+from app.services.api.widgets.agentic import routes as agentic
+from app.services.api.widgets.agentic.schemas import (
     AgenticDisableRequest,
     AgenticHandoffApprovalRequest,
     AgenticQuarantineRequest,

@@ -16,13 +16,13 @@ from app.services.api import (
     register_api_user,
     run_api_migrations,
 )
-from app.services.api.workstation.simulation_workbench.migrations import (
+from app.services.api.widgets.simulator.migrations import (
     get_simulation_workbench_migration_steps,
 )
-from app.services.api.workstation.simulation_workbench.persistence import (
+from app.services.api.widgets.simulator.persistence import (
     create_simulation_result_record,
 )
-from app.services.api.workstation.simulation_workbench.schemas import (
+from app.services.api.widgets.simulator.workbench_schemas import (
     BatchCreateRequest,
     BatchRunSpec,
     LiveSessionCommandRequest,

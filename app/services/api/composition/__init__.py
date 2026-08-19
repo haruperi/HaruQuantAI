@@ -10,25 +10,25 @@ from app.services.api.composition.in_process import (
     get_required_provider_names,
 )
 from app.services.api.composition.lifecycle import StartupError, lifespan
-from app.services.api.workstation.agentic.orchestration import (
+from app.services.api.widgets.agentic.orchestration import (
     build_api_agentic_dependencies,
 )
-from app.services.api.workstation.optimization.orchestration import (
+from app.services.api.widgets.optimization.orchestration import (
     build_api_optimization_dependencies,
 )
-from app.services.api.workstation.portfolio.orchestration import (
+from app.services.api.widgets.portfolio.orchestration import (
     build_api_portfolio_dependencies,
 )
-from app.services.api.workstation.risk.orchestration import (
+from app.services.api.widgets.risk.orchestration import (
     build_api_risk_dependencies,
 )
-from app.services.api.workstation.simulation.orchestration import (
+from app.services.api.widgets.simulation.orchestration import (
     build_api_simulation_dependencies,
 )
-from app.services.api.workstation.strategies.orchestration import (
+from app.services.api.widgets.strategies.orchestration import (
     build_api_strategy_dependencies,
 )
-from app.services.api.workstation.trading.orchestration import (
+from app.services.api.widgets.trading.orchestration import (
     build_api_trading_dependencies,
 )
 

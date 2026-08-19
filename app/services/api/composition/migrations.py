@@ -1,10 +1,10 @@
 """Aggregate feature-local API migrations for canonical startup."""
 
 from app.services.api.identity.migrations import get_identity_migration_steps
-from app.services.api.workstation.simulation_workbench.migrations import (
+from app.services.api.widgets.simulator.migrations import (
     get_simulation_workbench_migration_steps,
 )
-from app.services.api.workstation.watchlists.migrations import (
+from app.services.api.widgets.watchlists.migrations import (
     get_watchlist_migration_steps,
 )
 from app.services.data import build_migration_request, run_domain_migrations

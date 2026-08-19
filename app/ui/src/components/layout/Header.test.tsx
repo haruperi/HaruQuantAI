@@ -10,7 +10,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 
 import { Header } from "./Header";
 import { useTradingStore } from "../../store/useTradingStore";
-import { useWorkspaceStore } from "../../features/workspaces";
+import { useWorkspaceStore } from "../../widgets/workspaces";
 
 const { readSystem, updateSystem, accountProfile, listExecutionSessions, actOnExecutionSession, logout } = vi.hoisted(() => ({
   readSystem: vi.fn(),

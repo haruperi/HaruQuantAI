@@ -22,7 +22,7 @@ from app.utils import (
 )
 
 if TYPE_CHECKING:
-    from app.services.api.workstation.settings.bootstrap import ApiSettings
+    from app.services.api.widgets.settings.bootstrap import ApiSettings
 
 logger = get_logger(__name__)
 _CREDENTIAL_KEY_BYTES = 32

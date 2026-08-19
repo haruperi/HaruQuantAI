@@ -5,34 +5,34 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from types import MappingProxyType
 
-from app.services.api.workstation.agentic.routes import _agentic_source
-from app.services.api.workstation.analytics_workbench.routes import (
+from app.services.api.widgets.agentic.routes import _agentic_source
+from app.services.api.widgets.analytics.routes import (
     _analytics_workbench_source,
 )
-from app.services.api.workstation.dashboards.routes import _dashboard_source
-from app.services.api.workstation.data.routes import _dataset_source
-from app.services.api.workstation.operator.routes import _audit_source, _event_source
-from app.services.api.workstation.optimization.routes import _optimization_source
-from app.services.api.workstation.portfolio.routes import _portfolio_source
-from app.services.api.workstation.research.routes import _research_source
-from app.services.api.workstation.risk.routes import _risk_command_source, _risk_source
-from app.services.api.workstation.simulation.live_routes import _live_source
-from app.services.api.workstation.simulation.routes import (
+from app.services.api.widgets.dashboards.routes import _dashboard_source
+from app.services.api.widgets.data.routes import _dataset_source
+from app.services.api.widgets.operator.routes import _audit_source, _event_source
+from app.services.api.widgets.optimization.routes import _optimization_source
+from app.services.api.widgets.portfolio.routes import _portfolio_source
+from app.services.api.widgets.research.routes import _research_source
+from app.services.api.widgets.risk.routes import _risk_command_source, _risk_source
+from app.services.api.widgets.simulation.live_routes import _live_source
+from app.services.api.widgets.simulation.routes import (
     _simulation_result_source,
     _simulation_run_source,
 )
-from app.services.api.workstation.simulation.session_routes import (
+from app.services.api.widgets.simulation.session_routes import (
     _simulation_session_source,
 )
-from app.services.api.workstation.simulation_workbench.routes import (
-    _simulation_workbench_source,
-)
-from app.services.api.workstation.simulator.routes import (
+from app.services.api.widgets.simulator.routes import (
     _simulator_run_source,
     _simulator_strategy_source,
 )
-from app.services.api.workstation.strategies.routes import _strategy_mutation_source
-from app.services.api.workstation.trading.routes import (
+from app.services.api.widgets.simulator.workbench_routes import (
+    _simulation_workbench_source,
+)
+from app.services.api.widgets.strategies.routes import _strategy_mutation_source
+from app.services.api.widgets.trading.routes import (
     _trading_account_profile_source,
     _trading_cancel_all_preflight_source,
     _trading_cancel_order_preflight_source,

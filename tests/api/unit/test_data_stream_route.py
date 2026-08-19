@@ -9,8 +9,8 @@ from datetime import UTC, datetime
 
 import pytest
 from app.services.api.identity import build_auth_context
-from app.services.api.workstation.data import stream_routes as data_stream
-from app.services.api.workstation.data.stream_routes import (
+from app.services.api.widgets.data import stream_routes as data_stream
+from app.services.api.widgets.data.stream_routes import (
     _resume_sequence,
     _stream_market_data,
 )

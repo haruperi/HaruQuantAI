@@ -16,8 +16,8 @@ from app.services.api.identity import (
     revoke_session,
     validate_csrf,
 )
-from app.services.api.workstation.settings.account_mode import resolve_runtime_profile
-from app.services.api.workstation.settings.bootstrap import get_api_settings
+from app.services.api.widgets.settings.account_mode import resolve_runtime_profile
+from app.services.api.widgets.settings.bootstrap import get_api_settings
 from app.utils import generate_id, get_logger
 
 if TYPE_CHECKING:

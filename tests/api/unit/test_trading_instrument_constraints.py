@@ -5,7 +5,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
-from app.services.api.workstation.trading import routes
+from app.services.api.widgets.trading import routes
 
 
 def test_constraints_preserve_provider_values(monkeypatch: pytest.MonkeyPatch) -> None:

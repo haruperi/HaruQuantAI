@@ -13,8 +13,8 @@ from uuid import uuid4
 
 import pytest
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.risk import orchestration as risk_dependencies
-from app.services.api.workstation.risk import routes as risk
+from app.services.api.widgets.risk import orchestration as risk_dependencies
+from app.services.api.widgets.risk import routes as risk
 from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI
 

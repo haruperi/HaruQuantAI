@@ -16,7 +16,7 @@ from app.services.api.middleware import (
 from app.services.api.middleware import (
     build_secret_redaction_middleware as _build_secret_redaction_middleware,
 )
-from app.services.api.workstation.operational import (
+from app.services.api.widgets.operational import (
     build_workstation_read_model,
     execute_workstation_command,
 )
@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     from app.services.api.middleware.redaction import EventEmitter
     from app.services.api.observability.exposition import MetricSnapshot
     from app.services.api.observability.sinks import MetricSink
-    from app.services.api.workstation.research.schemas import ResearchRunRequest
+    from app.services.api.widgets.research.schemas import ResearchRunRequest
 type AuthContext = Any
 
 __all__ = (
@@ -207,7 +207,7 @@ def build_research_run_request(**values: object) -> ResearchRunRequest:
     Returns:
         The validated, bounded result.
     """
-    from app.services.api.workstation.research.schemas import ResearchRunRequest
+    from app.services.api.widgets.research.schemas import ResearchRunRequest
 
     return ResearchRunRequest.model_validate(values)
 
@@ -503,7 +503,7 @@ def build_simulation_workbench_source(**values: object) -> object:
     Returns:
         Callable dispatching one allowlisted workbench operation.
     """
-    from app.services.api.workstation.simulation_workbench.orchestration import (
+    from app.services.api.widgets.simulator.workbench_orchestration import (
         build_simulation_workbench_source as _build,
     )
 
@@ -522,7 +522,7 @@ def build_simulation_workbench_live_authority(
     Returns:
         Callable dispatching one named interactive operation.
     """
-    from app.services.api.workstation.simulation_workbench.orchestration import (
+    from app.services.api.widgets.simulator.workbench_orchestration import (
         build_simulation_workbench_live_authority as _build,
     )
 
@@ -535,7 +535,7 @@ def build_simulation_workbench_registry(**values: object) -> object:
     Returns:
         Opaque registry consumed by the gateway orchestration.
     """
-    from app.services.api.workstation.simulation_workbench.registry import (
+    from app.services.api.widgets.simulator.registry import (
         build_simulation_workbench_registry as _build,
     )
 
@@ -548,7 +548,7 @@ def build_analytics_workbench_source(**values: object) -> object:
     Returns:
         Callable dispatching one allowlisted Analytics Workbench operation.
     """
-    from app.services.api.workstation.analytics_workbench.orchestration import (
+    from app.services.api.widgets.analytics.orchestration import (
         build_analytics_workbench_source as _build,
     )
 
@@ -564,7 +564,7 @@ def build_analytics_workbench_composition(settings: object) -> object:
     Returns:
         Dispatch source with catalogue-backed report and result readers.
     """
-    from app.services.api.workstation.analytics_workbench.orchestration import (
+    from app.services.api.widgets.analytics.orchestration import (
         build_analytics_workbench_composition as _build,
     )
 
@@ -577,7 +577,7 @@ def build_api_settings(**values: object) -> object:
     Returns:
         Validated API settings.
     """
-    from app.services.api.workstation.settings.bootstrap import ApiSettings
+    from app.services.api.widgets.settings.bootstrap import ApiSettings
 
     return ApiSettings.model_validate(values)
 
@@ -588,7 +588,7 @@ def get_api_settings() -> object:
     Returns:
         Validated API settings.
     """
-    from app.services.api.workstation.settings.bootstrap import (
+    from app.services.api.widgets.settings.bootstrap import (
         get_api_settings as _get_api_settings,
     )
 
@@ -613,7 +613,7 @@ def create_api_app(
         Canonical FastAPI application.
     """
     from app.services.api.composition import create_app
-    from app.services.api.workstation.settings.bootstrap import ApiSettings
+    from app.services.api.widgets.settings.bootstrap import ApiSettings
 
     typed_config = config if isinstance(config, ApiSettings) else None
     return create_app(
@@ -870,7 +870,7 @@ def resolve_system_credential_slot(slot: str, *, request_id: str) -> object:
     """
     from app.services.api.composition.runtime_settings import build_credential_key_set
     from app.services.api.identity import resolve_credential_reference
-    from app.services.api.workstation.settings.bootstrap import ApiSettings
+    from app.services.api.widgets.settings.bootstrap import ApiSettings
     from app.utils import derive_stable_id
 
     reference_id = derive_stable_id("id", f"api-credential:system:{slot}")
@@ -1061,7 +1061,7 @@ def create_stream_manager(**values: object) -> object:
     Returns:
         Internal stream manager through its function-only public factory.
     """
-    from app.services.api.workstation.event_delivery import (
+    from app.services.api.widgets.event_delivery import (
         create_stream_connection_manager as _create_manager,
     )
 
@@ -1074,7 +1074,7 @@ def normalize_stream_event(event: object, trace: object) -> StreamEvent:
     Returns:
         Validated stream event.
     """
-    from app.services.api.workstation.event_delivery import (
+    from app.services.api.widgets.event_delivery import (
         build_stream_event as _build_stream_event,
     )
 
@@ -1173,7 +1173,7 @@ def validate_api_csrf(
 
 def get_default_watchlist_symbols() -> tuple[str, ...]:
     """Return the immutable default-watchlist seed symbols."""
-    from app.services.api.workstation.watchlists import DEFAULT_WATCHLIST_SYMBOLS
+    from app.services.api.widgets.watchlists import DEFAULT_WATCHLIST_SYMBOLS
 
     return DEFAULT_WATCHLIST_SYMBOLS
 
@@ -1193,7 +1193,7 @@ def list_account_watchlists(
     Returns:
         Account-owned watchlists in display order.
     """
-    from app.services.api.workstation.watchlists import list_watchlists
+    from app.services.api.widgets.watchlists import list_watchlists
 
     return cast(
         "tuple[object, ...]",
@@ -1205,7 +1205,7 @@ def get_account_watchlist(
     watchlist_id: str, account_id: str, *, request_id: str
 ) -> object:
     """Return one account-owned watchlist."""
-    from app.services.api.workstation.watchlists import get_watchlist
+    from app.services.api.widgets.watchlists import get_watchlist
 
     return get_watchlist(watchlist_id, account_id, request_id=request_id)
 
@@ -1216,7 +1216,7 @@ def create_account_watchlist(account_id: str, name: str, *, request_id: str) -> 
     Returns:
         Created watchlist.
     """
-    from app.services.api.workstation.watchlists import create_watchlist
+    from app.services.api.widgets.watchlists import create_watchlist
 
     return create_watchlist(account_id, name, request_id=request_id)
 
@@ -1233,7 +1233,7 @@ def rename_account_watchlist(
     Returns:
         Renamed watchlist.
     """
-    from app.services.api.workstation.watchlists import rename_watchlist
+    from app.services.api.widgets.watchlists import rename_watchlist
 
     return rename_watchlist(watchlist_id, account_id, name, request_id=request_id)
 
@@ -1246,7 +1246,7 @@ def set_default_account_watchlist(
     Returns:
         Updated default watchlist.
     """
-    from app.services.api.workstation.watchlists import set_default_watchlist
+    from app.services.api.widgets.watchlists import set_default_watchlist
 
     return set_default_watchlist(watchlist_id, account_id, request_id=request_id)
 
@@ -1264,7 +1264,7 @@ def replace_account_watchlist_items(
     Returns:
         Updated watchlist.
     """
-    from app.services.api.workstation.watchlists import replace_watchlist_items
+    from app.services.api.widgets.watchlists import replace_watchlist_items
 
     return replace_watchlist_items(
         watchlist_id,
@@ -1279,6 +1279,6 @@ def delete_account_watchlist(
     watchlist_id: str, account_id: str, *, request_id: str
 ) -> None:
     """Delete one non-default account watchlist."""
-    from app.services.api.workstation.watchlists import delete_watchlist
+    from app.services.api.widgets.watchlists import delete_watchlist
 
     delete_watchlist(watchlist_id, account_id, request_id=request_id)

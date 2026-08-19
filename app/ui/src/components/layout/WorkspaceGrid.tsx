@@ -10,7 +10,7 @@
  */
 import React from 'react';
 
-import { useWorkspaceStore, TemplatePicker, WorkspaceEmptyState } from '../../features/workspaces';
+import { useWorkspaceStore, TemplatePicker, WorkspaceEmptyState } from '../../widgets/workspaces';
 import { DockingWorkspace } from './DockingWorkspace';
 
 export const WorkspaceGrid: React.FC = () => {

@@ -17,12 +17,12 @@ from uuid import uuid4
 import pytest
 from app.services.api import build_api_settings
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.portfolio import (
+from app.services.api.widgets.portfolio import (
     orchestration as portfolio_dependencies,
 )
-from app.services.api.workstation.portfolio import routes as portfolio
-from app.services.api.workstation.portfolio import routes as portfolio_routes
-from app.services.api.workstation.portfolio.schemas import (
+from app.services.api.widgets.portfolio import routes as portfolio
+from app.services.api.widgets.portfolio import routes as portfolio_routes
+from app.services.api.widgets.portfolio.schemas import (
     PortfolioConstructRequest,
     PortfolioDefinitionRequest,
 )

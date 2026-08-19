@@ -1,5 +1,7 @@
 @import "../index.css";
-@import "../features/research/research.css";
+@import "../widgets/research/research.css";
+@import "../widgets/simulator/simulator.css";
+@import "../widgets/analytics/analytics.css";
 /* Operational workstation: dense, accessible, evidence-first layout. */
 .workstation-shell { min-height: 100vh; padding: 2rem; color: #eef4f7; background: radial-gradient(circle at top right, #173447, #071116 55%); }
 .workstation-shell header { display: flex; align-items: baseline; gap: 1rem; border-bottom: 1px solid #38505c; }

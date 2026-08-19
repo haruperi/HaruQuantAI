@@ -9,9 +9,9 @@ import React, { useEffect } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
 
-import type { Workspace } from "../../features/workspaces";
-import { useWorkspaceStore } from "../../features/workspaces";
-import type { Widget } from "../../features/workspaces";
+import type { Workspace } from "../../widgets/workspaces";
+import { useWorkspaceStore } from "../../widgets/workspaces";
+import type { Widget } from "../../widgets/workspaces";
 
 const widget = (over: Partial<Widget> & Pick<Widget, "id" | "type" | "title">): Widget => ({
   ...over,

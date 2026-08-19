@@ -10,11 +10,11 @@ from types import SimpleNamespace
 
 import pytest
 from app.services.api.identity import build_auth_context
-from app.services.api.workstation.event_delivery import StreamLimitError
-from app.services.api.workstation.simulation import (
+from app.services.api.widgets.event_delivery import StreamLimitError
+from app.services.api.widgets.simulation import (
     session_routes as simulation_sessions,
 )
-from app.services.api.workstation.simulation.session_routes import (
+from app.services.api.widgets.simulation.session_routes import (
     _create_session,
     _stream_frames,
 )

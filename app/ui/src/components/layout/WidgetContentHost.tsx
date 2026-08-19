@@ -9,30 +9,31 @@
  */
 import React from 'react';
 
-import { MarketsWidget } from '../../features/markets';
-import { MarketTicksTableWidget } from '../../features/market-ticks';
-import { WatchlistWidget } from '../../features/watchlists';
-import { ChartWidget } from '../../features/chart';
-import { OptionsGridWidget } from '../../features/instrument-panels';
-import { PriceLadderWidget } from '../../features/price-ladder';
-import { TradePlanWidget } from '../../features/planning';
-import { ChallengesWidget, EducationWidget } from '../../features/training-ux';
+import { MarketsWidget } from '../../widgets/markets';
+import { MarketTicksTableWidget } from '../../widgets/market-ticks';
+import { WatchlistWidget } from '../../widgets/watchlists';
+import { ChartWidget } from '../../widgets/chart';
+import { OptionsGridWidget } from '../../widgets/instrument-panels';
+import { PriceLadderWidget } from '../../widgets/price-ladder';
+import { TradePlanWidget } from '../../widgets/planning';
+import { ChallengesWidget, EducationWidget } from '../../widgets/training-ux';
 import { PositionsWidget, TradeLogWidget } from '../workflow';
 import { DashboardView } from '../workflow/dashboard';
 import { DataWorkspace } from '../workflow/data';
 import { StrategyWorkspace } from '../workflow/strategies';
-import { ResearchDashboard } from '../../features/research';
+import { ResearchDashboard } from '../../widgets/research';
 import { OptimizationView } from '../workflow/optimization';
 import { PortfolioView } from '../workflow/portfolio';
 import { AgenticView } from '../workflow/agentic';
-import { SimulatorWidget } from '../../features/simulator';
+import { SimulationHome } from '../../widgets/simulator';
 import { RiskView } from '../workflow/risk';
-import { TradingWidget } from '../../features/trading';
-import { SessionRegistryWidget } from '../../features/session-registry';
+import { TradingWidget } from '../../widgets/trading';
+import { SessionRegistryWidget } from '../../widgets/session-registry';
 import { IndicatorWorkspace } from '../workflow/indicators';
-import { NewsWidget } from '../../features/news';
-import { MarketHoursWidget } from '../../features/market-hours';
-import type { Widget } from '../../features/workspaces';
+import { NewsWidget } from '../../widgets/news';
+import { MarketHoursWidget } from '../../widgets/market-hours';
+import { AnalyticsWorkspace } from '../../widgets/analytics';
+import type { Widget } from '../../widgets/workspaces';
 
 export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
   switch (widget.type) {
@@ -73,7 +74,7 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
     case 'agentic':
       return <AgenticView />;
     case 'simulator':
-      return <SimulatorWidget />;
+      return <SimulationHome />;
     case 'risk':
       return <RiskView />;
     case 'trading':
@@ -86,6 +87,8 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
       return <NewsWidget />;
     case 'market-hours':
       return <MarketHoursWidget />;
+    case 'analytics':
+      return <AnalyticsWorkspace runId={widget.runId} />;
     default:
       return <MarketsWidget />;
   }

@@ -33,7 +33,7 @@ import {
 } from "react";
 
 import { ApiClientError, apiClients } from "@/clients";
-import { useWorkspaceStore } from "@/features/workspaces";
+import { useWorkspaceStore } from "@/widgets/workspaces";
 
 /** sessionStorage key for the non-secret identity metadata. */
 const IDENTITY_STORAGE_KEY = "hq:identity";

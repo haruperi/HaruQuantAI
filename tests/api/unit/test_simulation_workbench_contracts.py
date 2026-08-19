@@ -5,7 +5,10 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
-from app.services.api.workstation.simulation_workbench import (
+from app.services.api.widgets.simulator.migrations import (
+    get_simulation_workbench_migration_steps,
+)
+from app.services.api.widgets.simulator.workbench_schemas import (
     DEFAULT_PAGE_SIZE,
     DEFAULT_VIEWPORT_BEFORE,
     MAX_BATCH_CONCURRENCY,
@@ -18,15 +21,12 @@ from app.services.api.workstation.simulation_workbench import (
     MAX_TRADE_PAGE_SIZE,
     MAX_VIEWPORT_BEFORE,
     VIEWPORT_AFTER,
-    RunCatalogueEntry,
-    get_simulation_workbench_migration_steps,
-)
-from app.services.api.workstation.simulation_workbench.schemas import (
     BatchCreateRequest,
     BatchRunSpec,
     LiveSessionBranchRequest,
     LiveSessionCommandRequest,
     RunAnnotationRequest,
+    RunCatalogueEntry,
     SeekRequest,
     StepRequest,
     ViewportQuery,
@@ -114,7 +114,7 @@ def test_command_discriminators_are_the_exact_six() -> None:
     """Only the six frozen command discriminators are accepted."""
     from typing import get_args
 
-    from app.services.api.workstation.simulation_workbench.schemas import (
+    from app.services.api.widgets.simulator.workbench_schemas import (
         CommandType,
     )
 

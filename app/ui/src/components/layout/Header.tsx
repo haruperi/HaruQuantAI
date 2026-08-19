@@ -8,7 +8,7 @@ import {
   isSelectableAccountMode,
   type SelectableAccountMode,
   type Workspace,
-} from '../../features/workspaces';
+} from '../../widgets/workspaces';
 import { useAuth } from '../../context';
 import { ProfileDropdown } from './ProfileDropdown';
 import { AccountMetricsMenu } from './AccountMetricsMenu';

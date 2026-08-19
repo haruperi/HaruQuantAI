@@ -9,8 +9,8 @@ from datetime import UTC, datetime
 
 import pytest
 from app.services.api.identity import build_auth_context
-from app.services.api.workstation.data import stream_routes
-from app.services.api.workstation.data.stream_routes import _stream_market_depth
+from app.services.api.widgets.data import stream_routes
+from app.services.api.widgets.data.stream_routes import _stream_market_depth
 from app.services.data.contracts import DataError
 from app.utils import generate_id
 from fastapi import FastAPI

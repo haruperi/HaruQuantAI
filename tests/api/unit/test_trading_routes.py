@@ -5,8 +5,8 @@ from typing import Any, cast
 
 import pytest
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.trading import orchestration as trading_dependencies
-from app.services.api.workstation.trading import routes as trading
+from app.services.api.widgets.trading import orchestration as trading_dependencies
+from app.services.api.widgets.trading import routes as trading
 from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI, HTTPException
 

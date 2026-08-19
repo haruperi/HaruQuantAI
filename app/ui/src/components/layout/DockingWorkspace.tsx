@@ -32,7 +32,7 @@ import {
   type Widget,
   type Workspace,
   type WorkspaceStoreState,
-} from '../../features/workspaces';
+} from '../../widgets/workspaces';
 import { WidgetContentHost } from './WidgetContentHost';
 
 /** Stable selector for one widget of the active workspace (registry lookup). */

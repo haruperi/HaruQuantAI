@@ -11,7 +11,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
-from app.services.api.workstation.settings import account_mode
+from app.services.api.widgets.settings import account_mode
 
 
 def _stored(monkeypatch: pytest.MonkeyPatch, value: str | None) -> None:

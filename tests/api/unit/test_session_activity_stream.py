@@ -7,7 +7,7 @@ from collections.abc import AsyncIterator
 from pathlib import Path
 
 import pytest
-from app.services.api.workstation.trading import activity
+from app.services.api.widgets.trading import activity
 
 
 class _Request:

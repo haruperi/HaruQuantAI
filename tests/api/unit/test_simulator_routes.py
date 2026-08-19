@@ -8,11 +8,11 @@ from typing import Any
 
 import pytest
 from app.services.api.identity import build_auth_context
-from app.services.api.workstation.simulator.orchestration import (
+from app.services.api.widgets.simulator.orchestration import (
     build_simulator_run_source,
     build_simulator_strategy_source,
 )
-from app.services.api.workstation.simulator.routes import (
+from app.services.api.widgets.simulator.routes import (
     _cancel_run,
     _get_run,
     _list_runs,
@@ -20,7 +20,7 @@ from app.services.api.workstation.simulator.routes import (
     _simulator_run_source,
     _simulator_strategy_source,
 )
-from app.services.api.workstation.simulator.schemas import SimulatorRunRequest
+from app.services.api.widgets.simulator.schemas import SimulatorRunRequest
 from app.utils import generate_id
 from fastapi import HTTPException
 from pydantic import ValidationError

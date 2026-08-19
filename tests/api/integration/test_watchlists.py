@@ -16,7 +16,7 @@ from app.services.api import (
     run_api_migrations,
     set_default_account_watchlist,
 )
-from app.services.api.workstation.watchlists import (
+from app.services.api.widgets.watchlists import (
     orchestration as watchlist_orchestration,
 )
 from app.services.data import build_data_settings, data_settings_context

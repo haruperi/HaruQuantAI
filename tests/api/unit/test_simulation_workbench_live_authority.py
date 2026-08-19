@@ -12,8 +12,10 @@ from collections.abc import Mapping
 from typing import Any
 
 import pytest
-from app.services.api.workstation.simulation_workbench import orchestration
-from app.services.api.workstation.simulation_workbench.orchestration import (
+from app.services.api.widgets.simulator import (
+    workbench_orchestration as orchestration,
+)
+from app.services.api.widgets.simulator.workbench_orchestration import (
     build_simulation_workbench_live_authority,
 )
 

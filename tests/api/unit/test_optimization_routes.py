@@ -13,10 +13,10 @@ from typing import Any
 
 import pytest
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.optimization import (
+from app.services.api.widgets.optimization import (
     orchestration as optimization_dependencies,
 )
-from app.services.api.workstation.optimization import routes as optimization
+from app.services.api.widgets.optimization import routes as optimization
 from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI, HTTPException
 

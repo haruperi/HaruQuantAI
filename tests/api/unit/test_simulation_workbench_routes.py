@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 from app.services.api.identity import build_auth_context
-from app.services.api.workstation.simulation_workbench.routes import (
+from app.services.api.widgets.simulator.workbench_routes import (
     _cancel_batch,
     _close_live_session,
     _create_live_session,
@@ -21,7 +21,7 @@ from app.services.api.workstation.simulation_workbench.routes import (
     _step_live_session,
     _submit_command,
 )
-from app.services.api.workstation.simulation_workbench.schemas import (
+from app.services.api.widgets.simulator.workbench_schemas import (
     LiveSessionCommandRequest,
     LiveSessionCreateRequest,
     StepRequest,

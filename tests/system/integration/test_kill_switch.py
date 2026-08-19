@@ -5,7 +5,7 @@ from dataclasses import replace
 from datetime import timedelta
 from typing import Any
 
-from app.services.api.workstation.operator.routes import router
+from app.services.api.widgets.operator.routes import router
 from app.services.risk import (
     apply_kill_switch_command,
     check_risk_kill_switch,

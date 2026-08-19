@@ -8,11 +8,11 @@ removed from the registry), and a terminal error stops delivery cleanly.
 import asyncio
 
 import pytest
-from app.services.api.workstation.event_delivery import (
+from app.services.api.widgets.event_delivery import (
     build_stream_event,
     create_stream_connection_manager,
 )
-from app.services.api.workstation.event_delivery.orchestration import StreamLimitError
+from app.services.api.widgets.event_delivery.orchestration import StreamLimitError
 
 
 def _manager() -> object:

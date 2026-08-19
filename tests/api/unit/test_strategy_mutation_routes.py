@@ -13,10 +13,10 @@ from uuid import uuid4
 
 import pytest
 from app.services.api.identity import require_auth_context
-from app.services.api.workstation.strategies import (
+from app.services.api.widgets.strategies import (
     orchestration as strategy_dependencies,
 )
-from app.services.api.workstation.strategies import routes as strategies
+from app.services.api.widgets.strategies import routes as strategies
 from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI
 

@@ -18,7 +18,7 @@ from pydantic import (
     model_validator,
 )
 
-from app.services.api.workstation.settings.limits import (
+from app.services.api.widgets.settings.limits import (
     MAX_ERROR_DETAILS,
     MAX_ERROR_TEXT_LENGTH,
 )

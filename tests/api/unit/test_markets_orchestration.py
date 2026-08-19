@@ -3,7 +3,7 @@
 from types import SimpleNamespace
 
 import pytest
-from app.services.api.workstation.markets import orchestration
+from app.services.api.widgets.markets import orchestration
 
 
 def test_technical_evidence_fetches_then_delegates(

@@ -11,7 +11,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, waitFor } from "@testing-library/react";
 
 import { AppShell } from "./shell";
-import { useWorkspaceStore } from "@/features/workspaces";
+import { useWorkspaceStore } from "@/widgets/workspaces";
 
 // Mock useAuth for AppShell.
 const authStateMock = vi.fn();
@@ -93,7 +93,7 @@ describe("NFR-API-009: Accessibility structural checks", () => {
       platformAccountMode: "demo",
       tradingModeCompatible: true,
     });
-    const { TradingWidget } = await import("../../features/trading");
+    const { TradingWidget } = await import("../../widgets/trading");
     globalThis.fetch = vi.fn(async () => new Response(
       JSON.stringify({
         status: "success", message: "ok",
