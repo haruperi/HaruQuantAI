@@ -637,7 +637,7 @@ None.
 - [x] Phase 4 — P4-T01 through P4-T05
 - [x] Phase 5 — P5-T01
 - [x] Phase 6 — P6-T01 through P6-T03
-- [ ] Phase 7 — P7-T01 through P7-T02
+- [x] Phase 7 — P7-T01 through P7-T02
 - [ ] Phase 8 — P8-T01 through P8-T02
 
 ## 11. PHASES
@@ -1136,7 +1136,7 @@ Git Commit: `feat(ui): build Analytics run comparison`
 
 ### Phase 7 — V2-only operational depth
 
-#### - [ ] Task `P7-T01` — Build scenario mission panels
+#### - [x] Task `P7-T01` — Build scenario mission panels
 
 **Files:** scenario, checklist, and mission panels (CREATE).
 
@@ -1144,7 +1144,7 @@ Render owner catalogue, faults, emergency steps, assistance, completion, and qua
 
 Git Commit: `feat(ui): build scenario mission panels`
 
-#### - [ ] Task `P7-T02` — Build portfolio destination
+#### - [x] Task `P7-T02` — Build portfolio destination
 
 **Files:** `PortfolioSimulationPanel.tsx` CREATE; run builder and overview MODIFY.
 
