@@ -1,0 +1,6 @@
+{
+  "domain": "test_stateful",
+  "migration_id": "001_test_stateful",
+  "checksum": "chk_stateful_v1",
+  "sql": "CREATE TABLE test_stateful_records (record_id TEXT PRIMARY KEY, value TEXT NOT NULL);"
+}

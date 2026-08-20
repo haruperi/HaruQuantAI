@@ -5,8 +5,8 @@ Traces to: P3-T03, Gate G3
 
 from __future__ import annotations
 
-import sys
 from dataclasses import FrozenInstanceError
+from pathlib import Path
 from typing import Any
 
 import app.capabilities.indicator.rsi.v1 as rsi_v1
@@ -20,6 +20,8 @@ from app.capabilities.indicator.rsi.v1 import (
     CAPABILITY_ID,
     RsiCapabilityV1,
 )
+
+from tests.removability.harness import run_in_fresh_process
 
 
 def test_rsi_contract_exports_are_exact() -> None:
@@ -78,10 +80,14 @@ def test_rsi_callable_preserves_keywords() -> None:
 
 def test_rsi_contract_imports_without_services() -> None:
     """Verify RSI capability contract imports without pulling in any business services."""
-    for mod_name in sys.modules:
-        assert not mod_name.startswith("app.services"), (
-            f"Forbidden business domain imported: {mod_name}"
-        )
-        assert not mod_name.startswith("app.agentic"), (
-            f"Forbidden agentic domain imported: {mod_name}"
-        )
+    script = """
+import sys
+import app.capabilities.indicator.rsi.v1 as rsi_v1
+assert rsi_v1 is not None
+for mod_name in sys.modules:
+    assert not mod_name.startswith('app.services'), f'Forbidden business domain imported: {mod_name}'
+    assert not mod_name.startswith('app.agentic'), f'Forbidden agentic domain imported: {mod_name}'
+"""
+    repo_root = Path(__file__).resolve().parents[3]
+    res = run_in_fresh_process(repository_root=repo_root, script=script)
+    assert res.returncode == 0, res.stderr

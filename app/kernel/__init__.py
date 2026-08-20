@@ -13,6 +13,7 @@ _EXPORTS: dict[str, str] = {
     "SemanticVersion": "app.kernel.identifiers",
     "RuntimeProfile": "app.kernel.profiles",
     "Cardinality": "app.kernel.manifests",
+    "DowngradePolicy": "app.kernel.manifests",
     "EffectClass": "app.kernel.manifests",
     "LifecyclePolicy": "app.kernel.manifests",
     "OnMissing": "app.kernel.manifests",

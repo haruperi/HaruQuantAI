@@ -5,11 +5,11 @@ Traces to: P3-T02, Gate G3
 
 from __future__ import annotations
 
-import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
+from pathlib import Path
 from typing import Any
 
 import app.capabilities.indicator.common.v1 as common_v1
@@ -20,6 +20,8 @@ from app.capabilities.indicator.common.v1 import (
     MarketDatasetV1,
     OHLCVRecordV1,
 )
+
+from tests.removability.harness import run_in_fresh_process
 
 
 @dataclass(frozen=True, slots=True)
@@ -75,13 +77,17 @@ def test_common_module_has_exact_exports() -> None:
 
 def test_common_module_imports_no_business_domain() -> None:
     """Verify common v1 contract does not import any business services or agentic packages."""
-    for mod_name in sys.modules:
-        assert not mod_name.startswith("app.services"), (
-            f"Forbidden business domain imported: {mod_name}"
-        )
-        assert not mod_name.startswith("app.agentic"), (
-            f"Forbidden agentic domain imported: {mod_name}"
-        )
+    script = """
+import sys
+import app.capabilities.indicator.common.v1 as common_v1
+assert common_v1 is not None
+for mod_name in sys.modules:
+    assert not mod_name.startswith('app.services'), f'Forbidden business domain imported: {mod_name}'
+    assert not mod_name.startswith('app.agentic'), f'Forbidden agentic domain imported: {mod_name}'
+"""
+    repo_root = Path(__file__).resolve().parents[3]
+    res = run_in_fresh_process(repository_root=repo_root, script=script)
+    assert res.returncode == 0, res.stderr
 
 
 def test_fixture_exposes_required_attributes() -> None:

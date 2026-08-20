@@ -697,9 +697,9 @@ None. Phase 12 provider boundaries and file lists are produced by the determinis
 | P7-T01 | Normalize capability failures | P6-T03 | [x] |
 | P7-T02 | Compute profile readiness | P7-T01 | [x] |
 | P7-T03 | Extend runtime validation | P7-T02 | [x] |
-| P8-T01 | Define provider state metadata | P7-T03 | [ ] |
-| P8-T02 | Accept migration tombstones | P8-T01 | [ ] |
-| P8-T03 | Prove retained-state reinstall | P8-T02 | [ ] |
+| P8-T01 | Define provider state metadata | P7-T03 | [x] |
+| P8-T02 | Accept migration tombstones | P8-T01 | [x] |
+| P8-T03 | Prove retained-state reinstall | P8-T02 | [x] |
 | P9-T01 | Create RSI provider package | P8-T03 | [ ] |
 | P9-T02 | Activate RSI provider | P9-T01 | [ ] |
 | P9-T03 | Create Williams provider package | P9-T02 | [ ] |
@@ -3472,7 +3472,7 @@ git diff --check
 **Deliverable:** manifest state rules, tombstone-aware migration request, and retained-state cycle proof.
 **Phase Exit Gate:** G8 restarts without provider code and validates preserved state on reinstall.
 
-#### - [ ] Task `P8-T01` — Define provider state metadata
+#### - [x] Task `P8-T01` — Define provider state metadata
 
 **Traces to:** `D-09`, `Phase 8`, `G8`
 **Depends on:** P7-T03
@@ -3536,12 +3536,12 @@ git diff --check
 **Re-run safety:** Safe at exact parser anchors.
 
 **Definition of Done:**
-- [ ] Retention/purge fail closed.
-- [ ] Python class paths rejected.
-- [ ] Existing stateless manifests pass.
-- [ ] Commit executed only with separate authorization.
+- [x] Retention/purge fail closed.
+- [x] Python class paths rejected.
+- [x] Existing stateless manifests pass.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P8-T02` — Accept migration tombstones
+#### - [x] Task `P8-T02` — Accept migration tombstones
 
 **Traces to:** `D-09`, `Phase 8`, `G8`
 **Depends on:** P8-T01
@@ -3632,12 +3632,12 @@ git diff --check
 **Re-run safety:** Safe — no migration or schema mutation occurs outside temporary tests.
 
 **Definition of Done:**
-- [ ] Existing checksum enforcement preserved.
-- [ ] Valid owner absence accepted.
-- [ ] Data remains intact.
-- [ ] Commit executed only with separate authorization.
+- [x] Existing checksum enforcement preserved.
+- [x] Valid owner absence accepted.
+- [x] Data remains intact.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P8-T03` — Prove retained-state reinstall
+#### - [x] Task `P8-T03` — Prove retained-state reinstall
 
 **Traces to:** `Phase 8`, `G8`
 **Depends on:** P8-T02
@@ -3706,19 +3706,19 @@ git diff --check
 **Re-run safety:** Safe — all state is temporary and closed.
 
 **Definition of Done:**
-- [ ] Three fresh-process tests pass.
-- [ ] State preserved and incompatible reinstall blocked.
-- [ ] No handle leaks.
-- [ ] G8 passes.
+- [x] Three fresh-process tests pass.
+- [x] State preserved and incompatible reinstall blocked.
+- [x] No handle leaks.
+- [x] G8 passes.
 
 **Phase 8 Exit Gate — all must be true before Phase 9 starts:**
-- [ ] Every task checked off.
-- [ ] Full lint, type-check, tests, and 80% coverage pass.
-- [ ] No immutable migration definition changed.
-- [ ] No PROTECTED path appears except approved Data persistence files.
-- [ ] Uninstall preserves data.
-- [ ] Compatible reinstall restores access.
-- [ ] G8 passes.
+- [x] Every task checked off.
+- [x] Full lint, type-check, tests, and 80% coverage pass.
+- [x] No immutable migration definition changed.
+- [x] No PROTECTED path appears except approved Data persistence files.
+- [x] Uninstall preserves data.
+- [x] Compatible reinstall restores access.
+- [x] G8 passes.
 
 ### Phase 9 — Pure Pilot: RSI and Williams %R
 

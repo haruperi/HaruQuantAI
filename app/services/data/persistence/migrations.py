@@ -235,6 +235,61 @@ def _apply_step(step: MigrationStep, request_id: str) -> None:
         ) from error
 
 
+def _validate_applied_tombstones_and_orphans(
+    request: MigrationRequest,
+    applied_migrations: dict[str, str],
+) -> None:
+    """Validate tombstone checksums and complete-manifest orphan constraints."""
+    tombstone_by_id = {t.migration_id: t for t in request.tombstones}
+
+    # Validate matching tombstones against applied migrations
+    for t_id, tombstone in tombstone_by_id.items():
+        if t_id in applied_migrations:
+            if tombstone.checksum != applied_migrations[t_id]:
+                logger.error(
+                    "Tombstone checksum mismatch for %s: expected %s, got %s",
+                    t_id,
+                    applied_migrations[t_id],
+                    tombstone.checksum,
+                )
+                details = {
+                    "domain": request.domain,
+                    "migration_id": t_id,
+                    "stage": "checksum_validation",
+                }
+                raise DataError(
+                    "SCHEMA_MIGRATION_FAILED",
+                    safe_details=details,
+                    request_id=request.request_id,
+                )
+            logger.info(
+                "Validated retained migration tombstone %s/%s",
+                request.domain,
+                t_id,
+            )
+
+    if request.complete_manifest:
+        declared_ids = {step.migration_id for step in request.steps}
+        orphaned_ids = sorted(set(applied_migrations) - declared_ids)
+        unaccounted_orphans = [
+            oid for oid in orphaned_ids if oid not in tombstone_by_id
+        ]
+        if unaccounted_orphans:
+            logger.error(
+                "Applied migrations are absent from the complete manifest: %s",
+                ", ".join(unaccounted_orphans),
+            )
+            raise DataError(
+                "SCHEMA_MIGRATION_FAILED",
+                safe_details={
+                    "domain": request.domain,
+                    "migration_id": unaccounted_orphans[0],
+                    "stage": "manifest_validation",
+                },
+                request_id=request.request_id,
+            )
+
+
 def _run_domain_migrations_raw(request: MigrationRequest) -> MigrationResult:
     """Validate and execute domain-owned migration steps.
 
@@ -280,27 +335,11 @@ def _run_domain_migrations_raw(request: MigrationRequest) -> MigrationResult:
         # 1. Idempotently create data_migration_ledger table
         _initialize_ledger(request.domain, request.request_id)
 
-        # 2. Fetch applied migrations for this domain
+        # 2. Fetch applied migrations and validate tombstones/manifest
         applied_migrations = _fetch_applied_migrations(
             request.domain, request.request_id
         )
-        if request.complete_manifest:
-            declared_ids = {step.migration_id for step in request.steps}
-            orphaned_ids = sorted(set(applied_migrations) - declared_ids)
-            if orphaned_ids:
-                logger.error(
-                    "Applied migrations are absent from the complete manifest: %s",
-                    ", ".join(orphaned_ids),
-                )
-                raise DataError(
-                    "SCHEMA_MIGRATION_FAILED",
-                    safe_details={
-                        "domain": request.domain,
-                        "migration_id": orphaned_ids[0],
-                        "stage": "manifest_validation",
-                    },
-                    request_id=request.request_id,
-                )
+        _validate_applied_tombstones_and_orphans(request, applied_migrations)
         max_applied_id = max(applied_migrations.keys()) if applied_migrations else None
 
         # 3. Validate and apply/skip steps

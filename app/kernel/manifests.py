@@ -5,6 +5,7 @@ Traces to: P4-T02, Gate G4
 
 from __future__ import annotations
 
+import re
 import tomllib
 from dataclasses import dataclass
 from enum import StrEnum
@@ -55,6 +56,13 @@ class ReloadPolicy(StrEnum):
     PROCESS_RESTART = "process_restart"
 
 
+class DowngradePolicy(StrEnum):
+    """Policy for handling schema downgrades in stateful providers."""
+
+    REJECT = "reject"
+    READ_ONLY = "read_only"
+
+
 @dataclass(frozen=True, slots=True)
 class ProvidedCapability:
     """Capability provided by a manifest."""
@@ -96,6 +104,7 @@ class ProviderManifest:
     compatible_state_majors: tuple[int, ...]
     uninstall_retention: str | None
     purge_requires_authorization: bool
+    downgrade_policy: DowngradePolicy | None = None
 
 
 _ALLOWED_ROOT_KEYS = {
@@ -116,12 +125,16 @@ _ALLOWED_REQUIRES_KEYS = {
 }
 _ALLOWED_RUNTIME_KEYS = {"profiles", "scopes", "effect_classes", "lifecycle", "reload"}
 _ALLOWED_STATE_KEYS = {
-    "state_schema_id",
-    "state_schema_version",
+    "schema_id",
+    "schema_version",
     "migration_manifest",
-    "compatible_state_majors",
+    "compatible_prior_majors",
+    "downgrade_policy",
     "uninstall_retention",
     "purge_requires_authorization",
+    "state_schema_id",
+    "state_schema_version",
+    "compatible_state_majors",
 }
 
 
@@ -392,22 +405,78 @@ def load_manifest(path: Path) -> ProviderManifest:
                 f"invalid provider manifest {path}: [state] must be a table"
             )
         _check_keys(state_tbl, _ALLOWED_STATE_KEYS, path, "[state]")
-        if set(state_tbl.keys()) != _ALLOWED_STATE_KEYS:
+
+        schema_id_raw = state_tbl.get("schema_id") or state_tbl.get("state_schema_id")
+        schema_ver_raw = state_tbl.get("schema_version") or state_tbl.get(
+            "state_schema_version"
+        )
+        mig_manifest_raw = state_tbl.get("migration_manifest")
+        prior_majors_raw = (
+            state_tbl.get("compatible_prior_majors")
+            if "compatible_prior_majors" in state_tbl
+            else state_tbl.get("compatible_state_majors")
+        )
+        downgrade_raw = state_tbl.get("downgrade_policy", "reject")
+        retention_raw = state_tbl.get("uninstall_retention")
+        purge_raw = state_tbl.get("purge_requires_authorization")
+
+        if (
+            schema_id_raw is None
+            or schema_ver_raw is None
+            or mig_manifest_raw is None
+            or prior_majors_raw is None
+            or retention_raw is None
+            or purge_raw is None
+        ):
             raise ManifestValidationError(
                 f"invalid provider manifest {path}: state fields must be all present or all absent"
             )
 
+        # Validate schema_id syntax: [a-z][a-z0-9_.-]* and cannot start with app.
+        schema_id_str = str(schema_id_raw)
+        if schema_id_str.startswith("app.") or not re.match(
+            r"^[a-z][a-z0-9_.-]*$", schema_id_str
+        ):
+            raise ManifestValidationError(
+                f"invalid provider manifest {path}: invalid schema_id {schema_id_str!r}"
+            )
+
+        # Validate migration_manifest cannot be Python class path
+        mig_manifest_str = str(mig_manifest_raw)
+        if mig_manifest_str.startswith("app."):
+            raise ManifestValidationError(
+                f"invalid provider manifest {path}: migration_manifest cannot be a Python class path"
+            )
+
+        # Validate downgrade policy
         try:
-            state_schema_id = str(state_tbl["state_schema_id"])
-            state_schema_version = SemanticVersion.parse(
-                state_tbl["state_schema_version"]
+            downgrade_policy = DowngradePolicy(downgrade_raw)
+        except ValueError as exc:
+            raise ManifestValidationError(
+                f"invalid provider manifest {path}: invalid downgrade_policy {downgrade_raw!r}"
+            ) from exc
+
+        # Validate retention and purge authorization
+        if retention_raw != "retain" or purge_raw is not True:
+            raise ManifestValidationError(
+                f"invalid provider manifest {path}: stateful provider must retain data and require purge authorization"
             )
-            migration_manifest = str(state_tbl["migration_manifest"])
-            compatible_state_majors = tuple(
-                sorted({int(m) for m in state_tbl["compatible_state_majors"]})
-            )
-            uninstall_retention = str(state_tbl["uninstall_retention"])
-            purge_requires_auth = bool(state_tbl["purge_requires_authorization"])
+
+        try:
+            state_schema_id = schema_id_str
+            state_schema_version = SemanticVersion.parse(schema_ver_raw)
+            migration_manifest = mig_manifest_str
+            if not isinstance(prior_majors_raw, (list, tuple)):
+                raise ManifestValidationError(
+                    f"invalid provider manifest {path}: compatible_prior_majors must be a list"
+                )
+            compatible_state_majors = tuple(sorted({int(m) for m in prior_majors_raw}))
+            if any(m <= 0 for m in compatible_state_majors):
+                raise ManifestValidationError(
+                    f"invalid provider manifest {path}: compatible_prior_majors must contain positive integers"
+                )
+            uninstall_retention = str(retention_raw)
+            purge_requires_auth = bool(purge_raw)
         except ValueError as exc:
             raise ManifestValidationError(
                 f"invalid provider manifest {path}: {exc}"
@@ -419,6 +488,7 @@ def load_manifest(path: Path) -> ProviderManifest:
         compatible_state_majors = ()
         uninstall_retention = None
         purge_requires_auth = False
+        downgrade_policy = None
 
     return ProviderManifest(
         provider_id=provider_id,
@@ -439,11 +509,13 @@ def load_manifest(path: Path) -> ProviderManifest:
         compatible_state_majors=compatible_state_majors,
         uninstall_retention=uninstall_retention,
         purge_requires_authorization=purge_requires_auth,
+        downgrade_policy=downgrade_policy,
     )
 
 
 __all__ = (
     "Cardinality",
+    "DowngradePolicy",
     "EffectClass",
     "LifecyclePolicy",
     "OnMissing",

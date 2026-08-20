@@ -98,11 +98,12 @@ lifecycle = "scoped"
 reload = "process_restart"
 
 [state]
-state_schema_id = "trading_orders"
-state_schema_version = "2.0.0"
-migration_manifest = "app.services.trading.migrations:orders_v2"
-compatible_state_majors = [1, 2]
-uninstall_retention = "retain_ledger"
+schema_id = "trading_orders"
+schema_version = "2.0.0"
+migration_manifest = "schema:trading.orders.v2"
+compatible_prior_majors = [1, 2]
+downgrade_policy = "reject"
+uninstall_retention = "retain"
 purge_requires_authorization = true
 """
     manifest_path = _write_manifest(tmp_path, content)
@@ -110,9 +111,9 @@ purge_requires_authorization = true
 
     assert manifest.state_schema_id == "trading_orders"
     assert str(manifest.state_schema_version) == "2.0.0"
-    assert manifest.migration_manifest == "app.services.trading.migrations:orders_v2"
+    assert manifest.migration_manifest == "schema:trading.orders.v2"
     assert manifest.compatible_state_majors == (1, 2)
-    assert manifest.uninstall_retention == "retain_ledger"
+    assert manifest.uninstall_retention == "retain"
     assert manifest.purge_requires_authorization is True
 
 

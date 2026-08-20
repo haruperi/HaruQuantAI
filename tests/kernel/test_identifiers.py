@@ -5,12 +5,14 @@ Traces to: P4-T01, Gate G4
 
 from __future__ import annotations
 
-import sys
+from pathlib import Path
 
 import pytest
 from app import kernel
 from app.kernel.identifiers import CapabilityId, ProviderId, SemanticVersion
 from app.kernel.profiles import RuntimeProfile
+
+from tests.removability.harness import run_in_fresh_process
 
 
 def test_valid_identifiers_round_trip() -> None:
@@ -119,10 +121,15 @@ def test_kernel_lazy_exports_and_imports_without_services() -> None:
     assert kernel.CapabilityId is CapabilityId
     assert kernel.RuntimeProfile is RuntimeProfile
 
-    for mod_name in sys.modules:
-        assert not mod_name.startswith("app.services"), (
-            f"Forbidden business domain imported: {mod_name}"
-        )
-        assert not mod_name.startswith("app.agentic"), (
-            f"Forbidden agentic domain imported: {mod_name}"
-        )
+    script = """
+import sys
+import app.kernel as kernel
+assert 'CapabilityId' in dir(kernel)
+assert kernel.CapabilityId is not None
+for mod_name in sys.modules:
+    assert not mod_name.startswith('app.services'), f'Forbidden business domain imported: {mod_name}'
+    assert not mod_name.startswith('app.agentic'), f'Forbidden agentic domain imported: {mod_name}'
+"""
+    repo_root = Path(__file__).resolve().parents[2]
+    res = run_in_fresh_process(repository_root=repo_root, script=script)
+    assert res.returncode == 0, res.stderr

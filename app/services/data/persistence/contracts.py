@@ -300,6 +300,29 @@ class MigrationStep(_Contract):
         return validated
 
 
+class MigrationTombstone(_Contract):
+    """Immutable tombstone evidence for historical provider migration."""
+
+    domain: str
+    migration_id: str
+    checksum: str
+    owner_provider_id: str
+    state_schema_id: str
+
+    @field_validator(
+        "domain",
+        "migration_id",
+        "checksum",
+        "owner_provider_id",
+        "state_schema_id",
+    )
+    @classmethod
+    def _validate_text(cls, value: str) -> str:
+        """Validate string fields are non-empty and trimmed."""
+        logger.debug("Running DATA function: _validate_text")
+        return _text(value)
+
+
 class MigrationRequest(_Contract):
     """Ordered migration execution request for one owning domain."""
 
@@ -307,6 +330,7 @@ class MigrationRequest(_Contract):
     steps: tuple[MigrationStep, ...]
     request_id: str
     complete_manifest: bool = False
+    tombstones: tuple[MigrationTombstone, ...] = ()
 
     @field_validator("domain", "request_id")
     @classmethod
@@ -342,6 +366,18 @@ class MigrationRequest(_Contract):
             raise ValueError("migration identifiers must be unique")
         if identifiers != tuple(sorted(identifiers)):
             raise ValueError("migration steps must be ordered")
+        if self.tombstones:
+            if any(t.domain != self.domain for t in self.tombstones):
+                raise ValueError(
+                    "migration tombstone ownership must match request domain"
+                )
+            tombstone_ids = tuple(t.migration_id for t in self.tombstones)
+            if len(set(tombstone_ids)) != len(tombstone_ids):
+                raise ValueError("migration tombstone identifiers must be unique")
+            if any(tid in set(identifiers) for tid in tombstone_ids):
+                raise ValueError(
+                    "migration step and tombstone identifiers must not overlap"
+                )
         return self
 
 
@@ -1313,6 +1349,7 @@ __all__ = [
     "MigrationRequest",
     "MigrationResult",
     "MigrationStep",
+    "MigrationTombstone",
     "RestoreReport",
     "StatementPlan",
     "StorageManifest",
