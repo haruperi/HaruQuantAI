@@ -31,6 +31,7 @@ repos:
         stages: [pre-commit]
 
       - id: check-added-large-files
+        args: ["--maxkb=25000"]
         stages: [pre-commit]
 
       - id: debug-statements

@@ -671,11 +671,11 @@ None. Phase 12 provider boundaries and file lists are produced by the determinis
 | P1-T02 | Freeze architecture policy | P1-T01 | [x] |
 | P1-T03 | Update system relationships | P1-T02 | [x] |
 | P1-T04 | Enforce G1 documentation | P1-T03 | [x] |
-| P2-T01 | Extract static dependency graph | P1-T04 | [ ] |
-| P2-T02 | Extract runtime configuration graphs | P2-T01 | [ ] |
-| P2-T03 | Extract state frontend graphs | P2-T01 | [ ] |
-| P2-T04 | Build removability matrices | P2-T02, P2-T03 | [ ] |
-| P2-T05 | Freeze G2 classifications | P2-T04 | [ ] |
+| P2-T01 | Extract static dependency graph | P1-T04 | [x] |
+| P2-T02 | Extract runtime configuration graphs | P2-T01 | [x] |
+| P2-T03 | Extract state frontend graphs | P2-T01 | [x] |
+| P2-T04 | Build removability matrices | P2-T02, P2-T03 | [x] |
+| P2-T05 | Freeze G2 classifications | P2-T04 | [x] |
 | P3-T01 | Create capability package skeleton | P2-T05 | [ ] |
 | P3-T02 | Add indicator common contract | P3-T01 | [ ] |
 | P3-T03 | Add RSI capability contract | P3-T02 | [ ] |
@@ -1383,7 +1383,7 @@ git diff --check
 **Deliverable:** deterministic JSON graphs, cycle report, and provider/domain removability matrices.
 **Phase Exit Gate:** G2 classifies every registered feature and explains every dynamic import.
 
-#### - [ ] Task `P2-T01` — Extract static dependency graph
+#### - [x] Task `P2-T01` — Extract static dependency graph
 
 **Traces to:** `Phase 2`, `G2`
 **Depends on:** P1-T04
@@ -1459,12 +1459,12 @@ git diff --check
 **Re-run safety:** Safe — generated JSON is byte-deterministic at the same commit.
 
 **Definition of Done:**
-- [ ] Four scanner tests pass.
-- [ ] Current graph generated without importing app.
-- [ ] Dynamic expressions fail closed.
-- [ ] Commit executed only with separate authorization.
+- [x] Four scanner tests pass.
+- [x] Current graph generated without importing app.
+- [x] Dynamic expressions fail closed.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P2-T02` — Extract runtime configuration graphs
+#### - [x] Task `P2-T02` — Extract runtime configuration graphs
 
 **Traces to:** `Phase 2`, `G2`
 **Depends on:** P2-T01
@@ -1538,12 +1538,12 @@ git diff --check
 **Re-run safety:** Safe — deterministic generation.
 
 **Definition of Done:**
-- [ ] Runtime and config tests pass.
-- [ ] No secret values are read or written.
-- [ ] Current artifact has zero unexplained entries or task stops.
-- [ ] Commit executed only with separate authorization.
+- [x] Runtime and config tests pass.
+- [x] No secret values are read or written.
+- [x] Current artifact has zero unexplained entries or task stops.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P2-T03` — Extract state frontend graphs
+#### - [x] Task `P2-T03` — Extract state frontend graphs
 
 **Traces to:** `Phase 2`, `G2`
 **Depends on:** P2-T01
@@ -1617,12 +1617,12 @@ git diff --check
 **Re-run safety:** Safe — deterministic generation.
 
 **Definition of Done:**
-- [ ] Four extractor tests pass.
-- [ ] No database or frontend runtime starts.
-- [ ] Current artifact generated.
-- [ ] Commit executed only with separate authorization.
+- [x] Four extractor tests pass.
+- [x] No database or frontend runtime starts.
+- [x] Current artifact generated.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P2-T04` — Build removability matrices
+#### - [x] Task `P2-T04` — Build removability matrices
 
 **Traces to:** `Phase 2`, `G2`
 **Depends on:** P2-T02, P2-T03
@@ -1696,12 +1696,12 @@ git diff --check
 **Re-run safety:** Safe — deterministic generation.
 
 **Definition of Done:**
-- [ ] All feature rows classified.
-- [ ] Hard/reactive cycles separated.
-- [ ] No dynamic import unexplained.
-- [ ] Commit executed only with separate authorization.
+- [x] All feature rows classified.
+- [x] Hard/reactive cycles separated.
+- [x] No dynamic import unexplained.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P2-T05` — Freeze G2 classifications
+#### - [x] Task `P2-T05` — Freeze G2 classifications
 
 **Traces to:** `G2`, `Stop conditions`
 **Depends on:** P2-T04
@@ -1771,20 +1771,20 @@ git diff --check
 **Re-run safety:** Not safe — report includes reviewed break decisions; regenerate only through a new approved audit task.
 
 **Definition of Done:**
-- [ ] Four parity tests pass.
-- [ ] Gate result is PASS.
-- [ ] Wave inputs are exact.
-- [ ] Commit executed only with separate authorization.
+- [x] Four parity tests pass.
+- [x] Gate result is PASS.
+- [x] Wave inputs are exact.
+- [x] Commit executed only with separate authorization.
 
 **Phase 2 Exit Gate — all must be true before Phase 3 starts:**
-- [ ] Every task in this phase is checked off.
-- [ ] Full lint and type-check clean across repo.
-- [ ] Full test suite green and coverage at least 80%.
-- [ ] No PROTECTED path appears in the phase diff.
-- [ ] All five graph categories are present.
-- [ ] Every registered feature has one classification.
-- [ ] Every hard cycle has one approved break edge.
-- [ ] Unexplained dynamic imports are zero.
+- [x] Every task in this phase is checked off.
+- [x] Full lint and type-check clean across repo.
+- [x] Full test suite green and coverage at least 80%.
+- [x] No PROTECTED path appears in the phase diff.
+- [x] All five graph categories are present.
+- [x] Every registered feature has one classification.
+- [x] Every hard cycle has one approved break edge.
+- [x] Unexplained dynamic imports are zero.
 
 ### Phase 3 — Capability Specification Layer
 
