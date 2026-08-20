@@ -694,9 +694,9 @@ None. Phase 12 provider boundaries and file lists are produced by the determinis
 | P6-T01 | Define provider generations | P5-T04 | [x] |
 | P6-T02 | Compose injected providers | P6-T01 | [x] |
 | P6-T03 | Reconcile installed configuration | P6-T02 | [x] |
-| P7-T01 | Normalize capability failures | P6-T03 | [ ] |
-| P7-T02 | Compute profile readiness | P7-T01 | [ ] |
-| P7-T03 | Extend runtime validation | P7-T02 | [ ] |
+| P7-T01 | Normalize capability failures | P6-T03 | [x] |
+| P7-T02 | Compute profile readiness | P7-T01 | [x] |
+| P7-T03 | Extend runtime validation | P7-T02 | [x] |
 | P8-T01 | Define provider state metadata | P7-T03 | [ ] |
 | P8-T02 | Accept migration tombstones | P8-T01 | [ ] |
 | P8-T03 | Prove retained-state reinstall | P8-T02 | [ ] |
@@ -3236,7 +3236,7 @@ git diff --check
 **Deliverable:** full error payload, readiness evaluator, and backward-compatible runtime validation extension.
 **Phase Exit Gate:** G7 normalizes missing capability at kernel/runtime boundaries.
 
-#### - [ ] Task `P7-T01` — Normalize capability failures
+#### - [x] Task `P7-T01` — Normalize capability failures
 
 **Traces to:** `D-06`, `G7`
 **Depends on:** P6-T03
@@ -3300,12 +3300,12 @@ git diff --check
 **Re-run safety:** Safe at exact error anchor.
 
 **Definition of Done:**
-- [ ] One error family exists.
-- [ ] Thirteen reasons exact.
-- [ ] Payload test passes.
-- [ ] Commit executed only with separate authorization.
+- [x] One error family exists.
+- [x] Thirteen reasons exact.
+- [x] Payload test passes.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P7-T02` — Compute profile readiness
+#### - [x] Task `P7-T02` — Compute profile readiness
 
 **Traces to:** `D-04`, `G7`, `Profile readiness`
 **Depends on:** P7-T01
@@ -3372,12 +3372,12 @@ git diff --check
 **Re-run safety:** Safe at exact enum anchor.
 
 **Definition of Done:**
-- [ ] Four profiles returned.
-- [ ] Demo/live fail closed.
-- [ ] Kernel liveness stays distinct.
-- [ ] Commit executed only with separate authorization.
+- [x] Four profiles returned.
+- [x] Demo/live fail closed.
+- [x] Kernel liveness stays distinct.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P7-T03` — Extend runtime validation
+#### - [x] Task `P7-T03` — Extend runtime validation
 
 **Traces to:** `G7`, `Profile readiness`, `Existing assets`
 **Depends on:** P7-T02
@@ -3452,18 +3452,18 @@ git diff --check
 **Re-run safety:** Safe when exact signature/export anchors match.
 
 **Definition of Done:**
-- [ ] Existing signature unchanged.
-- [ ] New function fails closed.
-- [ ] Compatibility tests pass.
-- [ ] G7 kernel/runtime boundary passes.
+- [x] Existing signature unchanged.
+- [x] New function fails closed.
+- [x] Compatibility tests pass.
+- [x] G7 kernel/runtime boundary passes.
 
 **Phase 7 Exit Gate — all must be true before Phase 8 starts:**
-- [ ] Every task checked off.
-- [ ] Full lint, type-check, tests, and 80% coverage pass.
-- [ ] No PROTECTED path appears in phase diff.
-- [ ] Six status concepts remain distinct.
-- [ ] Runtime compatibility is unchanged.
-- [ ] G7 passes at implemented boundaries.
+- [x] Every task checked off.
+- [x] Full lint, type-check, tests, and 80% coverage pass.
+- [x] No PROTECTED path appears in phase diff.
+- [x] Six status concepts remain distinct.
+- [x] Runtime compatibility is unchanged.
+- [x] G7 passes at implemented boundaries.
 
 ### Phase 8 — Provider State and Migration Lifecycle
 

@@ -49,6 +49,7 @@ _EXPORTS: dict[str, str] = {
     "LifecycleError": "app.kernel.errors",
     "ManifestValidationError": "app.kernel.errors",
     "ResolutionError": "app.kernel.errors",
+    "capability_unavailable_payload": "app.kernel.errors",
 }
 
 

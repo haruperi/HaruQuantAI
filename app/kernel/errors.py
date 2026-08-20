@@ -80,6 +80,37 @@ class CapabilityUnavailableError(KernelError):
         self.detail = detail
 
 
+def capability_unavailable_payload(
+    detail: CapabilityUnavailable,
+) -> dict[str, object]:
+    """Project a CapabilityUnavailable record into a JSON-serializable dictionary.
+
+    Args:
+        detail: The structured unavailability detail record.
+
+    Returns:
+        Mapping containing all 9 normalized fields with no omitted nulls.
+
+    Raises:
+        ValueError: If dependency_chain is empty or does not end with detail.capability.
+    """
+    if not detail.dependency_chain or detail.dependency_chain[-1] != detail.capability:
+        msg = "dependency_chain must end with capability"
+        raise ValueError(msg)
+
+    return {
+        "code": detail.code,
+        "reason_code": str(detail.reason_code),
+        "capability": detail.capability,
+        "consumer": detail.consumer,
+        "provider_id": detail.provider_id,
+        "provider_state": detail.provider_state,
+        "profile": detail.profile,
+        "dependency_chain": list(detail.dependency_chain),
+        "retryable": detail.retryable,
+    }
+
+
 __all__ = (
     "CapabilityReasonCode",
     "CapabilityUnavailable",
@@ -88,4 +119,5 @@ __all__ = (
     "LifecycleError",
     "ManifestValidationError",
     "ResolutionError",
+    "capability_unavailable_payload",
 )
