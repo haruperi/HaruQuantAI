@@ -66,6 +66,7 @@ def test_registry_folders_and_usage_programs_reconcile() -> None:
                 "evidence",
                 "runtime_stores",
                 "replay",
+                "sqx_source",
             ),
             start=1,
         )

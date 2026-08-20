@@ -260,6 +260,156 @@ def _execute_create(
     )
 
 
+_UPSERT_MARKET_SERIES = """
+INSERT INTO data_market_series (
+    source_data_id, connection, symbol, instrument, timeframe, timezone,
+    filename, date_from, date_to, data_type, row_count, decimals, source,
+    seconds_records, usymbol, usymbol_name, remove_weekends, show,
+    basket_id, broker_id, request_id, correlation_id, created_at, updated_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT(symbol, timeframe) DO UPDATE SET
+    connection = excluded.connection,
+    symbol = excluded.symbol,
+    instrument = excluded.instrument,
+    timeframe = excluded.timeframe,
+    timezone = excluded.timezone,
+    filename = excluded.filename,
+    date_from = excluded.date_from,
+    date_to = excluded.date_to,
+    data_type = excluded.data_type,
+    row_count = excluded.row_count,
+    decimals = excluded.decimals,
+    source = excluded.source,
+    seconds_records = excluded.seconds_records,
+    usymbol = excluded.usymbol,
+    usymbol_name = excluded.usymbol_name,
+    remove_weekends = excluded.remove_weekends,
+    show = excluded.show,
+    basket_id = excluded.basket_id,
+    broker_id = excluded.broker_id,
+    request_id = excluded.request_id,
+    correlation_id = excluded.correlation_id,
+    updated_at = excluded.updated_at
+""".strip()
+
+_UPSERT_BROKER_REFERENCE = """
+INSERT INTO data_brokers (
+    provider_id, provider_code, provider_kind, priority, trust_tier,
+    rate_limit, rate_window_seconds, license_json, enabled,
+    request_id, correlation_id, created_at, updated_at,
+    broker_id, name, is_system, description, stockpicker_use, mt_use,
+    mt_timezone, postfix
+) VALUES (?, ?, 'broker_profile', 100, 'unverified', 0, 1, '{}', 1,
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT(provider_id) DO UPDATE SET
+    name = excluded.name,
+    is_system = excluded.is_system,
+    description = excluded.description,
+    stockpicker_use = excluded.stockpicker_use,
+    mt_use = excluded.mt_use,
+    mt_timezone = excluded.mt_timezone,
+    postfix = excluded.postfix,
+    request_id = excluded.request_id,
+    correlation_id = excluded.correlation_id,
+    updated_at = excluded.updated_at
+""".strip()
+
+_UPSERT_INSTRUMENT_REFERENCE = """
+INSERT INTO data_instruments (
+    symbol_id, canonical_symbol, asset_class, base_currency, quote_currency,
+    digits, tick_size_decimal, min_volume_decimal, max_volume_decimal,
+    volume_step_decimal, contract_size_decimal, spec_json, state,
+    request_id, correlation_id, created_at, updated_at,
+    description, point_value, tick_size, tick_step, default_spread,
+    commissions, data_type, exchange, country, sector, default_slippage,
+    swap, order_size_multiplier, order_size_step, broker_id, min_distance
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT(symbol_id) DO UPDATE SET
+    description = excluded.description,
+    digits = excluded.digits,
+    point_value = excluded.point_value,
+    tick_size = excluded.tick_size,
+    tick_size_decimal = excluded.tick_size_decimal,
+    tick_step = excluded.tick_step,
+    contract_size_decimal = excluded.contract_size_decimal,
+    default_spread = excluded.default_spread,
+    default_slippage = excluded.default_slippage,
+    exchange = excluded.exchange,
+    sector = excluded.sector,
+    min_distance = excluded.min_distance,
+    swap = excluded.swap,
+    spec_json = excluded.spec_json,
+    state = excluded.state,
+    request_id = excluded.request_id,
+    correlation_id = excluded.correlation_id,
+    updated_at = excluded.updated_at
+""".strip()
+
+
+def create_market_series_records(
+    parameter_sets: tuple[tuple[Any, ...], ...], *, request_id: str
+) -> TransactionResult:
+    """Upsert QuantDataManager-derived series rows atomically.
+
+    Args:
+        parameter_sets: One binding tuple per series row.
+        request_id: Caller trace identity.
+
+    Returns:
+        Transaction result including the affected-row count.
+    """
+    logger.debug("Upserting Data market series reference rows")
+    return _execute_create(
+        tuple(_UPSERT_MARKET_SERIES for _ in parameter_sets),
+        parameter_sets,
+        request_id=request_id,
+        max_rows=max(1, len(parameter_sets)),
+    )
+
+
+def create_broker_reference_records(
+    parameter_sets: tuple[tuple[Any, ...], ...], *, request_id: str
+) -> TransactionResult:
+    """Upsert QuantDataManager-derived broker profile rows atomically.
+
+    Args:
+        parameter_sets: One binding tuple per broker row.
+        request_id: Caller trace identity.
+
+    Returns:
+        Transaction result including the affected-row count.
+    """
+    logger.debug("Upserting Data broker reference rows")
+    return _execute_create(
+        tuple(_UPSERT_BROKER_REFERENCE for _ in parameter_sets),
+        parameter_sets,
+        request_id=request_id,
+        max_rows=max(1, len(parameter_sets)),
+    )
+
+
+def create_instrument_reference_records(
+    parameter_sets: tuple[tuple[Any, ...], ...], *, request_id: str
+) -> TransactionResult:
+    """Upsert MT5-derived instrument specification rows atomically.
+
+    Args:
+        parameter_sets: One binding tuple per instrument row.
+        request_id: Caller trace identity.
+
+    Returns:
+        Transaction result including the affected-row count.
+    """
+    logger.debug("Upserting Data instrument reference rows")
+    return _execute_create(
+        tuple(_UPSERT_INSTRUMENT_REFERENCE for _ in parameter_sets),
+        parameter_sets,
+        request_id=request_id,
+        max_rows=max(1, len(parameter_sets)),
+    )
+
+
 def create_audit_event_record(
     parameters: tuple[Any, ...], *, request_id: str
 ) -> TransactionResult:
@@ -437,10 +587,13 @@ def create_runtime_put_once_record(
 __all__ = [
     "create_audit_event_record",
     "create_backfill_checkpoint_record",
+    "create_broker_reference_records",
     "create_catalog_artifact_records",
     "create_catalog_reference_records",
     "create_feed_record",
     "create_fetch_log_record",
+    "create_instrument_reference_records",
+    "create_market_series_records",
     "create_provider_specification_revision",
     "create_quality_event_record",
     "create_research_observation_record",

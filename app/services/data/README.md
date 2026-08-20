@@ -6,7 +6,7 @@ The official weekly-calendar synchronization accepts optional aware-UTC
 uses the runtime UTC clock.
 
 > **Package:** `app/services/data`
-> **Status:** `Completed` — all 14 registered features (`FEAT-DATA-01`..`14`) are implemented. The sim⇄live parity-programme extension of `FEAT-DATA-02` now implements immutable provider-specification revisions (`FR-DATA-214`–`216`). Canonical Depth-of-Market state is implemented as an extension of `FEAT-DATA-10` (`FR-DATA-217`–`219`); Brokers/MetaTrader produces normalized book reads and Data owns the canonical multi-symbol depth stream (`OD-DATA-01`, resolved in Section 6).
+> **Status:** `Completed` — all 15 registered features (`FEAT-DATA-01`..`15`) are implemented. The sim⇄live parity-programme extension of `FEAT-DATA-02` now implements immutable provider-specification revisions (`FR-DATA-214`–`216`). Canonical Depth-of-Market state is implemented as an extension of `FEAT-DATA-10` (`FR-DATA-217`–`219`); Brokers/MetaTrader produces normalized book reads and Data owns the canonical multi-symbol depth stream (`OD-DATA-01`, resolved in Section 6).
 > **Last updated:** `2026-08-14`
 
 > This README is the package's **single source of truth** for requirements,
@@ -269,6 +269,7 @@ operations are support packages excluded from the feature count.
 | Completed | `FEAT-DATA-12` Evidence | `evidence/` | Market, FX, account, and authorized audit evidence | Existing evidence and audit requirements, including `FR-DATA-008`, `014`–`021`, `028`, `076`–`079`, and `105`–`106` | `tests/data/usage/features/12_evidence.py` |
 | Completed | `FEAT-DATA-13` Runtime Stores | `runtime_stores/` | Namespaced cross-domain state and atomic transitions | `FR-DATA-146`–`150` | `tests/data/usage/features/13_runtime_stores.py` |
 | Completed | `FEAT-DATA-14` Replay | `replay/` | Availability-gated packages, ordering, hashing, and evidence export | `FR-DATA-181`–`183` and replay behavior in `FR-DATA-206` | `tests/data/usage/features/14_replay.py` |
+| Completed | `FEAT-DATA-15` SQX Source | `sqx_source/` | Direct QuantDataManager `.dat` M1/tick decoding (`read_sqx_m1`, `read_sqx_ticks`), catalogue symbol discovery (`list_sqx_symbols`), and reference synchronisation (`sync_quantdata_reference`) that upserts series and broker rows from the QuantDataManager catalogue and instrument specifications from live MT5 symbol metadata; root configured by `QUANTDATA_MANAGER_ROOT` | `FR-DATA-221`–`224` | `tests/data/usage/features/15_sqx_source.py` |
 
 `FR-DATA-220`: Data shall expose a bounded catalogue containing only ready datasets whose complete artifact set remains integrity verified. Each entry carries its stable dataset ID, display identity, aggregate revision, aggregate content hash, row count, and active eligibility for exact SIM-session binding.
 

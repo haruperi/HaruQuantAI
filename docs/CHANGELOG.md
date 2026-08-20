@@ -2,6 +2,65 @@
 
 ## [Unreleased]
 
+### Add the QuantDataManager source feature and sync refresh
+
+FEAT-DATA-15 reads QuantDataManager `.dat` history directly with a Numba
+JIT decoder (no CSV export, no disk duplication), and the Data Explorer
+Refresh button now synchronises the reference catalogues from the
+QuantDataManager catalogue plus live MT5 symbol metadata before reloading.
+
+#### Added (8)
+
+- Added the `sqx_source` feature module with `read_sqx_m1`,
+  `read_sqx_ticks`, `list_sqx_symbols`, and `sync_quantdata_reference`,
+  configured by `QUANTDATA_MANAGER_ROOT` and validated against synthetic
+  `.dat` fixtures and the live workspace.
+- Added migration step `012_market_series_natural_key` giving
+  `data_market_series` a unique `(symbol, timeframe)` key so repeated
+  syncs upsert instead of duplicating.
+- Added persistence upserts for series, broker, and instrument reference
+  rows plus read-only QuantDataManager catalogue reads.
+- Added gateway route `POST /api/v1/data/reference/sync` (governed write,
+  required idempotency) returning the sync summary; missing QuantDataManager
+  roots surface as 503.
+- Added the typed frontend client `syncReference` with its Zod summary
+  contract and route entry.
+- Added Refresh-button synchronisation: sync first, then reload the
+  active tab, with the summary shown under the toolbar.
+- Added three manifest-backed Data error codes (`QUANTDATA_ROOT_MISSING`,
+  `SQX_FILE_NOT_FOUND`, `SQX_FILE_EMPTY`).
+- Added instrument specifications sourced from live MT5 symbol metadata
+  (digits, point, spread, stops level, contract size, tick size/value,
+  swaps), never inventing values the broker does not provide.
+
+#### Changed (1)
+
+- Refreshed the frozen OpenAPI contract snapshot (175 to 176 operations).
+
+### Add the governed instrument edit dialog
+
+Clicking an Instrument in the Instruments tab opens a prepopulated edit
+dialog over `data_instruments`; saving persists through a governed PATCH.
+
+#### Added (4)
+
+- Added the public Data operation `update_instrument_spec` (single-row
+  specification update failing closed on unknown identities) with its
+  persistence statement.
+- Added gateway route `PATCH /api/v1/data/instruments/{instrument}`
+  (governed write, required idempotency, owner not-found mapped to 404).
+- Added the typed frontend client `updateInstrument` with its Zod contract
+  and route entry.
+- Added the themed instrument edit dialog (read-only identity, editable
+  description, point value, pip/tick size and step, default spread and
+  slippage, min distance, order-size multiplier and step; swap rules shown
+  read-only) with the Instruments tab's identity column as a clickable link.
+
+#### Changed (1)
+
+- Refreshed the frozen OpenAPI contract snapshot for the new operation
+  (174 to 175 operations).
+
 ### Add the governed series edit dialog
 
 Clicking a Symbol in the Data tab opens a prepopulated edit dialog covering

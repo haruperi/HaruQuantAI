@@ -800,3 +800,7 @@ app/ui/test-results/
 app/ui/playwright-report/
 app/ui/blob-report/
 app/ui/.playwright/
+
+# Binary data files
+*.dat
+data/*.dat

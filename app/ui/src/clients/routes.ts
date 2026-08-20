@@ -244,6 +244,15 @@ export const dataRoutes = {
     governed: true,
     idempotencyRequired: true,
   }),
+  syncReference: route({
+    id: "api.data.reference_sync",
+    method: "POST",
+    path: "/api/v1/data/reference/sync",
+    permission: "data:write",
+    sideEffect: "write",
+    governed: true,
+    idempotencyRequired: true,
+  }),
   updateInstrument: route({
     id: "api.data.instrument_update",
     method: "PATCH",

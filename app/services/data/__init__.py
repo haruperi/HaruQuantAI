@@ -347,6 +347,12 @@ if typing.TYPE_CHECKING:
     from app.services.data.sources.verified_research import (
         persist_verified_research_source,
     )
+    from app.services.data.sqx_source import (
+        list_sqx_symbols,
+        read_sqx_m1,
+        read_sqx_ticks,
+        sync_quantdata_reference,
+    )
     from app.services.data.synthetic_data import (
         generate_synthetic_bars,
         generate_synthetic_dataset,
@@ -1289,6 +1295,13 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.data.datasets",
         "update_instrument_spec",
     ),
+    "list_sqx_symbols": ("app.services.data.sqx_source", "list_sqx_symbols"),
+    "read_sqx_m1": ("app.services.data.sqx_source", "read_sqx_m1"),
+    "read_sqx_ticks": ("app.services.data.sqx_source", "read_sqx_ticks"),
+    "sync_quantdata_reference": (
+        "app.services.data.sqx_source",
+        "sync_quantdata_reference",
+    ),
     "validate_resample_target": (
         "app.services.data.time_sessions",
         "validate_resample_target",
@@ -1579,6 +1592,7 @@ __all__ = (
     "list_market_directory",
     "list_market_series",
     "list_registered_sources",
+    "list_sqx_symbols",
     "list_symbols",
     "list_verified_datasets",
     "load_csv",
@@ -1603,6 +1617,8 @@ __all__ = (
     "query_research_source_observations",
     "query_research_sources",
     "read_feed_status",
+    "read_sqx_m1",
+    "read_sqx_ticks",
     "read_update_job_status",
     "reconcile_data_catalog",
     "reconcile_feed_gap",
@@ -1644,6 +1660,7 @@ __all__ = (
     "summarize_quality_remediation",
     "sync_catalog_reference",
     "sync_current_week_economic_calendar",
+    "sync_quantdata_reference",
     "to_ohlcv_dataframe",
     "to_tick_dataframe",
     "unwrap_data_response",

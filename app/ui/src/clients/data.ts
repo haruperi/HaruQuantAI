@@ -103,7 +103,9 @@ export function marketSeries(
   params: MarketSeriesQuery = {},
   options?: RequestOptions
 ): Promise<ApiResponse<MarketSeries>> {
-  const query: Record<string, QueryValue> = {};
+  // The full reference catalogue is small; request the backend's page
+  // ceiling so the Data tab shows every series rather than the default page.
+  const query: Record<string, QueryValue> = { limit: params.limit ?? 200 };
   if (params.limit !== undefined) query.limit = params.limit;
   return request<MarketSeries>(dataRoutes.series, {
     schema: marketSeriesSchema,
@@ -116,13 +118,15 @@ export function marketSeries(
 export const instrumentRowSchema = z.object({
   instrument: z.string().min(1),
   description: z.string().nullable(),
-  broker_id: z.number().int().nullable(),
+  /** MT5 server name the specification was read from. */
+  broker_profile: z.string().nullable(),
   point_value: z.number().nullable(),
+  contract_size: z.union([z.number(), z.string()]).nullable(),
   tick_size: z.number().nullable(),
-  tick_step: z.number().nullable(),
   default_spread: z.number().nullable(),
   default_slippage: z.number().nullable(),
-  data_type: z.number().int().nullable(),
+  /** Broker market category from symbol_info.path (e.g. "Forex"). */
+  data_type: z.string().nullable(),
   order_size_multiplier: z.number().nullable(),
   order_size_step: z.number().nullable(),
 });
@@ -231,6 +235,29 @@ export interface InstrumentUpdateBody {
   order_size_step?: number | null;
 }
 
+/** Sync summary returned by the governed reference synchronisation. */
+export const referenceSyncSummarySchema = z.object({
+  series_synced: z.number().int(),
+  brokers_synced: z.number().int(),
+  instruments_synced: z.number().int(),
+  instruments_failed: z.array(z.string()),
+  mt5_available: z.boolean(),
+});
+export type ReferenceSyncSummary = z.infer<typeof referenceSyncSummarySchema>;
+
+/**
+ * Synchronise the reference catalogues from QuantDataManager and MT5
+ * (requires `data:write`).
+ */
+export function syncReference(
+  options?: RequestOptions
+): Promise<ApiResponse<ReferenceSyncSummary>> {
+  return request<ReferenceSyncSummary>(dataRoutes.syncReference, {
+    schema: referenceSyncSummarySchema,
+    ...options,
+  });
+}
+
 /** Governed edit of one instrument specification (requires `data:write`). */
 export function updateInstrument(
   instrumentId: string,
@@ -249,8 +276,9 @@ export function updateInstrument(
 export const instrumentSpecSchema = z.object({
   instrument: z.string().min(1),
   description: z.string().nullable(),
-  broker_id: z.number().int().nullable(),
+  broker_profile: z.string().nullable(),
   point_value: z.number().nullable(),
+  contract_size: z.union([z.number(), z.string()]).nullable(),
   tick_size: z.number().nullable(),
   tick_step: z.number().nullable(),
   default_spread: z.number().nullable(),
@@ -640,6 +668,7 @@ export const data = {
   instrument,
   updateSeries,
   updateInstrument,
+  syncReference,
   markets,
   quotes,
   bars,

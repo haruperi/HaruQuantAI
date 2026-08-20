@@ -114,7 +114,9 @@ export function InstrumentEditDialog({
   useEffect(() => {
     if (!spec) return;
     setDescription(spec.description ?? "");
-    setPointValue(spec.point_value === null ? "" : String(spec.point_value));
+    setPointValue(
+      spec.point_value === null ? "" : Number(spec.point_value).toFixed(5)
+    );
     setTickSize(spec.tick_size === null ? "" : String(spec.tick_size));
     setTickStep(spec.tick_step === null ? "" : String(spec.tick_step));
     setDefaultSpread(

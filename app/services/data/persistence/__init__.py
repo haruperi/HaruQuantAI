@@ -20,6 +20,9 @@ if typing.TYPE_CHECKING:
     from app.services.data.persistence.create import (
         create_catalog_artifact_records,
         create_catalog_reference_records,
+        create_broker_reference_records,
+        create_instrument_reference_records,
+        create_market_series_records,
         create_fetch_log_record,
         create_quality_event_record,
         create_provider_specification_revision,
@@ -52,6 +55,8 @@ if typing.TYPE_CHECKING:
         read_instrument_records,
         read_instrument_spec_record,
         read_market_series_exists,
+        read_quantdata_series_and_broker_rows,
+        read_quantdata_symbol_rows,
         read_market_series_records,
         read_latest_research_observation_record,
         read_latest_research_source_record,
@@ -140,6 +145,14 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.data.persistence.read",
         "read_market_series_exists",
     ),
+    "read_quantdata_series_and_broker_rows": (
+        "app.services.data.persistence.read",
+        "read_quantdata_series_and_broker_rows",
+    ),
+    "read_quantdata_symbol_rows": (
+        "app.services.data.persistence.read",
+        "read_quantdata_symbol_rows",
+    ),
     "update_market_series_records": (
         "app.services.data.persistence.update",
         "update_market_series_records",
@@ -171,6 +184,18 @@ _EXPORTS: dict[str, tuple[str, str]] = {
     "create_catalog_artifact_records": (
         "app.services.data.persistence.create",
         "create_catalog_artifact_records",
+    ),
+    "create_broker_reference_records": (
+        "app.services.data.persistence.create",
+        "create_broker_reference_records",
+    ),
+    "create_instrument_reference_records": (
+        "app.services.data.persistence.create",
+        "create_instrument_reference_records",
+    ),
+    "create_market_series_records": (
+        "app.services.data.persistence.create",
+        "create_market_series_records",
     ),
     "create_catalog_reference_records": (
         "app.services.data.persistence.create",
@@ -519,10 +544,13 @@ __all__ = [
     "create_audit_event_record",
     "create_backfill_checkpoint_record",
     "create_backup",
+    "create_broker_reference_records",
     "create_catalog_artifact_records",
     "create_catalog_reference_records",
     "create_feed_record",
     "create_fetch_log_record",
+    "create_instrument_reference_records",
+    "create_market_series_records",
     "create_provider_specification_revision",
     "create_provider_specification_revision",
     "create_quality_event_record",
@@ -568,6 +596,8 @@ __all__ = [
     "read_provider_specification_revision_interval",
     "read_provider_specification_revisions",
     "read_provider_specification_revisions",
+    "read_quantdata_series_and_broker_rows",
+    "read_quantdata_symbol_rows",
     "read_ready_dataset_catalog_records",
     "read_recent_source_attempt_records",
     "read_research_observation_records",
@@ -597,6 +627,7 @@ __all__ = [
     "update_economic_event_definition_record",
     "update_economic_event_records",
     "update_feed_record",
+    "update_instrument_spec_record",
     "update_job_recovery_blocked",
     "update_job_run_failure",
     "update_job_run_lease",

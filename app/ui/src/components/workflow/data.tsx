@@ -15,6 +15,7 @@ import {
 } from "@/clients";
 
 import { DataEditDialog } from "./DataEditDialog";
+import { InstrumentEditDialog } from "./InstrumentEditDialog";
 
 /** Render an epoch-seconds timestamp as a UTC date, or an em dash. */
 function formatDate(seconds: number | null): string {
@@ -77,15 +78,42 @@ function SeriesRow({
 }
 
 /** One instrument specification table row. */
-function InstrumentRowView({ row }: { row: InstrumentRow }): ReactNode {
+function InstrumentRowView({
+  row,
+  onEdit,
+}: {
+  row: InstrumentRow;
+  onEdit: (instrumentId: string) => void;
+}): ReactNode {
   return (
     <tr>
-      <td>{row.instrument}</td>
+      <td>
+        <button
+          onClick={() => onEdit(row.instrument)}
+          aria-label={`Edit instrument ${row.instrument}`}
+          style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+            color: "var(--cme-blue-bright)",
+            cursor: "pointer",
+            font: "inherit",
+            textDecoration: "underline",
+            textUnderlineOffset: 2,
+          }}
+        >
+          {row.instrument}
+        </button>
+      </td>
       <td>{orDash(row.description)}</td>
-      <td>{orDash(row.broker_id)}</td>
-      <td>{orDash(row.point_value)}</td>
+      <td>{orDash(row.broker_profile)}</td>
+      <td>
+        {row.point_value !== null && row.point_value !== undefined
+          ? row.point_value.toFixed(5)
+          : "—"}
+      </td>
+      <td>{orDash(row.contract_size)}</td>
       <td>{orDash(row.tick_size)}</td>
-      <td>{orDash(row.tick_step)}</td>
       <td>{orDash(row.default_spread)}</td>
       <td>{orDash(row.default_slippage)}</td>
       <td>{orDash(row.data_type)}</td>
@@ -171,8 +199,8 @@ const INSTRUMENT_HEADERS = (
     <th>Description</th>
     <th>Broker profile</th>
     <th>Point value</th>
-    <th>Pip/Tick size</th>
-    <th>Pip/Tick step</th>
+    <th>Contract Size</th>
+    <th>Tick Size</th>
     <th>Default spread</th>
     <th>Default slippage</th>
     <th>Data type</th>
@@ -214,6 +242,9 @@ export function DataWorkspace(): ReactNode {
     brokers: false,
   });
   const [editing, setEditing] = useState<MarketSeriesRow | null>(null);
+  const [editingInstrument, setEditingInstrument] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncNote, setSyncNote] = useState<string | null>(null);
 
   const load = useCallback(async (tab: TabId): Promise<void> => {
     setLoading(true);
@@ -238,6 +269,33 @@ export function DataWorkspace(): ReactNode {
       setLoading(false);
     }
   }, []);
+
+  const refresh = useCallback(
+    async (tab: TabId): Promise<void> => {
+      setSyncing(true);
+      setSyncNote(null);
+      try {
+        const response = await apiClients.data.syncReference();
+        const summary = unwrapData(response);
+        setSyncNote(
+          `synced ${summary.series_synced} series, ` +
+            `${summary.brokers_synced} brokers, ` +
+            `${summary.instruments_synced} instruments` +
+            (summary.mt5_available ? "" : " (MT5 unavailable)")
+        );
+      } catch (reason) {
+        setError(
+          reason instanceof ApiClientError ? reason.message : "sync unavailable"
+        );
+      } finally {
+        setSyncing(false);
+      }
+      // Reset lazy caches so every tab reloads fresh reference data.
+      setFetched({ data: false, instruments: false, brokers: false });
+      await load(tab);
+    },
+    [load]
+  );
 
   useEffect(() => {
     if (!fetched[activeTab]) void load(activeTab);
@@ -316,14 +374,26 @@ export function DataWorkspace(): ReactNode {
         </div>
         <button
           className="btn-cme btn-outline btn-sm"
-          onClick={() => void load(activeTab)}
-          disabled={loading}
-          aria-label="Refresh the active table"
-          title="Refresh the active table"
+          onClick={() => void refresh(activeTab)}
+          disabled={loading || syncing}
+          aria-label="Sync from QuantDataManager and refresh the active table"
+          title="Sync from QuantDataManager and refresh the active table"
         >
-          <RefreshCw size={12} /> Refresh
+          <RefreshCw size={12} /> {syncing ? "Syncing…" : "Refresh"}
         </button>
       </div>
+      {syncNote && (
+        <p
+          style={{
+            margin: "0 14px",
+            padding: "4px 0 0",
+            fontSize: 11,
+            color: "var(--text-muted-grey)",
+          }}
+        >
+          {syncNote}
+        </p>
+      )}
       <div
         role="tabpanel"
         id={`panel-${activeTab}`}
@@ -358,7 +428,11 @@ export function DataWorkspace(): ReactNode {
                   ))}
                 {activeTab === "instruments" &&
                   instruments.map((row) => (
-                    <InstrumentRowView key={row.instrument} row={row} />
+                    <InstrumentRowView
+                      key={row.instrument}
+                      row={row}
+                      onEdit={setEditingInstrument}
+                    />
                   ))}
                 {activeTab === "brokers" &&
                   brokers.map((row, index) => (
@@ -379,6 +453,16 @@ export function DataWorkspace(): ReactNode {
           onSaved={() => {
             setEditing(null);
             void load("data");
+          }}
+        />
+      )}
+      {editingInstrument && (
+        <InstrumentEditDialog
+          instrumentId={editingInstrument}
+          onClose={() => setEditingInstrument(null)}
+          onSaved={() => {
+            setEditingInstrument(null);
+            void load("instruments");
           }}
         />
       )}

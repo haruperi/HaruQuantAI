@@ -127,6 +127,24 @@ _ERROR_DEFINITIONS = (
         operator_action="Supply a start at or before the end",
     ),
     _definition(
+        "QUANTDATA_ROOT_MISSING",
+        "PERMANENT",
+        safe_message="The QuantDataManager workspace is absent",
+        operator_action="Verify QUANTDATA_MANAGER_ROOT and the workspace install",
+    ),
+    _definition(
+        "SQX_FILE_NOT_FOUND",
+        "PERMANENT",
+        safe_message="The SQX data file was not found",
+        operator_action="Verify the symbol and history directory",
+    ),
+    _definition(
+        "SQX_FILE_EMPTY",
+        "PERMANENT",
+        safe_message="The SQX data file declares no records",
+        operator_action="Re-export or refresh the source history",
+    ),
+    _definition(
         "FLAG_INVALID",
         "PERMANENT",
         safe_message="A boolean flag was not 0 or 1",

@@ -26,6 +26,7 @@ FEATURE_DIRECTORIES = frozenset(
         "replay",
         "runtime_stores",
         "sources",
+        "sqx_source",
         "synthetic_data",
         "time_sessions",
         "transformation",

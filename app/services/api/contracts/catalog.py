@@ -313,6 +313,15 @@ _KNOWN_ROUTE_CONTRACTS: tuple[RouteContract, ...] = (
         idempotency_policy="required",
     ),
     _contract(
+        "api.data.reference_sync",
+        "POST",
+        "/api/v1/data/reference/sync",
+        "data",
+        "data:write",
+        side_effect=RouteSideEffect.WRITE,
+        idempotency_policy="required",
+    ),
+    _contract(
         "api.data.series_update",
         "PATCH",
         "/api/v1/data/series/{series_id}",

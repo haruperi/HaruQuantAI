@@ -53,6 +53,7 @@ class DataSettings(BaseSettings):
     data_local_sources: Annotated[tuple[str, ...], NoDecode] = DEFAULT_LOCAL_SOURCES
     data_provider_sources: Annotated[tuple[str, ...], NoDecode] = ()
     data_raw_root: Path = DEFAULT_RAW_ROOT
+    quantdata_manager_root: Path | None = Path("C:/QuantDataManager125")
     quality_profile: Literal["strict", "standard", "lenient"] = "standard"
 
     @override

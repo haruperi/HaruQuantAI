@@ -208,4 +208,23 @@ MARKET_REFERENCE_MIGRATION_STEP = MigrationStep(
     statements=_STATEMENTS,
 )
 
-__all__ = ("MARKET_REFERENCE_MIGRATION_STEP",)
+_NATURAL_KEY_STATEMENTS = (
+    (
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_data_market_series_symbol_tf "
+        "ON data_market_series(symbol, timeframe)"
+    ),
+)
+
+MARKET_REFERENCE_KEY_MIGRATION_STEP = MigrationStep(
+    domain="data",
+    migration_id="012_market_series_natural_key",
+    checksum=hashlib.sha256(
+        "\n-- statement --\n".join(_NATURAL_KEY_STATEMENTS).encode()
+    ).hexdigest(),
+    statements=_NATURAL_KEY_STATEMENTS,
+)
+
+__all__ = (
+    "MARKET_REFERENCE_KEY_MIGRATION_STEP",
+    "MARKET_REFERENCE_MIGRATION_STEP",
+)

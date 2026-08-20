@@ -33,8 +33,8 @@ from app.services.data.persistence import (
     read_provider_specification_revisions,
     read_ready_dataset_catalog_records,
     read_verified_research_source_record,
-    update_market_series_records,
     update_instrument_spec_record,
+    update_market_series_records,
     update_provider_specification_revision,
 )
 from app.services.data.persistence.contracts import StorageManifest
@@ -178,8 +178,9 @@ def get_instrument_spec(instrument: str, *, request_id: str) -> dict[str, object
     return {
         "instrument": row.get("instrument"),
         "description": row.get("description"),
-        "broker_id": row.get("broker_id"),
+        "broker_profile": row.get("broker_profile"),
         "point_value": row.get("point_value"),
+        "contract_size": row.get("contract_size"),
         "tick_size": row.get("tick_size"),
         "tick_step": row.get("tick_step"),
         "default_spread": row.get("default_spread"),
@@ -407,10 +408,10 @@ def list_instruments(
         {
             "instrument": row.get("instrument"),
             "description": row.get("description"),
-            "broker_id": row.get("broker_id"),
+            "broker_profile": row.get("broker_profile"),
             "point_value": row.get("point_value"),
+            "contract_size": row.get("contract_size"),
             "tick_size": row.get("tick_size"),
-            "tick_step": row.get("tick_step"),
             "default_spread": row.get("default_spread"),
             "default_slippage": row.get("default_slippage"),
             "data_type": row.get("data_type"),
@@ -483,7 +484,11 @@ def _provider_identity(
 _CATALOG_TABLE_LIFECYCLES: Mapping[str, tuple[str, ...]] = {
     "data_audit_events": ("persist_audit_event", "query_audit_events"),
     "data_backfill_checkpoints": ("run_data_update_job_once", "recover_update_jobs"),
-    "data_brokers": ("sync_catalog_reference", "get_catalog_evidence"),
+    "data_brokers": (
+        "sync_catalog_reference",
+        "sync_quantdata_reference",
+        "get_catalog_evidence",
+    ),
     "data_cache": ("get_cache_entry", "put_cache_entry", "clear_data_cache"),
     "data_datasets": ("register_catalog_artifact", "get_catalog_evidence"),
     "data_economic_events": ("scrape_economic_calendar", "get_economic_events"),
@@ -499,7 +504,7 @@ _CATALOG_TABLE_LIFECYCLES: Mapping[str, tuple[str, ...]] = {
     "data_feeds": ("start_internal_feed", "get_feed_status"),
     "data_fetch_log": ("record_catalog_fetch", "get_catalog_evidence"),
     "data_instruments": ("sync_catalog_reference", "get_catalog_evidence"),
-    "data_market_series": ("list_market_series",),
+    "data_market_series": ("list_market_series", "sync_quantdata_reference"),
     "data_migration_ledger": ("run_data_migrations",),
     "data_partition_files": ("register_catalog_artifact", "get_catalog_evidence"),
     "data_provider_specification_revisions": (

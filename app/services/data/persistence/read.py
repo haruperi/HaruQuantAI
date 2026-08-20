@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import sqlite3
 from collections.abc import Sequence
+from contextlib import closing
+from pathlib import Path
 from typing import Any
 
 from app.services.data.persistence.contracts import (
@@ -700,6 +703,82 @@ def read_runtime_collection_records(
     )
 
 
+_SELECT_QUANTDATA_SYMBOLS = """
+SELECT SYMBOL, INSTRUMENT, TIMEFRAME, TIMEZONE, DATEFROM, DATETO, ROWS
+FROM DATA ORDER BY INSTRUMENT, TIMEFRAME
+""".strip()
+
+_SELECT_QUANTDATA_DATA = """
+SELECT ID, CONNECTION, SYMBOL, INSTRUMENT, TIMEFRAME, TIMEZONE, FILENAME,
+       DATEFROM, DATETO, DATATYPE, ROWS, DECIMALS, SOURCE, SECONDS_RECORDS,
+       USYMBOL, USYMBOLNAME, REMOVE_WEEKENDS, SHOW, BASKET_ID, BROKER_ID
+FROM DATA ORDER BY ID LIMIT ?
+""".strip()
+
+_SELECT_QUANTDATA_BROKERS = """
+SELECT ID, NAME, SYSTEM, "DESC", STOCKPICKER_USE, MT_USE, MT_TIMEZONE,
+       POSTFIX FROM BROKER ORDER BY ID LIMIT ?
+""".strip()
+
+
+def _project_rows(rows: tuple[Any, ...]) -> tuple[dict[str, Any], ...]:
+    """Project raw sqlite rows into plain dictionaries.
+
+    Args:
+        rows: Raw ``sqlite3.Row`` values.
+
+    Returns:
+        Dictionary rows preserving column names.
+    """
+    return tuple(dict(row) for row in rows)
+
+
+def read_quantdata_symbol_rows(
+    database_path: Path, *, request_id: str
+) -> tuple[dict[str, Any], ...]:
+    """Read the QuantDataManager symbol catalogue read-only.
+
+    Args:
+        database_path: Path to the external QuantDataManager SQLite database.
+        request_id: Caller trace identity.
+
+    Returns:
+        Symbol catalogue rows with normalized column names.
+    """
+    logger.debug("Reading QuantDataManager symbol catalogue")
+    _ = request_id  # trace identity reserved for the owning feature's log
+    with closing(
+        sqlite3.connect(f"file:{database_path}?mode=ro", uri=True)
+    ) as connection:
+        connection.row_factory = sqlite3.Row
+        rows = tuple(connection.execute(_SELECT_QUANTDATA_SYMBOLS))
+    return _project_rows(rows)
+
+
+def read_quantdata_series_and_broker_rows(
+    database_path: Path, *, request_id: str, limit: int
+) -> tuple[dict[str, Any], ...]:
+    """Read bounded QuantDataManager series and broker rows read-only.
+
+    Args:
+        database_path: Path to the external QuantDataManager SQLite database.
+        request_id: Caller trace identity.
+        limit: Maximum rows read per table.
+
+    Returns:
+        Mixed series and broker rows; series rows carry a ``SYMBOL`` key.
+    """
+    logger.debug("Reading QuantDataManager series and broker rows")
+    _ = request_id  # trace identity reserved for the owning feature's log
+    with closing(
+        sqlite3.connect(f"file:{database_path}?mode=ro", uri=True)
+    ) as connection:
+        connection.row_factory = sqlite3.Row
+        data_rows = tuple(connection.execute(_SELECT_QUANTDATA_DATA, (limit,)))
+        broker_rows = tuple(connection.execute(_SELECT_QUANTDATA_BROKERS, (limit,)))
+    return (*_project_rows(data_rows), *_project_rows(broker_rows))
+
+
 __all__ = [
     "read_audit_event_records",
     "read_cache_record",
@@ -970,6 +1049,7 @@ SELECT series_id, symbol, instrument, filename, broker_id, usymbol, timeframe,
        row_count, decimals, source, data_type, show, remove_weekends
 FROM data_market_series
 ORDER BY symbol, timeframe
+LIMIT ?
 """.strip()
 
 
@@ -986,7 +1066,7 @@ def read_market_series_records(*, request_id: str, limit: int) -> TransactionRes
     logger.debug("Reading Data market series reference rows")
     return _execute_read(
         _SELECT_MARKET_SERIES,
-        (),
+        (limit,),
         request_id=request_id,
         max_rows=limit,
     )
@@ -1017,17 +1097,20 @@ def read_market_series_exists(series_id: int, *, request_id: str) -> Transaction
 
 
 _SELECT_INSTRUMENTS = """
-SELECT symbol_id AS instrument, description, broker_id, point_value, tick_size,
-       tick_step, default_spread, default_slippage, data_type,
+SELECT symbol_id AS instrument, description, exchange AS broker_profile,
+       point_value, contract_size_decimal AS contract_size, tick_size,
+       default_spread, default_slippage, sector AS data_type,
        order_size_multiplier, order_size_step, min_distance, swap
 FROM data_instruments
 ORDER BY symbol_id
+LIMIT ?
 """.strip()
 
 
 _SELECT_INSTRUMENT_ONE = """
-SELECT symbol_id AS instrument, description, broker_id, point_value, tick_size,
-       tick_step, default_spread, default_slippage, data_type,
+SELECT symbol_id AS instrument, description, exchange AS broker_profile,
+       point_value, contract_size_decimal AS contract_size, tick_size,
+       default_spread, default_slippage, sector AS data_type,
        order_size_multiplier, order_size_step, min_distance, swap
 FROM data_instruments
 WHERE symbol_id = ?
@@ -1068,7 +1151,7 @@ def read_instrument_records(*, request_id: str, limit: int) -> TransactionResult
     logger.debug("Reading Data instrument reference rows")
     return _execute_read(
         _SELECT_INSTRUMENTS,
-        (),
+        (limit,),
         request_id=request_id,
         max_rows=limit,
     )
@@ -1080,6 +1163,7 @@ SELECT b.broker_id, b.name, b.description, b.postfix, b.mt_timezone,
         WHERE i.broker_id = b.broker_id) AS customized_instruments
 FROM data_brokers b
 ORDER BY b.name
+LIMIT ?
 """.strip()
 
 
@@ -1096,7 +1180,7 @@ def read_broker_records(*, request_id: str, limit: int) -> TransactionResult:
     logger.debug("Reading Data broker reference rows")
     return _execute_read(
         _SELECT_BROKERS,
-        (),
+        (limit,),
         request_id=request_id,
         max_rows=limit,
     )

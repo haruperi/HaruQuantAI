@@ -21,6 +21,8 @@ vi.mock("@/clients", async () => {
         brokers: vi.fn(),
         instrument: vi.fn(),
         updateSeries: vi.fn(),
+        updateInstrument: vi.fn(),
+        syncReference: vi.fn(),
       },
     },
   };
@@ -96,12 +98,13 @@ function mockInstrumentSpec(): void {
     data: {
       instrument: "EURJPY",
       description: "Euro vs Japanese Yen",
-      broker_id: 1,
-      point_value: 1,
+      broker_profile: "MetaTrader 5 Demo",
+      point_value: 0.001,
+      contract_size: 100000,
       tick_size: 0.001,
       tick_step: 0.001,
       default_spread: 0.002,
-      default_slippage: 0,
+      default_slippage: 1,
       data_type: 1,
       order_size_multiplier: 1,
       order_size_step: 0,
@@ -223,13 +226,13 @@ describe("DataWorkspace", () => {
       {
         instrument: "EURJPY",
         description: "Euro vs Japanese Yen",
-        broker_id: 1,
-        point_value: 1,
-        tick_size: 0.001,
-        tick_step: 0.001,
-        default_spread: 0.002,
-        default_slippage: 0,
-        data_type: 1,
+        broker_profile: "MetaTrader 5 Demo",
+        point_value: 0.00001,
+        contract_size: 100000,
+        tick_size: 0.00001,
+        default_spread: 12,
+        default_slippage: 1,
+        data_type: "FOREX",
         order_size_multiplier: 1,
         order_size_step: 0,
       },
@@ -240,9 +243,150 @@ describe("DataWorkspace", () => {
 
     await waitFor(() => expect(screen.getByText("EURJPY")).toBeInTheDocument());
     expect(screen.getByText("Point value")).toBeInTheDocument();
-    expect(screen.getByText("Pip/Tick size")).toBeInTheDocument();
+    expect(screen.getByText("Contract Size")).toBeInTheDocument();
+    expect(screen.getByText("Tick Size")).toBeInTheDocument();
+    expect(screen.getByText("Default spread")).toBeInTheDocument();
+    expect(screen.getByText("Default slippage")).toBeInTheDocument();
+    expect(screen.getByText("Data type")).toBeInTheDocument();
     expect(screen.getByText("Order size mult.")).toBeInTheDocument();
-    expect(screen.getByText("Euro vs Japanese Yen")).toBeInTheDocument();
+    expect(screen.getByText("MetaTrader 5 Demo")).toBeInTheDocument();
+    expect(screen.getAllByText("0.00001")).toHaveLength(2);
+    expect(screen.getByText("100000")).toBeInTheDocument();
+    expect(screen.getByText("FOREX")).toBeInTheDocument();
+  });
+
+  it("opens the instrument edit dialog prepopulated when an instrument is clicked", async () => {
+    mockInstruments([
+      {
+        instrument: "EURJPY",
+        description: null,
+        broker_profile: "MetaTrader 5 Demo",
+        point_value: 0.001,
+        contract_size: 100000,
+        tick_size: 0.001,
+        default_spread: 0.002,
+        default_slippage: 1,
+        data_type: "FOREX",
+        order_size_multiplier: 1,
+        order_size_step: 0,
+      },
+    ]);
+    mockInstrumentSpec();
+    render(<DataWorkspace />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "Instruments" }));
+    await waitFor(() => expect(screen.getByText("EURJPY")).toBeInTheDocument());
+    fireEvent.click(
+      screen.getByRole("button", { name: "Edit instrument EURJPY" })
+    );
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveAttribute("aria-label", "Edit instrument EURJPY");
+    expect((screen.getByLabelText("Instrument") as HTMLInputElement).value).toBe(
+      "EURJPY"
+    );
+    await waitFor(() =>
+      expect((screen.getByLabelText("Description") as HTMLInputElement).value).toBe(
+        "Euro vs Japanese Yen"
+      )
+    );
+    expect(
+      (screen.getByLabelText("Pip/Tick size") as HTMLInputElement).value
+    ).toBe("0.001");
+  });
+
+  it("saves the edited instrument and refetches the tab", async () => {
+    mockInstruments([
+      {
+        instrument: "EURJPY",
+        description: null,
+        broker_profile: "MetaTrader 5 Demo",
+        point_value: 0.001,
+        contract_size: 100000,
+        tick_size: 0.001,
+        default_spread: 0.002,
+        default_slippage: 1,
+        data_type: "FOREX",
+        order_size_multiplier: 1,
+        order_size_step: 0,
+      },
+    ]);
+    mockInstrumentSpec();
+    vi.mocked(apiClients.data.updateInstrument).mockResolvedValue({
+      status: "success",
+      message: "ok",
+      data: {
+        instrument: "EURJPY",
+        description: "Edited",
+        broker_profile: "MetaTrader 5 Demo",
+        point_value: 0.001,
+        contract_size: 100000,
+        tick_size: 0.005,
+        tick_step: 0.001,
+        default_spread: 0.002,
+        default_slippage: 1,
+        data_type: 1,
+        order_size_multiplier: 1,
+        order_size_step: 0,
+        min_distance: 0,
+        swap: null,
+      } as never,
+      error: null,
+      metadata: METADATA,
+    });
+    render(<DataWorkspace />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "Instruments" }));
+    await waitFor(() => expect(screen.getByText("EURJPY")).toBeInTheDocument());
+    fireEvent.click(
+      screen.getByRole("button", { name: "Edit instrument EURJPY" })
+    );
+    const tickSizeInput = await screen.findByLabelText("Pip/Tick size");
+    await waitFor(() => expect(tickSizeInput).toHaveValue("0.001"));
+    fireEvent.change(tickSizeInput, { target: { value: "0.005" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() =>
+      expect(apiClients.data.updateInstrument).toHaveBeenCalledWith(
+        "EURJPY",
+        expect.objectContaining({ tick_size: 0.005 })
+      )
+    );
+    await waitFor(() =>
+      expect(apiClients.data.instruments).toHaveBeenCalledTimes(2)
+    );
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("discards instrument edits when Cancel closes the dialog", async () => {
+    mockInstruments([
+      {
+        instrument: "EURJPY",
+        description: null,
+        broker_profile: "MetaTrader 5 Demo",
+        point_value: 0.001,
+        contract_size: 100000,
+        tick_size: 0.001,
+        default_spread: 0.002,
+        default_slippage: 1,
+        data_type: "FOREX",
+        order_size_multiplier: 1,
+        order_size_step: 0,
+      },
+    ]);
+    mockInstrumentSpec();
+    render(<DataWorkspace />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "Instruments" }));
+    await waitFor(() => expect(screen.getByText("EURJPY")).toBeInTheDocument());
+    fireEvent.click(
+      screen.getByRole("button", { name: "Edit instrument EURJPY" })
+    );
+    await screen.findByRole("dialog");
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(apiClients.data.updateInstrument).not.toHaveBeenCalled();
   });
 
   it("switches to the Broker Profiles tab and renders its columns", async () => {
@@ -274,13 +418,36 @@ describe("DataWorkspace", () => {
     expect(screen.queryByText("EURJPY_M1")).not.toBeInTheDocument();
   });
 
-  it("refetches the active tab when Refresh is clicked", async () => {
+  it("syncs from QuantDataManager and refetches when Refresh is clicked", async () => {
+    vi.mocked(apiClients.data.syncReference).mockResolvedValue({
+      status: "success",
+      message: "ok",
+      data: {
+        series_synced: 60,
+        brokers_synced: 9,
+        instruments_synced: 30,
+        instruments_failed: [],
+        mt5_available: true,
+      } as never,
+      error: null,
+      metadata: METADATA,
+    });
     render(<DataWorkspace />);
     await waitFor(() => expect(screen.getByText("Symbol Name")).toBeInTheDocument());
     expect(apiClients.data.marketSeries).toHaveBeenCalledTimes(1);
 
-    fireEvent.click(screen.getByRole("button", { name: "Refresh the active table" }));
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Sync from QuantDataManager and refresh the active table",
+      })
+    );
 
+    await waitFor(() =>
+      expect(apiClients.data.syncReference).toHaveBeenCalledTimes(1)
+    );
+    await waitFor(() =>
+      expect(screen.getByText(/synced 60 series/)).toBeInTheDocument()
+    );
     await waitFor(() =>
       expect(apiClients.data.marketSeries).toHaveBeenCalledTimes(2)
     );

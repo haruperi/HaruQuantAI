@@ -68,6 +68,7 @@ def test_economic_events_step_is_additive_and_second() -> None:
         "009_economic_event_definitions",
         "010_provider_specification_revisions",
         "011_market_reference_v1",
+        "012_market_series_natural_key",
     )
 
 
@@ -104,6 +105,7 @@ def test_run_data_migrations_is_idempotent_on_re_run(
         "009_economic_event_definitions",
         "010_provider_specification_revisions",
         "011_market_reference_v1",
+        "012_market_series_natural_key",
     )
     assert tuple(first.applied_ids) == expected_ids
     assert tuple(second.applied_ids) == ()

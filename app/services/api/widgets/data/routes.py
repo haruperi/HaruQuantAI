@@ -43,6 +43,7 @@ from app.services.data import (
     list_instruments,
     list_market_series,
     list_symbols,
+    sync_quantdata_reference,
     update_instrument_spec,
     update_market_series,
 )
@@ -473,6 +474,67 @@ def _update_instrument(
             request_id=request_id,
             route="/api/v1/data/instruments/{instrument}",
             operation="api.data.instrument_update",
+            side_effect="write",
+        ),
+    )
+
+
+@router.post("/reference/sync", response_model=None)
+def _sync_reference(
+    context: Annotated[AuthContext, Depends(require_auth_context)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> object:
+    """Synchronise reference catalogues from QuantDataManager and MT5.
+
+    Series and broker rows come from the QuantDataManager catalogue; the
+    instrument specifications come from the live MT5 connection.
+
+    Args:
+        context: Authenticated API request context.
+        idempotency_key: Required durable HTTP idempotency key.
+
+    Returns:
+        Successful API response containing the sync summary.
+
+    Raises:
+        HTTPException: If authentication, authorization, or idempotency
+            fails, or the QuantDataManager root is absent.
+    """
+    require_human_permission(context, "data:write")
+    if (
+        idempotency_key is None
+        or not idempotency_key.strip()
+        or len(idempotency_key) > _MAX_IDEMPOTENCY_KEY_LENGTH
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="IDEMPOTENCY_KEY_REQUIRED",
+        )
+    request_id = generate_id("req")
+    try:
+        summary = sync_quantdata_reference(
+            request_id=request_id,
+            source_id=resolve_runtime_source_id(request_id=request_id),
+        )
+    except Exception as error:
+        code = str(getattr(error, "code", "") or "")
+        if code == "QUANTDATA_ROOT_MISSING":
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=code
+            ) from error
+        if code:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=code
+            ) from error
+        raise
+    return build_api_response(
+        status="success",
+        message="Reference catalogues synchronised",
+        data=summary,
+        metadata=build_api_metadata(
+            request_id=request_id,
+            route="/api/v1/data/reference/sync",
+            operation="api.data.reference_sync",
             side_effect="write",
         ),
     )

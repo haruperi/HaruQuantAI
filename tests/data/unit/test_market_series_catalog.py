@@ -12,6 +12,7 @@ from app.services.data.datasets.catalog import (
     list_brokers,
     list_instruments,
     list_market_series,
+    update_instrument_spec,
     update_market_series,
 )
 from app.utils import generate_id
@@ -236,6 +237,40 @@ def test_get_instrument_spec_requires_a_known_identity() -> None:
     ):
         get_instrument_spec("UNKNOWN", request_id=generate_id("req"))
     assert excinfo.value.code == "INSTRUMENT_NOT_FOUND"
+
+
+def test_update_instrument_spec_applies_and_returns_the_spec() -> None:
+    """The instrument edit executes one statement and re-reads the result."""
+    spec = {"instrument": "EURJPY", "tick_size": 0.005}
+    with (
+        patch(
+            "app.services.data.datasets.catalog.update_instrument_spec_record"
+        ) as update,
+        patch(
+            "app.services.data.datasets.catalog.get_instrument_spec",
+            return_value=spec,
+        ),
+    ):
+        result = update_instrument_spec(
+            "EURJPY",
+            description="Edited",
+            point_value=1,
+            tick_size=0.005,
+            tick_step=0.001,
+            default_spread=0.002,
+            default_slippage=0,
+            min_distance=0,
+            order_size_multiplier=1,
+            order_size_step=0,
+            request_id=generate_id("req"),
+        )
+
+    update.assert_called_once()
+    parameters = update.call_args.args[0]
+    assert parameters[0] == "Edited"
+    assert parameters[2] == 0.005
+    assert parameters[-1] == "EURJPY"
+    assert result == spec
 
 
 def test_list_market_series_rejects_an_invalid_bound() -> None:

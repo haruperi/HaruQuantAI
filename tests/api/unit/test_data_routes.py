@@ -339,6 +339,143 @@ def test_series_update_translates_owner_not_found(
     assert body["detail"] == "SERIES_NOT_FOUND"
 
 
+def test_reference_sync_requires_idempotency_key() -> None:
+    """The governed sync without a durable key is refused with 422."""
+    status_code, body = post_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/reference/sync",
+        {},
+        headers={},
+    )
+
+    assert status_code == 422
+    assert body["detail"] == "IDEMPOTENCY_KEY_REQUIRED"
+
+
+def test_reference_sync_delegates_to_the_owner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The sync route wraps the owner summary in the canonical envelope."""
+    captured_sync: dict[str, Any] = {}
+
+    def _sync(**kwargs: Any) -> dict[str, Any]:
+        captured_sync.update(kwargs)
+        return {
+            "series_synced": 60,
+            "brokers_synced": 9,
+            "instruments_synced": 30,
+            "instruments_failed": (),
+            "mt5_available": True,
+        }
+
+    monkeypatch.setattr(data, "sync_quantdata_reference", _sync)
+
+    status_code, body = post_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/reference/sync",
+        {},
+        headers={"Idempotency-Key": _key()},
+    )
+
+    assert status_code == 200
+    assert body["data"]["series_synced"] == 60
+    assert body["data"]["mt5_available"] is True
+    assert captured_sync["source_id"] == "mt5"
+    assert body["metadata"]["operation"] == "api.data.reference_sync"
+
+
+def test_reference_sync_translates_missing_root(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An absent QuantDataManager root surfaces as 503."""
+
+    class _MissingError(Exception):
+        code = "QUANTDATA_ROOT_MISSING"
+
+    def _raise(*_args: Any, **_kwargs: Any) -> None:
+        raise _MissingError
+
+    monkeypatch.setattr(data, "sync_quantdata_reference", _raise)
+
+    status_code, body = post_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/reference/sync",
+        {},
+        headers={"Idempotency-Key": _key()},
+    )
+
+    assert status_code == 503
+    assert body["detail"] == "QUANTDATA_ROOT_MISSING"
+
+
+def test_instrument_update_requires_idempotency_key() -> None:
+    """A governed instrument edit without a durable key is refused with 422."""
+    status_code, body = post_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/instruments/EURJPY",
+        {"tick_size": 0.002},
+        headers={},
+        method="PATCH",
+    )
+
+    assert status_code == 422
+    assert body["detail"] == "IDEMPOTENCY_KEY_REQUIRED"
+
+
+def test_instrument_update_delegates_to_the_owner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The governed instrument edit forwards the payload and wraps the spec."""
+    captured: dict[str, Any] = {}
+
+    def _capture(instrument: str, **kwargs: Any) -> dict[str, Any]:
+        captured.update(kwargs)
+        captured["instrument"] = instrument
+        return {"instrument": instrument, **kwargs}
+
+    monkeypatch.setattr(data, "update_instrument_spec", _capture)
+
+    status_code, body = post_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/instruments/EURJPY",
+        {"tick_size": 0.005, "description": "Edited"},
+        headers={"Idempotency-Key": _key()},
+        method="PATCH",
+    )
+
+    assert status_code == 200
+    assert body["data"]["instrument"] == "EURJPY"
+    assert captured["instrument"] == "EURJPY"
+    assert captured["tick_size"] == 0.005
+    assert captured["description"] == "Edited"
+    assert body["metadata"]["operation"] == "api.data.instrument_update"
+
+
+def test_instrument_update_translates_owner_not_found(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An unknown instrument identity fails closed with 404."""
+
+    class _NotFoundError(Exception):
+        code = "INSTRUMENT_NOT_FOUND"
+
+    def _raise(*_args: Any, **_kwargs: Any) -> None:
+        raise _NotFoundError
+
+    monkeypatch.setattr(data, "update_instrument_spec", _raise)
+
+    status_code, body = post_json(
+        _app(lambda *_args: None),
+        "/api/v1/data/instruments/UNKNOWN",
+        {"tick_size": 0.002},
+        headers={"Idempotency-Key": _key()},
+        method="PATCH",
+    )
+
+    assert status_code == 404
+    assert body["detail"] == "INSTRUMENT_NOT_FOUND"
+
+
 def test_symbol_directory_returns_canonical_api_envelope(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
