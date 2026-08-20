@@ -667,10 +667,10 @@ None. Phase 12 provider boundaries and file lists are produced by the determinis
 | P0-T02 | Freeze financial evidence hashes | P0-T01 | [x] |
 | P0-T03 | Scaffold import deletion harness | P0-T01 | [x] |
 | P0-T04 | Certify G0 baseline | P0-T02, P0-T03, EP-01 | [x] |
-| P1-T01 | Amend builder governance | P0-T04 | [ ] |
-| P1-T02 | Freeze architecture policy | P1-T01 | [ ] |
-| P1-T03 | Update system relationships | P1-T02 | [ ] |
-| P1-T04 | Enforce G1 documentation | P1-T03 | [ ] |
+| P1-T01 | Amend builder governance | P0-T04 | [x] |
+| P1-T02 | Freeze architecture policy | P1-T01 | [x] |
+| P1-T03 | Update system relationships | P1-T02 | [x] |
+| P1-T04 | Enforce G1 documentation | P1-T03 | [x] |
 | P2-T01 | Extract static dependency graph | P1-T04 | [ ] |
 | P2-T02 | Extract runtime configuration graphs | P2-T01 | [ ] |
 | P2-T03 | Extract state frontend graphs | P2-T01 | [ ] |
@@ -1066,20 +1066,20 @@ git diff --check
 **Re-run safety:** Safe after G0; a second run must produce no file diff.
 
 **Definition of Done:**
-- [ ] EP-01 is resolved by separate commits.
-- [ ] Every gate exits 0.
-- [ ] Original failure evidence remains.
-- [ ] Commit executed only with separate authorization.
+- [x] EP-01 is resolved by separate commits.
+- [x] Every gate exits 0.
+- [x] Original failure evidence remains.
+- [x] Commit executed only with separate authorization.
 
 **Phase 0 Exit Gate — all must be true before Phase 1 starts:**
-- [ ] Every task in this phase is checked off.
-- [ ] Full lint and type-check clean across repo.
-- [ ] Full test suite green; coverage remains at least 80%.
-- [ ] No test failing that was not in the original Phase 0 record.
-- [ ] No PROTECTED path appears in the phase diff.
-- [ ] All frontend checks exit 0.
-- [ ] Financial hash and fresh-process smoke tests pass.
-- [ ] G0 status is `PASSED`.
+- [x] Every task in this phase is checked off.
+- [x] Full lint and type-check clean across repo.
+- [x] Full test suite green; coverage remains at least 80%.
+- [x] No test failing that was not in the original Phase 0 record.
+- [x] No PROTECTED path appears in the phase diff.
+- [x] All frontend checks exit 0.
+- [x] Financial hash and fresh-process smoke tests pass.
+- [x] G0 status is `PASSED`.
 
 ### Phase 1 — Governing Rules
 
@@ -1088,7 +1088,7 @@ git diff --check
 **Deliverable:** approved governance, architecture, system-index changes plus a structural policy test.
 **Phase Exit Gate:** G1 policy changes merged; later decisions remain as frozen in §3 and §7.
 
-#### - [ ] Task `P1-T01` — Amend builder governance
+#### - [x] Task `P1-T01` — Amend builder governance
 
 **Traces to:** `D-09`, `D-10`, `D-12`, `D-01`, `R-03`, `R-04`, `R-07`, `G1`
 **Depends on:** P0-T04
@@ -1152,12 +1152,12 @@ rg -n 'Provider Infrastructure Exception|Capability Boundary Export Exception|Pr
 **Re-run safety:** Not safe — anchored policy insertions would duplicate; verify headings are absent before execution.
 
 **Definition of Done:**
-- [ ] Five exact rules are present once.
-- [ ] Existing safety text remains.
-- [ ] No other file changed.
-- [ ] Commit executed only with separate authorization.
+- [x] Five exact rules are present once.
+- [x] Existing safety text remains.
+- [x] No other file changed.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P1-T02` — Freeze architecture policy
+#### - [x] Task `P1-T02` — Freeze architecture policy
 
 **Traces to:** `D-01`, `D-02`, `D-03`, `D-04`, `D-05`, `D-07`, `D-08`, `R-01`, `R-02`, `R-05`, `R-06`, `G1`
 **Depends on:** P1-T01
@@ -1223,12 +1223,12 @@ rg -n '^## Spatiotemporal Provider Architecture$|^### (Units|Contract Shape|Iden
 **Re-run safety:** Not safe — stop if the top-level heading exists.
 
 **Definition of Done:**
-- [ ] All frozen contracts are documented.
-- [ ] Current domain documentation remains intact.
-- [ ] One file changed.
-- [ ] Commit executed only with separate authorization.
+- [x] All frozen contracts are documented.
+- [x] Current domain documentation remains intact.
+- [x] One file changed.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P1-T03` — Update system relationships
+#### - [x] Task `P1-T03` — Update system relationships
 
 **Traces to:** `R-03`, `R-06`, `G1`
 **Depends on:** P1-T02
@@ -1287,12 +1287,12 @@ rg -n 'app/kernel/|app/capabilities/|app/composition/' docs/PROJECT.md
 **Re-run safety:** Not safe — stop if all three index rows already exist.
 
 **Definition of Done:**
-- [ ] Three non-feature packages indexed.
-- [ ] Dependency direction stated once.
-- [ ] No registry duplicated.
-- [ ] Commit executed only with separate authorization.
+- [x] Three non-feature packages indexed.
+- [x] Dependency direction stated once.
+- [x] No registry duplicated.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P1-T04` — Enforce G1 documentation
+#### - [x] Task `P1-T04` — Enforce G1 documentation
 
 **Traces to:** `G1`
 **Depends on:** P1-T03
@@ -1355,24 +1355,26 @@ git diff --check
 
 **Documentation Updates:** none; this task verifies P1-T01–P1-T03.
 
+**Rollback:** revert the task commit before any Phase 2+ code; after Phase 2 begins, revert all dependent commits first.
+
 **Git Commit:** `test(architecture): enforce provider governance`
 
 **Re-run safety:** Safe — create-only; stop if file exists.
 
 **Definition of Done:**
-- [ ] Four tests pass.
-- [ ] Test uses exact-count assertions.
-- [ ] No docs changed.
-- [ ] Commit executed only with separate authorization.
+- [x] Four tests pass.
+- [x] Test uses exact-count assertions.
+- [x] No docs changed.
+- [x] Commit executed only with separate authorization.
 
 **Phase 1 Exit Gate — all must be true before Phase 2 starts:**
-- [ ] Every task in this phase is checked off.
-- [ ] Full lint and type-check clean across repo.
-- [ ] Full test suite green; coverage remains at least 80%.
-- [ ] No new failure exists beyond Phase 0 evidence.
-- [ ] No PROTECTED path appears in the phase diff.
-- [ ] G1 structural test passes.
-- [ ] Architecture and project docs contain no second Feature Registry.
+- [x] Every task in this phase is checked off.
+- [x] Full lint and type-check clean across repo.
+- [x] Full test suite green; coverage remains at least 80%.
+- [x] No new failure exists beyond Phase 0 evidence.
+- [x] No PROTECTED path appears in the phase diff.
+- [x] G1 structural test passes.
+- [x] Architecture and project docs contain no second Feature Registry.
 
 ### Phase 2 — Five-Graph Audit
 

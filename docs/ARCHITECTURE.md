@@ -357,7 +357,112 @@
 
 ---
 
-## Folder Topology & Dependency Flow
+## Spatiotemporal Provider Architecture
+
+### Units
+
+The provider architecture decomposes runtime execution into nine distinct architectural units:
+
+* **Kernel**: Business-neutral runtime machinery (`app/kernel/`) that discovers manifests, resolves dependencies, coordinates lifecycles, tracks health, and manages effect scopes without business domain knowledge.
+* **Capability Specification**: Stable, versioned contract in `app/capabilities/<domain>/<capability>/v<N>.py` defining pure callable records or effectful protocols.
+* **Provider**: Concrete implementation package of one or more capabilities. The provider is the fundamental unit of runtime removability and replacement.
+* **Component**: An activated provider generation paired with its parsed configuration, allocated resources, and registered effect scope.
+* **Feature**: Product capability owned by a business domain, comprising one or more cooperating providers.
+* **Domain**: Business ownership and namespace boundary (`app/services/[DOMAIN]/`), exposing public functions and acting as a transitional compatibility façade.
+* **Profile**: Operational readiness policy (`research`, `simulation`, `demo`, `live`) declaring required capabilities and degradation rules.
+* **Composition Root**: Dedicated construction layer (`app/composition/`) that inspects profiles, instantiates selected providers, and injects capabilities.
+* **Effect Scope**: Managed lifecycle boundary tracking background tasks, open sockets, event streams, file handles, and database transactions.
+
+### Contract Shape
+
+Capability contracts use a hybrid model based on effect classification:
+
+* **Pure Capabilities**: Frozen dataclasses of callable types (e.g. `RsiCapability`, `WilliamsRCapability`). Pure functions take inputs, return outputs, and hold zero state or external handles.
+* **Effectful Capabilities**: `typing.Protocol` interfaces (e.g. `NotificationDeliveryCapability`, `TickStreamCapability`). Effectful components own state, manage async/sync edge adapters, acquire system resources, and require formal lifecycle disposal.
+
+### Identifiers
+
+Components and contracts are identified by validated, immutable value objects:
+
+* **`CapabilityId`**: `<domain>.<capability>.v<major>` (e.g., `indicator.rsi.v1`, `broker.market_data.v1`). Segments match `[a-z][a-z0-9_]*` with a positive integer major version.
+* **`ProviderId`**: `<domain>.<capability>.<implementation>` (e.g., `indicator.rsi.numpy`, `broker.execution.mt5`).
+* **`SemanticVersion`**: `<major>.<minor>.<patch>` representing contract or implementation versioning.
+
+### Manifest
+
+Every provider folder contains a static `manifest.toml` parsed with stdlib `tomllib` during filesystem discovery without executing or importing provider Python code:
+
+* `provider_id`: Unique `ProviderId`.
+* `provider_version`: `SemanticVersion`.
+* `entry_point`: Factory function string (e.g., `"app.services.indicators.providers.rsi:create_rsi_provider"`).
+* `provides`: List of `ProvidedCapability` records (`capability_id`, `contract_version`, `cardinality`).
+* `requires` & `optional_requires`: List of `RequiredCapability` dependencies with supported major versions and `on_missing` policies (`fail_closed`, `degrade`, `skip`).
+* `profiles`: Allowed runtime profiles (`research`, `simulation`, `demo`, `live`).
+* `effect_classes`: Declared effects (`reversible_ephemeral`, `durable_compensatable`, `irreversible_external`).
+* `lifecycle` & `reload`: Policies (`pure` vs `scoped`, `config_restart` vs `process_restart`).
+* `state_retention`: Schema versioning, migration manifests, and purge authorization requirements.
+
+### Resolution
+
+Dependency resolution is deterministic and occurs at component activation:
+
+* The resolver constructs a directed acyclic dependency graph across discovered manifests.
+* Circular dependencies and version incompatibilities fail fast with detailed diagnostic chains.
+* Missing required dependencies trigger declared `on_missing` behavior (`fail_closed` halts startup; `degrade` drops optional features; `skip` bypasses optional providers).
+* The API Gateway synthesizes call-time `CAPABILITY_UNAVAILABLE` responses for absent capabilities so public HTTP/WebSocket routes maintain structural stability.
+
+### Lifecycle
+
+Components follow an explicit synchronous finite state machine:
+
+$$\text{Discovered} \longrightarrow \text{Registered} \longrightarrow \text{Activating} \longrightarrow \text{Active} \longleftrightarrow \text{Quiescing} \longrightarrow \text{Quiesced} \longrightarrow \text{Disposed}$$
+
+* **Activation**: Allocates resources, verifies environment readiness, and binds effect scopes.
+* **Quiesce & Drain**: Signals components to reject new work and complete in-flight transactions.
+* **Disposal**: Releases sockets, locks, and handles in reverse registration order.
+* **Error**: Captures activation or runtime failures into structured health projections without crashing unaffected services.
+
+### Composition
+
+`app/composition/` is the sole assembly layer permitted to import concrete provider factories and instantiate runtime pipelines:
+
+* Injects capability implementations directly into consumer constructors at startup.
+* Prevents runtime service-locator anti-patterns and dynamic global lookups in high-frequency calculation loops.
+* Manages generation leases, enabling atomic configuration reload and seamless provider replacement.
+
+### Profiles
+
+Runtime profiles define strict operational boundaries and readiness constraints:
+
+* `research`: Focuses on data exploration and analysis; prohibits live broker sockets and external mutation.
+* `simulation`: Executes reproducible backtests against historical tick ledgers with simulated fills and deterministic time.
+* `demo`: Connects to non-production demo brokers with genuine transport isolation and mock risk approvals.
+* `live`: Operates with real capital; enforces all mandatory safety gates, strict risk limits, verified credentials, and kill-switch readiness.
+
+### State Retention
+
+Provider uninstallation maintains database and state ledger integrity:
+
+* **Uninstall $\neq$ Purge**: Removing or disabling a provider retains its historical database tables, schema records, and migration ledger entries.
+* **Checksum Stability**: Applied migration checksums remain verifiable in the ledger, preventing database corruption when optional plugins are absent.
+* **Purge Governance**: Dropping tables or destroying persisted provider assets requires explicit, separate administrative authorization.
+
+### Removability Tiers
+
+The system classifies removability into three functional tiers:
+
+| Tier | Classification | Characteristics | Examples |
+|---|---|---|---|
+| **Tier A** | Pure Calculation | Zero dependencies, pure callable records, instant replacement, stateless. | RSI, Williams %R, ATR, MACD, mathematical transformations. |
+| **Tier B** | Business Domain | Swappable implementations, managed effect scopes, protocol interfaces, configurable. | MT5 Broker, cTrader, Notification channels, Alpha research models. |
+| **Tier C** | Core Infrastructure | Essential platform foundations, fail-closed safety, migration ledger, authorization. | SQLite connection pool, Risk Gate, Kill Switch, Kernel lifecycle. |
+
+### Frontend Boundary
+
+The Next.js UI interacts with providers exclusively through stable API routes:
+
+* When a provider is absent or disabled, API endpoints return a standardized `CAPABILITY_UNAVAILABLE` payload with precise reason codes and missing dependency chains.
+* UI components transition to graceful empty, degraded, or unavailable states without visual crashes or unhandled client exceptions.
 
 ### Workspace Directory Layout (Target)
 

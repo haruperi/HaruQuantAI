@@ -366,6 +366,21 @@ One responsibility
 
 Other domains may consume the capability, but they must not duplicate its business logic.
 
+### 2.3 System Infrastructure Packages
+
+The spatiotemporal provider architecture introduces three non-feature system infrastructure packages. These packages contain no `FEAT-*` features, own no feature registry, and define no standalone usage programs.
+
+| Package | Status | Owner | Feature Prefix | Registry | Responsibility |
+|---|---|---|---|---|---|
+| `app/kernel/` | `Planned until its gate passes` | `System infrastructure` | `None` | `None` | Business-neutral discovery, manifest parsing, dependency resolution, health, and lifecycle coordination. |
+| `app/capabilities/` | `Planned until its gate passes` | `System infrastructure` | `None` | `None` | Decoupled, versioned capability specifications (pure callable records and effectful Protocols). |
+| `app/composition/` | `Planned until its gate passes` | `System infrastructure` | `None` | `None` | Construction-time provider assembly, injection, and runtime generation leasing. |
+
+**Cross-domain provider relationship:**
+`composition → provider factory → injected capability; business consumer → capability spec; kernel ↛ business domain`
+
+See [Spatiotemporal Provider Architecture](file:///c:/Users/rharu/AppDev/HaruquantAI/docs/ARCHITECTURE.md#spatiotemporal-provider-architecture) for full contract definitions.
+
 ---
 
 ## 3. Domain Dependency Diagram
