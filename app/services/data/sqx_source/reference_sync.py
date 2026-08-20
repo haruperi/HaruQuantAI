@@ -245,7 +245,10 @@ def _mt5_server_name() -> str | None:
     server = getattr(provider, "mt5_server", None)
     if server is None:
         return None
-    return server.get_secret_value()
+    if hasattr(server, "get_secret_value"):
+        value: str = server.get_secret_value()
+        return value
+    return str(server)
 
 
 def sync_quantdata_reference(
