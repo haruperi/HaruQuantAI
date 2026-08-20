@@ -691,9 +691,9 @@ None. Phase 12 provider boundaries and file lists are produced by the determinis
 | P5-T02 | Enforce component transitions | P5-T01 | [x] |
 | P5-T03 | Coordinate component lifecycle | P5-T02 | [x] |
 | P5-T04 | Adapt asynchronous edges | P5-T03 | [x] |
-| P6-T01 | Define provider generations | P5-T04 | [ ] |
-| P6-T02 | Compose injected providers | P6-T01 | [ ] |
-| P6-T03 | Reconcile installed configuration | P6-T02 | [ ] |
+| P6-T01 | Define provider generations | P5-T04 | [x] |
+| P6-T02 | Compose injected providers | P6-T01 | [x] |
+| P6-T03 | Reconcile installed configuration | P6-T02 | [x] |
 | P7-T01 | Normalize capability failures | P6-T03 | [ ] |
 | P7-T02 | Compute profile readiness | P7-T01 | [ ] |
 | P7-T03 | Extend runtime validation | P7-T02 | [ ] |
@@ -2960,7 +2960,7 @@ git diff --check
 **Deliverable:** generation records, leases, composition runtime, and Tier-1 configuration reconciliation.
 **Phase Exit Gate:** G6 switches a consumer to a new generation without retaining a stale instance.
 
-#### - [ ] Task `P6-T01` — Define provider generations
+#### - [x] Task `P6-T01` — Define provider generations
 
 **Traces to:** `Phase 6`, `G6`
 **Depends on:** P5-T04
@@ -3025,12 +3025,12 @@ git diff --check
 **Re-run safety:** Safe — create-only.
 
 **Definition of Done:**
-- [ ] Generation and lease values frozen.
-- [ ] Digest deterministic.
-- [ ] Pinning tests pass.
-- [ ] Commit executed only with separate authorization.
+- [x] Generation and lease values frozen.
+- [x] Digest deterministic.
+- [x] Pinning tests pass.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P6-T02` — Compose injected providers
+#### - [x] Task `P6-T02` — Compose injected providers
 
 **Traces to:** `D-05`, `D-10`, `Phase 6`, `G6`
 **Depends on:** P6-T01
@@ -3117,12 +3117,12 @@ git diff --check
 **Re-run safety:** Safe — additive.
 
 **Definition of Done:**
-- [ ] Direct injection proven.
-- [ ] Candidate failure preserves incumbent.
-- [ ] Old/new lease behavior proven.
-- [ ] Commit executed only with separate authorization.
+- [x] Direct injection proven.
+- [x] Candidate failure preserves incumbent.
+- [x] Old/new lease behavior proven.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P6-T03` — Reconcile installed configuration
+#### - [x] Task `P6-T03` — Reconcile installed configuration
 
 **Traces to:** `Phase 6`, `Phase 17`, `D-13`, `G6`
 **Depends on:** P6-T02
@@ -3216,18 +3216,18 @@ git diff --check
 **Re-run safety:** Safe — reconciliation is idempotent for identical configs.
 
 **Definition of Done:**
-- [ ] Installed-only restriction enforced.
-- [ ] Transitive affected set tested.
-- [ ] Rollback restores incumbent IDs.
-- [ ] G6 passes.
+- [x] Installed-only restriction enforced.
+- [x] Transitive affected set tested.
+- [x] Rollback restores incumbent IDs.
+- [x] G6 passes.
 
 **Phase 6 Exit Gate — all must be true before Phase 7 starts:**
-- [ ] Every task checked off.
-- [ ] Full lint, type-check, tests, and 80% coverage pass.
-- [ ] No PROTECTED path appears in phase diff.
-- [ ] Business consumers receive direct objects, not registry access.
-- [ ] Replacement is atomic and generational.
-- [ ] G6 passes.
+- [x] Every task checked off.
+- [x] Full lint, type-check, tests, and 80% coverage pass.
+- [x] No PROTECTED path appears in phase diff.
+- [x] Business consumers receive direct objects, not registry access.
+- [x] Replacement is atomic and generational.
+- [x] G6 passes.
 
 ### Phase 7 — Errors, Health, Profile Readiness
 
