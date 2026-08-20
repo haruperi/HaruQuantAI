@@ -676,21 +676,21 @@ None. Phase 12 provider boundaries and file lists are produced by the determinis
 | P2-T03 | Extract state frontend graphs | P2-T01 | [x] |
 | P2-T04 | Build removability matrices | P2-T02, P2-T03 | [x] |
 | P2-T05 | Freeze G2 classifications | P2-T04 | [x] |
-| P3-T01 | Create capability package skeleton | P2-T05 | [ ] |
-| P3-T02 | Add indicator common contract | P3-T01 | [ ] |
-| P3-T03 | Add RSI capability contract | P3-T02 | [ ] |
-| P3-T04 | Add Williams capability contract | P3-T02 | [ ] |
-| P3-T05 | Enforce capability import isolation | P3-T03, P3-T04 | [ ] |
-| P4-T01 | Add kernel identifiers | P3-T05 | [ ] |
-| P4-T02 | Parse provider manifests | P4-T01 | [ ] |
-| P4-T03 | Discover first-party manifests | P4-T02 | [ ] |
-| P4-T04 | Register provider inventory | P4-T03 | [ ] |
-| P4-T05 | Resolve provider graph | P4-T04 | [ ] |
-| P4-T06 | Project kernel diagnostics | P4-T05 | [ ] |
-| P5-T01 | Own synchronous effects | P4-T06 | [ ] |
-| P5-T02 | Enforce component transitions | P5-T01 | [ ] |
-| P5-T03 | Coordinate component lifecycle | P5-T02 | [ ] |
-| P5-T04 | Adapt asynchronous edges | P5-T03 | [ ] |
+| P3-T01 | Create capability package skeleton | P2-T05 | [x] |
+| P3-T02 | Add indicator common contract | P3-T01 | [x] |
+| P3-T03 | Add RSI capability contract | P3-T02 | [x] |
+| P3-T04 | Add Williams capability contract | P3-T02 | [x] |
+| P3-T05 | Enforce capability import isolation | P3-T03, P3-T04 | [x] |
+| P4-T01 | Add kernel identifiers | P3-T05 | [x] |
+| P4-T02 | Parse provider manifests | P4-T01 | [x] |
+| P4-T03 | Discover first-party manifests | P4-T02 | [x] |
+| P4-T04 | Register provider inventory | P4-T03 | [x] |
+| P4-T05 | Resolve provider graph | P4-T04 | [x] |
+| P4-T06 | Project kernel diagnostics | P4-T05 | [x] |
+| P5-T01 | Own synchronous effects | P4-T06 | [x] |
+| P5-T02 | Enforce component transitions | P5-T01 | [x] |
+| P5-T03 | Coordinate component lifecycle | P5-T02 | [x] |
+| P5-T04 | Adapt asynchronous edges | P5-T03 | [x] |
 | P6-T01 | Define provider generations | P5-T04 | [ ] |
 | P6-T02 | Compose injected providers | P6-T01 | [ ] |
 | P6-T03 | Reconcile installed configuration | P6-T02 | [ ] |
@@ -1793,7 +1793,7 @@ git diff --check
 **Deliverable:** infrastructure package plus common, RSI, and Williams v1 specs with import-isolation tests.
 **Phase Exit Gate:** G3 consumer imports succeed with `app.services` and `app.agentic` blocked.
 
-#### - [ ] Task `P3-T01` — Create capability package skeleton
+#### - [x] Task `P3-T01` — Create capability package skeleton
 
 **Traces to:** `D-01`, `R-03`, `R-04`, `G3`
 **Depends on:** P2-T05
@@ -1853,12 +1853,12 @@ git diff --check
 **Re-run safety:** Safe — create-only; stop if a target exists.
 
 **Definition of Done:**
-- [ ] Three packages import.
-- [ ] All exports are empty.
-- [ ] No business module imported.
-- [ ] Commit executed only with separate authorization.
+- [x] Three packages import.
+- [x] All exports are empty.
+- [x] No business module imported.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P3-T02` — Add indicator common contract
+#### - [x] Task `P3-T02` — Add indicator common contract
 
 **Traces to:** `R-01`, `R-04`, `G3`
 **Depends on:** P3-T01
@@ -1928,12 +1928,12 @@ git diff --check
 **Re-run safety:** Safe — create-only.
 
 **Definition of Done:**
-- [ ] Four exact protocols exist.
-- [ ] No `Any` or business import exists.
-- [ ] Three tests pass.
-- [ ] Commit executed only with separate authorization.
+- [x] Four exact protocols exist.
+- [x] No `Any` or business import exists.
+- [x] Three tests pass.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P3-T03` — Add RSI capability contract
+#### - [x] Task `P3-T03` — Add RSI capability contract
 
 **Traces to:** `R-01`, `R-04`, `G3`, `Phase 9`
 **Depends on:** P3-T02
@@ -2020,12 +2020,12 @@ git diff --check
 **Re-run safety:** Safe — create-only.
 
 **Definition of Done:**
-- [ ] Exact signature and exports exist.
-- [ ] Four tests pass.
-- [ ] No provider import occurs.
-- [ ] Commit executed only with separate authorization.
+- [x] Exact signature and exports exist.
+- [x] Four tests pass.
+- [x] No provider import occurs.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P3-T04` — Add Williams capability contract
+#### - [x] Task `P3-T04` — Add Williams capability contract
 
 **Traces to:** `R-01`, `R-04`, `G3`, `Phase 9`
 **Depends on:** P3-T02
@@ -2104,12 +2104,12 @@ git diff --check
 **Re-run safety:** Safe — create-only.
 
 **Definition of Done:**
-- [ ] Exact signature and exports exist.
-- [ ] Tests reject an invented `source` parameter.
-- [ ] No provider import occurs.
-- [ ] Commit executed only with separate authorization.
+- [x] Exact signature and exports exist.
+- [x] Tests reject an invented `source` parameter.
+- [x] No provider import occurs.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P3-T05` — Enforce capability import isolation
+#### - [x] Task `P3-T05` — Enforce capability import isolation
 
 **Traces to:** `G3`, `Phase 16`
 **Depends on:** P3-T03, P3-T04
@@ -2175,18 +2175,18 @@ git diff --check
 **Re-run safety:** Safe — create-only.
 
 **Definition of Done:**
-- [ ] All capability tests pass.
-- [ ] Business imports blocked statically and dynamically.
-- [ ] G3 is satisfied.
-- [ ] Commit executed only with separate authorization.
+- [x] All capability tests pass.
+- [x] Business imports blocked statically and dynamically.
+- [x] G3 is satisfied.
+- [x] Commit executed only with separate authorization.
 
 **Phase 3 Exit Gate — all must be true before Phase 4 starts:**
-- [ ] Every task in this phase is checked off.
-- [ ] Full lint and type-check clean across repo.
-- [ ] Full suite green and coverage at least 80%.
-- [ ] No PROTECTED path appears in the phase diff.
-- [ ] Capability specs import with zero business providers.
-- [ ] G3 tests pass.
+- [x] Every task in this phase is checked off.
+- [x] Full lint and type-check clean across repo.
+- [x] Full suite green and coverage at least 80%.
+- [x] No PROTECTED path appears in the phase diff.
+- [x] Capability specs import with zero business providers.
+- [x] G3 tests pass.
 
 ### Phase 4 — Protected Microkernel
 
@@ -2195,7 +2195,7 @@ git diff --check
 **Deliverable:** identifiers, manifest parser, discovery, immutable registry, resolver, states, health, and diagnostics.
 **Phase Exit Gate:** G4 imports in a copied tree without `app/services/` and returns an empty business inventory.
 
-#### - [ ] Task `P4-T01` — Add kernel identifiers
+#### - [x] Task `P4-T01` — Add kernel identifiers
 
 **Traces to:** `D-01`, `D-02`, `R-03`, `G4`
 **Depends on:** P3-T05
@@ -2260,12 +2260,12 @@ git diff --check
 **Re-run safety:** Safe — create-only.
 
 **Definition of Done:**
-- [ ] Six tests pass.
-- [ ] Exact error messages match §3.2.
-- [ ] Kernel import is business-neutral.
-- [ ] Commit executed only with separate authorization.
+- [x] Six tests pass.
+- [x] Exact error messages match §3.2.
+- [x] Kernel import is business-neutral.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P4-T02` — Parse provider manifests
+#### - [x] Task `P4-T02` — Parse provider manifests
 
 **Traces to:** `R-05`, `D-03`, `D-04`, `D-07`, `D-08`, `G4`
 **Depends on:** P4-T01
@@ -2333,12 +2333,12 @@ git diff --check
 **Re-run safety:** Safe — files are additive; root export anchors must match.
 
 **Definition of Done:**
-- [ ] Strict parser tests pass.
-- [ ] Unknown fields fail closed.
-- [ ] Entry points remain unimported.
-- [ ] Commit executed only with separate authorization.
+- [x] Strict parser tests pass.
+- [x] Unknown fields fail closed.
+- [x] Entry points remain unimported.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P4-T03` — Discover first-party manifests
+#### - [x] Task `P4-T03` — Discover first-party manifests
 
 **Traces to:** `D-01`, `R-05`, `G4`
 **Depends on:** P4-T02
@@ -2411,12 +2411,12 @@ git diff --check
 **Re-run safety:** Safe — additive.
 
 **Definition of Done:**
-- [ ] Discovery is deterministic.
-- [ ] Escapes and duplicates fail closed.
-- [ ] No provider imports occur.
-- [ ] Commit executed only with separate authorization.
+- [x] Discovery is deterministic.
+- [x] Escapes and duplicates fail closed.
+- [x] No provider imports occur.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P4-T04` — Register provider inventory
+#### - [x] Task `P4-T04` — Register provider inventory
 
 **Traces to:** `D-01`, `D-03`, `G4`
 **Depends on:** P4-T03
@@ -2490,12 +2490,12 @@ git diff --check
 **Re-run safety:** Safe — additive.
 
 **Definition of Done:**
-- [ ] Inventory maps are immutable.
-- [ ] Cardinality is not resolved prematurely.
-- [ ] Five tests pass.
-- [ ] Commit executed only with separate authorization.
+- [x] Inventory maps are immutable.
+- [x] Cardinality is not resolved prematurely.
+- [x] Five tests pass.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P4-T05` — Resolve provider graph
+#### - [x] Task `P4-T05` — Resolve provider graph
 
 **Traces to:** `D-02`, `D-03`, `D-04`, `D-05`, `G4`
 **Depends on:** P4-T04
@@ -2564,12 +2564,12 @@ git diff --check
 **Re-run safety:** Safe — additive.
 
 **Definition of Done:**
-- [ ] All cardinalities and policies tested.
-- [ ] No ambiguity fallback exists.
-- [ ] Dependency chains are complete.
-- [ ] Commit executed only with separate authorization.
+- [x] All cardinalities and policies tested.
+- [x] No ambiguity fallback exists.
+- [x] Dependency chains are complete.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P4-T06` — Project kernel diagnostics
+#### - [x] Task `P4-T06` — Project kernel diagnostics
 
 **Traces to:** `D-01`, `G4`
 **Depends on:** P4-T05
@@ -2636,18 +2636,18 @@ git diff --check
 **Re-run safety:** Safe — additive and anchored exports.
 
 **Definition of Done:**
-- [ ] Kernel tests pass.
-- [ ] Missing services root returns empty tuple.
-- [ ] Diagnostics contain no configuration payload.
-- [ ] G4 is satisfied.
+- [x] Kernel tests pass.
+- [x] Missing services root returns empty tuple.
+- [x] Diagnostics contain no configuration payload.
+- [x] G4 is satisfied.
 
 **Phase 4 Exit Gate — all must be true before Phase 5 starts:**
-- [ ] Every task in this phase is checked off.
-- [ ] Full lint, type-check, tests, and 80% coverage pass.
-- [ ] Kernel LOC for identifiers through diagnostics is at most 600 excluding docstrings/tests.
-- [ ] Kernel imports no business domain.
-- [ ] Copied-tree import with `app/services/` absent succeeds.
-- [ ] G4 tests pass.
+- [x] Every task in this phase is checked off.
+- [x] Full lint, type-check, tests, and 80% coverage pass.
+- [x] Kernel LOC for identifiers through diagnostics is at most 600 excluding docstrings/tests.
+- [x] Kernel imports no business domain.
+- [x] Copied-tree import with `app/services/` absent succeeds.
+- [x] G4 tests pass.
 
 ### Phase 5 — Lifecycle and Effect Ownership
 
@@ -2656,7 +2656,7 @@ git diff --check
 **Deliverable:** sync effect scope, transition machine, lifecycle coordinator, and async edge adapter.
 **Phase Exit Gate:** G5 returns tasks/listeners/timers/mock clients to zero with no resource warning.
 
-#### - [ ] Task `P5-T01` — Own synchronous effects
+#### - [x] Task `P5-T01` — Own synchronous effects
 
 **Traces to:** `D-07`, `D-08`, `R-02`, `G5`
 **Depends on:** P4-T06
@@ -2720,12 +2720,12 @@ git diff --check
 **Re-run safety:** Safe — additive.
 
 **Definition of Done:**
-- [ ] Reverse order and refusal proven.
-- [ ] All cleanup failures retained.
-- [ ] No async/business code added.
-- [ ] Commit executed only with separate authorization.
+- [x] Reverse order and refusal proven.
+- [x] All cleanup failures retained.
+- [x] No async/business code added.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P5-T02` — Enforce component transitions
+#### - [x] Task `P5-T02` — Enforce component transitions
 
 **Traces to:** `Phase 5`, `D-08`, `G5`
 **Depends on:** P5-T01
@@ -2785,12 +2785,12 @@ git diff --check
 **Re-run safety:** Safe when exact enum anchor matches.
 
 **Definition of Done:**
-- [ ] Cartesian transition test passes.
-- [ ] Error text exact.
-- [ ] Enum unchanged.
-- [ ] Commit executed only with separate authorization.
+- [x] Cartesian transition test passes.
+- [x] Error text exact.
+- [x] Enum unchanged.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P5-T03` — Coordinate component lifecycle
+#### - [x] Task `P5-T03` — Coordinate component lifecycle
 
 **Traces to:** `D-05`, `D-08`, `R-02`, `G5`
 **Depends on:** P5-T02
@@ -2873,12 +2873,12 @@ git diff --check
 **Re-run safety:** Safe — additive.
 
 **Definition of Done:**
-- [ ] Nine lifecycle tests pass.
-- [ ] Partial-startup resources return to zero.
-- [ ] No warning leaks.
-- [ ] Commit executed only with separate authorization.
+- [x] Nine lifecycle tests pass.
+- [x] Partial-startup resources return to zero.
+- [x] No warning leaks.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P5-T04` — Adapt asynchronous edges
+#### - [x] Task `P5-T04` — Adapt asynchronous edges
 
 **Traces to:** `R-02`, `G5`
 **Depends on:** P5-T03
@@ -2940,18 +2940,18 @@ git diff --check
 **Re-run safety:** Safe — additive.
 
 **Definition of Done:**
-- [ ] Async/sync order proven.
-- [ ] No RuntimeWarning.
-- [ ] Core remains synchronous.
-- [ ] G5 resource counts reach zero.
+- [x] Async/sync order proven.
+- [x] No RuntimeWarning.
+- [x] Core remains synchronous.
+- [x] G5 resource counts reach zero.
 
 **Phase 5 Exit Gate — all must be true before Phase 6 starts:**
-- [ ] Every task checked off.
-- [ ] Full lint, type-check, tests, and 80% coverage pass.
-- [ ] No PROTECTED path appears in phase diff.
-- [ ] Partial activation cleanup reaches zero resources.
-- [ ] No ResourceWarning or RuntimeWarning.
-- [ ] G5 passes.
+- [x] Every task checked off.
+- [x] Full lint, type-check, tests, and 80% coverage pass.
+- [x] No PROTECTED path appears in phase diff.
+- [x] Partial activation cleanup reaches zero resources.
+- [x] No ResourceWarning or RuntimeWarning.
+- [x] G5 passes.
 
 ### Phase 6 — Composition, Injection, Generations
 

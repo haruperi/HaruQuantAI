@@ -230,7 +230,7 @@ def _find_cycles(
     for d1, targets in domain_deps.items():
         for d2 in targets:
             if d2 in domain_deps and d1 in domain_deps[d2]:
-                pair = tuple(sorted([d1, d2]))
+                pair = (d1, d2) if d1 < d2 else (d2, d1)
                 if pair not in visited_pairs:
                     visited_pairs.add(pair)
                     if "trading" in pair or "simulator" in pair:

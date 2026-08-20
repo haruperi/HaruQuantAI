@@ -11,7 +11,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
 EXCLUDE_DIRS = {
     ".git",
@@ -100,6 +100,7 @@ class RuntimeConfigVisitor(ast.NodeVisitor):
         self.config_edges: list[dict[str, Any]] = []
         self.unexplained: list[dict[str, Any]] = []
 
+    @override
     def visit_Call(self, node: ast.Call) -> None:
         """Process call nodes for runtime actions and configuration string arguments.
 
@@ -146,21 +147,20 @@ class RuntimeConfigVisitor(ast.NodeVisitor):
                     "detail": func_name,
                 }
             )
-        elif func_name in (
-            "run",
-            "Popen",
-            "check_output",
-            "check_call",
-        ) and isinstance(getattr(node.func, "value", None), ast.Name):
-            if getattr(node.func.value, "id", "") == "subprocess":
-                self.runtime_edges.append(
-                    {
-                        "source": self.rel_path,
-                        "kind": "subprocess",
-                        "lineno": node.lineno,
-                        "detail": f"subprocess.{func_name}",
-                    }
-                )
+        elif (
+            func_name in ("run", "Popen", "check_output", "check_call")
+            and isinstance(node.func, ast.Attribute)
+            and isinstance(node.func.value, ast.Name)
+            and node.func.value.id == "subprocess"
+        ):
+            self.runtime_edges.append(
+                {
+                    "source": self.rel_path,
+                    "kind": "subprocess",
+                    "lineno": node.lineno,
+                    "detail": f"subprocess.{func_name}",
+                }
+            )
         elif "add_job" in func_name or "schedule" in func_name:
             self.runtime_edges.append(
                 {
@@ -240,6 +240,7 @@ class RuntimeConfigVisitor(ast.NodeVisitor):
                         }
                     )
 
+    @override
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         """Inspect function definitions and decorators for lifecycle hooks.
 
@@ -279,6 +280,7 @@ class RuntimeConfigVisitor(ast.NodeVisitor):
 
         self.generic_visit(node)
 
+    @override
     def visit_Assign(self, node: ast.Assign) -> None:
         """Inspect assignments for secrets, allowlists, and feature flags.
 

@@ -11,7 +11,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
 EXCLUDE_DIRS = {
     ".git",
@@ -107,6 +107,7 @@ class StaticImportVisitor(ast.NodeVisitor):
         self._exports_dict_found = False
         self._lazy_class_modules: set[str] = set()
 
+    @override
     def visit_If(self, node: ast.If) -> None:
         """Handle if statements and track TYPE_CHECKING guard depth.
 
@@ -124,6 +125,7 @@ class StaticImportVisitor(ast.NodeVisitor):
         else:
             self.generic_visit(node)
 
+    @override
     def visit_Import(self, node: ast.Import) -> None:
         """Handle plain import statements.
 
@@ -144,6 +146,7 @@ class StaticImportVisitor(ast.NodeVisitor):
             )
         self.generic_visit(node)
 
+    @override
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         """Handle from ... import ... statements.
 
@@ -166,6 +169,7 @@ class StaticImportVisitor(ast.NodeVisitor):
             )
         self.generic_visit(node)
 
+    @override
     def visit_Call(self, node: ast.Call) -> None:
         """Handle call expressions for dynamic imports and lazy module instantiations.
 
@@ -253,6 +257,7 @@ class StaticImportVisitor(ast.NodeVisitor):
             )
             sys.exit(2)
 
+    @override
     def visit_Assign(self, node: ast.Assign) -> None:
         """Handle variable assignments for _EXPORTS and _FACTORIES registrations.
 
