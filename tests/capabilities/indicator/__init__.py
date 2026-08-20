@@ -1,0 +1,1 @@
+"""Indicator capability test package."""
