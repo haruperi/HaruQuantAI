@@ -25,7 +25,7 @@ def test_stateful_provider_absence_and_compatible_reinstall(tmp_path: Path) -> N
     db_dir_str = str(db_dir).replace("\\", "/")
 
     manifest = load_manifest(_FIXTURE_DIR / "manifest.toml")
-    assert manifest.state is not None
+    assert manifest.state_schema_id is not None
     migration_path = _FIXTURE_DIR / "migration.json"
     mig_data = json.loads(migration_path.read_text(encoding="utf-8"))
 

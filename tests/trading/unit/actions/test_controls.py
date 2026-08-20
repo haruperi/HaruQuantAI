@@ -1,6 +1,5 @@
 """Unit tests for Trading controls and Risk-owned kill-switch transitions."""
 
-# ruff: noqa: ARG005
 from dataclasses import replace
 from datetime import timedelta
 

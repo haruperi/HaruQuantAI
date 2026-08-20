@@ -1,0 +1,1 @@
+"""Notification capabilities domain namespace."""

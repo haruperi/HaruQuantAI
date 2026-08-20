@@ -1,6 +1,5 @@
 """Shared fixtures and unit tests for Trading action dependencies."""
 
-# ruff: noqa: ARG005
 from __future__ import annotations
 
 import asyncio

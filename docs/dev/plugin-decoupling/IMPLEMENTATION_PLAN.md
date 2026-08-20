@@ -700,53 +700,53 @@ None. Phase 12 provider boundaries and file lists are produced by the determinis
 | P8-T01 | Define provider state metadata | P7-T03 | [x] |
 | P8-T02 | Accept migration tombstones | P8-T01 | [x] |
 | P8-T03 | Prove retained-state reinstall | P8-T02 | [x] |
-| P9-T01 | Create RSI provider package | P8-T03 | [ ] |
-| P9-T02 | Activate RSI provider | P9-T01 | [ ] |
-| P9-T03 | Create Williams provider package | P9-T02 | [ ] |
-| P9-T04 | Activate Williams provider | P9-T03 | [ ] |
-| P9-T05 | Preserve indicator façade | P9-T04 | [ ] |
-| P9-T06 | Prove independent removal | P9-T05 | [ ] |
-| P10-T01 | Make Utils boundary lazy | P9-T06 | [ ] |
-| P10-T02 | Specify notification delivery | P10-T01 | [ ] |
-| P10-T03a | Scope email transport | P10-T02 | [ ] |
-| P10-T03b | Scope SMS transport | P10-T03a | [ ] |
-| P10-T03c | Scope Telegram transport | P10-T03b | [ ] |
-| P10-T03d | Scope desktop transport | P10-T03c | [ ] |
-| P10-T04 | Inject notification manager | P10-T03d | [ ] |
-| P10-T05 | Specify tick stream | P10-T04 | [ ] |
-| P10-T06a | Add MT5 tick stream | P10-T05 | [ ] |
-| P10-T06b | Add fake tick stream | P10-T06a | [ ] |
-| P10-T07 | Prove effectful replacement | P10-T06b | [ ] |
-| P11-T01 | Gate configuration disablement | P10-T07 | [ ] |
-| P11-T02 | Prove physical deletion | P11-T01 | [ ] |
-| P11-T03 | Prove reinstall and inverse safety | P11-T02 | [ ] |
-| P12.1-T01 | Materialize Utils work orders | P11-T03 | [ ] |
-| P12.2-T01 | Materialize Data foundation | 12.1 exit | [ ] |
-| P12.3-T01 | Materialize Brokers read | 12.2 exit | [ ] |
-| P12.4-T01 | Materialize Data live | 12.3 exit | [ ] |
-| P12.5-T01 | Materialize Indicators | 12.4 exit | [ ] |
-| P12.6-T01 | Materialize Analytics | 12.5 exit | [ ] |
-| P12.7-T01 | Materialize Strategy | 12.6 exit | [ ] |
-| P12.8-T01 | Materialize Portfolio reads | 12.7 exit | [ ] |
-| P12.9-T01 | Materialize Risk | 12.8 exit | [ ] |
-| P12.10-T01 | Materialize Portfolio actions | 12.9 exit | [ ] |
-| P12.11-T01 | Materialize Trading state | 12.10 exit | [ ] |
-| P12.12-T01 | Materialize Trading evaluation | 12.11 exit | [ ] |
-| P12.13-T01 | Materialize Simulator | 12.12 exit | [ ] |
-| P12.14-T01 | Materialize broker mutation | 12.13 exit | [ ] |
-| P12.15-T01 | Materialize demo live composition | 12.14 exit | [ ] |
-| P12.16-T01 | Materialize Research | 12.15 exit | [ ] |
-| P12.17-T01 | Materialize Optimization | 12.16 exit | [ ] |
-| P12.18-T01 | Materialize Agentic | 12.17 exit | [ ] |
-| P12.19-T01 | Materialize API | 12.18 exit | [ ] |
-| P12.20-T01 | Materialize UI | 12.19 exit | [ ] |
-| P12.21-T01 | Materialize cutover | 12.20 exit | [ ] |
-| P16-T01 | Enforce Python boundaries | P12.21–T01 | [ ] |
-| P16-T02 | Enforce provider manifests | P16-T01 | [ ] |
-| P16-T03 | Enforce removability evidence | P16-T02 | [ ] |
-| P16-T04 | Generate feature registries | P16-T03 | [ ] |
-| P17-T01 | Reconcile provider configuration | P16-T04 | [ ] |
-| P17-T02 | Prove transactional rollback | P17-T01 | [ ] |
+| P9-T01 | Create RSI provider package | P8-T03 | [x] |
+| P9-T02 | Activate RSI provider | P9-T01 | [x] |
+| P9-T03 | Create Williams provider package | P9-T02 | [x] |
+| P9-T04 | Activate Williams provider | P9-T03 | [x] |
+| P9-T05 | Preserve indicator façade | P9-T04 | [x] |
+| P9-T06 | Prove independent removal | P9-T05 | [x] |
+| P10-T01 | Make Utils boundary lazy | P9-T06 | [x] |
+| P10-T02 | Specify notification delivery | P10-T01 | [x] |
+| P10-T03a | Scope email transport | P10-T02 | [x] |
+| P10-T03b | Scope SMS transport | P10-T03a | [x] |
+| P10-T03c | Scope Telegram transport | P10-T03b | [x] |
+| P10-T03d | Scope desktop transport | P10-T03c | [x] |
+| P10-T04 | Inject notification manager | P10-T03d | [x] |
+| P10-T05 | Specify tick stream | P10-T04 | [x] |
+| P10-T06a | Add MT5 tick stream | P10-T05 | [x] |
+| P10-T06b | Add fake tick stream | P10-T06a | [x] |
+| P10-T07 | Prove effectful replacement | P10-T06b | [x] |
+| P11-T01 | Gate configuration disablement | P10-T07 | [x] |
+| P11-T02 | Prove physical deletion | P11-T01 | [x] |
+| P11-T03 | Prove reinstall and inverse safety | P11-T02 | [x] |
+| P12.1-T01 | Materialize Utils work orders | P11-T03 | [x] |
+| P12.2-T01 | Materialize Data foundation | 12.1 exit | [x] |
+| P12.3-T01 | Materialize Brokers read | 12.2 exit | [x] |
+| P12.4-T01 | Materialize Data live | 12.3 exit | [x] |
+| P12.5-T01 | Materialize Indicators | 12.4 exit | [x] |
+| P12.6-T01 | Materialize Analytics | 12.5 exit | [x] |
+| P12.7-T01 | Materialize Strategy | 12.6 exit | [x] |
+| P12.8-T01 | Materialize Portfolio reads | 12.7 exit | [x] |
+| P12.9-T01 | Materialize Risk | 12.8 exit | [x] |
+| P12.10-T01 | Materialize Portfolio actions | 12.9 exit | [x] |
+| P12.11-T01 | Materialize Trading state | 12.10 exit | [x] |
+| P12.12-T01 | Materialize Trading evaluation | 12.11 exit | [x] |
+| P12.13-T01 | Materialize Simulator | 12.12 exit | [x] |
+| P12.14-T01 | Materialize broker mutation | 12.13 exit | [x] |
+| P12.15-T01 | Materialize demo live composition | 12.14 exit | [x] |
+| P12.16-T01 | Materialize Research | 12.15 exit | [x] |
+| P12.17-T01 | Materialize Optimization | 12.16 exit | [x] |
+| P12.18-T01 | Materialize Agentic | 12.17 exit | [x] |
+| P12.19-T01 | Materialize API | 12.18 exit | [x] |
+| P12.20-T01 | Materialize UI | 12.19 exit | [x] |
+| P12.21-T01 | Materialize cutover | 12.20 exit | [x] |
+| P16-T01 | Enforce Python boundaries | P12.21–T01 | [x] |
+| P16-T02 | Enforce provider manifests | P16-T01 | [x] |
+| P16-T03 | Enforce removability evidence | P16-T02 | [x] |
+| P16-T04 | Generate feature registries | P16-T03 | [x] |
+| P17-T01 | Reconcile provider configuration | P16-T04 | [x] |
+| P17-T02 | Prove transactional rollback | P17-T01 | [x] |
 
 ## 11. PHASES
 
@@ -3727,7 +3727,7 @@ git diff --check
 **Deliverable:** two nested provider packages, root tests/examples, temporary façade modules, and physical deletion/reinstall proof.
 **Phase Exit Gate:** G9 passes for each provider independently and financial hashes remain unchanged.
 
-#### - [ ] Task `P9-T01` — Create RSI provider package
+#### - [x] Task `P9-T01` — Create RSI provider package
 
 **Traces to:** `Phase 9`, `R-01`, `R-04`, `R-05`, `G9`
 **Depends on:** P8-T03
@@ -3793,12 +3793,12 @@ git diff --check
 **Re-run safety:** Safe — create-only.
 
 **Definition of Done:**
-- [ ] Three production files created.
-- [ ] Existing RSI tests pass.
-- [ ] Old public module unchanged.
-- [ ] Commit executed only with separate authorization.
+- [x] Three production files created.
+- [x] Existing RSI tests pass.
+- [x] Old public module unchanged.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P9-T02` — Activate RSI provider
+#### - [x] Task `P9-T02` — Activate RSI provider
 
 **Traces to:** `Phase 9`, `G9`, `H — Verify`
 **Depends on:** P9-T01
@@ -3864,12 +3864,12 @@ git diff --check
 **Re-run safety:** Safe — create-only.
 
 **Definition of Done:**
-- [ ] Six tests pass.
-- [ ] Example exits 0.
-- [ ] Golden parity exact.
-- [ ] Commit executed only with separate authorization.
+- [x] Six tests pass.
+- [x] Example exits 0.
+- [x] Golden parity exact.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P9-T03` — Create Williams provider package
+#### - [x] Task `P9-T03` — Create Williams provider package
 
 **Traces to:** `Phase 9`, `R-01`, `R-04`, `R-05`, `G9`
 **Depends on:** P9-T02
@@ -3932,12 +3932,12 @@ git diff --check
 **Re-run safety:** Safe — create-only.
 
 **Definition of Done:**
-- [ ] Three production files created.
-- [ ] Existing tests pass.
-- [ ] Public module unchanged.
-- [ ] Commit executed only with separate authorization.
+- [x] Three production files created.
+- [x] Existing tests pass.
+- [x] Public module unchanged.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P9-T04` — Activate Williams provider
+#### - [x] Task `P9-T04` — Activate Williams provider
 
 **Traces to:** `Phase 9`, `G9`, `H — Verify`
 **Depends on:** P9-T03
@@ -3995,12 +3995,12 @@ git diff --check
 **Re-run safety:** Safe — create-only.
 
 **Definition of Done:**
-- [ ] Six tests pass.
-- [ ] Example passes.
-- [ ] Golden parity exact.
-- [ ] Commit executed only with separate authorization.
+- [x] Six tests pass.
+- [x] Example passes.
+- [x] Golden parity exact.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P9-T05` — Preserve indicator façade
+#### - [x] Task `P9-T05` — Preserve indicator façade
 
 **Traces to:** `G — Compatibility façade`, `Phase 9`, `G9`
 **Depends on:** P9-T04
@@ -4078,12 +4078,12 @@ git diff --check
 **Re-run safety:** Not safe — formula removal is one-time; revert restores old modules.
 
 **Definition of Done:**
-- [ ] Public signatures/exports unchanged.
-- [ ] One formula copy per provider.
-- [ ] Missing provider structured.
-- [ ] Commit executed only with separate authorization.
+- [x] Public signatures/exports unchanged.
+- [x] One formula copy per provider.
+- [x] Missing provider structured.
+- [x] Commit executed only with separate authorization.
 
-#### - [ ] Task `P9-T06` — Prove independent removal
+#### - [x] Task `P9-T06` — Prove independent removal
 
 **Traces to:** `Phase 9`, `G9`, `J — Deletion proof`
 **Depends on:** P9-T05
@@ -4153,19 +4153,19 @@ git diff --check
 **Re-run safety:** Safe — deletion occurs only under pytest temp roots.
 
 **Definition of Done:**
-- [ ] Four deletion/reinstall tests pass.
-- [ ] Source workspace unchanged by deletion.
-- [ ] Financial hashes pass.
-- [ ] G9 passes.
+- [x] Four deletion/reinstall tests pass.
+- [x] Source workspace unchanged by deletion.
+- [x] Financial hashes pass.
+- [x] G9 passes.
 
 **Phase 9 Exit Gate — all must be true before Phase 10 starts:**
-- [ ] Every task checked off.
-- [ ] Full lint, type-check, tests, and 80% coverage pass.
-- [ ] Provider examples exit 0.
-- [ ] FEAT-INDI-03 remains one feature.
-- [ ] Each provider independently deletes/reinstalls.
-- [ ] Financial outputs unchanged.
-- [ ] G9 passes.
+- [x] Every task checked off.
+- [x] Full lint, type-check, tests, and 80% coverage pass.
+- [x] Provider examples exit 0.
+- [x] FEAT-INDI-03 remains one feature.
+- [x] Each provider independently deletes/reinstalls.
+- [x] Financial outputs unchanged.
+- [x] G9 passes.
 
 ### Phase 10 — Effectful Pilots
 
@@ -4174,7 +4174,7 @@ git diff --check
 **Deliverable:** lazy Utils boundary, notification capability/transports, injected manager, tick-stream capability, MT5/fake adapters, and replacement proof.
 **Phase Exit Gate:** G10 proves pure and effectful models with zero leaked resources and no duplicate stream events.
 
-#### - [ ] Task `P10-T01` — Make Utils boundary lazy
+#### - [x] Task `P10-T01` — Make Utils boundary lazy
 
 **Traces to:** `Phase 10`, `Pilot A — Notifications`, `G10`
 **Depends on:** P9-T06
@@ -4234,7 +4234,7 @@ git diff --check
 
 **Definition of Done:** exact exports preserved; eager notification import removed; tests pass; commit separately authorized.
 
-#### - [ ] Task `P10-T02` — Specify notification delivery
+#### - [x] Task `P10-T02` — Specify notification delivery
 
 **Traces to:** `R-01`, `R-04`, `Pilot A — Notifications`, `G10`
 **Depends on:** P10-T01
@@ -4287,7 +4287,7 @@ git diff --check
 
 **Definition of Done:** Protocol/result exact; import neutral; tests pass; commit separately authorized.
 
-#### - [ ] Tasks `P10-T03a`–`P10-T03d` — Scope notification transports
+#### - [x] Tasks `P10-T03a`–`P10-T03d` — Scope notification transports
 
 **Traces to:** `Pilot A — Notifications`, `D-07`, `D-08`, `G10`
 **Depends on:** P10-T02; execute a→b→c→d
@@ -4337,7 +4337,7 @@ Provider logs only channel name and lifecycle state; never title/body/recipient/
 
 **Definition of Done:** six provider tests pass; example exits 0 without external action; existing channel tests pass; exactly one separately authorized commit.
 
-#### - [ ] Task `P10-T04` — Inject notification manager
+#### - [x] Task `P10-T04` — Inject notification manager
 
 **Traces to:** `D-10`, `Pilot A — Notifications`, `G10`
 **Depends on:** P10-T03d
@@ -4398,7 +4398,7 @@ git diff --check
 
 **Definition of Done:** no direct construction; no fallback; lifecycle tests zero resources; commit separately authorized.
 
-#### - [ ] Task `P10-T05` — Specify tick stream
+#### - [x] Task `P10-T05` — Specify tick stream
 
 **Traces to:** `R-01`, `R-02`, `Pilot B — one Data stream`, `G10`
 **Depends on:** P10-T04
@@ -4452,7 +4452,7 @@ git diff --check
 
 **Definition of Done:** neutral async contract; bounds exact; tests pass; commit separately authorized.
 
-#### - [ ] Task `P10-T06a` — Add MT5 tick stream
+#### - [x] Task `P10-T06a` — Add MT5 tick stream
 
 **Traces to:** `Pilot B — one Data stream`, `R-02`, `G10`
 **Depends on:** P10-T05
@@ -4514,7 +4514,7 @@ git diff --check
 
 **Definition of Done:** eight tests pass; example performs no external call; zero resources; commit separately authorized.
 
-#### - [ ] Task `P10-T06b` — Add fake tick stream
+#### - [x] Task `P10-T06b` — Add fake tick stream
 
 **Traces to:** `Pilot B — one Data stream`, `R-02`, `G10`
 **Depends on:** P10-T06a
@@ -4572,7 +4572,7 @@ git diff --check
 
 **Definition of Done:** seven tests pass; exact three-line example; zero resources; commit separately authorized.
 
-#### - [ ] Task `P10-T07` — Prove effectful replacement
+#### - [x] Task `P10-T07` — Prove effectful replacement
 
 **Traces to:** `G10`, `H — Verify`
 **Depends on:** P10-T06b
@@ -4621,12 +4621,12 @@ git diff --check
 **Definition of Done:** all counters zero; identities unique; warning-free; G10 passes.
 
 **Phase 10 Exit Gate — all must be true before Phase 11 starts:**
-- [ ] Every task checked off.
-- [ ] Full lint, type-check, tests, and 80% coverage pass.
-- [ ] All provider examples exit 0 without external action.
-- [ ] No PROTECTED mutation path imported by stream providers.
-- [ ] No resource/warning leaks or duplicate events.
-- [ ] G10 passes.
+- [x] Every task checked off.
+- [x] Full lint, type-check, tests, and 80% coverage pass.
+- [x] All provider examples exit 0 without external action.
+- [x] No PROTECTED mutation path imported by stream providers.
+- [x] No resource/warning leaks or duplicate events.
+- [x] G10 passes.
 
 ### Phase 11 — Deletion, Reinstall, Enforcement CI
 
@@ -4635,7 +4635,7 @@ git diff --check
 **Deliverable:** generated matrices, copied-tree runner, CI scheduling, and inverse safety assertions.
 **Phase Exit Gate:** G11 fast/slow/reinstall suites pass and are required at their assigned cadence.
 
-#### - [ ] Task `P11-T01` — Gate configuration disablement
+#### - [x] Task `P11-T01` — Gate configuration disablement
 
 **Traces to:** `Phase 11` proof `1`, `G11`
 **Depends on:** P10-T07
@@ -4687,7 +4687,7 @@ git diff --check
 
 **Definition of Done:** all optional providers represented; fast cases green; CI step present; commit separately authorized.
 
-#### - [ ] Task `P11-T02` — Prove physical deletion
+#### - [x] Task `P11-T02` — Prove physical deletion
 
 **Traces to:** `Phase 11` proof `2`, `G11`
 **Depends on:** P11-T01
@@ -4739,7 +4739,7 @@ git diff --check
 
 **Definition of Done:** source guard tested; fresh interpreter enforced; workflow scheduled; commit separately authorized.
 
-#### - [ ] Task `P11-T03` — Prove reinstall and inverse safety
+#### - [x] Task `P11-T03` — Prove reinstall and inverse safety
 
 **Traces to:** `Phase 11` proof `3`, `Inverse assertion`, `G11`
 **Depends on:** P11-T02
@@ -4794,13 +4794,13 @@ git diff --check
 **Definition of Done:** reinstall/current state proven; Tier C counts exact; mutation fail-closed; G11 passes.
 
 **Phase 11 Exit Gate — all must be true before wave 12.1 starts:**
-- [ ] Every task checked off.
-- [ ] Full lint, type-check, tests, and 80% coverage pass.
-- [ ] Fast matrix gates every merge.
-- [ ] Physical deletion/reinstall/inverse workflow is green.
-- [ ] No source workspace deletion occurs.
-- [ ] Latest slow result is cited by wave 12.1 dry run.
-- [ ] G11 passes.
+- [x] Every task checked off.
+- [x] Full lint, type-check, tests, and 80% coverage pass.
+- [x] Fast matrix gates every merge.
+- [x] Physical deletion/reinstall/inverse workflow is green.
+- [x] No source workspace deletion occurs.
+- [x] Latest slow result is cited by wave 12.1 dry run.
+- [x] G11 passes.
 
 ### Phase 12 — Cross-Domain Waves
 
@@ -4861,7 +4861,7 @@ Every generated provider follows steps A–J verbatim. Consumer `c*` tasks may d
 | 12.20 | typed client; store; shell; navigation; dynamic modules; unavailable/disabled/loading/stale/unhealthy; call prevention; deep links; readiness; absent builds | component/integration/browser unavailable-state evidence | backend contracts |
 | 12.21 | remove internal compatibility imports and obsolete wrappers/inventories | full deletion matrix and public external compatibility proof | public external façades until evidence permits removal |
 
-#### - [ ] Task `P12.1-T01` — Materialize Utils work orders
+#### - [x] Task `P12.1-T01` — Materialize Utils work orders
 
 **Traces to:** `12.1`, `A — Removal boundary` through `J — Deletion proof`
 **Depends on:** P11-T03
@@ -4905,7 +4905,7 @@ git diff --check
 
 After P12.1-T01, execute every unchecked task in `waves/12.1.md` in order under the same wave approval. Do not start 12.2 until all generated tasks and the wave exit gate pass.
 
-#### - [ ] Tasks `P12.2-T01`–`P12.21-T01` — Materialize remaining waves
+#### - [x] Tasks `P12.2-T01`–`P12.21-T01` — Materialize remaining waves
 
 Each task below is one documentation-only, one-commit materialization task. It uses the existing generator from P12.1-T01, creates exactly the listed appendix, and then the executor runs every generated provider task under that wave's single approval. All fields below are mandatory and exact for every row.
 
@@ -4966,16 +4966,16 @@ Each task below is one documentation-only, one-commit materialization task. It u
 
 #### Wave exit gate — applies separately to every 12.x wave
 
-- [ ] Materializer task and every generated provider task checked off.
-- [ ] Full Python lint/type-check/test/80% coverage green.
-- [ ] Applicable frontend unit/type/build/E2E green.
-- [ ] All new provider examples exit 0 without production action.
-- [ ] Phase 0 parity artifacts unchanged.
-- [ ] Config-disable proof passes on every merge.
-- [ ] Physical deletion and reinstall proof passes before next wave.
-- [ ] No path protected for a later wave appears in diff.
-- [ ] Owning README registry evidence is updated while README remains canonical.
-- [ ] Latest slow removability report is cited in the next wave dry run.
+- [x] Materializer task and every generated provider task checked off.
+- [x] Full Python lint/type-check/test/80% coverage green.
+- [x] Applicable frontend unit/type/build/E2E green.
+- [x] All new provider examples exit 0 without production action.
+- [x] Phase 0 parity artifacts unchanged.
+- [x] Config-disable proof passes on every merge.
+- [x] Physical deletion and reinstall proof passes before next wave.
+- [x] No path protected for a later wave appears in diff.
+- [x] Owning README registry evidence is updated while README remains canonical.
+- [x] Latest slow removability report is cited in the next wave dry run.
 
 ### Phase 16 — Executable Architecture Constraints
 
@@ -4984,7 +4984,7 @@ Each task below is one documentation-only, one-commit materialization task. It u
 **Deliverable:** static boundary lints, manifest/spec parity, evidence matrix, and manifest-to-README registry generation.
 **Phase Exit Gate:** all Phase 16 constraints gate every merge and generated registries are byte-current.
 
-#### - [ ] Task `P16-T01` — Enforce Python boundaries
+#### - [x] Task `P16-T01` — Enforce Python boundaries
 
 **Traces to:** `Phase 16`
 **Depends on:** P12.21-T01 and all generated 12.21 tasks
@@ -5036,7 +5036,7 @@ git diff --check
 
 **Definition of Done:** six violation fixtures fail correctly; current tree passes; CI includes gate; commit separately authorized.
 
-#### - [ ] Task `P16-T02` — Enforce provider manifests
+#### - [x] Task `P16-T02` — Enforce provider manifests
 
 **Traces to:** `Phase 16`
 **Depends on:** P16-T01
@@ -5086,7 +5086,7 @@ git diff --check
 
 **Definition of Done:** seven violations tested; current graph passes; CI gate active; commit separately authorized.
 
-#### - [ ] Task `P16-T03` — Enforce removability evidence
+#### - [x] Task `P16-T03` — Enforce removability evidence
 
 **Traces to:** `Phase 16`, `Phase 11`
 **Depends on:** P16-T02
@@ -5134,7 +5134,7 @@ git diff --check
 
 **Definition of Done:** all applicability counts exact; current tree passes; CI gate active; commit separately authorized.
 
-#### - [ ] Task `P16-T04` — Generate feature registries
+#### - [x] Task `P16-T04` — Generate feature registries
 
 **Traces to:** `D-11`, `Phase 16`
 **Depends on:** P16-T03
@@ -5185,12 +5185,12 @@ git diff --check
 **Definition of Done:** generator/tests green; mechanical README subtasks complete; AGENTS authority switched; commit separately authorized.
 
 **Phase 16 Exit Gate — all must be true before Phase 17 starts:**
-- [ ] Every task and generated README subtask checked off.
-- [ ] Full lint, type-check, tests, coverage, frontend gates green.
-- [ ] All architecture/manifest/evidence gates run in CI.
-- [ ] Registries are byte-current from manifests.
-- [ ] No hard cycle, import-order selection, or internal façade import exists.
-- [ ] Removability matrices regenerate deterministically.
+- [x] Every task and generated README subtask checked off.
+- [x] Full lint, type-check, tests, coverage, frontend gates green.
+- [x] All architecture/manifest/evidence gates run in CI.
+- [x] Registries are byte-current from manifests.
+- [x] No hard cycle, import-order selection, or internal façade import exists.
+- [x] Removability matrices regenerate deterministically.
 
 ### Phase 17 — Controlled Configuration Replacement
 
@@ -5199,7 +5199,7 @@ git diff --check
 **Deliverable:** controlled configuration controller and failure/rollback system proof.
 **Phase Exit Gate:** candidate configuration succeeds atomically or restores the exact incumbent graph.
 
-#### - [ ] Task `P17-T01` — Reconcile provider configuration
+#### - [x] Task `P17-T01` — Reconcile provider configuration
 
 **Traces to:** `D-13`, `Phase 17` Tier `1`
 **Depends on:** P16-T04 and generated subtasks
@@ -5252,7 +5252,7 @@ git diff --check
 
 **Definition of Done:** installed-only enforced; evidence bounded; no source reload; commit separately authorized.
 
-#### - [ ] Task `P17-T02` — Prove transactional rollback
+#### - [x] Task `P17-T02` — Prove transactional rollback
 
 **Traces to:** `Phase 17` Tier `1`, `Definition of done`
 **Depends on:** P17-T01
@@ -5301,12 +5301,12 @@ git diff --check
 **Definition of Done:** four tests pass; resources zero; incumbent exact after failure; full CI green.
 
 **Phase 17 Exit Gate — all must be true:**
-- [ ] P17 tasks checked off.
-- [ ] Full backend/frontend gates green and coverage at least 80%.
-- [ ] Installed-only Tier 1 switching and rollback proven.
-- [ ] Tiers 2–3 remain absent.
-- [ ] Live source-code HMR remains disabled.
-- [ ] Full definition of done from source plan passes.
+- [x] P17 tasks checked off.
+- [x] Full backend/frontend gates green and coverage at least 80%.
+- [x] Installed-only Tier 1 switching and rollback proven.
+- [x] Tiers 2–3 remain absent.
+- [x] Live source-code HMR remains disabled.
+- [x] Full definition of done from source plan passes.
 
 ## 12. TRACEABILITY MAP
 

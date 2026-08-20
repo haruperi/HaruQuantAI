@@ -1,0 +1,1 @@
+"""Notification delivery capability namespace."""

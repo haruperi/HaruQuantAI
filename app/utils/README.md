@@ -309,13 +309,15 @@ its operations as standalone functions through the package root, matching the
 existing nine.
 
 Package and feature `__init__.py` files expose only documented standalone
-functions through explicit `__all__` declarations. Class-based implementations
-and constants are not public operations. The package-root public API is exactly
-the function list in `app/utils/__init__.py`; contract, error, settings, logging,
-response, and redaction classes are implementation details and must be accessed
-through their documented function factories/getters. No compatibility aliases
-are retained for removed class or constant exports. `JsonValue` is an internal
-type alias and is not exported.
+functions through explicit `__all__` declarations. Exports resolve lazily through
+`_EXPORTS` and `__getattr__` (PEP 562), ensuring that importing logger or runtime
+does not eagerly load notifications or other downstream modules. Class-based
+implementations and constants are not public operations. The package-root public
+API is exactly the function list in `app/utils/__init__.py`; contract, error, settings,
+logging, response, and redaction classes are implementation details and must be
+accessed through their documented function factories/getters. No compatibility
+aliases are retained for removed class or constant exports. `JsonValue` is an
+internal type alias and is not exported.
 
 ```mermaid
 flowchart LR

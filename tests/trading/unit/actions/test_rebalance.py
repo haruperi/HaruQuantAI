@@ -1,6 +1,5 @@
 """Unit tests for authorized Trading portfolio rebalance execution."""
 
-# ruff: noqa: ARG005
 from dataclasses import replace
 from datetime import timedelta
 from decimal import Decimal

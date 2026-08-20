@@ -2,25 +2,38 @@
 
 from __future__ import annotations
 
+import importlib
 from collections import defaultdict, deque
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from threading import RLock
 from time import monotonic
 from types import MappingProxyType
-from typing import Protocol
+from typing import Any, Protocol
 
+from app.capabilities.notification.delivery.v1 import (
+    NotificationDeliveryCapabilityV1,
+    NotificationDeliveryResultV1,
+)
+from app.kernel.effects import EffectScope
 from app.utils.errors.exceptions import ConfigurationError
 from app.utils.logging import get_logger
-from app.utils.notifications.desktop import DesktopConfig, DesktopNotifier
-from app.utils.notifications.email import EmailConfig, EmailNotifier
-from app.utils.notifications.sms import SMSConfig, SMSNotifier
-from app.utils.notifications.telegram import TelegramConfig, TelegramNotifier
+from app.utils.notifications.desktop import DesktopConfig
+from app.utils.notifications.email import EmailConfig
+from app.utils.notifications.sms import SMSConfig
+from app.utils.notifications.telegram import TelegramConfig
 from app.utils.notifications.templates import TemplateRegistry
 
 _LOGGER = get_logger(__name__)
 _MIN_RATE_WINDOW_SECONDS = 0.1
 _MAX_RATE_WINDOW_SECONDS = 86_400.0
+
+_PROVIDER_FACTORIES: Mapping[str, str] = {
+    "desktop": "app.utils.notifications.providers.desktop.plugin",
+    "email": "app.utils.notifications.providers.email.plugin",
+    "telegram": "app.utils.notifications.providers.telegram.plugin",
+    "sms": "app.utils.notifications.providers.sms.plugin",
+}
 
 
 class _Notifier(Protocol):
@@ -28,26 +41,13 @@ class _Notifier(Protocol):
 
     @property
     def active(self) -> bool:
-        """Return whether the channel is active.
-
-        Returns:
-            True if active and ready.
-        """
+        """Return whether the channel is active."""
         ...
 
     def send(
         self, title: str, text: str, html_body: str | None = None
-    ) -> Mapping[str, object]:
-        """Send a message through the notifier.
-
-        Args:
-            title: Notification title.
-            text: Plain text body.
-            html_body: Optional HTML body.
-
-        Returns:
-            Channel delivery result mapping.
-        """
+    ) -> Mapping[str, object] | NotificationDeliveryResultV1:
+        """Send a message through the notifier."""
         ...
 
 
@@ -72,7 +72,11 @@ class NotificationManager:
     """Coordinate notifier lifetimes, templates, and per-channel rate limits."""
 
     def __init__(
-        self, config: NotificationManagerConfig, notifiers: Mapping[str, _Notifier]
+        self,
+        config: NotificationManagerConfig,
+        notifiers: (
+            Mapping[str, NotificationDeliveryCapabilityV1] | Mapping[str, _Notifier]
+        ),
     ) -> None:
         """Initialize one manager session.
 
@@ -140,8 +144,18 @@ class NotificationManager:
                 continue
             try:
                 result = notifier.send(title, text, html_body)
+                result_payload: dict[str, object]
+                if isinstance(result, NotificationDeliveryResultV1):
+                    result_payload = {
+                        "channel": result.channel,
+                        "status": result.status,
+                    }
+                    if result.recipient_count is not None:
+                        result_payload["recipients"] = result.recipient_count
+                else:
+                    result_payload = dict(result)
                 results.append(
-                    {"channel": channel, "status": "sent", "result": dict(result)}
+                    {"channel": channel, "status": "sent", "result": result_payload}
                 )
             except (ConfigurationError, OSError, RuntimeError) as error:
                 _LOGGER.exception("Notification channel failed: %s", channel)
@@ -187,6 +201,13 @@ class NotificationManager:
         """Close this manager against future sends."""
         with self._lock:
             self._closed = True
+            for notifier in self._notifiers.values():
+                close_func = getattr(notifier, "close", None)
+                if callable(close_func):
+                    try:
+                        close_func()
+                    except Exception:
+                        _LOGGER.exception("Failed to close notification delivery")
             self._notifiers.clear()
             self._events.clear()
 
@@ -271,6 +292,7 @@ def create_notification_manager(
     email_config: object | None = None,
     telegram_config: object | None = None,
     sms_config: object | None = None,
+    deliveries: Mapping[str, NotificationDeliveryCapabilityV1] | None = None,
 ) -> object:
     """Create one thread-safe notification manager from opaque configurations.
 
@@ -280,6 +302,7 @@ def create_notification_manager(
         email_config: Optional opaque email configuration.
         telegram_config: Optional opaque Telegram configuration.
         sms_config: Optional opaque SMS configuration.
+        deliveries: Optional explicit mapping of channel to delivery capabilities.
 
     Returns:
         Opaque thread-safe manager.
@@ -289,18 +312,39 @@ def create_notification_manager(
     """
     if not isinstance(config, NotificationManagerConfig):
         raise ConfigurationError("NOTIFICATION_CONFIG_INVALID")
+
+    notifiers: dict[str, Any] = {}
+    if deliveries is not None:
+        notifiers.update(deliveries)
+
     pairs = (
-        ("desktop", desktop_config, DesktopConfig, DesktopNotifier),
-        ("email", email_config, EmailConfig, EmailNotifier),
-        ("telegram", telegram_config, TelegramConfig, TelegramNotifier),
-        ("sms", sms_config, SMSConfig, SMSNotifier),
+        ("desktop", desktop_config, DesktopConfig),
+        ("email", email_config, EmailConfig),
+        ("telegram", telegram_config, TelegramConfig),
+        ("sms", sms_config, SMSConfig),
     )
-    notifiers: dict[str, _Notifier] = {}
-    for name, value, expected, factory in pairs:
+
+    for name, value, expected in pairs:
         if value is not None:
             if not isinstance(value, expected):
                 raise ConfigurationError("NOTIFICATION_CONFIG_INVALID")
-            notifiers[name] = factory(value)  # type: ignore[arg-type]
+            module_name = _PROVIDER_FACTORIES.get(name)
+            if module_name is not None:
+                try:
+                    mod = importlib.import_module(module_name)
+                    create_func = mod.create_provider
+                    scope = EffectScope()
+                    adapter = create_func(
+                        dependencies={},
+                        config={"configuration": value},
+                        scope=scope,
+                    )
+                    notifiers[name] = adapter
+                except (ImportError, AttributeError, ValueError) as err:
+                    _LOGGER.warning(
+                        "Notification provider %s could not be loaded: %s", name, err
+                    )
+
     return NotificationManager(config, notifiers)
 
 

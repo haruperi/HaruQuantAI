@@ -1,0 +1,16 @@
+[provider]
+id = "notification.delivery.email"
+version = "1.0.0"
+entry_point = "app.utils.notifications.providers.email.plugin:create_provider"
+
+[[provides]]
+capability_id = "notification.delivery.v1"
+contract_version = "1.0.0"
+cardinality = "exactly_one"
+
+[runtime]
+profiles = ["simulation", "research", "demo", "live"]
+scopes = ["process"]
+effect_classes = ["reversible_ephemeral"]
+lifecycle = "scoped"
+reload = "config_restart"

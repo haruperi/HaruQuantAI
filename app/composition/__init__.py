@@ -10,12 +10,14 @@ import importlib
 _EXPORTS: dict[str, str] = {
     "CapabilityLease": "app.composition.generations",
     "CompositionRuntime": "app.composition.runtime",
+    "ConfigurationReplacementEvidence": "app.composition.controller",
     "PinnedCapabilityGraph": "app.composition.generations",
     "ProviderConfiguration": "app.composition.reconciliation",
     "ProviderGeneration": "app.composition.generations",
     "ReconciliationResult": "app.composition.reconciliation",
     "configuration_digest": "app.composition.generations",
     "reconcile_configuration": "app.composition.reconciliation",
+    "replace_provider_configuration": "app.composition.controller",
 }
 
 

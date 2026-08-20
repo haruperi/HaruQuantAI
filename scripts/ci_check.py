@@ -49,6 +49,39 @@ def main() -> None:
         (["mypy", "."], "Mypy Type Check"),
         (
             [
+                "python",
+                "scripts/architecture/enforce_provider_boundaries.py",
+                "--root",
+                ".",
+                "--matrix",
+                "docs/dev/plugin-decoupling/audit/removability_matrix.json",
+            ],
+            "Provider Architecture Boundaries",
+        ),
+        (
+            [
+                "python",
+                "scripts/architecture/enforce_provider_manifests.py",
+                "--root",
+                ".",
+                "--matrix",
+                "docs/dev/plugin-decoupling/audit/removability_matrix.json",
+            ],
+            "Provider Manifests & Graph",
+        ),
+        (
+            [
+                "python",
+                "scripts/architecture/enforce_provider_evidence.py",
+                "--root",
+                ".",
+                "--matrix",
+                "docs/dev/plugin-decoupling/audit/removability_matrix.json",
+            ],
+            "Provider Removability Evidence",
+        ),
+        (
+            [
                 "pytest",
                 "--cov=app",
                 "--cov-report=term-missing",

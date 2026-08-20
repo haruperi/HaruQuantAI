@@ -27,3 +27,6 @@ jobs:
 
       - name: Run CI quality gates
         run: uv run python scripts/ci_check.py
+
+      - name: Run provider config disable matrix
+        run: uv run pytest tests/removability/test_config_disable_matrix.py -q

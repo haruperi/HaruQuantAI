@@ -14,7 +14,7 @@ REQUIRED_AGENT_HEADINGS = (
     "Provider Infrastructure Exception",
     "Capability Boundary Export Exception",
     "Provider Test and Example Placement",
-    "Manifest Authority Transition",
+    "Manifest Canonical Authority",
     "Migration Tombstones and Uninstall Retention",
 )
 

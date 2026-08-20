@@ -1,0 +1,16 @@
+[provider]
+id = "indicator.rsi.default"
+version = "1.0.0"
+entry_point = "app.services.indicators.momentum.rsi_default.plugin:create_provider"
+
+[[provides]]
+capability_id = "indicator.rsi.v1"
+contract_version = "1.0.0"
+cardinality = "exactly_one"
+
+[runtime]
+profiles = ["simulation", "research", "demo", "live"]
+scopes = ["process"]
+effect_classes = []
+lifecycle = "scoped"
+reload = "process_restart"

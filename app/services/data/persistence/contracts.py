@@ -318,7 +318,14 @@ class MigrationTombstone(_Contract):
     )
     @classmethod
     def _validate_text(cls, value: str) -> str:
-        """Validate string fields are non-empty and trimmed."""
+        """Validate string fields are non-empty and trimmed.
+
+        Args:
+            value: Input string value to validate.
+
+        Returns:
+            Validated non-empty string.
+        """
         logger.debug("Running DATA function: _validate_text")
         return _text(value)
 

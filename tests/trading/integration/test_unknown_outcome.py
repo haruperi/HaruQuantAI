@@ -1,6 +1,5 @@
 """Workflow integration for uncertain authority outcomes."""
 
-# ruff: noqa: ARG005
 from typing import Any
 
 from app.services.trading import (

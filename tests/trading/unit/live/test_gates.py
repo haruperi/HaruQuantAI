@@ -1,6 +1,6 @@
 """Unit tests for the canonical Trading live gate sequence."""
 
-# ruff: noqa: ARG005, INP001
+# ruff: noqa: INP001
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal

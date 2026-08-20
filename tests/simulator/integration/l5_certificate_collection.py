@@ -1225,7 +1225,7 @@ class _OperationalAuthority:
         self._target = target
         self._order_id = order_id
 
-    def __getattr__(self, name: str) -> Any:  # noqa: ANN401
+    def __getattr__(self, name: str) -> Any:
         return getattr(self._target, name)
 
     async def ping(self) -> object:

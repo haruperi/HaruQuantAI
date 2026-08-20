@@ -239,7 +239,15 @@ def _validate_applied_tombstones_and_orphans(
     request: MigrationRequest,
     applied_migrations: dict[str, str],
 ) -> None:
-    """Validate tombstone checksums and complete-manifest orphan constraints."""
+    """Validate tombstone checksums and complete-manifest orphan constraints.
+
+    Args:
+        request: Migration execution request.
+        applied_migrations: Mapping of applied migration IDs to checksums.
+
+    Raises:
+        DataError: If checksum mismatch or uninstalled orphan detected.
+    """
     tombstone_by_id = {t.migration_id: t for t in request.tombstones}
 
     # Validate matching tombstones against applied migrations

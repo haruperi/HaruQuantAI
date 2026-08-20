@@ -15,7 +15,13 @@ DATA_PUBLIC_ROOT = "app.services.data"
 
 # The complete approved runtime dependency surface for this pure domain.
 ALLOWED_THIRD_PARTY = {"numpy", "pandas"}
-ALLOWED_LOCAL_PREFIXES = ("app.utils", DOMAIN_PREFIX)
+ALLOWED_LOCAL_PREFIXES = (
+    "app.utils",
+    DOMAIN_PREFIX,
+    "app.capabilities",
+    "app.composition",
+    "app.kernel",
+)
 
 # Modules that would give this domain I/O, persistence, network, subprocess,
 # environment, wall-clock, or nondeterminism capability it must never hold.
@@ -56,13 +62,15 @@ EXPECTED_FEATURE_IDS = tuple(f"FEAT-INDI-{index:02d}" for index in range(1, 13))
 
 
 def _python_files() -> list[Path]:
-    """Return every non-cached source file in the Indicators package.
+    """Return every non-cached production source file in the Indicators package.
 
     Returns:
         Sorted list of source file paths.
     """
     return sorted(
-        p for p in INDICATORS_ROOT.rglob("*.py") if "__pycache__" not in p.parts
+        p
+        for p in INDICATORS_ROOT.rglob("*.py")
+        if "__pycache__" not in p.parts and p.name != "example.py"
     )
 
 

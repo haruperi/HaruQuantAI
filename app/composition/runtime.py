@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import contextlib
 import threading
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -57,6 +57,9 @@ class CompositionRuntime:
         *,
         factories: Mapping[ProviderId, ProviderFactory],
         configs: Mapping[ProviderId, Mapping[str, object]],
+        manifests: Mapping[ProviderId, ProviderManifest]
+        | Sequence[ProviderManifest]
+        | None = None,
     ) -> tuple[ProviderGeneration, ...]:
         """Activate resolved providers in topological order with injected dependencies.
 
@@ -64,6 +67,7 @@ class CompositionRuntime:
             report: Resolution report with topological activation order.
             factories: Mapping of ProviderId to ProviderFactory callable.
             configs: Mapping of ProviderId to provider configuration dictionaries.
+            manifests: Optional mapping or sequence of provider manifests.
 
         Returns:
             Tuple of activated ProviderGeneration records.
@@ -78,56 +82,48 @@ class CompositionRuntime:
                 raise LifecycleError(msg)
 
         # Build lookup for provided capabilities per provider
+        manifest_map: dict[ProviderId, ProviderManifest] = {}
+        if manifests is not None:
+            if isinstance(manifests, Mapping):
+                manifest_map = dict(manifests)
+            else:
+                manifest_map = {m.provider_id: m for m in manifests}
+
         manifest_by_provider: dict[ProviderId, ProviderManifest] = {}
         caps_by_provider: dict[ProviderId, list[CapabilityId]] = {}
         for b in report.bindings:
-            manifest_by_provider[b.provider_id] = ProviderManifest(
-                provider_id=b.provider_id,
-                provider_version=b.provider_version,
-                entry_point="",
-                config_schema=None,
-                provides=(),
-                requires=(),
-                optional_requires=(),
-                profiles=(),
-                scopes=(),
-                effect_classes=(),
-                lifecycle=None,  # type: ignore[arg-type]
-                reload=None,  # type: ignore[arg-type]
-                state_schema_id=None,
-                state_schema_version=None,
-                migration_manifest=None,
-                compatible_state_majors=(),
-                uninstall_retention=None,
-                purge_requires_authorization=False,
+            manifest_by_provider[b.provider_id] = manifest_map.get(
+                b.provider_id,
+                ProviderManifest(
+                    provider_id=b.provider_id,
+                    provider_version=b.provider_version,
+                    entry_point="",
+                    config_schema=None,
+                    provides=(),
+                    requires=(),
+                    optional_requires=(),
+                    profiles=(),
+                    scopes=(),
+                    effect_classes=(),
+                    lifecycle=None,  # type: ignore[arg-type]
+                    reload=None,  # type: ignore[arg-type]
+                    state_schema_id=None,
+                    state_schema_version=None,
+                    migration_manifest=None,
+                    compatible_state_majors=(),
+                    uninstall_retention=None,
+                    purge_requires_authorization=False,
+                ),
             )
             caps_by_provider.setdefault(b.provider_id, []).append(b.capability_id)
 
-        candidate_components: list[ActiveComponent] = []
-        candidate_generations: dict[ProviderId, ProviderGeneration] = {}
-        candidate_leases: dict[CapabilityId, CapabilityLease[object]] = {}
-        activated_instances: dict[CapabilityId, object] = {}
-        provider_gen_ids: dict[ProviderId, UUID] = {}
-
-        try:
-            for pid in report.activation_order:
-                _logger.info("Activating provider generation %s", pid)
-
-                # Collect already-activated dependencies
-                deps: dict[CapabilityId, object] = {}
-                dep_gen_ids: list[UUID] = []
-                for cap_id, lease in candidate_leases.items():
-                    deps[cap_id] = lease.instance
-                    if lease.generation_id not in dep_gen_ids:
-                        dep_gen_ids.append(lease.generation_id)
-
-                manifest = manifest_by_provider.get(
+        for pid in report.activation_order:
+            if pid not in manifest_by_provider:
+                manifest_by_provider[pid] = manifest_map.get(
                     pid,
                     ProviderManifest(
                         provider_id=pid,
-                        provider_version=report.bindings[0].provider_version
-                        if report.bindings
-                        else SemanticVersion.parse("1.0.0"),
+                        provider_version=SemanticVersion.parse("1.0.0"),
                         entry_point="",
                         config_schema=None,
                         provides=(),
@@ -146,6 +142,37 @@ class CompositionRuntime:
                         purge_requires_authorization=False,
                     ),
                 )
+
+        candidate_components: list[ActiveComponent] = []
+        candidate_generations: dict[ProviderId, ProviderGeneration] = {}
+        candidate_leases: dict[CapabilityId, CapabilityLease[object]] = {}
+        activated_instances: dict[CapabilityId, object] = {}
+        provider_gen_ids: dict[ProviderId, UUID] = {}
+
+        try:
+            for pid in report.activation_order:
+                _logger.info("Activating provider generation %s", pid)
+
+                manifest = manifest_by_provider[pid]
+
+                # Collect declared dependencies
+                deps: dict[CapabilityId, object] = {}
+                dep_gen_ids: list[UUID] = []
+                if manifests is not None and pid in manifest_map:
+                    needed_caps = {req.capability_id for req in manifest.requires} | {
+                        req.capability_id for req in manifest.optional_requires
+                    }
+                    for cap_id in sorted(needed_caps, key=str):
+                        if cap_id in candidate_leases:
+                            lease = candidate_leases[cap_id]
+                            deps[cap_id] = lease.instance
+                            if lease.generation_id not in dep_gen_ids:
+                                dep_gen_ids.append(lease.generation_id)
+                else:
+                    for cap_id, lease in candidate_leases.items():
+                        deps[cap_id] = lease.instance
+                        if lease.generation_id not in dep_gen_ids:
+                            dep_gen_ids.append(lease.generation_id)
                 conf = configs.get(pid, {})
                 scope = EffectScope()
 

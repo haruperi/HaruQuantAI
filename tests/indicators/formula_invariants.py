@@ -1,4 +1,3 @@
-# ruff: noqa: S101
 """Reusable causal and deterministic assertions for indicator formula tests."""
 
 from typing import Any

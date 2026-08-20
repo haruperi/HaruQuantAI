@@ -75,11 +75,11 @@ def test_workflow_resource_and_evidence_guards(
         )
     monkeypatch.setattr(
         "app.services.research.modeling.workflow.cluster_feature_space",
-        lambda _features, *, config: {"labels": []},  # noqa: ARG005
+        lambda _features, *, config: {"labels": []},
     )
     monkeypatch.setattr(
         "app.services.research.modeling.workflow.build_unsupervised_insight_report",
-        lambda _features, *, config: {  # noqa: ARG005
+        lambda _features, *, config: {
             "descriptive": "bad",
             "pca": {},
         },
@@ -92,7 +92,7 @@ def test_workflow_resource_and_evidence_guards(
         )
     monkeypatch.setattr(
         "app.services.research.modeling.workflow.build_unsupervised_insight_report",
-        lambda _features, *, config: {  # noqa: ARG005
+        lambda _features, *, config: {
             "descriptive": {"rows": 25},
             "pca": {},
         },
