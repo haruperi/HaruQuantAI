@@ -23,6 +23,16 @@ UNRELATED_CAP = CapabilityKey[object]("test.unrelated", 1)
 CRASHING_CAP = CapabilityKey[object]("test.crashing", 1)
 
 
+def _active_feature_count(engine: CompositionEngine) -> int:
+    """Return a fresh active-feature count after lifecycle mutations."""
+    return len(engine.reconciler.active_features)
+
+
+def _active_capability_count(engine: CompositionEngine) -> int:
+    """Return a fresh active-capability count after lifecycle mutations."""
+    return len(engine.registry.active_capabilities())
+
+
 class ChurnRootFeature(Feature):
     """Root feature used by rapid mount/unmount tests."""
 
@@ -99,11 +109,11 @@ async def test_100x_rapid_mount_unmount_churn() -> None:
 
     for _ in range(100):
         await engine.load_and_reconcile_toml(enabled)
-        assert len(engine.reconciler.active_features) == 3
-        assert len(engine.registry.active_capabilities()) == 3
+        assert _active_feature_count(engine) == 3
+        assert _active_capability_count(engine) == 3
         await engine.load_and_reconcile_toml(disabled)
-        assert not engine.reconciler.active_features
-        assert not engine.registry.active_capabilities()
+        assert _active_feature_count(engine) == 0
+        assert _active_capability_count(engine) == 0
         assert engine.event_bus.listener_count() == 0
     await engine.shutdown()
 
@@ -240,7 +250,9 @@ async def test_runtime_failure_blocks_required_consumers_only() -> None:
     assert status.feature_states["FEAT-TEST-CRASHING_PROVIDER"] == (
         FeatureState.FAILED_RUNTIME
     )
-    assert status.feature_states["FEAT-TEST-CRASH_CONSUMER"] == (FeatureState.BLOCKED)
+    assert status.feature_states["FEAT-TEST-CRASH_CONSUMER"] == (
+        FeatureState.BLOCKED
+    )
     assert status.feature_states["FEAT-TEST-UNRELATED"] == FeatureState.ACTIVE
     assert not engine.registry.is_available(CRASHING_CAP)
     assert not engine.registry.is_available(CONSUMER_CAP)
