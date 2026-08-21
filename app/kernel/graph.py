@@ -1,4 +1,4 @@
-"""Dependency graph construction, cycle detection, and topological ordering."""
+"""Dependency graph construction, cycle detection, and deterministic provider selection."""
 
 from collections import deque
 from collections.abc import Iterable, Mapping, Sequence
@@ -14,7 +14,7 @@ class DependencyError(RuntimeError):
 
 
 class DependencyCycleError(DependencyError):
-    """Raised when a circular dependency is detected among required capabilities."""
+    """Raised when a circular required-capability dependency is detected."""
 
     def __init__(self, cycle: Sequence[str]) -> None:
         self.cycle = tuple(cycle)
@@ -24,7 +24,7 @@ class DependencyCycleError(DependencyError):
 
 
 class AmbiguousProviderError(DependencyError):
-    """Raised when multiple enabled features provide a capability without selection."""
+    """Raised when multiple enabled providers exist without explicit selection."""
 
     def __init__(self, capability: str, providers: Sequence[str]) -> None:
         self.capability = capability
@@ -36,7 +36,7 @@ class AmbiguousProviderError(DependencyError):
 
 
 class InvalidProviderSelectionError(DependencyError):
-    """Raised when configured provider selection cannot satisfy a capability."""
+    """Raised when configured provider selection cannot be honored safely."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,15 +61,17 @@ class DependencyGraph:
         enabled_feature_ids: Iterable[str],
         provider_selection: Mapping[str, str] | None = None,
     ) -> GraphResolution:
-        """Calculate eligible features and deterministic execution order."""
+        """Calculate eligible features and deterministic start/stop order."""
         enabled_set = set(enabled_feature_ids)
         available_specs = {
-            f_id: self._specs[f_id] for f_id in enabled_set if f_id in self._specs
+            feature_id: self._specs[feature_id]
+            for feature_id in enabled_set
+            if feature_id in self._specs
         }
         blocked_features = {
-            f_id: "Feature specification not found (MISSING)"
-            for f_id in enabled_set
-            if f_id not in self._specs
+            feature_id: "Feature specification not found (MISSING)"
+            for feature_id in enabled_set
+            if feature_id not in self._specs
         }
 
         candidates, conflict_blocks = self._filter_conflicts(available_specs)
@@ -79,34 +81,36 @@ class DependencyGraph:
             candidates,
             provider_selection or {},
         )
-        self._detect_required_cycles(candidates, provider_map)
+        candidates, selection_blocks = self._suppress_unselected_providers(
+            candidates,
+            provider_map,
+        )
+        blocked_features.update(selection_blocks)
+        provider_map = {
+            capability: provider
+            for capability, provider in provider_map.items()
+            if provider in candidates
+        }
 
+        self._detect_required_cycles(candidates, provider_map)
         eligible_set, eligibility_blocks = self._resolve_eligibility(
             candidates,
             provider_map,
         )
         blocked_features.update(eligibility_blocks)
-
         start_order = self._topological_sort_required(
             eligible_set,
             candidates,
             provider_map,
         )
-        start_order = self._apply_optional_startup_preferences(
-            start_order,
-            candidates,
-            provider_map,
-        )
-        stop_order = tuple(reversed(start_order))
-
         return GraphResolution(
             eligible_features=start_order,
             start_order=start_order,
-            stop_order=stop_order,
+            stop_order=tuple(reversed(start_order)),
             blocked_features=blocked_features,
             provider_map={
-                cap: provider
-                for cap, provider in provider_map.items()
+                capability: provider
+                for capability, provider in provider_map.items()
                 if provider in eligible_set
             },
         )
@@ -117,13 +121,19 @@ class DependencyGraph:
     ) -> tuple[dict[str, FeatureSpec], dict[str, str]]:
         conflicted: set[str] = set()
         blocks: dict[str, str] = {}
-        for f_id, spec in available_specs.items():
+        for feature_id, spec in available_specs.items():
             for conflict_id in spec.conflicts:
-                if conflict_id in available_specs and conflict_id != f_id:
-                    conflicted.add(f_id)
-                    blocks[f_id] = f"Conflicts with active feature '{conflict_id}'"
+                if conflict_id in available_specs and conflict_id != feature_id:
+                    conflicted.add(feature_id)
+                    blocks[feature_id] = (
+                        f"Conflicts with active feature '{conflict_id}'"
+                    )
         return (
-            {f_id: spec for f_id, spec in available_specs.items() if f_id not in conflicted},
+            {
+                feature_id: spec
+                for feature_id, spec in available_specs.items()
+                if feature_id not in conflicted
+            },
             blocks,
         )
 
@@ -133,9 +143,9 @@ class DependencyGraph:
         provider_selection: Mapping[str, str],
     ) -> dict[str, str]:
         providers: dict[str, list[str]] = {}
-        for f_id in sorted(candidates):
-            for cap in candidates[f_id].provides:
-                providers.setdefault(cap.identifier, []).append(f_id)
+        for feature_id in sorted(candidates):
+            for capability in candidates[feature_id].provides:
+                providers.setdefault(capability.identifier, []).append(feature_id)
 
         result: dict[str, str] = {}
         for capability, feature_ids in providers.items():
@@ -162,15 +172,54 @@ class DependencyGraph:
                 raise InvalidProviderSelectionError(msg)
         return result
 
+    def _suppress_unselected_providers(
+        self,
+        candidates: Mapping[str, FeatureSpec],
+        provider_map: Mapping[str, str],
+    ) -> tuple[dict[str, FeatureSpec], dict[str, str]]:
+        """Prevent unselected providers from mounting and overwriting registry bindings."""
+        suppressed: set[str] = set()
+        blocks: dict[str, str] = {}
+        for feature_id, spec in candidates.items():
+            provided = {cap.identifier for cap in spec.provides}
+            selected = {cap for cap in provided if provider_map.get(cap) == feature_id}
+            unselected = {
+                cap
+                for cap in provided
+                if cap in provider_map and provider_map[cap] != feature_id
+            }
+            if not unselected:
+                continue
+            if selected:
+                msg = (
+                    f"Feature '{feature_id}' is selected for {sorted(selected)} but "
+                    f"unselected for {sorted(unselected)}. Provider bundles are atomic; "
+                    "select one feature consistently for every overlapping capability."
+                )
+                raise InvalidProviderSelectionError(msg)
+            suppressed.add(feature_id)
+            blocks[feature_id] = (
+                "Provider not selected for capability bundle: "
+                + ", ".join(sorted(unselected))
+            )
+        return (
+            {
+                feature_id: spec
+                for feature_id, spec in candidates.items()
+                if feature_id not in suppressed
+            },
+            blocks,
+        )
+
     def _required_edges(
         self,
         candidates: Mapping[str, FeatureSpec],
         provider_map: Mapping[str, str],
     ) -> dict[str, set[str]]:
-        edges: dict[str, set[str]] = {f_id: set() for f_id in candidates}
+        edges: dict[str, set[str]] = {feature_id: set() for feature_id in candidates}
         for consumer_id, spec in candidates.items():
-            for cap in spec.requires:
-                provider_id = provider_map.get(cap.identifier)
+            for capability in spec.requires:
+                provider_id = provider_map.get(capability.identifier)
                 if provider_id is not None and provider_id != consumer_id:
                     edges[provider_id].add(consumer_id)
         return edges
@@ -211,29 +260,28 @@ class DependencyGraph:
         changed = True
         while changed:
             changed = False
-            for f_id in sorted(candidates):
-                if f_id in eligible:
+            for feature_id in sorted(candidates):
+                if feature_id in eligible:
                     continue
-                spec = candidates[f_id]
-                missing = []
-                for cap in spec.requires:
-                    provider = provider_map.get(cap.identifier)
-                    if provider is None or provider not in eligible:
-                        missing.append(cap.identifier)
+                missing = [
+                    capability.identifier
+                    for capability in candidates[feature_id].requires
+                    if provider_map.get(capability.identifier) not in eligible
+                ]
                 if not missing:
-                    eligible.add(f_id)
+                    eligible.add(feature_id)
                     changed = True
 
         blocks: dict[str, str] = {}
-        for f_id in sorted(candidates):
-            if f_id in eligible:
+        for feature_id in sorted(candidates):
+            if feature_id in eligible:
                 continue
             missing = [
-                cap.identifier
-                for cap in candidates[f_id].requires
-                if provider_map.get(cap.identifier) not in eligible
+                capability.identifier
+                for capability in candidates[feature_id].requires
+                if provider_map.get(capability.identifier) not in eligible
             ]
-            blocks[f_id] = (
+            blocks[feature_id] = (
                 f"Missing required capabilities: {', '.join(missing)}"
                 if missing
                 else "Unsatisfied required dependencies"
@@ -246,11 +294,13 @@ class DependencyGraph:
         candidates: Mapping[str, FeatureSpec],
         provider_map: Mapping[str, str],
     ) -> tuple[str, ...]:
-        dependents: dict[str, set[str]] = {f_id: set() for f_id in eligible_set}
+        dependents: dict[str, set[str]] = {
+            feature_id: set() for feature_id in eligible_set
+        }
         in_degree: dict[str, int] = dict.fromkeys(eligible_set, 0)
         for consumer_id in eligible_set:
-            for cap in candidates[consumer_id].requires:
-                provider_id = provider_map.get(cap.identifier)
+            for capability in candidates[consumer_id].requires:
+                provider_id = provider_map.get(capability.identifier)
                 if (
                     provider_id in eligible_set
                     and provider_id != consumer_id
@@ -259,39 +309,25 @@ class DependencyGraph:
                     dependents[provider_id].add(consumer_id)
                     in_degree[consumer_id] += 1
 
-        queue = deque(sorted(f_id for f_id in eligible_set if in_degree[f_id] == 0))
+        queue = deque(
+            sorted(
+                feature_id
+                for feature_id in eligible_set
+                if in_degree[feature_id] == 0
+            )
+        )
         order: list[str] = []
         while queue:
             node = queue.popleft()
             order.append(node)
-            for consumer in sorted(dependents[node]):
-                in_degree[consumer] -= 1
-                if in_degree[consumer] == 0:
-                    queue.append(consumer)
+            for consumer_id in sorted(dependents[node]):
+                in_degree[consumer_id] -= 1
+                if in_degree[consumer_id] == 0:
+                    queue.append(consumer_id)
 
         if len(order) != len(eligible_set):
-            unresolved = sorted(f_id for f_id in eligible_set if in_degree[f_id] > 0)
+            unresolved = sorted(
+                feature_id for feature_id in eligible_set if in_degree[feature_id] > 0
+            )
             raise DependencyCycleError(unresolved)
-        return tuple(order)
-
-    def _apply_optional_startup_preferences(
-        self,
-        required_order: tuple[str, ...],
-        candidates: Mapping[str, FeatureSpec],
-        provider_map: Mapping[str, str],
-    ) -> tuple[str, ...]:
-        """Move optional providers earlier when safe without making them dependencies."""
-        order = list(required_order)
-        position = {feature_id: index for index, feature_id in enumerate(order)}
-        for consumer_id in tuple(order):
-            for cap in candidates[consumer_id].optional:
-                provider_id = provider_map.get(cap.identifier)
-                if provider_id is None or provider_id == consumer_id:
-                    continue
-                if position[provider_id] > position[consumer_id]:
-                    provider_index = order.index(provider_id)
-                    order.pop(provider_index)
-                    consumer_index = order.index(consumer_id)
-                    order.insert(consumer_index, provider_id)
-                    position = {fid: idx for idx, fid in enumerate(order)}
         return tuple(order)
