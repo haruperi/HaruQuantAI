@@ -1,16 +1,58 @@
 """Declarative TOML configuration models and loader."""
 
+import re
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-KNOWN_PROFILES: frozenset[str] = frozenset({"research", "backtest", "live"})
+_CAPABILITY_PATTERN = re.compile(r"^[a-z][a-z0-9.-]*@[1-9][0-9]*$")
+_FEATURE_ID_PATTERN = re.compile(r"^FEAT-[A-Z0-9]+-[A-Z0-9_]+$")
+
+
+class ConfigurationError(ValueError):
+    """Raised when deployment configuration is malformed or unsupported."""
+
+
+@dataclass(frozen=True, slots=True)
+class DeploymentProfile:
+    """Immutable deployment profile and its readiness requirements."""
+
+    name: str
+    required_capabilities: frozenset[str]
+
+
+DEPLOYMENT_PROFILES: dict[str, DeploymentProfile] = {
+    "research": DeploymentProfile(
+        name="research",
+        required_capabilities=frozenset({"data.historical-bars@1"}),
+    ),
+    "backtest": DeploymentProfile(
+        name="backtest",
+        required_capabilities=frozenset(
+            {"data.historical-bars@1", "system.clock@1"}
+        ),
+    ),
+    "live": DeploymentProfile(
+        name="live",
+        required_capabilities=frozenset(
+            {
+                "system.clock@1",
+                "broker.market-data@1",
+                "broker.execution@1",
+                "data.realtime-ticks@1",
+                "portfolio.positions@1",
+                "risk.approval@1",
+                "trading.execution@1",
+            }
+        ),
+    ),
+}
 
 
 @dataclass(frozen=True, slots=True)
 class FeatureConfig:
-    """Configuration section for a single feature package."""
+    """Configuration section for one feature package."""
 
     enabled: bool = True
     config: dict[str, Any] = field(default_factory=dict)
@@ -18,111 +60,132 @@ class FeatureConfig:
 
 @dataclass(frozen=True, slots=True)
 class AppConfig:
-    """Top-level application deployment configuration."""
+    """Validated top-level application deployment configuration."""
 
     profile: str = "research"
     features: dict[str, FeatureConfig] = field(default_factory=dict)
-    capability_providers: dict[str, str] = field(default_factory=dict)
+    provider_selections: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         normalized = self.profile.strip().lower()
-        if normalized not in KNOWN_PROFILES:
-            allowed = ", ".join(sorted(KNOWN_PROFILES))
+        if normalized not in DEPLOYMENT_PROFILES:
+            allowed = ", ".join(sorted(DEPLOYMENT_PROFILES))
             msg = f"Unknown application profile '{self.profile}'. Allowed: {allowed}"
-            raise ValueError(msg)
+            raise ConfigurationError(msg)
         object.__setattr__(self, "profile", normalized)
 
-        for capability, feature_id in self.capability_providers.items():
-            if "@" not in capability or not capability.strip():
+        for capability, feature_id in self.provider_selections.items():
+            if _CAPABILITY_PATTERN.fullmatch(capability) is None:
                 msg = (
-                    "Capability provider keys must be versioned identifiers "
-                    f"like 'broker.market-data@1', got '{capability}'"
+                    "Provider keys must be versioned capability identifiers such as "
+                    f"'broker.market-data@1', got '{capability}'"
                 )
-                raise ValueError(msg)
-            if not feature_id.strip():
-                msg = f"Provider feature ID for '{capability}' must not be empty"
-                raise ValueError(msg)
+                raise ConfigurationError(msg)
+            if _FEATURE_ID_PATTERN.fullmatch(feature_id) is None:
+                msg = f"Invalid provider feature ID '{feature_id}' for '{capability}'"
+                raise ConfigurationError(msg)
+
+    @property
+    def deployment_profile(self) -> DeploymentProfile:
+        """Return the selected immutable deployment profile."""
+        return DEPLOYMENT_PROFILES[self.profile]
 
     def is_feature_enabled(self, feature_id: str) -> bool:
-        """Check if a given feature is declared and enabled."""
-        feat_cfg = self.features.get(feature_id)
-        return feat_cfg.enabled if feat_cfg is not None else False
+        """Return whether a feature is declared and enabled."""
+        feature_config = self.features.get(feature_id)
+        return feature_config.enabled if feature_config is not None else False
 
     def get_feature_config(self, feature_id: str) -> dict[str, Any]:
-        """Retrieve the configuration dictionary for a feature."""
-        feat_cfg = self.features.get(feature_id)
-        return feat_cfg.config if feat_cfg is not None else {}
+        """Return a copy of a feature's configuration dictionary."""
+        feature_config = self.features.get(feature_id)
+        return dict(feature_config.config) if feature_config is not None else {}
 
 
 def _parse_profile(raw: dict[str, Any]) -> str:
-    """Resolve the application profile while accepting the legacy profile table."""
-    app_section = raw.get("application", {})
-    legacy_section = raw.get("profile", {})
+    """Parse the canonical ``[application].profile`` declaration."""
+    if "profile" in raw:
+        raise ConfigurationError(
+            "Legacy [profile] configuration is unsupported; use "
+            "[application] with profile = '<name>'"
+        )
+    application = raw.get("application")
+    if application is None:
+        return "research"
+    if not isinstance(application, dict):
+        raise ConfigurationError("[application] must be a TOML table")
+    profile = application.get("profile", "research")
+    if not isinstance(profile, str) or not profile.strip():
+        raise ConfigurationError("[application].profile must be a non-empty string")
+    return profile.strip().lower()
 
-    app_profile = app_section.get("profile") if isinstance(app_section, dict) else None
-    legacy_profile = legacy_section.get("name") if isinstance(legacy_section, dict) else None
 
-    if app_profile is not None and legacy_profile is not None:
-        if str(app_profile).strip().lower() != str(legacy_profile).strip().lower():
-            msg = (
-                "Conflicting profile declarations in [application].profile and "
-                "legacy [profile].name"
+def _parse_features(raw: dict[str, Any]) -> dict[str, FeatureConfig]:
+    """Parse feature enablement and feature-local configuration."""
+    features_raw = raw.get("features", {})
+    if not isinstance(features_raw, dict):
+        raise ConfigurationError("[features] must be a TOML table")
+
+    features: dict[str, FeatureConfig] = {}
+    for feature_id, feature_data in features_raw.items():
+        if _FEATURE_ID_PATTERN.fullmatch(feature_id) is None:
+            raise ConfigurationError(f"Invalid feature ID '{feature_id}'")
+        if not isinstance(feature_data, dict):
+            raise ConfigurationError(
+                f"Feature '{feature_id}' configuration must be a TOML table"
             )
-            raise ValueError(msg)
+        enabled_value = feature_data.get("enabled", True)
+        if not isinstance(enabled_value, bool):
+            raise ConfigurationError(
+                f"Feature '{feature_id}'.enabled must be a boolean"
+            )
+        if "config" in feature_data:
+            raw_config = feature_data["config"]
+            if not isinstance(raw_config, dict):
+                raise ConfigurationError(
+                    f"Feature '{feature_id}'.config must be a TOML table"
+                )
+            config = dict(raw_config)
+        else:
+            config = {
+                key: value
+                for key, value in feature_data.items()
+                if key != "enabled"
+            }
+        features[feature_id] = FeatureConfig(
+            enabled=enabled_value,
+            config=config,
+        )
+    return features
 
-    selected = app_profile if app_profile is not None else legacy_profile
-    return str(selected if selected is not None else "research").strip().lower()
+
+def _parse_provider_selections(raw: dict[str, Any]) -> dict[str, str]:
+    """Parse explicit capability-provider selections."""
+    providers_raw = raw.get("providers", {})
+    if not isinstance(providers_raw, dict):
+        raise ConfigurationError("[providers] must be a TOML table")
+    selections: dict[str, str] = {}
+    for capability, feature_id in providers_raw.items():
+        if not isinstance(feature_id, str):
+            raise ConfigurationError(
+                f"Provider selection for '{capability}' must be a feature ID string"
+            )
+        selections[str(capability)] = feature_id
+    return selections
 
 
 def load_config_from_toml_string(content: str) -> AppConfig:
-    """Parse application configuration from a TOML string."""
+    """Parse and validate application configuration from a TOML string."""
     raw = tomllib.loads(content)
-    profile = _parse_profile(raw)
-
-    features_raw = raw.get("features", {})
-    if not isinstance(features_raw, dict):
-        raise ValueError("[features] must be a TOML table")
-
-    features: dict[str, FeatureConfig] = {}
-    for f_id, f_data in features_raw.items():
-        if not isinstance(f_data, dict):
-            msg = f"Feature '{f_id}' configuration must be a TOML table"
-            raise ValueError(msg)
-        enabled = bool(f_data.get("enabled", True))
-        if "config" in f_data:
-            raw_cfg = f_data["config"]
-            if not isinstance(raw_cfg, dict):
-                msg = f"Feature '{f_id}'.config must be a TOML table"
-                raise ValueError(msg)
-            cfg = dict(raw_cfg)
-        else:
-            cfg = {k: v for k, v in f_data.items() if k != "enabled"}
-        features[f_id] = FeatureConfig(enabled=enabled, config=cfg)
-
-    provider_raw = raw.get("capabilities", {})
-    if not isinstance(provider_raw, dict):
-        raise ValueError("[capabilities] must be a TOML table")
-
-    provider_selection: dict[str, str] = {}
-    for capability, feature_id in provider_raw.items():
-        if not isinstance(feature_id, str):
-            msg = f"Provider selection for '{capability}' must be a feature ID string"
-            raise ValueError(msg)
-        provider_selection[str(capability)] = feature_id
-
     return AppConfig(
-        profile=profile,
-        features=features,
-        capability_providers=provider_selection,
+        profile=_parse_profile(raw),
+        features=_parse_features(raw),
+        provider_selections=_parse_provider_selections(raw),
     )
 
 
 def load_config_from_file(path: str | Path) -> AppConfig:
-    """Load and parse application configuration from a TOML file."""
+    """Load and validate application configuration from a TOML file."""
     file_path = Path(path)
     if not file_path.is_file():
-        msg = f"Configuration file not found: {file_path}"
-        raise FileNotFoundError(msg)
-
-    content = file_path.read_text(encoding="utf-8")
-    return load_config_from_toml_string(content)
+        raise FileNotFoundError(f"Configuration file not found: {file_path}")
+    return load_config_from_toml_string(file_path.read_text(encoding="utf-8"))
