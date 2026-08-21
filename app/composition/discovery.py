@@ -38,16 +38,22 @@ class FeatureDiscoverer:
             TypeError: If the supplied object is neither a feature nor a factory.
         """
         if isinstance(feature_or_factory, Feature):
-            key = feature_id or feature_or_factory.spec.feature_id
-        elif callable(feature_or_factory):
-            key = feature_id or getattr(
-                feature_or_factory,
-                "__name__",
-                f"manual_factory_{id(feature_or_factory)}",
+            key = (
+                feature_id
+                if feature_id is not None
+                else feature_or_factory.spec.feature_id
             )
         else:
-            raise TypeError("Manual feature must satisfy Feature or be callable")
-        self._manual_features[str(key)] = feature_or_factory
+            if feature_id is not None:
+                key = feature_id
+            else:
+                factory_name = getattr(feature_or_factory, "__name__", None)
+                key = (
+                    factory_name
+                    if isinstance(factory_name, str)
+                    else f"manual_factory_{id(feature_or_factory)}"
+                )
+        self._manual_features[key] = feature_or_factory
 
     def discover(self) -> DiscoveryResult:
         """Discover manual features and installed entry-point features.
@@ -99,14 +105,7 @@ class FeatureDiscoverer:
     ) -> None:
         for diagnostic_name, item in self._manual_features.items():
             try:
-                feature = (
-                    item() if callable(item) and not isinstance(item, Feature) else item
-                )
-                if not isinstance(feature, Feature):
-                    failed_specs[diagnostic_name] = (
-                        "Manual target does not satisfy the Feature protocol"
-                    )
-                    continue
+                feature = item if isinstance(item, Feature) else item()
                 self._record_feature(
                     feature,
                     diagnostic_name,
