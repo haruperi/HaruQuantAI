@@ -7,11 +7,13 @@ PROFILE_REQUIRED_CAPABILITIES: Mapping[str, frozenset[str]] = {
     "backtest": frozenset({"data.historical-bars@1", "system.clock@1"}),
     "live": frozenset(
         {
+            "system.clock@1",
             "broker.market-data@1",
             "broker.execution@1",
+            "data.realtime-ticks@1",
+            "portfolio.positions@1",
             "risk.approval@1",
-            "data.historical-bars@1",
-            "system.clock@1",
+            "trading.execution@1",
         }
     ),
 }
@@ -23,16 +25,17 @@ def check_profile_readiness(
 ) -> tuple[bool, tuple[str, ...]]:
     """Check whether all required capabilities for a deployment profile are active.
 
-    Args:
-        profile: Target deployment profile name (e.g. 'research', 'backtest', 'live').
-        active_capabilities: Collection of currently active capability identifiers.
-
-    Returns:
-        Tuple of (is_ready boolean, tuple of missing required capability identifiers).
+    Raises:
+        ValueError: If profile is unknown. Readiness must fail closed rather than
+            silently treating an unknown deployment profile as ready.
     """
-    active_set = set(active_capabilities)
-    required = PROFILE_REQUIRED_CAPABILITIES.get(profile.lower(), frozenset())
+    normalized = profile.strip().lower()
+    if normalized not in PROFILE_REQUIRED_CAPABILITIES:
+        allowed = ", ".join(sorted(PROFILE_REQUIRED_CAPABILITIES))
+        msg = f"Unknown readiness profile '{profile}'. Allowed: {allowed}"
+        raise ValueError(msg)
 
+    active_set = set(active_capabilities)
+    required = PROFILE_REQUIRED_CAPABILITIES[normalized]
     missing = tuple(sorted(cap for cap in required if cap not in active_set))
-    is_ready = len(missing) == 0
-    return is_ready, missing
+    return len(missing) == 0, missing
