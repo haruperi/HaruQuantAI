@@ -22,12 +22,14 @@ class CapabilityInfo:
         identifier: Formatted capability identifier (e.g. 'data.historical-bars@1').
         is_available: Whether an active provider is bound.
         provider_feature_id: Owning feature ID if available, None otherwise.
+        generation: Active binding generation number, or None.
         registered_at: Timestamp when provider was bound, or None.
     """
 
     identifier: str
     is_available: bool
     provider_feature_id: str | None = None
+    generation: int | None = None
     registered_at: datetime | None = None
 
 
@@ -38,12 +40,14 @@ class FeatureDiagnosticInfo:
     Attributes:
         feature_id: Unique feature identifier.
         is_active: Whether feature is currently mounted and active.
+        state: Current lifecycle state name if known.
         package_error: Python package/import failure reason, if any.
         capability_error: Runtime capability dependency failure reason, if any.
     """
 
     feature_id: str
     is_active: bool
+    state: str | None = None
     package_error: str | None = None
     capability_error: str | None = None
 
@@ -132,12 +136,14 @@ class SystemAPI:
                 identifier=cap_id,
                 is_available=True,
                 provider_feature_id=binding.token.owner_id,
+                generation=binding.token.generation,
                 registered_at=binding.registered_at,
             )
         return CapabilityInfo(
             identifier=cap_id,
             is_available=False,
             provider_feature_id=None,
+            generation=None,
             registered_at=None,
         )
 
@@ -163,18 +169,23 @@ class SystemAPI:
             FeatureDiagnosticInfo detailing package vs capability dependency health.
         """
         is_active = False
+        state_name: str | None = None
         pkg_err: str | None = None
         cap_err: str | None = None
 
         if self._engine is not None:
             status = self._engine.get_status()
             is_active = feature_id in status.active_features
+            state = status.feature_states.get(feature_id)
+            if state is not None:
+                state_name = state.value
             pkg_err = status.package_dependency_errors.get(feature_id)
             cap_err = status.capability_dependency_errors.get(feature_id)
 
         return FeatureDiagnosticInfo(
             feature_id=feature_id,
             is_active=is_active,
+            state=state_name,
             package_error=pkg_err,
             capability_error=cap_err,
         )

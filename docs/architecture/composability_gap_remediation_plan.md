@@ -906,14 +906,14 @@ pyproject.toml
 
 ## Task 9.1 — Implement application bootstrap
 
-- [ ] Add `async_main()`.
-- [ ] Parse a configuration-file argument.
-- [ ] Construct `CompositionEngine`.
-- [ ] Load and reconcile configuration.
-- [ ] Construct the `HaruQuantAPI` facade.
-- [ ] Install graceful shutdown handling.
-- [ ] Always call `engine.shutdown()` in a `finally` block.
-- [ ] Return a nonzero exit status only for invalid startup/configuration or control-plane failure, not for ordinary degraded capability status.
+- [x] Add `async_main()`.
+- [x] Parse a configuration-file argument.
+- [x] Construct `CompositionEngine`.
+- [x] Load and reconcile configuration.
+- [x] Construct the `HaruQuantAPI` facade.
+- [x] Install graceful shutdown handling.
+- [x] Always call `engine.shutdown()` in a `finally` block.
+- [x] Return a nonzero exit status only for invalid startup/configuration or control-plane failure, not for ordinary degraded capability status.
 
 ## Task 9.2 — Add safe CLI modes
 
@@ -924,9 +924,9 @@ haruquantai --config config/examples/research.toml --status
 haruquantai --config config/examples/research.toml --serve
 ```
 
-- [ ] `--status` prints JSON diagnostics and exits cleanly.
-- [ ] `--serve` starts only the system control plane at this stage.
-- [ ] No command places orders or connects to real brokers.
+- [x] `--status` prints JSON diagnostics and exits cleanly.
+- [x] `--serve` starts only the system control plane at this stage.
+- [x] No command places orders or connects to real brokers.
 
 ## Task 9.3 — Implement system endpoints
 
@@ -943,21 +943,21 @@ GET /system/features
 
 Behavior:
 
-- [ ] Liveness returns success while kernel and control plane are responsive.
-- [ ] Readiness returns `200` only when the selected profile requirements are met.
-- [ ] Readiness returns `503` with missing capabilities otherwise.
-- [ ] Capability output includes provider feature ID and generation.
-- [ ] Feature output includes lifecycle state, package errors, capability errors, runtime failures, and cleanup errors.
+- [x] Liveness returns success while kernel and control plane are responsive.
+- [x] Readiness returns `200` only when the selected profile requirements are met.
+- [x] Readiness returns `503` with missing capabilities otherwise.
+- [x] Capability output includes provider feature ID and generation.
+- [x] Feature output includes lifecycle state, package errors, capability errors, runtime failures, and cleanup errors.
 
 ## Task 9.4 — Tests and examples
 
-- [ ] Test `--status` with zero features.
-- [ ] Test `--status` with Mock Broker and Historical Bars.
-- [ ] Test degraded Research readiness.
-- [ ] Test Live readiness failure.
-- [ ] Test all four system endpoints.
-- [ ] Test graceful shutdown leaves no active capabilities or tasks.
-- [ ] Add README commands for local non-production startup.
+- [x] Test `--status` with zero features.
+- [x] Test `--status` with Mock Broker and Historical Bars.
+- [x] Test degraded Research readiness.
+- [x] Test Live readiness failure.
+- [x] Test all four system endpoints.
+- [x] Test graceful shutdown leaves no active capabilities or tasks.
+- [x] Add README commands for local non-production startup.
 
 ## Proposed commit
 
@@ -967,9 +967,9 @@ feat(app): wire composition runtime and system control plane
 
 ## Exit criteria
 
-- [ ] The installed application command exercises the real composition engine.
-- [ ] Liveness and readiness are observable independently.
-- [ ] The physical-removal verifier can launch the real entry point.
+- [x] The installed application command exercises the real composition engine.
+- [x] Liveness and readiness are observable independently.
+- [x] The physical-removal verifier can launch the real entry point.
 
 ---
 
