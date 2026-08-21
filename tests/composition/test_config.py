@@ -6,6 +6,7 @@ import pytest
 
 from app.composition.config import (
     AppConfig,
+    ConfigurationError,
     load_config_from_file,
     load_config_from_toml_string,
 )
@@ -14,7 +15,7 @@ SAMPLE_TOML = """
 [application]
 profile = "research"
 
-[capabilities]
+[providers]
 "broker.market-data@1" = "FEAT-BROKER-FEED_MOCK"
 
 [features."FEAT-SYS-PROVIDE_CLOCK"]
@@ -33,62 +34,78 @@ enabled = false
 
 
 def test_load_config_from_toml_string() -> None:
-    cfg = load_config_from_toml_string(SAMPLE_TOML)
-    assert cfg.profile == "research"
-    assert cfg.is_feature_enabled("FEAT-SYS-PROVIDE_CLOCK")
-    assert cfg.is_feature_enabled("FEAT-DATA-RETRIEVE_BARS")
-    assert not cfg.is_feature_enabled("FEAT-TEST-DISABLE_ME")
-    assert not cfg.is_feature_enabled("FEAT-TEST-NONEXISTENT")
+    config = load_config_from_toml_string(SAMPLE_TOML)
+    assert config.profile == "research"
+    assert config.is_feature_enabled("FEAT-SYS-PROVIDE_CLOCK")
+    assert config.is_feature_enabled("FEAT-DATA-RETRIEVE_BARS")
+    assert not config.is_feature_enabled("FEAT-TEST-DISABLE_ME")
+    assert not config.is_feature_enabled("FEAT-TEST-NONEXISTENT")
     assert (
-        cfg.capability_providers["broker.market-data@1"]
+        config.provider_selections["broker.market-data@1"]
         == "FEAT-BROKER-FEED_MOCK"
     )
 
-    data_cfg = cfg.get_feature_config("FEAT-DATA-RETRIEVE_BARS")
-    assert data_cfg["default_timeframe"] == "M1"
-    assert data_cfg["cache_enabled"] is True
-    assert cfg.get_feature_config("FEAT-SYS-PROVIDE_CLOCK") == {}
-    assert cfg.get_feature_config("FEAT-TEST-NONEXISTENT") == {}
+    data_config = config.get_feature_config("FEAT-DATA-RETRIEVE_BARS")
+    assert data_config["default_timeframe"] == "M1"
+    assert data_config["cache_enabled"] is True
+    assert config.get_feature_config("FEAT-SYS-PROVIDE_CLOCK") == {}
+    assert config.get_feature_config("FEAT-TEST-NONEXISTENT") == {}
 
 
-def test_legacy_profile_syntax_remains_compatible() -> None:
-    cfg = load_config_from_toml_string('[profile]\nname = "backtest"\n')
-    assert cfg.profile == "backtest"
-
-
-def test_conflicting_profile_declarations_fail() -> None:
-    content = """
-    [application]
-    profile = "live"
-    [profile]
-    name = "research"
-    """
-    with pytest.raises(ValueError, match="Conflicting profile declarations"):
-        load_config_from_toml_string(content)
+def test_legacy_profile_syntax_is_rejected() -> None:
+    with pytest.raises(ConfigurationError, match="Legacy \\[profile\\]"):
+        load_config_from_toml_string('[profile]\nname = "backtest"\n')
 
 
 def test_unknown_profile_fails_closed() -> None:
-    with pytest.raises(ValueError, match="Unknown application profile"):
+    with pytest.raises(ConfigurationError, match="Unknown application profile"):
         load_config_from_toml_string('[application]\nprofile = "mystery"\n')
+
+
+def test_blank_profile_is_rejected() -> None:
+    with pytest.raises(ConfigurationError, match="non-empty string"):
+        load_config_from_toml_string('[application]\nprofile = ""\n')
 
 
 def test_invalid_provider_selection_key_fails() -> None:
     content = """
     [application]
     profile = "research"
-    [capabilities]
+    [providers]
     "broker.market-data" = "FEAT-BROKER-FEED_MOCK"
     """
-    with pytest.raises(ValueError, match="versioned identifiers"):
+    with pytest.raises(ConfigurationError, match="versioned capability identifiers"):
+        load_config_from_toml_string(content)
+
+
+def test_invalid_provider_feature_id_fails() -> None:
+    content = """
+    [application]
+    profile = "research"
+    [providers]
+    "broker.market-data@1" = "mock"
+    """
+    with pytest.raises(ConfigurationError, match="Invalid provider feature ID"):
+        load_config_from_toml_string(content)
+
+
+def test_non_boolean_feature_enabled_is_rejected() -> None:
+    content = """
+    [application]
+    profile = "research"
+    [features.FEAT-DATA-RETRIEVE_BARS]
+    enabled = "yes"
+    """
+    with pytest.raises(ConfigurationError, match="enabled must be a boolean"):
         load_config_from_toml_string(content)
 
 
 def test_load_config_from_file(tmp_path: Path) -> None:
     config_file = tmp_path / "app.toml"
     config_file.write_text(SAMPLE_TOML, encoding="utf-8")
-    cfg = load_config_from_file(config_file)
-    assert cfg.profile == "research"
-    assert cfg.is_feature_enabled("FEAT-DATA-RETRIEVE_BARS")
+    config = load_config_from_file(config_file)
+    assert config.profile == "research"
+    assert config.is_feature_enabled("FEAT-DATA-RETRIEVE_BARS")
 
 
 def test_load_config_from_file_missing_raises(tmp_path: Path) -> None:
@@ -98,7 +115,7 @@ def test_load_config_from_file_missing_raises(tmp_path: Path) -> None:
 
 
 def test_default_app_config() -> None:
-    cfg = AppConfig()
-    assert cfg.profile == "research"
-    assert cfg.features == {}
-    assert cfg.capability_providers == {}
+    config = AppConfig()
+    assert config.profile == "research"
+    assert config.features == {}
+    assert config.provider_selections == {}
