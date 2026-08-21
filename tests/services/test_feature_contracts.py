@@ -26,8 +26,8 @@ def _registered_feature_targets() -> dict[str, str]:
     """Read the current registered feature targets from pyproject.toml."""
     with Path("pyproject.toml").open("rb") as file:
         data = tomllib.load(file)
-    targets = data.get("project", {}).get("entry-points", {}).get(
-        "haruquantai.features", {}
+    targets = (
+        data.get("project", {}).get("entry-points", {}).get("haruquantai.features", {})
     )
     if not isinstance(targets, dict):
         raise TypeError("Feature entry-point table must be a mapping")
