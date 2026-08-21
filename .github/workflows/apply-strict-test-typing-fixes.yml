@@ -1,0 +1,50 @@
+name: Apply Strict Test Typing Fixes
+
+on:
+  push:
+    branches: [fix/final-composability-audit]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: strict-test-typing-fixes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apply-fixes:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/final-composability-audit
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --frozen --dev
+
+      - name: Apply strict typing fixes
+        run: uv run --frozen python scripts/_strict_test_typing_fixes.py
+
+      - name: Apply Ruff formatting
+        run: uv run --frozen ruff format .
+
+      - name: Commit cleanup
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "test: complete strict typing cleanup"
+          git push origin HEAD:fix/final-composability-audit
