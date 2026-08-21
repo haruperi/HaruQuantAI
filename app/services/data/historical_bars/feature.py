@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING
 
 from app.contracts.broker.market_data import BROKER_MARKET_DATA
+from app.contracts.data.bar_cache import BAR_CACHE
 from app.contracts.data.historical_bars import HISTORICAL_BARS
 from app.services.data.historical_bars.config import HistoricalBarsConfig
 from app.services.data.historical_bars.manifest import SPEC
@@ -23,25 +24,15 @@ class HistoricalBarsFeature:
         context: FeatureContext,
         config: object,
     ) -> None:
-        """Mount feature, resolve broker dependency, and register capability.
-
-        Args:
-            context: Scoped feature context.
-            config: Feature configuration dictionary or object.
-        """
+        """Mount the feature and resolve required and optional capabilities."""
         cfg_dict = config if isinstance(config, dict) else {}
-        _bars_config = HistoricalBarsConfig.from_dict(cfg_dict)
-
+        bars_config = HistoricalBarsConfig.from_dict(cfg_dict)
         market_data = context.require(BROKER_MARKET_DATA)
-        service = HistoricalBarsService(market_data=market_data)
-
+        cache = context.optional(BAR_CACHE) if bars_config.cache_enabled else None
+        service = HistoricalBarsService(market_data=market_data, cache=cache)
         context.provide(HISTORICAL_BARS, service)
 
 
 def create_feature() -> HistoricalBarsFeature:
-    """Entry point factory creating HistoricalBarsFeature instance.
-
-    Returns:
-        New HistoricalBarsFeature instance.
-    """
+    """Create a HistoricalBarsFeature instance."""
     return HistoricalBarsFeature()
