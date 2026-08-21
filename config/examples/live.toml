@@ -1,0 +1,14 @@
+[application]
+profile = "live"
+
+# Safety-only example: no credentials and no live execution providers are bundled.
+# Readiness must remain DEGRADED until every required live capability is active:
+# system.clock@1, broker.market-data@1, broker.execution@1,
+# data.realtime-ticks@1, portfolio.positions@1, risk.approval@1,
+# and trading.execution@1.
+
+[providers]
+"broker.market-data@1" = "FEAT-BROKER-FEED_MOCK"
+
+[features.FEAT-BROKER-FEED_MOCK]
+enabled = true
