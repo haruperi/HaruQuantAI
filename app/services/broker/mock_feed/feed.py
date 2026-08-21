@@ -13,22 +13,23 @@ from app.contracts.broker.market_data import (
 from app.services.broker.mock_feed.config import MockFeedConfig
 
 MAX_SYNTHETIC_BARS: int = 10_000
+TIMEFRAME_STEPS: dict[str, timedelta] = {
+    "M1": timedelta(minutes=1),
+    "M5": timedelta(minutes=5),
+    "M15": timedelta(minutes=15),
+    "M30": timedelta(minutes=30),
+    "H1": timedelta(hours=1),
+    "H4": timedelta(hours=4),
+    "D1": timedelta(days=1),
+    "W1": timedelta(weeks=1),
+    "MN1": timedelta(days=30),
+}
 
 
 class MockBrokerMarketData(BrokerMarketData):
-    """Synthetic broker market data implementation.
-
-    Satisfies:
-        FR-BROKER-GENERATE_RAW_BARS: Generates deterministic raw OHLCV bars
-        within requested time windows.
-    """
+    """Deterministic synthetic broker market-data implementation."""
 
     def __init__(self, config: MockFeedConfig | None = None) -> None:
-        """Initialize feed with configuration.
-
-        Args:
-            config: Optional feed parameters.
-        """
         self._config = config or MockFeedConfig()
 
     @override
@@ -36,66 +37,37 @@ class MockBrokerMarketData(BrokerMarketData):
         self,
         request: BrokerBarsRequest,
     ) -> Sequence[BrokerRawBar]:
-        """Fetch synthetic raw historical bars for the requested window.
-
-        Args:
-            request: Raw bar query specification.
-
-        Returns:
-            Sequence of synthetic raw price bars.
-        """
+        """Generate synthetic raw OHLCV bars for the requested interval."""
         if request.end <= request.start:
             return ()
-
         step = self._resolve_timeframe_step(request.timeframe)
         bars: list[BrokerRawBar] = []
-        curr = request.start
-        idx = 0
-        base = self._config.base_price
-
-        while curr < request.end:
-            offset = math.sin(idx * 0.1) * 0.0050
-            open_p = round(base + offset, 5)
-            high_p = round(open_p + 0.0010, 5)
-            low_p = round(open_p - 0.0008, 5)
-            close_p = round(open_p + 0.0002, 5)
-            vol = 100.0 + (idx % 20) * 10.0
-
-            bar = BrokerRawBar(
-                timestamp=curr,
-                open_price=open_p,
-                high_price=high_p,
-                low_price=low_p,
-                close_price=close_p,
-                volume=vol,
+        current = request.start
+        index = 0
+        base_price = self._config.base_price
+        while current < request.end and len(bars) < MAX_SYNTHETIC_BARS:
+            offset = math.sin(index * 0.1) * 0.0050
+            open_price = round(base_price + offset, 5)
+            bars.append(
+                BrokerRawBar(
+                    timestamp=current,
+                    open_price=open_price,
+                    high_price=round(open_price + 0.0010, 5),
+                    low_price=round(open_price - 0.0008, 5),
+                    close_price=round(open_price + 0.0002, 5),
+                    volume=100.0 + (index % 20) * 10.0,
+                )
             )
-            bars.append(bar)
-            curr += step
-            idx += 1
-
-            if len(bars) >= MAX_SYNTHETIC_BARS:
-                break
-
-        return bars
+            current += step
+            index += 1
+        return tuple(bars)
 
     def _resolve_timeframe_step(self, timeframe: str) -> timedelta:
-        """Map timeframe string to timedelta step.
-
-        Args:
-            timeframe: Interval string identifier.
-
-        Returns:
-            Timedelta step interval.
-        """
-        tf = timeframe.upper()
-        if tf == "M1":
-            return timedelta(minutes=1)
-        if tf == "M5":
-            return timedelta(minutes=5)
-        if tf == "M15":
-            return timedelta(minutes=15)
-        if tf == "H1":
-            return timedelta(hours=1)
-        if tf == "D1":
-            return timedelta(days=1)
-        return timedelta(minutes=1)
+        """Map a supported timeframe identifier to its deterministic interval."""
+        normalized = timeframe.upper()
+        try:
+            return TIMEFRAME_STEPS[normalized]
+        except KeyError as error:
+            allowed = ", ".join(TIMEFRAME_STEPS)
+            msg = f"Unsupported timeframe '{timeframe}'. Allowed: {allowed}"
+            raise ValueError(msg) from error
