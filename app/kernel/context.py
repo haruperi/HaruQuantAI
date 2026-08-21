@@ -282,8 +282,10 @@ class DefaultFeatureContext:
             handler: Event handler function or coroutine.
             mode: Dispatch mode for this subscription.
         """
-        disposer = self._event_bus.subscribe(event_type, handler, mode=mode)
-        self._scope.callback(disposer)
+        disposer = self._event_bus.subscribe(
+            event_type, handler, mode=mode, owner_id=self._spec.feature_id
+        )
+        self._scope.callback(disposer, name=f"unsubscribe:{event_type.__name__}")
 
     async def publish(self, event: object) -> None:
         """Publish an event to the shared event bus.

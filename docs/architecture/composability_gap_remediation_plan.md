@@ -607,36 +607,36 @@ docs/architecture/capability-model.md
 
 ## Task 5.1 — Introduce subscription tokens
 
-- [ ] Add immutable `SubscriptionToken` with a monotonically increasing or UUID identifier.
-- [ ] Record event type, dispatch mode, and optionally owner feature ID.
-- [ ] Make `subscribe()` return the exact token or a disposer bound to that token.
-- [ ] Make disposal idempotent.
-- [ ] Remove only the exact registration identified by the token.
+- [x] Add immutable `SubscriptionToken` with a monotonically increasing or UUID identifier.
+- [x] Record event type, dispatch mode, and optionally owner feature ID.
+- [x] Make `subscribe()` return the exact token or a disposer bound to that token.
+- [x] Make disposal idempotent.
+- [x] Remove only the exact registration identified by the token.
 
 ## Task 5.2 — Filter dispatch by mode
 
-- [ ] `publish()` invokes only `PUBLISH` subscriptions.
-- [ ] `dispatch_serial()` invokes only `SERIAL` subscriptions.
-- [ ] `dispatch_parallel()` invokes only `PARALLEL` subscriptions.
-- [ ] `dispatch_pipeline()` invokes only `PIPELINE` subscriptions.
-- [ ] Preserve registration order for serial and pipeline modes.
-- [ ] Define and document exception behavior for every mode.
+- [x] `publish()` invokes only `PUBLISH` subscriptions.
+- [x] `dispatch_serial()` invokes only `SERIAL` subscriptions.
+- [x] `dispatch_parallel()` invokes only `PARALLEL` subscriptions.
+- [x] `dispatch_pipeline()` invokes only `PIPELINE` subscriptions.
+- [x] Preserve registration order for serial and pipeline modes.
+- [x] Define and document exception behavior for every mode.
 
 ## Task 5.3 — Concurrency and snapshots
 
-- [ ] Protect subscription mutation with an appropriate short-lived lock.
-- [ ] Dispatch from an immutable snapshot.
-- [ ] Permit a handler to unsubscribe safely during dispatch without corrupting iteration.
-- [ ] Remove the unused lock if a different implementation is selected.
+- [x] Protect subscription mutation with an appropriate short-lived lock.
+- [x] Dispatch from an immutable snapshot.
+- [x] Permit a handler to unsubscribe safely during dispatch without corrupting iteration.
+- [x] Remove the unused lock if a different implementation is selected.
 
 ## Task 5.4 — Tests and example
 
-- [ ] Register all four modes for the same event type and verify strict separation.
-- [ ] Register the same handler twice and dispose one token only.
-- [ ] Test disposal during dispatch.
-- [ ] Test pipeline short-circuiting.
-- [ ] Test publish error isolation.
-- [ ] Add an example showing an observational event and a policy pipeline using the same payload type only when explicitly intended.
+- [x] Register all four modes for the same event type and verify strict separation.
+- [x] Register the same handler twice and dispose one token only.
+- [x] Test disposal during dispatch.
+- [x] Test pipeline short-circuiting.
+- [x] Test publish error isolation.
+- [x] Add an example showing an observational event and a policy pipeline using the same payload type only when explicitly intended.
 
 ## Proposed commit
 
@@ -646,8 +646,8 @@ fix(kernel): enforce event modes and exact subscription disposal
 
 ## Exit criteria
 
-- [ ] Dispatch mode is part of actual runtime behavior, not metadata only.
-- [ ] Subscription ownership is exact and idempotent.
+- [x] Dispatch mode is part of actual runtime behavior, not metadata only.
+- [x] Subscription ownership is exact and idempotent.
 
 ---
 

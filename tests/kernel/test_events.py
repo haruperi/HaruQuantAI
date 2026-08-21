@@ -268,3 +268,48 @@ async def test_duplicate_subscription_exact_token_disposal() -> None:
     disposer2()
     await bus.publish(SampleFactEvent("none_left"))
     assert len(calls) == 0
+
+
+@pytest.mark.asyncio
+async def test_unsubscribe_during_dispatch_is_safe() -> None:
+    """Test that disposing a subscription from within a handler during active dispatch does not corrupt iteration."""
+    bus = EventBus()
+    disposer: object = None
+    calls: list[str] = []
+
+    def self_unsubscribing_handler(_e: SampleFactEvent) -> None:
+        calls.append("self_unsub")
+        if callable(disposer):
+            disposer()
+
+    def second_handler(_e: SampleFactEvent) -> None:
+        calls.append("second")
+
+    disposer = bus.subscribe(SampleFactEvent, self_unsubscribing_handler)
+    bus.subscribe(SampleFactEvent, second_handler)
+
+    # First dispatch invokes both handlers, self_unsub removes itself
+    await bus.publish(SampleFactEvent("first"))
+    assert calls == ["self_unsub", "second"]
+
+    # Second dispatch invokes only second_handler
+    calls.clear()
+    await bus.publish(SampleFactEvent("second"))
+    assert calls == ["second"]
+
+
+def test_listener_count_by_mode() -> None:
+    """Test listener_count filtering by EventMode."""
+    bus = EventBus()
+
+    bus.subscribe(SampleFactEvent, lambda _e: None, mode=EventMode.PUBLISH)
+    bus.subscribe(SampleFactEvent, lambda _e: None, mode=EventMode.SERIAL)
+    bus.subscribe(PolicyProposalEvent, lambda _e: _e, mode=EventMode.PIPELINE)
+
+    assert bus.listener_count() == 3
+    assert bus.listener_count(mode=EventMode.PUBLISH) == 1
+    assert bus.listener_count(mode=EventMode.SERIAL) == 1
+    assert bus.listener_count(mode=EventMode.PIPELINE) == 1
+    assert bus.listener_count(mode=EventMode.PARALLEL) == 0
+    assert bus.listener_count(SampleFactEvent, mode=EventMode.PUBLISH) == 1
+    assert bus.listener_count(PolicyProposalEvent, mode=EventMode.PUBLISH) == 0

@@ -28,12 +28,28 @@ class EventMode(StrEnum):
 
 
 @dataclass(frozen=True, slots=True)
-class EventSubscription:
-    """Represents an active event subscription."""
+class SubscriptionToken:
+    """Unique ownership token for an exact event subscription.
 
+    Attributes:
+        token_id: Unique integer identifying this exact subscription.
+        event_type: Target event type.
+        mode: Dispatch mode for this subscription.
+        owner_id: Feature ID that owns this subscription.
+    """
+
+    token_id: int
     event_type: type[Any]
+    mode: EventMode
+    owner_id: str = ""
+
+
+@dataclass(frozen=True, slots=True)
+class EventSubscription:
+    """Represents an active event subscription binding a token to a handler."""
+
+    token: SubscriptionToken
     handler: EventHandler
-    mode: EventMode = EventMode.PUBLISH
 
 
 class EventBus:
@@ -44,6 +60,8 @@ class EventBus:
         self._subscriptions: dict[type[Any], list[EventSubscription]] = defaultdict(
             list
         )
+        self._token_map: dict[int, SubscriptionToken] = {}
+        self._counter: int = 0
         self._lock = asyncio.Lock()
 
     def subscribe[EventT](
@@ -51,6 +69,7 @@ class EventBus:
         event_type: type[EventT],
         handler: Callable[[EventT], Any | Awaitable[Any]],
         mode: EventMode = EventMode.PUBLISH,
+        owner_id: str = "",
     ) -> Callable[[], None]:
         """Subscribe a handler to an event type.
 
@@ -58,28 +77,56 @@ class EventBus:
             event_type: Class or type of the event to listen for.
             handler: Callable or coroutine receiving the event instance.
             mode: Dispatch mode for this subscription.
+            owner_id: Optional feature identifier registering this handler.
 
         Returns:
-            Disposer callable that unregisters the subscription when called.
+            Idempotent disposer callable that unregisters the exact subscription.
         """
-        sub = EventSubscription(
+        self._counter += 1
+        token = SubscriptionToken(
+            token_id=self._counter,
             event_type=event_type,
-            handler=handler,
             mode=mode,
+            owner_id=owner_id,
         )
+        sub = EventSubscription(token=token, handler=handler)
         self._subscriptions[event_type].append(sub)
+        self._token_map[token.token_id] = token
 
         def disposer() -> None:
-            self.unsubscribe(event_type, handler)
+            self.unsubscribe_token(token)
 
         return disposer
+
+    def unsubscribe_token(self, token: SubscriptionToken) -> bool:
+        """Unsubscribe an exact subscription using its unique token.
+
+        Args:
+            token: SubscriptionToken returned at registration.
+
+        Returns:
+            True if matching subscription was removed, False if token is stale.
+        """
+        if token.token_id not in self._token_map:
+            return False
+
+        del self._token_map[token.token_id]
+        event_type = token.event_type
+        if event_type in self._subscriptions:
+            self._subscriptions[event_type] = [
+                s for s in self._subscriptions[event_type] if s.token != token
+            ]
+            if not self._subscriptions[event_type]:
+                del self._subscriptions[event_type]
+
+        return True
 
     def unsubscribe[EventT](
         self,
         event_type: type[EventT],
         handler: Callable[[EventT], Any | Awaitable[Any]],
     ) -> bool:
-        """Unsubscribe a previously registered handler.
+        """Unsubscribe the first matching registered handler for an event type.
 
         Args:
             event_type: Target event type.
@@ -91,23 +138,26 @@ class EventBus:
         if event_type not in self._subscriptions:
             return False
 
-        original_len = len(self._subscriptions[event_type])
-        self._subscriptions[event_type] = [
-            s for s in self._subscriptions[event_type] if s.handler != handler
-        ]
-        if not self._subscriptions[event_type]:
-            del self._subscriptions[event_type]
+        matching = [s for s in self._subscriptions[event_type] if s.handler == handler]
+        if not matching:
+            return False
 
-        return len(self._subscriptions.get(event_type, [])) < original_len
+        return self.unsubscribe_token(matching[0].token)
 
     async def publish(self, event: object) -> None:
         """Dispatch event in observational PUBLISH mode (concurrent, error-isolated).
+
+        Only handlers registered with EventMode.PUBLISH are invoked.
 
         Args:
             event: Event instance to publish.
         """
         event_type = type(event)
-        subscriptions = list(self._subscriptions.get(event_type, []))
+        subscriptions = [
+            s
+            for s in list(self._subscriptions.get(event_type, []))
+            if s.token.mode == EventMode.PUBLISH
+        ]
         if not subscriptions:
             return
 
@@ -129,24 +179,36 @@ class EventBus:
                 )
 
     async def dispatch_serial(self, event: object) -> None:
-        """Dispatch event sequentially to all registered handlers in order.
+        """Dispatch event sequentially to handlers in registration order.
+
+        Only handlers registered with EventMode.SERIAL are invoked.
 
         Args:
             event: Event instance to dispatch.
         """
         event_type = type(event)
-        subscriptions = list(self._subscriptions.get(event_type, []))
+        subscriptions = [
+            s
+            for s in list(self._subscriptions.get(event_type, []))
+            if s.token.mode == EventMode.SERIAL
+        ]
         for sub in subscriptions:
             await self._invoke_handler(sub.handler, event)
 
     async def dispatch_parallel(self, event: object) -> None:
         """Dispatch event concurrently, raising exceptions if any handler fails.
 
+        Only handlers registered with EventMode.PARALLEL are invoked.
+
         Args:
             event: Event instance to dispatch.
         """
         event_type = type(event)
-        subscriptions = list(self._subscriptions.get(event_type, []))
+        subscriptions = [
+            s
+            for s in list(self._subscriptions.get(event_type, []))
+            if s.token.mode == EventMode.PARALLEL
+        ]
         if not subscriptions:
             return
 
@@ -156,6 +218,7 @@ class EventBus:
     async def dispatch_pipeline[EventT](self, initial_event: EventT) -> EventT | None:
         """Dispatch through a waterfall transformation pipeline.
 
+        Only handlers registered with EventMode.PIPELINE are invoked.
         Each handler receives the output of the previous handler. If any handler
         returns None, the pipeline is short-circuited and returns None.
 
@@ -166,7 +229,11 @@ class EventBus:
             Final transformed event, or None if short-circuited.
         """
         event_type = type(initial_event)
-        subscriptions = list(self._subscriptions.get(event_type, []))
+        subscriptions = [
+            s
+            for s in list(self._subscriptions.get(event_type, []))
+            if s.token.mode == EventMode.PIPELINE
+        ]
         current: Any = initial_event
 
         for sub in subscriptions:
@@ -192,22 +259,36 @@ class EventBus:
             return await res
         return res
 
-    def listener_count(self, event_type: type[Any] | None = None) -> int:
+    def listener_count(
+        self,
+        event_type: type[Any] | None = None,
+        mode: EventMode | None = None,
+    ) -> int:
         """Return total or type-specific active listener count.
 
         Args:
             event_type: Optional event type filter.
+            mode: Optional event mode filter.
 
         Returns:
-            Number of registered subscriptions.
+            Number of registered subscriptions matching criteria.
         """
         if event_type is not None:
-            return len(self._subscriptions.get(event_type, []))
-        return sum(len(subs) for subs in self._subscriptions.values())
+            subs = self._subscriptions.get(event_type, [])
+            if mode is not None:
+                return sum(1 for s in subs if s.token.mode == mode)
+            return len(subs)
+
+        all_subs = [s for subs in self._subscriptions.values() for s in subs]
+        if mode is not None:
+            return sum(1 for s in all_subs if s.token.mode == mode)
+        return len(all_subs)
 
     def clear(self) -> None:
-        """Remove all subscriptions."""
+        """Remove all subscriptions and reset counter."""
         self._subscriptions.clear()
+        self._token_map.clear()
+        self._counter = 0
 
 
 class ContributorRegistry[ItemT]:
