@@ -1,6 +1,7 @@
 """Tests verifying Phase 15: hot reconfiguration and transactional feature replacement."""
 
 import asyncio
+from collections.abc import Awaitable, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, override
 
@@ -23,8 +24,6 @@ from app.contracts.events.system import (
 from app.kernel.feature import Feature, FeatureSpec
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
     from app.kernel.context import FeatureContext
 
 
@@ -363,3 +362,174 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
     assert callback_cleaned is True, (
         "Cleanup callback was not invoked on engine shutdown"
     )
+
+
+@pytest.mark.asyncio
+async def test_transactional_replacement_health_check_failure_rolls_back() -> None:
+    """Test feature with health_check hook rolling back on failure."""
+
+    class HealthCheckingBrokerFeature(Feature):
+        def __init__(self) -> None:
+            self.mount_count = 0
+            self.should_fail_health = False
+
+        @property
+        def spec(self) -> FeatureSpec:
+            return FeatureSpec(
+                feature_id="FEAT-BROKER-HEALTH_CHECK",
+                domain="broker",
+                provides=frozenset({BROKER_MARKET_DATA}),
+            )
+
+        @override
+        async def mount(self, context: FeatureContext, _config: object) -> None:
+            self.mount_count += 1
+            context.provide(
+                BROKER_MARKET_DATA,
+                ConfigurableBrokerService(base_price=float(self.mount_count)),
+            )
+
+        def health_check(self) -> None:
+            if self.should_fail_health:
+                msg = "Upstream broker health check timeout"
+                raise RuntimeError(msg)
+
+    feat = HealthCheckingBrokerFeature()
+    discoverer = FeatureDiscoverer()
+    discoverer.register_feature(feat)
+    engine = CompositionEngine(discoverer=discoverer)
+
+    initial_toml = """
+    [application]
+    profile = "research"
+    [features.FEAT-BROKER-HEALTH_CHECK]
+    enabled = true
+    """
+    await engine.load_and_reconcile_toml(initial_toml)
+    assert feat.mount_count == 1
+
+    # Configure health check failure
+    feat.should_fail_health = True
+
+    report = await engine.replace_feature_transactional_detailed(
+        "FEAT-BROKER-HEALTH_CHECK"
+    )
+    assert report.committed is False
+    assert report.rolled_back is True
+    assert report.status == "rolled_back"
+    assert "health check timeout" in (report.error or "")
+
+    await engine.shutdown()
+
+
+@pytest.mark.asyncio
+async def test_transactional_replacement_quiesce_and_drain() -> None:
+    """Test that quiesce and drain hooks on old feature are executed during replacement."""
+    quiesced = False
+    drained = False
+
+    class QuiescingBrokerFeature(Feature):
+        def __init__(self) -> None:
+            self.mount_count = 0
+
+        @property
+        def spec(self) -> FeatureSpec:
+            return FeatureSpec(
+                feature_id="FEAT-BROKER-QUIESCE",
+                domain="broker",
+                provides=frozenset({BROKER_MARKET_DATA}),
+            )
+
+        @override
+        async def mount(self, context: FeatureContext, _config: object) -> None:
+            self.mount_count += 1
+            context.provide(BROKER_MARKET_DATA, ConfigurableBrokerService())
+
+        def quiesce(self) -> Awaitable[None] | None:
+            nonlocal quiesced
+            quiesced = True
+            return None
+
+        def drain(self) -> Awaitable[None] | None:
+            nonlocal drained
+            drained = True
+            return None
+
+    feat = QuiescingBrokerFeature()
+    discoverer = FeatureDiscoverer()
+    discoverer.register_feature(feat)
+    engine = CompositionEngine(discoverer=discoverer)
+
+    initial_toml = """
+    [application]
+    profile = "research"
+    [features.FEAT-BROKER-QUIESCE]
+    enabled = true
+    """
+    await engine.load_and_reconcile_toml(initial_toml)
+    assert feat.mount_count == 1
+
+    report = await engine.replace_feature_transactional_detailed(
+        "FEAT-BROKER-QUIESCE", new_config={"reloaded": True}
+    )
+    assert report.committed is True
+    assert report.rolled_back is False
+    assert report.status == "committed"
+    assert quiesced is True
+    assert drained is True
+
+    await engine.shutdown()
+
+
+@pytest.mark.asyncio
+async def test_transactional_replacement_cleanup_error_degrades_status() -> None:
+    """Test post-commit cleanup error in old scope marks status degraded without rolling back."""
+
+    class FailingCleanupBrokerFeature(Feature):
+        def __init__(self) -> None:
+            self.mount_count = 0
+
+        @property
+        def spec(self) -> FeatureSpec:
+            return FeatureSpec(
+                feature_id="FEAT-BROKER-CLEANUP_ERR",
+                domain="broker",
+                provides=frozenset({BROKER_MARKET_DATA}),
+            )
+
+        @override
+        async def mount(self, context: FeatureContext, _config: object) -> None:
+            self.mount_count += 1
+            context.provide(BROKER_MARKET_DATA, ConfigurableBrokerService())
+
+            if self.mount_count == 1:
+
+                def broken_cleanup() -> None:
+                    msg = "Corrupted connection release"
+                    raise RuntimeError(msg)
+
+                context.register_callback(broken_cleanup)
+
+    feat = FailingCleanupBrokerFeature()
+    discoverer = FeatureDiscoverer()
+    discoverer.register_feature(feat)
+    engine = CompositionEngine(discoverer=discoverer)
+
+    initial_toml = """
+    [application]
+    profile = "research"
+    [features.FEAT-BROKER-CLEANUP_ERR]
+    enabled = true
+    """
+    await engine.load_and_reconcile_toml(initial_toml)
+
+    report = await engine.replace_feature_transactional_detailed(
+        "FEAT-BROKER-CLEANUP_ERR", new_config={"gen": 2}
+    )
+    assert report.committed is True
+    assert report.rolled_back is False
+    assert report.status == "degraded"
+    assert len(report.cleanup_errors) == 1
+    assert "Corrupted connection release" in report.cleanup_errors[0]
+
+    await engine.shutdown()

@@ -19,6 +19,7 @@ from app.kernel.events import EventBus
 from app.kernel.feature import FeatureState
 from app.kernel.reconciler import Reconciler, ReconciliationReport
 from app.kernel.registry import ServiceRegistry
+from app.kernel.replacement import ReplacementReport
 
 
 @dataclass(frozen=True, slots=True)
@@ -221,32 +222,56 @@ class CompositionEngine:
         Returns:
             Tuple of (success boolean, optional error message).
         """
+        report = await self.replace_feature_transactional_detailed(
+            feature_id, new_config=new_config
+        )
+        err = report.error
+        if not err and report.cleanup_errors:
+            err = "; ".join(report.cleanup_errors)
+        return report.committed, err
+
+    async def replace_feature_transactional_detailed(
+        self,
+        feature_id: str,
+        new_config: object | None = None,
+    ) -> ReplacementReport:
+        """Perform transactional swap returning detailed ReplacementReport.
+
+        Args:
+            feature_id: Identifier of the feature to replace.
+            new_config: Optional updated configuration object.
+
+        Returns:
+            ReplacementReport detailing commit, rollback, generation, and cleanup.
+        """
         discovery = self._discoverer.discover()
         feature = discovery.discovered.get(feature_id)
         if feature is None:
-            return False, f"Feature '{feature_id}' not found in discovery"
+            return ReplacementReport(
+                feature_id=feature_id,
+                old_generation=0,
+                new_generation=0,
+                committed=False,
+                rolled_back=False,
+                status="rolled_back",
+                error=f"Feature '{feature_id}' not found in discovery",
+            )
 
         cfg = (
             new_config
             if new_config is not None
             else self._config.get_feature_config(feature_id)
         )
-        success, error = await self._reconciler.swap_feature_transactional(feature, cfg)
-        if success:
-            active_tokens = self._registry.active_capabilities()
-            gen = 1
-            for token in active_tokens.values():
-                if token.owner_id == feature_id:
-                    gen = token.generation
-                    break
+        report = await self._reconciler.swap_feature_transactional(feature, cfg)
+        if report.committed:
             await self._event_bus.publish(
                 FeatureReconfiguredEvent(
                     feature_id=feature_id,
-                    generation=gen,
+                    generation=report.new_generation,
                     timestamp=datetime.now(UTC),
                 )
             )
-        return success, error
+        return report
 
     def get_status(self) -> RuntimeStatus:
         """Calculate and return full runtime readiness and state snapshot.

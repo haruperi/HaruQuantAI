@@ -1,5 +1,6 @@
 """Feature specifications, lifecycle states, and interface protocols."""
 
+from collections.abc import Awaitable
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
@@ -88,4 +89,31 @@ class Feature(Protocol):
             context: Reversible feature context providing scoped operations.
             config: Validated feature-specific configuration object.
         """
+        ...
+
+
+@runtime_checkable
+class HealthCheckableFeature(Protocol):
+    """Optional protocol for features supporting pre-commit health check."""
+
+    def health_check(self) -> Awaitable[None] | None:
+        """Verify internal health before transactional replacement commit."""
+        ...
+
+
+@runtime_checkable
+class QuiesceableFeature(Protocol):
+    """Optional protocol for features supporting graceful pausing before unmount."""
+
+    def quiesce(self) -> Awaitable[None] | None:
+        """Pause active ingestion/processing prior to retirement."""
+        ...
+
+
+@runtime_checkable
+class DrainableFeature(Protocol):
+    """Optional protocol for features supporting in-flight work draining."""
+
+    def drain(self) -> Awaitable[None] | None:
+        """Drain active in-flight requests or buffers prior to retirement."""
         ...

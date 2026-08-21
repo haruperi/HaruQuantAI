@@ -496,14 +496,14 @@ Define three outcome classes:
 
 ## Task 4.2 — Preserve the staged scope
 
-- [ ] Mount the new feature into one staged `FeatureScope`.
-- [ ] Collect staged capability bindings without exposing them globally.
-- [ ] Run feature-spec validation and optional health checks.
-- [ ] Atomically publish all staged bindings.
-- [ ] Attach exact binding-token cleanup callbacks to the same staged scope.
-- [ ] Set the staged scope as the feature's active scope.
-- [ ] Never create an empty replacement scope that owns only provider tokens.
-- [ ] Never close the staged scope after successful commit.
+- [x] Mount the new feature into one staged `FeatureScope`.
+- [x] Collect staged capability bindings without exposing them globally.
+- [x] Run feature-spec validation and optional health checks.
+- [x] Atomically publish all staged bindings.
+- [x] Attach exact binding-token cleanup callbacks to the same staged scope.
+- [x] Set the staged scope as the feature's active scope.
+- [x] Never create an empty replacement scope that owns only provider tokens.
+- [x] Never close the staged scope after successful commit.
 
 ## Task 4.3 — Add optional lifecycle protocols
 
@@ -517,49 +517,49 @@ DrainableFeature
 
 Rules:
 
-- [ ] Health check occurs before commit.
-- [ ] Quiesce occurs before old-provider retirement.
-- [ ] Drain is required for a feature to claim zero-downtime replacement.
-- [ ] Features without drain support use safe stop/remount semantics and must not be labeled zero-downtime.
-- [ ] Timeouts are configurable and produce typed errors.
+- [x] Health check occurs before commit.
+- [x] Quiesce occurs before old-provider retirement.
+- [x] Drain is required for a feature to claim zero-downtime replacement.
+- [x] Features without drain support use safe stop/remount semantics and must not be labeled zero-downtime.
+- [x] Timeouts are configurable and produce typed errors.
 
 ## Task 4.4 — Coordinate consumer remounts
 
-- [ ] Calculate the provider's transitive dependent closure.
-- [ ] Quiesce or stop consumers before retiring the old provider unless a safe generation-aware reference exists.
-- [ ] Commit the new provider.
-- [ ] Restart consumers against the new generation.
-- [ ] Preserve the old provider if any pre-commit step fails.
+- [x] Calculate the provider's transitive dependent closure.
+- [x] Quiesce or stop consumers before retiring the old provider unless a safe generation-aware reference exists.
+- [x] Commit the new provider.
+- [x] Restart consumers against the new generation.
+- [x] Preserve the old provider if any pre-commit step fails.
 
 ## Task 4.5 — Cleanup-failure handling
 
-- [ ] Aggregate cleanup errors without losing records for remaining cleanup operations.
-- [ ] Store orphaned cleanup scopes for retry when needed.
-- [ ] Expose cleanup errors through runtime status.
-- [ ] Emit a typed system event for replacement completion and another for cleanup degradation.
+- [x] Aggregate cleanup errors without losing records for remaining cleanup operations.
+- [x] Store orphaned cleanup scopes for retry when needed.
+- [x] Expose cleanup errors through runtime status.
+- [x] Emit a typed system event for replacement completion and another for cleanup degradation.
 
 ## Task 4.6 — Tests
 
 Create a replacement test feature that registers:
 
-- [ ] One capability provider.
-- [ ] One long-running task.
-- [ ] One event listener.
-- [ ] One synchronous callback.
-- [ ] One asynchronous callback.
-- [ ] One synchronous context manager.
-- [ ] One asynchronous context manager.
+- [x] One capability provider.
+- [x] One long-running task.
+- [x] One event listener.
+- [x] One synchronous callback.
+- [x] One asynchronous callback.
+- [x] One synchronous context manager.
+- [x] One asynchronous context manager.
 
 Test:
 
-- [ ] All staged effects remain active after commit.
-- [ ] All old effects are cleaned after successful replacement.
-- [ ] Old binding disposers cannot remove new bindings.
-- [ ] Pre-commit failure preserves the exact old provider and effects.
-- [ ] Health-check failure rolls back.
-- [ ] Post-commit old-scope cleanup failure returns `committed=True` plus cleanup errors.
-- [ ] A dependent consumer uses the new provider generation.
-- [ ] Repeated replacement does not leak effects.
+- [x] All staged effects remain active after commit.
+- [x] All old effects are cleaned after successful replacement.
+- [x] Old binding disposers cannot remove new bindings.
+- [x] Pre-commit failure preserves the exact old provider and effects.
+- [x] Health-check failure rolls back.
+- [x] Post-commit old-scope cleanup failure returns `committed=True` plus cleanup errors.
+- [x] A dependent consumer uses the new provider generation.
+- [x] Repeated replacement does not leak effects.
 
 ## Task 4.7 — Usage example
 
@@ -580,10 +580,10 @@ fix(kernel): make transactional replacement lifecycle safe
 
 ## Exit criteria
 
-- [ ] Replacement effects survive successful commit.
-- [ ] Pre-commit failure is exactly reversible.
-- [ ] Post-commit cleanup failure is represented honestly.
-- [ ] Consumers never continue using the retired provider generation.
+- [x] Replacement effects survive successful commit.
+- [x] Pre-commit failure is exactly reversible.
+- [x] Post-commit cleanup failure is represented honestly.
+- [x] Consumers never continue using the retired provider generation.
 
 ---
 

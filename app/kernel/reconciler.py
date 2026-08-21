@@ -6,8 +6,16 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from app.kernel.context import DefaultFeatureContext
-from app.kernel.feature import Feature, FeatureSpec, FeatureState
+from app.kernel.feature import (
+    DrainableFeature,
+    Feature,
+    FeatureSpec,
+    FeatureState,
+    HealthCheckableFeature,
+    QuiesceableFeature,
+)
 from app.kernel.graph import DependencyGraph, GraphResolution
+from app.kernel.replacement import ReplacementReport
 from app.kernel.scope import FeatureScope
 
 if TYPE_CHECKING:
@@ -305,78 +313,152 @@ class Reconciler:
             self._feature_states[f_id] = FeatureState.FAILED_START
             return False, str(err)
 
+    async def _run_health_check(self, feature: Feature) -> None:
+        """Execute optional pre-commit health check hook if implemented.
+
+        Args:
+            feature: Feature instance to check.
+        """
+        if isinstance(feature, HealthCheckableFeature) or (
+            hasattr(feature, "health_check") and callable(feature.health_check)
+        ):
+            res = feature.health_check()
+            if inspect.isawaitable(res):
+                await res
+
+    async def _cleanup_old_feature(
+        self,
+        old_feature: Feature | None,
+        old_scope: FeatureScope | None,
+    ) -> list[str]:
+        """Execute quiesce, drain, and scope disposal for a replaced feature.
+
+        Args:
+            old_feature: Replaced feature instance if previously active.
+            old_scope: Replaced feature's private scope to close.
+
+        Returns:
+            List of error messages encountered during teardown.
+        """
+        cleanup_errors: list[str] = []
+        if old_feature is not None:
+            if isinstance(old_feature, QuiesceableFeature) or (
+                hasattr(old_feature, "quiesce") and callable(old_feature.quiesce)
+            ):
+                try:
+                    q_res = old_feature.quiesce()
+                    if inspect.isawaitable(q_res):
+                        await q_res
+                except Exception as q_err:  # noqa: BLE001
+                    cleanup_errors.append(f"Quiesce error: {q_err}")
+
+            if isinstance(old_feature, DrainableFeature) or (
+                hasattr(old_feature, "drain") and callable(old_feature.drain)
+            ):
+                try:
+                    d_res = old_feature.drain()
+                    if inspect.isawaitable(d_res):
+                        await d_res
+                except Exception as d_err:  # noqa: BLE001
+                    cleanup_errors.append(f"Drain error: {d_err}")
+
+        if old_scope is not None:
+            try:
+                await old_scope.close()
+            except Exception as close_err:  # noqa: BLE001
+                cleanup_errors.append(f"Scope cleanup error: {close_err}")
+
+        return cleanup_errors
+
     async def swap_feature_transactional(
         self,
         feature: Feature,
         config: object,
-    ) -> tuple[bool, str | None]:
-        """Perform zero-downtime transactional replacement using a shadow scope.
+    ) -> ReplacementReport:
+        """Perform a zero-downtime transactional feature swap using shadow staging.
 
         Sequence (Section 26):
-            1. Create shadow scope.
-            2. Mount new feature instance in shadow context.
-            3. Run optional health check.
-            4. Atomically swap registry bindings with incremented generation.
-            5. Dispose old scope.
-            6. Roll back shadow scope on any failure, leaving active provider intact.
+            1. Create staged scope and mount new feature instance in staged context.
+            2. Run optional pre-commit health check.
+            3. On pre-commit failure: close staged scope and return rollback report.
+            4. Atomically commit registry bindings, incrementing generation.
+            5. Promote staged scope to active scope (do not close staged scope).
+            6. Execute quiesce and drain on old feature (if supported).
+            7. Dispose old scope and aggregate any cleanup errors.
 
         Args:
             feature: New feature instance to mount.
             config: Configuration for the new feature.
 
         Returns:
-            Tuple of (success boolean, optional error message).
+            ReplacementReport detailing commit/rollback status and diagnostics.
         """
         f_id = feature.spec.feature_id
-        shadow_scope = FeatureScope(owner_id=f"{f_id}_shadow")
-        shadow_providers: list[tuple[CapabilityKey[Any], object]] = []
+        active_tokens = self._registry.active_capabilities()
+        old_tokens = [t for t in active_tokens.values() if t.owner_id == f_id]
+        old_gen = old_tokens[0].generation if old_tokens else 0
+        old_scope = self._active_scopes.get(f_id)
+        old_feature = self._active_features.get(f_id)
 
-        def shadow_registrar(
+        staged_scope = FeatureScope(owner_id=f_id)
+        staged_providers: list[tuple[CapabilityKey[Any], object]] = []
+
+        def staged_registrar(
             cap: CapabilityKey[Any], impl: object, _sc: FeatureScope
         ) -> None:
-            shadow_providers.append((cap, impl))
+            staged_providers.append((cap, impl))
 
-        shadow_context = DefaultFeatureContext(
+        staged_context = DefaultFeatureContext(
             spec=feature.spec,
-            scope=shadow_scope,
+            scope=staged_scope,
             resolver=self._registry.resolve,
-            provider_registrar=shadow_registrar,
+            provider_registrar=staged_registrar,
             event_bus=self._event_bus,
         )
 
         try:
-            # 1. Mount into shadow context
-            await feature.mount(shadow_context, config)
-
-            # 2. Optional health check
-            if hasattr(feature, "health_check") and callable(feature.health_check):
-                res = feature.health_check()
-                if inspect.isawaitable(res):
-                    await res
-
-            # 3. Commit: Transfer shadow providers into global registry with real scope
-            real_scope = FeatureScope(owner_id=f_id)
-            for cap, impl in shadow_providers:
-                self._registry.replace_binding(
-                    cap, impl, owner_id=f_id, scope=real_scope
-                )
-
-            # 4. Dispose old scope and record new active feature
-            old_scope = self._active_scopes.get(f_id)
-            self._active_features[f_id] = feature
-            self._active_scopes[f_id] = real_scope
-            self._active_configs[f_id] = config
-            self._feature_states[f_id] = FeatureState.ACTIVE
-
-            if old_scope is not None:
-                await old_scope.close()
-
-            await shadow_scope.close()
-            return True, None
+            await feature.mount(staged_context, config)
+            await self._run_health_check(feature)
         except Exception as err:  # noqa: BLE001
-            # Rollback: dispose shadow scope without touching active provider
-            await shadow_scope.close()
-            return False, str(err)
+            await staged_scope.close()
+            return ReplacementReport(
+                feature_id=f_id,
+                old_generation=old_gen,
+                new_generation=old_gen,
+                committed=False,
+                rolled_back=True,
+                status="rolled_back",
+                error=str(err),
+            )
+
+        # Commit: Transfer staged providers into global registry with staged_scope
+        new_gen = old_gen + 1
+        for cap, impl in staged_providers:
+            token = self._registry.replace_binding(
+                cap, impl, owner_id=f_id, scope=staged_scope
+            )
+            new_gen = token.generation
+
+        # Record staged scope as active scope (preserved, not closed!)
+        self._active_features[f_id] = feature
+        self._active_scopes[f_id] = staged_scope
+        self._active_configs[f_id] = config
+        self._feature_states[f_id] = FeatureState.ACTIVE
+
+        # Cleanup old feature and scope
+        cleanup_errors = await self._cleanup_old_feature(old_feature, old_scope)
+
+        status = "degraded" if cleanup_errors else "committed"
+        return ReplacementReport(
+            feature_id=f_id,
+            old_generation=old_gen,
+            new_generation=new_gen,
+            committed=True,
+            rolled_back=False,
+            cleanup_errors=tuple(cleanup_errors),
+            status=status,
+            error=None,
+        )
 
     async def _stop_feature(self, f_id: str) -> None:
         """Unmount an active feature and close its private scope.
