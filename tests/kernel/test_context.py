@@ -1,18 +1,59 @@
 """Tests for DefaultFeatureContext capability operations and boundary enforcement."""
 
 import asyncio
-from typing import Any
+from collections.abc import Sequence
+from contextlib import asynccontextmanager, contextmanager
+from typing import Any, override
 
 import pytest
 
-from app.contracts.broker.market_data import BROKER_MARKET_DATA
-from app.contracts.data.bar_cache import BAR_CACHE
-from app.contracts.data.historical_bars import HISTORICAL_BARS
+from app.contracts.broker.market_data import (
+    BROKER_MARKET_DATA,
+    BrokerBarsRequest,
+    BrokerMarketData,
+    BrokerRawBar,
+)
+from app.contracts.data.bar_cache import BAR_CACHE, BarCache
+from app.contracts.data.historical_bars import (
+    HISTORICAL_BARS,
+    Bar,
+    HistoricalBarsRequest,
+)
 from app.contracts.data.realtime_ticks import REALTIME_TICKS
 from app.kernel.capability import CapabilityKey, CapabilityUnavailableError
 from app.kernel.context import DefaultFeatureContext
 from app.kernel.feature import FeatureSpec
 from app.kernel.scope import FeatureScope
+
+
+class StubBrokerMarketData(BrokerMarketData):
+    """Protocol-compatible broker test double."""
+
+    @override
+    async def retrieve_bars(
+        self,
+        _request: BrokerBarsRequest,
+    ) -> Sequence[BrokerRawBar]:
+        return ()
+
+
+class StubBarCache(BarCache):
+    """Protocol-compatible bar-cache test double."""
+
+    @override
+    async def get_bars(
+        self,
+        _request: HistoricalBarsRequest,
+    ) -> Sequence[Bar] | None:
+        return None
+
+    @override
+    async def put_bars(
+        self,
+        _request: HistoricalBarsRequest,
+        _bars: Sequence[Bar],
+    ) -> None:
+        return None
 
 
 def test_context_require_and_optional_declared() -> None:
@@ -25,9 +66,11 @@ def test_context_require_and_optional_declared() -> None:
         optional=frozenset({BAR_CACHE}),
     )
     scope = FeatureScope("FEAT-DATA-RETRIEVE_BARS")
+    broker_service = StubBrokerMarketData()
+    bar_cache = StubBarCache()
     registry: dict[str, object] = {
-        BROKER_MARKET_DATA.identifier: "mock_broker_service",
-        BAR_CACHE.identifier: "mock_bar_cache",
+        BROKER_MARKET_DATA.identifier: broker_service,
+        BAR_CACHE.identifier: bar_cache,
     }
 
     def resolver(key: CapabilityKey[Any]) -> Any | None:
@@ -35,8 +78,8 @@ def test_context_require_and_optional_declared() -> None:
 
     ctx = DefaultFeatureContext(spec=spec, scope=scope, resolver=resolver)
 
-    assert ctx.require(BROKER_MARKET_DATA) == "mock_broker_service"
-    assert ctx.optional(BAR_CACHE) == "mock_bar_cache"
+    assert ctx.require(BROKER_MARKET_DATA) is broker_service
+    assert ctx.optional(BAR_CACHE) is bar_cache
 
 
 def test_context_require_undeclared_raises() -> None:
@@ -159,8 +202,6 @@ async def test_context_spawn_and_cleanup_delegation() -> None:
 @pytest.mark.asyncio
 async def test_context_enter_context_managers() -> None:
     """Test entering sync and async context managers through FeatureContext."""
-    from contextlib import asynccontextmanager, contextmanager
-
     spec = FeatureSpec(
         feature_id="FEAT-TEST-CM_CONTEXT",
         domain="data",
@@ -168,34 +209,28 @@ async def test_context_enter_context_managers() -> None:
     )
     scope = FeatureScope("FEAT-TEST-CM_CONTEXT")
     ctx = DefaultFeatureContext(spec=spec, scope=scope)
-
-    exited_sync = False
-    exited_async = False
+    exited: set[str] = set()
 
     @contextmanager
     def sync_res() -> Any:
         try:
             yield "sync_result"
         finally:
-            nonlocal exited_sync
-            exited_sync = True
+            exited.add("sync")
 
     @asynccontextmanager
     async def async_res() -> Any:
         try:
             yield "async_result"
         finally:
-            nonlocal exited_async
-            exited_async = True
+            exited.add("async")
 
     v1 = ctx.enter_context(sync_res(), name="sync_cm")
     v2 = await ctx.enter_async_context(async_res(), name="async_cm")
 
     assert v1 == "sync_result"
     assert v2 == "async_result"
-    assert not exited_sync
-    assert not exited_async
+    assert not exited
 
     await ctx.scope.close()
-    assert exited_sync
-    assert exited_async
+    assert exited == {"sync", "async"}
