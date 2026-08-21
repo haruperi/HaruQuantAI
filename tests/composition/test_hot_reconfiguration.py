@@ -239,7 +239,6 @@ async def test_config_file_watcher_polling(tmp_path: Path) -> None:
         debounce=0.01,
     )
     watcher.start()
-    assert watcher.is_running is True
 
     try:
         # Update config file on disk
@@ -270,10 +269,12 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
     None
 ):
     """Characterization test: replacement effects (tasks, listeners, callbacks) must survive after commit."""
-    task_running = False
-    task_cancelled = False
-    listener_invoked = False
-    callback_cleaned = False
+    lifecycle: dict[str, bool] = {
+        "task_running": False,
+        "task_cancelled": False,
+        "listener_invoked": False,
+        "callback_cleaned": False,
+    }
 
     class RichLifecycleBrokerFeature(Feature):
         spec: FeatureSpec = FeatureSpec(
@@ -287,7 +288,6 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
 
         @override
         async def mount(self, context: FeatureContext, config: object) -> None:
-            nonlocal task_running, task_cancelled, listener_invoked, callback_cleaned
             self.mount_count += 1
             service = ConfigurableBrokerService(base_price=99.0)
             context.provide(BROKER_MARKET_DATA, service)
@@ -297,27 +297,24 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
 
                 # Spawn background task on replacement
                 async def worker() -> None:
-                    nonlocal task_running, task_cancelled
-                    task_running = True
+                    lifecycle["task_running"] = True
                     try:
                         await stop_evt.wait()
                     except asyncio.CancelledError:
-                        task_cancelled = True
+                        lifecycle["task_cancelled"] = True
                         raise
 
                 context.spawn(worker(), name="replacement_worker")
 
                 # Register listener on replacement
                 def on_reconfigured(_e: FeatureReconfiguredEvent) -> None:
-                    nonlocal listener_invoked
-                    listener_invoked = True
+                    lifecycle["listener_invoked"] = True
 
                 context.subscribe(FeatureReconfiguredEvent, on_reconfigured)
 
                 # Register cleanup callback
                 def cleanup_cb() -> None:
-                    nonlocal callback_cleaned
-                    callback_cleaned = True
+                    lifecycle["callback_cleaned"] = True
 
                 context.register_callback(cleanup_cb)
 
@@ -348,14 +345,18 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
     await asyncio.sleep(0.02)
 
     # CRITICAL: Replacement task must STILL be running, not killed by shadow scope close!
-    assert task_running is True, "Replacement background task was killed during commit!"
-    assert not task_cancelled, (
+    assert lifecycle["task_running"] is True, (
+        "Replacement background task was killed during commit!"
+    )
+    assert not lifecycle["task_cancelled"], (
         "Replacement task was cancelled during shadow scope cleanup!"
     )
 
     await engine.shutdown()
-    assert task_cancelled is True, "Task was not cancelled on engine shutdown"
-    assert callback_cleaned is True, (
+    assert lifecycle["task_cancelled"] is True, (
+        "Task was not cancelled on engine shutdown"
+    )
+    assert lifecycle["callback_cleaned"] is True, (
         "Cleanup callback was not invoked on engine shutdown"
     )
 

@@ -250,9 +250,7 @@ async def test_runtime_failure_blocks_required_consumers_only() -> None:
     assert status.feature_states["FEAT-TEST-CRASHING_PROVIDER"] == (
         FeatureState.FAILED_RUNTIME
     )
-    assert status.feature_states["FEAT-TEST-CRASH_CONSUMER"] == (
-        FeatureState.BLOCKED
-    )
+    assert status.feature_states["FEAT-TEST-CRASH_CONSUMER"] == (FeatureState.BLOCKED)
     assert status.feature_states["FEAT-TEST-UNRELATED"] == FeatureState.ACTIVE
     assert not engine.registry.is_available(CRASHING_CAP)
     assert not engine.registry.is_available(CONSUMER_CAP)
