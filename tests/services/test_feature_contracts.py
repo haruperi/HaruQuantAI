@@ -7,17 +7,19 @@ import tomllib
 from contextlib import suppress
 from importlib import import_module
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
 from app.composition.discovery import FeatureDiscoverer
-from app.kernel.capability import CapabilityKey
 from app.kernel.context import DefaultFeatureContext
 from app.kernel.events import EventBus
 from app.kernel.feature import Feature
 from app.kernel.registry import ServiceRegistry
 from app.kernel.scope import FeatureScope
+
+if TYPE_CHECKING:
+    from app.kernel.capability import CapabilityKey
 
 FEATURE_ID_REGEX = re.compile(r"^FEAT-[A-Z]+-[A-Z_]+$")
 
