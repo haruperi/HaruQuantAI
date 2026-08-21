@@ -68,6 +68,7 @@ async def test_storage_feature_mount_disk(tmp_path: Path) -> None:
 
     assert SYSTEM_STORAGE in provided
     engine = provided[SYSTEM_STORAGE]
+    assert isinstance(engine, StorageEngine)
     await engine.set("disk_key", b"disk_payload")
     assert await engine.get("disk_key") == b"disk_payload"
 

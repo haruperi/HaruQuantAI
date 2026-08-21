@@ -25,14 +25,14 @@ FEATURE_ID_REGEX = re.compile(r"^FEAT-[A-Z]+-[A-Z_]+$")
 
 
 @pytest.fixture(scope="module")
-def all_discovered_features() -> list[Feature[Any]]:
+def all_discovered_features() -> list[Feature]:
     """Discover all registered feature instances."""
     res = FeatureDiscoverer().discover()
     return list(res.discovered.values())
 
 
 def test_discovered_features_non_empty(
-    all_discovered_features: list[Feature[Any]],
+    all_discovered_features: list[Feature],
 ) -> None:
     """Verify that feature discovery finds features in the codebase."""
     assert len(all_discovered_features) >= 3
@@ -43,7 +43,7 @@ def test_discovered_features_non_empty(
     [feat.__class__ for feat in FeatureDiscoverer().discover().discovered.values()],
 )
 def test_feature_contract_spec_and_id(
-    feature_cls: type[Feature[Any]],
+    feature_cls: type[Feature],
 ) -> None:
     """Verify feature ID, spec declaration, and naming convention."""
     feature = feature_cls()
@@ -72,7 +72,7 @@ def test_feature_contract_spec_and_id(
 )
 @pytest.mark.asyncio
 async def test_feature_contract_idempotent_unmount(
-    feature_cls: type[Feature[Any]],
+    feature_cls: type[Feature],
 ) -> None:
     """Verify unmount is safe and idempotent even when called repeatedly."""
     feature = feature_cls()
@@ -93,7 +93,7 @@ async def test_feature_contract_idempotent_unmount(
 
     # Mount may fail if dependencies are missing, but unmount MUST never crash
     with suppress(Exception):
-        cfg = feature.spec.config_type()
+        cfg: dict[str, object] = {}
         await feature.mount(context, cfg)
 
     # Double unmount/close must succeed without error

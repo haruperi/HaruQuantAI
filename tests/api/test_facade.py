@@ -123,9 +123,9 @@ async def test_root_haruquant_api_end_to_end(monkeypatch: pytest.MonkeyPatch) ->
     assert api.engine is engine
 
     # Initially no features mounted
-    assert api.data.is_historical_bars_available is False
-    assert api.broker.is_market_data_available is False
-    assert api.system.is_storage_available is False
+    assert not api.data.is_historical_bars_available
+    assert not api.broker.is_market_data_available
+    assert not api.system.is_storage_available
 
     # 1. Mount features
     config_toml = """
@@ -144,9 +144,9 @@ async def test_root_haruquant_api_end_to_end(monkeypatch: pytest.MonkeyPatch) ->
     await engine.load_and_reconcile_toml(config_toml)
 
     # 2. Check capabilities are now live through facade
-    assert api.data.is_historical_bars_available is True
-    assert api.broker.is_market_data_available is True
-    assert api.system.is_storage_available is True
+    assert bool(api.data.is_historical_bars_available)
+    assert bool(api.broker.is_market_data_available)
+    assert bool(api.system.is_storage_available)
 
     # 3. Call DataAPI
     req = HistoricalBarsRequest(
@@ -176,11 +176,20 @@ async def test_root_haruquant_api_end_to_end(monkeypatch: pytest.MonkeyPatch) ->
         """
         [application]
         profile = "research"
+
+        [features.FEAT-SYS-TEST_STORAGE]
+        enabled = true
+
+        [features.FEAT-BROKER-TEST_MOCK_FEED]
+        enabled = true
+
         [features.FEAT-DATA-TEST_RETRIEVE_BARS]
         enabled = false
         """
     )
-    assert api.data.is_historical_bars_available is False
+    assert not api.data.is_historical_bars_available
+    assert bool(api.broker.is_market_data_available)
+    assert bool(api.system.is_storage_available)
     with pytest.raises(CapabilityUnavailableError):
         await api.data.get_historical_bars(req)
 

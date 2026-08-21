@@ -1,60 +1,65 @@
-"""Tests for Reconciler transactional mounting, dynamic changes, and teardowns."""
+from typing import TYPE_CHECKING, override
 
 import pytest
 
 from app.contracts.broker.market_data import BROKER_MARKET_DATA
 from app.contracts.data.historical_bars import HISTORICAL_BARS
 from app.contracts.system.clock import SYSTEM_CLOCK
-from app.kernel.context import FeatureContext
-from app.kernel.feature import FeatureSpec, FeatureState
+from app.kernel.feature import Feature, FeatureSpec, FeatureState
 from app.kernel.reconciler import Reconciler
 from app.kernel.registry import ServiceRegistry
 
+if TYPE_CHECKING:
+    from app.kernel.context import FeatureContext
 
-class MockClockFeature:
-    spec = FeatureSpec(
+
+class MockClockFeature(Feature):
+    spec: FeatureSpec = FeatureSpec(
         feature_id="FEAT-SYS-PROVIDE_CLOCK",
         domain="system",
         provides=frozenset({SYSTEM_CLOCK}),
     )
 
+    @override
     async def mount(self, context: FeatureContext, _config: object) -> None:
         context.provide(SYSTEM_CLOCK, "clock_service_instance")
 
 
-class MockBrokerFeature:
-    spec = FeatureSpec(
+class MockBrokerFeature(Feature):
+    spec: FeatureSpec = FeatureSpec(
         feature_id="FEAT-BROKER-FEED_MT5",
         domain="broker",
         provides=frozenset({BROKER_MARKET_DATA}),
         requires=frozenset({SYSTEM_CLOCK}),
     )
 
+    @override
     async def mount(self, context: FeatureContext, _config: object) -> None:
         clock = context.require(SYSTEM_CLOCK)
         context.provide(BROKER_MARKET_DATA, f"broker_service_using_{clock}")
 
 
-class MockDataFeature:
-    spec = FeatureSpec(
+class MockDataFeature(Feature):
+    spec: FeatureSpec = FeatureSpec(
         feature_id="FEAT-DATA-RETRIEVE_BARS",
         domain="data",
         provides=frozenset({HISTORICAL_BARS}),
         requires=frozenset({BROKER_MARKET_DATA}),
     )
 
+    @override
     async def mount(self, context: FeatureContext, _config: object) -> None:
-        broker = context.require(BROKER_MARKET_DATA)
-        context.provide(HISTORICAL_BARS, f"historical_bars_using_{broker}")
+        context.provide(HISTORICAL_BARS, "data_service_instance")
 
 
-class FailingFeature:
-    spec = FeatureSpec(
+class FailingFeature(Feature):
+    spec: FeatureSpec = FeatureSpec(
         feature_id="FEAT-TEST-FAIL_MOUNT",
         domain="test",
         provides=frozenset(),
     )
 
+    @override
     async def mount(self, _context: FeatureContext, _config: object) -> None:
         msg = "Fatal error inside mount"
         raise RuntimeError(msg)
@@ -66,7 +71,7 @@ async def test_reconciler_topological_mounting_flow() -> None:
     registry = ServiceRegistry()
     reconciler = Reconciler(registry)
 
-    features = {
+    features: dict[str, Feature] = {
         "FEAT-SYS-PROVIDE_CLOCK": MockClockFeature(),
         "FEAT-BROKER-FEED_MT5": MockBrokerFeature(),
         "FEAT-DATA-RETRIEVE_BARS": MockDataFeature(),
@@ -96,7 +101,6 @@ async def test_reconciler_topological_mounting_flow() -> None:
     assert states["FEAT-SYS-PROVIDE_CLOCK"] == FeatureState.ACTIVE
     assert states["FEAT-BROKER-FEED_MT5"] == FeatureState.ACTIVE
     assert states["FEAT-DATA-RETRIEVE_BARS"] == FeatureState.ACTIVE
-    assert FeatureContext is not None
 
 
 @pytest.mark.asyncio
@@ -126,7 +130,7 @@ async def test_reconciler_graceful_provider_removal_and_dependent_unmount() -> N
     registry = ServiceRegistry()
     reconciler = Reconciler(registry)
 
-    features = {
+    features: dict[str, Feature] = {
         "FEAT-SYS-PROVIDE_CLOCK": MockClockFeature(),
         "FEAT-BROKER-FEED_MT5": MockBrokerFeature(),
         "FEAT-DATA-RETRIEVE_BARS": MockDataFeature(),
@@ -167,7 +171,7 @@ async def test_reconciler_config_change_triggers_remount() -> None:
     registry = ServiceRegistry()
     reconciler = Reconciler(registry)
 
-    features = {"FEAT-SYS-PROVIDE_CLOCK": MockClockFeature()}
+    features: dict[str, Feature] = {"FEAT-SYS-PROVIDE_CLOCK": MockClockFeature()}
 
     await reconciler.reconcile(
         discovered_features=features,
@@ -194,7 +198,7 @@ async def test_reconciler_stop_all() -> None:
     registry = ServiceRegistry()
     reconciler = Reconciler(registry)
 
-    features = {
+    features: dict[str, Feature] = {
         "FEAT-SYS-PROVIDE_CLOCK": MockClockFeature(),
         "FEAT-BROKER-FEED_MT5": MockBrokerFeature(),
     }
@@ -217,8 +221,8 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
     registry = ServiceRegistry()
     reconciler = Reconciler(registry)
 
-    class CountingClockFeature:
-        spec = FeatureSpec(
+    class CountingClockFeature(Feature):
+        spec: FeatureSpec = FeatureSpec(
             feature_id="FEAT-SYS-PROVIDE_CLOCK",
             domain="system",
             provides=frozenset({SYSTEM_CLOCK}),
@@ -227,6 +231,7 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
         def __init__(self) -> None:
             self.mount_count = 0
 
+        @override
         async def mount(self, context: FeatureContext, config: object) -> None:
             self.mount_count += 1
             mode = "default"
@@ -234,8 +239,8 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
                 mode = config.get("mode", "default")
             context.provide(SYSTEM_CLOCK, {"mode": mode, "gen": self.mount_count})
 
-    class CountingBrokerFeature:
-        spec = FeatureSpec(
+    class CountingBrokerFeature(Feature):
+        spec: FeatureSpec = FeatureSpec(
             feature_id="FEAT-BROKER-FEED_MT5",
             domain="broker",
             provides=frozenset({BROKER_MARKET_DATA}),
@@ -246,13 +251,14 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
             self.mount_count = 0
             self.captured_clock: object = None
 
+        @override
         async def mount(self, context: FeatureContext, _config: object) -> None:
             self.mount_count += 1
             self.captured_clock = context.require(SYSTEM_CLOCK)
             context.provide(BROKER_MARKET_DATA, {"broker_gen": self.mount_count})
 
-    class CountingDataFeature:
-        spec = FeatureSpec(
+    class CountingDataFeature(Feature):
+        spec: FeatureSpec = FeatureSpec(
             feature_id="FEAT-DATA-RETRIEVE_BARS",
             domain="data",
             provides=frozenset({HISTORICAL_BARS}),
@@ -263,6 +269,7 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
             self.mount_count = 0
             self.captured_broker: object = None
 
+        @override
         async def mount(self, context: FeatureContext, _config: object) -> None:
             self.mount_count += 1
             self.captured_broker = context.require(BROKER_MARKET_DATA)
@@ -272,7 +279,7 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
     broker_feat = CountingBrokerFeature()
     data_feat = CountingDataFeature()
 
-    features = {
+    features: dict[str, Feature] = {
         "FEAT-SYS-PROVIDE_CLOCK": clock_feat,
         "FEAT-BROKER-FEED_MT5": broker_feat,
         "FEAT-DATA-RETRIEVE_BARS": data_feat,

@@ -1070,10 +1070,10 @@ docs/architecture/audit/composability_remediation_result.md
 
 ## Task 11.1 — Tighten test typing
 
-- [ ] Remove the blanket `tests.* ignore_errors = true` override.
-- [ ] Fix test typing incrementally by directory if one-step removal is too large.
-- [ ] Keep explicit, narrow overrides only for third-party libraries that truly lack typing.
-- [ ] Require mypy to check all new remediation tests.
+- [x] Remove the blanket `tests.* ignore_errors = true` override.
+- [x] Fix test typing incrementally by directory if one-step removal is too large.
+- [x] Keep explicit, narrow overrides only for third-party libraries that truly lack typing.
+- [x] Require mypy to check all new remediation tests.
 
 ## Task 11.2 — Final quality gate
 
@@ -1090,23 +1090,23 @@ uv run --frozen pytest
 uv run --frozen python scripts/verify_feature_removal.py --all --report removability-report.json
 ```
 
-- [ ] Keep overall coverage at or above 80%.
-- [ ] Require new kernel and composition code to have direct tests for all branches involving failure or rollback.
-- [ ] Confirm no ignored failing tests, conditional skips, or workflow-level silent skips were added.
-- [ ] Confirm pre-commit and CI invoke compatible locked commands.
+- [x] Keep overall coverage at or above 80%.
+- [x] Require new kernel and composition code to have direct tests for all branches involving failure or rollback.
+- [x] Confirm no ignored failing tests, conditional skips, or workflow-level silent skips were added.
+- [x] Confirm pre-commit and CI invoke compatible locked commands.
 
 ## Task 11.3 — Final audit report
 
 Create `docs/architecture/audit/composability_remediation_result.md` with:
 
-- [ ] Baseline and final commit SHAs.
-- [ ] Gap-by-gap status.
-- [ ] Test count and coverage.
-- [ ] Full removal-matrix summary.
-- [ ] Live-readiness capability list.
-- [ ] Replacement success, rollback, and cleanup-degradation evidence.
-- [ ] Known limitations and deferred work.
-- [ ] Confirmation that no real broker or live-trading operation was executed.
+- [x] Baseline and final commit SHAs.
+- [x] Gap-by-gap status.
+- [x] Test count and coverage.
+- [x] Full removal-matrix summary.
+- [x] Live-readiness capability list.
+- [x] Replacement success, rollback, and cleanup-degradation evidence.
+- [x] Known limitations and deferred work.
+- [x] Confirmation that no real broker or live-trading operation was executed.
 
 ## Proposed commit
 
@@ -1116,9 +1116,9 @@ chore(quality): finalize composability remediation evidence
 
 ## Exit criteria
 
-- [ ] All quality gates pass locally and in GitHub Actions.
-- [ ] The full removal matrix passes.
-- [ ] The remediation result document contains reproducible evidence.
+- [x] All quality gates pass locally and in GitHub Actions.
+- [x] The full removal matrix passes.
+- [x] The remediation result document contains reproducible evidence.
 
 ---
 

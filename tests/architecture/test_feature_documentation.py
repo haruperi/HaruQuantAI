@@ -23,6 +23,7 @@ def test_all_feature_readmes_match_spec() -> None:
         feature = factory()
         spec = feature.spec
 
+        assert mod.__file__ is not None
         module_file = Path(mod.__file__).resolve()
         pkg_dir = module_file.parent
         readme_path = pkg_dir / "README.md"

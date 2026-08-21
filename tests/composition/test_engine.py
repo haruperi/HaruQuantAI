@@ -1,4 +1,4 @@
-"""Tests for CompositionEngine coordination, status snapshots, and shutdown."""
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -6,8 +6,10 @@ from app.composition.engine import CompositionEngine
 from app.contracts.broker.market_data import BROKER_MARKET_DATA
 from app.contracts.data.historical_bars import HISTORICAL_BARS
 from app.contracts.system.clock import SYSTEM_CLOCK
-from app.kernel.context import FeatureContext
 from app.kernel.feature import FeatureSpec, FeatureState
+
+if TYPE_CHECKING:
+    from app.kernel.context import FeatureContext
 
 
 class MockClockFeature:
@@ -87,7 +89,6 @@ async def test_engine_load_and_reconcile_toml() -> None:
     await engine.shutdown()
     assert len(engine.reconciler.active_features) == 0
     assert len(engine.registry.active_capabilities()) == 0
-    assert FeatureContext is not None
 
 
 @pytest.mark.asyncio

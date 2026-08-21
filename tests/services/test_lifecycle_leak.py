@@ -84,14 +84,12 @@ async def test_100x_rapid_mount_unmount_churn(
 class BuggyMountFeature(Feature):
     """Feature that deliberately crashes halfway through mount."""
 
-    @property
-    def spec(self) -> FeatureSpec:
-        return FeatureSpec(
-            feature_id="FEAT-TEST-BUGGY_MOUNT",
-            domain="test",
-            description="Deliberately fails mount",
-            provides=frozenset({CapabilityKey[object](name="test.buggy", major=1)}),
-        )
+    spec: FeatureSpec = FeatureSpec(
+        feature_id="FEAT-TEST-BUGGY_MOUNT",
+        domain="test",
+        description="Deliberately fails mount",
+        provides=frozenset({CapabilityKey[object](name="test.buggy", major=1)}),
+    )
 
     @override
     async def mount(self, context: FeatureContext, config: object) -> None:
@@ -190,13 +188,11 @@ async def test_unexpected_task_failure_transitions_to_failed_runtime() -> None:
     cap_worker = CapabilityKey[object](name="test.worker_service", major=1)
 
     class CrashingWorkerFeature(Feature):
-        @property
-        def spec(self) -> FeatureSpec:
-            return FeatureSpec(
-                feature_id="FEAT-TEST-CRASHING_WORKER",
-                domain="test",
-                provides=frozenset({cap_worker}),
-            )
+        spec: FeatureSpec = FeatureSpec(
+            feature_id="FEAT-TEST-CRASHING_WORKER",
+            domain="test",
+            provides=frozenset({cap_worker}),
+        )
 
         @override
         async def mount(self, context: FeatureContext, _config: object) -> None:

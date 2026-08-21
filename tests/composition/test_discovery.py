@@ -1,11 +1,12 @@
-"""Tests for feature discovery via manual registration and entry points."""
-
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 from app.composition.discovery import FeatureDiscoverer
 from app.contracts.system.clock import SYSTEM_CLOCK
-from app.kernel.context import FeatureContext
 from app.kernel.feature import Feature, FeatureSpec
+
+if TYPE_CHECKING:
+    from app.kernel.context import FeatureContext
 
 
 class MockFeature:
@@ -41,7 +42,6 @@ def test_discover_manual_features() -> None:
         assert "FEAT-SYS-PROVIDE_CLOCK" in result.discovered
         assert len(result.failed_specs) == 0
         assert len(result.failed_imports) == 0
-        assert FeatureContext is not None
 
 
 def test_discover_invalid_spec_feature() -> None:

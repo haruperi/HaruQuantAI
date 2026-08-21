@@ -42,15 +42,13 @@ class DummyExternalBrokerService(BrokerMarketData):
 class ExternalBrokerPlugin(Feature):
     """Simulated external plugin distributed in a separate wheel."""
 
-    @property
-    def spec(self) -> FeatureSpec:
-        return FeatureSpec(
-            feature_id="FEAT-BROKER-FEED_EXTERNAL",
-            domain="broker",
-            description="External broker plugin",
-            provides=frozenset({BROKER_MARKET_DATA}),
-            requires=frozenset(),
-        )
+    spec: FeatureSpec = FeatureSpec(
+        feature_id="FEAT-BROKER-FEED_EXTERNAL",
+        domain="broker",
+        description="External broker plugin",
+        provides=frozenset({BROKER_MARKET_DATA}),
+        requires=frozenset(),
+    )
 
     @override
     async def mount(self, context: FeatureContext, config: object) -> None:
@@ -60,20 +58,18 @@ class ExternalBrokerPlugin(Feature):
 class DependentConsumerPlugin(Feature):
     """Simulated external plugin depending on broker.market-data@1."""
 
-    @property
-    def spec(self) -> FeatureSpec:
-        return FeatureSpec(
-            feature_id="FEAT-DATA-EXTERNAL_CONSUMER",
-            domain="data",
-            description="External consumer plugin",
-            provides=frozenset({CapabilityKey[object](name="data.external", major=1)}),
-            requires=frozenset({BROKER_MARKET_DATA}),
-        )
+    spec: FeatureSpec = FeatureSpec(
+        feature_id="FEAT-DATA-EXTERNAL_CONSUMER",
+        domain="data",
+        description="External consumer plugin",
+        provides=frozenset({CapabilityKey[object](name="data.external", major=1)}),
+        requires=frozenset({BROKER_MARKET_DATA}),
+    )
 
     @override
     async def mount(self, context: FeatureContext, config: object) -> None:
         market_data = context.require(BROKER_MARKET_DATA)
-        assert market_data is not None
+        assert bool(market_data)
         context.provide(CapabilityKey[object](name="data.external", major=1), object())
 
 

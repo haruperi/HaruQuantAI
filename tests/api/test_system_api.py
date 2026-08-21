@@ -1,5 +1,6 @@
 """Unit tests for capability-aware SystemAPI facade and introspection."""
 
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from typing import override
 
@@ -43,17 +44,31 @@ class DummyStorageEngine(StorageEngine):
 
 class DummyClock(SystemClock):
     @override
-    def now_utc(self) -> datetime:
+    def now(self) -> datetime:
         return datetime(2026, 6, 1, 12, 0, 0, tzinfo=UTC)
+
+    @override
+    def timestamp(self) -> float:
+        return 1780315200.0
 
 
 class DummyMetrics(MetricsCollector):
     @override
-    def counter(self, name: str, value: float = 1.0, **tags: str) -> None:
+    def increment(
+        self,
+        name: str,
+        value: float = 1.0,
+        tags: Mapping[str, str] | None = None,
+    ) -> None:
         pass
 
     @override
-    def gauge(self, name: str, value: float, **tags: str) -> None:
+    def gauge(
+        self,
+        name: str,
+        value: float,
+        tags: Mapping[str, str] | None = None,
+    ) -> None:
         pass
 
 
@@ -94,7 +109,7 @@ async def test_system_api_storage_and_introspection() -> None:
     assert await storage.get("foo") == b"bar"
 
     clock = api.get_clock()
-    assert clock.now_utc() == datetime(2026, 6, 1, 12, 0, 0, tzinfo=UTC)
+    assert clock.now() == datetime(2026, 6, 1, 12, 0, 0, tzinfo=UTC)
 
     with pytest.raises(CapabilityUnavailableError, match=r"system\.metrics@1"):
         api.get_metrics()

@@ -55,15 +55,13 @@ class ConfigurableBrokerFeature(Feature):
         self.mount_count = 0
         self.active_base_price = 1.0
 
-    @property
-    def spec(self) -> FeatureSpec:
-        return FeatureSpec(
-            feature_id="FEAT-BROKER-CONFIGURABLE",
-            domain="broker",
-            description="Configurable broker feature",
-            provides=frozenset({BROKER_MARKET_DATA}),
-            requires=frozenset(),
-        )
+    spec: FeatureSpec = FeatureSpec(
+        feature_id="FEAT-BROKER-CONFIGURABLE",
+        domain="broker",
+        description="Configurable broker feature",
+        provides=frozenset({BROKER_MARKET_DATA}),
+        requires=frozenset(),
+    )
 
     @override
     async def mount(self, context: FeatureContext, config: object) -> None:
@@ -278,16 +276,14 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
     callback_cleaned = False
 
     class RichLifecycleBrokerFeature(Feature):
+        spec: FeatureSpec = FeatureSpec(
+            feature_id="FEAT-BROKER-RICH_LIFECYCLE",
+            domain="broker",
+            provides=frozenset({BROKER_MARKET_DATA}),
+        )
+
         def __init__(self) -> None:
             self.mount_count = 0
-
-        @property
-        def spec(self) -> FeatureSpec:
-            return FeatureSpec(
-                feature_id="FEAT-BROKER-RICH_LIFECYCLE",
-                domain="broker",
-                provides=frozenset({BROKER_MARKET_DATA}),
-            )
 
         @override
         async def mount(self, context: FeatureContext, config: object) -> None:
@@ -369,17 +365,15 @@ async def test_transactional_replacement_health_check_failure_rolls_back() -> No
     """Test feature with health_check hook rolling back on failure."""
 
     class HealthCheckingBrokerFeature(Feature):
+        spec: FeatureSpec = FeatureSpec(
+            feature_id="FEAT-BROKER-HEALTH_CHECK",
+            domain="broker",
+            provides=frozenset({BROKER_MARKET_DATA}),
+        )
+
         def __init__(self) -> None:
             self.mount_count = 0
             self.should_fail_health = False
-
-        @property
-        def spec(self) -> FeatureSpec:
-            return FeatureSpec(
-                feature_id="FEAT-BROKER-HEALTH_CHECK",
-                domain="broker",
-                provides=frozenset({BROKER_MARKET_DATA}),
-            )
 
         @override
         async def mount(self, context: FeatureContext, _config: object) -> None:
@@ -429,16 +423,14 @@ async def test_transactional_replacement_quiesce_and_drain() -> None:
     drained = False
 
     class QuiescingBrokerFeature(Feature):
+        spec: FeatureSpec = FeatureSpec(
+            feature_id="FEAT-BROKER-QUIESCE",
+            domain="broker",
+            provides=frozenset({BROKER_MARKET_DATA}),
+        )
+
         def __init__(self) -> None:
             self.mount_count = 0
-
-        @property
-        def spec(self) -> FeatureSpec:
-            return FeatureSpec(
-                feature_id="FEAT-BROKER-QUIESCE",
-                domain="broker",
-                provides=frozenset({BROKER_MARKET_DATA}),
-            )
 
         @override
         async def mount(self, context: FeatureContext, _config: object) -> None:
@@ -486,16 +478,14 @@ async def test_transactional_replacement_cleanup_error_degrades_status() -> None
     """Test post-commit cleanup error in old scope marks status degraded without rolling back."""
 
     class FailingCleanupBrokerFeature(Feature):
+        spec: FeatureSpec = FeatureSpec(
+            feature_id="FEAT-BROKER-CLEANUP_ERR",
+            domain="broker",
+            provides=frozenset({BROKER_MARKET_DATA}),
+        )
+
         def __init__(self) -> None:
             self.mount_count = 0
-
-        @property
-        def spec(self) -> FeatureSpec:
-            return FeatureSpec(
-                feature_id="FEAT-BROKER-CLEANUP_ERR",
-                domain="broker",
-                provides=frozenset({BROKER_MARKET_DATA}),
-            )
 
         @override
         async def mount(self, context: FeatureContext, _config: object) -> None:

@@ -1,11 +1,13 @@
-"""Tests for kernel feature specification and lifecycle states."""
+from typing import TYPE_CHECKING
 
 import pytest
 
 from app.contracts.broker.market_data import BROKER_MARKET_DATA
 from app.contracts.data.historical_bars import HISTORICAL_BARS
-from app.kernel.context import FeatureContext
 from app.kernel.feature import Feature, FeatureSpec, FeatureState
+
+if TYPE_CHECKING:
+    from app.kernel.context import FeatureContext
 
 
 def test_feature_states_completeness() -> None:
@@ -111,4 +113,3 @@ def test_feature_protocol_conformance() -> None:
 
     feature_instance: Feature = DummyFeature()
     assert feature_instance.spec.feature_id == "FEAT-TEST-RUN_DUMMY"
-    assert FeatureContext is not None
