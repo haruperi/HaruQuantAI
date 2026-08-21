@@ -1,4 +1,4 @@
-"""Asynchronous file watcher for configuration hot reloading."""
+"""Asynchronous file watcher for lifecycle-managed configuration hot reload."""
 
 import asyncio
 import contextlib
@@ -11,31 +11,16 @@ if TYPE_CHECKING:
 
 
 class ConfigFileWatcher:
-    """Watches configuration files for changes and triggers dynamic reconciliation.
-
-    Features:
-        - Non-blocking async polling with customizable interval.
-        - Debounce handling to prevent partial file read race conditions.
-        - Clean task cancellation and disposal.
-    """
+    """Watch a configuration file using an explicitly owned lifecycle scope."""
 
     def __init__(
         self,
         config_path: Path,
         engine: CompositionEngine,
-        scope: FeatureScope | None = None,
+        scope: FeatureScope,
         poll_interval: float = 0.2,
         debounce: float = 0.05,
     ) -> None:
-        """Initialize configuration file watcher.
-
-        Args:
-            config_path: Path to TOML configuration file on disk.
-            engine: Target CompositionEngine to notify on changes.
-            scope: Optional FeatureScope to manage the background task lifecycle.
-            poll_interval: Polling frequency in seconds.
-            debounce: Wait duration in seconds before triggering reload.
-        """
         self._config_path = config_path
         self._engine = engine
         self._scope = scope
@@ -44,24 +29,17 @@ class ConfigFileWatcher:
         self._task: asyncio.Task[None] | None = None
         self._running = False
         self._last_mtime: float | None = None
-
         if self._config_path.is_file():
             self._last_mtime = self._config_path.stat().st_mtime
 
     @property
     def is_running(self) -> bool:
-        """Return whether the watcher loop is active."""
         return self._running
 
     async def check_and_reload(self) -> bool:
-        """Check if file modification time has changed and trigger reconciliation.
-
-        Returns:
-            True if reload was triggered and completed, False otherwise.
-        """
+        """Reload configuration when file modification time advances."""
         if not self._config_path.is_file():
             return False
-
         current_mtime = self._config_path.stat().st_mtime
         if self._last_mtime is None or current_mtime > self._last_mtime:
             self._last_mtime = current_mtime
@@ -72,7 +50,6 @@ class ConfigFileWatcher:
         return False
 
     async def _watch_loop(self) -> None:
-        """Background polling loop."""
         while self._running:
             try:
                 await self.check_and_reload()
@@ -83,21 +60,14 @@ class ConfigFileWatcher:
                 await asyncio.sleep(self._poll_interval)
 
     def start(self) -> None:
-        """Start the background configuration watcher task."""
-        if not self._running:
-            self._running = True
-            if self._scope is not None:
-                self._task = self._scope.spawn(
-                    self._watch_loop(), name="config_file_watcher"
-                )
-            else:
-                loop = asyncio.get_running_loop()
-                self._task = loop.create_task(
-                    self._watch_loop(), name="config_file_watcher"
-                )
+        """Start the watcher as a task owned by the supplied FeatureScope."""
+        if self._running:
+            return
+        self._running = True
+        self._task = self._scope.spawn(self._watch_loop(), name="config_file_watcher")
 
     async def stop(self) -> None:
-        """Stop the background watcher task and await its completion."""
+        """Stop the watcher without closing the caller-owned scope."""
         self._running = False
         if self._task is not None:
             self._task.cancel()
