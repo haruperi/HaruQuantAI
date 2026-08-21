@@ -1,28 +1,109 @@
 """Unit tests for root HaruQuantAPI facade and create_api factory."""
 
 from datetime import UTC, datetime
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 from app.api.facade import HaruQuantAPI, create_api
 from app.composition.discovery import DiscoveryResult, FeatureDiscoverer
 from app.composition.engine import CompositionEngine
-from app.contracts.data.historical_bars import HistoricalBarsRequest
+from app.contracts.broker.market_data import BROKER_MARKET_DATA
+from app.contracts.data.historical_bars import (
+    HISTORICAL_BARS,
+    Bar,
+    HistoricalBarsRequest,
+)
+from app.contracts.system.storage import SYSTEM_STORAGE
 from app.kernel.capability import CapabilityUnavailableError
-from app.services.broker.mock_feed.feature import MockFeedFeature
-from app.services.data.historical_bars.feature import HistoricalBarsFeature
-from app.services.system.storage.feature import StorageFeature
+from app.kernel.feature import FeatureSpec
+
+if TYPE_CHECKING:
+    from app.kernel.context import FeatureContext
+
+
+class InMemoryStorageEngine:
+    """In-memory test storage engine."""
+
+    def __init__(self) -> None:
+        self._data: dict[str, bytes] = {}
+
+    async def get(self, key: str) -> bytes | None:
+        return self._data.get(key)
+
+    async def set(self, key: str, value: bytes) -> None:
+        self._data[key] = value
+
+    async def delete(self, key: str) -> bool:
+        return self._data.pop(key, None) is not None
+
+    async def exists(self, key: str) -> bool:
+        return key in self._data
+
+
+class TestHistoricalBarsProvider:
+    """Test historical bars provider implementation."""
+
+    async def retrieve(self, _request: HistoricalBarsRequest) -> list[Bar]:
+        return [
+            Bar(
+                datetime=datetime(2026, 1, 1, 10, 0, tzinfo=UTC),
+                open=1.1,
+                high=1.2,
+                low=1.0,
+                close=1.15,
+                volume=100.0,
+            )
+        ]
+
+
+class TestStorageFeature:
+    """Test feature providing system storage."""
+
+    spec = FeatureSpec(
+        feature_id="FEAT-SYS-TEST_STORAGE",
+        domain="system",
+        provides=frozenset({SYSTEM_STORAGE}),
+    )
+
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        storage = InMemoryStorageEngine()
+        context.provide(SYSTEM_STORAGE, storage)
+
+
+class TestMockFeedFeature:
+    """Test feature providing market data."""
+
+    spec = FeatureSpec(
+        feature_id="FEAT-BROKER-TEST_MOCK_FEED",
+        domain="broker",
+        provides=frozenset({BROKER_MARKET_DATA}),
+    )
+
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        context.provide(BROKER_MARKET_DATA, object())
+
+
+class TestHistoricalBarsFeature:
+    """Test feature providing historical bars."""
+
+    spec = FeatureSpec(
+        feature_id="FEAT-DATA-TEST_RETRIEVE_BARS",
+        domain="data",
+        provides=frozenset({HISTORICAL_BARS}),
+    )
+
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        provider = TestHistoricalBarsProvider()
+        context.provide(HISTORICAL_BARS, provider)
 
 
 @pytest.mark.asyncio
-async def test_root_haruquant_api_end_to_end(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+async def test_root_haruquant_api_end_to_end(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test full HaruQuantAPI dynamic resolution with active features."""
-    storage_feat = StorageFeature()
-    mock_feed = MockFeedFeature()
-    hist_bars = HistoricalBarsFeature()
+    storage_feat = TestStorageFeature()
+    mock_feed = TestMockFeedFeature()
+    hist_bars = TestHistoricalBarsFeature()
 
     engine = CompositionEngine()
     monkeypatch.setattr(
@@ -30,9 +111,9 @@ async def test_root_haruquant_api_end_to_end(
         "discover",
         lambda _self: DiscoveryResult(
             discovered={
-                "FEAT-SYS-PERSIST_STORAGE": storage_feat,
-                "FEAT-BROKER-FEED_MOCK": mock_feed,
-                "FEAT-DATA-RETRIEVE_BARS": hist_bars,
+                "FEAT-SYS-TEST_STORAGE": storage_feat,
+                "FEAT-BROKER-TEST_MOCK_FEED": mock_feed,
+                "FEAT-DATA-TEST_RETRIEVE_BARS": hist_bars,
             }
         ),
     )
@@ -47,20 +128,17 @@ async def test_root_haruquant_api_end_to_end(
     assert api.system.is_storage_available is False
 
     # 1. Mount features
-    db_file = tmp_path / "app.db"
-    config_toml = f"""
+    config_toml = """
     [application]
     profile = "research"
 
-    [features.FEAT-SYS-PERSIST_STORAGE]
-    enabled = true
-    db_path = "{db_file.as_posix()}"
-    driver = "sqlite"
-
-    [features.FEAT-BROKER-FEED_MOCK]
+    [features.FEAT-SYS-TEST_STORAGE]
     enabled = true
 
-    [features.FEAT-DATA-RETRIEVE_BARS]
+    [features.FEAT-BROKER-TEST_MOCK_FEED]
+    enabled = true
+
+    [features.FEAT-DATA-TEST_RETRIEVE_BARS]
     enabled = true
     """
     await engine.load_and_reconcile_toml(config_toml)
@@ -89,7 +167,8 @@ async def test_root_haruquant_api_end_to_end(
     caps = api.system.list_capabilities()
     assert "data.historical-bars@1" in caps
     assert (
-        caps["data.historical-bars@1"].provider_feature_id == "FEAT-DATA-RETRIEVE_BARS"
+        caps["data.historical-bars@1"].provider_feature_id
+        == "FEAT-DATA-TEST_RETRIEVE_BARS"
     )
 
     # 6. Unmount features -> verify graceful capability degradation
@@ -97,7 +176,7 @@ async def test_root_haruquant_api_end_to_end(
         """
         [application]
         profile = "research"
-        [features.FEAT-DATA-RETRIEVE_BARS]
+        [features.FEAT-DATA-TEST_RETRIEVE_BARS]
         enabled = false
         """
     )

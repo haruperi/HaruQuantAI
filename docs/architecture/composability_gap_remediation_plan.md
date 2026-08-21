@@ -815,50 +815,50 @@ scripts/removability_report.py
 
 ## Task 8.1 — Make feature targets discoverable
 
-- [ ] Add `--all`, `--feature`, and `--report` CLI options.
-- [ ] Discover registered feature entry points from `pyproject.toml` or installed metadata.
-- [ ] Resolve each entry point before deletion to record feature ID, provided capabilities, package path, and owned test paths.
-- [ ] Fail on duplicate feature IDs or unmappable package paths.
-- [ ] Avoid a permanently hardcoded target dictionary as the only source of truth.
+- [x] Add `--all`, `--feature`, and `--report` CLI options.
+- [x] Discover registered feature entry points from `pyproject.toml` or installed metadata.
+- [x] Resolve each entry point before deletion to record feature ID, provided capabilities, package path, and owned test paths.
+- [x] Fail on duplicate feature IDs or unmappable package paths.
+- [x] Avoid a permanently hardcoded target dictionary as the only source of truth.
 
 ## Task 8.2 — Define test ownership
 
-- [ ] Feature-local tests may be removed with the feature.
-- [ ] Integration tests involving a deleted feature must be declared explicitly as owned feature-set tests.
-- [ ] Core API absence tests, discovery tests, architecture tests, and unrelated feature tests must remain.
-- [ ] Stop deleting `tests/api/test_facade.py` merely to make removal pass.
-- [ ] Add or retain tests proving the facade returns capability-unavailable behavior after deletion.
+- [x] Feature-local tests may be removed with the feature.
+- [x] Integration tests involving a deleted feature must be declared explicitly as owned feature-set tests.
+- [x] Core API absence tests, discovery tests, architecture tests, and unrelated feature tests must remain.
+- [x] Stop deleting `tests/api/test_facade.py` merely to make removal pass.
+- [x] Add or retain tests proving the facade returns capability-unavailable behavior after deletion.
 
 ## Task 8.3 — Strengthen runtime assertions
 
 For each removed feature, assert:
 
-- [ ] The stale configuration still parses.
-- [ ] The feature state is `MISSING`.
-- [ ] Every capability it provided is unavailable.
-- [ ] Required consumers are `BLOCKED`.
-- [ ] Unrelated features remain active.
-- [ ] Profile readiness reflects the missing capability.
-- [ ] The actual application bootstrap starts.
-- [ ] Shutdown completes without leaked tasks or listeners.
+- [x] The stale configuration still parses.
+- [x] The feature state is `MISSING`.
+- [x] Every capability it provided is unavailable.
+- [x] Required consumers are `BLOCKED`.
+- [x] Unrelated features remain active.
+- [x] Profile readiness reflects the missing capability.
+- [x] The actual application bootstrap starts.
+- [x] Shutdown completes without leaked tasks or listeners.
 
 ## Task 8.4 — Correct the workflows
 
-- [ ] Change the removability workflow to execute the real verifier.
-- [ ] Remove the silent "script not implemented — skipping" behavior.
-- [ ] Fail the workflow if the verifier is missing.
-- [ ] Run at least a critical-feature removal check on pull requests.
-- [ ] Run the complete matrix nightly, manually, and on releases.
-- [ ] Upload a JSON report artifact even when one scenario fails.
-- [ ] Include removed feature, provided capabilities, blocked consumers, active unrelated features, command results, and elapsed time in the report.
+- [x] Change the removability workflow to execute the real verifier.
+- [x] Remove the silent "script not implemented — skipping" behavior.
+- [x] Fail the workflow if the verifier is missing.
+- [x] Run at least a critical-feature removal check on pull requests.
+- [x] Run the complete matrix nightly, manually, and on releases.
+- [x] Upload a JSON report artifact even when one scenario fails.
+- [x] Include removed feature, provided capabilities, blocked consumers, active unrelated features, command results, and elapsed time in the report.
 
 ## Task 8.5 — Tests and usage
 
-- [ ] Unit-test target discovery and report generation.
-- [ ] Test deletion of Mock Broker.
-- [ ] Test deletion of Historical Bars.
-- [ ] Test deletion of Persistent Storage.
-- [ ] Run the complete matrix locally.
+- [x] Unit-test target discovery and report generation.
+- [x] Test deletion of Mock Broker.
+- [x] Test deletion of Historical Bars.
+- [x] Test deletion of Persistent Storage.
+- [x] Run the complete matrix locally.
 
 Commands:
 
@@ -874,9 +874,9 @@ feat(architecture): enforce physical feature removability in CI
 
 ## Exit criteria
 
-- [ ] The CI workflow cannot silently skip removability verification.
-- [ ] Every registered built-in feature has a deletion result.
-- [ ] Core absence behavior is tested rather than deleted from the temporary workspace.
+- [x] The CI workflow cannot silently skip removability verification.
+- [x] Every registered built-in feature has a deletion result.
+- [x] Core absence behavior is tested rather than deleted from the temporary workspace.
 
 ---
 

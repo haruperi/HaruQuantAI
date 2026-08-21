@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: "0 2 * * *"
   workflow_dispatch:
+  pull_request:
+    branches: [ main, master ]
   release:
     types: [published]
 
@@ -26,13 +28,8 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
 
-      - name: Run physical deletion and reinstall matrix
-        run: |
-          if (Test-Path "scripts/architecture/provider_deletion_matrix.py") {
-            uv run python scripts/architecture/provider_deletion_matrix.py --all --reinstall --report removability-report.json
-          } else {
-            Write-Host "Provider deletion matrix script not yet implemented - skipping."
-          }
+      - name: Run physical deletion and removability verification
+        run: uv run python scripts/verify_feature_removal.py --all --report removability-report.json
 
       - name: Upload removability report
         uses: actions/upload-artifact@v4

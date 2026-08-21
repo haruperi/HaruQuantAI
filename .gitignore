@@ -63,6 +63,7 @@ htmlcov/
 .testmondata
 nosetests.xml
 coverage.xml
+removability-report.json
 *.cover
 *.py,cover
 .hypothesis/
