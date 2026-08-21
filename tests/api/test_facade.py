@@ -49,8 +49,8 @@ async def test_root_haruquant_api_end_to_end(
     # 1. Mount features
     db_file = tmp_path / "app.db"
     config_toml = f"""
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
 
     [features.FEAT-SYS-PERSIST_STORAGE]
     enabled = true
@@ -95,8 +95,8 @@ async def test_root_haruquant_api_end_to_end(
     # 6. Unmount features -> verify graceful capability degradation
     await engine.load_and_reconcile_toml(
         """
-        [profile]
-        name = "research"
+        [application]
+        profile = "research"
         [features.FEAT-DATA-RETRIEVE_BARS]
         enabled = false
         """

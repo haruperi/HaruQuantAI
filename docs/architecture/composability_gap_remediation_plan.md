@@ -211,21 +211,21 @@ enabled = true
 
 Implementation steps:
 
-- [ ] Parse the active profile only from `[application].profile`.
-- [ ] Reject the legacy `[profile]` section with a typed `ConfigurationError` explaining the supported form.
-- [ ] Reject unknown top-level keys where practical, or at minimum reject unknown profile-related sections.
-- [ ] Reject missing, blank, or non-string profile values.
-- [ ] Normalize profile names once, using lowercase internal identifiers.
-- [ ] Preserve feature-specific dictionaries under each feature section.
-- [ ] Add a typed error hierarchy for parsing and validation rather than relying on generic `ValueError` where the caller needs diagnostics.
+- [x] Parse the active profile only from `[application].profile`.
+- [x] Reject the legacy `[profile]` section with a typed `ConfigurationError` explaining the supported form.
+- [x] Reject unknown top-level keys where practical, or at minimum reject unknown profile-related sections.
+- [x] Reject missing, blank, or non-string profile values.
+- [x] Normalize profile names once, using lowercase internal identifiers.
+- [x] Preserve feature-specific dictionaries under each feature section.
+- [x] Add a typed error hierarchy for parsing and validation rather than relying on generic `ValueError` where the caller needs diagnostics.
 
 ## Task 1.2 — Make profile definitions explicit
 
-- [ ] Introduce an immutable `DeploymentProfile` model.
-- [ ] Keep the built-in profiles in one authoritative mapping.
-- [ ] Reject unknown profiles instead of treating them as having zero requirements.
-- [ ] Add an explicit noncritical profile such as `offline` if a zero-capability shell is required.
-- [ ] Ensure profile criticality remains configuration/runtime policy rather than feature-owned policy.
+- [x] Introduce an immutable `DeploymentProfile` model.
+- [x] Keep the built-in profiles in one authoritative mapping.
+- [x] Reject unknown profiles instead of treating them as having zero requirements.
+- [x] Add an explicit noncritical profile such as `offline` if a zero-capability shell is required.
+- [x] Ensure profile criticality remains configuration/runtime policy rather than feature-owned policy.
 
 ## Task 1.3 — Correct Live readiness
 
@@ -243,20 +243,20 @@ trading.execution@1
 
 Implementation steps:
 
-- [ ] Remove `data.historical-bars@1` from Live requirements unless live startup genuinely depends on it.
-- [ ] Add all documented Live safety capabilities.
-- [ ] Confirm Research and Backtest requirements separately.
-- [ ] Return machine-readable missing capability identifiers.
-- [ ] Ensure `SystemAPI` reports the selected profile and all missing requirements.
+- [x] Remove `data.historical-bars@1` from Live requirements unless live startup genuinely depends on it.
+- [x] Add all documented Live safety capabilities.
+- [x] Confirm Research and Backtest requirements separately.
+- [x] Return machine-readable missing capability identifiers.
+- [x] Ensure `SystemAPI` reports the selected profile and all missing requirements.
 
 ## Task 1.4 — Tests and examples
 
-- [ ] Test the canonical grammar.
-- [ ] Test rejection of legacy grammar.
-- [ ] Test rejection of an unknown profile.
-- [ ] Parameterize Live readiness by removing each required capability one at a time.
-- [ ] Add `config/examples/research.toml`, `config/examples/backtest.toml`, and `config/examples/live.toml` with no credentials.
-- [ ] Add a usage example that loads each example and prints readiness diagnostics.
+- [x] Test the canonical grammar.
+- [x] Test rejection of legacy grammar.
+- [x] Test rejection of an unknown profile.
+- [x] Parameterize Live readiness by removing each required capability one at a time.
+- [x] Add `config/examples/research.toml`, `config/examples/backtest.toml`, and `config/examples/live.toml` with no credentials.
+- [x] Add a usage example that loads each example and prints readiness diagnostics.
 
 ## Proposed commit
 
@@ -266,9 +266,10 @@ fix(composition): enforce profile grammar and live readiness safety
 
 ## Exit criteria
 
-- [ ] No configuration can silently select a different profile.
-- [ ] Live is never ready without all required safety capabilities.
-- [ ] Documentation, examples, parser, and tests use the same grammar.
+- [x] No configuration can silently select a different profile.
+- [x] Live is never ready without all required safety capabilities.
+- [x] Documentation, examples, parser, and tests use the same grammar.
+
 
 ---
 

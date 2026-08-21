@@ -1,6 +1,25 @@
-"""Tests for profile readiness checking."""
+"""Tests for deployment profile readiness evaluation."""
 
-from app.composition.readiness import check_profile_readiness
+import pytest
+
+from app.composition.readiness import (
+    PROFILES,
+    DeploymentProfile,
+    check_profile_readiness,
+)
+
+
+def test_deployment_profile_model() -> None:
+    """Test DeploymentProfile model attributes and registry."""
+    assert "research" in PROFILES
+    assert "live" in PROFILES
+    assert "backtest" in PROFILES
+    assert "offline" in PROFILES
+
+    live_prof = PROFILES["live"]
+    assert isinstance(live_prof, DeploymentProfile)
+    assert live_prof.is_critical is True
+    assert "trading.execution@1" in live_prof.required_capabilities
 
 
 def test_research_profile_readiness() -> None:
@@ -31,37 +50,15 @@ def test_backtest_profile_readiness() -> None:
     assert missing_now == ()
 
 
-def test_live_profile_readiness() -> None:
-    """Test live profile requires broker execution, market data, risk, and clock."""
-    live_caps = [
-        "broker.market-data@1",
-        "broker.execution@1",
-        "risk.approval@1",
-        "data.historical-bars@1",
-        "system.clock@1",
-    ]
-    is_ready, missing = check_profile_readiness("live", live_caps)
-    assert is_ready
-    assert missing == ()
-
-    # If missing risk approval
-    incomplete_caps = [c for c in live_caps if c != "risk.approval@1"]
-    is_ready_incomplete, missing_incomplete = check_profile_readiness(
-        "live", incomplete_caps
-    )
-    assert not is_ready_incomplete
-    assert "risk.approval@1" in missing_incomplete
-
-
-def test_unknown_profile_defaults_ready() -> None:
-    """Test unknown profile has no required capabilities and is considered ready."""
-    is_ready, missing = check_profile_readiness("custom-offline", [])
+def test_offline_profile_readiness() -> None:
+    """Test explicit offline profile has zero required capabilities and is considered ready."""
+    is_ready, missing = check_profile_readiness("offline", [])
     assert is_ready
     assert missing == ()
 
 
 def test_live_readiness_requires_all_safety_capabilities() -> None:
-    """Characterization test: Live readiness must fail if ANY required trading safety capability is missing."""
+    """Test Live readiness fails if ANY required trading safety capability is missing."""
     all_safety_caps = [
         "system.clock@1",
         "broker.market-data@1",
@@ -85,8 +82,11 @@ def test_live_readiness_requires_all_safety_capabilities() -> None:
         assert missing_cap in missing_list
 
 
-def test_unknown_profile_fails_or_raises() -> None:
-    """Characterization test: unknown profile should not silently report ready."""
-    # Under fail-closed design, an unrecognized profile must not be marked ready with 0 requirements
-    is_ready, _ = check_profile_readiness("non_existent_profile", [])
-    assert not is_ready, "Unknown profile should not report ready by default"
+@pytest.mark.parametrize(
+    "unknown_profile", ["custom-offline", "unknown_profile", "invalid"]
+)
+def test_unknown_profile_fails_readiness(unknown_profile: str) -> None:
+    """Test unknown profile fail-closed behavior."""
+    is_ready, missing = check_profile_readiness(unknown_profile, [])
+    assert not is_ready
+    assert any("UNKNOWN_PROFILE" in m for m in missing)

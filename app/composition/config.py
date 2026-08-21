@@ -5,6 +5,16 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from app.composition.readiness import KNOWN_PROFILES
+
+
+class ConfigurationError(ValueError):
+    """Base exception for configuration parsing and validation errors."""
+
+
+class InvalidProfileError(ConfigurationError):
+    """Raised when a deployment profile specification is missing, invalid, or legacy."""
+
 
 @dataclass(frozen=True, slots=True)
 class FeatureConfig:
@@ -24,7 +34,7 @@ class AppConfig:
     """Top-level application deployment configuration.
 
     Attributes:
-        profile: Active deployment profile ('research', 'backtest', 'live').
+        profile: Active deployment profile ('research', 'backtest', 'live', 'offline').
         features: Mapping of feature_id to FeatureConfig.
     """
 
@@ -68,14 +78,55 @@ def load_config_from_toml_string(content: str) -> AppConfig:
 
     Returns:
         Parsed AppConfig instance.
+
+    Raises:
+        InvalidProfileError: If profile grammar is legacy, missing, invalid, or unknown.
+        ConfigurationError: If configuration structure is malformed.
     """
-    raw = tomllib.loads(content)
-    app_section = raw.get("application", {})
-    profile = app_section.get("profile", "research")
+    try:
+        raw = tomllib.loads(content)
+    except Exception as err:
+        msg = f"Failed to parse TOML configuration: {err}"
+        raise ConfigurationError(msg) from err
+
+    # Reject legacy [profile] section
+    if "profile" in raw:
+        msg = (
+            "Legacy '[profile]' table is not supported. "
+            "Use '[application]' table with 'profile = \"<name>\"'."
+        )
+        raise InvalidProfileError(msg)
+
+    # Require canonical [application] section
+    app_section = raw.get("application")
+    if app_section is None or not isinstance(app_section, dict):
+        msg = "Missing required '[application]' table in configuration"
+        raise InvalidProfileError(msg)
+
+    profile_raw = app_section.get("profile")
+    if (
+        profile_raw is None
+        or not isinstance(profile_raw, str)
+        or not profile_raw.strip()
+    ):
+        msg = "Missing or blank 'profile' string in '[application]' table"
+        raise InvalidProfileError(msg)
+
+    profile = profile_raw.strip().lower()
+    if profile not in KNOWN_PROFILES:
+        supported = sorted(KNOWN_PROFILES)
+        msg = (
+            f"Unknown deployment profile '{profile_raw}'. "
+            f"Supported profiles: {supported}"
+        )
+        raise InvalidProfileError(msg)
 
     features_raw = raw.get("features", {})
-    features: dict[str, FeatureConfig] = {}
+    if not isinstance(features_raw, dict):
+        msg = "'features' section must be a table if present"
+        raise ConfigurationError(msg)
 
+    features: dict[str, FeatureConfig] = {}
     for f_id, f_data in features_raw.items():
         if isinstance(f_data, dict):
             enabled = bool(f_data.get("enabled", True))
@@ -99,6 +150,7 @@ def load_config_from_file(path: str | Path) -> AppConfig:
 
     Raises:
         FileNotFoundError: If the config file does not exist.
+        ConfigurationError: If config parsing or validation fails.
     """
     file_path = Path(path)
     if not file_path.is_file():

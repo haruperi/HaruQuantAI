@@ -95,8 +95,8 @@ async def test_live_configuration_hot_reload() -> None:
 
     # Initial Mount
     initial_toml = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-BROKER-CONFIGURABLE]
     enabled = true
     base_price = 1.10
@@ -107,8 +107,8 @@ async def test_live_configuration_hot_reload() -> None:
 
     # Hot reload with updated config
     updated_toml = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-BROKER-CONFIGURABLE]
     enabled = true
     base_price = 1.25
@@ -141,8 +141,8 @@ async def test_transactional_feature_replacement_success() -> None:
     engine.event_bus.subscribe(FeatureReconfiguredEvent, on_reconfigured)
 
     initial_toml = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-BROKER-CONFIGURABLE]
     enabled = true
     base_price = 2.0
@@ -180,8 +180,8 @@ async def test_transactional_feature_replacement_failure_rollback() -> None:
 
     engine = CompositionEngine(discoverer=discoverer)
     initial_toml = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-BROKER-CONFIGURABLE]
     enabled = true
     base_price = 10.0
@@ -223,8 +223,8 @@ async def test_config_file_watcher_polling(tmp_path: Path) -> None:
     # Initial write
     config_file.write_text(
         """
-        [profile]
-        name = "research"
+        [application]
+        profile = "research"
         [features.FEAT-BROKER-CONFIGURABLE]
         enabled = true
         base_price = 5.0
@@ -249,8 +249,8 @@ async def test_config_file_watcher_polling(tmp_path: Path) -> None:
         await asyncio.sleep(0.05)
         config_file.write_text(
             """
-            [profile]
-            name = "research"
+            [application]
+            profile = "research"
             [features.FEAT-BROKER-CONFIGURABLE]
             enabled = true
             base_price = 8.5
@@ -332,8 +332,8 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
     engine = CompositionEngine(discoverer=discoverer)
 
     initial_toml = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-BROKER-RICH_LIFECYCLE]
     enabled = true
     """

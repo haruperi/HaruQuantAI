@@ -135,8 +135,8 @@ SPEC = FeatureSpec(
 When a user enables an external plugin in `app.toml`:
 
 ```toml
-[profile]
-name = "live"
+[application]
+profile = "live"
 
 [features.FEAT-BROKER-FEED_BINANCE]
 enabled = true

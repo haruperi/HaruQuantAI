@@ -31,8 +31,8 @@ async def test_state_retained_across_unmount_and_remount(
 
     # 1. Mount storage feature with SQLite driver
     toml_cfg_mount = f"""
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
 
     [features.FEAT-SYS-PERSIST_STORAGE]
     enabled = true
@@ -55,8 +55,8 @@ async def test_state_retained_across_unmount_and_remount(
 
     # 3. Unmount storage feature
     toml_cfg_unmount = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
 
     [features.FEAT-SYS-PERSIST_STORAGE]
     enabled = false

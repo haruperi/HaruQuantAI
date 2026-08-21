@@ -6,6 +6,8 @@ import pytest
 
 from app.composition.config import (
     AppConfig,
+    ConfigurationError,
+    InvalidProfileError,
     load_config_from_file,
     load_config_from_toml_string,
 )
@@ -72,7 +74,7 @@ def test_default_app_config() -> None:
 
 
 def test_legacy_profile_section_rejected() -> None:
-    """Characterization test: [profile] legacy section must be rejected with an error rather than silently defaulting."""
+    """Test that [profile] legacy section is rejected with InvalidProfileError."""
     legacy_toml = """
     [profile]
     name = "live"
@@ -80,15 +82,44 @@ def test_legacy_profile_section_rejected() -> None:
     [features."FEAT-BROKER-FEED_MOCK"]
     enabled = true
     """
-    with pytest.raises((ValueError, KeyError), match=r"(?i)profile|legacy|application"):
+    with pytest.raises(InvalidProfileError, match=r"(?i)legacy.*profile"):
         load_config_from_toml_string(legacy_toml)
 
 
 def test_unknown_profile_rejected() -> None:
-    """Characterization test: unknown profile names must be rejected."""
+    """Test that unknown profile names are rejected with InvalidProfileError."""
     unknown_toml = """
     [application]
     profile = "unknown_quantum_profile"
     """
-    with pytest.raises((ValueError, KeyError), match=r"(?i)profile|unknown|invalid"):
+    with pytest.raises(InvalidProfileError, match=r"(?i)unknown deployment profile"):
         load_config_from_toml_string(unknown_toml)
+
+
+def test_missing_application_section_rejected() -> None:
+    """Test that missing [application] section raises InvalidProfileError."""
+    no_app_toml = """
+    [features."FEAT-BROKER-FEED_MOCK"]
+    enabled = true
+    """
+    with pytest.raises(
+        InvalidProfileError, match=r"(?i)missing required '\[application\]'"
+    ):
+        load_config_from_toml_string(no_app_toml)
+
+
+def test_blank_profile_rejected() -> None:
+    """Test that blank profile string raises InvalidProfileError."""
+    blank_profile_toml = """
+    [application]
+    profile = "   "
+    """
+    with pytest.raises(InvalidProfileError, match=r"(?i)missing or blank 'profile'"):
+        load_config_from_toml_string(blank_profile_toml)
+
+
+def test_malformed_toml_raises_configuration_error() -> None:
+    """Test that invalid TOML syntax raises ConfigurationError."""
+    malformed = "invalid = [ unclosed array"
+    with pytest.raises(ConfigurationError, match=r"(?i)failed to parse toml"):
+        load_config_from_toml_string(malformed)

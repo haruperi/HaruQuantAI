@@ -44,8 +44,8 @@ async def test_100x_rapid_mount_unmount_churn(
 
     db_file = tmp_path / "churn.db"
     enable_config = f"""
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-SYS-PERSIST_STORAGE]
     enabled = true
     db_path = "{db_file.as_posix()}"
@@ -57,8 +57,8 @@ async def test_100x_rapid_mount_unmount_churn(
     """
 
     disable_config = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-SYS-PERSIST_STORAGE]
     enabled = false
     [features.FEAT-BROKER-FEED_MOCK]
@@ -215,8 +215,8 @@ async def test_unexpected_task_failure_transitions_to_failed_runtime() -> None:
     engine = CompositionEngine(discoverer=discoverer)
 
     config_toml = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-TEST-CRASHING_WORKER]
     enabled = true
     """

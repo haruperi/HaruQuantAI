@@ -1,0 +1,11 @@
+# HaruQuantAI — Live Profile Configuration (Example)
+# NOTE: Requires all safety capabilities (clock, market-data, broker execution, realtime ticks, positions, risk approval, trading execution)
+
+[application]
+profile = "live"
+
+[features.FEAT-SYS-PROVIDE_CLOCK]
+enabled = true
+
+[features.FEAT-BROKER-FEED_MOCK]
+enabled = true

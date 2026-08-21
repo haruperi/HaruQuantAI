@@ -124,8 +124,8 @@ async def test_package_dependency_error_diagnosed_separately() -> None:
 
     engine = CompositionEngine(discoverer=discoverer)
     config = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-UNKNOWN-MISSING_PKG]
     enabled = true
     """
@@ -159,8 +159,8 @@ async def test_capability_dependency_error_diagnosed_separately() -> None:
 
     engine = CompositionEngine(discoverer=discoverer)
     config = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-DATA-EXTERNAL_CONSUMER]
     enabled = true
     """
@@ -196,8 +196,8 @@ async def test_external_plugin_mount_and_unmount_cycle() -> None:
 
     engine = CompositionEngine(discoverer=discoverer)
     config = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-BROKER-FEED_EXTERNAL]
     enabled = true
     [features.FEAT-DATA-EXTERNAL_CONSUMER]
@@ -211,8 +211,8 @@ async def test_external_plugin_mount_and_unmount_cycle() -> None:
 
     # Unmount
     unmount_cfg = """
-    [profile]
-    name = "research"
+    [application]
+    profile = "research"
     [features.FEAT-BROKER-FEED_EXTERNAL]
     enabled = false
     [features.FEAT-DATA-EXTERNAL_CONSUMER]
