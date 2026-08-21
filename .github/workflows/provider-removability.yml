@@ -1,6 +1,8 @@
-name: Provider Removability Verification
+name: Feature Removability Verification
 
 on:
+  pull_request:
+    branches: [ main, master ]
   schedule:
     - cron: "0 2 * * *"
   workflow_dispatch:
@@ -10,6 +12,13 @@ on:
 jobs:
   removability-matrix:
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        feature_id:
+          - FEAT-BROKER-FEED_MOCK
+          - FEAT-DATA-RETRIEVE_BARS
+          - FEAT-SYS-PERSIST_STORAGE
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,20 +33,7 @@ jobs:
         run: uv python install
 
       - name: Install dependencies
-        run: uv sync --dev
+        run: uv sync --frozen --dev
 
-      - name: Run physical deletion and reinstall matrix
-        run: |
-          if (Test-Path "scripts/architecture/provider_deletion_matrix.py") {
-            uv run python scripts/architecture/provider_deletion_matrix.py --all --reinstall --report removability-report.json
-          } else {
-            Write-Host "Provider deletion matrix script not yet implemented - skipping."
-          }
-
-      - name: Upload removability report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: removability-report
-          path: removability-report.json
-          if-no-files-found: ignore
+      - name: Verify physical feature removal
+        run: uv run --frozen python scripts/verify_feature_removal.py ${{ matrix.feature_id }}
