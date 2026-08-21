@@ -109,7 +109,7 @@ class Reconciler:
         resolution = graph.resolve(enabled_set, provider_selections=provider_selections)
 
         to_stop, to_start = self._plan_transitions(resolution, config_map)
-        stopped_list = await self._execute_stops(to_stop)
+        stopped_list = await self._execute_stops(to_stop, resolution.stop_order)
         started_list, errors = await self._execute_starts(
             resolution.start_order, to_start, discovered_features, config_map
         )
@@ -132,7 +132,7 @@ class Reconciler:
         resolution: GraphResolution,
         config_map: dict[str, object],
     ) -> tuple[set[str], set[str]]:
-        """Calculate features to stop and start.
+        """Calculate features to stop and start including transitive consumer remounts.
 
         Args:
             resolution: Current dependency resolution.
@@ -149,24 +149,46 @@ class Reconciler:
             if self._active_configs.get(f_id) != config_map.get(f_id):
                 to_remount.add(f_id)
 
+        all_changing = to_remount | (current_active - target_active)
+        transitive_closure: set[str] = set()
+        for f_id in all_changing:
+            closure = resolution.get_transitive_dependents(f_id)
+            transitive_closure.update(closure.intersection(target_active))
+
+        to_remount.update(transitive_closure)
+
         to_stop = (current_active - target_active) | to_remount
         to_start = (target_active - current_active) | to_remount
         return to_stop, to_start
 
-    async def _execute_stops(self, to_stop: set[str]) -> list[str]:
-        """Execute unmounting of features in reverse active order.
+    async def _execute_stops(
+        self,
+        to_stop: set[str],
+        stop_order: Sequence[str] | None = None,
+    ) -> list[str]:
+        """Execute unmounting of features in reverse topological stop order.
 
         Args:
             to_stop: Set of feature IDs to stop.
+            stop_order: Optional topological stop order from graph resolution.
 
         Returns:
             List of successfully stopped feature IDs.
         """
         stopped: list[str] = []
-        for f_id in list(self._active_features.keys())[::-1]:
-            if f_id in to_stop:
-                await self._stop_feature(f_id)
-                stopped.append(f_id)
+        ordered_candidates: list[str] = []
+        if stop_order is not None:
+            for f_id in stop_order:
+                if f_id in to_stop and f_id in self._active_features:
+                    ordered_candidates.append(f_id)
+
+        for f_id in reversed(list(self._active_features.keys())):
+            if f_id in to_stop and f_id not in ordered_candidates:
+                ordered_candidates.append(f_id)
+
+        for f_id in ordered_candidates:
+            await self._stop_feature(f_id)
+            stopped.append(f_id)
         return stopped
 
     async def _execute_starts(

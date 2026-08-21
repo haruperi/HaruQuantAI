@@ -10,6 +10,7 @@ from app.kernel.capability import CapabilityKey
 from app.kernel.feature import FeatureSpec
 from app.kernel.graph import (
     AmbiguousProviderError,
+    DependencyCycleError,
     DependencyGraph,
     ProviderSelectionError,
 )
@@ -60,6 +61,23 @@ def test_graph_linear_dependency_resolution() -> None:
     )
     assert len(resolution.blocked_features) == 0
 
+    # Test transitive closures
+    clock_dependents = resolution.get_transitive_dependents("FEAT-SYS-PROVIDE_CLOCK")
+    assert clock_dependents == {
+        "FEAT-BROKER-FEED_MT5",
+        "FEAT-DATA-RETRIEVE_BARS",
+        "FEAT-RESEARCH-PREPARE_DATASET",
+    }
+
+    dataset_dependencies = resolution.get_transitive_dependencies(
+        "FEAT-RESEARCH-PREPARE_DATASET"
+    )
+    assert dataset_dependencies == {
+        "FEAT-SYS-PROVIDE_CLOCK",
+        "FEAT-BROKER-FEED_MT5",
+        "FEAT-DATA-RETRIEVE_BARS",
+    }
+
 
 def test_graph_missing_dependency_blocks_dependents() -> None:
     """Test missing provider leaves consumer in blocked_features."""
@@ -108,11 +126,8 @@ def test_graph_cycle_detection_raises_error() -> None:
     specs = {spec_a.feature_id: spec_a, spec_b.feature_id: spec_b}
     graph = DependencyGraph(specs)
 
-    # In fixed-point iteration, neither satisfies requirements because of mutual dependency
-    resolution = graph.resolve(specs.keys())
-    assert resolution.eligible_features == ()
-    assert "FEAT-TEST-CONSUME_ALPHA" in resolution.blocked_features
-    assert "FEAT-TEST-PRODUCE_ALPHA" in resolution.blocked_features
+    with pytest.raises(DependencyCycleError, match=r"(?i)circular required dependency"):
+        graph.resolve(specs.keys())
 
 
 def test_graph_optional_dependency_ordering() -> None:
@@ -285,5 +300,5 @@ def test_required_dependency_cycle_raises_explicit_error() -> None:
     specs = {spec_a.feature_id: spec_a, spec_b.feature_id: spec_b}
     graph = DependencyGraph(specs)
 
-    with pytest.raises((ValueError, RuntimeError), match=r"(?i)cycle|circular"):
+    with pytest.raises(DependencyCycleError, match=r"(?i)circular required dependency"):
         graph.resolve(specs.keys())

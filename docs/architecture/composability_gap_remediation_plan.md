@@ -382,55 +382,55 @@ tests/services/test_vertical_feature_pair.py
 
 Extend `GraphResolution` to include:
 
-- [ ] Required provider edges.
-- [ ] Optional provider edges that currently resolve to an active provider.
-- [ ] Direct dependents by feature ID.
-- [ ] Transitive dependent-closure calculation.
-- [ ] Deterministic start and stop order.
+- [x] Required provider edges.
+- [x] Optional provider edges that currently resolve to an active provider.
+- [x] Direct dependents by feature ID.
+- [x] Transitive dependent-closure calculation.
+- [x] Deterministic start and stop order.
 
 ## Task 3.2 — Correct cycle semantics
 
-- [ ] Detect required dependency cycles before fixed-point eligibility filtering.
-- [ ] Raise `DependencyCycleError` for required cycles.
-- [ ] Do not let optional-only cycles prevent activation.
-- [ ] Use optional edges only for best-effort ordering when the optional provider is selected and active.
-- [ ] Correct misleading test names and assertions.
+- [x] Detect required dependency cycles before fixed-point eligibility filtering.
+- [x] Raise `DependencyCycleError` for required cycles.
+- [x] Do not let optional-only cycles prevent activation.
+- [x] Use optional edges only for best-effort ordering when the optional provider is selected and active.
+- [x] Correct misleading test names and assertions.
 
 ## Task 3.3 — Plan remount closures
 
 For any feature whose implementation generation changes:
 
-- [ ] Include the feature in the remount set.
-- [ ] Include all transitive required consumers.
-- [ ] Include consumers of optional capabilities under the initial simple policy.
-- [ ] Include downstream consumers of those consumers.
-- [ ] Stop the closure in reverse topological order.
-- [ ] Start the closure in topological order.
+- [x] Include the feature in the remount set.
+- [x] Include all transitive required consumers.
+- [x] Include consumers of optional capabilities under the initial simple policy.
+- [x] Include downstream consumers of those consumers.
+- [x] Stop the closure in reverse topological order.
+- [x] Start the closure in topological order.
 
 Generation-changing events include:
 
-- [ ] Provider configuration changed.
-- [ ] Selected provider changed.
-- [ ] Provider was removed and returned.
-- [ ] Provider was transactionally replaced.
-- [ ] Consumer's own configuration changed and it provides a capability used downstream.
+- [x] Provider configuration changed.
+- [x] Selected provider changed.
+- [x] Provider was removed and returned.
+- [x] Provider was transactionally replaced.
+- [x] Consumer's own configuration changed and it provides a capability used downstream.
 
 ## Task 3.4 — Use graph order rather than dictionary insertion order
 
-- [ ] Replace reverse `_active_features` iteration with explicit stop order from the current active graph.
-- [ ] Persist the last successfully committed active graph.
-- [ ] Ensure partially failed starts do not corrupt the committed active graph.
+- [x] Replace reverse `_active_features` iteration with explicit stop order from the current active graph.
+- [x] Persist the last successfully committed active graph.
+- [x] Ensure partially failed starts do not corrupt the committed active graph.
 
 ## Task 3.5 — Tests and usage example
 
-- [ ] Build a provider → consumer → downstream-consumer chain.
-- [ ] Capture each consumer's provider object identity.
-- [ ] Reconfigure the provider.
-- [ ] Assert every transitive consumer remounted.
-- [ ] Assert every consumer points to the new provider object.
-- [ ] Assert stop order is downstream-first.
-- [ ] Assert start order is provider-first.
-- [ ] Add a runnable example printing generations and mount counts before and after a provider change.
+- [x] Build a provider → consumer → downstream-consumer chain.
+- [x] Capture each consumer's provider object identity.
+- [x] Reconfigure the provider.
+- [x] Assert every transitive consumer remounted.
+- [x] Assert every consumer points to the new provider object.
+- [x] Assert stop order is downstream-first.
+- [x] Assert start order is provider-first.
+- [x] Add a runnable example printing generations and mount counts before and after a provider change.
 
 ## Proposed commit
 
@@ -440,9 +440,9 @@ fix(kernel): remount transitive consumers on provider changes
 
 ## Exit criteria
 
-- [ ] No active feature retains a provider object from an obsolete generation.
-- [ ] Required and optional dependency changes have deterministic remount behavior.
-- [ ] Required cycles are rejected explicitly.
+- [x] No active feature retains a provider object from an obsolete generation.
+- [x] Required and optional dependency changes have deterministic remount behavior.
+- [x] Required cycles are rejected explicitly.
 
 ---
 

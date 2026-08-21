@@ -2,7 +2,7 @@
 
 from collections import deque
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -49,6 +49,8 @@ class GraphResolution:
         stop_order: Ordered tuple of feature IDs to stop (dependents first).
         blocked_features: Mapping of feature ID to reason/missing capability.
         provider_map: Mapping of capability identifier to providing feature ID.
+        dependencies: Mapping of feature ID to direct provider feature IDs.
+        dependents: Mapping of feature ID to direct consumer feature IDs.
     """
 
     eligible_features: tuple[str, ...]
@@ -56,6 +58,46 @@ class GraphResolution:
     stop_order: tuple[str, ...]
     blocked_features: dict[str, str]
     provider_map: dict[str, str]
+    dependencies: dict[str, set[str]] = field(default_factory=dict)
+    dependents: dict[str, set[str]] = field(default_factory=dict)
+
+    def get_transitive_dependents(self, feature_id: str) -> set[str]:
+        """Calculate all transitive downstream consumers of a feature.
+
+        Args:
+            feature_id: Unique feature identifier.
+
+        Returns:
+            Set of feature IDs that transitively depend on this feature.
+        """
+        closure: set[str] = set()
+        queue = deque([feature_id])
+        while queue:
+            curr = queue.popleft()
+            for dep in self.dependents.get(curr, set()):
+                if dep not in closure:
+                    closure.add(dep)
+                    queue.append(dep)
+        return closure
+
+    def get_transitive_dependencies(self, feature_id: str) -> set[str]:
+        """Calculate all transitive upstream providers of a feature.
+
+        Args:
+            feature_id: Unique feature identifier.
+
+        Returns:
+            Set of feature IDs that this feature transitively depends on.
+        """
+        closure: set[str] = set()
+        queue = deque([feature_id])
+        while queue:
+            curr = queue.popleft()
+            for provider in self.dependencies.get(curr, set()):
+                if provider not in closure:
+                    closure.add(provider)
+                    queue.append(provider)
+        return closure
 
 
 class DependencyGraph:
@@ -112,10 +154,14 @@ class DependencyGraph:
         blocked_features.update(conflict_blocks)
 
         cap_to_provider = self._build_provider_map(candidates, effective_selections)
+        self._detect_required_cycles(candidates, cap_to_provider)
+
         eligible_set, eligibility_blocks = self._resolve_eligibility(candidates)
         blocked_features.update(eligibility_blocks)
 
-        start_order = self._topological_sort(eligible_set, candidates, cap_to_provider)
+        start_order, dependencies, dependents = self._topological_sort(
+            eligible_set, candidates, cap_to_provider
+        )
         stop_order = tuple(reversed(start_order))
 
         return GraphResolution(
@@ -128,6 +174,8 @@ class DependencyGraph:
                 for cap, p_id in cap_to_provider.items()
                 if p_id in eligible_set
             },
+            dependencies=dependencies,
+            dependents=dependents,
         )
 
     def _filter_conflicts(
@@ -159,6 +207,47 @@ class DependencyGraph:
             if f_id not in conflicted
         }
         return candidates, conflict_blocks
+
+    def _detect_required_cycles(
+        self,
+        candidates: Mapping[str, FeatureSpec],
+        cap_to_provider: Mapping[str, str],
+    ) -> None:
+        """Detect circular dependencies exclusively among required capabilities.
+
+        Args:
+            candidates: Candidate feature specs.
+            cap_to_provider: Map of capability identifier to provider feature ID.
+
+        Raises:
+            DependencyCycleError: If a required dependency cycle is detected.
+        """
+        adj: dict[str, set[str]] = {f_id: set() for f_id in candidates}
+        for f_id, spec in candidates.items():
+            for cap in spec.requires:
+                provider_id = cap_to_provider.get(cap.identifier)
+                if provider_id and provider_id in candidates and provider_id != f_id:
+                    adj[f_id].add(provider_id)
+
+        visited: dict[str, int] = {}
+        path: list[str] = []
+
+        def dfs(node: str) -> None:
+            visited[node] = 1
+            path.append(node)
+            for neighbor in sorted(adj.get(node, ())):
+                if visited.get(neighbor) == 1:
+                    cycle_start = path.index(neighbor)
+                    cycle = [*path[cycle_start:], neighbor]
+                    raise DependencyCycleError(cycle)
+                if visited.get(neighbor, 0) == 0:
+                    dfs(neighbor)
+            path.pop()
+            visited[node] = 2
+
+        for node in sorted(candidates.keys()):
+            if visited.get(node, 0) == 0:
+                dfs(node)
 
     def _resolve_single_capability_provider(
         self,
@@ -300,7 +389,7 @@ class DependencyGraph:
         eligible_set: set[str],
         candidates: Mapping[str, FeatureSpec],
         cap_to_provider: Mapping[str, str],
-    ) -> tuple[str, ...]:
+    ) -> tuple[tuple[str, ...], dict[str, set[str]], dict[str, set[str]]]:
         """Perform topological sort on eligible features.
 
         Args:
@@ -309,12 +398,13 @@ class DependencyGraph:
             cap_to_provider: Capability to provider mapping.
 
         Returns:
-            Topologically ordered tuple of feature IDs (dependencies first).
+            Tuple of (start_order tuple, dependencies map, dependents map).
 
         Raises:
             DependencyCycleError: If an unsatisfied required dependency cycle exists.
         """
         dependents: dict[str, set[str]] = {f_id: set() for f_id in eligible_set}
+        dependencies: dict[str, set[str]] = {f_id: set() for f_id in eligible_set}
         in_degree: dict[str, int] = dict.fromkeys(eligible_set, 0)
 
         for f_id in eligible_set:
@@ -329,6 +419,7 @@ class DependencyGraph:
                     and f_id not in dependents[provider_id]
                 ):
                     dependents[provider_id].add(f_id)
+                    dependencies[f_id].add(provider_id)
                     in_degree[f_id] += 1
 
         queue = deque([f_id for f_id in eligible_set if in_degree[f_id] == 0])
@@ -346,4 +437,4 @@ class DependencyGraph:
             unresolved = [f_id for f_id in eligible_set if in_degree[f_id] > 0]
             raise DependencyCycleError(unresolved)
 
-        return tuple(start_order)
+        return tuple(start_order), dependencies, dependents
