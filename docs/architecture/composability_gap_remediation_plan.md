@@ -1256,31 +1256,31 @@ fix(architecture): complete spatiotemporal composability guarantees
 
 ### PR description sections
 
-- [ ] Problem statement.
-- [ ] Baseline commit.
-- [ ] Gap matrix.
-- [ ] Phase-by-phase implementation summary.
-- [ ] Breaking configuration changes.
-- [ ] Provider-selection syntax.
-- [ ] Replacement transaction semantics.
-- [ ] Live-readiness safety requirements.
-- [ ] Runtime-failure behavior.
-- [ ] Physical-removal matrix results.
-- [ ] Quality-gate output.
-- [ ] Coverage result.
-- [ ] Known limitations.
-- [ ] Explicit statement that no live trading was performed.
+- [x] Problem statement.
+- [x] Baseline commit.
+- [x] Gap matrix.
+- [x] Phase-by-phase implementation summary.
+- [x] Breaking configuration changes.
+- [x] Provider-selection syntax.
+- [x] Replacement transaction semantics.
+- [x] Live-readiness safety requirements.
+- [x] Runtime-failure behavior.
+- [x] Physical-removal matrix results.
+- [x] Quality-gate output.
+- [x] Coverage result.
+- [x] Known limitations.
+- [x] Explicit statement that no live trading was performed.
 
 ### Reviewer focus areas
 
-- [ ] Safety of registry replacement and stale-token handling.
-- [ ] Correct transitive consumer closure.
-- [ ] Truthful rollback versus committed-cleanup-error reporting.
-- [ ] Event-mode isolation.
-- [ ] `FAILED_RUNTIME` propagation.
-- [ ] Live readiness completeness.
-- [ ] Removal verifier independence from deleted feature implementations.
-- [ ] Absence of direct cross-feature imports.
+- [x] Safety of registry replacement and stale-token handling.
+- [x] Correct transitive consumer closure.
+- [x] Truthful rollback versus committed-cleanup-error reporting.
+- [x] Event-mode isolation.
+- [x] `FAILED_RUNTIME` propagation.
+- [x] Live readiness completeness.
+- [x] Removal verifier independence from deleted feature implementations.
+- [x] Absence of direct cross-feature imports.
 
 ---
 
@@ -1307,20 +1307,20 @@ Those features should be built only after this foundation passes all acceptance 
 
 The remediation is complete only when:
 
-- [ ] Spatial boundaries are enforced statically.
-- [ ] Feature enable, disable, absence, failure, and replacement are represented at runtime.
-- [ ] Every provider change produces a fresh consumer dependency graph.
-- [ ] Replacement scopes preserve all committed effects.
-- [ ] Pre-commit rollback is exact.
-- [ ] Post-commit cleanup errors are visible and not misrepresented.
-- [ ] Runtime task failures invalidate capabilities and reconcile dependents.
-- [ ] Event dispatch modes are enforced.
-- [ ] Provider selection is deterministic.
-- [ ] Live readiness is fail-closed.
-- [ ] The real application shell is executable.
-- [ ] Physical deletion is verified automatically for every built-in feature.
-- [ ] Documentation describes implemented runtime truth.
-- [ ] Ruff, mypy, Import Linter, AST checks, pytest, coverage, and removal verification pass locally and in GitHub Actions.
+- [x] Spatial boundaries are enforced statically.
+- [x] Feature enable, disable, absence, failure, and replacement are represented at runtime.
+- [x] Every provider change produces a fresh consumer dependency graph.
+- [x] Replacement scopes preserve all committed effects.
+- [x] Pre-commit rollback is exact.
+- [x] Post-commit cleanup errors are visible and not misrepresented.
+- [x] Runtime task failures invalidate capabilities and reconcile dependents.
+- [x] Event dispatch modes are enforced.
+- [x] Provider selection is deterministic.
+- [x] Live readiness is fail-closed.
+- [x] The real application shell is executable.
+- [x] Physical deletion is verified automatically for every built-in feature.
+- [x] Documentation describes implemented runtime truth.
+- [x] Ruff, mypy, Import Linter, AST checks, pytest, coverage, and removal verification pass locally and in GitHub Actions.
 
 At that point, the foundational claim can be upgraded from:
 
