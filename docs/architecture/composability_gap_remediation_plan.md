@@ -746,34 +746,34 @@ tests/kernel/test_registry.py
 
 ## Task 7.1 — Add closed-scope protection
 
-- [ ] Add a typed `ScopeClosedError`.
-- [ ] Check scope state before every effect registration operation.
-- [ ] Reject callbacks, tasks, context managers, listeners, and bindings registered after closure.
-- [ ] Keep `close()` idempotent.
+- [x] Add a typed `ScopeClosedError`.
+- [x] Check scope state before every effect registration operation.
+- [x] Reject callbacks, tasks, context managers, listeners, and bindings registered after closure.
+- [x] Keep `close()` idempotent.
 
 ## Task 7.2 — Expose context-manager operations
 
 Add to `FeatureContext` and `DefaultFeatureContext`:
 
-- [ ] `enter_context()`.
-- [ ] `enter_async_context()`.
-- [ ] Typed return values.
-- [ ] Optional resource names for diagnostics.
+- [x] `enter_context()`.
+- [x] `enter_async_context()`.
+- [x] Typed return values.
+- [x] Optional resource names for diagnostics.
 
 ## Task 7.3 — Improve effect classification
 
-- [ ] Record service bindings as `SERVICE_BINDING`.
-- [ ] Record event subscriptions as `EVENT_LISTENER`.
-- [ ] Record background tasks as `BACKGROUND_TASK`.
-- [ ] Preserve resource names and cleanup outcomes.
-- [ ] Expose active and cleaned effect counts through diagnostics.
+- [x] Record service bindings as `SERVICE_BINDING`.
+- [x] Record event subscriptions as `EVENT_LISTENER`.
+- [x] Record background tasks as `BACKGROUND_TASK`.
+- [x] Preserve resource names and cleanup outcomes.
+- [x] Expose active and cleaned effect counts through diagnostics.
 
 ## Task 7.4 — Tests
 
-- [ ] Test all registrations fail after scope closure.
-- [ ] Test context-manager entry through `FeatureContext`.
-- [ ] Test service and listener effect types.
-- [ ] Test cleanup continues across multiple registered effects even when one cleanup fails, with all failures reported.
+- [x] Test all registrations fail after scope closure.
+- [x] Test context-manager entry through `FeatureContext`.
+- [x] Test service and listener effect types.
+- [x] Test cleanup continues across multiple registered effects even when one cleanup fails, with all failures reported.
 
 ## Proposed commit
 
@@ -783,8 +783,8 @@ fix(kernel): complete scoped resource lifecycle APIs
 
 ## Exit criteria
 
-- [ ] Feature authors never need to bypass `FeatureContext` for supported reversible resources.
-- [ ] A closed scope cannot acquire new unmanaged effects.
+- [x] Feature authors never need to bypass `FeatureContext` for supported reversible resources.
+- [x] A closed scope cannot acquire new unmanaged effects.
 
 ---
 

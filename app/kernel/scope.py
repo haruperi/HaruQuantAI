@@ -19,6 +19,10 @@ TaskFailureCallback = Callable[
 ]
 
 
+class ScopeClosedError(RuntimeError):
+    """Raised when attempting to register an effect onto a closed FeatureScope."""
+
+
 class EffectType(StrEnum):
     """Categorization of runtime effects owned by a feature scope."""
 
@@ -123,11 +127,18 @@ class FeatureScope:
             *args: Positional arguments to pass to the callback.
             name: Optional descriptive resource name.
             effect_type: Category of this effect.
+
+        Raises:
+            ScopeClosedError: If this scope has already been closed.
         """
+        if self._closed:
+            msg = f"Cannot register callback on closed FeatureScope '{self.owner_id}'"
+            raise ScopeClosedError(msg)
+
         record = EffectRecord(
             owner_id=self.owner_id,
             effect_type=effect_type,
-            resource_name=name or callback_fn.__name__,
+            resource_name=name or getattr(callback_fn, "__name__", "callback"),
             created_at=datetime.now(UTC),
         )
         self._effects.append(record)
@@ -157,7 +168,14 @@ class FeatureScope:
             *args: Positional arguments to pass to the callback.
             name: Optional descriptive resource name.
             effect_type: Category of this effect.
+
+        Raises:
+            ScopeClosedError: If this scope has already been closed.
         """
+        if self._closed:
+            msg = f"Cannot register callback on closed FeatureScope '{self.owner_id}'"
+            raise ScopeClosedError(msg)
+
         record = EffectRecord(
             owner_id=self.owner_id,
             effect_type=effect_type,
@@ -191,7 +209,14 @@ class FeatureScope:
 
         Returns:
             Tracked asyncio Task.
+
+        Raises:
+            ScopeClosedError: If this scope has already been closed.
         """
+        if self._closed:
+            msg = f"Cannot spawn task on closed FeatureScope '{self.owner_id}'"
+            raise ScopeClosedError(msg)
+
         task_name = f"{self.owner_id}:{name}"
         task = asyncio.create_task(coroutine, name=task_name)
         record = EffectRecord(
@@ -241,7 +266,16 @@ class FeatureScope:
 
         Returns:
             Resource yielded by the context manager.
+
+        Raises:
+            ScopeClosedError: If this scope has already been closed.
         """
+        if self._closed:
+            msg = (
+                f"Cannot enter context manager on closed FeatureScope '{self.owner_id}'"
+            )
+            raise ScopeClosedError(msg)
+
         record = EffectRecord(
             owner_id=self.owner_id,
             effect_type=EffectType.CONTEXT_MANAGER,
@@ -267,7 +301,14 @@ class FeatureScope:
 
         Returns:
             Resource yielded by the context manager.
+
+        Raises:
+            ScopeClosedError: If this scope has already been closed.
         """
+        if self._closed:
+            msg = f"Cannot enter async context on closed FeatureScope '{self.owner_id}'"
+            raise ScopeClosedError(msg)
+
         record = EffectRecord(
             owner_id=self.owner_id,
             effect_type=EffectType.CONTEXT_MANAGER,

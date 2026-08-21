@@ -154,3 +154,48 @@ async def test_context_spawn_and_cleanup_delegation() -> None:
     assert task.cancelled()
     assert cleaned_sync
     assert cleaned_async
+
+
+@pytest.mark.asyncio
+async def test_context_enter_context_managers() -> None:
+    """Test entering sync and async context managers through FeatureContext."""
+    from contextlib import asynccontextmanager, contextmanager
+
+    spec = FeatureSpec(
+        feature_id="FEAT-TEST-CM_CONTEXT",
+        domain="data",
+        provides=frozenset(),
+    )
+    scope = FeatureScope("FEAT-TEST-CM_CONTEXT")
+    ctx = DefaultFeatureContext(spec=spec, scope=scope)
+
+    exited_sync = False
+    exited_async = False
+
+    @contextmanager
+    def sync_res() -> Any:
+        try:
+            yield "sync_result"
+        finally:
+            nonlocal exited_sync
+            exited_sync = True
+
+    @asynccontextmanager
+    async def async_res() -> Any:
+        try:
+            yield "async_result"
+        finally:
+            nonlocal exited_async
+            exited_async = True
+
+    v1 = ctx.enter_context(sync_res(), name="sync_cm")
+    v2 = await ctx.enter_async_context(async_res(), name="async_cm")
+
+    assert v1 == "sync_result"
+    assert v2 == "async_result"
+    assert not exited_sync
+    assert not exited_async
+
+    await ctx.scope.close()
+    assert exited_sync
+    assert exited_async

@@ -185,13 +185,33 @@ async def test_scope_registration_on_closed_scope_raises_error() -> None:
     """Characterization test: registering effects on a closed scope must raise an explicit error."""
     scope = FeatureScope(owner_id="FEAT-TEST-CLOSED_SCOPE")
     await scope.close()
-    assert scope.is_closed
-
     with pytest.raises((RuntimeError, ValueError), match=r"(?i)closed|scope"):
         scope.callback(lambda: None, name="late_callback")
+
+    async def dummy_async_cb() -> None:
+        pass
+
+    with pytest.raises((RuntimeError, ValueError), match=r"(?i)closed|scope"):
+        scope.async_callback(dummy_async_cb, name="late_async_cb")
 
     async def dummy() -> None:
         pass
 
+    d_coro = dummy()
     with pytest.raises((RuntimeError, ValueError), match=r"(?i)closed|scope"):
-        scope.spawn(dummy(), name="late_task")
+        scope.spawn(d_coro, name="late_task")
+    d_coro.close()
+
+    @contextmanager
+    def sync_cm() -> Any:
+        yield
+
+    @asynccontextmanager
+    async def async_cm() -> Any:
+        yield
+
+    with pytest.raises((RuntimeError, ValueError), match=r"(?i)closed|scope"):
+        scope.enter_context(sync_cm(), name="late_sync_cm")
+
+    with pytest.raises((RuntimeError, ValueError), match=r"(?i)closed|scope"):
+        await scope.enter_async_context(async_cm(), name="late_async_cm")

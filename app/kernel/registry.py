@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, cast
 
 from app.kernel.capability import CapabilityKey, CapabilityUnavailableError
+from app.kernel.scope import EffectType
 
 if TYPE_CHECKING:
     from app.kernel.scope import FeatureScope
@@ -105,6 +106,7 @@ class ServiceRegistry:
                 self.revoke,
                 token,
                 name=f"revoke_provider:{cap_id}",
+                effect_type=EffectType.SERVICE_BINDING,
             )
 
         return token
@@ -148,6 +150,7 @@ class ServiceRegistry:
                 self.revoke,
                 token,
                 name=f"revoke_provider:{cap_id}",
+                effect_type=EffectType.SERVICE_BINDING,
             )
 
         return token

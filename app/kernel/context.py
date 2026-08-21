@@ -3,10 +3,12 @@
 import asyncio
 import inspect
 from collections.abc import Awaitable, Callable, Coroutine
+from contextlib import AbstractAsyncContextManager, AbstractContextManager
 from typing import TYPE_CHECKING, Any, Protocol
 
 from app.kernel.capability import CapabilityKey, CapabilityUnavailableError
 from app.kernel.events import EventBus, EventMode
+from app.kernel.scope import EffectType
 
 if TYPE_CHECKING:
     from app.kernel.feature import FeatureSpec
@@ -79,6 +81,40 @@ class FeatureContext(Protocol):
 
         Args:
             callback: Cleanup callback executed upon unmount.
+        """
+        ...
+
+    def enter_context[ContextT](
+        self,
+        cm: AbstractContextManager[ContextT],
+        *,
+        name: str = "",
+    ) -> ContextT:
+        """Enter a synchronous context manager and track its cleanup in this scope.
+
+        Args:
+            cm: Context manager to enter.
+            name: Optional descriptive resource name.
+
+        Returns:
+            Resource yielded by context manager.
+        """
+        ...
+
+    async def enter_async_context[ContextT](
+        self,
+        cm: AbstractAsyncContextManager[ContextT],
+        *,
+        name: str = "",
+    ) -> ContextT:
+        """Enter an asynchronous context manager and track its cleanup in this scope.
+
+        Args:
+            cm: Async context manager to enter.
+            name: Optional descriptive resource name.
+
+        Returns:
+            Resource yielded by context manager.
         """
         ...
 
@@ -269,6 +305,40 @@ class DefaultFeatureContext:
         else:
             self._scope.callback(callback)
 
+    def enter_context[ContextT](
+        self,
+        cm: AbstractContextManager[ContextT],
+        *,
+        name: str = "",
+    ) -> ContextT:
+        """Enter a synchronous context manager and track its cleanup in this scope.
+
+        Args:
+            cm: Context manager to enter.
+            name: Optional descriptive resource name.
+
+        Returns:
+            Resource yielded by context manager.
+        """
+        return self._scope.enter_context(cm, name=name)
+
+    async def enter_async_context[ContextT](
+        self,
+        cm: AbstractAsyncContextManager[ContextT],
+        *,
+        name: str = "",
+    ) -> ContextT:
+        """Enter an asynchronous context manager and track its cleanup in this scope.
+
+        Args:
+            cm: Async context manager to enter.
+            name: Optional descriptive resource name.
+
+        Returns:
+            Resource yielded by context manager.
+        """
+        return await self._scope.enter_async_context(cm, name=name)
+
     def subscribe[EventT](
         self,
         event_type: type[EventT],
@@ -285,7 +355,11 @@ class DefaultFeatureContext:
         disposer = self._event_bus.subscribe(
             event_type, handler, mode=mode, owner_id=self._spec.feature_id
         )
-        self._scope.callback(disposer, name=f"unsubscribe:{event_type.__name__}")
+        self._scope.callback(
+            disposer,
+            name=f"unsubscribe:{event_type.__name__}",
+            effect_type=EffectType.EVENT_LISTENER,
+        )
 
     async def publish(self, event: object) -> None:
         """Publish an event to the shared event bus.
