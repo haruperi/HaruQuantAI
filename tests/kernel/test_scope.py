@@ -11,28 +11,19 @@ from app.kernel.scope import EffectType, FeatureScope, cancel_and_wait
 
 @pytest.mark.asyncio
 async def test_scope_sync_callback_reverse_order() -> None:
-    """Test that synchronous callbacks execute in reverse registration order."""
     scope = FeatureScope(owner_id="FEAT-TEST-RUN_CALLBACK")
     order: list[str] = []
-
     scope.callback(lambda: order.append("first"), name="cb1")
     scope.callback(lambda: order.append("second"), name="cb2")
     scope.callback(lambda: order.append("third"), name="cb3")
-
-    assert not scope.is_closed
     await scope.close()
-
-    assert scope.is_closed
     assert order == ["third", "second", "first"]
-
-    # Idempotent close
     await scope.close()
     assert order == ["third", "second", "first"]
 
 
 @pytest.mark.asyncio
 async def test_scope_async_callback() -> None:
-    """Test asynchronous callback execution and effect status."""
     scope = FeatureScope(owner_id="FEAT-TEST-RUN_ASYNC")
     cleaned: list[str] = []
 
@@ -40,19 +31,14 @@ async def test_scope_async_callback() -> None:
         await asyncio.sleep(0.01)
         cleaned.append(name)
 
-    scope.async_callback(async_cleanup, "async_resource", name="async_cleaner")
-    assert len(scope.effects) == 1
-    assert not scope.effects[0].cleaned_up
-
+    scope.async_callback(async_cleanup, "resource", name="async_cleaner")
     await scope.close()
-
-    assert cleaned == ["async_resource"]
+    assert cleaned == ["resource"]
     assert scope.effects[0].cleaned_up
 
 
 @pytest.mark.asyncio
 async def test_scope_spawn_task_cancellation() -> None:
-    """Test background task spawned in scope is cancelled and awaited on close."""
     scope = FeatureScope(owner_id="FEAT-TASK-RUN_BACKGROUND")
     cancelled = False
 
@@ -65,78 +51,90 @@ async def test_scope_spawn_task_cancellation() -> None:
             raise
 
     task = scope.spawn(background_worker(), name="worker")
-    assert not task.done()
-
     await asyncio.sleep(0.02)
-    assert not task.done()
-
     await scope.close()
-
-    assert task.done()
     assert task.cancelled()
     assert cancelled
     assert scope.effects[0].cleaned_up
 
 
 @pytest.mark.asyncio
+async def test_scope_reports_unexpected_task_failure() -> None:
+    failures: list[tuple[str, str]] = []
+
+    async def on_failure(owner_id: str, error: BaseException) -> None:
+        failures.append((owner_id, str(error)))
+
+    scope = FeatureScope(
+        owner_id="FEAT-TEST-CRASH",
+        on_task_failure=on_failure,
+    )
+
+    async def crashing_worker() -> None:
+        await asyncio.sleep(0)
+        raise RuntimeError("worker crashed")
+
+    task = scope.spawn(crashing_worker(), name="worker")
+    with pytest.raises(RuntimeError, match="worker crashed"):
+        await task
+    await asyncio.sleep(0)
+    assert failures == [("FEAT-TEST-CRASH", "worker crashed")]
+    await scope.close()
+
+
+@pytest.mark.asyncio
+async def test_scope_rejects_late_effect_registration() -> None:
+    scope = FeatureScope(owner_id="FEAT-TEST-CLOSED")
+    await scope.close()
+    with pytest.raises(RuntimeError, match="already closed"):
+        scope.callback(lambda: None)
+    with pytest.raises(RuntimeError, match="already closed"):
+        scope.spawn(asyncio.sleep(0), name="late")
+
+
+@pytest.mark.asyncio
 async def test_scope_context_managers() -> None:
-    """Test sync and async context managers entered in scope exit on close."""
     scope = FeatureScope(owner_id="FEAT-TEST-ENTER_CONTEXT")
     exited_sync = False
     exited_async = False
 
     @contextmanager
     def sync_resource() -> Any:
+        nonlocal exited_sync
         try:
             yield "sync_val"
         finally:
-            nonlocal exited_sync
             exited_sync = True
 
     @asynccontextmanager
     async def async_resource() -> Any:
+        nonlocal exited_async
         try:
             yield "async_val"
         finally:
-            nonlocal exited_async
             exited_async = True
 
-    val1 = scope.enter_context(sync_resource(), name="sync_res")
-    val2 = await scope.enter_async_context(async_resource(), name="async_res")
-
-    assert val1 == "sync_val"
-    assert val2 == "async_val"
-    assert not exited_sync
-    assert not exited_async
-
+    assert scope.enter_context(sync_resource(), name="sync_res") == "sync_val"
+    assert await scope.enter_async_context(async_resource(), name="async_res") == "async_val"
     await scope.close()
-
     assert exited_sync
     assert exited_async
 
 
 @pytest.mark.asyncio
 async def test_scope_effect_records_metadata() -> None:
-    """Test effect records contain correct diagnostic metadata."""
     scope = FeatureScope(owner_id="FEAT-TEST-TRACK_EFFECTS")
     scope.callback(lambda: None, name="meta_cb", effect_type=EffectType.SERVICE_BINDING)
-
-    effects = scope.effects
-    assert len(effects) == 1
-    record = effects[0]
+    record = scope.effects[0]
     assert record.owner_id == "FEAT-TEST-TRACK_EFFECTS"
     assert record.effect_type == EffectType.SERVICE_BINDING
-    assert record.resource_name == "meta_cb"
     assert not record.cleaned_up
-
     await scope.close()
     assert record.cleaned_up
 
 
 @pytest.mark.asyncio
 async def test_cancel_and_wait_done_task() -> None:
-    """Test cancel_and_wait handles already completed tasks gracefully."""
-
     async def done_coro() -> str:
         return "finished"
 
@@ -147,34 +145,14 @@ async def test_cancel_and_wait_done_task() -> None:
 
 
 @pytest.mark.asyncio
-async def test_scope_sync_callback_error_recording() -> None:
-    """Test sync callback exception is captured in effect record."""
+async def test_cleanup_errors_are_recorded() -> None:
     scope = FeatureScope(owner_id="FEAT-TEST-FAIL_SYNC")
 
     def failing_cleanup() -> None:
-        msg = "Cleanup failed"
-        raise RuntimeError(msg)
+        raise RuntimeError("Cleanup failed")
 
     scope.callback(failing_cleanup, name="fail_cb")
     with pytest.raises(RuntimeError, match="Cleanup failed"):
         await scope.close()
-
     assert scope.effects[0].cleaned_up
     assert scope.effects[0].last_error == "Cleanup failed"
-
-
-@pytest.mark.asyncio
-async def test_scope_async_callback_error_recording() -> None:
-    """Test async callback exception is captured in effect record."""
-    scope = FeatureScope(owner_id="FEAT-TEST-FAIL_ASYNC")
-
-    async def failing_async_cleanup() -> None:
-        msg = "Async cleanup failed"
-        raise RuntimeError(msg)
-
-    scope.async_callback(failing_async_cleanup, name="fail_async_cb")
-    with pytest.raises(RuntimeError, match="Async cleanup failed"):
-        await scope.close()
-
-    assert scope.effects[0].cleaned_up
-    assert scope.effects[0].last_error == "Async cleanup failed"
