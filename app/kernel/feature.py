@@ -30,18 +30,7 @@ class FeatureState(StrEnum):
 
 @dataclass(frozen=True, slots=True)
 class FeatureSpec:
-    """Static capability declaration and metadata for a feature package.
-
-    Attributes:
-        feature_id: Unique feature identifier (e.g., 'FEAT-DATA-RETRIEVE_BARS').
-        domain: Business domain name (e.g., 'data', 'broker', 'risk').
-        provides: Set of capability keys provided by this feature.
-        requires: Set of mandatory capability keys required for activation.
-        optional: Set of optional capability keys consumed if available.
-        conflicts: Set of conflicting feature IDs that cannot run concurrently.
-        description: Brief description of the feature responsibility.
-        state: Optional persistent state ownership declaration.
-    """
+    """Static capability declaration and metadata for a feature package."""
 
     feature_id: str
     domain: str
@@ -53,22 +42,17 @@ class FeatureSpec:
     state: StateDeclaration | None = None
 
     def validate(self) -> None:
-        """Validate specification consistency and structural integrity.
-
-        Raises:
-            ValueError: If specifications violate invariants (e.g., overlap).
-        """
+        """Validate specification consistency and structural integrity."""
         if not self.feature_id.strip():
-            msg = "Feature ID must not be empty."
-            raise ValueError(msg)
+            raise ValueError("Feature ID must not be empty.")
         if not self.domain.strip():
-            msg = "Domain must not be empty."
-            raise ValueError(msg)
+            raise ValueError("Domain must not be empty.")
         overlap = self.provides.intersection(self.requires)
         if overlap:
-            overlap_ids = ", ".join(k.identifier for k in overlap)
-            msg = f"Feature cannot both provide and require capability: {overlap_ids}"
-            raise ValueError(msg)
+            overlap_ids = ", ".join(capability.identifier for capability in overlap)
+            raise ValueError(
+                f"Feature cannot both provide and require capability: {overlap_ids}"
+            )
 
 
 @runtime_checkable
@@ -82,10 +66,32 @@ class Feature(Protocol):
         context: FeatureContext,
         config: object,
     ) -> None:
-        """Mount the feature into the given lifecycle context with configuration.
+        """Mount the feature into a reversible lifecycle context."""
+        ...
 
-        Args:
-            context: Reversible feature context providing scoped operations.
-            config: Validated feature-specific configuration object.
-        """
+
+@runtime_checkable
+class HealthCheckableFeature(Protocol):
+    """Optional pre-commit health-check protocol for replacement."""
+
+    async def health_check(self) -> None:
+        """Raise when the staged feature is not healthy enough to commit."""
+        ...
+
+
+@runtime_checkable
+class QuiesceableFeature(Protocol):
+    """Optional protocol for stopping new work before provider retirement."""
+
+    async def quiesce(self) -> None:
+        """Stop accepting new work while preserving in-flight operations."""
+        ...
+
+
+@runtime_checkable
+class DrainableFeature(Protocol):
+    """Optional protocol for draining in-flight operations before retirement."""
+
+    async def drain(self) -> None:
+        """Wait until in-flight feature work has safely completed."""
         ...
