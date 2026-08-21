@@ -13,15 +13,13 @@ class HistoricalBarsConfig:
     """Configuration options for historical bars retrieval.
 
     Satisfies:
-        FR-DATA-VALIDATE_CONFIG: Validates default timeframe and caching parameters.
+        FR-DATA-VALIDATE_CONFIG: Validates default timeframe parameter.
 
     Attributes:
         default_timeframe: Default fallback timeframe interval.
-        cache_enabled: Whether to attempt local caching when cache capability exists.
     """
 
     default_timeframe: str = "M1"
-    cache_enabled: bool = True
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> HistoricalBarsConfig:
@@ -45,5 +43,4 @@ class HistoricalBarsConfig:
             msg = f"Unsupported default_timeframe: '{tf}'. Allowed: {allowed}"
             raise ValueError(msg)
 
-        cache_on = bool(data.get("cache_enabled", True))
-        return cls(default_timeframe=tf, cache_enabled=cache_on)
+        return cls(default_timeframe=tf)

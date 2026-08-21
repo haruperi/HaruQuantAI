@@ -1002,42 +1002,42 @@ tests/architecture/test_feature_documentation.py
 
 Choose one truthful implementation path:
 
-- [ ] Either declare and implement `data.bar-cache@1` and `system.metrics@1` as optional dependencies, or remove them from the README until implemented.
-- [ ] Either use `cache_enabled` or remove the unused configuration field.
-- [ ] Either declare `StateDeclaration(namespace="data.historical_bars", ...)` and use storage, or remove the persistent-state claim.
-- [ ] Ensure failure and removal behavior matches the manifest.
+- [x] Either declare and implement `data.bar-cache@1` and `system.metrics@1` as optional dependencies, or remove them from the README until implemented.
+- [x] Either use `cache_enabled` or remove the unused configuration field.
+- [x] Either declare `StateDeclaration(namespace="data.historical_bars", ...)` and use storage, or remove the persistent-state claim.
+- [x] Ensure failure and removal behavior matches the manifest.
 
 The preferred minimal remediation is to document only implemented behavior, then add caching later as its own feature.
 
 ## Task 10.2 — Resolve Mock Broker drift
 
-- [ ] Implement all accepted timeframes or restrict validation to the provider's supported set.
-- [ ] Never silently treat unsupported timeframes as `M1`.
-- [ ] Either apply `spread` to a contract that exposes bid/ask information or remove the unused setting from this bar-only provider.
-- [ ] Update functional requirements and tests.
+- [x] Implement all accepted timeframes or restrict validation to the provider's supported set.
+- [x] Never silently treat unsupported timeframes as `M1`.
+- [x] Either apply `spread` to a contract that exposes bid/ask information or remove the unused setting from this bar-only provider.
+- [x] Update functional requirements and tests.
 
 ## Task 10.3 — Resolve Storage drift
 
-- [ ] Standardize on one configuration key: `base_path` or `root_dir`.
-- [ ] Update README, examples, parser, and tests together.
-- [ ] Document that unmount retains state and purge is explicit.
+- [x] Standardize on one configuration key: `base_path` or `root_dir`.
+- [x] Update README, examples, parser, and tests together.
+- [x] Document that unmount retains state and purge is explicit.
 
 ## Task 10.4 — Add documentation validation
 
-- [ ] Create a script/test that discovers each built-in feature.
-- [ ] Verify each feature has a README.
-- [ ] Verify feature ID, domain, provided capabilities, required capabilities, optional capabilities, and state namespace appear consistently.
-- [ ] Prefer generating the implemented-feature portion of the capability catalog from `FeatureSpec` objects.
-- [ ] Separate implemented capabilities from roadmap capabilities in the catalog.
+- [x] Create a script/test that discovers each built-in feature.
+- [x] Verify each feature has a README.
+- [x] Verify feature ID, domain, provided capabilities, required capabilities, optional capabilities, and state namespace appear consistently.
+- [x] Prefer generating the implemented-feature portion of the capability catalog from `FeatureSpec` objects.
+- [x] Separate implemented capabilities from roadmap capabilities in the catalog.
 
 ## Task 10.5 — Root README
 
-- [ ] Explain the project purpose.
-- [ ] Explain the composition model.
-- [ ] Show project setup and quality commands.
-- [ ] Show non-production startup.
-- [ ] Link to capability model, implementation pipeline, plugin packaging, and this remediation plan.
-- [ ] State clearly that the current foundation is not permission to perform live trading.
+- [x] Explain the project purpose.
+- [x] Explain the composition model.
+- [x] Show project setup and quality commands.
+- [x] Show non-production startup.
+- [x] Link to capability model, implementation pipeline, plugin packaging, and this remediation plan.
+- [x] State clearly that the current foundation is not permission to perform live trading.
 
 ## Proposed commit
 
@@ -1047,8 +1047,8 @@ docs(architecture): align feature manifests and runtime documentation
 
 ## Exit criteria
 
-- [ ] No implemented feature claims capabilities, state, or configuration it does not actually support.
-- [ ] Documentation validation runs in CI.
+- [x] No implemented feature claims capabilities, state, or configuration it does not actually support.
+- [x] Documentation validation runs in CI.
 
 ---
 

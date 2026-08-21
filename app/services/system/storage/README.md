@@ -26,7 +26,7 @@ None
 | :--- | :--- | :--- | :--- |
 | `driver` | `str` | `"sqlite"` | Storage driver (`"sqlite"` or `"disk"`) |
 | `db_path` | `str` | `"data/db/haruquantai.db"` | SQLite database file path (when driver is sqlite) |
-| `root_dir` | `str` | `"data/storage"` | Root filesystem directory (when driver is disk) |
+| `base_path` | `str` | `"data/storage"` | Root filesystem directory (when driver is disk) |
 
 ## Runtime Effects
 

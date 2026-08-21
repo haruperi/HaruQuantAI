@@ -15,4 +15,3 @@ enabled = true
 
 [features.FEAT-DATA-RETRIEVE_BARS.config]
 default_timeframe = "M1"
-cache_enabled = false

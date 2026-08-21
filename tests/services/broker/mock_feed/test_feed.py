@@ -52,12 +52,19 @@ async def test_mock_feed_timeframes() -> None:
     bars_d1 = await feed.retrieve_bars(req_d1)
     assert len(bars_d1) == 2
 
-    # Default fallback timeframe
-    req_def = BrokerBarsRequest(
-        symbol="EURUSD", timeframe="UNKNOWN", start=start, end=end
+
+@pytest.mark.asyncio
+async def test_mock_feed_unsupported_timeframe_raises() -> None:
+    """Test unsupported timeframe raises ValueError."""
+    feed = MockBrokerMarketData()
+    start = datetime(2026, 1, 1, tzinfo=UTC)
+    end = datetime(2026, 1, 2, tzinfo=UTC)
+
+    req = BrokerBarsRequest(
+        symbol="EURUSD", timeframe="INVALID_TF", start=start, end=end
     )
-    bars_def = await feed.retrieve_bars(req_def)
-    assert len(bars_def) == 5
+    with pytest.raises(ValueError, match="Unsupported timeframe: 'INVALID_TF'"):
+        await feed.retrieve_bars(req)
 
 
 @pytest.mark.asyncio

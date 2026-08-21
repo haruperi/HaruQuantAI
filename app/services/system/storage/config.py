@@ -43,7 +43,12 @@ class StorageConfig:
             msg = "db_path must not be empty"
             raise ValueError(msg)
 
-        base_path_str = str(data.get("base_path", "data/storage")).strip()
+        raw_base = (
+            data.get("base_path")
+            if "base_path" in data
+            else data.get("root_dir", "data/storage")
+        )
+        base_path_str = str(raw_base).strip()
         if not base_path_str:
             msg = "base_path must not be empty"
             raise ValueError(msg)

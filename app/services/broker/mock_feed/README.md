@@ -25,7 +25,10 @@ None
 | Field | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `base_price` | `float` | `1.1000` | Center price level for synthetic price waves |
-| `spread` | `float` | `0.0002` | Simulated bid/ask spread offset |
+
+## Supported Timeframes
+
+- `M1`, `M5`, `M15`, `M30`, `H1`, `H4`, `D1`, `W1`, `MN1`
 
 ## Runtime Effects
 
@@ -41,12 +44,13 @@ None
 
 | Requirement ID | Responsibility | Implementing Symbol | Source File |
 | :--- | :--- | :--- | :--- |
-| `FR-BROKER-VALIDATE_FEED_CONFIG` | Validate base price and spread constraints | `MockFeedConfig.from_dict()` | `config.py` |
+| `FR-BROKER-VALIDATE_FEED_CONFIG` | Validate base price constraint | `MockFeedConfig.from_dict()` | `config.py` |
 | `FR-BROKER-GENERATE_RAW_BARS` | Generate deterministic raw OHLCV price bars | `MockBrokerMarketData.retrieve_bars()` | `feed.py` |
 
 ## Failure Behavior
 
-- Invalid config values (negative prices/spreads) $\rightarrow$ Mount raises `ValueError` $\rightarrow$ transitions to `FAILED_START` with complete rollback.
+- Non-positive `base_price` $\rightarrow$ Mount raises `ValueError` $\rightarrow$ transitions to `FAILED_START` with complete rollback.
+- Unsupported query timeframe $\rightarrow$ `retrieve_bars()` raises `ValueError`.
 
 ## Removal Behavior
 

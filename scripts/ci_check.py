@@ -51,6 +51,10 @@ def main() -> None:
         (["lint-imports"], "Import Linter Check"),
         (["python", "scripts/architecture_check.py"], "Architectural AST Check"),
         (
+            ["python", "scripts/validate_feature_docs.py"],
+            "Feature Documentation Check",
+        ),
+        (
             [
                 "pytest",
                 "--cov=app",

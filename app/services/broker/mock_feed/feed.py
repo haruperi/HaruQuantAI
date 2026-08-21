@@ -14,6 +14,18 @@ from app.services.broker.mock_feed.config import MockFeedConfig
 
 MAX_SYNTHETIC_BARS: int = 10_000
 
+SUPPORTED_TIMEFRAME_STEPS: dict[str, timedelta] = {
+    "M1": timedelta(minutes=1),
+    "M5": timedelta(minutes=5),
+    "M15": timedelta(minutes=15),
+    "M30": timedelta(minutes=30),
+    "H1": timedelta(hours=1),
+    "H4": timedelta(hours=4),
+    "D1": timedelta(days=1),
+    "W1": timedelta(weeks=1),
+    "MN1": timedelta(days=30),
+}
+
 
 class MockBrokerMarketData(BrokerMarketData):
     """Synthetic broker market data implementation.
@@ -86,16 +98,14 @@ class MockBrokerMarketData(BrokerMarketData):
 
         Returns:
             Timedelta step interval.
+
+        Raises:
+            ValueError: If timeframe is not supported.
         """
         tf = timeframe.upper()
-        if tf == "M1":
-            return timedelta(minutes=1)
-        if tf == "M5":
-            return timedelta(minutes=5)
-        if tf == "M15":
-            return timedelta(minutes=15)
-        if tf == "H1":
-            return timedelta(hours=1)
-        if tf == "D1":
-            return timedelta(days=1)
-        return timedelta(minutes=1)
+        if tf in SUPPORTED_TIMEFRAME_STEPS:
+            return SUPPORTED_TIMEFRAME_STEPS[tf]
+
+        allowed = sorted(SUPPORTED_TIMEFRAME_STEPS)
+        msg = f"Unsupported timeframe: '{timeframe}'. Supported: {allowed}"
+        raise ValueError(msg)
