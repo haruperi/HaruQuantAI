@@ -16,6 +16,10 @@ T = TypeVar("T")
 TaskFailureHandler = Callable[[str, BaseException], Awaitable[None] | None]
 
 
+class ScopeClosedError(RuntimeError):
+    """Raised when a closed feature scope attempts to acquire a new effect."""
+
+
 class EffectType(StrEnum):
     """Categorization of runtime effects owned by a feature scope."""
 
@@ -69,10 +73,21 @@ class FeatureScope:
     def effects(self) -> Sequence[EffectRecord]:
         return tuple(self._effects)
 
+    @property
+    def active_effect_count(self) -> int:
+        """Return the number of effects not yet cleaned up."""
+        return sum(not effect.cleaned_up for effect in self._effects)
+
+    @property
+    def cleaned_effect_count(self) -> int:
+        """Return the number of effects already cleaned up."""
+        return sum(effect.cleaned_up for effect in self._effects)
+
     def _ensure_open(self) -> None:
         if self._closed:
-            msg = f"Feature scope '{self.owner_id}' is already closed"
-            raise RuntimeError(msg)
+            raise ScopeClosedError(
+                f"Feature scope '{self.owner_id}' is already closed"
+            )
 
     def callback(
         self,
@@ -94,8 +109,8 @@ class FeatureScope:
         def wrapped_disposer() -> None:
             try:
                 callback_fn(*args)
-            except Exception as err:
-                record.last_error = str(err)
+            except Exception as error:
+                record.last_error = str(error)
                 raise
             finally:
                 record.cleaned_up = True
@@ -122,8 +137,8 @@ class FeatureScope:
         async def wrapped_async_disposer() -> None:
             try:
                 await callback_fn(*args)
-            except Exception as err:
-                record.last_error = str(err)
+            except Exception as error:
+                record.last_error = str(error)
                 raise
             finally:
                 record.cleaned_up = True
@@ -159,7 +174,10 @@ class FeatureScope:
                 return
             result = self._on_task_failure(self.owner_id, error)
             if result is not None:
-                asyncio.create_task(result, name=f"{self.owner_id}:runtime-failure")
+                asyncio.create_task(
+                    result,
+                    name=f"{self.owner_id}:runtime-failure",
+                )
 
         task.add_done_callback(task_done)
 
