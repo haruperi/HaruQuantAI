@@ -69,3 +69,26 @@ def test_default_app_config() -> None:
     cfg = AppConfig()
     assert cfg.profile == "research"
     assert len(cfg.features) == 0
+
+
+def test_legacy_profile_section_rejected() -> None:
+    """Characterization test: [profile] legacy section must be rejected with an error rather than silently defaulting."""
+    legacy_toml = """
+    [profile]
+    name = "live"
+
+    [features."FEAT-BROKER-FEED_MOCK"]
+    enabled = true
+    """
+    with pytest.raises((ValueError, KeyError), match=r"(?i)profile|legacy|application"):
+        load_config_from_toml_string(legacy_toml)
+
+
+def test_unknown_profile_rejected() -> None:
+    """Characterization test: unknown profile names must be rejected."""
+    unknown_toml = """
+    [application]
+    profile = "unknown_quantum_profile"
+    """
+    with pytest.raises((ValueError, KeyError), match=r"(?i)profile|unknown|invalid"):
+        load_config_from_toml_string(unknown_toml)

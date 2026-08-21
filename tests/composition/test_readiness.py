@@ -58,3 +58,35 @@ def test_unknown_profile_defaults_ready() -> None:
     is_ready, missing = check_profile_readiness("custom-offline", [])
     assert is_ready
     assert missing == ()
+
+
+def test_live_readiness_requires_all_safety_capabilities() -> None:
+    """Characterization test: Live readiness must fail if ANY required trading safety capability is missing."""
+    all_safety_caps = [
+        "system.clock@1",
+        "broker.market-data@1",
+        "broker.execution@1",
+        "data.realtime-ticks@1",
+        "portfolio.positions@1",
+        "risk.approval@1",
+        "trading.execution@1",
+    ]
+
+    # When all safety capabilities are present, Live is ready
+    is_ready, missing = check_profile_readiness("live", all_safety_caps)
+    assert is_ready
+    assert missing == ()
+
+    # Parametric check: removing any single safety capability must result in readiness failure
+    for missing_cap in all_safety_caps:
+        subset = [c for c in all_safety_caps if c != missing_cap]
+        ready, missing_list = check_profile_readiness("live", subset)
+        assert not ready, f"Live profile should not be ready when missing {missing_cap}"
+        assert missing_cap in missing_list
+
+
+def test_unknown_profile_fails_or_raises() -> None:
+    """Characterization test: unknown profile should not silently report ready."""
+    # Under fail-closed design, an unrecognized profile must not be marked ready with 0 requirements
+    is_ready, _ = check_profile_readiness("non_existent_profile", [])
+    assert not is_ready, "Unknown profile should not report ready by default"

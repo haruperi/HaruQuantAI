@@ -182,3 +182,89 @@ def test_contributor_registry() -> None:
     disposer()
     assert registry.get("mt5") is None
     assert registry.list_keys() == ("binance",)
+
+
+@pytest.mark.asyncio
+async def test_event_mode_strict_isolation() -> None:
+    """Characterization test: event dispatch must strictly isolate and only invoke matching modes."""
+    bus = EventBus()
+    invocations: list[str] = []
+
+    def pub_handler(_e: SampleFactEvent) -> None:
+        invocations.append("publish")
+
+    def serial_handler(_e: SampleFactEvent) -> None:
+        invocations.append("serial")
+
+    def parallel_handler(_e: SampleFactEvent) -> None:
+        invocations.append("parallel")
+
+    def pipeline_handler(e: SampleFactEvent) -> SampleFactEvent:
+        invocations.append("pipeline")
+        return e
+
+    bus.subscribe(SampleFactEvent, pub_handler, mode=EventMode.PUBLISH)
+    bus.subscribe(SampleFactEvent, serial_handler, mode=EventMode.SERIAL)
+    bus.subscribe(SampleFactEvent, parallel_handler, mode=EventMode.PARALLEL)
+    bus.subscribe(SampleFactEvent, pipeline_handler, mode=EventMode.PIPELINE)
+
+    # 1. Calling publish() must ONLY invoke PUBLISH mode handlers
+    invocations.clear()
+    await bus.publish(SampleFactEvent("test_publish"))
+    assert invocations == ["publish"], (
+        f"publish() invoked non-publish handlers: {invocations}"
+    )
+
+    # 2. Calling dispatch_serial() must ONLY invoke SERIAL mode handlers
+    invocations.clear()
+    await bus.dispatch_serial(SampleFactEvent("test_serial"))
+    assert invocations == ["serial"], (
+        f"dispatch_serial() invoked non-serial handlers: {invocations}"
+    )
+
+    # 3. Calling dispatch_parallel() must ONLY invoke PARALLEL mode handlers
+    invocations.clear()
+    await bus.dispatch_parallel(SampleFactEvent("test_parallel"))
+    assert invocations == ["parallel"], (
+        f"dispatch_parallel() invoked non-parallel handlers: {invocations}"
+    )
+
+    # 4. Calling dispatch_pipeline() must ONLY invoke PIPELINE mode handlers
+    invocations.clear()
+    await bus.dispatch_pipeline(SampleFactEvent("test_pipeline"))
+    assert invocations == ["pipeline"], (
+        f"dispatch_pipeline() invoked non-pipeline handlers: {invocations}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_duplicate_subscription_exact_token_disposal() -> None:
+    """Characterization test: disposing one subscription should not unsubscribe identical duplicate handlers."""
+    bus = EventBus()
+    calls: list[int] = []
+
+    def shared_handler(_e: SampleFactEvent) -> None:
+        calls.append(1)
+
+    disposer1 = bus.subscribe(SampleFactEvent, shared_handler, mode=EventMode.PUBLISH)
+    disposer2 = bus.subscribe(SampleFactEvent, shared_handler, mode=EventMode.PUBLISH)
+
+    # Both subscriptions should fire
+    await bus.publish(SampleFactEvent("both"))
+    assert len(calls) == 2
+
+    # Dispose ONLY the first subscription
+    calls.clear()
+    disposer1()
+
+    # The second subscription MUST still receive the event
+    await bus.publish(SampleFactEvent("one_left"))
+    assert len(calls) == 1, (
+        f"Expected exactly 1 call after disposing first token, got {len(calls)}"
+    )
+
+    # Dispose second subscription
+    calls.clear()
+    disposer2()
+    await bus.publish(SampleFactEvent("none_left"))
+    assert len(calls) == 0

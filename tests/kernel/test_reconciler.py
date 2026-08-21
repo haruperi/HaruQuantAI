@@ -209,3 +209,102 @@ async def test_reconciler_stop_all() -> None:
     assert len(reconciler.active_features) == 0
     assert not registry.is_available(SYSTEM_CLOCK)
     assert not registry.is_available(BROKER_MARKET_DATA)
+
+
+@pytest.mark.asyncio
+async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
+    """Characterization test: changing provider config must remount all transitive consumers in order."""
+    registry = ServiceRegistry()
+    reconciler = Reconciler(registry)
+
+    class CountingClockFeature:
+        spec = FeatureSpec(
+            feature_id="FEAT-SYS-PROVIDE_CLOCK",
+            domain="system",
+            provides=frozenset({SYSTEM_CLOCK}),
+        )
+
+        def __init__(self) -> None:
+            self.mount_count = 0
+
+        async def mount(self, context: FeatureContext, config: object) -> None:
+            self.mount_count += 1
+            mode = "default"
+            if isinstance(config, dict):
+                mode = config.get("mode", "default")
+            context.provide(SYSTEM_CLOCK, {"mode": mode, "gen": self.mount_count})
+
+    class CountingBrokerFeature:
+        spec = FeatureSpec(
+            feature_id="FEAT-BROKER-FEED_MT5",
+            domain="broker",
+            provides=frozenset({BROKER_MARKET_DATA}),
+            requires=frozenset({SYSTEM_CLOCK}),
+        )
+
+        def __init__(self) -> None:
+            self.mount_count = 0
+            self.captured_clock: object = None
+
+        async def mount(self, context: FeatureContext, _config: object) -> None:
+            self.mount_count += 1
+            self.captured_clock = context.require(SYSTEM_CLOCK)
+            context.provide(BROKER_MARKET_DATA, {"broker_gen": self.mount_count})
+
+    class CountingDataFeature:
+        spec = FeatureSpec(
+            feature_id="FEAT-DATA-RETRIEVE_BARS",
+            domain="data",
+            provides=frozenset({HISTORICAL_BARS}),
+            requires=frozenset({BROKER_MARKET_DATA}),
+        )
+
+        def __init__(self) -> None:
+            self.mount_count = 0
+            self.captured_broker: object = None
+
+        async def mount(self, context: FeatureContext, _config: object) -> None:
+            self.mount_count += 1
+            self.captured_broker = context.require(BROKER_MARKET_DATA)
+            context.provide(HISTORICAL_BARS, {"data_gen": self.mount_count})
+
+    clock_feat = CountingClockFeature()
+    broker_feat = CountingBrokerFeature()
+    data_feat = CountingDataFeature()
+
+    features = {
+        "FEAT-SYS-PROVIDE_CLOCK": clock_feat,
+        "FEAT-BROKER-FEED_MT5": broker_feat,
+        "FEAT-DATA-RETRIEVE_BARS": data_feat,
+    }
+
+    # Initial Mount
+    await reconciler.reconcile(
+        discovered_features=features,
+        enabled_feature_ids=features.keys(),
+        configs={"FEAT-SYS-PROVIDE_CLOCK": {"mode": "v1"}},
+    )
+
+    assert clock_feat.mount_count == 1
+    assert broker_feat.mount_count == 1
+    assert data_feat.mount_count == 1
+    assert broker_feat.captured_clock == {"mode": "v1", "gen": 1}
+    assert data_feat.captured_broker == {"broker_gen": 1}
+
+    # Reconfigure only clock provider
+    await reconciler.reconcile(
+        discovered_features=features,
+        enabled_feature_ids=features.keys(),
+        configs={"FEAT-SYS-PROVIDE_CLOCK": {"mode": "v2"}},
+    )
+
+    # Provider and all transitive consumers must have been remounted
+    assert clock_feat.mount_count == 2
+    assert broker_feat.mount_count == 2, (
+        "Broker consumer was not remounted on clock change!"
+    )
+    assert data_feat.mount_count == 2, (
+        "Data downstream consumer was not remounted on clock change!"
+    )
+    assert broker_feat.captured_clock == {"mode": "v2", "gen": 2}
+    assert data_feat.captured_broker == {"broker_gen": 2}

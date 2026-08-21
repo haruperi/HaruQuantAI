@@ -1,5 +1,7 @@
 """Tests for DependencyGraph topological sorting, cycle detection, and eligibility."""
 
+import pytest
+
 from app.contracts.broker.market_data import BROKER_MARKET_DATA
 from app.contracts.data.bar_cache import BAR_CACHE
 from app.contracts.data.historical_bars import HISTORICAL_BARS
@@ -154,3 +156,51 @@ def test_graph_conflict_detection() -> None:
     assert "FEAT-BROKER-FEED_MT5" in resolution.blocked_features
     assert "FEAT-BROKER-FEED_BINANCE" in resolution.blocked_features
     assert "Conflicts" in resolution.blocked_features["FEAT-BROKER-FEED_MT5"]
+
+
+def test_ambiguous_providers_rejected_without_selection() -> None:
+    """Characterization test: two enabled providers for one capability without explicit selection must fail or raise ambiguity."""
+    spec_prov_a = FeatureSpec(
+        "FEAT-BROKER-FEED_MT5",
+        "broker",
+        provides=frozenset({BROKER_MARKET_DATA}),
+    )
+    spec_prov_b = FeatureSpec(
+        "FEAT-BROKER-FEED_CTRADER",
+        "broker",
+        provides=frozenset({BROKER_MARKET_DATA}),
+    )
+
+    specs = {
+        spec_prov_a.feature_id: spec_prov_a,
+        spec_prov_b.feature_id: spec_prov_b,
+    }
+    graph = DependencyGraph(specs)
+
+    # Without explicit provider selection, graph resolution must fail or reject ambiguity
+    with pytest.raises(
+        (ValueError, RuntimeError), match=r"(?i)ambiguous|multiple providers|selection"
+    ):
+        graph.resolve(specs.keys())
+
+
+def test_required_dependency_cycle_raises_explicit_error() -> None:
+    """Characterization test: circular required dependencies must explicitly raise an error rather than silently blocking."""
+    spec_a = FeatureSpec(
+        "FEAT-TEST-CONSUME_ALPHA",
+        "test",
+        provides=frozenset({CAP_RESEARCH}),
+        requires=frozenset({CAP_ALPHA}),
+    )
+    spec_b = FeatureSpec(
+        "FEAT-TEST-PRODUCE_ALPHA",
+        "test",
+        provides=frozenset({CAP_ALPHA}),
+        requires=frozenset({CAP_RESEARCH}),
+    )
+
+    specs = {spec_a.feature_id: spec_a, spec_b.feature_id: spec_b}
+    graph = DependencyGraph(specs)
+
+    with pytest.raises((ValueError, RuntimeError), match=r"(?i)cycle|circular"):
+        graph.resolve(specs.keys())

@@ -178,3 +178,20 @@ async def test_scope_async_callback_error_recording() -> None:
 
     assert scope.effects[0].cleaned_up
     assert scope.effects[0].last_error == "Async cleanup failed"
+
+
+@pytest.mark.asyncio
+async def test_scope_registration_on_closed_scope_raises_error() -> None:
+    """Characterization test: registering effects on a closed scope must raise an explicit error."""
+    scope = FeatureScope(owner_id="FEAT-TEST-CLOSED_SCOPE")
+    await scope.close()
+    assert scope.is_closed
+
+    with pytest.raises((RuntimeError, ValueError), match=r"(?i)closed|scope"):
+        scope.callback(lambda: None, name="late_callback")
+
+    async def dummy() -> None:
+        pass
+
+    with pytest.raises((RuntimeError, ValueError), match=r"(?i)closed|scope"):
+        scope.spawn(dummy(), name="late_task")

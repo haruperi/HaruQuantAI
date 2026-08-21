@@ -182,3 +182,62 @@ async def test_background_task_and_listener_cleanup_on_unmount() -> None:
     assert task_cancelled is True
     assert task.done()
     assert event_bus.listener_count(FeatureMountedEvent) == 0
+
+
+@pytest.mark.asyncio
+async def test_unexpected_task_failure_transitions_to_failed_runtime() -> None:
+    """Characterization test: background task crash must transition owner to FAILED_RUNTIME and revoke capability."""
+    cap_worker = CapabilityKey[object](name="test.worker_service", major=1)
+
+    class CrashingWorkerFeature(Feature):
+        @property
+        def spec(self) -> FeatureSpec:
+            return FeatureSpec(
+                feature_id="FEAT-TEST-CRASHING_WORKER",
+                domain="test",
+                provides=frozenset({cap_worker}),
+            )
+
+        @override
+        async def mount(self, context: FeatureContext, _config: object) -> None:
+            context.provide(cap_worker, "active_worker_instance")
+
+            async def crashing_loop() -> None:
+                await asyncio.sleep(0.01)
+                msg = "Simulated unexpected worker failure in runtime task"
+                raise RuntimeError(msg)
+
+            context.spawn(crashing_loop(), name="failing_task")
+
+    feat = CrashingWorkerFeature()
+    discoverer = FeatureDiscoverer()
+    discoverer.register_feature(feat)
+    engine = CompositionEngine(discoverer=discoverer)
+
+    config_toml = """
+    [profile]
+    name = "research"
+    [features.FEAT-TEST-CRASHING_WORKER]
+    enabled = true
+    """
+    await engine.load_and_reconcile_toml(config_toml)
+    assert engine.registry.is_available(cap_worker)
+    assert (
+        engine.reconciler.feature_states["FEAT-TEST-CRASHING_WORKER"].name == "ACTIVE"
+    )
+
+    # Wait for the task to crash
+    await asyncio.sleep(0.05)
+
+    # After unexpected task failure:
+    # 1. Feature state must NOT remain ACTIVE
+    state = engine.reconciler.feature_states.get("FEAT-TEST-CRASHING_WORKER")
+    assert state is not None
+    assert state.name == "FAILED_RUNTIME"
+
+    # 2. Capability must be revoked
+    assert not engine.registry.is_available(cap_worker), (
+        "Capability was not revoked after runtime task crash"
+    )
+
+    await engine.shutdown()
