@@ -28,6 +28,9 @@ cache_enabled = true
 
 [features."FEAT-TEST-DISABLE_ME"]
 enabled = false
+
+[providers]
+"broker.market-data@1" = "FEAT-BROKER-FEED_MOCK"
 """
 
 
@@ -47,6 +50,9 @@ def test_load_config_from_toml_string() -> None:
 
     assert cfg.get_feature_config("FEAT-SYS-PROVIDE_CLOCK") == {}
     assert cfg.get_feature_config("FEAT-TEST-NONEXISTENT") == {}
+
+    assert cfg.get_selected_provider("broker.market-data@1") == "FEAT-BROKER-FEED_MOCK"
+    assert cfg.get_selected_provider("system.clock@1") is None
 
 
 def test_load_config_from_file(tmp_path: Path) -> None:
@@ -71,6 +77,7 @@ def test_default_app_config() -> None:
     cfg = AppConfig()
     assert cfg.profile == "research"
     assert len(cfg.features) == 0
+    assert len(cfg.provider_selections) == 0
 
 
 def test_legacy_profile_section_rejected() -> None:
@@ -123,3 +130,26 @@ def test_malformed_toml_raises_configuration_error() -> None:
     malformed = "invalid = [ unclosed array"
     with pytest.raises(ConfigurationError, match=r"(?i)failed to parse toml"):
         load_config_from_toml_string(malformed)
+
+
+def test_invalid_providers_table_raises_configuration_error() -> None:
+    """Test that invalid [providers] table structure raises ConfigurationError."""
+    bad_cap_toml = """
+    [application]
+    profile = "research"
+
+    [providers]
+    "invalid_cap_no_version" = "FEAT-TEST"
+    """
+    with pytest.raises(ConfigurationError, match=r"(?i)invalid capability identifier"):
+        load_config_from_toml_string(bad_cap_toml)
+
+    bad_val_toml = """
+    [application]
+    profile = "research"
+
+    [providers]
+    "data.historical-bars@1" = ""
+    """
+    with pytest.raises(ConfigurationError, match=r"(?i)invalid provider feature ID"):
+        load_config_from_toml_string(bad_val_toml)

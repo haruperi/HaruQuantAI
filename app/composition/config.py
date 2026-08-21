@@ -36,10 +36,12 @@ class AppConfig:
     Attributes:
         profile: Active deployment profile ('research', 'backtest', 'live', 'offline').
         features: Mapping of feature_id to FeatureConfig.
+        provider_selections: Mapping of capability identifiers to selected provider IDs.
     """
 
     profile: str = "research"
     features: dict[str, FeatureConfig] = field(default_factory=dict)
+    provider_selections: dict[str, str] = field(default_factory=dict)
 
     def is_feature_enabled(self, feature_id: str) -> bool:
         """Check if a given feature is declared and enabled.
@@ -69,27 +71,30 @@ class AppConfig:
             return feat_cfg.config
         return {}
 
+    def get_selected_provider(self, capability_identifier: str) -> str | None:
+        """Retrieve the explicitly selected provider feature ID for a capability.
 
-def load_config_from_toml_string(content: str) -> AppConfig:
-    """Parse application configuration from a TOML string.
+        Args:
+            capability_identifier: Target capability identifier.
+
+        Returns:
+            Selected feature ID if configured, None otherwise.
+        """
+        return self.provider_selections.get(capability_identifier)
+
+
+def _parse_profile(raw: dict[str, Any]) -> str:
+    """Validate and extract profile name from raw TOML dictionary.
 
     Args:
-        content: Raw TOML text content.
+        raw: Parsed TOML content dictionary.
 
     Returns:
-        Parsed AppConfig instance.
+        Normalized lowercase profile string.
 
     Raises:
-        InvalidProfileError: If profile grammar is legacy, missing, invalid, or unknown.
-        ConfigurationError: If configuration structure is malformed.
+        InvalidProfileError: If profile table is legacy, missing, blank, or unknown.
     """
-    try:
-        raw = tomllib.loads(content)
-    except Exception as err:
-        msg = f"Failed to parse TOML configuration: {err}"
-        raise ConfigurationError(msg) from err
-
-    # Reject legacy [profile] section
     if "profile" in raw:
         msg = (
             "Legacy '[profile]' table is not supported. "
@@ -97,7 +102,6 @@ def load_config_from_toml_string(content: str) -> AppConfig:
         )
         raise InvalidProfileError(msg)
 
-    # Require canonical [application] section
     app_section = raw.get("application")
     if app_section is None or not isinstance(app_section, dict):
         msg = "Missing required '[application]' table in configuration"
@@ -121,6 +125,21 @@ def load_config_from_toml_string(content: str) -> AppConfig:
         )
         raise InvalidProfileError(msg)
 
+    return profile
+
+
+def _parse_features(raw: dict[str, Any]) -> dict[str, FeatureConfig]:
+    """Validate and extract feature configurations from raw TOML dictionary.
+
+    Args:
+        raw: Parsed TOML content dictionary.
+
+    Returns:
+        Dictionary mapping feature ID to parsed FeatureConfig.
+
+    Raises:
+        ConfigurationError: If features table structure is invalid.
+    """
     features_raw = raw.get("features", {})
     if not isinstance(features_raw, dict):
         msg = "'features' section must be a table if present"
@@ -135,8 +154,69 @@ def load_config_from_toml_string(content: str) -> AppConfig:
             else:
                 cfg = {k: v for k, v in f_data.items() if k != "enabled"}
             features[f_id] = FeatureConfig(enabled=enabled, config=cfg)
+    return features
 
-    return AppConfig(profile=profile, features=features)
+
+def _parse_providers(raw: dict[str, Any]) -> dict[str, str]:
+    """Validate and extract provider selections from raw TOML dictionary.
+
+    Args:
+        raw: Parsed TOML content dictionary.
+
+    Returns:
+        Dictionary mapping capability identifiers to selected provider IDs.
+
+    Raises:
+        ConfigurationError: If providers table structure or identifiers are invalid.
+    """
+    providers_raw = raw.get("providers", {})
+    if not isinstance(providers_raw, dict):
+        msg = "'providers' section must be a table if present"
+        raise ConfigurationError(msg)
+
+    provider_selections: dict[str, str] = {}
+    for cap_id, feat_id in providers_raw.items():
+        if not isinstance(cap_id, str) or "@" not in cap_id or not cap_id.strip():
+            msg = f"Invalid capability identifier in '[providers]': '{cap_id}'"
+            raise ConfigurationError(msg)
+        if not isinstance(feat_id, str) or not feat_id.strip():
+            msg = (
+                f"Invalid provider feature ID in '[providers]' for "
+                f"'{cap_id}': '{feat_id}'"
+            )
+            raise ConfigurationError(msg)
+        provider_selections[cap_id.strip()] = feat_id.strip()
+    return provider_selections
+
+
+def load_config_from_toml_string(content: str) -> AppConfig:
+    """Parse application configuration from a TOML string.
+
+    Args:
+        content: Raw TOML text content.
+
+    Returns:
+        Parsed AppConfig instance.
+
+    Raises:
+        InvalidProfileError: If profile grammar is legacy, missing, invalid, or unknown.
+        ConfigurationError: If configuration structure is malformed.
+    """
+    try:
+        raw = tomllib.loads(content)
+    except Exception as err:
+        msg = f"Failed to parse TOML configuration: {err}"
+        raise ConfigurationError(msg) from err
+
+    profile = _parse_profile(raw)
+    features = _parse_features(raw)
+    provider_selections = _parse_providers(raw)
+
+    return AppConfig(
+        profile=profile,
+        features=features,
+        provider_selections=provider_selections,
+    )
 
 
 def load_config_from_file(path: str | Path) -> AppConfig:

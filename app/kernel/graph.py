@@ -13,6 +13,14 @@ class DependencyError(RuntimeError):
     """Base exception for dependency graph errors."""
 
 
+class ProviderSelectionError(DependencyError, ValueError):
+    """Raised when capability provider selection is invalid or fails validation."""
+
+
+class AmbiguousProviderError(ProviderSelectionError):
+    """Raised when multiple candidate providers exist without explicit selection."""
+
+
 class DependencyCycleError(DependencyError):
     """Raised when a circular dependency is detected among required capabilities.
 
@@ -53,30 +61,44 @@ class GraphResolution:
 class DependencyGraph:
     """Analyzes and resolves feature capability dependencies."""
 
-    def __init__(self, specs: Mapping[str, FeatureSpec]) -> None:
-        """Initialize graph with feature specifications.
+    def __init__(
+        self,
+        specs: Mapping[str, FeatureSpec],
+        provider_selections: Mapping[str, str] | None = None,
+    ) -> None:
+        """Initialize graph with feature specifications and provider selections.
 
         Args:
             specs: Mapping of feature_id to FeatureSpec.
+            provider_selections: Optional capability-to-provider mappings.
         """
         self._specs = dict(specs)
+        self._provider_selections = dict(provider_selections or {})
 
     def resolve(
         self,
         enabled_feature_ids: Iterable[str],
+        provider_selections: Mapping[str, str] | None = None,
     ) -> GraphResolution:
         """Calculate eligible features and topological execution order.
 
         Args:
             enabled_feature_ids: Collection of feature IDs requested to run.
+            provider_selections: Optional override provider selections.
 
         Returns:
             GraphResolution with topological start/stop order and blocked reasons.
 
         Raises:
+            AmbiguousProviderError: If multiple enabled features provide a capability.
+            ProviderSelectionError: If an explicit selection is invalid or incompatible.
             DependencyCycleError: If an enabled required dependency cycle is found.
         """
         enabled_set = set(enabled_feature_ids)
+        effective_selections = dict(self._provider_selections)
+        if provider_selections is not None:
+            effective_selections.update(provider_selections)
+
         available_specs = {
             f_id: self._specs[f_id] for f_id in enabled_set if f_id in self._specs
         }
@@ -89,7 +111,7 @@ class DependencyGraph:
         candidates, conflict_blocks = self._filter_conflicts(available_specs)
         blocked_features.update(conflict_blocks)
 
-        cap_to_provider = self._build_provider_map(candidates)
+        cap_to_provider = self._build_provider_map(candidates, effective_selections)
         eligible_set, eligibility_blocks = self._resolve_eligibility(candidates)
         blocked_features.update(eligibility_blocks)
 
@@ -138,23 +160,90 @@ class DependencyGraph:
         }
         return candidates, conflict_blocks
 
+    def _resolve_single_capability_provider(
+        self,
+        cap_id: str,
+        provider_list: list[str],
+        provider_selections: Mapping[str, str],
+    ) -> str:
+        """Resolve a single capability's provider, checking for ambiguity.
+
+        Args:
+            cap_id: Formatted capability identifier.
+            provider_list: List of candidate feature IDs providing this capability.
+            provider_selections: Explicit provider selections from configuration.
+
+        Returns:
+            Chosen feature ID providing the capability.
+
+        Raises:
+            AmbiguousProviderError: If multiple providers exist without selection.
+            ProviderSelectionError: If the configured selection is not a candidate.
+        """
+        if len(provider_list) == 1:
+            return provider_list[0]
+
+        selected = provider_selections.get(cap_id)
+        if selected is None:
+            candidates_str = ", ".join(sorted(provider_list))
+            msg = (
+                f"Ambiguous capability providers for '{cap_id}': "
+                f"multiple enabled candidates found [{candidates_str}]. "
+                f"Explicit selection required in [providers]."
+            )
+            raise AmbiguousProviderError(msg)
+
+        if selected not in provider_list:
+            candidates_str = ", ".join(sorted(provider_list))
+            msg = (
+                f"Selected provider '{selected}' for capability '{cap_id}' "
+                f"is not among enabled candidate providers [{candidates_str}]."
+            )
+            raise ProviderSelectionError(msg)
+
+        return selected
+
     def _build_provider_map(
         self,
         candidates: Mapping[str, FeatureSpec],
+        provider_selections: Mapping[str, str],
     ) -> dict[str, str]:
         """Build mapping of capability identifier to primary provider.
 
         Args:
             candidates: Eligible candidate feature specs.
+            provider_selections: Mapping of capability to selected provider feature ID.
 
         Returns:
             Dictionary mapping capability identifier string to provider feature ID.
+
+        Raises:
+            AmbiguousProviderError: If multiple features provide a capability.
+            ProviderSelectionError: If selected provider is invalid.
         """
-        cap_to_provider: dict[str, str] = {}
+        providers_by_cap: dict[str, list[str]] = {}
         for f_id, spec in candidates.items():
             for cap in spec.provides:
-                if cap.identifier not in cap_to_provider:
-                    cap_to_provider[cap.identifier] = f_id
+                providers_by_cap.setdefault(cap.identifier, []).append(f_id)
+
+        cap_to_provider: dict[str, str] = {}
+        for cap_id, provider_list in providers_by_cap.items():
+            chosen = self._resolve_single_capability_provider(
+                cap_id, provider_list, provider_selections
+            )
+            cap_to_provider[cap_id] = chosen
+
+        # Validate explicit selections for candidate features
+        for cap_id, selected_id in provider_selections.items():
+            if selected_id in candidates:
+                spec = candidates[selected_id]
+                if not any(c.identifier == cap_id for c in spec.provides):
+                    msg = (
+                        f"Selected provider '{selected_id}' does not provide "
+                        f"capability '{cap_id}'"
+                    )
+                    raise ProviderSelectionError(msg)
+
         return cap_to_provider
 
     def _resolve_eligibility(

@@ -4,8 +4,13 @@ import pytest
 
 from app.contracts.broker.market_data import BROKER_MARKET_DATA
 from app.contracts.data.historical_bars import HISTORICAL_BARS
+from app.contracts.system.clock import SYSTEM_CLOCK
 from app.kernel.capability import CapabilityUnavailableError
-from app.kernel.registry import BindingToken, ServiceRegistry
+from app.kernel.registry import (
+    BindingToken,
+    CapabilityAlreadyBoundError,
+    ServiceRegistry,
+)
 from app.kernel.scope import FeatureScope
 
 
@@ -37,6 +42,26 @@ def test_registry_register_and_resolve() -> None:
     assert binding is not None
     assert binding.token == token
     assert binding.provider is dummy_service
+
+
+def test_registry_register_duplicate_raises_error() -> None:
+    """Test that ordinary register() raises CapabilityAlreadyBoundError if already bound."""
+    registry = ServiceRegistry()
+    registry.register(
+        capability=HISTORICAL_BARS,
+        provider=object(),
+        owner_id="FEAT-DATA-RETRIEVE_BARS",
+    )
+
+    with pytest.raises(
+        CapabilityAlreadyBoundError,
+        match=r"(?i)already registered to 'FEAT-DATA-RETRIEVE_BARS'",
+    ):
+        registry.register(
+            capability=HISTORICAL_BARS,
+            provider=object(),
+            owner_id="FEAT-DATA-MOCK_BARS",
+        )
 
 
 def test_registry_require_missing_raises() -> None:
@@ -80,7 +105,8 @@ def test_registry_generation_stale_token_protection() -> None:
     )
     assert token_v1.generation == 1
 
-    token_v2 = registry.register(
+    # Replace via explicit replace_binding
+    token_v2 = registry.replace_binding(
         capability=HISTORICAL_BARS,
         provider=service_v2,
         owner_id="FEAT-DATA-MOCK_BARS",
@@ -118,6 +144,35 @@ async def test_registry_scope_automatic_revocation() -> None:
     await scope.close()
     assert not registry.is_available(HISTORICAL_BARS)
     assert registry.resolve(HISTORICAL_BARS) is None
+
+
+def test_registry_register_many_atomic() -> None:
+    """Test register_many atomically binds multiple capabilities or raises on conflict."""
+    registry = ServiceRegistry()
+    clock_service = object()
+    market_service = object()
+
+    tokens = registry.register_many(
+        [
+            (SYSTEM_CLOCK, clock_service, "FEAT-SYS-PROVIDE_CLOCK"),
+            (BROKER_MARKET_DATA, market_service, "FEAT-BROKER-FEED_MT5"),
+        ]
+    )
+    assert len(tokens) == 2
+    assert registry.resolve(SYSTEM_CLOCK) is clock_service
+    assert registry.resolve(BROKER_MARKET_DATA) is market_service
+
+    # Attempt register_many with one conflicting capability
+    with pytest.raises(CapabilityAlreadyBoundError):
+        registry.register_many(
+            [
+                (HISTORICAL_BARS, object(), "FEAT-DATA-RETRIEVE_BARS"),
+                (SYSTEM_CLOCK, object(), "FEAT-ANOTHER-CLOCK"),
+            ]
+        )
+
+    # Historical bars should NOT have been registered due to all-or-nothing validation
+    assert not registry.is_available(HISTORICAL_BARS)
 
 
 def test_registry_active_capabilities_and_clear() -> None:

@@ -1,5 +1,6 @@
 """Service registry mapping versioned capabilities to active providers."""
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, cast
@@ -10,14 +11,18 @@ if TYPE_CHECKING:
     from app.kernel.scope import FeatureScope
 
 
+class CapabilityAlreadyBoundError(RuntimeError, ValueError):
+    """Raised when attempting to register an already bound capability."""
+
+
 @dataclass(frozen=True, slots=True)
 class BindingToken:
-    """Ownership token representing one generation of a registered capability provider.
+    """Ownership token representing one generation of a registered provider.
 
     Attributes:
         capability: Formatted capability identifier string.
         owner_id: Feature identifier of the owning provider.
-        generation: Monotonically increasing generation number for this capability.
+        generation: Monotonically increasing generation number.
     """
 
     capability: str
@@ -61,10 +66,66 @@ class ServiceRegistry:
             capability: Target capability key.
             provider: Implementation conforming to capability protocol.
             owner_id: Feature ID registering the provider.
-            scope: Optional feature scope to automatically attach unmount disposer.
+            scope: Optional feature scope for unmount disposal.
 
         Returns:
             Ownership token representing this exact provider binding.
+
+        Raises:
+            CapabilityAlreadyBoundError: If capability is already bound.
+        """
+        cap_id = capability.identifier
+        existing = self._bindings.get(cap_id)
+        if existing is not None:
+            msg = (
+                f"Capability '{cap_id}' is already registered to "
+                f"'{existing.token.owner_id}' "
+                f"(generation {existing.token.generation}). "
+                f"Overwriting an active binding requires explicit replacement."
+            )
+            raise CapabilityAlreadyBoundError(msg)
+
+        current_gen = self._generations.get(cap_id, 0) + 1
+        self._generations[cap_id] = current_gen
+
+        token = BindingToken(
+            capability=cap_id,
+            owner_id=owner_id,
+            generation=current_gen,
+        )
+        binding = ProviderBinding(
+            token=token,
+            provider=provider,
+            registered_at=datetime.now(UTC),
+        )
+        self._bindings[cap_id] = binding
+
+        if scope is not None:
+            scope.callback(
+                self.revoke,
+                token,
+                name=f"revoke_provider:{cap_id}",
+            )
+
+        return token
+
+    def replace_binding[CapT](
+        self,
+        capability: CapabilityKey[CapT],
+        provider: CapT,
+        owner_id: str,
+        scope: FeatureScope | None = None,
+    ) -> BindingToken:
+        """Explicitly replace an existing capability binding with a new generation.
+
+        Args:
+            capability: Target capability key.
+            provider: Implementation conforming to capability protocol.
+            owner_id: Feature ID registering the replacement provider.
+            scope: Optional feature scope for unmount disposal.
+
+        Returns:
+            Ownership token representing the replacement binding.
         """
         cap_id = capability.identifier
         current_gen = self._generations.get(cap_id, 0) + 1
@@ -90,6 +151,41 @@ class ServiceRegistry:
             )
 
         return token
+
+    def register_many(
+        self,
+        bindings: Sequence[tuple[CapabilityKey[Any], Any, str]],
+        scope: FeatureScope | None = None,
+    ) -> list[BindingToken]:
+        """Atomically register multiple capability bindings (all-or-nothing).
+
+        Args:
+            bindings: Sequence of (capability_key, provider_impl, owner_id) tuples.
+            scope: Optional feature scope to attach unmount disposers.
+
+        Returns:
+            List of generated BindingTokens in matching order.
+
+        Raises:
+            CapabilityAlreadyBoundError: If any of the capabilities are already active.
+        """
+        # 1. Validation phase (verify no conflicting active bindings)
+        for cap, _provider, _owner in bindings:
+            cap_id = cap.identifier
+            if cap_id in self._bindings:
+                existing = self._bindings[cap_id]
+                msg = (
+                    f"Capability '{cap_id}' is already registered to "
+                    f"'{existing.token.owner_id}'"
+                )
+                raise CapabilityAlreadyBoundError(msg)
+
+        # 2. Registration phase
+        tokens: list[BindingToken] = []
+        for cap, provider, owner in bindings:
+            token = self.register(cap, provider, owner, scope=scope)
+            tokens.append(token)
+        return tokens
 
     def revoke(self, token: BindingToken) -> bool:
         """Revoke a provider binding if the token matches the active generation.

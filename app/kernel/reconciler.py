@@ -86,6 +86,7 @@ class Reconciler:
         discovered_features: Mapping[str, Feature],
         enabled_feature_ids: Iterable[str],
         configs: Mapping[str, object] | None = None,
+        provider_selections: Mapping[str, str] | None = None,
     ) -> ReconciliationReport:
         """Reconcile active features with desired configuration.
 
@@ -93,6 +94,7 @@ class Reconciler:
             discovered_features: Mapping of feature_id to Feature instances.
             enabled_feature_ids: Collection of feature IDs requested to run.
             configs: Optional mapping of feature_id to feature config objects.
+            provider_selections: Optional capability-to-provider mappings.
 
         Returns:
             ReconciliationReport detailing started, stopped, and active features.
@@ -103,8 +105,8 @@ class Reconciler:
             f_id: feat.spec for f_id, feat in discovered_features.items()
         }
 
-        graph = DependencyGraph(specs)
-        resolution = graph.resolve(enabled_set)
+        graph = DependencyGraph(specs, provider_selections=provider_selections)
+        resolution = graph.resolve(enabled_set, provider_selections=provider_selections)
 
         to_stop, to_start = self._plan_transitions(resolution, config_map)
         stopped_list = await self._execute_stops(to_stop)
@@ -333,7 +335,9 @@ class Reconciler:
             # 3. Commit: Transfer shadow providers into global registry with real scope
             real_scope = FeatureScope(owner_id=f_id)
             for cap, impl in shadow_providers:
-                self._registry.register(cap, impl, owner_id=f_id, scope=real_scope)
+                self._registry.replace_binding(
+                    cap, impl, owner_id=f_id, scope=real_scope
+                )
 
             # 4. Dispose old scope and record new active feature
             old_scope = self._active_scopes.get(f_id)

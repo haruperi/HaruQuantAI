@@ -311,38 +311,38 @@ Canonical syntax:
 
 Implementation steps:
 
-- [ ] Add `provider_selections: dict[str, str]` to `AppConfig`.
-- [ ] Validate capability identifier format.
-- [ ] Validate selected feature ID format.
-- [ ] Reject a selection that names a disabled or undiscovered feature.
-- [ ] Reject a selection where the chosen feature does not provide the capability.
+- [x] Add `provider_selections: dict[str, str]` to `AppConfig`.
+- [x] Validate capability identifier format.
+- [x] Validate selected feature ID format.
+- [x] Reject a selection that names a disabled or undiscovered feature.
+- [x] Reject a selection where the chosen feature does not provide the capability.
 
 ## Task 2.2 — Define provider-selection rules
 
-- [ ] Zero providers: capability is unavailable; consumers are blocked.
-- [ ] Exactly one enabled provider: select it automatically.
-- [ ] More than one enabled provider: require explicit configuration.
-- [ ] A selected provider must be enabled and compatible with the requested major capability version.
-- [ ] Preserve the selected provider in `GraphResolution.provider_map`.
-- [ ] Include ambiguity and invalid-selection reasons in diagnostics.
+- [x] Zero providers: capability is unavailable; consumers are blocked.
+- [x] Exactly one enabled provider: select it automatically.
+- [x] More than one enabled provider: require explicit configuration.
+- [x] A selected provider must be enabled and compatible with the requested major capability version.
+- [x] Preserve the selected provider in `GraphResolution.provider_map`.
+- [x] Include ambiguity and invalid-selection reasons in diagnostics.
 
 ## Task 2.3 — Harden the registry
 
-- [ ] Change normal registration so it rejects overwriting an active capability binding.
-- [ ] Permit replacement only through an explicit replacement/transaction API.
-- [ ] Preserve generation counters across replacement.
-- [ ] Add a lock around short multi-binding registry mutations.
-- [ ] Add `register_many` or equivalent all-or-nothing validation for features providing multiple capabilities.
+- [x] Change normal registration so it rejects overwriting an active capability binding.
+- [x] Permit replacement only through an explicit replacement/transaction API.
+- [x] Preserve generation counters across replacement.
+- [x] Add a lock around short multi-binding registry mutations.
+- [x] Add `register_many` or equivalent all-or-nothing validation for features providing multiple capabilities.
 
 ## Task 2.4 — Tests and examples
 
-- [ ] Test automatic selection with one provider.
-- [ ] Test ambiguity with two providers.
-- [ ] Test explicit selection with two providers.
-- [ ] Test invalid feature selection.
-- [ ] Test selection of a feature that does not provide the capability.
-- [ ] Test that ordinary `register()` cannot silently replace an active binding.
-- [ ] Add a configuration example selecting Mock Broker over a second test provider.
+- [x] Test automatic selection with one provider.
+- [x] Test ambiguity with two providers.
+- [x] Test explicit selection with two providers.
+- [x] Test invalid feature selection.
+- [x] Test selection of a feature that does not provide the capability.
+- [x] Test that ordinary `register()` cannot silently replace an active binding.
+- [x] Add a configuration example selecting Mock Broker over a second test provider.
 
 ## Proposed commit
 
@@ -352,9 +352,10 @@ feat(kernel): add deterministic capability provider selection
 
 ## Exit criteria
 
-- [ ] Graph edges and runtime bindings always refer to the same selected provider.
-- [ ] Ambiguous providers cannot start accidentally.
-- [ ] Provider replacement is possible only through the transactional path.
+- [x] Graph edges and runtime bindings always refer to the same selected provider.
+- [x] Ambiguous providers cannot start accidentally.
+- [x] Provider replacement is possible only through the transactional path.
+
 
 ---
 

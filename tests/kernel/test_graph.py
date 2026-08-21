@@ -8,7 +8,11 @@ from app.contracts.data.historical_bars import HISTORICAL_BARS
 from app.contracts.system.clock import SYSTEM_CLOCK
 from app.kernel.capability import CapabilityKey
 from app.kernel.feature import FeatureSpec
-from app.kernel.graph import DependencyGraph
+from app.kernel.graph import (
+    AmbiguousProviderError,
+    DependencyGraph,
+    ProviderSelectionError,
+)
 
 CAP_RESEARCH = CapabilityKey[object](name="research.dataset", major=1)
 CAP_ALPHA = CapabilityKey[object](name="research.alpha", major=1)
@@ -159,7 +163,7 @@ def test_graph_conflict_detection() -> None:
 
 
 def test_ambiguous_providers_rejected_without_selection() -> None:
-    """Characterization test: two enabled providers for one capability without explicit selection must fail or raise ambiguity."""
+    """Test two enabled providers for one capability without explicit selection raises AmbiguousProviderError."""
     spec_prov_a = FeatureSpec(
         "FEAT-BROKER-FEED_MT5",
         "broker",
@@ -177,11 +181,90 @@ def test_ambiguous_providers_rejected_without_selection() -> None:
     }
     graph = DependencyGraph(specs)
 
-    # Without explicit provider selection, graph resolution must fail or reject ambiguity
     with pytest.raises(
-        (ValueError, RuntimeError), match=r"(?i)ambiguous|multiple providers|selection"
+        AmbiguousProviderError, match=r"(?i)ambiguous.*broker\.market-data@1"
     ):
         graph.resolve(specs.keys())
+
+
+def test_explicit_selection_resolves_ambiguous_providers() -> None:
+    """Test providing explicit selection in provider_selections resolves ambiguity."""
+    spec_prov_a = FeatureSpec(
+        "FEAT-BROKER-FEED_MT5",
+        "broker",
+        provides=frozenset({BROKER_MARKET_DATA}),
+    )
+    spec_prov_b = FeatureSpec(
+        "FEAT-BROKER-FEED_CTRADER",
+        "broker",
+        provides=frozenset({BROKER_MARKET_DATA}),
+    )
+
+    specs = {
+        spec_prov_a.feature_id: spec_prov_a,
+        spec_prov_b.feature_id: spec_prov_b,
+    }
+    graph = DependencyGraph(specs)
+    resolution = graph.resolve(
+        specs.keys(),
+        provider_selections={"broker.market-data@1": "FEAT-BROKER-FEED_CTRADER"},
+    )
+
+    assert resolution.provider_map["broker.market-data@1"] == "FEAT-BROKER-FEED_CTRADER"
+    assert "FEAT-BROKER-FEED_CTRADER" in resolution.eligible_features
+
+
+def test_invalid_provider_selection_raises_error() -> None:
+    """Test selecting a non-existent or disabled feature raises ProviderSelectionError."""
+    spec_prov_a = FeatureSpec(
+        "FEAT-BROKER-FEED_MT5",
+        "broker",
+        provides=frozenset({BROKER_MARKET_DATA}),
+    )
+    spec_prov_b = FeatureSpec(
+        "FEAT-BROKER-FEED_CTRADER",
+        "broker",
+        provides=frozenset({BROKER_MARKET_DATA}),
+    )
+
+    specs = {
+        spec_prov_a.feature_id: spec_prov_a,
+        spec_prov_b.feature_id: spec_prov_b,
+    }
+    graph = DependencyGraph(specs)
+
+    with pytest.raises(
+        ProviderSelectionError, match=r"(?i)not among enabled candidate"
+    ):
+        graph.resolve(
+            specs.keys(),
+            provider_selections={"broker.market-data@1": "FEAT-NONEXISTENT"},
+        )
+
+
+def test_selection_of_feature_not_providing_capability_raises_error() -> None:
+    """Test selecting a feature that does not provide the capability raises ProviderSelectionError."""
+    clock_spec = FeatureSpec(
+        "FEAT-SYS-PROVIDE_CLOCK",
+        "system",
+        provides=frozenset({SYSTEM_CLOCK}),
+    )
+    broker_spec = FeatureSpec(
+        "FEAT-BROKER-FEED_MT5",
+        "broker",
+        provides=frozenset({BROKER_MARKET_DATA}),
+    )
+
+    specs = {clock_spec.feature_id: clock_spec, broker_spec.feature_id: broker_spec}
+    graph = DependencyGraph(specs)
+
+    with pytest.raises(
+        ProviderSelectionError, match=r"(?i)does not provide capability"
+    ):
+        graph.resolve(
+            specs.keys(),
+            provider_selections={"broker.market-data@1": "FEAT-SYS-PROVIDE_CLOCK"},
+        )
 
 
 def test_required_dependency_cycle_raises_explicit_error() -> None:

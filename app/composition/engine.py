@@ -179,6 +179,7 @@ class CompositionEngine:
             discovered_features=discovery.discovered,
             enabled_feature_ids=enabled_ids,
             configs=feature_configs,
+            provider_selections=config.provider_selections,
         )
         self._last_report = report
         return report
