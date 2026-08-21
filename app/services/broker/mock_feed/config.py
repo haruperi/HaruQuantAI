@@ -26,5 +26,6 @@ class MockFeedConfig:
             )
         base_price = float(data.get("base_price", 1.1000))
         if base_price <= 0:
-            raise ValueError(f"base_price must be positive, got {base_price}")
+            msg = f"base_price must be positive, got {base_price}"
+            raise ValueError(msg)
         return cls(base_price=base_price)

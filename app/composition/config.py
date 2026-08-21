@@ -42,10 +42,11 @@ class AppConfig:
     def __post_init__(self) -> None:
         normalized = self.profile.strip().lower()
         if normalized not in KNOWN_PROFILES:
-            raise InvalidProfileError(
+            msg = (
                 f"Unknown deployment profile '{self.profile}'. "
                 f"Supported profiles: {sorted(KNOWN_PROFILES)}"
             )
+            raise InvalidProfileError(msg)
         object.__setattr__(self, "profile", normalized)
         for capability, feature_id in self.provider_selections.items():
             _validate_provider_selection(capability, feature_id)
@@ -89,10 +90,11 @@ def _parse_profile(raw: dict[str, Any]) -> str:
         )
     normalized = profile.strip().lower()
     if normalized not in KNOWN_PROFILES:
-        raise InvalidProfileError(
+        msg = (
             f"Unknown deployment profile '{profile}'. "
             f"Supported profiles: {sorted(KNOWN_PROFILES)}"
         )
+        raise InvalidProfileError(msg)
     return normalized
 
 
@@ -106,28 +108,27 @@ def _parse_features(raw: dict[str, Any]) -> dict[str, FeatureConfig]:
         if not isinstance(feature_id, str) or not _FEATURE_ID_PATTERN.fullmatch(
             feature_id
         ):
-            raise ConfigurationError(f"Invalid feature ID '{feature_id}'")
+            msg = f"Invalid feature ID '{feature_id}'"
+            raise ConfigurationError(msg)
         if not isinstance(feature_data, dict):
-            raise ConfigurationError(
-                f"Feature '{feature_id}' configuration must be a TOML table"
-            )
+            msg = f"Feature '{feature_id}' configuration must be a TOML table"
+            raise ConfigurationError(msg)
         enabled = feature_data.get("enabled", True)
         if not isinstance(enabled, bool):
-            raise ConfigurationError(
-                f"Feature '{feature_id}'.enabled must be a boolean"
-            )
+            msg = f"Feature '{feature_id}'.enabled must be a boolean"
+            raise ConfigurationError(msg)
         if "config" in feature_data:
             config = feature_data["config"]
             if not isinstance(config, dict):
-                raise ConfigurationError(
-                    f"Feature '{feature_id}'.config must be a TOML table"
-                )
+                msg = f"Feature '{feature_id}'.config must be a TOML table"
+                raise ConfigurationError(msg)
             unexpected = set(feature_data) - {"enabled", "config"}
             if unexpected:
-                raise ConfigurationError(
+                msg = (
                     f"Feature '{feature_id}' mixes a .config table with inline "
                     f"configuration keys: {sorted(unexpected)}"
                 )
+                raise ConfigurationError(msg)
             parsed_config = dict(config)
         else:
             parsed_config = {
@@ -142,14 +143,14 @@ def _parse_features(raw: dict[str, Any]) -> dict[str, FeatureConfig]:
 
 def _validate_provider_selection(capability: str, feature_id: str) -> None:
     if not _CAPABILITY_ID_PATTERN.fullmatch(capability):
-        raise ConfigurationError(
+        msg = (
             f"Invalid capability identifier '{capability}' in [providers]; "
             "a version suffix such as '@1' is required"
         )
+        raise ConfigurationError(msg)
     if not _FEATURE_ID_PATTERN.fullmatch(feature_id):
-        raise ConfigurationError(
-            f"Invalid provider feature ID '{feature_id}' for '{capability}'"
-        )
+        msg = f"Invalid provider feature ID '{feature_id}' for '{capability}'"
+        raise ConfigurationError(msg)
 
 
 def _parse_providers(raw: dict[str, Any]) -> dict[str, str]:
@@ -174,9 +175,8 @@ def load_config_from_toml_string(content: str) -> AppConfig:
     try:
         raw = tomllib.loads(content)
     except tomllib.TOMLDecodeError as error:
-        raise ConfigurationError(
-            f"Failed to parse TOML configuration: {error}"
-        ) from error
+        msg = f"Failed to parse TOML configuration: {error}"
+        raise ConfigurationError(msg) from error
 
     unknown_top_level = set(raw) - _ALLOWED_TOP_LEVEL
     if unknown_top_level:
@@ -195,5 +195,6 @@ def load_config_from_file(path: str | Path) -> AppConfig:
     """Load and validate application configuration from a TOML file."""
     file_path = Path(path)
     if not file_path.is_file():
-        raise FileNotFoundError(f"Configuration file not found: {file_path}")
+        msg = f"Configuration file not found: {file_path}"
+        raise FileNotFoundError(msg)
     return load_config_from_toml_string(file_path.read_text(encoding="utf-8"))

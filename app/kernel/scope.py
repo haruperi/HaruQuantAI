@@ -97,7 +97,8 @@ class FeatureScope:
     def ensure_open(self) -> None:
         """Raise ScopeClosedError when the scope is already closed."""
         if self._closed:
-            raise ScopeClosedError(f"Feature scope '{self.owner_id}' is already closed")
+            msg = f"Feature scope '{self.owner_id}' is already closed"
+            raise ScopeClosedError(msg)
 
     def callback(
         self,

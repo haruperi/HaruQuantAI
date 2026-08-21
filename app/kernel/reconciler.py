@@ -7,6 +7,7 @@ from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+from app.kernel.capability import CapabilityKey
 from app.kernel.context import DefaultFeatureContext
 from app.kernel.feature import (
     DrainableFeature,
@@ -21,7 +22,6 @@ from app.kernel.replacement import ReplacementReport
 from app.kernel.scope import FeatureScope
 
 if TYPE_CHECKING:
-    from app.kernel.capability import CapabilityKey
     from app.kernel.events import EventBus
     from app.kernel.registry import ServiceRegistry
 
@@ -321,17 +321,17 @@ class Reconciler:
         declared = {capability.identifier for capability in spec.provides}
         actual = [capability.identifier for capability, _implementation in providers]
         if len(actual) != len(set(actual)):
-            raise ValueError(
-                f"Feature '{spec.feature_id}' registered a capability more than once"
-            )
+            msg = f"Feature '{spec.feature_id}' registered a capability more than once"
+            raise ValueError(msg)
         actual_set = set(actual)
         if declared != actual_set:
             missing = sorted(declared - actual_set)
             unexpected = sorted(actual_set - declared)
-            raise ValueError(
+            msg = (
                 f"Feature '{spec.feature_id}' provider bundle mismatch; "
                 f"missing={missing}, unexpected={unexpected}"
             )
+            raise ValueError(msg)
 
     async def _start_feature(
         self,

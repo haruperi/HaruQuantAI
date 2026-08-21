@@ -71,10 +71,11 @@ class FeatureSpec:
             key for key in self.config_keys if not key or key.strip() != key
         )
         if invalid_config_keys:
-            raise ValueError(
+            msg = (
                 f"Feature config keys must be non-empty and trimmed: "
                 f"{invalid_config_keys}"
             )
+            raise ValueError(msg)
 
 
 @runtime_checkable

@@ -30,8 +30,9 @@ class HistoricalBarsConfig:
             )
         timeframe = str(data.get("default_timeframe", "M1")).upper()
         if timeframe not in VALID_TIMEFRAMES:
-            raise ValueError(
+            msg = (
                 f"Unsupported default_timeframe: '{timeframe}'. "
                 f"Allowed: {sorted(VALID_TIMEFRAMES)}"
             )
+            raise ValueError(msg)
         return cls(default_timeframe=timeframe)

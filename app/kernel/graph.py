@@ -239,23 +239,24 @@ class DependencyGraph:
     ) -> None:
         for capability, selected_feature in selections.items():
             if selected_feature not in candidates:
-                raise ProviderSelectionError(
+                msg = (
                     f"Selected provider '{selected_feature}' for capability "
                     f"'{capability}' is not among enabled candidate features "
                     "(it is disabled or was not discovered)"
                 )
+                raise ProviderSelectionError(msg)
             selected_spec = candidates[selected_feature]
             if not any(
                 provided.identifier == capability for provided in selected_spec.provides
             ):
-                raise ProviderSelectionError(
+                msg = (
                     f"Selected provider '{selected_feature}' does not provide "
                     f"capability '{capability}'"
                 )
+                raise ProviderSelectionError(msg)
             if capability not in providers_by_capability:
-                raise ProviderSelectionError(
-                    f"No enabled feature provides selected capability '{capability}'"
-                )
+                msg = f"No enabled feature provides selected capability '{capability}'"
+                raise ProviderSelectionError(msg)
 
     def _select_providers(
         self,
@@ -267,19 +268,21 @@ class DependencyGraph:
             selected = selections.get(capability)
             if selected is not None:
                 if selected not in provider_ids:
-                    raise ProviderSelectionError(
+                    msg = (
                         f"Selected provider '{selected}' for capability '{capability}' "
                         f"is not among enabled candidates {list(provider_ids)}"
                     )
+                    raise ProviderSelectionError(msg)
                 provider_map[capability] = selected
             elif len(provider_ids) == 1:
                 provider_map[capability] = provider_ids[0]
             else:
-                raise AmbiguousProviderError(
+                msg = (
                     f"Ambiguous capability providers for '{capability}': "
                     f"{list(provider_ids)}. Configure an explicit selection in "
                     "[providers]."
                 )
+                raise AmbiguousProviderError(msg)
         return provider_map
 
     def _suppress_unselected_providers(
@@ -304,12 +307,13 @@ class DependencyGraph:
             if not unselected:
                 continue
             if selected:
-                raise ProviderSelectionError(
+                msg = (
                     f"Feature '{feature_id}' is selected for {sorted(selected)} but "
                     f"unselected for {sorted(unselected)}. Capability bundles are "
                     "atomic; select one feature consistently for every overlapping "
                     "capability."
                 )
+                raise ProviderSelectionError(msg)
             suppressed.add(feature_id)
             blocks[feature_id] = "Provider feature not selected for: " + ", ".join(
                 sorted(unselected)

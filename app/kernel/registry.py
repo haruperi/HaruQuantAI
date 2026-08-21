@@ -87,10 +87,11 @@ class ServiceRegistry:
                     f"{capability_id} -> {self._bindings[capability_id].token.owner_id}"
                     for capability_id in sorted(overlaps)
                 )
-                raise CapabilityAlreadyBoundError(
+                msg = (
                     "Active capability bindings cannot be overwritten by normal "
                     f"registration: {details}"
                 )
+                raise CapabilityAlreadyBoundError(msg)
             tokens = self._publish_bundle_locked(bundle)
 
         try:

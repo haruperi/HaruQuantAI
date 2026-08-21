@@ -87,9 +87,8 @@ def discover_targets(root_dir: Path) -> dict[str, FeatureRemovalTarget]:
     loaded: dict[str, tuple[str, str, Any]] = {}
     for entry_point_name, target in _entry_points(root_dir).items():
         if ":" not in target:
-            raise RuntimeError(
-                f"Entry point '{entry_point_name}' has invalid target '{target}'"
-            )
+            msg = f"Entry point '{entry_point_name}' has invalid target '{target}'"
+            raise RuntimeError(msg)
         module_name, factory_name = target.split(":", maxsplit=1)
         try:
             module = import_module(module_name)
@@ -97,18 +96,18 @@ def discover_targets(root_dir: Path) -> dict[str, FeatureRemovalTarget]:
             feature = factory() if callable(factory) else factory
             spec = feature.spec
             spec.validate()
-        except Exception as error:  # noqa: BLE001
-            raise RuntimeError(
-                f"Failed to resolve feature entry point '{entry_point_name}': {error}"
-            ) from error
+        except Exception as error:
+            msg = f"Failed to resolve feature entry point '{entry_point_name}': {error}"
+            raise RuntimeError(msg) from error
 
         feature_id = str(spec.feature_id)
         if feature_id in loaded:
             other_entry_point = loaded[feature_id][0]
-            raise RuntimeError(
+            msg = (
                 f"Duplicate feature ID '{feature_id}' from '{other_entry_point}' "
                 f"and '{entry_point_name}'"
             )
+            raise RuntimeError(msg)
         loaded[feature_id] = (entry_point_name, module_name, spec)
 
     targets: dict[str, FeatureRemovalTarget] = {}
@@ -196,9 +195,8 @@ def remove_entry_point(pyproject_path: Path, entry_point_name: str) -> None:
     pattern = rf"^{re.escape(entry_point_name)}\s*=.*$\n?"
     updated, count = re.subn(pattern, "", content, flags=re.MULTILINE)
     if count != 1:
-        raise RuntimeError(
-            f"Expected one entry point named '{entry_point_name}', removed {count}"
-        )
+        msg = f"Expected one entry point named '{entry_point_name}', removed {count}"
+        raise RuntimeError(msg)
     pyproject_path.write_text(updated, encoding="utf-8")
 
 
@@ -353,7 +351,8 @@ def verify_target(
         package_path = workspace / target.pkg_rel_path
         test_path = workspace / target.test_rel_path
         if not package_path.is_dir():
-            raise RuntimeError(f"Feature package does not exist: {package_path}")
+            msg = f"Feature package does not exist: {package_path}"
+            raise RuntimeError(msg)
         shutil.rmtree(package_path)
         if test_path.exists():
             shutil.rmtree(test_path)

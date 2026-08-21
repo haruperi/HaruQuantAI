@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import importlib
 import re
-import sys
 import tomllib
 from pathlib import Path
 from typing import TYPE_CHECKING, Any

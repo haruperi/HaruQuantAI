@@ -222,9 +222,8 @@ class ContributorRegistry[ItemT]:
         """Register an item and return an idempotent disposer."""
         with self._lock:
             if key in self._items:
-                raise ValueError(
-                    f"Contributor '{key}' already registered in {self._name} registry"
-                )
+                msg = f"Contributor '{key}' already registered in {self._name} registry"
+                raise ValueError(msg)
             self._items[key] = item
 
         def disposer() -> None:
@@ -242,7 +241,8 @@ class ContributorRegistry[ItemT]:
         """Return an item or raise KeyError."""
         item = self.get(key)
         if item is None:
-            raise KeyError(f"Contributor '{key}' not found in {self._name} registry")
+            msg = f"Contributor '{key}' not found in {self._name} registry"
+            raise KeyError(msg)
         return item
 
     def list_keys(self) -> tuple[str, ...]:
