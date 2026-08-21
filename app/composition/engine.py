@@ -76,9 +76,14 @@ class CompositionEngine:
     def config(self) -> AppConfig:
         return self._config
 
-    async def load_and_reconcile_toml(self, toml_content: str) -> ReconciliationReport:
+    async def load_and_reconcile_toml(
+        self,
+        toml_content: str,
+    ) -> ReconciliationReport:
         """Parse TOML configuration and reconcile runtime state."""
-        return await self.reconcile_with_config(load_config_from_toml_string(toml_content))
+        return await self.reconcile_with_config(
+            load_config_from_toml_string(toml_content)
+        )
 
     async def load_and_reconcile_file(
         self,
@@ -92,16 +97,19 @@ class CompositionEngine:
         async with self._reconcile_lock:
             discovery = self._discoverer.discover()
             enabled_ids = [
-                f_id for f_id in config.features if config.is_feature_enabled(f_id)
+                feature_id
+                for feature_id in config.features
+                if config.is_feature_enabled(feature_id)
             ]
             feature_configs = {
-                f_id: config.get_feature_config(f_id) for f_id in enabled_ids
+                feature_id: config.get_feature_config(feature_id)
+                for feature_id in enabled_ids
             }
             report = await self._reconciler.reconcile(
                 discovered_features=discovery.discovered,
                 enabled_feature_ids=enabled_ids,
                 configs=feature_configs,
-                provider_selection=config.capability_providers,
+                provider_selection=config.provider_selections,
             )
             self._config = config
             self._last_discovery = discovery
@@ -139,9 +147,9 @@ class CompositionEngine:
                 else self._config.get_feature_config(feature_id)
             )
             configs = {
-                f_id: self._config.get_feature_config(f_id)
-                for f_id in self._config.features
-                if self._config.is_feature_enabled(f_id)
+                configured_id: self._config.get_feature_config(configured_id)
+                for configured_id in self._config.features
+                if self._config.is_feature_enabled(configured_id)
             }
             configs[feature_id] = config
             success, warning = await self._reconciler.swap_feature_transactional(
@@ -149,7 +157,7 @@ class CompositionEngine:
                 config,
                 discovered_features=discovery.discovered,
                 configs=configs,
-                provider_selection=self._config.capability_providers,
+                provider_selection=self._config.provider_selections,
             )
             if success:
                 active_tokens = self._registry.active_capabilities()
@@ -173,25 +181,34 @@ class CompositionEngine:
     def get_status(self) -> RuntimeStatus:
         """Return full runtime readiness and diagnostic state."""
         active_caps = tuple(sorted(self._registry.active_capabilities()))
-        is_ready, missing_caps = check_profile_readiness(self._config.profile, active_caps)
+        is_ready, missing_caps = check_profile_readiness(
+            self._config.profile,
+            active_caps,
+        )
 
         package_errors: dict[str, str] = {}
         if self._last_discovery is not None:
-            for f_id in self._config.features:
-                if not self._config.is_feature_enabled(f_id):
+            for feature_id in self._config.features:
+                if not self._config.is_feature_enabled(feature_id):
                     continue
-                if f_id in self._last_discovery.failed_imports:
-                    package_errors[f_id] = self._last_discovery.failed_imports[f_id]
-                elif f_id in self._last_discovery.missing_targets:
-                    package_errors[f_id] = self._last_discovery.missing_targets[f_id]
+                if feature_id in self._last_discovery.failed_imports:
+                    package_errors[feature_id] = self._last_discovery.failed_imports[
+                        feature_id
+                    ]
+                elif feature_id in self._last_discovery.missing_targets:
+                    package_errors[feature_id] = self._last_discovery.missing_targets[
+                        feature_id
+                    ]
 
         blocked_features = (
-            dict(self._last_report.blocked_features) if self._last_report is not None else {}
+            dict(self._last_report.blocked_features)
+            if self._last_report is not None
+            else {}
         )
         capability_errors = {
-            f_id: reason
-            for f_id, reason in blocked_features.items()
-            if self._reconciler.feature_states.get(f_id) == FeatureState.BLOCKED
+            feature_id: reason
+            for feature_id, reason in blocked_features.items()
+            if self._reconciler.feature_states.get(feature_id) == FeatureState.BLOCKED
         }
         combined_errors = dict(package_errors)
         if self._last_report is not None:
