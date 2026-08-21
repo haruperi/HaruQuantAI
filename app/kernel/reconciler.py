@@ -109,14 +109,12 @@ class Reconciler:
     ) -> tuple[set[str], set[str]]:
         target_active = set(resolution.eligible_features)
         current_active = set(self._active_features)
-
         seeds: set[str] = current_active.symmetric_difference(target_active)
         seeds.update(
             feature_id
             for feature_id in current_active.intersection(target_active)
             if self._active_configs.get(feature_id) != config_map.get(feature_id)
         )
-
         for capability, target_provider in resolution.provider_map.items():
             active_binding = self._registry.get_binding(capability)
             if (
@@ -128,9 +126,10 @@ class Reconciler:
 
         affected = self._dependent_closure(seeds, specs)
         remount = affected.intersection(current_active).intersection(target_active)
-        to_stop = (current_active - target_active) | remount
-        to_start = (target_active - current_active) | remount
-        return to_stop, to_start
+        return (
+            (current_active - target_active) | remount,
+            (target_active - current_active) | remount,
+        )
 
     def _dependent_closure(
         self,
@@ -253,21 +252,18 @@ class Reconciler:
         feature: Feature,
         config: object,
     ) -> tuple[bool, str | None]:
+        """Mount a feature and publish its whole provider bundle atomically."""
         feature_id = feature.spec.feature_id
         self._feature_states[feature_id] = FeatureState.PREPARING
         scope = self._new_scope(feature_id)
+        staged_providers: list[tuple[CapabilityKey[Any], object]] = []
 
         def registrar(
             capability: CapabilityKey[Any],
             implementation: object,
-            owner_scope: FeatureScope,
+            _scope: FeatureScope,
         ) -> None:
-            self._registry.register(
-                capability,
-                implementation,
-                owner_id=feature_id,
-                scope=owner_scope,
-            )
+            staged_providers.append((capability, implementation))
 
         context = DefaultFeatureContext(
             spec=feature.spec,
@@ -278,6 +274,11 @@ class Reconciler:
         )
         try:
             await feature.mount(context, config)
+            self._registry.register_many(
+                staged_providers,
+                owner_id=feature_id,
+                scope=scope,
+            )
         except Exception as error:  # noqa: BLE001
             await scope.close()
             self._feature_states[feature_id] = FeatureState.FAILED_START
@@ -328,14 +329,11 @@ class Reconciler:
             return False, str(error)
 
         old_scope = self._active_scopes.get(feature_id)
-        for capability, implementation in staged_providers:
-            self._registry.register(
-                capability,
-                implementation,
-                owner_id=feature_id,
-                scope=staged_scope,
-            )
-
+        self._registry.replace_many(
+            staged_providers,
+            owner_id=feature_id,
+            scope=staged_scope,
+        )
         self._active_features[feature_id] = feature
         self._active_scopes[feature_id] = staged_scope
         self._active_configs[feature_id] = config
@@ -347,15 +345,13 @@ class Reconciler:
                 await old_scope.close()
             except Exception as error:  # noqa: BLE001
                 warning = (
-                    "Replacement committed, but old scope cleanup failed: "
-                    + str(error)
+                    "Replacement committed, but old scope cleanup failed: " + str(error)
                 )
 
         enabled_ids = set(configs)
         enabled_ids.add(feature_id)
         specs = {
-            item_id: item.spec
-            for item_id, item in discovered_features.items()
+            item_id: item.spec for item_id, item in discovered_features.items()
         }
         resolution = DependencyGraph(specs).resolve(
             enabled_ids,
@@ -366,9 +362,7 @@ class Reconciler:
         if active_dependents:
             await self._execute_stops(active_dependents)
             ordered_dependents = [
-                item
-                for item in resolution.start_order
-                if item in active_dependents
+                item for item in resolution.start_order if item in active_dependents
             ]
             _, errors = await self._execute_starts(
                 ordered_dependents,
@@ -378,9 +372,13 @@ class Reconciler:
             )
             if errors:
                 prefix = f"{warning}; " if warning else ""
-                warning = prefix + "Dependent remount failures: " + ", ".join(
-                    f"{item_id}: {message}"
-                    for item_id, message in errors.items()
+                warning = (
+                    prefix
+                    + "Dependent remount failures: "
+                    + ", ".join(
+                        f"{item_id}: {message}"
+                        for item_id, message in errors.items()
+                    )
                 )
         return True, warning
 
