@@ -43,16 +43,15 @@ class FeatureDiscoverer:
                 if feature_id is not None
                 else feature_or_factory.spec.feature_id
             )
+        elif feature_id is not None:
+            key = feature_id
         else:
-            if feature_id is not None:
-                key = feature_id
-            else:
-                factory_name = getattr(feature_or_factory, "__name__", None)
-                key = (
-                    factory_name
-                    if isinstance(factory_name, str)
-                    else f"manual_factory_{id(feature_or_factory)}"
-                )
+            factory_name = getattr(feature_or_factory, "__name__", None)
+            key = (
+                factory_name
+                if isinstance(factory_name, str)
+                else f"manual_factory_{id(feature_or_factory)}"
+            )
         self._manual_features[key] = feature_or_factory
 
     def discover(self) -> DiscoveryResult:
