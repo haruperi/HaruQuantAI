@@ -1,0 +1,15 @@
+[application]
+profile = "research"
+
+[providers]
+"broker.market-data@1" = "FEAT-BROKER-FEED_MOCK"
+
+[features.FEAT-BROKER-FEED_MOCK]
+enabled = true
+
+[features.FEAT-DATA-RETRIEVE_BARS]
+enabled = true
+
+[features.FEAT-DATA-RETRIEVE_BARS.config]
+default_timeframe = "M1"
+cache_enabled = false
