@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 from app.kernel.capability import CapabilityKey, CapabilityUnavailableError
 from app.kernel.events import EventBus, EventMode
+from app.kernel.scope import EffectType
 
 if TYPE_CHECKING:
     from app.kernel.feature import FeatureSpec
@@ -62,7 +63,10 @@ class FeatureContext(Protocol):
 
     async def publish(self, event: object) -> None: ...
 
-    async def dispatch_pipeline[EventT](self, initial_event: EventT) -> EventT | None: ...
+    async def dispatch_pipeline[EventT](
+        self,
+        initial_event: EventT,
+    ) -> EventT | None: ...
 
 
 class DefaultFeatureContext:
@@ -96,7 +100,10 @@ class DefaultFeatureContext:
 
     def require[CapT](self, capability: CapabilityKey[CapT]) -> CapT:
         """Resolve a declared required or optional capability."""
-        if capability not in self._spec.requires and capability not in self._spec.optional:
+        if (
+            capability not in self._spec.requires
+            and capability not in self._spec.optional
+        ):
             msg = (
                 f"Feature '{self._spec.feature_id}' attempted to require undeclared "
                 f"capability '{capability.identifier}'"
@@ -109,7 +116,10 @@ class DefaultFeatureContext:
 
     def optional[CapT](self, capability: CapabilityKey[CapT]) -> CapT | None:
         """Resolve a declared optional capability when available."""
-        if capability not in self._spec.optional and capability not in self._spec.requires:
+        if (
+            capability not in self._spec.optional
+            and capability not in self._spec.requires
+        ):
             msg = (
                 f"Feature '{self._spec.feature_id}' attempted to access undeclared "
                 f"optional capability '{capability.identifier}'"
@@ -123,7 +133,7 @@ class DefaultFeatureContext:
         capability: CapabilityKey[CapT],
         implementation: CapT,
     ) -> None:
-        """Register a provider declared by this feature specification."""
+        """Stage a provider declared by this feature specification."""
         if capability not in self._spec.provides:
             msg = (
                 f"Feature '{self._spec.feature_id}' attempted to provide undeclared "
@@ -175,10 +185,17 @@ class DefaultFeatureContext:
     ) -> None:
         """Subscribe with exact-registration disposal bound to this scope."""
         disposer = self._event_bus.subscribe(event_type, handler, mode=mode)
-        self._scope.callback(disposer)
+        self._scope.callback(
+            disposer,
+            name=f"event:{event_type.__name__}:{mode.value}",
+            effect_type=EffectType.EVENT_LISTENER,
+        )
 
     async def publish(self, event: object) -> None:
         await self._event_bus.publish(event)
 
-    async def dispatch_pipeline[EventT](self, initial_event: EventT) -> EventT | None:
+    async def dispatch_pipeline[EventT](
+        self,
+        initial_event: EventT,
+    ) -> EventT | None:
         return await self._event_bus.dispatch_pipeline(initial_event)
