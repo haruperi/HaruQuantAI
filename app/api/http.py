@@ -100,7 +100,11 @@ def handle_system_request(
     path: str,
     method: str = "GET",
 ) -> tuple[int, dict[str, str], dict[str, Any]]:
-    """Route one system control-plane request."""
+    """Route one system control-plane request.
+
+    Returns:
+        HTTP status, response headers, and JSON-compatible response body.
+    """
     headers = {"Content-Type": "application/json"}
     if method != "GET":
         return 405, headers, {"error": "Method Not Allowed"}

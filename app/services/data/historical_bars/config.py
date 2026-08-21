@@ -19,7 +19,14 @@ class HistoricalBarsConfig:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> HistoricalBarsConfig:
-        """Parse and validate a strict historical-bars configuration mapping."""
+        """Parse and validate a strict historical-bars configuration mapping.
+
+        Returns:
+            Validated historical-bars configuration.
+
+        Raises:
+            ValueError: If a field is unknown or invalid.
+        """
         if not data:
             return cls()
         unknown = set(data) - _ALLOWED_CONFIG_KEYS

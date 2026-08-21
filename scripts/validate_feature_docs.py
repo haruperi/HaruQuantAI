@@ -15,14 +15,21 @@ _CAPABILITY_PATTERN = re.compile(r"[a-z][a-z0-9_.-]*@[1-9][0-9]*")
 
 
 def load_feature_entry_points(pyproject_path: Path) -> dict[str, str]:
-    """Load registered feature factories from pyproject.toml."""
+    """Load registered feature factories from pyproject.toml.
+
+    Returns:
+        Entry-point name-to-target mapping.
+
+    Raises:
+        TypeError: If the entry-point table is not a mapping.
+    """
     with pyproject_path.open("rb") as file:
         data = tomllib.load(file)
     value = (
         data.get("project", {}).get("entry-points", {}).get("haruquantai.features", {})
     )
     if not isinstance(value, dict):
-        raise ValueError("Feature entry-point table is invalid")
+        raise TypeError("Feature entry-point table is invalid")
     return {str(name): str(target) for name, target in value.items()}
 
 
@@ -56,7 +63,7 @@ def _configuration_keys(section: str | None) -> set[str] | None:
     return keys
 
 
-def validate_feature_readme(
+def validate_feature_readme(  # noqa: C901, PLR0912
     spec: FeatureSpec,
     readme_path: Path,
 ) -> list[str]:
@@ -124,12 +131,16 @@ def validate_feature_readme(
     return errors
 
 
-def main() -> int:
-    """Validate every registered feature README."""
+def main() -> int:  # noqa: C901
+    """Validate every registered feature README.
+
+    Returns:
+        Zero when all documents match runtime truth; otherwise one.
+    """
     root = Path(__file__).resolve().parent.parent
     try:
         entry_points = load_feature_entry_points(root / "pyproject.toml")
-    except (OSError, ValueError, tomllib.TOMLDecodeError) as error:
+    except (OSError, TypeError, tomllib.TOMLDecodeError) as error:
         print(f"[ERROR] {error}")
         return 1
     if not entry_points:

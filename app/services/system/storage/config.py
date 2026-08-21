@@ -19,7 +19,14 @@ class StorageConfig:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> StorageConfig:
-        """Parse and validate a strict storage configuration mapping."""
+        """Parse and validate a strict storage configuration mapping.
+
+        Returns:
+            Validated storage configuration.
+
+        Raises:
+            ValueError: If a field is unknown or invalid.
+        """
         if not data:
             return cls()
         unknown = set(data) - _ALLOWED_CONFIG_KEYS

@@ -35,7 +35,11 @@ class HistoricalBarsService(HistoricalBars):
         self,
         request: HistoricalBarsRequest,
     ) -> Sequence[Bar]:
-        """Retrieve normalized bars, applying the configured blank-timeframe fallback."""
+        """Retrieve normalized bars with the configured timeframe fallback.
+
+        Returns:
+            Canonical normalized bars.
+        """
         effective_request = (
             request
             if request.timeframe.strip()

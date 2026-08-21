@@ -66,7 +66,11 @@ class EventBus:
         mode: EventMode = EventMode.PUBLISH,
         owner_id: str = "",
     ) -> Callable[[], None]:
-        """Register one handler and return an idempotent exact disposer."""
+        """Register one handler and return an idempotent exact disposer.
+
+        Returns:
+            Disposer for this exact subscription.
+        """
         with self._lock:
             token = SubscriptionToken(
                 token_id=next(self._token_counter),
@@ -84,7 +88,11 @@ class EventBus:
         return disposer
 
     def unsubscribe_token(self, token: SubscriptionToken) -> bool:
-        """Remove only the subscription identified by the exact token."""
+        """Remove only the subscription identified by the exact token.
+
+        Returns:
+            Whether an active subscription was removed.
+        """
         with self._lock:
             if token.token_id not in self._token_map:
                 return False
@@ -106,7 +114,11 @@ class EventBus:
         event_type: type[EventT],
         handler: Callable[[EventT], Any | Awaitable[Any]],
     ) -> bool:
-        """Remove the first matching registration for compatibility."""
+        """Remove the first matching registration for compatibility.
+
+        Returns:
+            Whether a matching registration was removed.
+        """
         with self._lock:
             match = next(
                 (
@@ -168,7 +180,11 @@ class EventBus:
         )
 
     async def dispatch_pipeline[EventT](self, initial_event: EventT) -> EventT | None:
-        """Transform an event through ordered pipeline handlers."""
+        """Transform an event through ordered pipeline handlers.
+
+        Returns:
+            Final transformed value, or None when short-circuited.
+        """
         current: Any = initial_event
         for subscription in self._snapshot(type(initial_event), EventMode.PIPELINE):
             current = await self._invoke_handler(subscription.handler, current)
@@ -219,7 +235,14 @@ class ContributorRegistry[ItemT]:
         self._lock = RLock()
 
     def register(self, key: str, item: ItemT) -> Callable[[], None]:
-        """Register an item and return an idempotent disposer."""
+        """Register an item and return an idempotent disposer.
+
+        Returns:
+            Disposer for the registered contributor.
+
+        Raises:
+            ValueError: If the key is already registered.
+        """
         with self._lock:
             if key in self._items:
                 msg = f"Contributor '{key}' already registered in {self._name} registry"
@@ -238,7 +261,11 @@ class ContributorRegistry[ItemT]:
             return self._items.get(key)
 
     def require(self, key: str) -> ItemT:
-        """Return an item or raise KeyError."""
+        """Return an item or raise KeyError.
+
+        Raises:
+            KeyError: If the contributor is unavailable.
+        """
         item = self.get(key)
         if item is None:
             msg = f"Contributor '{key}' not found in {self._name} registry"

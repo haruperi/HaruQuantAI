@@ -56,7 +56,11 @@ class ServiceRegistry:
         owner_id: str,
         scope: FeatureScope | None = None,
     ) -> BindingToken:
-        """Register one capability without overwriting an active binding."""
+        """Register one capability without overwriting an active binding.
+
+        Returns:
+            Ownership token for the new binding.
+        """
         return self.register_many(
             [(capability, provider, owner_id)],
             scope=scope,
@@ -67,7 +71,14 @@ class ServiceRegistry:
         bindings: Sequence[BindingInput],
         scope: FeatureScope | None = None,
     ) -> list[BindingToken]:
-        """Atomically register a new capability bundle."""
+        """Atomically register a new capability bundle.
+
+        Returns:
+            Ownership tokens in bundle order.
+
+        Raises:
+            CapabilityAlreadyBoundError: If a capability is duplicated or active.
+        """
         bundle = tuple(bindings)
         self._validate_bundle(bundle, scope)
         capability_ids = tuple(capability.identifier for capability, _, _ in bundle)
@@ -113,7 +124,11 @@ class ServiceRegistry:
         owner_id: str,
         scope: FeatureScope | None = None,
     ) -> BindingToken:
-        """Atomically replace one capability through the explicit swap path."""
+        """Atomically replace one capability through the explicit swap path.
+
+        Returns:
+            Ownership token for the replacement binding.
+        """
         return self.replace_many(
             [(capability, provider, owner_id)],
             scope=scope,
@@ -124,7 +139,11 @@ class ServiceRegistry:
         bindings: Sequence[BindingInput],
         scope: FeatureScope | None = None,
     ) -> list[BindingToken]:
-        """Atomically replace every capability in a provider bundle."""
+        """Atomically replace every capability in a provider bundle.
+
+        Returns:
+            Ownership tokens in bundle order.
+        """
         bundle = tuple(bindings)
         self._validate_bundle(bundle, scope)
         capability_ids = tuple(capability.identifier for capability, _, _ in bundle)
@@ -225,7 +244,11 @@ class ServiceRegistry:
             )
 
     def revoke(self, token: BindingToken) -> bool:
-        """Revoke a binding only when its exact generation is still active."""
+        """Revoke a binding only when its exact generation is still active.
+
+        Returns:
+            Whether the active generation was removed.
+        """
         with self._lock:
             active = self._bindings.get(token.capability)
             if active is not None and active.token == token:
@@ -234,13 +257,24 @@ class ServiceRegistry:
             return False
 
     def resolve[CapT](self, capability: CapabilityKey[CapT]) -> CapT | None:
-        """Resolve an active provider for a capability."""
+        """Resolve an active provider for a capability.
+
+        Returns:
+            Active provider, or None when unavailable.
+        """
         with self._lock:
             binding = self._bindings.get(capability.identifier)
             return cast("CapT", binding.provider) if binding is not None else None
 
     def require[CapT](self, capability: CapabilityKey[CapT]) -> CapT:
-        """Resolve a mandatory capability or raise when unavailable."""
+        """Resolve a mandatory capability or raise when unavailable.
+
+        Returns:
+            Active capability provider.
+
+        Raises:
+            CapabilityUnavailableError: If no provider is active.
+        """
         provider = self.resolve(capability)
         if provider is None:
             raise CapabilityUnavailableError(capability.identifier)

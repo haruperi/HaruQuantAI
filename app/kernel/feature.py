@@ -46,7 +46,11 @@ class FeatureSpec:
     config_keys: frozenset[str] = field(default_factory=frozenset)
 
     def validate(self) -> None:
-        """Validate feature identity and declaration consistency."""
+        """Validate feature identity and declaration consistency.
+
+        Raises:
+            ValueError: If identity, dependencies, or configuration keys are invalid.
+        """
         if not self.feature_id.strip():
             raise ValueError("Feature ID must not be empty")
         if not self.domain.strip():

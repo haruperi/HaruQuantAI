@@ -70,22 +70,38 @@ class SystemAPI:
         return self._registry.is_available(SYSTEM_METRICS)
 
     def get_storage_engine(self) -> StorageEngine:
-        """Resolve the active storage engine."""
+        """Resolve the active storage engine.
+
+        Returns:
+            Active storage-engine provider.
+        """
         return self._registry.require(SYSTEM_STORAGE)
 
     def get_clock(self) -> SystemClock:
-        """Resolve the active system clock."""
+        """Resolve the active system clock.
+
+        Returns:
+            Active system-clock provider.
+        """
         return self._registry.require(SYSTEM_CLOCK)
 
     def get_metrics(self) -> MetricsCollector:
-        """Resolve the active metrics collector."""
+        """Resolve the active metrics collector.
+
+        Returns:
+            Active metrics-collector provider.
+        """
         return self._registry.require(SYSTEM_METRICS)
 
     def inspect_capability(
         self,
         capability: CapabilityKey[Any] | str,
     ) -> CapabilityInfo:
-        """Inspect one capability and its active provider generation."""
+        """Inspect one capability and its active provider generation.
+
+        Returns:
+            Capability availability and provider metadata.
+        """
         identifier = (
             capability if isinstance(capability, str) else capability.identifier
         )
@@ -108,7 +124,11 @@ class SystemAPI:
         }
 
     def inspect_feature(self, feature_id: str) -> FeatureDiagnosticInfo:
-        """Inspect package, capability, runtime, and replacement health."""
+        """Inspect package, capability, runtime, and replacement health.
+
+        Returns:
+            Consolidated diagnostic information for the feature.
+        """
         if self._engine is None:
             return FeatureDiagnosticInfo(feature_id=feature_id, is_active=False)
         status = self._engine.get_status()

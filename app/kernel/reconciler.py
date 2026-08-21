@@ -112,7 +112,11 @@ class Reconciler:
         configs: Mapping[str, object] | None = None,
         provider_selections: Mapping[str, str] | None = None,
     ) -> ReconciliationReport:
-        """Reconcile active features against a desired configuration."""
+        """Reconcile active features against a desired configuration.
+
+        Returns:
+            Report describing started, stopped, blocked, and failed features.
+        """
         enabled_set = set(enabled_feature_ids)
         config_map = dict(configs or {})
         selection_map = dict(provider_selections or {})
@@ -417,12 +421,16 @@ class Reconciler:
                 cleanup_errors.append(f"Scope cleanup error: {error}")
         return cleanup_errors
 
-    async def swap_feature_transactional(
+    async def swap_feature_transactional(  # noqa: PLR0915
         self,
         feature: Feature,
         config: object,
     ) -> ReplacementReport:
-        """Stage, atomically publish, and reconcile a feature replacement."""
+        """Stage, atomically publish, and reconcile a feature replacement.
+
+        Returns:
+            Detailed commit, rollback, consumer, and cleanup result.
+        """
         feature_id = feature.spec.feature_id
         old_feature = self._active_features.get(feature_id)
         old_scope = self._active_scopes.get(feature_id)

@@ -35,16 +35,16 @@ REPLACEMENTS: dict[str, list[tuple[str, str]]] = {
     ],
     "app/composition/config.py": [
         (
-            '    def __post_init__(self) -> None:\n        normalized = self.profile.strip().lower()',
+            "    def __post_init__(self) -> None:\n        normalized = self.profile.strip().lower()",
             '    def __post_init__(self) -> None:\n        """Normalize and validate direct AppConfig construction."""\n        normalized = self.profile.strip().lower()',
         ),
         (
-            '    for capability, feature_id in providers_raw.items():\n        if not isinstance(capability, str) or not isinstance(feature_id, str):',
-            '    for raw_capability, raw_feature_id in providers_raw.items():\n        if not isinstance(raw_capability, str) or not isinstance(raw_feature_id, str):',
+            "    for capability, feature_id in providers_raw.items():\n        if not isinstance(capability, str) or not isinstance(feature_id, str):",
+            "    for raw_capability, raw_feature_id in providers_raw.items():\n        if not isinstance(raw_capability, str) or not isinstance(raw_feature_id, str):",
         ),
         (
-            '        capability = capability.strip()\n        feature_id = feature_id.strip()',
-            '        capability = raw_capability.strip()\n        feature_id = raw_feature_id.strip()',
+            "        capability = capability.strip()\n        feature_id = feature_id.strip()",
+            "        capability = raw_capability.strip()\n        feature_id = raw_feature_id.strip()",
         ),
         (
             '    """Parse and validate application configuration from TOML text."""',
@@ -135,8 +135,8 @@ REPLACEMENTS: dict[str, list[tuple[str, str]]] = {
             '        """Reconcile active features against a desired configuration.\n\n        Returns:\n            Report describing started, stopped, blocked, and failed features.\n        """',
         ),
         (
-            '    async def swap_feature_transactional(\n',
-            '    async def swap_feature_transactional(  # noqa: PLR0915\n',
+            "    async def swap_feature_transactional(\n",
+            "    async def swap_feature_transactional(  # noqa: PLR0915\n",
         ),
         (
             '        """Stage, atomically publish, and reconcile a feature replacement."""',
@@ -241,22 +241,22 @@ REPLACEMENTS: dict[str, list[tuple[str, str]]] = {
             '        raise TypeError("Feature entry-point table is invalid")',
         ),
         (
-            'def validate_feature_readme(\n',
-            'def validate_feature_readme(  # noqa: C901, PLR0912\n',
+            "def validate_feature_readme(\n",
+            "def validate_feature_readme(  # noqa: C901, PLR0912\n",
         ),
         (
             'def main() -> int:\n    """Validate every registered feature README."""',
             'def main() -> int:  # noqa: C901\n    """Validate every registered feature README.\n\n    Returns:\n        Zero when all documents match runtime truth; otherwise one.\n    """',
         ),
         (
-            '    except (OSError, ValueError, tomllib.TOMLDecodeError) as error:',
-            '    except (OSError, TypeError, tomllib.TOMLDecodeError) as error:',
+            "    except (OSError, ValueError, tomllib.TOMLDecodeError) as error:",
+            "    except (OSError, TypeError, tomllib.TOMLDecodeError) as error:",
         ),
     ],
     "scripts/verify_feature_removal.py": [
         (
-            '        raise RuntimeError("[project.entry-points.\'haruquantai.features\'] is invalid")',
-            '        raise TypeError("[project.entry-points.\'haruquantai.features\'] is invalid")',
+            "        raise RuntimeError(\"[project.entry-points.'haruquantai.features'] is invalid\")",
+            "        raise TypeError(\"[project.entry-points.'haruquantai.features'] is invalid\")",
         ),
         (
             '    """Discover every registered feature or fail on incomplete metadata."""',
@@ -279,8 +279,8 @@ REPLACEMENTS: dict[str, list[tuple[str, str]]] = {
             '    """Run one target or the complete registered-feature removal matrix.\n\n    Returns:\n        Zero when every selected target passes; otherwise one.\n    """',
         ),
         (
-            '    except RuntimeError as error:',
-            '    except (RuntimeError, TypeError) as error:',
+            "    except RuntimeError as error:",
+            "    except (RuntimeError, TypeError) as error:",
         ),
     ],
     "tests/composition/test_config.py": [
@@ -299,7 +299,9 @@ def main() -> None:
         content = path.read_text(encoding="utf-8")
         for old, new in replacements:
             if old not in content:
-                raise RuntimeError(f"Expected text not found in {relative_path}: {old!r}")
+                raise RuntimeError(
+                    f"Expected text not found in {relative_path}: {old!r}"
+                )
             content = content.replace(old, new, 1)
         path.write_text(content, encoding="utf-8")
 

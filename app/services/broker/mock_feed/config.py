@@ -16,7 +16,14 @@ class MockFeedConfig:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> MockFeedConfig:
-        """Parse and validate a strict mock-feed configuration mapping."""
+        """Parse and validate a strict mock-feed configuration mapping.
+
+        Returns:
+            Validated mock-feed configuration.
+
+        Raises:
+            ValueError: If a field is unknown or invalid.
+        """
         if not data:
             return cls()
         unknown = set(data) - _ALLOWED_CONFIG_KEYS

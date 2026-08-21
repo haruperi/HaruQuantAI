@@ -105,7 +105,11 @@ class DependencyGraph:
         enabled_feature_ids: Iterable[str],
         provider_selections: Mapping[str, str] | None = None,
     ) -> GraphResolution:
-        """Resolve providers, eligibility, and deterministic lifecycle order."""
+        """Resolve providers, eligibility, and deterministic lifecycle order.
+
+        Returns:
+            Resolved providers, lifecycle order, and dependency maps.
+        """
         enabled_set = set(enabled_feature_ids)
         selections = dict(self._provider_selections)
         if provider_selections is not None:

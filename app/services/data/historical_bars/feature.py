@@ -36,5 +36,9 @@ class HistoricalBarsFeature:
 
 
 def create_feature() -> HistoricalBarsFeature:
-    """Create a HistoricalBarsFeature instance."""
+    """Create a HistoricalBarsFeature instance.
+
+    Returns:
+        New feature instance.
+    """
     return HistoricalBarsFeature()

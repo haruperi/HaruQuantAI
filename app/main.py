@@ -68,7 +68,11 @@ def _status_payload(engine: CompositionEngine) -> dict[str, object]:
 
 
 async def async_main(argv: Sequence[str] | None = None) -> int:
-    """Run the composition runtime and return a process exit code."""
+    """Run the composition runtime and return a process exit code.
+
+    Returns:
+        Process exit code.
+    """
     parser = argparse.ArgumentParser(
         prog="haruquantai",
         description="HaruQuantAI quantitative composition runtime",
@@ -117,7 +121,11 @@ async def async_main(argv: Sequence[str] | None = None) -> int:
 
 
 def run() -> None:
-    """Synchronous project script entry point."""
+    """Synchronous project script entry point.
+
+    Raises:
+        SystemExit: Always, with the asynchronous runtime exit code.
+    """
     raise SystemExit(asyncio.run(async_main()))
 
 

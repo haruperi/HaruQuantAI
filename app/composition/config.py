@@ -40,6 +40,7 @@ class AppConfig:
     provider_selections: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Normalize and validate direct AppConfig construction."""
         normalized = self.profile.strip().lower()
         if normalized not in KNOWN_PROFILES:
             msg = (
@@ -158,20 +159,27 @@ def _parse_providers(raw: dict[str, Any]) -> dict[str, str]:
     if not isinstance(providers_raw, dict):
         raise ConfigurationError("'[providers]' must be a TOML table")
     providers: dict[str, str] = {}
-    for capability, feature_id in providers_raw.items():
-        if not isinstance(capability, str) or not isinstance(feature_id, str):
+    for raw_capability, raw_feature_id in providers_raw.items():
+        if not isinstance(raw_capability, str) or not isinstance(raw_feature_id, str):
             raise ConfigurationError(
                 "Provider selections must map capability strings to feature-ID strings"
             )
-        capability = capability.strip()
-        feature_id = feature_id.strip()
+        capability = raw_capability.strip()
+        feature_id = raw_feature_id.strip()
         _validate_provider_selection(capability, feature_id)
         providers[capability] = feature_id
     return providers
 
 
 def load_config_from_toml_string(content: str) -> AppConfig:
-    """Parse and validate application configuration from TOML text."""
+    """Parse and validate application configuration from TOML text.
+
+    Returns:
+        Validated application configuration.
+
+    Raises:
+        ConfigurationError: If TOML syntax or configuration semantics are invalid.
+    """
     try:
         raw = tomllib.loads(content)
     except tomllib.TOMLDecodeError as error:
@@ -192,7 +200,15 @@ def load_config_from_toml_string(content: str) -> AppConfig:
 
 
 def load_config_from_file(path: str | Path) -> AppConfig:
-    """Load and validate application configuration from a TOML file."""
+    """Load and validate application configuration from a TOML file.
+
+    Returns:
+        Validated application configuration.
+
+    Raises:
+        FileNotFoundError: If the configuration file does not exist.
+        ConfigurationError: If the file content is invalid.
+    """
     file_path = Path(path)
     if not file_path.is_file():
         msg = f"Configuration file not found: {file_path}"

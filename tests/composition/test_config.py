@@ -144,7 +144,7 @@ def test_unknown_sections_and_invalid_feature_shapes_are_rejected() -> None:
             enabled = "yes"
             """
         )
-    with pytest.raises(ConfigurationError, match="mixes a .config table"):
+    with pytest.raises(ConfigurationError, match=r"mixes a \.config table"):
         load_config_from_toml_string(
             """
             [application]

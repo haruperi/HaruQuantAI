@@ -32,7 +32,11 @@ class FeatureDiscoverer:
         feature_or_factory: Feature | Callable[[], Feature],
         feature_id: str | None = None,
     ) -> None:
-        """Register a feature instance or factory for discovery."""
+        """Register a feature instance or factory for discovery.
+
+        Raises:
+            TypeError: If the supplied object is neither a feature nor a factory.
+        """
         if isinstance(feature_or_factory, Feature):
             key = feature_id or feature_or_factory.spec.feature_id
         elif callable(feature_or_factory):
@@ -46,7 +50,11 @@ class FeatureDiscoverer:
         self._manual_features[str(key)] = feature_or_factory
 
     def discover(self) -> DiscoveryResult:
-        """Discover manual features and installed entry-point features."""
+        """Discover manual features and installed entry-point features.
+
+        Returns:
+            Successfully discovered features and categorized failures.
+        """
         discovered: dict[str, Feature] = {}
         missing_targets: dict[str, str] = {}
         failed_imports: dict[str, str] = {}

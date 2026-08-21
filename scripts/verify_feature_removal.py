@@ -78,12 +78,20 @@ def _entry_points(root_dir: Path) -> dict[str, str]:
         data.get("project", {}).get("entry-points", {}).get("haruquantai.features", {})
     )
     if not isinstance(value, dict):
-        raise RuntimeError("[project.entry-points.'haruquantai.features'] is invalid")
+        raise TypeError("[project.entry-points.'haruquantai.features'] is invalid")
     return {str(name): str(target) for name, target in value.items()}
 
 
 def discover_targets(root_dir: Path) -> dict[str, FeatureRemovalTarget]:
-    """Discover every registered feature or fail on incomplete metadata."""
+    """Discover every registered feature or fail on incomplete metadata.
+
+    Returns:
+        Complete feature-removal target mapping.
+
+    Raises:
+        RuntimeError: If an entry point cannot be resolved or is duplicated.
+        TypeError: If entry-point metadata has an invalid type.
+    """
     loaded: dict[str, tuple[str, str, Any]] = {}
     for entry_point_name, target in _entry_points(root_dir).items():
         if ":" not in target:
@@ -168,7 +176,11 @@ def run_step(
     cwd: Path,
     step_name: str,
 ) -> StepResult:
-    """Run one verification step and capture its output on failure."""
+    """Run one verification step and capture its output on failure.
+
+    Returns:
+        Captured verification-step result.
+    """
     print(f"--> {step_name}: {' '.join(command)}")
     started = time.monotonic()
     result = subprocess.run(
@@ -190,7 +202,11 @@ def run_step(
 
 
 def remove_entry_point(pyproject_path: Path, entry_point_name: str) -> None:
-    """Remove one exact feature entry-point declaration."""
+    """Remove one exact feature entry-point declaration.
+
+    Raises:
+        RuntimeError: If exactly one matching declaration is not removed.
+    """
     content = pyproject_path.read_text(encoding="utf-8")
     pattern = rf"^{re.escape(entry_point_name)}\s*=.*$\n?"
     updated, count = re.subn(pattern, "", content, flags=re.MULTILINE)
@@ -327,7 +343,14 @@ def verify_target(
     target: FeatureRemovalTarget,
     all_targets: dict[str, FeatureRemovalTarget],
 ) -> TargetVerificationReport:
-    """Verify one feature deletion inside an isolated temporary workspace."""
+    """Verify one feature deletion inside an isolated temporary workspace.
+
+    Returns:
+        Complete target verification report.
+
+    Raises:
+        RuntimeError: If target source or metadata is inconsistent.
+    """
     started = time.monotonic()
     steps: list[StepResult] = []
     passed = True
@@ -429,7 +452,11 @@ def verify_target(
 
 
 def main() -> int:
-    """Run one target or the complete registered-feature removal matrix."""
+    """Run one target or the complete registered-feature removal matrix.
+
+    Returns:
+        Zero when every selected target passes; otherwise one.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--all", action="store_true")
     parser.add_argument("--feature", type=str, default=None)
@@ -438,7 +465,7 @@ def main() -> int:
 
     try:
         targets = discover_targets(ROOT_DIR)
-    except RuntimeError as error:
+    except (RuntimeError, TypeError) as error:
         print(f"[ERROR] {error}")
         return 1
 

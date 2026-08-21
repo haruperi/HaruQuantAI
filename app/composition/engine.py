@@ -121,7 +121,11 @@ class CompositionEngine:
         self,
         toml_content: str,
     ) -> ReconciliationReport:
-        """Parse TOML and reconcile it atomically."""
+        """Parse TOML and reconcile it atomically.
+
+        Returns:
+            Report describing lifecycle transitions.
+        """
         return await self.reconcile_with_config(
             load_config_from_toml_string(toml_content)
         )
@@ -130,7 +134,11 @@ class CompositionEngine:
         self,
         config_path: str | Path,
     ) -> ReconciliationReport:
-        """Load a TOML file and reconcile it atomically."""
+        """Load a TOML file and reconcile it atomically.
+
+        Returns:
+            Report describing lifecycle transitions.
+        """
         return await self.reconcile_with_config(load_config_from_file(config_path))
 
     async def _reconcile_unlocked(
@@ -162,7 +170,11 @@ class CompositionEngine:
         self,
         config: AppConfig,
     ) -> ReconciliationReport:
-        """Serialize and commit one configuration reconciliation."""
+        """Serialize and commit one configuration reconciliation.
+
+        Returns:
+            Report describing lifecycle transitions.
+        """
         async with self._mutation_lock:
             return await self._reconcile_unlocked(config)
 
@@ -170,7 +182,11 @@ class CompositionEngine:
         self,
         new_config: AppConfig,
     ) -> ReconciliationReport:
-        """Reconcile a new configuration and emit a reload event."""
+        """Reconcile a new configuration and emit a reload event.
+
+        Returns:
+            Report describing lifecycle transitions.
+        """
         async with self._mutation_lock:
             report = await self._reconcile_unlocked(new_config)
         modified = tuple(sorted(set(report.started) | set(report.stopped)))
@@ -188,7 +204,11 @@ class CompositionEngine:
         feature_id: str,
         new_config: object | None = None,
     ) -> tuple[bool, str | None]:
-        """Replace a feature and return a compatibility success tuple."""
+        """Replace a feature and return a compatibility success tuple.
+
+        Returns:
+            Commit status and optional diagnostic message.
+        """
         report = await self.replace_feature_transactional_detailed(
             feature_id,
             new_config=new_config,
@@ -209,7 +229,11 @@ class CompositionEngine:
         feature_id: str,
         new_config: object | None = None,
     ) -> ReplacementReport:
-        """Serialize a staged feature replacement and return full diagnostics."""
+        """Serialize a staged feature replacement and return full diagnostics.
+
+        Returns:
+            Detailed replacement and cleanup report.
+        """
         async with self._mutation_lock:
             discovery = self._discoverer.discover()
             feature = discovery.discovered.get(feature_id)

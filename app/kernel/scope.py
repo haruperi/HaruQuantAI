@@ -95,7 +95,11 @@ class FeatureScope:
         self._on_failure = callback
 
     def ensure_open(self) -> None:
-        """Raise ScopeClosedError when the scope is already closed."""
+        """Raise ScopeClosedError when the scope is already closed.
+
+        Raises:
+            ScopeClosedError: If the scope is closed.
+        """
         if self._closed:
             msg = f"Feature scope '{self.owner_id}' is already closed"
             raise ScopeClosedError(msg)
@@ -162,7 +166,14 @@ class FeatureScope:
         *,
         name: str,
     ) -> asyncio.Task[T]:
-        """Spawn and supervise a background task owned by this scope."""
+        """Spawn and supervise a background task owned by this scope.
+
+        Returns:
+            Managed asyncio task.
+
+        Raises:
+            ScopeClosedError: If the scope is closed.
+        """
         try:
             self.ensure_open()
         except ScopeClosedError:
@@ -218,7 +229,11 @@ class FeatureScope:
         *,
         name: str = "",
     ) -> ContextT:
-        """Enter a synchronous context manager owned by this scope."""
+        """Enter a synchronous context manager owned by this scope.
+
+        Returns:
+            Resource returned by the context manager.
+        """
         self.ensure_open()
         record = EffectRecord(
             owner_id=self.owner_id,
@@ -237,7 +252,11 @@ class FeatureScope:
         *,
         name: str = "",
     ) -> ContextT:
-        """Enter an asynchronous context manager owned by this scope."""
+        """Enter an asynchronous context manager owned by this scope.
+
+        Returns:
+            Resource returned by the context manager.
+        """
         self.ensure_open()
         record = EffectRecord(
             owner_id=self.owner_id,
