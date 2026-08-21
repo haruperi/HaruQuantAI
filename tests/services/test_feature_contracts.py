@@ -26,10 +26,8 @@ def _registered_feature_targets() -> dict[str, str]:
     """Read the current registered feature targets from pyproject.toml."""
     with Path("pyproject.toml").open("rb") as file:
         data = tomllib.load(file)
-    targets = (
-        data.get("project", {})
-        .get("entry-points", {})
-        .get("haruquantai.features", {})
+    targets = data.get("project", {}).get("entry-points", {}).get(
+        "haruquantai.features", {}
     )
     if not isinstance(targets, dict):
         raise TypeError("Feature entry-point table must be a mapping")
@@ -77,8 +75,7 @@ def test_discovered_features_match_registered_entry_points(
     assert registered
     assert len(all_discovered_features) == len(registered)
     assert {feature.spec.feature_id for feature in all_discovered_features} == {
-        feature_class().spec.feature_id
-        for feature_class in _load_registered_classes()
+        feature_class().spec.feature_id for feature_class in _load_registered_classes()
     }
 
 
@@ -96,9 +93,7 @@ def test_feature_contract_spec_and_id(feature_cls: type[Feature]) -> None:
     for capability in spec.provides:
         assert capability.name.strip()
         assert capability.major >= 1
-        assert capability.identifier == (
-            f"{capability.name}@{capability.major}"
-        )
+        assert capability.identifier == f"{capability.name}@{capability.major}"
 
 
 @pytest.mark.parametrize("feature_cls", _discover_feature_classes())
