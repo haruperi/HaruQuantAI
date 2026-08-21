@@ -1,0 +1,14 @@
+[application]
+profile = "backtest"
+
+# This example intentionally contains no credentials. Add compatible providers
+# for system.clock@1 and data.historical-bars@1 before expecting READY status.
+
+[providers]
+"broker.market-data@1" = "FEAT-BROKER-FEED_MOCK"
+
+[features.FEAT-BROKER-FEED_MOCK]
+enabled = true
+
+[features.FEAT-DATA-RETRIEVE_BARS]
+enabled = true
