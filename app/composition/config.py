@@ -40,7 +40,12 @@ class AppConfig:
     provider_selections: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        """Normalize and validate direct AppConfig construction."""
+        """Normalize and validate direct AppConfig construction.
+
+        Raises:
+            InvalidProfileError: If the deployment profile is unsupported.
+            ConfigurationError: If a provider selection identifier is invalid.
+        """
         normalized = self.profile.strip().lower()
         if normalized not in KNOWN_PROFILES:
             msg = (
