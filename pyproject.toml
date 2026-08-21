@@ -12,6 +12,11 @@ dependencies = []
 [project.scripts]
 haruquantai = "app.main:run"
 
+[project.entry-points."haruquantai.features"]
+broker-mock-feed = "app.services.broker.mock_feed.feature:create_feature"
+data-historical-bars = "app.services.data.historical_bars.feature:create_feature"
+system-persist-storage = "app.services.system.storage.feature:create_feature"
+
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]
 build-backend = "uv_build"
@@ -31,6 +36,7 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
     "pytest-mock>=3.15.1",
+    "pytest-testmon>=2.2.0",
     "pytest-xdist>=3.8.0",
     "ruff>=0.16.4",
 ]

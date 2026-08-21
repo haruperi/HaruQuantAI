@@ -60,6 +60,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.testmondata
 nosetests.xml
 coverage.xml
 *.cover

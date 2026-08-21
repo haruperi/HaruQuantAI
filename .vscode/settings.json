@@ -43,6 +43,25 @@
         "vertexai",
         "yfinance"
     ],
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}"
+    ],
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}"
+    ],
+    "python.languageServer": "None",
+    "python.analysis.diagnosticMode": "openFilesOnly",
+    "python.analysis.exclude": [
+        "**/_pyrefly_virtual_/**",
+        "C:/_pyrefly_virtual_/**"
+    ],
+    "python.analysis.ignore": [
+        "**/_pyrefly_virtual_/**",
+        "C:/_pyrefly_virtual_/**"
+    ],
+    "pyrefly.enabled": false,
+    "pyrefly.diagnostics.enabled": false,
+    "pyrefly.displayDiagnostics": false,
     "files.exclude": {
         "**/.venv": true,
         "**/venv": true,
@@ -60,5 +79,9 @@
         "**/build": true,
         "**/.coverage": true,
         "**/.coveragerc_folder": true
+    },
+    "files.watcherExclude": {
+        "**/.venv/**": true,
+        "**/_pyrefly_virtual_/**": true
     }
 }

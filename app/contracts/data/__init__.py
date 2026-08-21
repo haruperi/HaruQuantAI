@@ -1,0 +1,1 @@
+"""Data domain capability contracts."""

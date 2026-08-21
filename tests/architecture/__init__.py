@@ -1,0 +1,1 @@
+"""Architecture verification tests package."""

@@ -1,0 +1,211 @@
+"""Tests for Reconciler transactional mounting, dynamic changes, and teardowns."""
+
+import pytest
+
+from app.contracts.broker.market_data import BROKER_MARKET_DATA
+from app.contracts.data.historical_bars import HISTORICAL_BARS
+from app.contracts.system.clock import SYSTEM_CLOCK
+from app.kernel.context import FeatureContext
+from app.kernel.feature import FeatureSpec, FeatureState
+from app.kernel.reconciler import Reconciler
+from app.kernel.registry import ServiceRegistry
+
+
+class MockClockFeature:
+    spec = FeatureSpec(
+        feature_id="FEAT-SYS-PROVIDE_CLOCK",
+        domain="system",
+        provides=frozenset({SYSTEM_CLOCK}),
+    )
+
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        context.provide(SYSTEM_CLOCK, "clock_service_instance")
+
+
+class MockBrokerFeature:
+    spec = FeatureSpec(
+        feature_id="FEAT-BROKER-FEED_MT5",
+        domain="broker",
+        provides=frozenset({BROKER_MARKET_DATA}),
+        requires=frozenset({SYSTEM_CLOCK}),
+    )
+
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        clock = context.require(SYSTEM_CLOCK)
+        context.provide(BROKER_MARKET_DATA, f"broker_service_using_{clock}")
+
+
+class MockDataFeature:
+    spec = FeatureSpec(
+        feature_id="FEAT-DATA-RETRIEVE_BARS",
+        domain="data",
+        provides=frozenset({HISTORICAL_BARS}),
+        requires=frozenset({BROKER_MARKET_DATA}),
+    )
+
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        broker = context.require(BROKER_MARKET_DATA)
+        context.provide(HISTORICAL_BARS, f"historical_bars_using_{broker}")
+
+
+class FailingFeature:
+    spec = FeatureSpec(
+        feature_id="FEAT-TEST-FAIL_MOUNT",
+        domain="test",
+        provides=frozenset(),
+    )
+
+    async def mount(self, _context: FeatureContext, _config: object) -> None:
+        msg = "Fatal error inside mount"
+        raise RuntimeError(msg)
+
+
+@pytest.mark.asyncio
+async def test_reconciler_topological_mounting_flow() -> None:
+    """Test full sequential mount in dependency order."""
+    registry = ServiceRegistry()
+    reconciler = Reconciler(registry)
+
+    features = {
+        "FEAT-SYS-PROVIDE_CLOCK": MockClockFeature(),
+        "FEAT-BROKER-FEED_MT5": MockBrokerFeature(),
+        "FEAT-DATA-RETRIEVE_BARS": MockDataFeature(),
+    }
+
+    report = await reconciler.reconcile(
+        discovered_features=features,
+        enabled_feature_ids=features.keys(),
+    )
+
+    assert report.started == (
+        "FEAT-SYS-PROVIDE_CLOCK",
+        "FEAT-BROKER-FEED_MT5",
+        "FEAT-DATA-RETRIEVE_BARS",
+    )
+    assert report.stopped == ()
+    assert report.active_features == (
+        "FEAT-SYS-PROVIDE_CLOCK",
+        "FEAT-BROKER-FEED_MT5",
+        "FEAT-DATA-RETRIEVE_BARS",
+    )
+    assert registry.is_available(SYSTEM_CLOCK)
+    assert registry.is_available(BROKER_MARKET_DATA)
+    assert registry.is_available(HISTORICAL_BARS)
+
+    states = reconciler.feature_states
+    assert states["FEAT-SYS-PROVIDE_CLOCK"] == FeatureState.ACTIVE
+    assert states["FEAT-BROKER-FEED_MT5"] == FeatureState.ACTIVE
+    assert states["FEAT-DATA-RETRIEVE_BARS"] == FeatureState.ACTIVE
+    assert FeatureContext is not None
+
+
+@pytest.mark.asyncio
+async def test_reconciler_transactional_rollback_on_failure() -> None:
+    """Test failure during mount triggers rollback and sets FAILED_START."""
+    registry = ServiceRegistry()
+    reconciler = Reconciler(registry)
+
+    features = {"FEAT-TEST-FAIL_MOUNT": FailingFeature()}
+    report = await reconciler.reconcile(
+        discovered_features=features,
+        enabled_feature_ids=["FEAT-TEST-FAIL_MOUNT"],
+    )
+
+    assert report.started == ()
+    assert "FEAT-TEST-FAIL_MOUNT" in report.errors
+    assert "Fatal error inside mount" in report.errors["FEAT-TEST-FAIL_MOUNT"]
+    assert (
+        reconciler.feature_states["FEAT-TEST-FAIL_MOUNT"] == FeatureState.FAILED_START
+    )
+    assert len(reconciler.active_features) == 0
+
+
+@pytest.mark.asyncio
+async def test_reconciler_graceful_provider_removal_and_dependent_unmount() -> None:
+    """Test removing a provider unmounts dependents in reverse topological order."""
+    registry = ServiceRegistry()
+    reconciler = Reconciler(registry)
+
+    features = {
+        "FEAT-SYS-PROVIDE_CLOCK": MockClockFeature(),
+        "FEAT-BROKER-FEED_MT5": MockBrokerFeature(),
+        "FEAT-DATA-RETRIEVE_BARS": MockDataFeature(),
+    }
+
+    # Step 1: Start all
+    await reconciler.reconcile(
+        discovered_features=features,
+        enabled_feature_ids=features.keys(),
+    )
+    assert len(reconciler.active_features) == 3
+
+    # Step 2: Disable broker provider
+    report2 = await reconciler.reconcile(
+        discovered_features=features,
+        enabled_feature_ids=[
+            "FEAT-SYS-PROVIDE_CLOCK",
+            "FEAT-DATA-RETRIEVE_BARS",
+        ],  # Broker missing/disabled
+    )
+
+    # Both Data (dependent) and Broker should be stopped
+    assert "FEAT-DATA-RETRIEVE_BARS" in report2.stopped
+    assert "FEAT-BROKER-FEED_MT5" in report2.stopped
+    assert reconciler.active_features == ("FEAT-SYS-PROVIDE_CLOCK",)
+    assert not registry.is_available(HISTORICAL_BARS)
+    assert not registry.is_available(BROKER_MARKET_DATA)
+    assert registry.is_available(SYSTEM_CLOCK)
+
+    # Data is in BLOCKED state because Broker is unavailable
+    assert reconciler.feature_states["FEAT-DATA-RETRIEVE_BARS"] == FeatureState.BLOCKED
+    assert reconciler.feature_states["FEAT-BROKER-FEED_MT5"] == FeatureState.DISABLED
+
+
+@pytest.mark.asyncio
+async def test_reconciler_config_change_triggers_remount() -> None:
+    """Test updating a feature configuration triggers remount."""
+    registry = ServiceRegistry()
+    reconciler = Reconciler(registry)
+
+    features = {"FEAT-SYS-PROVIDE_CLOCK": MockClockFeature()}
+
+    await reconciler.reconcile(
+        discovered_features=features,
+        enabled_feature_ids=["FEAT-SYS-PROVIDE_CLOCK"],
+        configs={"FEAT-SYS-PROVIDE_CLOCK": {"mode": "utc"}},
+    )
+    assert reconciler.active_features == ("FEAT-SYS-PROVIDE_CLOCK",)
+
+    # Reconcile with updated config
+    report = await reconciler.reconcile(
+        discovered_features=features,
+        enabled_feature_ids=["FEAT-SYS-PROVIDE_CLOCK"],
+        configs={"FEAT-SYS-PROVIDE_CLOCK": {"mode": "simulated"}},
+    )
+
+    assert "FEAT-SYS-PROVIDE_CLOCK" in report.stopped
+    assert "FEAT-SYS-PROVIDE_CLOCK" in report.started
+    assert reconciler.active_features == ("FEAT-SYS-PROVIDE_CLOCK",)
+
+
+@pytest.mark.asyncio
+async def test_reconciler_stop_all() -> None:
+    """Test stop_all stops all active features and cleans registry."""
+    registry = ServiceRegistry()
+    reconciler = Reconciler(registry)
+
+    features = {
+        "FEAT-SYS-PROVIDE_CLOCK": MockClockFeature(),
+        "FEAT-BROKER-FEED_MT5": MockBrokerFeature(),
+    }
+
+    await reconciler.reconcile(
+        discovered_features=features,
+        enabled_feature_ids=features.keys(),
+    )
+    assert len(reconciler.active_features) == 2
+
+    await reconciler.stop_all()
+    assert len(reconciler.active_features) == 0
+    assert not registry.is_available(SYSTEM_CLOCK)
+    assert not registry.is_available(BROKER_MARKET_DATA)

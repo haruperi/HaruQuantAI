@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 """CI check script for HaruQuantAI.
 
-Runs Ruff format check, Ruff lint check, Mypy type check, and Pytest with coverage.
+Runs Ruff format check, Ruff lint check, Mypy type check, Import Linter,
+Architectural AST Invariants, and Pytest with coverage.
 """
 
 import subprocess
@@ -47,6 +48,8 @@ def main() -> None:
         (["ruff", "format", "--check", "."], "Ruff Format Check"),
         (["ruff", "check", "."], "Ruff Lint Check"),
         (["mypy"], "Mypy Type Check"),
+        (["lint-imports"], "Import Linter Check"),
+        (["python", "scripts/architecture_check.py"], "Architectural AST Check"),
         (
             [
                 "pytest",
@@ -100,7 +103,6 @@ def main() -> None:
     print("========================================")
     print("[SUCCESS] All quality gates passed!")
     print("========================================\n")
-    sys.exit(0)
 
 
 if __name__ == "__main__":

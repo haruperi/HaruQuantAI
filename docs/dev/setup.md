@@ -311,12 +311,12 @@ Before implementing features, describe every feature in capability terms.
 
 For example:
 
-| Feature                            | Provides                   | Required capabilities                       | Optional capabilities | Removal result                           |
-| ---------------------------------- | -------------------------- | ------------------------------------------- | --------------------- | ---------------------------------------- |
-| `FEAT-BROKER-01` MT5 market data | `broker.market-data@1`   | `system.clock@1`                          | `system.metrics@1`  | MT5 market data becomes unavailable      |
-| `FEAT-DATA-01` Historical bars   | `data.historical-bars@1` | `broker.market-data@1`                    | `data.bar-cache@1`  | Historical retrieval becomes unavailable |
-| `FEAT-RES-01` Research dataset   | `research.dataset@1`     | `data.historical-bars@1`                  | —                    | Research feature becomes blocked         |
-| `FEAT-TRADING-01` Live execution | `trading.execution@1`    | `broker.execution@1`, `risk.approval@1` | `notifications@1`   | Live trading becomes blocked             |
+| Feature                                            | Provides                   | Required capabilities                       | Optional capabilities | Removal result                           |
+| -------------------------------------------------- | -------------------------- | ------------------------------------------- | --------------------- | ---------------------------------------- |
+| `FEAT-BROKER-FEED_MT5` MT5 market data           | `broker.market-data@1`   | `system.clock@1`                          | `system.metrics@1`  | MT5 market data becomes unavailable      |
+| `FEAT-DATA-RETRIEVE_BARS` Historical bars        | `data.historical-bars@1` | `broker.market-data@1`                    | `data.bar-cache@1`  | Historical retrieval becomes unavailable |
+| `FEAT-RESEARCH-PREPARE_DATASET` Research dataset | `research.dataset@1`     | `data.historical-bars@1`                  | —                    | Research feature becomes blocked         |
+| `FEAT-TRADING-EXECUTE_LIVE` Live execution       | `trading.execution@1`    | `broker.execution@1`, `risk.approval@1` | `notifications@1`   | Live trading becomes blocked             |
 
 This table is more important than the folder tree because it defines the runtime graph.
 
@@ -379,7 +379,7 @@ This gives you an important safety property:
 Create a contract package independent of implementations:
 
 ```text
-src/app/contracts/
+app/contracts/
 ├── broker/
 │   ├── market_data.py
 │   └── execution.py
@@ -398,7 +398,7 @@ Python `Protocol` is well suited to this because implementations can satisfy a c
 First create the generic capability identifier:
 
 ```python
-# src/app/kernel/capability.py
+# app/kernel/capability.py
 
 from dataclasses import dataclass
 from typing import Generic, TypeVar
@@ -649,7 +649,7 @@ last failure
 That allows the runtime to expose:
 
 ```text
-FEAT-DATA-01 owns:
+FEAT-DATA-RETRIEVE_BARS owns:
 - 1 service binding
 - 2 event listeners
 - 1 background task
@@ -751,7 +751,7 @@ The registry maps capability keys to active providers:
 
 ```text
 data.historical-bars@1
-    provider: FEAT-DATA-01
+    provider: FEAT-DATA-RETRIEVE_BARS
     generation: 4
     status: ACTIVE
 ```
@@ -891,27 +891,27 @@ A deployment configuration might look like this:
 [application]
 profile = "research"
 
-[features."FEAT-BROKER-MT5-01"]
+[features."FEAT-BROKER-FEED_MT5"]
 enabled = true
 
-[features."FEAT-BROKER-MT5-01".config]
+[features."FEAT-BROKER-FEED_MT5".config]
 terminal_path = "C:/MetaTrader 5/terminal64.exe"
 
-[features."FEAT-DATA-01"]
+[features."FEAT-DATA-RETRIEVE_BARS"]
 enabled = true
 
-[features."FEAT-DATA-01".config]
+[features."FEAT-DATA-RETRIEVE_BARS".config]
 default_timeframe = "M1"
 cache_enabled = true
 
-[features."FEAT-RES-01"]
+[features."FEAT-RESEARCH-PREPARE_DATASET"]
 enabled = true
 ```
 
 The loader should tolerate this situation:
 
 ```toml
-[features."FEAT-DATA-01"]
+[features."FEAT-DATA-RETRIEVE_BARS"]
 enabled = true
 ```
 
@@ -920,9 +920,9 @@ while the feature package no longer exists.
 The result should be:
 
 ```text
-FEAT-DATA-01: MISSING
+FEAT-DATA-RETRIEVE_BARS: MISSING
 data.historical-bars@1: UNAVAILABLE
-FEAT-RES-01: BLOCKED
+FEAT-RESEARCH-PREPARE_DATASET: BLOCKED
 application process: RUNNING
 research profile readiness: NOT READY
 ```
@@ -985,10 +985,10 @@ Do not begin with all domains. Build two features:
 For example:
 
 ```text
-FEAT-BROKER-01
+FEAT-BROKER-FEED_MT5
     provides broker.market-data@1
 
-FEAT-DATA-01
+FEAT-DATA-RETRIEVE_BARS
     requires broker.market-data@1
     provides data.historical-bars@1
 ```
@@ -996,7 +996,7 @@ FEAT-DATA-01
 ## Data feature package
 
 ```text
-src/app/services/data/
+app/services/data/
 └── historical_bars/
     ├── __init__.py
     ├── manifest.py
@@ -1063,7 +1063,7 @@ from app.services.data.historical_bars.retrieve import (
 
 class HistoricalBarsFeature:
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-01",
+        feature_id="FEAT-DATA-RETRIEVE_BARS",
         domain="data",
         provides=frozenset({HISTORICAL_BARS}),
         requires=frozenset({BROKER_MARKET_DATA}),
@@ -1126,7 +1126,7 @@ Expected:
 
 ```text
 broker.market-data@1: UNAVAILABLE
-FEAT-DATA-01: BLOCKED
+FEAT-DATA-RETRIEVE_BARS: BLOCKED
 data.historical-bars@1: UNAVAILABLE
 application: RUNNING
 ```
@@ -1139,8 +1139,8 @@ Expected:
 
 ```text
 new broker provider: ACTIVE
-FEAT-DATA-01: automatically becomes eligible
-FEAT-DATA-01: ACTIVE
+FEAT-DATA-RETRIEVE_BARS: automatically becomes eligible
+FEAT-DATA-RETRIEVE_BARS: ACTIVE
 data.historical-bars@1: ACTIVE
 ```
 
@@ -1275,7 +1275,7 @@ Purge command
 Example:
 
 ```text
-Feature: FEAT-DATA-01
+Feature: FEAT-DATA-RETRIEVE_BARS
 Namespace: data.historical_bars
 Schema version: 3
 Unload policy: retain
@@ -1312,7 +1312,7 @@ For a trading system, this is critical.
 Consider:
 
 ```text
-FEAT-TRADING-LIVE
+FEAT-TRADING-EXECUTE_LIVE
     requires:
         broker.execution@1
         risk.approval@1
@@ -1394,7 +1394,7 @@ Example response:
   },
   "data.realtime-ticks@1": {
     "available": true,
-    "provider": "FEAT-DATA-02"
+    "provider": "FEAT-DATA-STREAM_TICKS"
   }
 }
 ```
@@ -1609,7 +1609,7 @@ Run it as:
 
 ```bash
 uv run --frozen \
-  python scripts/verify_feature_removal.py FEAT-DATA-01
+  python scripts/verify_feature_removal.py FEAT-DATA-RETRIEVE_BARS
 ```
 
 Also run a second variant that deliberately leaves stale configuration behind. That proves stale configuration results in `MISSING`, not a startup crash.
@@ -1644,72 +1644,73 @@ A feature is not complete until all of these are true:
 # 24. Recommended feature README template
 
 ```markdown
-# FEAT-DATA-01 — Historical Bars
+# FEAT-DATA-RETRIEVE_BARS — Historical Bars
 
 ## Purpose
 
-Retrieve normalized historical bars.
+Retrieve and normalize historical OHLCV price bars across customizable timeframes and symbols from the active broker market data provider.
 
 ## Domain
 
-Data
+`data`
 
 ## Provides
 
-- data.historical-bars@1
+- `data.historical-bars@1`
 
 ## Required Capabilities
 
-- broker.market-data@1
+- `broker.market-data@1`
 
 ## Optional Capabilities
 
-- data.bar-cache@1
-- system.metrics@1
+- `data.bar-cache@1`
+- `system.metrics@1`
 
 ## Configuration
 
-| Field | Type | Required | Description |
-|---|---|---:|---|
-| default_timeframe | str | No | Default bar timeframe |
-| cache_enabled | bool | No | Enable persistent cache |
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `default_timeframe` | `str` | `"M1"` | Default bar timeframe interval |
+| `cache_enabled` | `bool` | `true` | Whether persistent cache is enabled |
 
 ## Runtime Effects
 
 | Effect | Owner | Disposal |
 |---|---|---|
-| HistoricalBars service binding | FEAT-DATA-01 | Unregister provider |
-| Provider-disconnect listener | FEAT-DATA-01 | Remove listener |
-| Cache refresh task | FEAT-DATA-01 | Cancel and await |
+| `HistoricalBars` service binding | `FEAT-DATA-RETRIEVE_BARS` | Unregister provider |
+| Provider-disconnect listener | `FEAT-DATA-RETRIEVE_BARS` | Remove listener from EventBus |
+| Cache refresh background task | `FEAT-DATA-RETRIEVE_BARS` | Cancel and await task |
 
 ## Persistent State
 
-- Namespace: data.historical_bars
-- Unload policy: retain
-- Purge policy: explicit
+- Namespace: `data.historical_bars`
+- Schema Version: `1`
+- Unload policy: `retain`
+- Purge policy: `explicit`
 
 ## Functional Requirements
 
-| Requirement | Responsibility | Symbol |
-|---|---|---|
-| FR-DATA-001 | Validate request | validate_request() |
-| FR-DATA-002 | Retrieve bars | HistoricalBarsService.retrieve() |
-| FR-DATA-003 | Normalize provider output | normalize_bars() |
-| FR-DATA-004 | Append cache | append_bars() |
+| Requirement ID | Responsibility | Implementing Symbol | Source File |
+|---|---|---|---|
+| `FR-DATA-VALIDATE_CONFIG` | Validate configuration parameters | `HistoricalBarsConfig.from_dict()` | `config.py` |
+| `FR-DATA-VALIDATE_REQUEST` | Validate request parameters and date bounds | `validate_historical_request()` | `validate_request.py` |
+| `FR-DATA-NORMALIZE_BARS` | Normalize broker raw bars to canonical Bar DTOs | `normalize_bars()` | `normalize.py` |
+| `FR-DATA-RETRIEVE_BARS` | Coordinate bar retrieval via broker contract | `HistoricalBarsService.retrieve()` | `retrieve.py` |
 
 ## Failure Behavior
 
-- Missing broker.market-data@1 → BLOCKED
-- Cache unavailable → runs without caching
-- Provider timeout → typed transient error
+- Missing `broker.market-data@1` → `BLOCKED`
+- Cache unavailable → runs in degraded mode without caching
+- Invalid parameters → raises `ValueError`
 
 ## Removal Behavior
 
-Removing this feature makes data.historical-bars@1 unavailable.
+Removing this feature makes `data.historical-bars@1` unavailable. Downstream consumers transition cleanly to `BLOCKED`.
 No persistent bar data is automatically deleted.
 ```
 
-This README can be used to generate the domain capability catalog automatically.
+This README format is used to generate the domain capability catalog and verify feature compliance.
 
 ---
 
@@ -1816,7 +1817,7 @@ A process-level replacement can still provide zero application downtime through 
 Implement the kernel in this exact sequence:
 
 ```text
-src/app/kernel/
+app/kernel/
 ├── errors.py
 ├── capability.py
 ├── feature.py
