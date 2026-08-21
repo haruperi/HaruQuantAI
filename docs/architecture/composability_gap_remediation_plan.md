@@ -680,38 +680,38 @@ app/kernel/supervision.py
 
 ## Task 6.1 — Detect task outcomes
 
-- [ ] Attach a completion observer to every task created by `FeatureScope.spawn()`.
-- [ ] Distinguish normal completion, intentional cancellation, and unexpected exception.
-- [ ] Capture exception type, message, traceback summary, owner feature ID, and task name.
-- [ ] Do not classify cancellation during scope shutdown as failure.
+- [x] Attach a completion observer to every task created by `FeatureScope.spawn()`.
+- [x] Distinguish normal completion, intentional cancellation, and unexpected exception.
+- [x] Capture exception type, message, traceback summary, owner feature ID, and task name.
+- [x] Do not classify cancellation during scope shutdown as failure.
 
 ## Task 6.2 — Notify the reconciler
 
-- [ ] Give the scope a runtime-failure callback supplied by the reconciler.
-- [ ] Serialize failure handling through the engine/reconciler lock.
-- [ ] Transition the owner to `FAILED_RUNTIME`.
-- [ ] Close the owner's scope.
-- [ ] Remove its capability bindings.
-- [ ] Stop or block transitive dependents.
-- [ ] Emit a typed `FeatureRuntimeFailedEvent`.
+- [x] Give the scope a runtime-failure callback supplied by the reconciler.
+- [x] Serialize failure handling through the engine/reconciler lock.
+- [x] Transition the owner to `FAILED_RUNTIME`.
+- [x] Close the owner's scope.
+- [x] Remove its capability bindings.
+- [x] Stop or block transitive dependents.
+- [x] Emit a typed `FeatureRuntimeFailedEvent`.
 
 ## Task 6.3 — Recovery policy
 
-- [ ] Default to no automatic restart loop.
-- [ ] Permit a bounded restart policy only when explicitly configured later.
-- [ ] Record last failure and failure count in runtime diagnostics.
-- [ ] Keep the application shell live.
-- [ ] Recalculate readiness immediately.
+- [x] Default to no automatic restart loop.
+- [x] Permit a bounded restart policy only when explicitly configured later.
+- [x] Record last failure and failure count in runtime diagnostics.
+- [x] Keep the application shell live.
+- [x] Recalculate readiness immediately.
 
 ## Task 6.4 — Tests and example
 
-- [ ] Spawn a worker that raises unexpectedly.
-- [ ] Assert the feature reaches `FAILED_RUNTIME`.
-- [ ] Assert its capability disappears.
-- [ ] Assert required consumers become `BLOCKED`.
-- [ ] Assert unrelated features remain `ACTIVE`.
-- [ ] Assert shutdown cancellation does not create a failure event.
-- [ ] Add a runnable failure-injection example that prints the state transition.
+- [x] Spawn a worker that raises unexpectedly.
+- [x] Assert the feature reaches `FAILED_RUNTIME`.
+- [x] Assert its capability disappears.
+- [x] Assert required consumers become `BLOCKED`.
+- [x] Assert unrelated features remain `ACTIVE`.
+- [x] Assert shutdown cancellation does not create a failure event.
+- [x] Add a runnable failure-injection example that prints the state transition.
 
 ## Proposed commit
 
@@ -721,8 +721,8 @@ feat(kernel): supervise runtime task failures
 
 ## Exit criteria
 
-- [ ] No crashed feature remains reported as active.
-- [ ] Task failure propagates through capability and readiness status safely.
+- [x] No crashed feature remains reported as active.
+- [x] Task failure propagates through capability and readiness status safely.
 
 ---
 

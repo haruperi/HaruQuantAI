@@ -14,6 +14,7 @@ from app.composition.readiness import check_profile_readiness
 from app.contracts.events.system import (
     ConfigurationReloadedEvent,
     FeatureReconfiguredEvent,
+    FeatureRuntimeFailedEvent,
 )
 from app.kernel.events import EventBus
 from app.kernel.feature import FeatureState
@@ -73,10 +74,33 @@ class CompositionEngine:
         self._reconciler = Reconciler(
             registry=self._registry,
             event_bus=self._event_bus,
+            failure_callback=self._on_feature_runtime_failed,
         )
         self._config: AppConfig = AppConfig()
         self._last_discovery: DiscoveryResult | None = None
         self._last_report: ReconciliationReport | None = None
+
+    async def _on_feature_runtime_failed(
+        self,
+        feature_id: str,
+        task_name: str,
+        exc: BaseException,
+    ) -> None:
+        """Publish FeatureRuntimeFailedEvent when a background task crashes.
+
+        Args:
+            feature_id: Failing feature ID.
+            task_name: Diagnostic name of crashed task.
+            exc: Exception that caused the failure.
+        """
+        await self._event_bus.publish(
+            FeatureRuntimeFailedEvent(
+                feature_id=feature_id,
+                task_name=task_name,
+                error_message=str(exc),
+                timestamp=datetime.now(UTC),
+            )
+        )
 
     @property
     def event_bus(self) -> EventBus:

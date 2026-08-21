@@ -14,6 +14,10 @@ from typing import Any, TypeVar
 
 T = TypeVar("T")
 
+TaskFailureCallback = Callable[
+    [str, str, BaseException], Coroutine[Any, Any, None] | None
+]
+
 
 class EffectType(StrEnum):
     """Categorization of runtime effects owned by a feature scope."""
@@ -61,16 +65,31 @@ async def cancel_and_wait(task: asyncio.Task[Any]) -> None:
 class FeatureScope:
     """Owns and tracks all reversible runtime effects of one mounted feature."""
 
-    def __init__(self, owner_id: str) -> None:
+    def __init__(
+        self,
+        owner_id: str,
+        on_failure: TaskFailureCallback | None = None,
+    ) -> None:
         """Initialize a new feature scope.
 
         Args:
             owner_id: Unique identifier of the owning feature.
+            on_failure: Optional callback triggered on unexpected background task crash.
         """
         self.owner_id = owner_id
         self._stack = AsyncExitStack()
         self._effects: list[EffectRecord] = []
         self._closed = False
+        self._on_failure = on_failure
+        self._tracked_failure_tasks: set[asyncio.Task[Any]] = set()
+
+    def set_failure_callback(self, callback: TaskFailureCallback | None) -> None:
+        """Set or update the runtime failure callback.
+
+        Args:
+            callback: Failure handler callback.
+        """
+        self._on_failure = callback
 
     @property
     def is_closed(self) -> bool:
@@ -182,6 +201,19 @@ class FeatureScope:
             created_at=datetime.now(UTC),
         )
         self._effects.append(record)
+
+        def _on_task_done(t: asyncio.Task[Any]) -> None:
+            if self._closed or t.cancelled():
+                return
+            exc = t.exception()
+            if exc is not None and self._on_failure is not None:
+                coro = self._on_failure(self.owner_id, name, exc)
+                if coro is not None:
+                    bg_task = asyncio.create_task(coro)
+                    self._tracked_failure_tasks.add(bg_task)
+                    bg_task.add_done_callback(self._tracked_failure_tasks.discard)
+
+        task.add_done_callback(_on_task_done)
 
         async def teardown_task() -> None:
             try:

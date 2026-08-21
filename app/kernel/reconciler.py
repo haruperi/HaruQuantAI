@@ -1,7 +1,7 @@
 """Reconciler comparing desired and actual states to execute mount/unmount."""
 
 import inspect
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Coroutine, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -46,18 +46,22 @@ class ReconciliationReport:
 
 
 class Reconciler:
-    """Orchestrates transactional mounting and unmounting of features."""
+    """Executes state transitions and manages active feature lifecycles."""
 
     def __init__(
         self,
         registry: ServiceRegistry,
         event_bus: EventBus | None = None,
+        failure_callback: (
+            Callable[[str, str, BaseException], Coroutine[Any, Any, None] | None] | None
+        ) = None,
     ) -> None:
         """Initialize the reconciler.
 
         Args:
             registry: Central ServiceRegistry used for capability binding.
             event_bus: Optional central EventBus used for inter-feature messaging.
+            failure_callback: Optional callback invoked when a runtime task crashes.
         """
         self._registry = registry
         if event_bus is None:
@@ -66,10 +70,24 @@ class Reconciler:
             self._event_bus = BusClass()
         else:
             self._event_bus = event_bus
+        self._failure_callback = failure_callback
         self._active_features: dict[str, Feature] = {}
         self._active_scopes: dict[str, FeatureScope] = {}
         self._feature_states: dict[str, FeatureState] = {}
         self._active_configs: dict[str, object] = {}
+
+    def set_failure_callback(
+        self,
+        callback: (
+            Callable[[str, str, BaseException], Coroutine[Any, Any, None] | None] | None
+        ),
+    ) -> None:
+        """Set or update the runtime failure callback.
+
+        Args:
+            callback: Failure handler callback.
+        """
+        self._failure_callback = callback
 
     @property
     def feature_states(self) -> dict[str, FeatureState]:
@@ -288,7 +306,7 @@ class Reconciler:
         """
         f_id = feature.spec.feature_id
         self._feature_states[f_id] = FeatureState.PREPARING
-        scope = FeatureScope(owner_id=f_id)
+        scope = FeatureScope(owner_id=f_id, on_failure=self.handle_runtime_failure)
 
         def registrar(cap: CapabilityKey[Any], impl: object, sc: FeatureScope) -> None:
             self._registry.register(cap, impl, owner_id=f_id, scope=sc)
@@ -400,7 +418,9 @@ class Reconciler:
         old_scope = self._active_scopes.get(f_id)
         old_feature = self._active_features.get(f_id)
 
-        staged_scope = FeatureScope(owner_id=f_id)
+        staged_scope = FeatureScope(
+            owner_id=f_id, on_failure=self.handle_runtime_failure
+        )
         staged_providers: list[tuple[CapabilityKey[Any], object]] = []
 
         def staged_registrar(
@@ -459,6 +479,38 @@ class Reconciler:
             status=status,
             error=None,
         )
+
+    async def handle_runtime_failure(
+        self,
+        feature_id: str,
+        task_name: str,
+        exc: BaseException,
+    ) -> None:
+        """Handle unexpected background task crash by marking feature FAILED_RUNTIME.
+
+        Args:
+            feature_id: ID of the failing feature.
+            task_name: Diagnostic name of the failing task.
+            exc: Exception that caused the failure.
+        """
+        self._feature_states[feature_id] = FeatureState.FAILED_RUNTIME
+        scope = self._active_scopes.pop(feature_id, None)
+        self._active_features.pop(feature_id, None)
+        self._active_configs.pop(feature_id, None)
+
+        if scope is not None:
+            await scope.close()
+
+        # Revoke all capabilities registered by this feature
+        active_caps = self._registry.active_capabilities()
+        for token in list(active_caps.values()):
+            if token.owner_id == feature_id:
+                self._registry.revoke(token)
+
+        if self._failure_callback is not None:
+            res = self._failure_callback(feature_id, task_name, exc)
+            if inspect.isawaitable(res):
+                await res
 
     async def _stop_feature(self, f_id: str) -> None:
         """Unmount an active feature and close its private scope.

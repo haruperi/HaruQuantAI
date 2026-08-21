@@ -77,3 +77,20 @@ class FeatureReconfiguredEvent:
     feature_id: str
     generation: int
     timestamp: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class FeatureRuntimeFailedEvent:
+    """Emitted when a background task in an active feature fails unexpectedly.
+
+    Attributes:
+        feature_id: Unique identifier of the failing feature.
+        task_name: Diagnostic name of the failing task.
+        error_message: Error description or exception string.
+        timestamp: Time of failure in UTC.
+    """
+
+    feature_id: str
+    task_name: str
+    error_message: str
+    timestamp: datetime
