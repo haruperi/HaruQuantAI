@@ -1,4 +1,6 @@
-"""Feature composition and lifecycle mounting for Historical Bars."""
+"""Lifecycle composition for the Historical Bars feature."""
+
+from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class HistoricalBarsFeature:
-    """Feature package providing normalized historical bars capability."""
+    """Provide normalized historical bars through the active broker contract."""
 
     spec: FeatureSpec = SPEC
 
@@ -23,25 +25,16 @@ class HistoricalBarsFeature:
         context: FeatureContext,
         config: object,
     ) -> None:
-        """Mount feature, resolve broker dependency, and register capability.
-
-        Args:
-            context: Scoped feature context.
-            config: Feature configuration dictionary or object.
-        """
-        cfg_dict = config if isinstance(config, dict) else {}
-        _bars_config = HistoricalBarsConfig.from_dict(cfg_dict)
-
-        market_data = context.require(BROKER_MARKET_DATA)
-        service = HistoricalBarsService(market_data=market_data)
-
+        """Resolve market data and publish the historical-bars service."""
+        raw_config = config if isinstance(config, dict) else {}
+        bars_config = HistoricalBarsConfig.from_dict(raw_config)
+        service = HistoricalBarsService(
+            market_data=context.require(BROKER_MARKET_DATA),
+            default_timeframe=bars_config.default_timeframe,
+        )
         context.provide(HISTORICAL_BARS, service)
 
 
 def create_feature() -> HistoricalBarsFeature:
-    """Entry point factory creating HistoricalBarsFeature instance.
-
-    Returns:
-        New HistoricalBarsFeature instance.
-    """
+    """Create a HistoricalBarsFeature instance."""
     return HistoricalBarsFeature()

@@ -1,4 +1,6 @@
-"""Feature specifications, lifecycle states, and interface protocols."""
+"""Feature specifications, lifecycle states, and optional lifecycle protocols."""
+
+from __future__ import annotations
 
 from collections.abc import Awaitable
 from dataclasses import dataclass, field
@@ -31,18 +33,7 @@ class FeatureState(StrEnum):
 
 @dataclass(frozen=True, slots=True)
 class FeatureSpec:
-    """Static capability declaration and metadata for a feature package.
-
-    Attributes:
-        feature_id: Unique feature identifier (e.g., 'FEAT-DATA-RETRIEVE_BARS').
-        domain: Business domain name (e.g., 'data', 'broker', 'risk').
-        provides: Set of capability keys provided by this feature.
-        requires: Set of mandatory capability keys required for activation.
-        optional: Set of optional capability keys consumed if available.
-        conflicts: Set of conflicting feature IDs that cannot run concurrently.
-        description: Brief description of the feature responsibility.
-        state: Optional persistent state ownership declaration.
-    """
+    """Static identity, capability graph, state, and configuration declaration."""
 
     feature_id: str
     domain: str
@@ -52,29 +43,44 @@ class FeatureSpec:
     conflicts: frozenset[str] = field(default_factory=frozenset)
     description: str = ""
     state: StateDeclaration | None = None
+    config_keys: frozenset[str] = field(default_factory=frozenset)
 
     def validate(self) -> None:
-        """Validate specification consistency and structural integrity.
-
-        Raises:
-            ValueError: If specifications violate invariants (e.g., overlap).
-        """
+        """Validate feature identity and declaration consistency."""
         if not self.feature_id.strip():
-            msg = "Feature ID must not be empty."
-            raise ValueError(msg)
+            raise ValueError("Feature ID must not be empty")
         if not self.domain.strip():
-            msg = "Domain must not be empty."
-            raise ValueError(msg)
+            raise ValueError("Domain must not be empty")
         overlap = self.provides.intersection(self.requires)
         if overlap:
-            overlap_ids = ", ".join(k.identifier for k in overlap)
-            msg = f"Feature cannot both provide and require capability: {overlap_ids}"
-            raise ValueError(msg)
+            identifiers = ", ".join(
+                sorted(capability.identifier for capability in overlap)
+            )
+            raise ValueError(
+                "Feature cannot both provide and require capability: "
+                + identifiers
+            )
+        dependency_overlap = self.requires.intersection(self.optional)
+        if dependency_overlap:
+            identifiers = ", ".join(
+                sorted(capability.identifier for capability in dependency_overlap)
+            )
+            raise ValueError(
+                "Capability cannot be both required and optional: " + identifiers
+            )
+        invalid_config_keys = sorted(
+            key for key in self.config_keys if not key or key.strip() != key
+        )
+        if invalid_config_keys:
+            raise ValueError(
+                f"Feature config keys must be non-empty and trimmed: "
+                f"{invalid_config_keys}"
+            )
 
 
 @runtime_checkable
 class Feature(Protocol):
-    """Protocol satisfied by all composable feature implementations."""
+    """Protocol satisfied by every composable feature implementation."""
 
     spec: FeatureSpec
 
@@ -83,37 +89,32 @@ class Feature(Protocol):
         context: FeatureContext,
         config: object,
     ) -> None:
-        """Mount the feature into the given lifecycle context with configuration.
-
-        Args:
-            context: Reversible feature context providing scoped operations.
-            config: Validated feature-specific configuration object.
-        """
+        """Register all lifecycle-owned effects and capability providers."""
         ...
 
 
 @runtime_checkable
 class HealthCheckableFeature(Protocol):
-    """Optional protocol for features supporting pre-commit health check."""
+    """Optional pre-commit health-check lifecycle protocol."""
 
     def health_check(self) -> Awaitable[None] | None:
-        """Verify internal health before transactional replacement commit."""
+        """Validate replacement health before publication."""
         ...
 
 
 @runtime_checkable
 class QuiesceableFeature(Protocol):
-    """Optional protocol for features supporting graceful pausing before unmount."""
+    """Optional protocol for pausing new work before retirement."""
 
     def quiesce(self) -> Awaitable[None] | None:
-        """Pause active ingestion/processing prior to retirement."""
+        """Stop accepting new work before teardown."""
         ...
 
 
 @runtime_checkable
 class DrainableFeature(Protocol):
-    """Optional protocol for features supporting in-flight work draining."""
+    """Optional protocol for draining in-flight work before retirement."""
 
     def drain(self) -> Awaitable[None] | None:
-        """Drain active in-flight requests or buffers prior to retirement."""
+        """Wait for in-flight work to complete before teardown."""
         ...

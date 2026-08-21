@@ -1,4 +1,6 @@
-"""Main application entry point and executable composition runtime."""
+"""Executable HaruQuantAI composition runtime."""
+
+from __future__ import annotations
 
 import argparse
 import asyncio
@@ -12,116 +14,104 @@ from app.api.http import SystemHttpServer
 from app.composition.engine import CompositionEngine
 
 
+def _status_payload(engine: CompositionEngine) -> dict[str, object]:
+    api = create_api(engine=engine)
+    status = api.system.get_runtime_status()
+    capabilities = api.system.list_capabilities()
+    if status is None:
+        return {"profile": "unknown", "is_ready": False}
+    return {
+        "profile": status.profile,
+        "is_ready": status.is_ready,
+        "missing_profile_capabilities": list(
+            status.missing_profile_capabilities
+        ),
+        "active_features": list(status.active_features),
+        "active_capabilities": list(status.active_capabilities),
+        "feature_states": {
+            feature_id: state.value
+            for feature_id, state in status.feature_states.items()
+        },
+        "blocked_features": status.blocked_features,
+        "package_dependency_errors": status.package_dependency_errors,
+        "capability_dependency_errors": status.capability_dependency_errors,
+        "runtime_failures": status.runtime_failures,
+        "cleanup_errors": {
+            feature_id: list(errors)
+            for feature_id, errors in status.cleanup_errors.items()
+        },
+        "replacement_reports": {
+            feature_id: {
+                "old_generation": report.old_generation,
+                "new_generation": report.new_generation,
+                "committed": report.committed,
+                "rolled_back": report.rolled_back,
+                "status": report.status,
+                "error": report.error,
+                "cleanup_errors": list(report.cleanup_errors),
+                "consumer_errors": list(report.consumer_errors),
+            }
+            for feature_id, report in status.replacement_reports.items()
+        },
+        "errors": status.errors,
+        "capabilities": {
+            identifier: {
+                "identifier": info.identifier,
+                "is_available": info.is_available,
+                "provider_feature_id": info.provider_feature_id,
+                "generation": info.generation,
+                "registered_at": (
+                    info.registered_at.isoformat() if info.registered_at else None
+                ),
+            }
+            for identifier, info in capabilities.items()
+        },
+    }
+
+
 async def async_main(argv: Sequence[str] | None = None) -> int:
-    """Run asynchronous application composition runtime.
-
-    Args:
-        argv: Command-line arguments sequence (defaults to sys.argv[1:]).
-
-    Returns:
-        Exit code (0 for success, non-zero for fatal configuration/runtime error).
-    """
+    """Run the composition runtime and return a process exit code."""
     parser = argparse.ArgumentParser(
         prog="haruquantai",
-        description="HaruQuantAI Quantitative Financial Trading System",
+        description="HaruQuantAI quantitative composition runtime",
     )
-    parser.add_argument(
-        "--config",
-        type=str,
-        default=None,
-        help="Path to application TOML configuration file.",
-    )
-    parser.add_argument(
-        "--status",
-        action="store_true",
-        help="Print machine-readable runtime status diagnostics as JSON and exit.",
-    )
-    parser.add_argument(
-        "--serve",
-        action="store_true",
-        help="Start the system control plane HTTP server.",
-    )
-    parser.add_argument(
-        "--host",
-        type=str,
-        default="127.0.0.1",
-        help="Host interface to bind control plane server to (default: 127.0.0.1).",
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=8000,
-        help="Port to bind control plane server to (default: 8000).",
-    )
-
+    parser.add_argument("--config", type=str, default=None)
+    parser.add_argument("--status", action="store_true")
+    parser.add_argument("--serve", action="store_true")
+    parser.add_argument("--host", type=str, default="127.0.0.1")
+    parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args(args=argv if argv is not None else sys.argv[1:])
 
     engine = CompositionEngine()
     try:
         if args.config is not None:
-            config_file = Path(args.config)
-            if not config_file.exists():  # noqa: ASYNC240
-                print(f"[ERROR] Configuration file not found: {config_file}")
+            config_path = Path(args.config)
+            if not config_path.is_file():  # noqa: ASYNC240
+                print(f"[ERROR] Configuration file not found: {config_path}")
                 return 1
-            await engine.load_and_reconcile_file(config_file)
-
-        api = create_api(engine=engine)
+            await engine.load_and_reconcile_file(config_path)
 
         if args.status:
-            status = api.system.get_runtime_status()
-            caps = api.system.list_capabilities()
-            status_dict = {
-                "profile": status.profile if status else "default",
-                "is_ready": status.is_ready if status else False,
-                "missing_profile_capabilities": (
-                    list(status.missing_profile_capabilities) if status else []
-                ),
-                "active_features": (list(status.active_features) if status else []),
-                "active_capabilities": (
-                    list(status.active_capabilities) if status else []
-                ),
-                "feature_states": (
-                    {k: v.value for k, v in status.feature_states.items()}
-                    if status
-                    else {}
-                ),
-                "blocked_features": (status.blocked_features if status else {}),
-                "package_dependency_errors": (
-                    status.package_dependency_errors if status else {}
-                ),
-                "capability_dependency_errors": (
-                    status.capability_dependency_errors if status else {}
-                ),
-                "errors": status.errors if status else {},
-                "capabilities": {
-                    k: {
-                        "identifier": v.identifier,
-                        "is_available": v.is_available,
-                        "provider_feature_id": v.provider_feature_id,
-                        "generation": v.generation,
-                        "registered_at": (
-                            v.registered_at.isoformat() if v.registered_at else None
-                        ),
-                    }
-                    for k, v in caps.items()
-                },
-            }
-            print(json.dumps(status_dict, indent=2))
+            print(json.dumps(_status_payload(engine), indent=2))
             return 0
 
         if args.serve:
+            api = create_api(engine=engine)
             server = SystemHttpServer(api=api, host=args.host, port=args.port)
             print(
-                f"[INFO] HaruQuantAI system control plane running at http://{args.host}:{args.port}"
+                "[INFO] HaruQuantAI system control plane running at "
+                f"http://{args.host}:{args.port}"
             )
-            await server.serve_forever()
+            try:
+                await server.serve_forever()
+            finally:
+                await server.stop()
             return 0
 
-        profile_name = engine.config.profile
         print(
-            f"HaruQuantAI initialized (Profile: '{profile_name}'). "
-            f"Active features: {len(engine.reconciler.active_features)}. "
-            f"Use --status or --serve."
+            f"HaruQuantAI initialized (profile='{engine.config.profile}', "
+            f"active_features={len(engine.reconciler.active_features)}). "
+            "Use --status or --serve."
         )
         return 0
     finally:
@@ -129,9 +119,8 @@ async def async_main(argv: Sequence[str] | None = None) -> int:
 
 
 def run() -> None:
-    """Synchronous entry point for project.scripts."""
-    exit_code = asyncio.run(async_main())
-    sys.exit(exit_code)
+    """Synchronous project script entry point."""
+    raise SystemExit(asyncio.run(async_main()))
 
 
 if __name__ == "__main__":

@@ -1,13 +1,19 @@
-name: Provider Removability Verification
+name: Feature Removability Verification
 
 on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
   schedule:
     - cron: "0 2 * * *"
   workflow_dispatch:
-  pull_request:
-    branches: [ main, master ]
   release:
     types: [published]
+
+concurrency:
+  group: removability-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   removability-matrix:
@@ -26,10 +32,12 @@ jobs:
         run: uv python install
 
       - name: Install dependencies
-        run: uv sync --dev
+        run: uv sync --frozen --dev
 
       - name: Run physical deletion and removability verification
-        run: uv run python scripts/verify_feature_removal.py --all --report removability-report.json
+        run: >-
+          uv run --frozen python scripts/verify_feature_removal.py
+          --all --report removability-report.json
 
       - name: Upload removability report
         uses: actions/upload-artifact@v4
@@ -37,4 +45,4 @@ jobs:
         with:
           name: removability-report
           path: removability-report.json
-          if-no-files-found: ignore
+          if-no-files-found: error

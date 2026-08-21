@@ -1,4 +1,6 @@
-"""Tests for FR-DATA-RETRIEVE_BARS use case coordination."""
+"""Tests for historical-bars use-case coordination."""
+
+from __future__ import annotations
 
 from collections.abc import Sequence
 from datetime import UTC, datetime
@@ -16,10 +18,17 @@ from app.services.data.historical_bars.retrieve import HistoricalBarsService
 
 
 class DummyBrokerMarketData(BrokerMarketData):
-    """Test double implementing BrokerMarketData protocol."""
+    """Broker test double recording the effective request."""
+
+    def __init__(self) -> None:
+        self.last_request: BrokerBarsRequest | None = None
 
     @override
-    async def retrieve_bars(self, request: BrokerBarsRequest) -> Sequence[BrokerRawBar]:
+    async def retrieve_bars(
+        self,
+        request: BrokerBarsRequest,
+    ) -> Sequence[BrokerRawBar]:
+        self.last_request = request
         return (
             BrokerRawBar(
                 timestamp=request.start,
@@ -34,15 +43,16 @@ class DummyBrokerMarketData(BrokerMarketData):
 
 @pytest.mark.asyncio
 async def test_historical_bars_service_retrieve() -> None:
-    """Test retrieving and normalizing historical bars via use case service."""
-    broker_feed = DummyBrokerMarketData()
-    service = HistoricalBarsService(market_data=broker_feed)
-
-    start = datetime(2026, 1, 1, 0, 0, tzinfo=UTC)
-    end = datetime(2026, 1, 1, 0, 30, tzinfo=UTC)
-    req = HistoricalBarsRequest(symbol="EURUSD", timeframe="M5", start=start, end=end)
-
-    bars = await service.retrieve(req)
+    broker = DummyBrokerMarketData()
+    service = HistoricalBarsService(market_data=broker)
+    start = datetime(2026, 1, 1, tzinfo=UTC)
+    request = HistoricalBarsRequest(
+        symbol="EURUSD",
+        timeframe="M5",
+        start=start,
+        end=datetime(2026, 1, 1, 0, 30, tzinfo=UTC),
+    )
+    bars = await service.retrieve(request)
     assert len(bars) == 1
     assert bars[0].datetime == start
     assert bars[0].open == 1.1000
@@ -50,17 +60,35 @@ async def test_historical_bars_service_retrieve() -> None:
 
 
 @pytest.mark.asyncio
-async def test_historical_bars_service_invalid_request_raises() -> None:
-    """Test that invalid request parameters raise ValueError before calling broker."""
-    broker_feed = DummyBrokerMarketData()
-    service = HistoricalBarsService(market_data=broker_feed)
-
-    invalid_req = HistoricalBarsRequest(
-        symbol="",
-        timeframe="M1",
-        start=datetime(2026, 1, 1, tzinfo=UTC),
-        end=datetime(2026, 1, 2, tzinfo=UTC),
+async def test_blank_timeframe_uses_configured_default() -> None:
+    """The documented default_timeframe is an actual runtime fallback."""
+    broker = DummyBrokerMarketData()
+    service = HistoricalBarsService(
+        market_data=broker,
+        default_timeframe="H1",
     )
+    await service.retrieve(
+        HistoricalBarsRequest(
+            symbol="EURUSD",
+            timeframe="   ",
+            start=datetime(2026, 1, 1, tzinfo=UTC),
+            end=datetime(2026, 1, 2, tzinfo=UTC),
+        )
+    )
+    assert broker.last_request is not None
+    assert broker.last_request.timeframe == "H1"
 
+
+@pytest.mark.asyncio
+async def test_historical_bars_service_invalid_request_raises() -> None:
+    broker = DummyBrokerMarketData()
+    service = HistoricalBarsService(market_data=broker)
     with pytest.raises(ValueError, match="Symbol must not be empty"):
-        await service.retrieve(invalid_req)
+        await service.retrieve(
+            HistoricalBarsRequest(
+                symbol="",
+                timeframe="M1",
+                start=datetime(2026, 1, 1, tzinfo=UTC),
+                end=datetime(2026, 1, 2, tzinfo=UTC),
+            )
+        )

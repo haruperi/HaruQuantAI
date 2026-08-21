@@ -1,7 +1,9 @@
-"""Reconciler comparing desired and actual states to execute mount/unmount."""
+"""Reconcile desired and actual feature state with lifecycle-safe transitions."""
+
+from __future__ import annotations
 
 import inspect
-from collections.abc import Callable, Coroutine, Iterable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -23,19 +25,15 @@ if TYPE_CHECKING:
     from app.kernel.events import EventBus
     from app.kernel.registry import ServiceRegistry
 
+RuntimeFailureCallback = Callable[
+    [str, str, BaseException], Awaitable[None] | None
+]
+StagedProvider = tuple[CapabilityKey[Any], object]
+
 
 @dataclass(frozen=True, slots=True)
 class ReconciliationReport:
-    """Report summarizing the outcome of a reconciliation pass.
-
-    Attributes:
-        started: Tuple of feature IDs started during this pass.
-        stopped: Tuple of feature IDs stopped during this pass.
-        active_features: Tuple of currently active feature IDs.
-        blocked_features: Mapping of blocked feature IDs to diagnostic reasons.
-        feature_states: Snapshot map of all feature IDs to FeatureState.
-        errors: Mapping of feature IDs to startup error descriptions.
-    """
+    """Summarize one desired-versus-actual reconciliation pass."""
 
     started: tuple[str, ...]
     stopped: tuple[str, ...]
@@ -46,23 +44,15 @@ class ReconciliationReport:
 
 
 class Reconciler:
-    """Executes state transitions and manages active feature lifecycles."""
+    """Own feature scopes and execute deterministic lifecycle transitions."""
 
     def __init__(
         self,
         registry: ServiceRegistry,
         event_bus: EventBus | None = None,
-        failure_callback: (
-            Callable[[str, str, BaseException], Coroutine[Any, Any, None] | None] | None
-        ) = None,
+        failure_callback: RuntimeFailureCallback | None = None,
     ) -> None:
-        """Initialize the reconciler.
-
-        Args:
-            registry: Central ServiceRegistry used for capability binding.
-            event_bus: Optional central EventBus used for inter-feature messaging.
-            failure_callback: Optional callback invoked when a runtime task crashes.
-        """
+        """Initialize the reconciler."""
         self._registry = registry
         if event_bus is None:
             from app.kernel.events import EventBus as BusClass
@@ -75,37 +65,47 @@ class Reconciler:
         self._active_scopes: dict[str, FeatureScope] = {}
         self._feature_states: dict[str, FeatureState] = {}
         self._active_configs: dict[str, object] = {}
+        self._active_resolution: GraphResolution | None = None
+        self._known_features: dict[str, Feature] = {}
+        self._desired_enabled: set[str] = set()
+        self._desired_configs: dict[str, object] = {}
+        self._provider_selections: dict[str, str] = {}
+        self._runtime_failures: dict[str, str] = {}
+        self._replacement_reports: dict[str, ReplacementReport] = {}
+        self._startup_blocks: dict[str, str] = {}
+        self._last_report: ReconciliationReport | None = None
 
     def set_failure_callback(
         self,
-        callback: (
-            Callable[[str, str, BaseException], Coroutine[Any, Any, None] | None] | None
-        ),
+        callback: RuntimeFailureCallback | None,
     ) -> None:
-        """Set or update the runtime failure callback.
-
-        Args:
-            callback: Failure handler callback.
-        """
+        """Set the engine-level serialized runtime-failure callback."""
         self._failure_callback = callback
 
     @property
     def feature_states(self) -> dict[str, FeatureState]:
-        """Return a copy of all current feature states.
-
-        Returns:
-            Dictionary mapping feature IDs to FeatureState.
-        """
+        """Return a snapshot of feature lifecycle states."""
         return dict(self._feature_states)
 
     @property
     def active_features(self) -> tuple[str, ...]:
-        """Return tuple of all currently active feature IDs.
+        """Return active feature IDs in activation order."""
+        return tuple(self._active_features)
 
-        Returns:
-            Tuple of active feature IDs.
-        """
-        return tuple(self._active_features.keys())
+    @property
+    def runtime_failures(self) -> dict[str, str]:
+        """Return the most recent runtime failure per feature."""
+        return dict(self._runtime_failures)
+
+    @property
+    def replacement_reports(self) -> dict[str, ReplacementReport]:
+        """Return the latest replacement report per feature."""
+        return dict(self._replacement_reports)
+
+    @property
+    def last_report(self) -> ReconciliationReport | None:
+        """Return the latest reconciliation report."""
+        return self._last_report
 
     async def reconcile(
         self,
@@ -114,107 +114,118 @@ class Reconciler:
         configs: Mapping[str, object] | None = None,
         provider_selections: Mapping[str, str] | None = None,
     ) -> ReconciliationReport:
-        """Reconcile active features with desired configuration.
-
-        Args:
-            discovered_features: Mapping of feature_id to Feature instances.
-            enabled_feature_ids: Collection of feature IDs requested to run.
-            configs: Optional mapping of feature_id to feature config objects.
-            provider_selections: Optional capability-to-provider mappings.
-
-        Returns:
-            ReconciliationReport detailing started, stopped, and active features.
-        """
+        """Reconcile active features against a desired configuration."""
         enabled_set = set(enabled_feature_ids)
         config_map = dict(configs or {})
-        specs: dict[str, FeatureSpec] = {
-            f_id: feat.spec for f_id, feat in discovered_features.items()
+        selection_map = dict(provider_selections or {})
+        specs = {
+            feature_id: feature.spec
+            for feature_id, feature in discovered_features.items()
         }
-
-        graph = DependencyGraph(specs, provider_selections=provider_selections)
-        resolution = graph.resolve(enabled_set, provider_selections=provider_selections)
+        resolution = DependencyGraph(
+            specs,
+            provider_selections=selection_map,
+        ).resolve(enabled_set)
 
         to_stop, to_start = self._plan_transitions(resolution, config_map)
-        stopped_list = await self._execute_stops(to_stop, resolution.stop_order)
-        started_list, errors = await self._execute_starts(
-            resolution.start_order, to_start, discovered_features, config_map
+        stop_order = self._combined_stop_order(resolution)
+        stopped = await self._execute_stops(to_stop, stop_order)
+        self._startup_blocks = {}
+        started, errors = await self._execute_starts(
+            resolution.start_order,
+            to_start,
+            discovered_features,
+            config_map,
+        )
+        blocked = self._update_feature_states(
+            discovered_features,
+            enabled_set,
+            resolution,
+            errors,
         )
 
-        all_blocked = self._update_feature_states(
-            discovered_features, enabled_set, resolution, errors
-        )
+        self._known_features = dict(discovered_features)
+        self._desired_enabled = set(enabled_set)
+        self._desired_configs = dict(config_map)
+        self._provider_selections = dict(selection_map)
+        for feature_id in started:
+            self._runtime_failures.pop(feature_id, None)
+        self._commit_active_resolution()
 
-        return ReconciliationReport(
-            started=tuple(started_list),
-            stopped=tuple(stopped_list),
-            active_features=tuple(self._active_features.keys()),
-            blocked_features=all_blocked,
+        report = ReconciliationReport(
+            started=tuple(started),
+            stopped=tuple(stopped),
+            active_features=tuple(self._active_features),
+            blocked_features=blocked,
             feature_states=dict(self._feature_states),
             errors=errors,
         )
+        self._last_report = report
+        return report
 
     def _plan_transitions(
         self,
         resolution: GraphResolution,
-        config_map: dict[str, object],
+        config_map: Mapping[str, object],
     ) -> tuple[set[str], set[str]]:
-        """Calculate features to stop and start including transitive consumer remounts.
-
-        Args:
-            resolution: Current dependency resolution.
-            config_map: Desired configuration mapping.
-
-        Returns:
-            Tuple of (features_to_stop set, features_to_start set).
-        """
         target_active = set(resolution.eligible_features)
-        current_active = set(self._active_features.keys())
+        current_active = set(self._active_features)
+        seeds = current_active.symmetric_difference(target_active)
+        seeds.update(
+            feature_id
+            for feature_id in current_active.intersection(target_active)
+            if self._active_configs.get(feature_id) != config_map.get(feature_id)
+        )
 
-        to_remount: set[str] = set()
-        for f_id in current_active.intersection(target_active):
-            if self._active_configs.get(f_id) != config_map.get(f_id):
-                to_remount.add(f_id)
+        previous_provider_map = (
+            self._active_resolution.provider_map
+            if self._active_resolution is not None
+            else {}
+        )
+        for capability in set(previous_provider_map) | set(resolution.provider_map):
+            previous_provider = previous_provider_map.get(capability)
+            next_provider = resolution.provider_map.get(capability)
+            if previous_provider == next_provider:
+                continue
+            if previous_provider is not None:
+                seeds.add(previous_provider)
+            if next_provider is not None:
+                seeds.add(next_provider)
 
-        all_changing = to_remount | (current_active - target_active)
-        transitive_closure: set[str] = set()
-        for f_id in all_changing:
-            closure = resolution.get_transitive_dependents(f_id)
-            transitive_closure.update(closure.intersection(target_active))
+        affected = set(seeds)
+        for feature_id in tuple(seeds):
+            if self._active_resolution is not None:
+                affected.update(
+                    self._active_resolution.get_transitive_dependents(feature_id)
+                )
+            affected.update(resolution.get_transitive_dependents(feature_id))
 
-        to_remount.update(transitive_closure)
-
-        to_stop = (current_active - target_active) | to_remount
-        to_start = (target_active - current_active) | to_remount
+        remount = affected.intersection(current_active).intersection(target_active)
+        to_stop = (current_active - target_active) | remount
+        to_start = (target_active - current_active) | remount
         return to_stop, to_start
+
+    def _combined_stop_order(
+        self,
+        next_resolution: GraphResolution,
+    ) -> tuple[str, ...]:
+        ordered: list[str] = []
+        if self._active_resolution is not None:
+            ordered.extend(self._active_resolution.stop_order)
+        ordered.extend(next_resolution.stop_order)
+        ordered.extend(reversed(tuple(self._active_features)))
+        return tuple(dict.fromkeys(ordered))
 
     async def _execute_stops(
         self,
         to_stop: set[str],
-        stop_order: Sequence[str] | None = None,
+        stop_order: Sequence[str],
     ) -> list[str]:
-        """Execute unmounting of features in reverse topological stop order.
-
-        Args:
-            to_stop: Set of feature IDs to stop.
-            stop_order: Optional topological stop order from graph resolution.
-
-        Returns:
-            List of successfully stopped feature IDs.
-        """
         stopped: list[str] = []
-        ordered_candidates: list[str] = []
-        if stop_order is not None:
-            for f_id in stop_order:
-                if f_id in to_stop and f_id in self._active_features:
-                    ordered_candidates.append(f_id)
-
-        for f_id in reversed(list(self._active_features.keys())):
-            if f_id in to_stop and f_id not in ordered_candidates:
-                ordered_candidates.append(f_id)
-
-        for f_id in ordered_candidates:
-            await self._stop_feature(f_id)
-            stopped.append(f_id)
+        for feature_id in stop_order:
+            if feature_id in to_stop and feature_id in self._active_features:
+                await self._stop_feature(feature_id)
+                stopped.append(feature_id)
         return stopped
 
     async def _execute_starts(
@@ -222,36 +233,36 @@ class Reconciler:
         start_order: Sequence[str],
         to_start: set[str],
         discovered_features: Mapping[str, Feature],
-        config_map: dict[str, object],
+        config_map: Mapping[str, object],
     ) -> tuple[list[str], dict[str, str]]:
-        """Execute mounting of features in topological start order.
-
-        Args:
-            start_order: Topological execution order.
-            to_start: Set of features to start.
-            discovered_features: Discovered feature instances.
-            config_map: Configuration dictionary.
-
-        Returns:
-            Tuple of (started feature ID list, errors map).
-        """
         started: list[str] = []
         errors: dict[str, str] = {}
-
-        for f_id in start_order:
-            if f_id in to_start:
-                feature = discovered_features.get(f_id)
-                if feature is None:
-                    self._feature_states[f_id] = FeatureState.MISSING
-                    continue
-
-                cfg = config_map.get(f_id)
-                success, error_msg = await self._start_feature(feature, cfg)
-                if success:
-                    started.append(f_id)
-                else:
-                    errors[f_id] = error_msg or "Failed to mount"
-
+        for feature_id in start_order:
+            if feature_id not in to_start:
+                continue
+            feature = discovered_features.get(feature_id)
+            if feature is None:
+                self._feature_states[feature_id] = FeatureState.MISSING
+                continue
+            missing = [
+                capability.identifier
+                for capability in feature.spec.requires
+                if not self._registry.is_available(capability)
+            ]
+            if missing:
+                self._startup_blocks[feature_id] = (
+                    "Required capabilities failed to activate: "
+                    + ", ".join(sorted(missing))
+                )
+                continue
+            success, error = await self._start_feature(
+                feature,
+                config_map.get(feature_id),
+            )
+            if success:
+                started.append(feature_id)
+            else:
+                errors[feature_id] = error or "Failed to mount"
         return started, errors
 
     def _update_feature_states(
@@ -261,131 +272,151 @@ class Reconciler:
         resolution: GraphResolution,
         errors: Mapping[str, str],
     ) -> dict[str, str]:
-        """Update lifecycle state enum for all known features.
-
-        Args:
-            discovered_features: Discovered feature instances.
-            enabled_set: Enabled feature IDs.
-            resolution: Graph resolution results.
-            errors: Startup errors map.
-
-        Returns:
-            Combined blocked features reason map.
-        """
         blocked = dict(resolution.blocked_features)
-        for f_id in discovered_features:
-            if f_id in self._active_features:
-                self._feature_states[f_id] = FeatureState.ACTIVE
-            elif f_id in errors:
-                self._feature_states[f_id] = FeatureState.FAILED_START
-            elif f_id in blocked:
-                self._feature_states[f_id] = FeatureState.BLOCKED
-            elif f_id not in enabled_set:
-                self._feature_states[f_id] = FeatureState.DISABLED
-
-        for f_id in enabled_set:
-            if f_id not in discovered_features:
-                self._feature_states[f_id] = FeatureState.MISSING
-                blocked[f_id] = "Feature package not found (MISSING)"
-
+        blocked.update(self._startup_blocks)
+        for feature_id in discovered_features:
+            if feature_id in self._active_features:
+                self._feature_states[feature_id] = FeatureState.ACTIVE
+            elif feature_id in errors:
+                self._feature_states[feature_id] = FeatureState.FAILED_START
+            elif feature_id in blocked:
+                self._feature_states[feature_id] = FeatureState.BLOCKED
+            elif feature_id not in enabled_set:
+                self._feature_states[feature_id] = FeatureState.DISABLED
+        for feature_id in enabled_set:
+            if feature_id not in discovered_features:
+                self._feature_states[feature_id] = FeatureState.MISSING
+                blocked[feature_id] = "Feature package not found (MISSING)"
         return blocked
+
+    async def _stage_feature(
+        self,
+        feature: Feature,
+        config: object,
+        scope: FeatureScope,
+    ) -> list[StagedProvider]:
+        staged_providers: list[StagedProvider] = []
+
+        def collect_provider(
+            capability: CapabilityKey[Any],
+            implementation: object,
+            _scope: FeatureScope,
+        ) -> None:
+            staged_providers.append((capability, implementation))
+
+        context = DefaultFeatureContext(
+            spec=feature.spec,
+            scope=scope,
+            resolver=self._registry.resolve,
+            provider_registrar=collect_provider,
+            event_bus=self._event_bus,
+        )
+        await feature.mount(context, config)
+        self._validate_provider_bundle(feature.spec, staged_providers)
+        return staged_providers
+
+    def _validate_provider_bundle(
+        self,
+        spec: FeatureSpec,
+        providers: Sequence[StagedProvider],
+    ) -> None:
+        declared = {capability.identifier for capability in spec.provides}
+        actual = [capability.identifier for capability, _implementation in providers]
+        if len(actual) != len(set(actual)):
+            raise ValueError(
+                f"Feature '{spec.feature_id}' registered a capability more than once"
+            )
+        actual_set = set(actual)
+        if declared != actual_set:
+            missing = sorted(declared - actual_set)
+            unexpected = sorted(actual_set - declared)
+            raise ValueError(
+                f"Feature '{spec.feature_id}' provider bundle mismatch; "
+                f"missing={missing}, unexpected={unexpected}"
+            )
 
     async def _start_feature(
         self,
         feature: Feature,
         config: object,
     ) -> tuple[bool, str | None]:
-        """Mount a single feature within a new temporal scope transactionally.
-
-        Args:
-            feature: Feature instance to mount.
-            config: Configuration object for the feature.
-
-        Returns:
-            Tuple of (success boolean, optional error message).
-        """
-        f_id = feature.spec.feature_id
-        self._feature_states[f_id] = FeatureState.PREPARING
-        scope = FeatureScope(owner_id=f_id, on_failure=self.handle_runtime_failure)
-
-        def registrar(cap: CapabilityKey[Any], impl: object, sc: FeatureScope) -> None:
-            self._registry.register(cap, impl, owner_id=f_id, scope=sc)
-
-        context = DefaultFeatureContext(
-            spec=feature.spec,
-            scope=scope,
-            resolver=self._registry.resolve,
-            provider_registrar=registrar,
-            event_bus=self._event_bus,
-        )
-
+        feature_id = feature.spec.feature_id
+        self._feature_states[feature_id] = FeatureState.PREPARING
+        scope = FeatureScope(owner_id=feature_id)
         try:
-            await feature.mount(context, config)
-            self._active_features[f_id] = feature
-            self._active_scopes[f_id] = scope
-            self._active_configs[f_id] = config
-            self._feature_states[f_id] = FeatureState.ACTIVE
-            return True, None
-        except Exception as err:  # noqa: BLE001
-            await scope.close()
-            self._feature_states[f_id] = FeatureState.FAILED_START
-            return False, str(err)
+            providers = await self._stage_feature(feature, config, scope)
+            self._registry.register_many(
+                [
+                    (capability, implementation, feature_id)
+                    for capability, implementation in providers
+                ],
+                scope=scope,
+            )
+        except Exception as error:  # noqa: BLE001
+            try:
+                await scope.close()
+            finally:
+                self._feature_states[feature_id] = FeatureState.FAILED_START
+            return False, str(error)
+
+        scope.set_failure_callback(self._dispatch_runtime_failure)
+        self._active_features[feature_id] = feature
+        self._active_scopes[feature_id] = scope
+        self._active_configs[feature_id] = config
+        self._feature_states[feature_id] = FeatureState.ACTIVE
+        return True, None
+
+    async def _dispatch_runtime_failure(
+        self,
+        feature_id: str,
+        task_name: str,
+        error: BaseException,
+    ) -> None:
+        if self._failure_callback is None:
+            await self.handle_runtime_failure(feature_id, task_name, error)
+            return
+        result = self._failure_callback(feature_id, task_name, error)
+        if inspect.isawaitable(result):
+            await result
 
     async def _run_health_check(self, feature: Feature) -> None:
-        """Execute optional pre-commit health check hook if implemented.
-
-        Args:
-            feature: Feature instance to check.
-        """
         if isinstance(feature, HealthCheckableFeature) or (
             hasattr(feature, "health_check") and callable(feature.health_check)
         ):
-            res = feature.health_check()
-            if inspect.isawaitable(res):
-                await res
+            result = feature.health_check()
+            if inspect.isawaitable(result):
+                await result
 
     async def _cleanup_old_feature(
         self,
         old_feature: Feature | None,
         old_scope: FeatureScope | None,
     ) -> list[str]:
-        """Execute quiesce, drain, and scope disposal for a replaced feature.
-
-        Args:
-            old_feature: Replaced feature instance if previously active.
-            old_scope: Replaced feature's private scope to close.
-
-        Returns:
-            List of error messages encountered during teardown.
-        """
         cleanup_errors: list[str] = []
         if old_feature is not None:
             if isinstance(old_feature, QuiesceableFeature) or (
                 hasattr(old_feature, "quiesce") and callable(old_feature.quiesce)
             ):
                 try:
-                    q_res = old_feature.quiesce()
-                    if inspect.isawaitable(q_res):
-                        await q_res
-                except Exception as q_err:  # noqa: BLE001
-                    cleanup_errors.append(f"Quiesce error: {q_err}")
-
+                    result = old_feature.quiesce()
+                    if inspect.isawaitable(result):
+                        await result
+                except Exception as error:  # noqa: BLE001
+                    cleanup_errors.append(f"Quiesce error: {error}")
             if isinstance(old_feature, DrainableFeature) or (
                 hasattr(old_feature, "drain") and callable(old_feature.drain)
             ):
                 try:
-                    d_res = old_feature.drain()
-                    if inspect.isawaitable(d_res):
-                        await d_res
-                except Exception as d_err:  # noqa: BLE001
-                    cleanup_errors.append(f"Drain error: {d_err}")
-
+                    result = old_feature.drain()
+                    if inspect.isawaitable(result):
+                        await result
+                except Exception as error:  # noqa: BLE001
+                    cleanup_errors.append(f"Drain error: {error}")
         if old_scope is not None:
             try:
                 await old_scope.close()
-            except Exception as close_err:  # noqa: BLE001
-                cleanup_errors.append(f"Scope cleanup error: {close_err}")
-
+            except Exception as error:  # noqa: BLE001
+                cleanup_errors.append(f"Scope cleanup error: {error}")
         return cleanup_errors
 
     async def swap_feature_transactional(
@@ -393,142 +424,240 @@ class Reconciler:
         feature: Feature,
         config: object,
     ) -> ReplacementReport:
-        """Perform a zero-downtime transactional feature swap using shadow staging.
-
-        Sequence (Section 26):
-            1. Create staged scope and mount new feature instance in staged context.
-            2. Run optional pre-commit health check.
-            3. On pre-commit failure: close staged scope and return rollback report.
-            4. Atomically commit registry bindings, incrementing generation.
-            5. Promote staged scope to active scope (do not close staged scope).
-            6. Execute quiesce and drain on old feature (if supported).
-            7. Dispose old scope and aggregate any cleanup errors.
-
-        Args:
-            feature: New feature instance to mount.
-            config: Configuration for the new feature.
-
-        Returns:
-            ReplacementReport detailing commit/rollback status and diagnostics.
-        """
-        f_id = feature.spec.feature_id
-        active_tokens = self._registry.active_capabilities()
-        old_tokens = [t for t in active_tokens.values() if t.owner_id == f_id]
-        old_gen = old_tokens[0].generation if old_tokens else 0
-        old_scope = self._active_scopes.get(f_id)
-        old_feature = self._active_features.get(f_id)
-
-        staged_scope = FeatureScope(
-            owner_id=f_id, on_failure=self.handle_runtime_failure
-        )
-        staged_providers: list[tuple[CapabilityKey[Any], object]] = []
-
-        def staged_registrar(
-            cap: CapabilityKey[Any], impl: object, _sc: FeatureScope
-        ) -> None:
-            staged_providers.append((cap, impl))
-
-        staged_context = DefaultFeatureContext(
-            spec=feature.spec,
-            scope=staged_scope,
-            resolver=self._registry.resolve,
-            provider_registrar=staged_registrar,
-            event_bus=self._event_bus,
-        )
-
-        try:
-            await feature.mount(staged_context, config)
-            await self._run_health_check(feature)
-        except Exception as err:  # noqa: BLE001
-            await staged_scope.close()
-            return ReplacementReport(
-                feature_id=f_id,
-                old_generation=old_gen,
-                new_generation=old_gen,
+        """Stage, atomically publish, and reconcile a feature replacement."""
+        feature_id = feature.spec.feature_id
+        old_feature = self._active_features.get(feature_id)
+        old_scope = self._active_scopes.get(feature_id)
+        if old_feature is None or old_scope is None:
+            report = ReplacementReport(
+                feature_id=feature_id,
+                old_generation=0,
+                new_generation=0,
                 committed=False,
                 rolled_back=True,
                 status="rolled_back",
-                error=str(err),
+                error=f"Feature '{feature_id}' is not active",
+            )
+            self._replacement_reports[feature_id] = report
+            return report
+
+        old_capabilities = {
+            capability.identifier for capability in old_feature.spec.provides
+        }
+        new_capabilities = {
+            capability.identifier for capability in feature.spec.provides
+        }
+        if old_capabilities != new_capabilities:
+            report = ReplacementReport(
+                feature_id=feature_id,
+                old_generation=0,
+                new_generation=0,
+                committed=False,
+                rolled_back=True,
+                status="rolled_back",
+                error=(
+                    "Hot replacement requires an unchanged provided-capability "
+                    f"bundle; old={sorted(old_capabilities)}, "
+                    f"new={sorted(new_capabilities)}"
+                ),
+            )
+            self._replacement_reports[feature_id] = report
+            return report
+
+        old_tokens = [
+            token
+            for token in self._registry.active_capabilities().values()
+            if token.owner_id == feature_id
+        ]
+        old_generation = max(
+            (token.generation for token in old_tokens),
+            default=0,
+        )
+        staged_scope = FeatureScope(owner_id=feature_id)
+        try:
+            staged_providers = await self._stage_feature(
+                feature,
+                config,
+                staged_scope,
+            )
+            await self._run_health_check(feature)
+
+            replacement_features = dict(self._known_features)
+            replacement_features[feature_id] = feature
+            replacement_specs = {
+                item_id: item.spec
+                for item_id, item in replacement_features.items()
+            }
+            desired_resolution = DependencyGraph(
+                replacement_specs,
+                provider_selections=self._provider_selections,
+            ).resolve(self._desired_enabled)
+
+            new_tokens = self._registry.replace_many(
+                [
+                    (capability, implementation, feature_id)
+                    for capability, implementation in staged_providers
+                ],
+                scope=staged_scope,
+            )
+        except Exception as error:  # noqa: BLE001
+            await staged_scope.close()
+            report = ReplacementReport(
+                feature_id=feature_id,
+                old_generation=old_generation,
+                new_generation=old_generation,
+                committed=False,
+                rolled_back=True,
+                status="rolled_back",
+                error=str(error),
+            )
+            self._replacement_reports[feature_id] = report
+            return report
+
+        staged_scope.set_failure_callback(self._dispatch_runtime_failure)
+        self._active_features[feature_id] = feature
+        self._active_scopes[feature_id] = staged_scope
+        self._active_configs[feature_id] = config
+        self._feature_states[feature_id] = FeatureState.ACTIVE
+        self._known_features[feature_id] = feature
+        self._desired_configs[feature_id] = config
+
+        dependent_ids: set[str] = set()
+        if self._active_resolution is not None:
+            dependent_ids.update(
+                self._active_resolution.get_transitive_dependents(feature_id)
+            )
+        dependent_ids.update(
+            desired_resolution.get_transitive_dependents(feature_id)
+        )
+        active_dependents = dependent_ids.intersection(self._active_features)
+        previous_stop_order = (
+            self._active_resolution.stop_order
+            if self._active_resolution is not None
+            else tuple(reversed(tuple(self._active_features)))
+        )
+        await self._execute_stops(active_dependents, previous_stop_order)
+
+        consumer_errors: list[str] = []
+        if active_dependents:
+            self._startup_blocks = {}
+            _started, start_errors = await self._execute_starts(
+                desired_resolution.start_order,
+                active_dependents,
+                replacement_features,
+                self._desired_configs,
+            )
+            consumer_errors.extend(
+                f"{item_id}: {message}"
+                for item_id, message in sorted(start_errors.items())
+            )
+            consumer_errors.extend(
+                f"{item_id}: {message}"
+                for item_id, message in sorted(self._startup_blocks.items())
             )
 
-        # Commit: Transfer staged providers into global registry with staged_scope
-        new_gen = old_gen + 1
-        for cap, impl in staged_providers:
-            token = self._registry.replace_binding(
-                cap, impl, owner_id=f_id, scope=staged_scope
-            )
-            new_gen = token.generation
-
-        # Record staged scope as active scope (preserved, not closed!)
-        self._active_features[f_id] = feature
-        self._active_scopes[f_id] = staged_scope
-        self._active_configs[f_id] = config
-        self._feature_states[f_id] = FeatureState.ACTIVE
-
-        # Cleanup old feature and scope
         cleanup_errors = await self._cleanup_old_feature(old_feature, old_scope)
-
-        status = "degraded" if cleanup_errors else "committed"
-        return ReplacementReport(
-            feature_id=f_id,
-            old_generation=old_gen,
-            new_generation=new_gen,
+        self._commit_active_resolution()
+        new_generation = max(
+            (token.generation for token in new_tokens),
+            default=old_generation,
+        )
+        status = (
+            "degraded"
+            if cleanup_errors or consumer_errors
+            else "committed"
+        )
+        report = ReplacementReport(
+            feature_id=feature_id,
+            old_generation=old_generation,
+            new_generation=new_generation,
             committed=True,
             rolled_back=False,
             cleanup_errors=tuple(cleanup_errors),
+            consumer_errors=tuple(consumer_errors),
             status=status,
-            error=None,
         )
+        self._replacement_reports[feature_id] = report
+        return report
 
     async def handle_runtime_failure(
         self,
         feature_id: str,
         task_name: str,
-        exc: BaseException,
+        error: BaseException,
     ) -> None:
-        """Handle unexpected background task crash by marking feature FAILED_RUNTIME.
+        """Remove a failed owner and reconcile required and optional consumers."""
+        if feature_id not in self._active_features:
+            return
+        desired_enabled = set(self._desired_enabled or self._active_features)
+        desired_configs = dict(self._desired_configs or self._active_configs)
+        provider_selections = dict(self._provider_selections)
+        known_features = dict(self._known_features or self._active_features)
 
-        Args:
-            feature_id: ID of the failing feature.
-            task_name: Diagnostic name of the failing task.
-            exc: Exception that caused the failure.
-        """
+        recovery_enabled = desired_enabled - {feature_id}
+        recovery_selections = {
+            capability: provider
+            for capability, provider in provider_selections.items()
+            if provider != feature_id
+        }
+        await self.reconcile(
+            known_features,
+            recovery_enabled,
+            configs=desired_configs,
+            provider_selections=recovery_selections,
+        )
+
+        self._desired_enabled = desired_enabled
+        self._desired_configs = desired_configs
+        self._provider_selections = provider_selections
+        self._known_features = known_features
         self._feature_states[feature_id] = FeatureState.FAILED_RUNTIME
+        self._runtime_failures[feature_id] = (
+            f"Task '{task_name}' failed: {type(error).__name__}: {error}"
+        )
+        if self._last_report is not None:
+            self._last_report = ReconciliationReport(
+                started=self._last_report.started,
+                stopped=self._last_report.stopped,
+                active_features=self._last_report.active_features,
+                blocked_features=self._last_report.blocked_features,
+                feature_states=dict(self._feature_states),
+                errors=self._last_report.errors,
+            )
+
+    async def _stop_feature(self, feature_id: str) -> None:
+        self._feature_states[feature_id] = FeatureState.STOPPING
         scope = self._active_scopes.pop(feature_id, None)
         self._active_features.pop(feature_id, None)
         self._active_configs.pop(feature_id, None)
-
         if scope is not None:
             await scope.close()
+        self._feature_states[feature_id] = FeatureState.STOPPED
 
-        # Revoke all capabilities registered by this feature
-        active_caps = self._registry.active_capabilities()
-        for token in list(active_caps.values()):
-            if token.owner_id == feature_id:
-                self._registry.revoke(token)
-
-        if self._failure_callback is not None:
-            res = self._failure_callback(feature_id, task_name, exc)
-            if inspect.isawaitable(res):
-                await res
-
-    async def _stop_feature(self, f_id: str) -> None:
-        """Unmount an active feature and close its private scope.
-
-        Args:
-            f_id: Identifier of the feature to stop.
-        """
-        self._feature_states[f_id] = FeatureState.STOPPING
-        scope = self._active_scopes.pop(f_id, None)
-        self._active_features.pop(f_id, None)
-        self._active_configs.pop(f_id, None)
-
-        if scope is not None:
-            await scope.close()
-
-        self._feature_states[f_id] = FeatureState.STOPPED
+    def _commit_active_resolution(self) -> None:
+        if not self._active_features:
+            self._active_resolution = GraphResolution(
+                eligible_features=(),
+                start_order=(),
+                stop_order=(),
+                blocked_features={},
+                provider_map={},
+            )
+            return
+        active_specs = {
+            feature_id: feature.spec
+            for feature_id, feature in self._active_features.items()
+        }
+        self._active_resolution = DependencyGraph(active_specs).resolve(
+            self._active_features
+        )
 
     async def stop_all(self) -> None:
-        """Stop all active features in reverse order."""
-        for f_id in list(self._active_features.keys())[::-1]:
-            await self._stop_feature(f_id)
+        """Stop all active features in dependency-safe order."""
+        stop_order = (
+            self._active_resolution.stop_order
+            if self._active_resolution is not None
+            else tuple(reversed(tuple(self._active_features)))
+        )
+        await self._execute_stops(set(self._active_features), stop_order)
+        self._commit_active_resolution()

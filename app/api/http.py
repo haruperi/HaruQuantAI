@@ -1,4 +1,6 @@
-"""System domain HTTP control plane and health endpoints."""
+"""Lightweight HTTP control plane for lifecycle and readiness diagnostics."""
+
+from __future__ import annotations
 
 import asyncio
 import json
@@ -36,25 +38,24 @@ def _handle_readiness(api: HaruQuantAPI) -> tuple[int, dict[str, Any]]:
                 "missing_capabilities": list(status.missing_profile_capabilities),
             },
         )
-
-    profile_name = status.profile if status is not None else "unknown"
-    missing = list(status.missing_profile_capabilities) if status is not None else []
     return (
         503,
         {
             "status": "degraded",
-            "profile": profile_name,
+            "profile": status.profile if status is not None else "unknown",
             "is_ready": False,
-            "missing_capabilities": missing,
+            "missing_capabilities": (
+                list(status.missing_profile_capabilities)
+                if status is not None
+                else []
+            ),
         },
     )
 
 
 def _handle_capabilities(api: HaruQuantAPI) -> tuple[int, dict[str, Any]]:
-    caps = api.system.list_capabilities()
-    res_caps: dict[str, dict[str, Any]] = {}
-    for cap_id, info in caps.items():
-        res_caps[cap_id] = {
+    capabilities = {
+        identifier: {
             "identifier": info.identifier,
             "is_available": info.is_available,
             "provider_feature_id": info.provider_feature_id,
@@ -63,29 +64,37 @@ def _handle_capabilities(api: HaruQuantAPI) -> tuple[int, dict[str, Any]]:
                 info.registered_at.isoformat() if info.registered_at else None
             ),
         }
-    return 200, {"capabilities": res_caps}
+        for identifier, info in api.system.list_capabilities().items()
+    }
+    return 200, {"capabilities": capabilities}
 
 
 def _handle_features(api: HaruQuantAPI) -> tuple[int, dict[str, Any]]:
     status = api.system.get_runtime_status()
     feature_ids: set[str] = set()
     if status is not None:
-        feature_ids.update(status.feature_states.keys())
+        feature_ids.update(status.feature_states)
         feature_ids.update(status.active_features)
-        feature_ids.update(status.package_dependency_errors.keys())
-        feature_ids.update(status.capability_dependency_errors.keys())
+        feature_ids.update(status.package_dependency_errors)
+        feature_ids.update(status.capability_dependency_errors)
+        feature_ids.update(status.runtime_failures)
+        feature_ids.update(status.replacement_reports)
 
-    features_report: dict[str, dict[str, Any]] = {}
-    for fid in sorted(feature_ids):
-        diag = api.system.inspect_feature(fid)
-        features_report[fid] = {
-            "feature_id": diag.feature_id,
-            "is_active": diag.is_active,
-            "state": diag.state,
-            "package_error": diag.package_error,
-            "capability_error": diag.capability_error,
+    features: dict[str, dict[str, Any]] = {}
+    for feature_id in sorted(feature_ids):
+        diagnostic = api.system.inspect_feature(feature_id)
+        features[feature_id] = {
+            "feature_id": diagnostic.feature_id,
+            "is_active": diagnostic.is_active,
+            "state": diagnostic.state,
+            "package_error": diagnostic.package_error,
+            "capability_error": diagnostic.capability_error,
+            "runtime_error": diagnostic.runtime_error,
+            "replacement_status": diagnostic.replacement_status,
+            "cleanup_errors": list(diagnostic.cleanup_errors),
+            "consumer_errors": list(diagnostic.consumer_errors),
         }
-    return 200, {"features": features_report}
+    return 200, {"features": features}
 
 
 def handle_system_request(
@@ -93,42 +102,27 @@ def handle_system_request(
     path: str,
     method: str = "GET",
 ) -> tuple[int, dict[str, str], dict[str, Any]]:
-    """Route and handle system control plane HTTP requests.
-
-    Args:
-        api: HaruQuantAPI facade instance.
-        path: Request URI path.
-        method: HTTP request method (default GET).
-
-    Returns:
-        Tuple of (status_code, response_headers, response_body_dict).
-    """
+    """Route one system control-plane request."""
     headers = {"Content-Type": "application/json"}
-
     if method != "GET":
         return 405, headers, {"error": "Method Not Allowed"}
 
-    clean_path = path.split("?", maxsplit=1)[0].rstrip("/")
-    if not clean_path:
-        clean_path = "/"
-
+    clean_path = path.split("?", maxsplit=1)[0].rstrip("/") or "/"
     routes: dict[str, Callable[[], tuple[int, dict[str, Any]]]] = {
         "/system/liveness": _handle_liveness,
         "/system/readiness": lambda: _handle_readiness(api),
         "/system/capabilities": lambda: _handle_capabilities(api),
         "/system/features": lambda: _handle_features(api),
     }
-
     handler = routes.get(clean_path)
-    if handler is not None:
-        status_code, body = handler()
-        return status_code, headers, body
-
-    return 404, headers, {"error": "Not Found", "path": path}
+    if handler is None:
+        return 404, headers, {"error": "Not Found", "path": path}
+    status_code, body = handler()
+    return status_code, headers, body
 
 
 class SystemHttpServer:
-    """Lightweight async HTTP control plane server for system endpoints."""
+    """Minimal asynchronous HTTP server for system diagnostics."""
 
     def __init__(
         self,
@@ -136,13 +130,7 @@ class SystemHttpServer:
         host: str = "127.0.0.1",
         port: int = 8000,
     ) -> None:
-        """Initialize the control plane server.
-
-        Args:
-            api: HaruQuantAPI instance.
-            host: Host interface to bind.
-            port: Port to bind (0 for ephemeral OS selection).
-        """
+        """Initialize the server without binding a socket."""
         self._api = api
         self._host = host
         self._port = port
@@ -150,12 +138,11 @@ class SystemHttpServer:
 
     @property
     def port(self) -> int:
-        """Return bound listening port."""
+        """Return the bound port, including an OS-selected ephemeral port."""
         if self._server is not None and self._server.sockets:
-            sock = self._server.sockets[0]
-            addr = sock.getsockname()
-            if isinstance(addr, tuple):
-                return int(addr[1])
+            address = self._server.sockets[0].getsockname()
+            if isinstance(address, tuple):
+                return int(address[1])
         return self._port
 
     async def _handle_client(
@@ -167,11 +154,7 @@ class SystemHttpServer:
             with suppress(Exception):
                 line = await reader.readline()
                 if not line:
-                    writer.close()
-                    with suppress(Exception):
-                        await writer.wait_closed()
                     return
-
                 request_line = line.decode("utf-8", errors="replace").strip()
                 parts = request_line.split()
                 method, path = (
@@ -179,34 +162,30 @@ class SystemHttpServer:
                     if len(parts) >= MIN_REQUEST_PARTS
                     else ("GET", "/")
                 )
-
-                # Drain remaining HTTP headers
                 while True:
                     header_line = await reader.readline()
                     if not header_line or header_line in (b"\r\n", b"\n"):
                         break
 
                 status_code, headers, body = handle_system_request(
-                    self._api, path, method
+                    self._api,
+                    path,
+                    method,
                 )
                 body_bytes = json.dumps(body).encode()
-
                 status_text = {
                     200: "OK",
                     404: "Not Found",
                     405: "Method Not Allowed",
                     503: "Service Unavailable",
                 }.get(status_code, "Unknown")
-
                 content_type = headers.get("Content-Type", "application/json")
                 response = (
                     f"HTTP/1.1 {status_code} {status_text}\r\n"
                     f"Content-Type: {content_type}\r\n"
                     f"Content-Length: {len(body_bytes)}\r\n"
-                    f"Connection: close\r\n"
-                    f"\r\n"
+                    "Connection: close\r\n\r\n"
                 ).encode() + body_bytes
-
                 writer.write(response)
                 await writer.drain()
         finally:
@@ -215,7 +194,7 @@ class SystemHttpServer:
                 await writer.wait_closed()
 
     async def start(self) -> None:
-        """Start listening for incoming control plane HTTP requests."""
+        """Bind and start accepting control-plane requests."""
         if self._server is None:
             self._server = await asyncio.start_server(
                 self._handle_client,
@@ -224,14 +203,14 @@ class SystemHttpServer:
             )
 
     async def stop(self) -> None:
-        """Stop listening and close all active server sockets."""
+        """Close the listening server."""
         if self._server is not None:
             self._server.close()
             await self._server.wait_closed()
             self._server = None
 
     async def serve_forever(self) -> None:
-        """Serve control plane requests until cancelled."""
+        """Serve until cancelled."""
         await self.start()
         if self._server is not None:
             async with self._server:

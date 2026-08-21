@@ -1,22 +1,17 @@
-"""Configuration validation for Persistent Storage feature."""
+"""Configuration validation for Persistent Storage."""
+
+from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+_ALLOWED_CONFIG_KEYS = frozenset({"driver", "db_path", "base_path"})
+
 
 @dataclass(frozen=True, slots=True)
 class StorageConfig:
-    """Configuration options for persistent storage.
-
-    Satisfies:
-        FR-SYS-VALIDATE_STORAGE_CONFIG: Validates database and storage paths.
-
-    Attributes:
-        db_path: Path to SQLite database file.
-        base_path: Filesystem path to root data directory.
-        driver: Storage engine driver type ('sqlite' or 'disk').
-    """
+    """Configuration for SQLite-backed or disk-backed persistent storage."""
 
     db_path: str = "data/db/haruquantai.db"
     base_path: str = "data/storage"
@@ -24,52 +19,34 @@ class StorageConfig:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> StorageConfig:
-        """Parse and validate configuration dictionary.
-
-        Args:
-            data: Raw dictionary from application configuration.
-
-        Returns:
-            Validated StorageConfig instance.
-
-        Raises:
-            ValueError: If db_path or base_path is empty.
-        """
+        """Parse and validate a strict storage configuration mapping."""
         if not data:
             return cls()
-
-        db_path_str = str(data.get("db_path", "data/db/haruquantai.db")).strip()
-        if not db_path_str:
-            msg = "db_path must not be empty"
-            raise ValueError(msg)
-
-        raw_base = (
-            data.get("base_path")
-            if "base_path" in data
-            else data.get("root_dir", "data/storage")
-        )
-        base_path_str = str(raw_base).strip()
-        if not base_path_str:
-            msg = "base_path must not be empty"
-            raise ValueError(msg)
-
-        driver_str = str(data.get("driver", "sqlite")).strip().lower()
-        if driver_str not in {"sqlite", "disk"}:
-            msg = f"driver must be 'sqlite' or 'disk', got '{driver_str}'"
-            raise ValueError(msg)
-
-        return cls(
-            db_path=db_path_str,
-            base_path=base_path_str,
-            driver=driver_str,
-        )
+        unknown = set(data) - _ALLOWED_CONFIG_KEYS
+        if unknown:
+            raise ValueError(
+                "Unknown Persistent Storage configuration keys: "
+                + ", ".join(sorted(unknown))
+            )
+        db_path = str(data.get("db_path", "data/db/haruquantai.db")).strip()
+        if not db_path:
+            raise ValueError("db_path must not be empty")
+        base_path = str(data.get("base_path", "data/storage")).strip()
+        if not base_path:
+            raise ValueError("base_path must not be empty")
+        driver = str(data.get("driver", "sqlite")).strip().lower()
+        if driver not in {"sqlite", "disk"}:
+            raise ValueError(
+                f"driver must be 'sqlite' or 'disk', got '{driver}'"
+            )
+        return cls(db_path=db_path, base_path=base_path, driver=driver)
 
     @property
     def database_file(self) -> Path:
-        """Return Path object for SQLite database file."""
+        """Return the configured SQLite database path."""
         return Path(self.db_path)
 
     @property
     def root_directory(self) -> Path:
-        """Return Path object for base storage directory."""
+        """Return the configured disk-storage root directory."""
         return Path(self.base_path)

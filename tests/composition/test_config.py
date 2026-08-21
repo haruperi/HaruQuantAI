@@ -1,4 +1,4 @@
-"""Tests for declarative TOML configuration loading and models."""
+"""Tests for declarative TOML configuration loading and validation."""
 
 from pathlib import Path
 
@@ -24,7 +24,6 @@ enabled = true
 
 [features."FEAT-DATA-RETRIEVE_BARS".config]
 default_timeframe = "M1"
-cache_enabled = true
 
 [features."FEAT-TEST-DISABLE_ME"]
 enabled = false
@@ -35,121 +34,125 @@ enabled = false
 
 
 def test_load_config_from_toml_string() -> None:
-    """Test parsing complete TOML configuration."""
-    cfg = load_config_from_toml_string(SAMPLE_TOML)
-
-    assert cfg.profile == "research"
-    assert cfg.is_feature_enabled("FEAT-SYS-PROVIDE_CLOCK")
-    assert cfg.is_feature_enabled("FEAT-DATA-RETRIEVE_BARS")
-    assert not cfg.is_feature_enabled("FEAT-TEST-DISABLE_ME")
-    assert not cfg.is_feature_enabled("FEAT-TEST-NONEXISTENT")
-
-    data_cfg = cfg.get_feature_config("FEAT-DATA-RETRIEVE_BARS")
-    assert data_cfg["default_timeframe"] == "M1"
-    assert data_cfg["cache_enabled"] is True
-
-    assert cfg.get_feature_config("FEAT-SYS-PROVIDE_CLOCK") == {}
-    assert cfg.get_feature_config("FEAT-TEST-NONEXISTENT") == {}
-
-    assert cfg.get_selected_provider("broker.market-data@1") == "FEAT-BROKER-FEED_MOCK"
-    assert cfg.get_selected_provider("system.clock@1") is None
+    """A complete canonical configuration is parsed exactly."""
+    config = load_config_from_toml_string(SAMPLE_TOML)
+    assert config.profile == "research"
+    assert config.is_feature_enabled("FEAT-SYS-PROVIDE_CLOCK")
+    assert config.is_feature_enabled("FEAT-DATA-RETRIEVE_BARS")
+    assert not config.is_feature_enabled("FEAT-TEST-DISABLE_ME")
+    assert not config.is_feature_enabled("FEAT-TEST-NONEXISTENT")
+    assert config.get_feature_config("FEAT-DATA-RETRIEVE_BARS") == {
+        "default_timeframe": "M1"
+    }
+    assert config.get_feature_config("FEAT-SYS-PROVIDE_CLOCK") == {}
+    assert config.get_selected_provider("broker.market-data@1") == (
+        "FEAT-BROKER-FEED_MOCK"
+    )
+    assert config.get_selected_provider("system.clock@1") is None
 
 
 def test_load_config_from_file(tmp_path: Path) -> None:
-    """Test loading configuration from a temporary TOML file."""
+    """Configuration files use the same strict parser."""
     config_file = tmp_path / "app.toml"
     config_file.write_text(SAMPLE_TOML, encoding="utf-8")
-
-    cfg = load_config_from_file(config_file)
-    assert cfg.profile == "research"
-    assert cfg.is_feature_enabled("FEAT-DATA-RETRIEVE_BARS")
+    assert load_config_from_file(config_file).profile == "research"
 
 
 def test_load_config_from_file_missing_raises(tmp_path: Path) -> None:
-    """Test loading from non-existent file raises FileNotFoundError."""
-    missing_file = tmp_path / "non_existent.toml"
+    """Missing configuration files are explicit startup failures."""
     with pytest.raises(FileNotFoundError, match="Configuration file not found"):
-        load_config_from_file(missing_file)
+        load_config_from_file(tmp_path / "missing.toml")
 
 
 def test_default_app_config() -> None:
-    """Test default values of AppConfig."""
-    cfg = AppConfig()
-    assert cfg.profile == "research"
-    assert len(cfg.features) == 0
-    assert len(cfg.provider_selections) == 0
+    """Direct construction retains a research default for embedded callers."""
+    config = AppConfig()
+    assert config.profile == "research"
+    assert config.features == {}
+    assert config.provider_selections == {}
 
 
 def test_legacy_profile_section_rejected() -> None:
-    """Test that [profile] legacy section is rejected with InvalidProfileError."""
-    legacy_toml = """
-    [profile]
-    name = "live"
-
-    [features."FEAT-BROKER-FEED_MOCK"]
-    enabled = true
-    """
+    """The legacy [profile] grammar cannot silently select another profile."""
     with pytest.raises(InvalidProfileError, match=r"(?i)legacy.*profile"):
-        load_config_from_toml_string(legacy_toml)
+        load_config_from_toml_string('[profile]\nname = "live"\n')
 
 
 def test_unknown_profile_rejected() -> None:
-    """Test that unknown profile names are rejected with InvalidProfileError."""
-    unknown_toml = """
-    [application]
-    profile = "unknown_quantum_profile"
-    """
+    """Unknown deployment profiles fail closed."""
     with pytest.raises(InvalidProfileError, match=r"(?i)unknown deployment profile"):
-        load_config_from_toml_string(unknown_toml)
+        load_config_from_toml_string(
+            '[application]\nprofile = "unknown_quantum_profile"\n'
+        )
 
 
-def test_missing_application_section_rejected() -> None:
-    """Test that missing [application] section raises InvalidProfileError."""
-    no_app_toml = """
-    [features."FEAT-BROKER-FEED_MOCK"]
-    enabled = true
-    """
-    with pytest.raises(
-        InvalidProfileError, match=r"(?i)missing required '\[application\]'"
-    ):
-        load_config_from_toml_string(no_app_toml)
-
-
-def test_blank_profile_rejected() -> None:
-    """Test that blank profile string raises InvalidProfileError."""
-    blank_profile_toml = """
-    [application]
-    profile = "   "
-    """
-    with pytest.raises(InvalidProfileError, match=r"(?i)missing or blank 'profile'"):
-        load_config_from_toml_string(blank_profile_toml)
+def test_missing_or_blank_profile_rejected() -> None:
+    """File-based configuration always declares its profile explicitly."""
+    with pytest.raises(InvalidProfileError, match=r"(?i)missing required"):
+        load_config_from_toml_string(
+            '[features."FEAT-BROKER-FEED_MOCK"]\nenabled = true\n'
+        )
+    with pytest.raises(InvalidProfileError, match=r"(?i)missing or blank"):
+        load_config_from_toml_string('[application]\nprofile = "   "\n')
 
 
 def test_malformed_toml_raises_configuration_error() -> None:
-    """Test that invalid TOML syntax raises ConfigurationError."""
-    malformed = "invalid = [ unclosed array"
+    """TOML syntax failures are wrapped in a typed configuration error."""
     with pytest.raises(ConfigurationError, match=r"(?i)failed to parse toml"):
-        load_config_from_toml_string(malformed)
+        load_config_from_toml_string("invalid = [ unclosed array")
 
 
-def test_invalid_providers_table_raises_configuration_error() -> None:
-    """Test that invalid [providers] table structure raises ConfigurationError."""
-    bad_cap_toml = """
-    [application]
-    profile = "research"
-
-    [providers]
-    "invalid_cap_no_version" = "FEAT-TEST"
-    """
+def test_invalid_provider_selection_raises_configuration_error() -> None:
+    """Provider selection identifiers are validated before graph construction."""
     with pytest.raises(ConfigurationError, match=r"(?i)invalid capability identifier"):
-        load_config_from_toml_string(bad_cap_toml)
-
-    bad_val_toml = """
-    [application]
-    profile = "research"
-
-    [providers]
-    "data.historical-bars@1" = ""
-    """
+        load_config_from_toml_string(
+            """
+            [application]
+            profile = "research"
+            [providers]
+            "invalid_cap_no_version" = "FEAT-TEST"
+            """
+        )
     with pytest.raises(ConfigurationError, match=r"(?i)invalid provider feature ID"):
-        load_config_from_toml_string(bad_val_toml)
+        load_config_from_toml_string(
+            """
+            [application]
+            profile = "research"
+            [providers]
+            "data.historical-bars@1" = ""
+            """
+        )
+
+
+def test_unknown_sections_and_invalid_feature_shapes_are_rejected() -> None:
+    """Unknown sections and weakly typed feature declarations cannot be ignored."""
+    with pytest.raises(ConfigurationError, match="Unknown top-level"):
+        load_config_from_toml_string(
+            """
+            [application]
+            profile = "research"
+            [unexpected]
+            value = true
+            """
+        )
+    with pytest.raises(ConfigurationError, match="enabled must be a boolean"):
+        load_config_from_toml_string(
+            """
+            [application]
+            profile = "research"
+            [features.FEAT-TEST]
+            enabled = "yes"
+            """
+        )
+    with pytest.raises(ConfigurationError, match="mixes a .config table"):
+        load_config_from_toml_string(
+            """
+            [application]
+            profile = "research"
+            [features.FEAT-TEST]
+            enabled = true
+            inline_value = 1
+            [features.FEAT-TEST.config]
+            nested_value = 2
+            """
+        )

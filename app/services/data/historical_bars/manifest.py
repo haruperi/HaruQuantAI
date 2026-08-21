@@ -1,4 +1,4 @@
-"""Feature specification and capability metadata for Historical Bars."""
+"""Feature specification for Historical Bars."""
 
 from app.contracts.broker.market_data import BROKER_MARKET_DATA
 from app.contracts.data.historical_bars import HISTORICAL_BARS
@@ -10,4 +10,5 @@ SPEC = FeatureSpec(
     provides=frozenset({HISTORICAL_BARS}),
     requires=frozenset({BROKER_MARKET_DATA}),
     description="Retrieve and normalize historical OHLCV bars from broker",
+    config_keys=frozenset({"default_timeframe"}),
 )

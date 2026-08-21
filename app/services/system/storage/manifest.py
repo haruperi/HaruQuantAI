@@ -1,4 +1,4 @@
-"""Feature specification and capability metadata for Persistent Storage."""
+"""Feature specification for Persistent Storage."""
 
 from app.contracts.system.storage import SYSTEM_STORAGE
 from app.kernel.feature import FeatureSpec
@@ -15,4 +15,5 @@ SPEC = FeatureSpec(
         retention_policy=RetentionPolicy.RETAIN,
         description="Root persistent key-value and partition data files",
     ),
+    config_keys=frozenset({"driver", "db_path", "base_path"}),
 )
