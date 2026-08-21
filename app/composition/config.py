@@ -191,6 +191,8 @@ def load_config_from_toml_string(content: str) -> AppConfig:
         msg = f"Failed to parse TOML configuration: {error}"
         raise ConfigurationError(msg) from error
 
+    if "profile" in raw:
+        _parse_profile(raw)
     unknown_top_level = set(raw) - _ALLOWED_TOP_LEVEL
     if unknown_top_level:
         raise ConfigurationError(

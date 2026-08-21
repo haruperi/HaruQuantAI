@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
 
 
-class TestMarketData(BrokerMarketData):
+class DummyMarketData(BrokerMarketData):
     """Deterministic provider independent of built-in feature packages."""
 
     @override
@@ -48,7 +48,7 @@ class TestMarketData(BrokerMarketData):
         )
 
 
-class TestHistoricalBars(HistoricalBars):
+class DummyHistoricalBars(HistoricalBars):
     """Required consumer retaining the resolved provider object."""
 
     def __init__(self, provider: BrokerMarketData) -> None:
@@ -80,7 +80,7 @@ class TestHistoricalBars(HistoricalBars):
         )
 
 
-class TestProviderFeature(Feature):
+class DummyProviderFeature(Feature):
     """Local provider used by core composability tests."""
 
     spec = FeatureSpec(
@@ -91,10 +91,10 @@ class TestProviderFeature(Feature):
 
     @override
     async def mount(self, context: FeatureContext, _config: object) -> None:
-        context.provide(BROKER_MARKET_DATA, TestMarketData())
+        context.provide(BROKER_MARKET_DATA, DummyMarketData())
 
 
-class TestConsumerFeature(Feature):
+class DummyConsumerFeature(Feature):
     """Local required consumer used by core composability tests."""
 
     spec = FeatureSpec(
@@ -108,7 +108,7 @@ class TestConsumerFeature(Feature):
     async def mount(self, context: FeatureContext, _config: object) -> None:
         context.provide(
             HISTORICAL_BARS,
-            TestHistoricalBars(context.require(BROKER_MARKET_DATA)),
+            DummyHistoricalBars(context.require(BROKER_MARKET_DATA)),
         )
 
 
@@ -116,8 +116,8 @@ class TestConsumerFeature(Feature):
 async def test_vertical_pair_end_to_end_provider_loss_and_recovery() -> None:
     """Required capability loss blocks the consumer without breaking the shell."""
     discoverer = FeatureDiscoverer()
-    discoverer.register_feature(TestProviderFeature())
-    discoverer.register_feature(TestConsumerFeature())
+    discoverer.register_feature(DummyProviderFeature())
+    discoverer.register_feature(DummyConsumerFeature())
     engine = CompositionEngine(discoverer=discoverer)
 
     enabled = """

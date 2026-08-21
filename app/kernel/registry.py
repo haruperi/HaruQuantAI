@@ -95,12 +95,13 @@ class ServiceRegistry:
             ]
             if overlaps:
                 details = ", ".join(
-                    f"{capability_id} -> {self._bindings[capability_id].token.owner_id}"
+                    f"Capability '{capability_id}' is already registered to "
+                    f"'{self._bindings[capability_id].token.owner_id}'"
                     for capability_id in sorted(overlaps)
                 )
                 msg = (
-                    "Active capability bindings cannot be overwritten by normal "
-                    f"registration: {details}"
+                    f"{details}. Active bindings cannot be overwritten by normal "
+                    "registration."
                 )
                 raise CapabilityAlreadyBoundError(msg)
             tokens = self._publish_bundle_locked(bundle)
