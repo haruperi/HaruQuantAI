@@ -2,7 +2,10 @@
 
 from pathlib import Path
 
-PATH = Path(__file__).resolve().parent.parent / "tests/composition/test_hot_reconfiguration.py"
+PATH = (
+    Path(__file__).resolve().parent.parent
+    / "tests/composition/test_hot_reconfiguration.py"
+)
 
 
 def main() -> None:
@@ -10,12 +13,12 @@ def main() -> None:
     content = PATH.read_text(encoding="utf-8")
     old = (
         "    # CRITICAL: Replacement task must STILL be running, not killed by shadow scope close!\n"
-        "    assert lifecycle[\"task_running\"] is True, (\n"
+        '    assert lifecycle["task_running"] is True, (\n'
     )
     new = (
         "    # CRITICAL: Replacement task must STILL be running, not killed by shadow scope close!\n"
         "    read_flag = lifecycle.__getitem__\n"
-        "    assert read_flag(\"task_running\") is True, (\n"
+        '    assert read_flag("task_running") is True, (\n'
     )
     if old not in content:
         raise RuntimeError("Expected first lifecycle assertion was not found")

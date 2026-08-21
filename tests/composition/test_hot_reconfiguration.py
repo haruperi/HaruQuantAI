@@ -345,18 +345,19 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
     await asyncio.sleep(0.02)
 
     # CRITICAL: Replacement task must STILL be running, not killed by shadow scope close!
-    assert lifecycle["task_running"] is True, (
+    read_flag = lifecycle.__getitem__
+    assert read_flag("task_running") is True, (
         "Replacement background task was killed during commit!"
     )
-    assert not lifecycle["task_cancelled"], (
+    assert not read_flag("task_cancelled"), (
         "Replacement task was cancelled during shadow scope cleanup!"
     )
 
     await engine.shutdown()
-    assert lifecycle["task_cancelled"] is True, (
+    assert read_flag("task_cancelled") is True, (
         "Task was not cancelled on engine shutdown"
     )
-    assert lifecycle["callback_cleaned"] is True, (
+    assert read_flag("callback_cleaned") is True, (
         "Cleanup callback was not invoked on engine shutdown"
     )
 
