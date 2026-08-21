@@ -13,6 +13,11 @@ if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
 
 
+def _active_feature_ids(reconciler: Reconciler) -> set[str]:
+    """Return a fresh set so type narrowing cannot outlive mutations."""
+    return set(reconciler.active_features)
+
+
 class MockClockFeature(Feature):
     spec: FeatureSpec = FeatureSpec(
         feature_id="FEAT-SYS-PROVIDE_CLOCK",
@@ -121,7 +126,7 @@ async def test_reconciler_transactional_rollback_on_failure() -> None:
     assert (
         reconciler.feature_states["FEAT-TEST-FAIL_MOUNT"] == FeatureState.FAILED_START
     )
-    assert len(reconciler.active_features) == 0
+    assert not _active_feature_ids(reconciler)
 
 
 @pytest.mark.asyncio
@@ -136,31 +141,26 @@ async def test_reconciler_graceful_provider_removal_and_dependent_unmount() -> N
         "FEAT-DATA-RETRIEVE_BARS": MockDataFeature(),
     }
 
-    # Step 1: Start all
     await reconciler.reconcile(
         discovered_features=features,
         enabled_feature_ids=features.keys(),
     )
-    assert len(reconciler.active_features) == 3
+    assert _active_feature_ids(reconciler) == set(features)
 
-    # Step 2: Disable broker provider
     report2 = await reconciler.reconcile(
         discovered_features=features,
         enabled_feature_ids=[
             "FEAT-SYS-PROVIDE_CLOCK",
             "FEAT-DATA-RETRIEVE_BARS",
-        ],  # Broker missing/disabled
+        ],
     )
 
-    # Both Data (dependent) and Broker should be stopped
     assert "FEAT-DATA-RETRIEVE_BARS" in report2.stopped
     assert "FEAT-BROKER-FEED_MT5" in report2.stopped
-    assert reconciler.active_features == ("FEAT-SYS-PROVIDE_CLOCK",)
+    assert _active_feature_ids(reconciler) == {"FEAT-SYS-PROVIDE_CLOCK"}
     assert not registry.is_available(HISTORICAL_BARS)
     assert not registry.is_available(BROKER_MARKET_DATA)
     assert registry.is_available(SYSTEM_CLOCK)
-
-    # Data is in BLOCKED state because Broker is unavailable
     assert reconciler.feature_states["FEAT-DATA-RETRIEVE_BARS"] == FeatureState.BLOCKED
     assert reconciler.feature_states["FEAT-BROKER-FEED_MT5"] == FeatureState.DISABLED
 
@@ -178,9 +178,8 @@ async def test_reconciler_config_change_triggers_remount() -> None:
         enabled_feature_ids=["FEAT-SYS-PROVIDE_CLOCK"],
         configs={"FEAT-SYS-PROVIDE_CLOCK": {"mode": "utc"}},
     )
-    assert reconciler.active_features == ("FEAT-SYS-PROVIDE_CLOCK",)
+    assert _active_feature_ids(reconciler) == {"FEAT-SYS-PROVIDE_CLOCK"}
 
-    # Reconcile with updated config
     report = await reconciler.reconcile(
         discovered_features=features,
         enabled_feature_ids=["FEAT-SYS-PROVIDE_CLOCK"],
@@ -189,7 +188,7 @@ async def test_reconciler_config_change_triggers_remount() -> None:
 
     assert "FEAT-SYS-PROVIDE_CLOCK" in report.stopped
     assert "FEAT-SYS-PROVIDE_CLOCK" in report.started
-    assert reconciler.active_features == ("FEAT-SYS-PROVIDE_CLOCK",)
+    assert _active_feature_ids(reconciler) == {"FEAT-SYS-PROVIDE_CLOCK"}
 
 
 @pytest.mark.asyncio
@@ -207,10 +206,10 @@ async def test_reconciler_stop_all() -> None:
         discovered_features=features,
         enabled_feature_ids=features.keys(),
     )
-    assert len(reconciler.active_features) == 2
+    assert _active_feature_ids(reconciler) == set(features)
 
     await reconciler.stop_all()
-    assert len(reconciler.active_features) == 0
+    assert not _active_feature_ids(reconciler)
     assert not registry.is_available(SYSTEM_CLOCK)
     assert not registry.is_available(BROKER_MARKET_DATA)
 
@@ -285,7 +284,6 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
         "FEAT-DATA-RETRIEVE_BARS": data_feat,
     }
 
-    # Initial Mount
     await reconciler.reconcile(
         discovered_features=features,
         enabled_feature_ids=features.keys(),
@@ -298,14 +296,12 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
     assert broker_feat.captured_clock == {"mode": "v1", "gen": 1}
     assert data_feat.captured_broker == {"broker_gen": 1}
 
-    # Reconfigure only clock provider
     await reconciler.reconcile(
         discovered_features=features,
         enabled_feature_ids=features.keys(),
         configs={"FEAT-SYS-PROVIDE_CLOCK": {"mode": "v2"}},
     )
 
-    # Provider and all transitive consumers must have been remounted
     assert clock_feat.mount_count == 2
     assert broker_feat.mount_count == 2, (
         "Broker consumer was not remounted on clock change!"
