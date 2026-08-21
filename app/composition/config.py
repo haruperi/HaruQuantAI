@@ -131,9 +131,7 @@ def _parse_features(raw: dict[str, Any]) -> dict[str, FeatureConfig]:
             parsed_config = dict(config)
         else:
             parsed_config = {
-                key: value
-                for key, value in feature_data.items()
-                if key != "enabled"
+                key: value for key, value in feature_data.items() if key != "enabled"
             }
         features[feature_id] = FeatureConfig(
             enabled=enabled,

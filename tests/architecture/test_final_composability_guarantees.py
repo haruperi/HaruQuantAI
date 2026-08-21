@@ -291,9 +291,7 @@ async def test_transactional_replacement_remounts_two_level_consumer_chain() -> 
     assert first_provider is not None
     assert first_provider.generation == 1
 
-    report = await engine.replace_feature_transactional_detailed(
-        "FEAT-TEST-PROVIDER_A"
-    )
+    report = await engine.replace_feature_transactional_detailed("FEAT-TEST-PROVIDER_A")
     assert report.committed
     assert report.status == "committed"
     assert not report.consumer_errors

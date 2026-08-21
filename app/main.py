@@ -23,9 +23,7 @@ def _status_payload(engine: CompositionEngine) -> dict[str, object]:
     return {
         "profile": status.profile,
         "is_ready": status.is_ready,
-        "missing_profile_capabilities": list(
-            status.missing_profile_capabilities
-        ),
+        "missing_profile_capabilities": list(status.missing_profile_capabilities),
         "active_features": list(status.active_features),
         "active_capabilities": list(status.active_capabilities),
         "feature_states": {

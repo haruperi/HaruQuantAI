@@ -57,8 +57,7 @@ class FeatureSpec:
                 sorted(capability.identifier for capability in overlap)
             )
             raise ValueError(
-                "Feature cannot both provide and require capability: "
-                + identifiers
+                "Feature cannot both provide and require capability: " + identifiers
             )
         dependency_overlap = self.requires.intersection(self.optional)
         if dependency_overlap:

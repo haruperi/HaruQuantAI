@@ -259,9 +259,7 @@ class CompositionEngine:
 
     def get_status(self) -> RuntimeStatus:
         """Return the current committed runtime status."""
-        active_capabilities = tuple(
-            sorted(self._registry.active_capabilities())
-        )
+        active_capabilities = tuple(sorted(self._registry.active_capabilities()))
         is_ready, missing = check_profile_readiness(
             self._config.profile,
             active_capabilities,
@@ -273,25 +271,22 @@ class CompositionEngine:
                 if not self._config.is_feature_enabled(feature_id):
                     continue
                 if feature_id in self._last_discovery.failed_imports:
-                    package_errors[feature_id] = (
-                        self._last_discovery.failed_imports[feature_id]
-                    )
+                    package_errors[feature_id] = self._last_discovery.failed_imports[
+                        feature_id
+                    ]
                 elif feature_id in self._last_discovery.missing_targets:
-                    package_errors[feature_id] = (
-                        self._last_discovery.missing_targets[feature_id]
-                    )
+                    package_errors[feature_id] = self._last_discovery.missing_targets[
+                        feature_id
+                    ]
 
         latest_report = self._reconciler.last_report or self._last_report
         blocked = (
-            dict(latest_report.blocked_features)
-            if latest_report is not None
-            else {}
+            dict(latest_report.blocked_features) if latest_report is not None else {}
         )
         capability_errors = {
             feature_id: reason
             for feature_id, reason in blocked.items()
-            if self._reconciler.feature_states.get(feature_id)
-            == FeatureState.BLOCKED
+            if self._reconciler.feature_states.get(feature_id) == FeatureState.BLOCKED
         }
         runtime_failures = self._reconciler.runtime_failures
         replacement_reports = self._reconciler.replacement_reports

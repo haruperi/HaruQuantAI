@@ -75,9 +75,7 @@ def _entry_points(root_dir: Path) -> dict[str, str]:
     with (root_dir / "pyproject.toml").open("rb") as file:
         data = tomllib.load(file)
     value = (
-        data.get("project", {})
-        .get("entry-points", {})
-        .get("haruquantai.features", {})
+        data.get("project", {}).get("entry-points", {}).get("haruquantai.features", {})
     )
     if not isinstance(value, dict):
         raise RuntimeError("[project.entry-points.'haruquantai.features'] is invalid")
@@ -101,8 +99,7 @@ def discover_targets(root_dir: Path) -> dict[str, FeatureRemovalTarget]:
             spec.validate()
         except Exception as error:  # noqa: BLE001
             raise RuntimeError(
-                f"Failed to resolve feature entry point '{entry_point_name}': "
-                f"{error}"
+                f"Failed to resolve feature entry point '{entry_point_name}': {error}"
             ) from error
 
         feature_id = str(spec.feature_id)
@@ -449,10 +446,7 @@ def main() -> int:
     if args.feature is not None:
         target = targets.get(args.feature)
         if target is None:
-            print(
-                f"[ERROR] Unknown feature '{args.feature}'. "
-                f"Known: {sorted(targets)}"
-            )
+            print(f"[ERROR] Unknown feature '{args.feature}'. Known: {sorted(targets)}")
             return 1
         selected = [target]
     elif args.all or not sys.argv[1:]:

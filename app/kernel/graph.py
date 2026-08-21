@@ -246,8 +246,7 @@ class DependencyGraph:
                 )
             selected_spec = candidates[selected_feature]
             if not any(
-                provided.identifier == capability
-                for provided in selected_spec.provides
+                provided.identifier == capability for provided in selected_spec.provides
             ):
                 raise ProviderSelectionError(
                     f"Selected provider '{selected_feature}' does not provide "
@@ -312,9 +311,8 @@ class DependencyGraph:
                     "capability."
                 )
             suppressed.add(feature_id)
-            blocks[feature_id] = (
-                "Provider feature not selected for: "
-                + ", ".join(sorted(unselected))
+            blocks[feature_id] = "Provider feature not selected for: " + ", ".join(
+                sorted(unselected)
             )
 
         return (
@@ -449,15 +447,10 @@ class DependencyGraph:
         dependencies: Mapping[str, set[str]],
     ) -> tuple[str, ...]:
         in_degree = {
-            feature_id: len(dependencies.get(feature_id, set()))
-            for feature_id in nodes
+            feature_id: len(dependencies.get(feature_id, set())) for feature_id in nodes
         }
         dependents = self._reverse_edges(nodes, dependencies)
-        queue = [
-            feature_id
-            for feature_id in nodes
-            if in_degree[feature_id] == 0
-        ]
+        queue = [feature_id for feature_id in nodes if in_degree[feature_id] == 0]
         heapq.heapify(queue)
         order: list[str] = []
         while queue:
@@ -470,9 +463,7 @@ class DependencyGraph:
 
         if len(order) != len(nodes):
             unresolved = sorted(
-                feature_id
-                for feature_id in nodes
-                if in_degree[feature_id] > 0
+                feature_id for feature_id in nodes if in_degree[feature_id] > 0
             )
             raise DependencyCycleError(unresolved)
         return tuple(order)

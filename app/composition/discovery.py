@@ -91,7 +91,9 @@ class FeatureDiscoverer:
     ) -> None:
         for diagnostic_name, item in self._manual_features.items():
             try:
-                feature = item() if callable(item) and not isinstance(item, Feature) else item
+                feature = (
+                    item() if callable(item) and not isinstance(item, Feature) else item
+                )
                 if not isinstance(feature, Feature):
                     failed_specs[diagnostic_name] = (
                         "Manual target does not satisfy the Feature protocol"
@@ -117,9 +119,7 @@ class FeatureDiscoverer:
     ) -> None:
         entry_points: Sequence[importlib.metadata.EntryPoint]
         try:
-            entry_points = tuple(
-                importlib.metadata.entry_points(group=self._group)
-            )
+            entry_points = tuple(importlib.metadata.entry_points(group=self._group))
         except Exception as error:  # noqa: BLE001
             failed_imports["__entry_points__"] = str(error)
             return

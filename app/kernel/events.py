@@ -199,9 +199,7 @@ class EventBus:
                 )
         if mode is None:
             return len(subscriptions)
-        return sum(
-            subscription.token.mode == mode for subscription in subscriptions
-        )
+        return sum(subscription.token.mode == mode for subscription in subscriptions)
 
     def clear(self) -> None:
         """Remove all active subscriptions."""
@@ -244,9 +242,7 @@ class ContributorRegistry[ItemT]:
         """Return an item or raise KeyError."""
         item = self.get(key)
         if item is None:
-            raise KeyError(
-                f"Contributor '{key}' not found in {self._name} registry"
-            )
+            raise KeyError(f"Contributor '{key}' not found in {self._name} registry")
         return item
 
     def list_keys(self) -> tuple[str, ...]:

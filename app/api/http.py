@@ -45,9 +45,7 @@ def _handle_readiness(api: HaruQuantAPI) -> tuple[int, dict[str, Any]]:
             "profile": status.profile if status is not None else "unknown",
             "is_ready": False,
             "missing_capabilities": (
-                list(status.missing_profile_capabilities)
-                if status is not None
-                else []
+                list(status.missing_profile_capabilities) if status is not None else []
             ),
         },
     )

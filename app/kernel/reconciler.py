@@ -25,9 +25,7 @@ if TYPE_CHECKING:
     from app.kernel.events import EventBus
     from app.kernel.registry import ServiceRegistry
 
-RuntimeFailureCallback = Callable[
-    [str, str, BaseException], Awaitable[None] | None
-]
+RuntimeFailureCallback = Callable[[str, str, BaseException], Awaitable[None] | None]
 StagedProvider = tuple[CapabilityKey[Any], object]
 
 
@@ -485,8 +483,7 @@ class Reconciler:
             replacement_features = dict(self._known_features)
             replacement_features[feature_id] = feature
             replacement_specs = {
-                item_id: item.spec
-                for item_id, item in replacement_features.items()
+                item_id: item.spec for item_id, item in replacement_features.items()
             }
             desired_resolution = DependencyGraph(
                 replacement_specs,
@@ -527,9 +524,7 @@ class Reconciler:
             dependent_ids.update(
                 self._active_resolution.get_transitive_dependents(feature_id)
             )
-        dependent_ids.update(
-            desired_resolution.get_transitive_dependents(feature_id)
-        )
+        dependent_ids.update(desired_resolution.get_transitive_dependents(feature_id))
         active_dependents = dependent_ids.intersection(self._active_features)
         previous_stop_order = (
             self._active_resolution.stop_order
@@ -562,11 +557,7 @@ class Reconciler:
             (token.generation for token in new_tokens),
             default=old_generation,
         )
-        status = (
-            "degraded"
-            if cleanup_errors or consumer_errors
-            else "committed"
-        )
+        status = "degraded" if cleanup_errors or consumer_errors else "committed"
         report = ReplacementReport(
             feature_id=feature_id,
             old_generation=old_generation,

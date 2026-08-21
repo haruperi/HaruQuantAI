@@ -115,9 +115,10 @@ def test_entry_point_missing_dependency_is_categorized() -> None:
     )
     with patch("importlib.metadata.entry_points", return_value=[entry_point]):
         result = FeatureDiscoverer().discover()
-    assert "Feature dependency 'MetaTrader5' missing" in result.failed_imports[
-        "mt5-feature"
-    ]
+    assert (
+        "Feature dependency 'MetaTrader5' missing"
+        in result.failed_imports["mt5-feature"]
+    )
 
 
 def test_entry_point_invalid_object_is_rejected() -> None:
@@ -127,9 +128,7 @@ def test_entry_point_invalid_object_is_rejected() -> None:
     entry_point.load.return_value = object
     with patch("importlib.metadata.entry_points", return_value=[entry_point]):
         result = FeatureDiscoverer().discover()
-    assert "does not satisfy Feature protocol" in result.failed_specs[
-        "invalid-feature"
-    ]
+    assert "does not satisfy Feature protocol" in result.failed_specs["invalid-feature"]
 
 
 def test_manual_factory_error_is_categorized() -> None:

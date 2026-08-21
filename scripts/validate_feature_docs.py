@@ -20,9 +20,7 @@ def load_feature_entry_points(pyproject_path: Path) -> dict[str, str]:
     with pyproject_path.open("rb") as file:
         data = tomllib.load(file)
     value = (
-        data.get("project", {})
-        .get("entry-points", {})
-        .get("haruquantai.features", {})
+        data.get("project", {}).get("entry-points", {}).get("haruquantai.features", {})
     )
     if not isinstance(value, dict):
         raise ValueError("Feature entry-point table is invalid")
@@ -80,8 +78,7 @@ def validate_feature_readme(
     )
     if documented_domain != spec.domain.lower():
         errors.append(
-            f"Domain mismatch: expected '{spec.domain}', "
-            f"got '{documented_domain}'"
+            f"Domain mismatch: expected '{spec.domain}', got '{documented_domain}'"
         )
 
     comparisons = (
@@ -124,9 +121,7 @@ def validate_feature_readme(
     elif spec.state is None and not state_section.strip().lower().startswith("none"):
         errors.append("Persistent State must be 'None' when FeatureSpec.state is None")
     elif spec.state is not None and spec.state.namespace not in state_section:
-        errors.append(
-            f"Persistent state namespace '{spec.state.namespace}' is missing"
-        )
+        errors.append(f"Persistent state namespace '{spec.state.namespace}' is missing")
     return errors
 
 

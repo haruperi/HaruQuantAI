@@ -22,8 +22,7 @@ class MockFeedConfig:
         unknown = set(data) - _ALLOWED_CONFIG_KEYS
         if unknown:
             raise ValueError(
-                "Unknown Mock Feed configuration keys: "
-                + ", ".join(sorted(unknown))
+                "Unknown Mock Feed configuration keys: " + ", ".join(sorted(unknown))
             )
         base_price = float(data.get("base_price", 1.1000))
         if base_price <= 0:

@@ -36,9 +36,7 @@ class StorageConfig:
             raise ValueError("base_path must not be empty")
         driver = str(data.get("driver", "sqlite")).strip().lower()
         if driver not in {"sqlite", "disk"}:
-            raise ValueError(
-                f"driver must be 'sqlite' or 'disk', got '{driver}'"
-            )
+            raise ValueError(f"driver must be 'sqlite' or 'disk', got '{driver}'")
         return cls(db_path=db_path, base_path=base_path, driver=driver)
 
     @property
