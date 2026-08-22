@@ -1,6 +1,9 @@
-"""Historical bars use case retrieving and coordinating bar data."""
+"""Historical bars use case retrieving and normalizing broker data."""
+
+from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import replace
 from typing import override
 
 from app.contracts.broker.market_data import BrokerBarsRequest, BrokerMarketData
@@ -16,42 +19,39 @@ from app.services.data.historical_bars.validate_request import (
 
 
 class HistoricalBarsService(HistoricalBars):
-    """Normalized historical bar retrieval service.
+    """Validate, retrieve, and normalize historical OHLCV bars."""
 
-    Satisfies:
-        FR-DATA-RETRIEVE_BARS: Validates query, calls broker market data contract,
-        and normalizes resulting price bars.
-    """
-
-    def __init__(self, market_data: BrokerMarketData) -> None:
-        """Initialize use case with broker market data provider.
-
-        Args:
-            market_data: Active broker market data provider satisfying BrokerMarketData.
-        """
+    def __init__(
+        self,
+        market_data: BrokerMarketData,
+        default_timeframe: str = "M1",
+    ) -> None:
+        """Initialize the use case with its provider and fallback timeframe."""
         self._market_data = market_data
+        self._default_timeframe = default_timeframe
 
     @override
     async def retrieve(
         self,
         request: HistoricalBarsRequest,
     ) -> Sequence[Bar]:
-        """Validate request and retrieve normalized historical bars.
-
-        Args:
-            request: Historical bar query specifications.
+        """Retrieve normalized bars with the configured timeframe fallback.
 
         Returns:
-            Sequence of canonical normalized Bar instances.
+            Canonical normalized bars.
         """
-        validate_historical_request(request)
-
-        broker_req = BrokerBarsRequest(
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            start=request.start,
-            end=request.end,
+        effective_request = (
+            request
+            if request.timeframe.strip()
+            else replace(request, timeframe=self._default_timeframe)
         )
-
-        raw_bars = await self._market_data.retrieve_bars(broker_req)
+        validate_historical_request(effective_request)
+        raw_bars = await self._market_data.retrieve_bars(
+            BrokerBarsRequest(
+                symbol=effective_request.symbol,
+                timeframe=effective_request.timeframe,
+                start=effective_request.start,
+                end=effective_request.end,
+            )
+        )
         return normalize_bars(raw_bars)

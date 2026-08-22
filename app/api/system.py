@@ -1,4 +1,6 @@
-"""System domain public capability-aware facade and introspection."""
+"""System capability facade and runtime diagnostics."""
+
+from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
@@ -16,15 +18,7 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True)
 class CapabilityInfo:
-    """Introspection report for a versioned capability.
-
-    Attributes:
-        identifier: Formatted capability identifier (e.g. 'data.historical-bars@1').
-        is_available: Whether an active provider is bound.
-        provider_feature_id: Owning feature ID if available, None otherwise.
-        generation: Active binding generation number, or None.
-        registered_at: Timestamp when provider was bound, or None.
-    """
+    """Provider metadata for one versioned capability."""
 
     identifier: str
     is_available: bool
@@ -35,85 +29,67 @@ class CapabilityInfo:
 
 @dataclass(frozen=True, slots=True)
 class FeatureDiagnosticInfo:
-    """Diagnostic report for a feature, separating package and capability dependencies.
-
-    Attributes:
-        feature_id: Unique feature identifier.
-        is_active: Whether feature is currently mounted and active.
-        state: Current lifecycle state name if known.
-        package_error: Python package/import failure reason, if any.
-        capability_error: Runtime capability dependency failure reason, if any.
-    """
+    """Lifecycle and degradation diagnostics for one feature."""
 
     feature_id: str
     is_active: bool
     state: str | None = None
     package_error: str | None = None
     capability_error: str | None = None
+    runtime_error: str | None = None
+    replacement_status: str | None = None
+    cleanup_errors: tuple[str, ...] = ()
+    consumer_errors: tuple[str, ...] = ()
 
 
 class SystemAPI:
-    """Stable facade providing system infrastructure capabilities and introspection."""
+    """Resolve system capabilities and inspect composition state."""
 
     def __init__(
         self,
         registry: ServiceRegistry,
         engine: CompositionEngine | None = None,
     ) -> None:
-        """Initialize SystemAPI.
-
-        Args:
-            registry: Central ServiceRegistry.
-            engine: Optional CompositionEngine for runtime status introspection.
-        """
+        """Initialize the system facade."""
         self._registry = registry
         self._engine = engine
 
     @property
     def is_storage_available(self) -> bool:
-        """Check if persistent storage engine is active."""
+        """Return whether persistent storage is active."""
         return self._registry.is_available(SYSTEM_STORAGE)
 
     @property
     def is_clock_available(self) -> bool:
-        """Check if system clock capability is active."""
+        """Return whether the system clock is active."""
         return self._registry.is_available(SYSTEM_CLOCK)
 
     @property
     def is_metrics_available(self) -> bool:
-        """Check if system metrics collector is active."""
+        """Return whether metrics collection is active."""
         return self._registry.is_available(SYSTEM_METRICS)
 
     def get_storage_engine(self) -> StorageEngine:
-        """Resolve active persistent storage engine.
+        """Resolve the active storage engine.
 
         Returns:
-            Active StorageEngine provider.
-
-        Raises:
-            CapabilityUnavailableError: If system.storage@1 is absent.
+            Active storage-engine provider.
         """
         return self._registry.require(SYSTEM_STORAGE)
 
     def get_clock(self) -> SystemClock:
-        """Resolve active system clock.
+        """Resolve the active system clock.
 
         Returns:
-            Active SystemClock provider.
-
-        Raises:
-            CapabilityUnavailableError: If system.clock@1 is absent.
+            Active system-clock provider.
         """
         return self._registry.require(SYSTEM_CLOCK)
 
     def get_metrics(self) -> MetricsCollector:
-        """Resolve active metrics collector.
+        """Resolve the active metrics collector.
 
         Returns:
-            Active MetricsCollector provider.
-
-        Raises:
-            CapabilityUnavailableError: If system.metrics@1 is absent.
+            Active metrics-collector provider.
         """
         return self._registry.require(SYSTEM_METRICS)
 
@@ -121,101 +97,73 @@ class SystemAPI:
         self,
         capability: CapabilityKey[Any] | str,
     ) -> CapabilityInfo:
-        """Inspect status and provider metadata for a capability.
-
-        Args:
-            capability: Capability key or formatted identifier string.
+        """Inspect one capability and its active provider generation.
 
         Returns:
-            CapabilityInfo snapshot.
+            Capability availability and provider metadata.
         """
-        cap_id = capability if isinstance(capability, str) else capability.identifier
-        binding = self._registry.get_binding(cap_id)
-        if binding is not None:
-            return CapabilityInfo(
-                identifier=cap_id,
-                is_available=True,
-                provider_feature_id=binding.token.owner_id,
-                generation=binding.token.generation,
-                registered_at=binding.registered_at,
-            )
+        identifier = (
+            capability if isinstance(capability, str) else capability.identifier
+        )
+        binding = self._registry.get_binding(identifier)
+        if binding is None:
+            return CapabilityInfo(identifier=identifier, is_available=False)
         return CapabilityInfo(
-            identifier=cap_id,
-            is_available=False,
-            provider_feature_id=None,
-            generation=None,
-            registered_at=None,
+            identifier=identifier,
+            is_available=True,
+            provider_feature_id=binding.token.owner_id,
+            generation=binding.token.generation,
+            registered_at=binding.registered_at,
         )
 
     def list_capabilities(self) -> dict[str, CapabilityInfo]:
-        """List all active capabilities and their metadata.
-
-        Returns:
-            Dictionary of capability identifier to CapabilityInfo.
-        """
-        active_tokens = self._registry.active_capabilities()
-        res: dict[str, CapabilityInfo] = {}
-        for cap_id in active_tokens:
-            res[cap_id] = self.inspect_capability(cap_id)
-        return res
+        """Return active capability metadata keyed by identifier."""
+        return {
+            identifier: self.inspect_capability(identifier)
+            for identifier in self._registry.active_capabilities()
+        }
 
     def inspect_feature(self, feature_id: str) -> FeatureDiagnosticInfo:
-        """Inspect detailed health and dependency diagnostics for a feature.
-
-        Args:
-            feature_id: Unique feature identifier.
+        """Inspect package, capability, runtime, and replacement health.
 
         Returns:
-            FeatureDiagnosticInfo detailing package vs capability dependency health.
+            Consolidated diagnostic information for the feature.
         """
-        is_active = False
-        state_name: str | None = None
-        pkg_err: str | None = None
-        cap_err: str | None = None
-
-        if self._engine is not None:
-            status = self._engine.get_status()
-            is_active = feature_id in status.active_features
-            state = status.feature_states.get(feature_id)
-            if state is not None:
-                state_name = state.value
-            pkg_err = status.package_dependency_errors.get(feature_id)
-            cap_err = status.capability_dependency_errors.get(feature_id)
-
+        if self._engine is None:
+            return FeatureDiagnosticInfo(feature_id=feature_id, is_active=False)
+        status = self._engine.get_status()
+        state = status.feature_states.get(feature_id)
+        replacement = status.replacement_reports.get(feature_id)
         return FeatureDiagnosticInfo(
             feature_id=feature_id,
-            is_active=is_active,
-            state=state_name,
-            package_error=pkg_err,
-            capability_error=cap_err,
+            is_active=feature_id in status.active_features,
+            state=state.value if state is not None else None,
+            package_error=status.package_dependency_errors.get(feature_id),
+            capability_error=status.capability_dependency_errors.get(feature_id),
+            runtime_error=status.runtime_failures.get(feature_id),
+            replacement_status=(
+                replacement.status if replacement is not None else None
+            ),
+            cleanup_errors=(
+                replacement.cleanup_errors if replacement is not None else ()
+            ),
+            consumer_errors=(
+                replacement.consumer_errors if replacement is not None else ()
+            ),
         )
 
     def list_package_dependency_errors(self) -> dict[str, str]:
-        """List all features failing due to missing Python package dependencies.
-
-        Returns:
-            Dictionary mapping feature ID to import error explanation.
-        """
-        if self._engine is not None:
-            return dict(self._engine.get_status().package_dependency_errors)
-        return {}
+        """Return package/import failures for enabled features."""
+        if self._engine is None:
+            return {}
+        return dict(self._engine.get_status().package_dependency_errors)
 
     def list_capability_dependency_errors(self) -> dict[str, str]:
-        """List all features blocked due to missing runtime capability dependencies.
-
-        Returns:
-            Dictionary mapping feature ID to capability block explanation.
-        """
-        if self._engine is not None:
-            return dict(self._engine.get_status().capability_dependency_errors)
-        return {}
+        """Return runtime capability blocks for enabled features."""
+        if self._engine is None:
+            return {}
+        return dict(self._engine.get_status().capability_dependency_errors)
 
     def get_runtime_status(self) -> RuntimeStatus | None:
-        """Retrieve overall application runtime readiness status if engine is bound.
-
-        Returns:
-            RuntimeStatus snapshot or None.
-        """
-        if self._engine is not None:
-            return self._engine.get_status()
-        return None
+        """Return overall runtime status when an engine is attached."""
+        return self._engine.get_status() if self._engine is not None else None

@@ -109,7 +109,7 @@ select = [
     "SIM",    # Flake8-simplify – code simplification hints
     "TID",    # Flake8-tidy-imports – enforces specific import styles
     "TC",     # Flake8-type-checking – proper import of typing in type checks
-    "INT",    # Flake8-gettext – checks for proper internationalization usage
+    "INT",    # Flake8-gettext – checks for proper internationalization
     "ARG",    # Flake8-unused-arguments – flags unused function arguments
     "PTH",    # Flake8-use-pathlib – encourages pathlib over os.path
     "TD",     # Flake8-todos – flags TODO comments
@@ -118,16 +118,16 @@ select = [
     "PGH",    # Pygrep-hooks – custom grep hooks for linting
     "PL",     # Pylint – integration with Pylint conventions
     "TRY",    # Tryceratops – try/except usage suggestions
-    "FLY",    # Flynt – f-string conversion suggestions
-    "NPY",    # NumPy-specific rules – ensures NumPy coding standards
-    "FAST",   # FastAPI – FastAPI-specific linting rules
-    "AIR",    # Airflow – Airflow-specific linting rules
+    "FLY",    # Flynt – f-string conversion
+    "NPY",    # NumPy-specific rules
+    "FAST",   # FastAPI-specific rules
+    "AIR",    # Airflow-specific rules
     "PERF",   # Perflint – performance-related checks
     "FURB",   # Refurb – rules for code refurbishment
-    "RUF",    # Ruff-specific rules – additional Ruff checks
-    "ANN",    # Flake8-annotations - enforces type annotations
-    "D420",   # Pydocstyle - enforce Google Args/Returns/Raises section order
-    "DOC102", # Pydoclint - reject parameters absent from the signature
+    "RUF",    # Ruff-specific rules
+    "ANN",    # Flake8-annotations
+    "D420",   # Pydocstyle - enforce Google Args/Returns/Raises order
+    "DOC102", # Pydoclint - reject parameters absent from signature
     "DOC201", # Pydoclint - require Returns for returned values
     "DOC202", # Pydoclint - reject Returns when no value is returned
     "DOC402", # Pydoclint - require Yields for generators
@@ -136,29 +136,29 @@ select = [
 ]
 
 ignore = [
-    "FBT003",  # Flake8-boolean-trap - boolean position value in function call
-    "D203",    # Pydocstyle - one blank line required before class docstring (conflicts with D211)
-    "D212",    # Pydocstyle - summary line should be immediately after opening quotes (conflicts with D213)
-    "D400",    # Pydocstyle - First line should end with a period
-    "D401",    # Pydocstyle - First line should be in an imperative mood
-    "D415",    # Pydocstyle - First line should end with a period, question mark, or exclamation point
-    "S311",    # Flake8-bandit - Pseudo-random generators warning (fine for quant simulations, non-crypto)
-    "PERF401", # Perflint - Checks for loops that can be replaced by a list comprehension
-    "RET504",  # Flake8-return - Checks for unnecessary variable assignments right before a return
-    "FA102",   # Flake8-future-annotations - Missing future annotations import but uses PEP 604
-    "TRY003",  # Tryceratops - Checks for long exception messages outside exception class
-    "EM101",   # Flake8-errmsg - Checks for string literals in exception constructors
-    "TC002",   # Flake8-type-checking - Checks for typing imports outside TYPE_CHECKING blocks
-    "TC003",   # Flake8-type-checking - Checks for imports from typing outside TYPE_CHECKING blocks
-    "UP047",   # Pyupgrade - PEP 695 generic functions are not supported by pinned mypy/pre-commit yet
-    "COM812",  # Flake8-commas - Formatter conflicts
-    "ISC001",  # Flake8-implicit-str-concat - Formatter conflicts
-    "PLC0415", # Pylint - deferred imports allowed for lazy-loading optional dependencies
-    "PLR0913", # Pylint - too many arguments in function definition
-    "FBT001",  # Flake8-boolean-trap - boolean-typed positional argument in function definition
-    "FBT002",  # Flake8-boolean-trap - boolean default positional argument in function definition
-    "D107",    # Pydocstyle - Missing docstring in __init__
-    "TRY300",  # Tryceratops - Consider moving statement to an else block
+    "FBT003",  # boolean positional value in function call
+    "D203",    # conflicts with D211
+    "D212",    # conflicts with D213
+    "D400",    # first line punctuation
+    "D401",    # imperative mood
+    "D415",    # first line punctuation
+    "S311",    # pseudo-random generators acceptable for simulations
+    "PERF401", # loops can be clearer than comprehensions
+    "RET504",  # explicit variable before return can aid readability
+    "FA102",   # PEP 604 is supported by project Python
+    "TRY003",  # detailed exception messages are acceptable
+    "EM101",   # literal exception messages are acceptable
+    "TC002",   # selected typing imports may remain at runtime
+    "TC003",   # selected typing imports may remain at runtime
+    "UP047",   # PEP 695 compatibility with pinned mypy/pre-commit
+    "COM812",  # formatter conflict
+    "ISC001",  # formatter conflict
+    "PLC0415", # lazy optional dependency imports
+    "PLR0913", # composition functions can require several dependencies
+    "FBT001",  # boolean positional arguments allowed where intentional
+    "FBT002",  # boolean defaults allowed where intentional
+    "D107",    # constructor docstrings not required globally
+    "TRY300",  # explicit success returns may be clearer
 ]
 
 [tool.ruff.lint.mccabe]
@@ -225,15 +225,6 @@ disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
 no_implicit_optional = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-check_untyped_defs = true
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-disallow_untyped_calls = false
-warn_unreachable = false
-disable_error_code = ["comparison-overlap"]
 
 [[tool.mypy.overrides]]
 module = "scripts.*"

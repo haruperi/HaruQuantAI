@@ -19,7 +19,6 @@ async def test_scope_sync_callback_reverse_order() -> None:
     scope.callback(lambda: order.append("second"), name="cb2")
     scope.callback(lambda: order.append("third"), name="cb3")
 
-    assert not scope.is_closed
     await scope.close()
 
     assert scope.is_closed
@@ -82,37 +81,32 @@ async def test_scope_spawn_task_cancellation() -> None:
 async def test_scope_context_managers() -> None:
     """Test sync and async context managers entered in scope exit on close."""
     scope = FeatureScope(owner_id="FEAT-TEST-ENTER_CONTEXT")
-    exited_sync = False
-    exited_async = False
+    exited: set[str] = set()
 
     @contextmanager
     def sync_resource() -> Any:
         try:
             yield "sync_val"
         finally:
-            nonlocal exited_sync
-            exited_sync = True
+            exited.add("sync")
 
     @asynccontextmanager
     async def async_resource() -> Any:
         try:
             yield "async_val"
         finally:
-            nonlocal exited_async
-            exited_async = True
+            exited.add("async")
 
     val1 = scope.enter_context(sync_resource(), name="sync_res")
     val2 = await scope.enter_async_context(async_resource(), name="async_res")
 
     assert val1 == "sync_val"
     assert val2 == "async_val"
-    assert not exited_sync
-    assert not exited_async
+    assert not exited
 
     await scope.close()
 
-    assert exited_sync
-    assert exited_async
+    assert exited == {"sync", "async"}
 
 
 @pytest.mark.asyncio

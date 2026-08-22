@@ -1,14 +1,18 @@
-# HaruQuantAI Spatiotemporal Composability Gap Remediation Plan
+# HaruQuantAI Spatiotemporal Composability Remediation — Completed Implementation Record
 
 ## Document status
 
-- **Type:** Dry-run implementation plan only
+- **Type:** Completed implementation and remote verification record
 - **Baseline branch:** `main`
 - **Audited baseline commit:** `c1584cb572fee29e119ec0daebb689b247aafe40`
-- **Target implementation branch:** Create a new implementation branch from the latest passing `main` after this plan is approved
+- **Implementation branch:** `fix/final-composability-audit`
+- **Verified implementation SHA:** `777b6ca3a84bb713faca5bfb74e66cb4a112e8a8`
+- **CI workflow run:** `32522153187` — success
+- **Feature-removability workflow run:** `32522153202` — success
+- **Implementation pull request:** `#4 — fix(architecture): close final composability audit gaps`
 - **Primary goal:** Correct the remaining spatial, temporal, runtime-safety, readiness, and removability gaps without adding unrelated trading-domain functionality
 
-This plan intentionally does **not** implement the fixes. It defines the exact order, files, tests, acceptance criteria, quality gates, documentation updates, and proposed commits for a later coding pass.
+This document began as the dry-run implementation plan and now serves as the completed implementation record. The runtime corrections, acceptance tests, quality gates, documentation validation, and complete built-in physical-removal matrix were implemented and remotely verified. Detailed evidence is recorded in `docs/architecture/audit/composability_remediation_result.md`.
 
 ---
 
@@ -35,11 +39,11 @@ Complete the foundational spatiotemporal-composability architecture so that Haru
 
 Before implementation begins:
 
-- [X] Confirm the latest `main` commit and record it in the implementation PR.
-- [ ] Create the implementation branch from that exact commit.
-- [X] Run the existing quality gates without modifications.
-- [X] Save the complete baseline output in the PR description or an attached artifact.
-- [X] Do not begin corrective code changes if the baseline already fails.
+- [x] Confirm the latest `main` commit and record it in the implementation PR.
+- [x] Create the implementation branch from that exact commit.
+- [x] Run the existing quality gates without modifications.
+- [x] Save the complete baseline output in the PR description or an attached artifact.
+- [x] Do not begin corrective code changes if the baseline already fails.
 
 Baseline command:
 
@@ -50,31 +54,31 @@ uv run --frozen python scripts/ci_check.py
 
 ### 2.2 Constraints
 
-- [ ] Preserve Python `>=3.14` unless a separate approved migration changes it.
-- [ ] Preserve the current four-level structure: Domain → Feature → Responsibility → Functional Requirement.
-- [ ] Do not introduce direct cross-feature implementation imports.
-- [ ] Do not add real live-trading execution or broker credentials during this remediation.
-- [ ] Use the Mock Broker feature and test doubles for replacement, failure, and readiness tests.
-- [ ] Treat every external or irreversible action as out of scope for automatic rollback.
-- [ ] Keep each phase reviewable and independently revertible.
-- [ ] Add failing characterization tests before correcting the behavior they describe.
+- [x] Preserve Python `>=3.14` unless a separate approved migration changes it.
+- [x] Preserve the current four-level structure: Domain → Feature → Responsibility → Functional Requirement.
+- [x] Do not introduce direct cross-feature implementation imports.
+- [x] Do not add real live-trading execution or broker credentials during this remediation.
+- [x] Use the Mock Broker feature and test doubles for replacement, failure, and readiness tests.
+- [x] Treat every external or irreversible action as out of scope for automatic rollback.
+- [x] Keep each phase reviewable and independently revertible.
+- [x] Add failing characterization tests before correcting the behavior they describe.
 
 ### 2.3 Global implementation rules
 
 For every phase:
 
-- [ ] Implement only the files listed for that phase unless an unavoidable dependency is documented in the commit.
-- [ ] Add or update unit tests.
-- [ ] Add at least one executable usage or integration example where the phase changes public behavior.
-- [ ] Run Ruff formatting.
-- [ ] Run Ruff linting.
-- [ ] Run mypy.
-- [ ] Run Import Linter.
-- [ ] Run the AST architecture checker.
-- [ ] Run the focused tests for the phase.
-- [ ] Run the complete test suite before committing.
-- [ ] Update relevant architecture and feature documentation.
-- [ ] Create one focused Git commit using the proposed commit message.
+- [x] Implement only the files listed for that phase unless an unavoidable dependency is documented in the commit.
+- [x] Add or update unit tests.
+- [x] Add at least one executable usage or integration example where the phase changes public behavior.
+- [x] Run Ruff formatting.
+- [x] Run Ruff linting.
+- [x] Run mypy.
+- [x] Run Import Linter.
+- [x] Run the AST architecture checker.
+- [x] Run the focused tests for the phase.
+- [x] Run the complete test suite before committing.
+- [x] Update relevant architecture and feature documentation.
+- [x] Create one focused Git commit using the proposed commit message.
 
 Standard verification commands:
 
@@ -119,12 +123,12 @@ Lock the current behavior in tests, then add tests that expose each known defect
 
 ## Task 0.1 — Record the baseline
 
-- [X] Create `docs/architecture/audit/composability_remediation_baseline.md`.
-- [X] Record the baseline commit SHA.
-- [X] Record Python and `uv` versions.
-- [X] Record the existing test count and coverage generated locally.
-- [X] Record results for Ruff, mypy, Import Linter, AST checks, and pytest.
-- [X] State clearly that GitHub Actions results, not commit-message claims, are the authoritative remote evidence.
+- [x] Create `docs/architecture/audit/composability_remediation_baseline.md`.
+- [x] Record the baseline commit SHA.
+- [x] Record Python and `uv` versions.
+- [x] Record the existing test count and coverage generated locally.
+- [x] Record results for Ruff, mypy, Import Linter, AST checks, and pytest.
+- [x] State clearly that GitHub Actions results, not commit-message claims, are the authoritative remote evidence.
 
 ## Task 0.2 — Add failing characterization tests
 
@@ -143,25 +147,25 @@ tests/services/test_lifecycle_leak.py
 
 Add tests for:
 
-- [X] `[profile] name = "live"` is rejected rather than silently becoming Research.
-- [X] Unknown profiles are rejected.
-- [X] Live readiness is false when any one required safety capability is missing.
-- [X] Two enabled providers for one capability without selection are rejected.
-- [X] Reconfiguring a provider remounts a consumer and replaces its captured provider object.
-- [X] Replacing a provider remounts all transitive consumers.
-- [X] A transactional replacement containing a task, listener, callback, and async context manager retains all replacement effects after commit.
-- [X] A pre-commit replacement failure preserves the exact old provider instance.
-- [X] A cleanup failure after commit is reported as a post-commit cleanup error, not a successful rollback.
-- [X] Mixed event modes on one event type invoke only matching handlers.
-- [X] Disposing one duplicate handler registration leaves the other registration active.
-- [X] Unexpected background-task failure changes feature state to `FAILED_RUNTIME`.
-- [X] Registering a new effect on a closed scope raises a lifecycle error.
+- [x] `[profile] name = "live"` is rejected rather than silently becoming Research.
+- [x] Unknown profiles are rejected.
+- [x] Live readiness is false when any one required safety capability is missing.
+- [x] Two enabled providers for one capability without selection are rejected.
+- [x] Reconfiguring a provider remounts a consumer and replaces its captured provider object.
+- [x] Replacing a provider remounts all transitive consumers.
+- [x] A transactional replacement containing a task, listener, callback, and async context manager retains all replacement effects after commit.
+- [x] A pre-commit replacement failure preserves the exact old provider instance.
+- [x] A cleanup failure after commit is reported as a post-commit cleanup error, not a successful rollback.
+- [x] Mixed event modes on one event type invoke only matching handlers.
+- [x] Disposing one duplicate handler registration leaves the other registration active.
+- [x] Unexpected background-task failure changes feature state to `FAILED_RUNTIME`.
+- [x] Registering a new effect on a closed scope raises a lifecycle error.
 
 ## Task 0.3 — Quality and documentation
 
-- [X] Confirm the new tests fail for the expected reasons only.
-- [X] Do not weaken assertions to make the current implementation pass.
-- [X] Add a short failure-to-phase mapping to the baseline document.
+- [x] Confirm the new tests fail for the expected reasons only.
+- [x] Do not weaken assertions to make the current implementation pass.
+- [x] Add a short failure-to-phase mapping to the baseline document.
 
 ## Proposed commit
 
@@ -171,9 +175,9 @@ test(architecture): characterize remaining composability gaps
 
 ## Exit criteria
 
-- [X] Existing tests still pass.
-- [X] New characterization tests fail and identify the audited defects precisely.
-- [X] No production behavior has changed.
+- [x] Existing tests still pass.
+- [x] New characterization tests fail and identify the audited defects precisely.
+- [x] No production behavior has changed.
 
 ---
 

@@ -1,5 +1,8 @@
-"""Dependency graph construction, cycle detection, and topological ordering."""
+"""Dependency graph construction, provider selection, and lifecycle ordering."""
 
+from __future__ import annotations
+
+import heapq
 from collections import deque
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -14,44 +17,27 @@ class DependencyError(RuntimeError):
 
 
 class ProviderSelectionError(DependencyError, ValueError):
-    """Raised when capability provider selection is invalid or fails validation."""
+    """Raised when capability provider selection is invalid."""
 
 
 class AmbiguousProviderError(ProviderSelectionError):
-    """Raised when multiple candidate providers exist without explicit selection."""
+    """Raised when multiple providers exist without an explicit selection."""
 
 
 class DependencyCycleError(DependencyError):
-    """Raised when a circular dependency is detected among required capabilities.
-
-    Attributes:
-        cycle: Sequence of feature IDs involved in the cycle.
-    """
+    """Raised when required capability dependencies contain a cycle."""
 
     def __init__(self, cycle: Sequence[str]) -> None:
-        """Initialize cycle error.
-
-        Args:
-            cycle: Sequence of cyclic feature identifiers.
-        """
+        """Initialize the error with the cyclic feature path."""
         self.cycle = tuple(cycle)
-        cycle_str = " -> ".join(self.cycle)
-        super().__init__(f"Circular required dependency detected: {cycle_str}")
+        super().__init__(
+            f"Circular required dependency detected: {' -> '.join(self.cycle)}"
+        )
 
 
 @dataclass(frozen=True, slots=True)
 class GraphResolution:
-    """Calculated dependency resolution and execution orders.
-
-    Attributes:
-        eligible_features: Tuple of feature IDs eligible for activation.
-        start_order: Ordered tuple of feature IDs to start (dependencies first).
-        stop_order: Ordered tuple of feature IDs to stop (dependents first).
-        blocked_features: Mapping of feature ID to reason/missing capability.
-        provider_map: Mapping of capability identifier to providing feature ID.
-        dependencies: Mapping of feature ID to direct provider feature IDs.
-        dependents: Mapping of feature ID to direct consumer feature IDs.
-    """
+    """Resolved feature eligibility, providers, and lifecycle ordering."""
 
     eligible_features: tuple[str, ...]
     start_order: tuple[str, ...]
@@ -60,40 +46,42 @@ class GraphResolution:
     provider_map: dict[str, str]
     dependencies: dict[str, set[str]] = field(default_factory=dict)
     dependents: dict[str, set[str]] = field(default_factory=dict)
+    required_dependencies: dict[str, set[str]] = field(default_factory=dict)
+    required_dependents: dict[str, set[str]] = field(default_factory=dict)
+    optional_dependencies: dict[str, set[str]] = field(default_factory=dict)
+    optional_dependents: dict[str, set[str]] = field(default_factory=dict)
 
-    def get_transitive_dependents(self, feature_id: str) -> set[str]:
-        """Calculate all transitive downstream consumers of a feature.
-
-        Args:
-            feature_id: Unique feature identifier.
-
-        Returns:
-            Set of feature IDs that transitively depend on this feature.
-        """
+    def get_transitive_dependents(
+        self,
+        feature_id: str,
+        *,
+        required_only: bool = False,
+    ) -> set[str]:
+        """Return all downstream consumers of a feature."""
+        edges = self.required_dependents if required_only else self.dependents
         closure: set[str] = set()
         queue = deque([feature_id])
         while queue:
-            curr = queue.popleft()
-            for dep in self.dependents.get(curr, set()):
-                if dep not in closure:
-                    closure.add(dep)
-                    queue.append(dep)
+            current = queue.popleft()
+            for dependent in edges.get(current, set()):
+                if dependent not in closure:
+                    closure.add(dependent)
+                    queue.append(dependent)
         return closure
 
-    def get_transitive_dependencies(self, feature_id: str) -> set[str]:
-        """Calculate all transitive upstream providers of a feature.
-
-        Args:
-            feature_id: Unique feature identifier.
-
-        Returns:
-            Set of feature IDs that this feature transitively depends on.
-        """
+    def get_transitive_dependencies(
+        self,
+        feature_id: str,
+        *,
+        required_only: bool = False,
+    ) -> set[str]:
+        """Return all upstream providers used by a feature."""
+        edges = self.required_dependencies if required_only else self.dependencies
         closure: set[str] = set()
         queue = deque([feature_id])
         while queue:
-            curr = queue.popleft()
-            for provider in self.dependencies.get(curr, set()):
+            current = queue.popleft()
+            for provider in edges.get(current, set()):
                 if provider not in closure:
                     closure.add(provider)
                     queue.append(provider)
@@ -101,19 +89,14 @@ class GraphResolution:
 
 
 class DependencyGraph:
-    """Analyzes and resolves feature capability dependencies."""
+    """Resolve composable features using deterministic capability providers."""
 
     def __init__(
         self,
         specs: Mapping[str, FeatureSpec],
         provider_selections: Mapping[str, str] | None = None,
     ) -> None:
-        """Initialize graph with feature specifications and provider selections.
-
-        Args:
-            specs: Mapping of feature_id to FeatureSpec.
-            provider_selections: Optional capability-to-provider mappings.
-        """
+        """Initialize the graph from feature specifications."""
         self._specs = dict(specs)
         self._provider_selections = dict(provider_selections or {})
 
@@ -122,319 +105,373 @@ class DependencyGraph:
         enabled_feature_ids: Iterable[str],
         provider_selections: Mapping[str, str] | None = None,
     ) -> GraphResolution:
-        """Calculate eligible features and topological execution order.
-
-        Args:
-            enabled_feature_ids: Collection of feature IDs requested to run.
-            provider_selections: Optional override provider selections.
+        """Resolve providers, eligibility, and deterministic lifecycle order.
 
         Returns:
-            GraphResolution with topological start/stop order and blocked reasons.
-
-        Raises:
-            AmbiguousProviderError: If multiple enabled features provide a capability.
-            ProviderSelectionError: If an explicit selection is invalid or incompatible.
-            DependencyCycleError: If an enabled required dependency cycle is found.
+            Resolved providers, lifecycle order, and dependency maps.
         """
         enabled_set = set(enabled_feature_ids)
-        effective_selections = dict(self._provider_selections)
+        selections = dict(self._provider_selections)
         if provider_selections is not None:
-            effective_selections.update(provider_selections)
+            selections.update(provider_selections)
 
         available_specs = {
-            f_id: self._specs[f_id] for f_id in enabled_set if f_id in self._specs
+            feature_id: self._specs[feature_id]
+            for feature_id in enabled_set
+            if feature_id in self._specs
         }
-        blocked_features = {
-            f_id: "Feature specification not found (MISSING)"
-            for f_id in enabled_set
-            if f_id not in self._specs
+        blocked = {
+            feature_id: "Feature specification not found (MISSING)"
+            for feature_id in enabled_set
+            if feature_id not in self._specs
         }
 
         candidates, conflict_blocks = self._filter_conflicts(available_specs)
-        blocked_features.update(conflict_blocks)
+        blocked.update(conflict_blocks)
 
-        cap_to_provider = self._build_provider_map(candidates, effective_selections)
-        self._detect_required_cycles(candidates, cap_to_provider)
-
-        eligible_set, eligibility_blocks = self._resolve_eligibility(candidates)
-        blocked_features.update(eligibility_blocks)
-
-        start_order, dependencies, dependents = self._topological_sort(
-            eligible_set, candidates, cap_to_provider
+        providers_by_capability = self._collect_providers(candidates)
+        self._validate_provider_selections(
+            candidates,
+            providers_by_capability,
+            selections,
         )
-        stop_order = tuple(reversed(start_order))
+        provider_map = self._select_providers(providers_by_capability, selections)
+        candidates, unselected_blocks = self._suppress_unselected_providers(
+            candidates,
+            provider_map,
+        )
+        blocked.update(unselected_blocks)
+        provider_map = {
+            capability: provider
+            for capability, provider in provider_map.items()
+            if provider in candidates
+        }
 
+        self._detect_required_cycles(candidates, provider_map)
+        eligible, eligibility_blocks = self._resolve_eligibility(
+            candidates,
+            provider_map,
+        )
+        blocked.update(eligibility_blocks)
+
+        required_dependencies = self._build_dependencies(
+            eligible,
+            candidates,
+            provider_map,
+            optional=False,
+        )
+        optional_dependencies = self._build_dependencies(
+            eligible,
+            candidates,
+            provider_map,
+            optional=True,
+        )
+        required_dependents = self._reverse_edges(eligible, required_dependencies)
+        optional_dependents = self._reverse_edges(eligible, optional_dependencies)
+
+        required_order = self._topological_sort(eligible, required_dependencies)
+        combined_dependencies = {
+            feature_id: required_dependencies[feature_id]
+            | optional_dependencies[feature_id]
+            for feature_id in eligible
+        }
+        try:
+            start_order = self._topological_sort(eligible, combined_dependencies)
+        except DependencyCycleError:
+            start_order = required_order
+
+        combined_dependents = self._reverse_edges(eligible, combined_dependencies)
+        active_provider_map = {
+            capability: provider
+            for capability, provider in provider_map.items()
+            if provider in eligible
+        }
         return GraphResolution(
             eligible_features=start_order,
             start_order=start_order,
-            stop_order=stop_order,
-            blocked_features=blocked_features,
-            provider_map={
-                cap: p_id
-                for cap, p_id in cap_to_provider.items()
-                if p_id in eligible_set
-            },
-            dependencies=dependencies,
-            dependents=dependents,
+            stop_order=tuple(reversed(start_order)),
+            blocked_features=blocked,
+            provider_map=active_provider_map,
+            dependencies=combined_dependencies,
+            dependents=combined_dependents,
+            required_dependencies=required_dependencies,
+            required_dependents=required_dependents,
+            optional_dependencies=optional_dependencies,
+            optional_dependents=optional_dependents,
         )
 
     def _filter_conflicts(
         self,
         available_specs: Mapping[str, FeatureSpec],
     ) -> tuple[dict[str, FeatureSpec], dict[str, str]]:
-        """Filter out conflicting features.
-
-        Args:
-            available_specs: Available feature specs.
-
-        Returns:
-            Tuple of non-conflicting candidates map and conflict block reasons map.
-        """
         conflicted: set[str] = set()
-        conflict_blocks: dict[str, str] = {}
-
-        for f_id, spec in available_specs.items():
+        blocks: dict[str, str] = {}
+        for feature_id, spec in available_specs.items():
             for conflict_id in spec.conflicts:
-                if conflict_id in available_specs and conflict_id != f_id:
-                    conflicted.add(f_id)
-                    conflict_blocks[f_id] = (
-                        f"Conflicts with active feature '{conflict_id}'"
+                if conflict_id in available_specs and conflict_id != feature_id:
+                    conflicted.add(feature_id)
+                    blocks[feature_id] = (
+                        f"Conflicts with enabled feature '{conflict_id}'"
                     )
+        return (
+            {
+                feature_id: spec
+                for feature_id, spec in available_specs.items()
+                if feature_id not in conflicted
+            },
+            blocks,
+        )
 
-        candidates = {
-            f_id: spec
-            for f_id, spec in available_specs.items()
-            if f_id not in conflicted
+    def _collect_providers(
+        self,
+        candidates: Mapping[str, FeatureSpec],
+    ) -> dict[str, tuple[str, ...]]:
+        providers: dict[str, list[str]] = {}
+        for feature_id in sorted(candidates):
+            for capability in candidates[feature_id].provides:
+                providers.setdefault(capability.identifier, []).append(feature_id)
+        return {
+            capability: tuple(sorted(feature_ids))
+            for capability, feature_ids in providers.items()
         }
-        return candidates, conflict_blocks
+
+    def _validate_provider_selections(
+        self,
+        candidates: Mapping[str, FeatureSpec],
+        providers_by_capability: Mapping[str, tuple[str, ...]],
+        selections: Mapping[str, str],
+    ) -> None:
+        for capability, selected_feature in selections.items():
+            if selected_feature not in candidates:
+                msg = (
+                    f"Selected provider '{selected_feature}' for capability "
+                    f"'{capability}' is not among enabled candidate features "
+                    "(it is disabled or was not discovered)"
+                )
+                raise ProviderSelectionError(msg)
+            selected_spec = candidates[selected_feature]
+            if not any(
+                provided.identifier == capability for provided in selected_spec.provides
+            ):
+                msg = (
+                    f"Selected provider '{selected_feature}' does not provide "
+                    f"capability '{capability}'"
+                )
+                raise ProviderSelectionError(msg)
+            if capability not in providers_by_capability:
+                msg = f"No enabled feature provides selected capability '{capability}'"
+                raise ProviderSelectionError(msg)
+
+    def _select_providers(
+        self,
+        providers_by_capability: Mapping[str, tuple[str, ...]],
+        selections: Mapping[str, str],
+    ) -> dict[str, str]:
+        provider_map: dict[str, str] = {}
+        for capability, provider_ids in sorted(providers_by_capability.items()):
+            selected = selections.get(capability)
+            if selected is not None:
+                if selected not in provider_ids:
+                    msg = (
+                        f"Selected provider '{selected}' for capability '{capability}' "
+                        f"is not among enabled candidates {list(provider_ids)}"
+                    )
+                    raise ProviderSelectionError(msg)
+                provider_map[capability] = selected
+            elif len(provider_ids) == 1:
+                provider_map[capability] = provider_ids[0]
+            else:
+                msg = (
+                    f"Ambiguous capability providers for '{capability}': "
+                    f"{list(provider_ids)}. Configure an explicit selection in "
+                    "[providers]."
+                )
+                raise AmbiguousProviderError(msg)
+        return provider_map
+
+    def _suppress_unselected_providers(
+        self,
+        candidates: Mapping[str, FeatureSpec],
+        provider_map: Mapping[str, str],
+    ) -> tuple[dict[str, FeatureSpec], dict[str, str]]:
+        suppressed: set[str] = set()
+        blocks: dict[str, str] = {}
+        for feature_id, spec in candidates.items():
+            provided = {capability.identifier for capability in spec.provides}
+            selected = {
+                capability
+                for capability in provided
+                if provider_map.get(capability) == feature_id
+            }
+            unselected = {
+                capability
+                for capability in provided
+                if provider_map.get(capability) not in {None, feature_id}
+            }
+            if not unselected:
+                continue
+            if selected:
+                msg = (
+                    f"Feature '{feature_id}' is selected for {sorted(selected)} but "
+                    f"unselected for {sorted(unselected)}. Capability bundles are "
+                    "atomic; select one feature consistently for every overlapping "
+                    "capability."
+                )
+                raise ProviderSelectionError(msg)
+            suppressed.add(feature_id)
+            blocks[feature_id] = "Provider feature not selected for: " + ", ".join(
+                sorted(unselected)
+            )
+
+        return (
+            {
+                feature_id: spec
+                for feature_id, spec in candidates.items()
+                if feature_id not in suppressed
+            },
+            blocks,
+        )
+
+    def _required_adjacency(
+        self,
+        candidates: Mapping[str, FeatureSpec],
+        provider_map: Mapping[str, str],
+    ) -> dict[str, set[str]]:
+        adjacency: dict[str, set[str]] = {
+            feature_id: set() for feature_id in candidates
+        }
+        for consumer_id, spec in candidates.items():
+            for capability in spec.requires:
+                provider_id = provider_map.get(capability.identifier)
+                if provider_id is not None and provider_id != consumer_id:
+                    adjacency[consumer_id].add(provider_id)
+        return adjacency
 
     def _detect_required_cycles(
         self,
         candidates: Mapping[str, FeatureSpec],
-        cap_to_provider: Mapping[str, str],
+        provider_map: Mapping[str, str],
     ) -> None:
-        """Detect circular dependencies exclusively among required capabilities.
-
-        Args:
-            candidates: Candidate feature specs.
-            cap_to_provider: Map of capability identifier to provider feature ID.
-
-        Raises:
-            DependencyCycleError: If a required dependency cycle is detected.
-        """
-        adj: dict[str, set[str]] = {f_id: set() for f_id in candidates}
-        for f_id, spec in candidates.items():
-            for cap in spec.requires:
-                provider_id = cap_to_provider.get(cap.identifier)
-                if provider_id and provider_id in candidates and provider_id != f_id:
-                    adj[f_id].add(provider_id)
-
-        visited: dict[str, int] = {}
+        adjacency = self._required_adjacency(candidates, provider_map)
+        visiting: set[str] = set()
+        visited: set[str] = set()
         path: list[str] = []
 
-        def dfs(node: str) -> None:
-            visited[node] = 1
+        def visit(node: str) -> None:
+            if node in visited:
+                return
+            if node in visiting:
+                cycle_start = path.index(node)
+                raise DependencyCycleError((*path[cycle_start:], node))
+            visiting.add(node)
             path.append(node)
-            for neighbor in sorted(adj.get(node, ())):
-                if visited.get(neighbor) == 1:
-                    cycle_start = path.index(neighbor)
-                    cycle = [*path[cycle_start:], neighbor]
-                    raise DependencyCycleError(cycle)
-                if visited.get(neighbor, 0) == 0:
-                    dfs(neighbor)
+            for provider in sorted(adjacency[node]):
+                visit(provider)
             path.pop()
-            visited[node] = 2
+            visiting.remove(node)
+            visited.add(node)
 
-        for node in sorted(candidates.keys()):
-            if visited.get(node, 0) == 0:
-                dfs(node)
-
-    def _resolve_single_capability_provider(
-        self,
-        cap_id: str,
-        provider_list: list[str],
-        provider_selections: Mapping[str, str],
-    ) -> str:
-        """Resolve a single capability's provider, checking for ambiguity.
-
-        Args:
-            cap_id: Formatted capability identifier.
-            provider_list: List of candidate feature IDs providing this capability.
-            provider_selections: Explicit provider selections from configuration.
-
-        Returns:
-            Chosen feature ID providing the capability.
-
-        Raises:
-            AmbiguousProviderError: If multiple providers exist without selection.
-            ProviderSelectionError: If the configured selection is not a candidate.
-        """
-        if len(provider_list) == 1:
-            return provider_list[0]
-
-        selected = provider_selections.get(cap_id)
-        if selected is None:
-            candidates_str = ", ".join(sorted(provider_list))
-            msg = (
-                f"Ambiguous capability providers for '{cap_id}': "
-                f"multiple enabled candidates found [{candidates_str}]. "
-                f"Explicit selection required in [providers]."
-            )
-            raise AmbiguousProviderError(msg)
-
-        if selected not in provider_list:
-            candidates_str = ", ".join(sorted(provider_list))
-            msg = (
-                f"Selected provider '{selected}' for capability '{cap_id}' "
-                f"is not among enabled candidate providers [{candidates_str}]."
-            )
-            raise ProviderSelectionError(msg)
-
-        return selected
-
-    def _build_provider_map(
-        self,
-        candidates: Mapping[str, FeatureSpec],
-        provider_selections: Mapping[str, str],
-    ) -> dict[str, str]:
-        """Build mapping of capability identifier to primary provider.
-
-        Args:
-            candidates: Eligible candidate feature specs.
-            provider_selections: Mapping of capability to selected provider feature ID.
-
-        Returns:
-            Dictionary mapping capability identifier string to provider feature ID.
-
-        Raises:
-            AmbiguousProviderError: If multiple features provide a capability.
-            ProviderSelectionError: If selected provider is invalid.
-        """
-        providers_by_cap: dict[str, list[str]] = {}
-        for f_id, spec in candidates.items():
-            for cap in spec.provides:
-                providers_by_cap.setdefault(cap.identifier, []).append(f_id)
-
-        cap_to_provider: dict[str, str] = {}
-        for cap_id, provider_list in providers_by_cap.items():
-            chosen = self._resolve_single_capability_provider(
-                cap_id, provider_list, provider_selections
-            )
-            cap_to_provider[cap_id] = chosen
-
-        # Validate explicit selections for candidate features
-        for cap_id, selected_id in provider_selections.items():
-            if selected_id in candidates:
-                spec = candidates[selected_id]
-                if not any(c.identifier == cap_id for c in spec.provides):
-                    msg = (
-                        f"Selected provider '{selected_id}' does not provide "
-                        f"capability '{cap_id}'"
-                    )
-                    raise ProviderSelectionError(msg)
-
-        return cap_to_provider
+        for feature_id in sorted(adjacency):
+            visit(feature_id)
 
     def _resolve_eligibility(
         self,
         candidates: Mapping[str, FeatureSpec],
+        provider_map: Mapping[str, str],
     ) -> tuple[set[str], dict[str, str]]:
-        """Determine eligible features through iterative fixed-point resolution.
-
-        Args:
-            candidates: Candidate feature specs.
-
-        Returns:
-            Tuple of eligible feature ID set and blocked features reason map.
-        """
-        eligible_set: set[str] = set()
-        available_caps: set[str] = set()
+        eligible: set[str] = set()
         changed = True
-
         while changed:
             changed = False
-            for f_id, spec in candidates.items():
-                if f_id in eligible_set:
+            for feature_id in sorted(candidates):
+                if feature_id in eligible:
                     continue
-                missing_reqs = [
-                    cap.identifier
-                    for cap in spec.requires
-                    if cap.identifier not in available_caps
+                missing = [
+                    capability.identifier
+                    for capability in candidates[feature_id].requires
+                    if provider_map.get(capability.identifier) not in eligible
                 ]
-                if not missing_reqs:
-                    eligible_set.add(f_id)
-                    for cap in spec.provides:
-                        available_caps.add(cap.identifier)
+                if not missing:
+                    eligible.add(feature_id)
                     changed = True
 
         blocks: dict[str, str] = {}
-        for f_id, spec in candidates.items():
-            if f_id not in eligible_set:
-                missing_reqs = [
-                    cap.identifier
-                    for cap in spec.requires
-                    if cap.identifier not in available_caps
-                ]
-                if missing_reqs:
-                    blocks[f_id] = (
-                        f"Missing required capabilities: {', '.join(missing_reqs)}"
-                    )
-                else:
-                    blocks[f_id] = "Unsatisfied dependencies or dependency cycle"
+        for feature_id in sorted(candidates):
+            if feature_id in eligible:
+                continue
+            missing = [
+                capability.identifier
+                for capability in candidates[feature_id].requires
+                if provider_map.get(capability.identifier) not in eligible
+            ]
+            blocks[feature_id] = (
+                f"Missing required capabilities: {', '.join(missing)}"
+                if missing
+                else "Unsatisfied required dependencies"
+            )
+        return eligible, blocks
 
-        return eligible_set, blocks
+    def _build_dependencies(
+        self,
+        eligible: set[str],
+        candidates: Mapping[str, FeatureSpec],
+        provider_map: Mapping[str, str],
+        *,
+        optional: bool,
+    ) -> dict[str, set[str]]:
+        dependencies: dict[str, set[str]] = {
+            feature_id: set() for feature_id in eligible
+        }
+        for consumer_id in eligible:
+            capabilities = (
+                candidates[consumer_id].optional
+                if optional
+                else candidates[consumer_id].requires
+            )
+            for capability in capabilities:
+                provider_id = provider_map.get(capability.identifier)
+                if (
+                    provider_id is not None
+                    and provider_id in eligible
+                    and provider_id != consumer_id
+                ):
+                    dependencies[consumer_id].add(provider_id)
+        return dependencies
+
+    def _reverse_edges(
+        self,
+        nodes: set[str],
+        dependencies: Mapping[str, set[str]],
+    ) -> dict[str, set[str]]:
+        dependents: dict[str, set[str]] = {feature_id: set() for feature_id in nodes}
+        for consumer_id, provider_ids in dependencies.items():
+            for provider_id in provider_ids:
+                dependents[provider_id].add(consumer_id)
+        return dependents
 
     def _topological_sort(
         self,
-        eligible_set: set[str],
-        candidates: Mapping[str, FeatureSpec],
-        cap_to_provider: Mapping[str, str],
-    ) -> tuple[tuple[str, ...], dict[str, set[str]], dict[str, set[str]]]:
-        """Perform topological sort on eligible features.
-
-        Args:
-            eligible_set: Set of eligible feature IDs.
-            candidates: Candidate feature specs.
-            cap_to_provider: Capability to provider mapping.
-
-        Returns:
-            Tuple of (start_order tuple, dependencies map, dependents map).
-
-        Raises:
-            DependencyCycleError: If an unsatisfied required dependency cycle exists.
-        """
-        dependents: dict[str, set[str]] = {f_id: set() for f_id in eligible_set}
-        dependencies: dict[str, set[str]] = {f_id: set() for f_id in eligible_set}
-        in_degree: dict[str, int] = dict.fromkeys(eligible_set, 0)
-
-        for f_id in eligible_set:
-            spec = candidates[f_id]
-            all_deps = tuple(spec.requires) + tuple(spec.optional)
-            for cap in all_deps:
-                provider_id = cap_to_provider.get(cap.identifier)
-                if (
-                    provider_id
-                    and provider_id in eligible_set
-                    and provider_id != f_id
-                    and f_id not in dependents[provider_id]
-                ):
-                    dependents[provider_id].add(f_id)
-                    dependencies[f_id].add(provider_id)
-                    in_degree[f_id] += 1
-
-        queue = deque([f_id for f_id in eligible_set if in_degree[f_id] == 0])
-        start_order: list[str] = []
-
+        nodes: set[str],
+        dependencies: Mapping[str, set[str]],
+    ) -> tuple[str, ...]:
+        in_degree = {
+            feature_id: len(dependencies.get(feature_id, set())) for feature_id in nodes
+        }
+        dependents = self._reverse_edges(nodes, dependencies)
+        queue = [feature_id for feature_id in nodes if in_degree[feature_id] == 0]
+        heapq.heapify(queue)
+        order: list[str] = []
         while queue:
-            node = queue.popleft()
-            start_order.append(node)
-            for dep in dependents[node]:
-                in_degree[dep] -= 1
-                if in_degree[dep] == 0:
-                    queue.append(dep)
+            feature_id = heapq.heappop(queue)
+            order.append(feature_id)
+            for dependent in sorted(dependents[feature_id]):
+                in_degree[dependent] -= 1
+                if in_degree[dependent] == 0:
+                    heapq.heappush(queue, dependent)
 
-        if len(start_order) != len(eligible_set):
-            unresolved = [f_id for f_id in eligible_set if in_degree[f_id] > 0]
+        if len(order) != len(nodes):
+            unresolved = sorted(
+                feature_id for feature_id in nodes if in_degree[feature_id] > 0
+            )
             raise DependencyCycleError(unresolved)
-
-        return tuple(start_order), dependencies, dependents
+        return tuple(order)

@@ -1,8 +1,11 @@
-"""Service registry mapping versioned capabilities to active providers."""
+"""Thread-safe registry for versioned capability providers."""
+
+from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from threading import RLock
 from typing import TYPE_CHECKING, Any, cast
 
 from app.kernel.capability import CapabilityKey, CapabilityUnavailableError
@@ -13,18 +16,12 @@ if TYPE_CHECKING:
 
 
 class CapabilityAlreadyBoundError(RuntimeError, ValueError):
-    """Raised when attempting to register an already bound capability."""
+    """Raised when normal registration would overwrite an active provider."""
 
 
 @dataclass(frozen=True, slots=True)
 class BindingToken:
-    """Ownership token representing one generation of a registered provider.
-
-    Attributes:
-        capability: Formatted capability identifier string.
-        owner_id: Feature identifier of the owning provider.
-        generation: Monotonically increasing generation number.
-    """
+    """Ownership token for one exact capability-provider generation."""
 
     capability: str
     owner_id: str
@@ -33,26 +30,24 @@ class BindingToken:
 
 @dataclass(slots=True)
 class ProviderBinding:
-    """Runtime record of an active capability provider binding.
-
-    Attributes:
-        token: Unique ownership token with generation.
-        provider: Conforming provider instance.
-        registered_at: Timestamp when binding was established.
-    """
+    """Runtime record for an active capability provider."""
 
     token: BindingToken
     provider: object
     registered_at: datetime
 
 
+BindingInput = tuple[CapabilityKey[Any], object, str]
+
+
 class ServiceRegistry:
-    """Central registry tracking active capability providers and their lifetimes."""
+    """Atomically publish, replace, resolve, and revoke capability bundles."""
 
     def __init__(self) -> None:
-        """Initialize an empty service registry."""
+        """Initialize an empty registry."""
         self._bindings: dict[str, ProviderBinding] = {}
         self._generations: dict[str, int] = {}
+        self._lock = RLock()
 
     def register[CapT](
         self,
@@ -61,55 +56,67 @@ class ServiceRegistry:
         owner_id: str,
         scope: FeatureScope | None = None,
     ) -> BindingToken:
-        """Register a capability provider and return its ownership token.
-
-        Args:
-            capability: Target capability key.
-            provider: Implementation conforming to capability protocol.
-            owner_id: Feature ID registering the provider.
-            scope: Optional feature scope for unmount disposal.
+        """Register one capability without overwriting an active binding.
 
         Returns:
-            Ownership token representing this exact provider binding.
+            Ownership token for the new binding.
+        """
+        return self.register_many(
+            [(capability, provider, owner_id)],
+            scope=scope,
+        )[0]
+
+    def register_many(
+        self,
+        bindings: Sequence[BindingInput],
+        scope: FeatureScope | None = None,
+    ) -> list[BindingToken]:
+        """Atomically register a new capability bundle.
+
+        Returns:
+            Ownership tokens in bundle order.
 
         Raises:
-            CapabilityAlreadyBoundError: If capability is already bound.
+            CapabilityAlreadyBoundError: If a capability is duplicated or active.
         """
-        cap_id = capability.identifier
-        existing = self._bindings.get(cap_id)
-        if existing is not None:
-            msg = (
-                f"Capability '{cap_id}' is already registered to "
-                f"'{existing.token.owner_id}' "
-                f"(generation {existing.token.generation}). "
-                f"Overwriting an active binding requires explicit replacement."
-            )
-            raise CapabilityAlreadyBoundError(msg)
+        bundle = tuple(bindings)
+        self._validate_bundle(bundle, scope)
+        capability_ids = tuple(capability.identifier for capability, _, _ in bundle)
 
-        current_gen = self._generations.get(cap_id, 0) + 1
-        self._generations[cap_id] = current_gen
+        with self._lock:
+            previous_generations = {
+                capability_id: self._generations.get(capability_id)
+                for capability_id in capability_ids
+            }
+            overlaps = [
+                capability_id
+                for capability_id in capability_ids
+                if capability_id in self._bindings
+            ]
+            if overlaps:
+                details = ", ".join(
+                    f"Capability '{capability_id}' is already registered to "
+                    f"'{self._bindings[capability_id].token.owner_id}'"
+                    for capability_id in sorted(overlaps)
+                )
+                msg = (
+                    f"{details}. Active bindings cannot be overwritten by normal "
+                    "registration."
+                )
+                raise CapabilityAlreadyBoundError(msg)
+            tokens = self._publish_bundle_locked(bundle)
 
-        token = BindingToken(
-            capability=cap_id,
-            owner_id=owner_id,
-            generation=current_gen,
-        )
-        binding = ProviderBinding(
-            token=token,
-            provider=provider,
-            registered_at=datetime.now(UTC),
-        )
-        self._bindings[cap_id] = binding
-
-        if scope is not None:
-            scope.callback(
-                self.revoke,
-                token,
-                name=f"revoke_provider:{cap_id}",
-                effect_type=EffectType.SERVICE_BINDING,
-            )
-
-        return token
+        try:
+            self._attach_disposers(tokens, scope)
+        except Exception:
+            with self._lock:
+                for token in tokens:
+                    active = self._bindings.get(token.capability)
+                    if active is not None and active.token == token:
+                        del self._bindings[token.capability]
+                self._restore_generations_locked(previous_generations)
+            raise
+        return list(tokens)
 
     def replace_binding[CapT](
         self,
@@ -118,118 +125,156 @@ class ServiceRegistry:
         owner_id: str,
         scope: FeatureScope | None = None,
     ) -> BindingToken:
-        """Explicitly replace an existing capability binding with a new generation.
-
-        Args:
-            capability: Target capability key.
-            provider: Implementation conforming to capability protocol.
-            owner_id: Feature ID registering the replacement provider.
-            scope: Optional feature scope for unmount disposal.
+        """Atomically replace one capability through the explicit swap path.
 
         Returns:
-            Ownership token representing the replacement binding.
+            Ownership token for the replacement binding.
         """
-        cap_id = capability.identifier
-        current_gen = self._generations.get(cap_id, 0) + 1
-        self._generations[cap_id] = current_gen
+        return self.replace_many(
+            [(capability, provider, owner_id)],
+            scope=scope,
+        )[0]
 
-        token = BindingToken(
-            capability=cap_id,
-            owner_id=owner_id,
-            generation=current_gen,
-        )
-        binding = ProviderBinding(
-            token=token,
-            provider=provider,
-            registered_at=datetime.now(UTC),
-        )
-        self._bindings[cap_id] = binding
+    def replace_many(
+        self,
+        bindings: Sequence[BindingInput],
+        scope: FeatureScope | None = None,
+    ) -> list[BindingToken]:
+        """Atomically replace every capability in a provider bundle.
 
+        Returns:
+            Ownership tokens in bundle order.
+        """
+        bundle = tuple(bindings)
+        self._validate_bundle(bundle, scope)
+        capability_ids = tuple(capability.identifier for capability, _, _ in bundle)
+
+        with self._lock:
+            previous_generations = {
+                capability_id: self._generations.get(capability_id)
+                for capability_id in capability_ids
+            }
+            previous = {
+                capability_id: self._bindings.get(capability_id)
+                for capability_id in capability_ids
+            }
+            tokens = self._publish_bundle_locked(bundle)
+
+        try:
+            self._attach_disposers(tokens, scope)
+        except Exception:
+            with self._lock:
+                for capability_id, old_binding in previous.items():
+                    if old_binding is None:
+                        self._bindings.pop(capability_id, None)
+                    else:
+                        self._bindings[capability_id] = old_binding
+                self._restore_generations_locked(previous_generations)
+            raise
+        return list(tokens)
+
+    def _restore_generations_locked(
+        self,
+        previous: dict[str, int | None],
+    ) -> None:
+        for capability_id, generation in previous.items():
+            if generation is None:
+                self._generations.pop(capability_id, None)
+            else:
+                self._generations[capability_id] = generation
+
+    def _validate_bundle(
+        self,
+        bindings: Sequence[BindingInput],
+        scope: FeatureScope | None,
+    ) -> None:
         if scope is not None:
+            scope.ensure_open()
+        capability_ids = [
+            capability.identifier for capability, _provider, _owner_id in bindings
+        ]
+        duplicates = sorted(
+            capability_id
+            for capability_id in set(capability_ids)
+            if capability_ids.count(capability_id) > 1
+        )
+        if duplicates:
+            raise CapabilityAlreadyBoundError(
+                "Capability bundle contains duplicate identifiers: "
+                + ", ".join(duplicates)
+            )
+        if any(not owner_id.strip() for _capability, _provider, owner_id in bindings):
+            raise ValueError("Capability binding owner_id must not be empty")
+
+    def _publish_bundle_locked(
+        self,
+        bindings: Sequence[BindingInput],
+    ) -> tuple[BindingToken, ...]:
+        registered_at = datetime.now(UTC)
+        tokens: list[BindingToken] = []
+        for capability, provider, owner_id in bindings:
+            capability_id = capability.identifier
+            generation = self._generations.get(capability_id, 0) + 1
+            self._generations[capability_id] = generation
+            token = BindingToken(
+                capability=capability_id,
+                owner_id=owner_id,
+                generation=generation,
+            )
+            self._bindings[capability_id] = ProviderBinding(
+                token=token,
+                provider=provider,
+                registered_at=registered_at,
+            )
+            tokens.append(token)
+        return tuple(tokens)
+
+    def _attach_disposers(
+        self,
+        tokens: Sequence[BindingToken],
+        scope: FeatureScope | None,
+    ) -> None:
+        if scope is None:
+            return
+        for token in tokens:
             scope.callback(
                 self.revoke,
                 token,
-                name=f"revoke_provider:{cap_id}",
+                name=f"revoke_provider:{token.capability}",
                 effect_type=EffectType.SERVICE_BINDING,
             )
 
-        return token
-
-    def register_many(
-        self,
-        bindings: Sequence[tuple[CapabilityKey[Any], Any, str]],
-        scope: FeatureScope | None = None,
-    ) -> list[BindingToken]:
-        """Atomically register multiple capability bindings (all-or-nothing).
-
-        Args:
-            bindings: Sequence of (capability_key, provider_impl, owner_id) tuples.
-            scope: Optional feature scope to attach unmount disposers.
-
-        Returns:
-            List of generated BindingTokens in matching order.
-
-        Raises:
-            CapabilityAlreadyBoundError: If any of the capabilities are already active.
-        """
-        # 1. Validation phase (verify no conflicting active bindings)
-        for cap, _provider, _owner in bindings:
-            cap_id = cap.identifier
-            if cap_id in self._bindings:
-                existing = self._bindings[cap_id]
-                msg = (
-                    f"Capability '{cap_id}' is already registered to "
-                    f"'{existing.token.owner_id}'"
-                )
-                raise CapabilityAlreadyBoundError(msg)
-
-        # 2. Registration phase
-        tokens: list[BindingToken] = []
-        for cap, provider, owner in bindings:
-            token = self.register(cap, provider, owner, scope=scope)
-            tokens.append(token)
-        return tokens
-
     def revoke(self, token: BindingToken) -> bool:
-        """Revoke a provider binding if the token matches the active generation.
-
-        Args:
-            token: Ownership token provided during registration.
+        """Revoke a binding only when its exact generation is still active.
 
         Returns:
-            True if matching active binding was removed, False if token is stale.
+            Whether the active generation was removed.
         """
-        active_binding = self._bindings.get(token.capability)
-        if active_binding is not None and active_binding.token == token:
-            del self._bindings[token.capability]
-            return True
-        return False
+        with self._lock:
+            active = self._bindings.get(token.capability)
+            if active is not None and active.token == token:
+                del self._bindings[token.capability]
+                return True
+            return False
 
     def resolve[CapT](self, capability: CapabilityKey[CapT]) -> CapT | None:
-        """Resolve an active provider for the given capability key.
-
-        Args:
-            capability: Target capability key.
+        """Resolve an active provider for a capability.
 
         Returns:
-            Active provider instance if available, None otherwise.
+            Active provider, or None when unavailable.
         """
-        binding = self._bindings.get(capability.identifier)
-        if binding is not None:
-            return cast("CapT", binding.provider)
-        return None
+        with self._lock:
+            binding = self._bindings.get(capability.identifier)
+            return cast("CapT", binding.provider) if binding is not None else None
 
     def require[CapT](self, capability: CapabilityKey[CapT]) -> CapT:
-        """Resolve a mandatory capability, raising if no provider is active.
-
-        Args:
-            capability: Target capability key.
+        """Resolve a mandatory capability or raise when unavailable.
 
         Returns:
-            Active provider instance.
+            Active capability provider.
 
         Raises:
-            CapabilityUnavailableError: If capability has no active provider.
+            CapabilityUnavailableError: If no provider is active.
         """
         provider = self.resolve(capability)
         if provider is None:
@@ -237,37 +282,28 @@ class ServiceRegistry:
         return provider
 
     def is_available(self, capability: CapabilityKey[Any] | str) -> bool:
-        """Check if an active provider is registered for a capability.
-
-        Args:
-            capability: Capability key or formatted string identifier.
-
-        Returns:
-            True if an active provider exists, False otherwise.
-        """
-        cap_id = capability if isinstance(capability, str) else capability.identifier
-        return cap_id in self._bindings
+        """Return whether a capability currently has an active provider."""
+        capability_id = (
+            capability if isinstance(capability, str) else capability.identifier
+        )
+        with self._lock:
+            return capability_id in self._bindings
 
     def get_binding(self, capability_identifier: str) -> ProviderBinding | None:
-        """Retrieve the active provider binding for a capability identifier.
-
-        Args:
-            capability_identifier: Formatted capability string.
-
-        Returns:
-            Active ProviderBinding if present, None otherwise.
-        """
-        return self._bindings.get(capability_identifier)
+        """Return the current provider binding when present."""
+        with self._lock:
+            return self._bindings.get(capability_identifier)
 
     def active_capabilities(self) -> dict[str, BindingToken]:
-        """Return a snapshot map of all active capability identifiers to tokens.
-
-        Returns:
-            Dictionary mapping capability identifiers to active BindingTokens.
-        """
-        return {cap_id: binding.token for cap_id, binding in self._bindings.items()}
+        """Return a snapshot of active capability ownership tokens."""
+        with self._lock:
+            return {
+                capability_id: binding.token
+                for capability_id, binding in self._bindings.items()
+            }
 
     def clear(self) -> None:
-        """Clear all active bindings and generation counters."""
-        self._bindings.clear()
-        self._generations.clear()
+        """Clear all bindings and generation counters."""
+        with self._lock:
+            self._bindings.clear()
+            self._generations.clear()

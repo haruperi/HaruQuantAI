@@ -1,155 +1,188 @@
 # Spatiotemporal Composability Remediation — Final Audit Record
 
-## 1. Executive Summary & Audit Metadata
+## 1. Executive summary and verification metadata
 
-- **Date:** 2026-08-21
-- **Baseline Commit SHA:** `c1584cb572fee29e119ec0daebb689b247aafe40`
-- **Characterization Commit SHA:** `ca44735b54faefad6ef97063cf4eb4e57849cb16`
-- **Final Release Commit:** (Target PR commit)
-- **Target Branch:** `main`
-- **Python Version:** `3.14.3`
-- **uv Version:** `0.12.3`
-- **Platform:** Windows (win32)
-- **Overall Status:** **REMEDIATION COMPLETE & VERIFIED**
+- **Audit date:** 2026-08-21
+- **Original architecture baseline:** `c1584cb572fee29e119ec0daebb689b247aafe40`
+- **Pre-final-audit repository state:** `b71d10f6fc02dc598b093e35fb8a59d4ac49ed47`
+- **Verified runtime implementation SHA:** `777b6ca3a84bb713faca5bfb74e66cb4a112e8a8`
+- **Implementation branch:** `fix/final-composability-audit`
+- **Pull request:** `#4 — fix(architecture): close final composability audit gaps`
+- **GitHub Actions Python:** `3.14.7`
+- **GitHub Actions uv:** `0.12.5`
+- **CI workflow run:** `32522153187` — **SUCCESS**
+- **Feature-removability workflow run:** `32522153202` — **SUCCESS**
+- **Removability artifact ID:** `9460964595`
+- **Overall status:** **REMEDIATION COMPLETE AND REMOTELY VERIFIED**
+
+The runtime implementation SHA above is the exact code revision for which both the complete CI quality gate and the complete built-in feature-removability matrix passed. Documentation-only evidence commits after that SHA do not alter runtime behavior and are required to pass the same workflows before merge.
 
 > [!IMPORTANT]
-> GitHub Actions CI results on pull requests and target branches, rather than local developer claims or commit message texts, are the authoritative remote evidence for architectural verification.
-> **Safety Guarantee**: No real broker, exchange connection, API secret, or live-trading operation was executed at any stage of this remediation. All tests run against pure in-memory test doubles and mock feeds.
+> GitHub Actions is the authoritative remote evidence. Commit messages, checkboxes, and local developer statements are not treated as proof by themselves.
+
+> [!CAUTION]
+> No real broker connection, exchange connection, API credential, live order, or capital-bearing trading operation was used. All verification used deterministic mocks, test doubles, local storage sandboxes, and the built-in mock feed.
 
 ---
 
-## 2. Gap-by-Gap Remediation Status
+## 2. Final gap-by-gap status
 
-All 10 architectural gaps identified in `docs/architecture/composability_gap_remediation_plan.md` have been resolved, covered by regression tests, and audited:
-
-| Gap / Phase | Title & Description | Resolution Summary | Status |
+| Area | Final implementation result | Evidence | Status |
 |---|---|---|---|
-| **Phase 1** | **Standardize Configuration Grammar & Enforce Live Readiness** | - Rejected legacy `[profile]` table in favor of top-level `[application]` table.<br>- Enforced strict validation for unknown profiles (`ProfileConfigurationError`).<br>- Mandated all 6 mission-critical safety capabilities for the `live` profile (`trading.execution@1`, `portfolio.positions@1`, `data.realtime-ticks@1`, `risk.pre-trade-check@1`, `system.storage@1`, `system.clock@1`). | **PASSED** |
-| **Phase 2** | **Deterministic Capability Provider Selection** | - Added explicit `[capabilities.<cap>] provider = "FEAT-ID"` grammar.<br>- Raised `AmbiguousProviderError` on multiple enabled providers for the same capability when no explicit selector is declared.<br>- Generated clear diagnostic messages listing competing feature IDs. | **PASSED** |
-| **Phase 3** | **Reconcile Provider Generations & Transitive Consumers** | - Enforced topological dependency sorting using Kahn's algorithm and raised `DependencyCycleError` for cycles.<br>- Tracked capability provider generations across reconfigurations.<br>- Re-mounted downstream transitive consumers in topological order when upstream provider generations incremented. | **PASSED** |
-| **Phase 4** | **Transactional Replacement Safety** | - Implemented two-phase commit for dynamic feature replacement (`replace_feature_transactional_detailed`).<br>- Staged replacement in isolated `shadow_scope` with health check hook execution before commit.<br>- Maintained old provider and rolled back on pre-commit failure.<br>- Migrated staged effects (tasks, listeners, callbacks) into active scope on commit.<br>- Captured post-commit cleanup errors as `degraded` without rolling back already-committed providers. | **PASSED** |
-| **Phase 5** | **Enforce Event Modes & Exact Subscription Disposal** | - Enforced strict handler isolation for `PUBLISH`, `SERIAL`, `PARALLEL`, and `PIPELINE` dispatch modes.<br>- Replaced non-deterministic handler removal with unique subscription tokens for exact subscription disposal.<br>- Ensured duplicate subscriptions are independently manageable. | **PASSED** |
-| **Phase 6** | **Runtime Task Failure Supervision** | - Supervised background tasks spawned via `context.spawn()`.<br>- Detected unhandled task exceptions, transitioned feature state to `FAILED_RUNTIME`, and revoked owned capabilities.<br>- Recalculated system readiness dynamically and transitioned dependent consumers to `BLOCKED`. | **PASSED** |
-| **Phase 7** | **Complete Scoped Resource Lifecycle APIs** | - Enforced strict rejection of new registrations on closed `FeatureScope` (`ScopeClosedError`).<br>- Added async and sync context manager APIs (`async with context.scoped_resource(...)`, `with context.scoped_sync_resource(...)`).<br>- Verified clean reverse-order resource disposal. | **PASSED** |
-| **Phase 8** | **Physical Feature Removability in CI** | - Implemented `scripts/verify_feature_removal.py` with isolated sandbox testing.<br>- Verified that deleting any built-in feature directory and entry point passes all quality gates, executes unrelated feature tests, and verifies graceful runtime degradation.<br>- Automated provider removability in `.github/workflows/provider-removability.yml`. | **PASSED** |
-| **Phase 9** | **Application Bootstrap & System Control Plane** | - Created production CLI entry points in `app/main.py` (`--config`, `--status`, `--serve`, `--host`, `--port`).<br>- Implemented structured JSON diagnostics output.<br>- Implemented pure-Python async `SystemHttpServer` in `app/api/http.py` for `/system/liveness`, `/system/readiness`, `/system/capabilities`, and `/system/features`. | **PASSED** |
-| **Phase 10** | **Eliminate Manifest, Implementation, and Documentation Drift** | - Removed unused configuration parameters from `HistoricalBarsConfig` and `MockFeedConfig`.<br>- Standardized storage configuration on `base_path`.<br>- Implemented `scripts/validate_feature_docs.py` and integrated into CI.<br>- Synchronized root `README.md` and `docs/architecture/capability-model.md`. | **PASSED** |
-| **Phase 11** | **Tighten Typing, Quality Gates, and Release Evidence** | - Removed blanket `tests.* ignore_errors = true` from `pyproject.toml`.<br>- Resolved all typing errors across all test modules (mypy strict passes on 123 files).<br>- Executed full quality gate matrix and generated final release evidence. | **PASSED** |
+| Configuration grammar | Canonical `[application].profile`, strict top-level validation, typed configuration errors, and rejection of legacy or unknown profiles | `app/composition/config.py`, configuration tests | **PASSED** |
+| Live readiness | Fail-closed profile model with all seven required Live safety capabilities | `app/composition/readiness.py`, parameterized readiness tests | **PASSED** |
+| Provider selection | Explicit selections are validated with zero, one, or multiple candidates; unselected providers are suppressed from activation | `app/kernel/graph.py`, final guarantee tests | **PASSED** |
+| Dependency graph | Required cycles fail explicitly; optional-only cycles do not block activation; required and optional edges are tracked separately | `app/kernel/graph.py`, graph tests | **PASSED** |
+| Provider changes | Configuration, availability, optional-dependency, and provider-selection changes remount the complete affected consumer closure | `app/kernel/reconciler.py`, reconciler and final guarantee tests | **PASSED** |
+| Registry atomicity | Capability bundles are validated and published or replaced atomically under a lock, with duplicate detection and rollback on disposer failure | `app/kernel/registry.py`, atomicity tests | **PASSED** |
+| Transactional replacement | Replacement uses a staged scope that survives commit, atomically publishes the provider bundle, remounts transitive consumers, and reports cleanup or consumer degradation truthfully | `app/kernel/reconciler.py`, replacement tests | **PASSED** |
+| Event semantics | PUBLISH, SERIAL, PARALLEL, and PIPELINE modes are enforced; exact subscription-token disposal is idempotent | `app/kernel/events.py`, event tests | **PASSED** |
+| Runtime failure supervision | Unexpected worker failure invalidates the owner, reconciles consumers to `BLOCKED`, preserves unrelated features, and records runtime diagnostics | `app/kernel/scope.py`, `app/kernel/reconciler.py`, lifecycle tests | **PASSED** |
+| Lifecycle ownership | Closed scopes reject new effects; tasks, listeners, callbacks, service bindings, and context managers are lifecycle-owned | `app/kernel/scope.py`, `app/kernel/context.py`, scope/context tests | **PASSED** |
+| Mutation serialization | Reload, replacement, runtime-failure handling, and shutdown share one engine mutation lock | `app/composition/engine.py`, concurrency acceptance test | **PASSED** |
+| Application shell | Installed CLI supports status and serving; system endpoints expose liveness, readiness, capabilities, feature state, runtime failures, and replacement degradation | `app/main.py`, `app/api/http.py`, API tests | **PASSED** |
+| Physical removal | Every registered built-in feature is physically removed in an isolated workspace while the remaining full suite, CLI, readiness, MISSING/BLOCKED state, unrelated ACTIVE state, and leak assertions pass | `scripts/verify_feature_removal.py`, run `32522153202` | **PASSED** |
+| Documentation truth | Feature READMEs are checked against exact provided, required, optional, state, and configuration declarations | `scripts/validate_feature_docs.py`, CI | **PASSED** |
+| Strict typing | Application and tests are checked under strict mypy without the former blanket `tests.*` relaxation | `pyproject.toml`, CI | **PASSED** |
 
 ---
 
-## 3. Final Quality Gate Results
+## 3. Authoritative CI evidence
 
-All commands executed and verified with `uv` on Python 3.14.3:
+### 3.1 Complete CI workflow
 
-| Quality Gate | Exact Command | Result | Duration | Details |
-|---|---|---|---|---|
-| **Ruff Formatting** | `uv run --frozen ruff format --check .` | **PASSED** | 0.13s | 131 files formatted |
-| **Ruff Linting** | `uv run --frozen ruff check .` | **PASSED** | 0.14s | 0 lint violations |
-| **Mypy Strict Typing** | `uv run --frozen mypy` | **PASSED** | 0.74s | 123 source/test files clean |
-| **Import Linter** | `uv run --frozen lint-imports` | **PASSED** | 0.43s | 3 architecture layer contracts |
-| **AST Invariants** | `uv run --frozen python scripts/architecture_check.py` | **PASSED** | 0.17s | 0 forbidden direct imports |
-| **Doc Synchronization** | `uv run --frozen python scripts/validate_feature_docs.py` | **PASSED** | 0.21s | 0 manifest/doc mismatches |
-| **Pytest & Coverage** | `uv run --frozen pytest --cov=app --cov-fail-under=80` | **PASSED** | 4.38s | 190 passed, 0 failed, 94.49% cov |
-| **CI Automation** | `uv run --frozen python scripts/ci_check.py` | **PASSED** | 6.20s | All 7 gates passed |
+**Workflow run:** `32522153187`  
+**Verified SHA:** `777b6ca3a84bb713faca5bfb74e66cb4a112e8a8`  
+**Conclusion:** `success`
 
----
+| Gate | Result |
+|---|---|
+| Ruff formatting | **PASSED** — 133 files formatted |
+| Ruff lint | **PASSED** — all checks passed |
+| Mypy strict | **PASSED** — no issues in 125 source/test files |
+| Import Linter | **PASSED** — 4 contracts kept, 0 broken |
+| Architectural AST rules | **PASSED** |
+| Feature documentation validation | **PASSED** — 3 registered feature READMEs matched runtime truth |
+| Pytest | **PASSED** — 205 tests passed |
+| Coverage | **PASSED** — 92.47%, above the 80% gate |
 
-## 4. Test Suite & Coverage Metrics
+The CI command remained:
 
-- **Total Test Count:** 190 passed (0 failed, 0 skipped, 0 xfailed)
-- **Overall Code Coverage:** 94.49% (well above the required 80.00% threshold)
-- **Execution Speed:** ~4.38 seconds
-
-### Module Coverage Breakdown
-
-| Package / Module | Statements | Missing Lines | Branch Coverage | Coverage % |
-|---|---|---|---|---|
-| `app/api/*` (Broker, Data, Facade, HTTP, Risk, System) | 248 | 19 | 82.5% | **92.3%** |
-| `app/composition/*` (Config, Discovery, Engine, Readiness, Watcher) | 337 | 20 | 83.3% | **91.8%** |
-| `app/contracts/*` (Capabilities, Events, Protocols) | 122 | 0 | 100.0% | **100.0%** |
-| `app/kernel/*` (Capability, Context, Events, Feature, Graph, Reconciler, Registry, Scope, State) | 889 | 31 | 91.5% | **95.2%** |
-| `app/main.py` (CLI & Bootstrap) | 44 | 4 | 87.5% | **90.0%** |
-| `app/services/broker/mock_feed/*` | 69 | 0 | 100.0% | **100.0%** |
-| `app/services/data/historical_bars/*` | 67 | 0 | 100.0% | **100.0%** |
-| `app/services/system/storage/*` | 210 | 2 | 96.7% | **98.2%** |
-| **TOTAL** | **1986** | **76** | **87.7%** | **94.49%** |
-
----
-
-## 5. Physical Removal Matrix Results
-
-Authoritative output from `scripts/verify_feature_removal.py --all --report removability-report.json`:
-
-```json
-{
-  "timestamp": "2026-08-21T17:00:12.907579+00:00",
-  "overall_passed": true,
-  "total_elapsed_seconds": 41.74,
-  "targets": [
-    {
-      "feature_id": "FEAT-BROKER-FEED_MOCK",
-      "entry_point_name": "broker-mock-feed",
-      "pkg_rel_path": "app/services/broker/mock_feed",
-      "test_rel_path": "tests/services/broker/mock_feed",
-      "provided_capabilities": ["broker.market-data@1"],
-      "passed": true,
-      "elapsed_seconds": 17.50
-    },
-    {
-      "feature_id": "FEAT-DATA-RETRIEVE_BARS",
-      "entry_point_name": "data-historical-bars",
-      "pkg_rel_path": "app/services/data/historical_bars",
-      "test_rel_path": "tests/services/data/historical_bars",
-      "provided_capabilities": ["data.historical-bars@1"],
-      "passed": true,
-      "elapsed_seconds": 15.18
-    },
-    {
-      "feature_id": "FEAT-SYS-PERSIST_STORAGE",
-      "entry_point_name": "system-persist-storage",
-      "pkg_rel_path": "app/services/system/storage",
-      "test_rel_path": "tests/services/system/storage",
-      "provided_capabilities": ["system.storage@1"],
-      "passed": true,
-      "elapsed_seconds": 9.07
-    }
-  ]
-}
+```bash
+uv run --frozen python scripts/ci_check.py
 ```
 
-For every feature tested:
-1. The feature source code and feature-local tests were physically deleted from an isolated sandbox workspace.
-2. Entry points were purged from `pyproject.toml` and `.importlinter`.
-3. Ruff format, Ruff check, Mypy, Import Linter, and AST architecture checks passed with zero errors.
-4. Core kernel, composition, and all other feature tests passed cleanly.
-5. The application started up cleanly with stale TOML configs referencing the removed feature, verifying graceful capability unavailability (`is_available == False`) and `MISSING`/`BLOCKED` feature states.
+---
+
+## 4. Physical-removal matrix evidence
+
+**Workflow run:** `32522153202`  
+**Verified SHA:** `777b6ca3a84bb713faca5bfb74e66cb4a112e8a8`  
+**Conclusion:** `success`  
+**Uploaded artifact:** `removability-report`, artifact ID `9460964595`
+
+| Removed feature | Provided capability | Required consumers verified | Result | Elapsed |
+|---|---|---|---|---:|
+| `FEAT-BROKER-FEED_MOCK` | `broker.market-data@1` | `FEAT-DATA-RETRIEVE_BARS` became `BLOCKED`; `data.historical-bars@1` disappeared | **PASS** | 22.75s |
+| `FEAT-DATA-RETRIEVE_BARS` | `data.historical-bars@1` | No built-in required consumer yet; Broker and Storage remained `ACTIVE`; Research readiness became false | **PASS** | 24.37s |
+| `FEAT-SYS-PERSIST_STORAGE` | `system.storage@1` | No built-in required consumer yet; Broker and Historical Bars remained `ACTIVE`; Offline readiness remained true | **PASS** | 21.12s |
+
+For every target, the verifier performed all of the following in an isolated copied workspace:
+
+1. Deleted the feature package and feature-local tests.
+2. Removed its entry point and Import Linter feature declaration.
+3. Preserved cross-feature, API, kernel, composition, architecture, and unrelated feature tests.
+4. Ran frozen environment synchronization.
+5. Ran Ruff formatting and linting.
+6. Ran strict mypy.
+7. Ran Import Linter and AST architecture checks.
+8. Ran exact feature-documentation validation for the remaining features.
+9. Ran the complete remaining test suite.
+10. Started the composition engine with stale configuration.
+11. Asserted `MISSING` for the deleted feature.
+12. Asserted `BLOCKED` for required consumers and removal of their capabilities.
+13. Asserted unrelated built-in features remained `ACTIVE`.
+14. Asserted profile readiness was recalculated correctly.
+15. Invoked the installed `haruquantai --status` command.
+16. Asserted shutdown left no active capabilities, listeners, or newly leaked tasks.
 
 ---
 
-## 6. Required Acceptance Scenarios Validation
+## 5. Acceptance scenarios
 
-All 9 acceptance scenarios defined in the remediation specification are verified:
+| Scenario | Result |
+|---|---|
+| Disable a consumer without breaking the provider or shell | **PASSED** |
+| Remove a required provider and block consumers | **PASSED** |
+| Reconfigure a provider and remount transitive consumers | **PASSED** |
+| Change an optional provider and refresh optional consumers | **PASSED** |
+| Allow optional-only dependency cycles without activation failure | **PASSED** |
+| Reject ambiguous or invalid provider selection | **PASSED** |
+| Mount only the explicitly selected provider | **PASSED** |
+| Roll back failed replacement before commit | **PASSED** |
+| Preserve replacement tasks, listeners, resources, and callbacks after commit | **PASSED** |
+| Remount a two-level consumer chain after replacement | **PASSED** |
+| Publish multi-capability replacement atomically | **PASSED** |
+| Report committed replacement cleanup errors as degraded rather than rolled back | **PASSED** |
+| Enforce all four event modes and exact token disposal | **PASSED** |
+| Convert runtime worker failure to `FAILED_RUNTIME` and block consumers | **PASSED** |
+| Serialize concurrent reload and replacement requests | **PASSED** |
+| Verify every built-in feature by physical deletion | **PASSED** |
 
-- **Scenario A (Disable a consumer)**: Disabling `FEAT-DATA-RETRIEVE_BARS` keeps `broker.market-data@1` available, transitions `data.historical-bars@1` to unavailable, and preserves application healthy liveness.
-- **Scenario B (Remove a required provider)**: Disabling `FEAT-BROKER-FEED_MOCK` transitions dependent `FEAT-DATA-RETRIEVE_BARS` to `BLOCKED`, marks `research` profile not ready, and keeps application liveness healthy.
-- **Scenario C (Reconfigure a provider)**: Updating provider configuration increments its generation, remounts transitive downstream consumers in topological order, and binds the new generation instance.
-- **Scenario D (Transactional pre-commit failure)**: Mount failure or health check failure in replacement candidate rolls back all staged effects without altering the active provider identity.
-- **Scenario E (Transactional commit with cleanup failure)**: When new provider is committed but old provider cleanup raises an error, the replacement is reported as committed with `status == "degraded"` and cleanup errors recorded.
-- **Scenario F (Runtime task failure)**: When an active background task crashes with an unhandled exception, the owner transitions to `FAILED_RUNTIME`, capabilities are revoked, dependents become `BLOCKED`, and unrelated features remain `ACTIVE`.
-- **Scenario G (Event-mode isolation)**: Dispatching `publish()` invokes only `PUBLISH` mode handlers. Exact token disposal removes only the targeted subscription even with duplicate registrations.
-- **Scenario H (Live safety)**: For every required Live capability, omitting the capability prevents `live` profile readiness and reports the exact missing capability.
-- **Scenario I (Physical removal matrix)**: Complete physical deletion of any provider verified across the matrix.
+The main final-regression suite is in:
+
+```text
+tests/architecture/test_final_composability_guarantees.py
+tests/kernel/test_registry_atomicity.py
+tests/services/test_lifecycle_leak.py
+tests/services/test_vertical_feature_pair.py
+```
 
 ---
 
-## 7. Known Limitations & Roadmap Work
+## 6. Live readiness safety boundary
 
-1. **Non-Blocking Hot Reconfiguration**: Transactional replacement currently swaps features in-memory synchronously with quiesce/drain hooks. Distributed zero-downtime clustering across multiple nodes will be addressed in future operational milestones.
-2. **Additional Built-in Features**: The three initial built-in features (`FEAT-BROKER-FEED_MOCK`, `FEAT-DATA-RETRIEVE_BARS`, `FEAT-SYS-PERSIST_STORAGE`) serve as reference implementations. Real broker connectors (e.g. MetaTrader5, cTrader, Binance) will be built as decoupled external wheels using the standardized plugin packaging and entry point specification.
+The `live` profile is ready only when all of these capabilities are active:
+
+```text
+system.clock@1
+broker.market-data@1
+broker.execution@1
+data.realtime-ticks@1
+portfolio.positions@1
+risk.approval@1
+trading.execution@1
+```
+
+Removing any one capability makes Live readiness false and reports that capability explicitly. Current built-in features intentionally do not satisfy the Live profile; this prevents accidental claims of production readiness before broker execution, real-time data, portfolio state, risk approval, and trading execution features exist.
 
 ---
 
-## 8. Final Audit Sign-Off
+## 7. Scope and known limitations
 
-The composability gap remediation is complete. The HaruQuantAI architecture enforces strict spatiotemporal composability, isolated capability contracts, deterministic topological reconciliation, transactional replacement safety, and complete physical provider removability.
+This sign-off applies to the current **single-process Python composition runtime** and the three registered built-in reference features:
+
+```text
+FEAT-BROKER-FEED_MOCK
+FEAT-DATA-RETRIEVE_BARS
+FEAT-SYS-PERSIST_STORAGE
+```
+
+The following remain future work rather than gaps in this remediation:
+
+- Distributed or multi-node transactional replacement.
+- Process isolation for untrusted plugins or native extensions.
+- Real MT5, cTrader, Binance, or other broker adapters.
+- Real order execution and reconciliation against live brokers.
+- Production risk, portfolio, strategy, indicator, simulator, optimization, research, and agentic features.
+- Automatic compensation for irreversible external business actions.
+
+Each future built-in feature must satisfy the same contract tests, strict architecture rules, documentation validation, lifecycle tests, and physical-removal matrix.
+
+---
+
+## 8. Final sign-off
+
+The foundational architecture can now accurately be described as:
+
+> **Remotely verified spatiotemporal composability for registered built-in Python features, with deterministic provider selection, required and optional dependency reconciliation, atomic capability bundles, lifecycle-safe transactional replacement, fail-closed readiness, runtime supervision, exact event ownership, and automated physical-removal evidence.**

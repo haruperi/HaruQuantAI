@@ -1,41 +1,38 @@
 """Configuration validation for Mock Broker Feed."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Any
+
+_ALLOWED_CONFIG_KEYS = frozenset({"base_price"})
 
 
 @dataclass(frozen=True, slots=True)
 class MockFeedConfig:
-    """Configuration options for mock broker feed.
-
-    Satisfies:
-        FR-BROKER-VALIDATE_FEED_CONFIG: Validates base price constraint.
-
-    Attributes:
-        base_price: Base price level for synthetic bar generation.
-    """
+    """Configuration for deterministic synthetic bar generation."""
 
     base_price: float = 1.1000
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> MockFeedConfig:
-        """Parse and validate configuration dictionary.
-
-        Args:
-            data: Raw dictionary from application configuration.
+        """Parse and validate a strict mock-feed configuration mapping.
 
         Returns:
-            Validated MockFeedConfig instance.
+            Validated mock-feed configuration.
 
         Raises:
-            ValueError: If base_price is not positive.
+            ValueError: If a field is unknown or invalid.
         """
         if not data:
             return cls()
-
-        base = float(data.get("base_price", 1.1000))
-        if base <= 0:
-            msg = f"base_price must be positive, got {base}"
+        unknown = set(data) - _ALLOWED_CONFIG_KEYS
+        if unknown:
+            raise ValueError(
+                "Unknown Mock Feed configuration keys: " + ", ".join(sorted(unknown))
+            )
+        base_price = float(data.get("base_price", 1.1000))
+        if base_price <= 0:
+            msg = f"base_price must be positive, got {base_price}"
             raise ValueError(msg)
-
-        return cls(base_price=base)
+        return cls(base_price=base_price)

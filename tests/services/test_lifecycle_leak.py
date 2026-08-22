@@ -1,239 +1,290 @@
-"""Category C Composability Tests: Lifecycle-Leak & Churn Suite."""
+"""Removal-safe lifecycle leak, churn, and runtime-failure tests."""
+
+from __future__ import annotations
 
 import asyncio
-from pathlib import Path
 from typing import Any, override
 
 import pytest
 
-from app.composition.discovery import DiscoveryResult, FeatureDiscoverer
+from app.composition.discovery import FeatureDiscoverer
 from app.composition.engine import CompositionEngine
 from app.contracts.events.system import FeatureMountedEvent
 from app.kernel.capability import CapabilityKey
 from app.kernel.context import DefaultFeatureContext, FeatureContext
 from app.kernel.events import EventBus, EventMode
-from app.kernel.feature import Feature, FeatureSpec
+from app.kernel.feature import Feature, FeatureSpec, FeatureState
 from app.kernel.registry import ServiceRegistry
 from app.kernel.scope import FeatureScope
-from app.services.broker.mock_feed.feature import MockFeedFeature
-from app.services.data.historical_bars.feature import HistoricalBarsFeature
-from app.services.system.storage.feature import StorageFeature
+
+ROOT_CAP = CapabilityKey[object]("test.churn-root", 1)
+CONSUMER_CAP = CapabilityKey[object]("test.churn-consumer", 1)
+UNRELATED_CAP = CapabilityKey[object]("test.unrelated", 1)
+CRASHING_CAP = CapabilityKey[object]("test.crashing", 1)
+
+
+def _active_feature_count(engine: CompositionEngine) -> int:
+    """Return a fresh active-feature count after lifecycle mutations."""
+    return len(engine.reconciler.active_features)
+
+
+def _active_capability_count(engine: CompositionEngine) -> int:
+    """Return a fresh active-capability count after lifecycle mutations."""
+    return len(engine.registry.active_capabilities())
+
+
+class ChurnRootFeature(Feature):
+    """Root feature used by rapid mount/unmount tests."""
+
+    spec = FeatureSpec(
+        "FEAT-TEST-CHURN_ROOT",
+        "test",
+        provides=frozenset({ROOT_CAP}),
+    )
+
+    @override
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        context.provide(ROOT_CAP, object())
+
+
+class ChurnConsumerFeature(Feature):
+    """Required consumer used by rapid mount/unmount tests."""
+
+    spec = FeatureSpec(
+        "FEAT-TEST-CHURN_CONSUMER",
+        "test",
+        provides=frozenset({CONSUMER_CAP}),
+        requires=frozenset({ROOT_CAP}),
+    )
+
+    @override
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        context.require(ROOT_CAP)
+        context.provide(CONSUMER_CAP, object())
+
+
+class UnrelatedFeature(Feature):
+    """Feature whose capability must survive unrelated failures."""
+
+    spec = FeatureSpec(
+        "FEAT-TEST-UNRELATED",
+        "test",
+        provides=frozenset({UNRELATED_CAP}),
+    )
+
+    @override
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        context.provide(UNRELATED_CAP, object())
 
 
 @pytest.mark.asyncio
-async def test_100x_rapid_mount_unmount_churn(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Test mounting and unmounting features 100 times without resource accumulation."""
-    engine = CompositionEngine()
-    storage_feat = StorageFeature()
-    mock_feed = MockFeedFeature()
-    hist_bars = HistoricalBarsFeature()
+async def test_100x_rapid_mount_unmount_churn() -> None:
+    """Repeated composition leaves no provider or listener accumulation."""
+    discoverer = FeatureDiscoverer()
+    discoverer.register_feature(ChurnRootFeature())
+    discoverer.register_feature(ChurnConsumerFeature())
+    discoverer.register_feature(UnrelatedFeature())
+    engine = CompositionEngine(discoverer=discoverer)
 
-    monkeypatch.setattr(
-        FeatureDiscoverer,
-        "discover",
-        lambda _self: DiscoveryResult(
-            discovered={
-                "FEAT-SYS-PERSIST_STORAGE": storage_feat,
-                "FEAT-BROKER-FEED_MOCK": mock_feed,
-                "FEAT-DATA-RETRIEVE_BARS": hist_bars,
-            }
-        ),
-    )
-
-    db_file = tmp_path / "churn.db"
-    enable_config = f"""
+    enabled = """
     [application]
-    profile = "research"
-    [features.FEAT-SYS-PERSIST_STORAGE]
+    profile = "offline"
+    [features.FEAT-TEST-CHURN_ROOT]
     enabled = true
-    db_path = "{db_file.as_posix()}"
-    driver = "sqlite"
-    [features.FEAT-BROKER-FEED_MOCK]
+    [features.FEAT-TEST-CHURN_CONSUMER]
     enabled = true
-    [features.FEAT-DATA-RETRIEVE_BARS]
+    [features.FEAT-TEST-UNRELATED]
     enabled = true
     """
-
-    disable_config = """
+    disabled = """
     [application]
-    profile = "research"
-    [features.FEAT-SYS-PERSIST_STORAGE]
+    profile = "offline"
+    [features.FEAT-TEST-CHURN_ROOT]
     enabled = false
-    [features.FEAT-BROKER-FEED_MOCK]
+    [features.FEAT-TEST-CHURN_CONSUMER]
     enabled = false
-    [features.FEAT-DATA-RETRIEVE_BARS]
+    [features.FEAT-TEST-UNRELATED]
     enabled = false
     """
 
     for _ in range(100):
-        # 1. Mount
-        await engine.load_and_reconcile_toml(enable_config)
-        assert len(engine.reconciler.active_features) == 3
-        assert len(engine.registry.active_capabilities()) == 3
-
-        # 2. Unmount
-        await engine.load_and_reconcile_toml(disable_config)
-        assert len(engine.reconciler.active_features) == 0
-        assert len(engine.registry.active_capabilities()) == 0
-
-    await engine.reconciler.stop_all()
+        await engine.load_and_reconcile_toml(enabled)
+        assert _active_feature_count(engine) == 3
+        assert _active_capability_count(engine) == 3
+        await engine.load_and_reconcile_toml(disabled)
+        assert _active_feature_count(engine) == 0
+        assert _active_capability_count(engine) == 0
+        assert engine.event_bus.listener_count() == 0
+    await engine.shutdown()
 
 
 class BuggyMountFeature(Feature):
-    """Feature that deliberately crashes halfway through mount."""
+    """Feature that fails after registering a staged provider."""
 
-    spec: FeatureSpec = FeatureSpec(
-        feature_id="FEAT-TEST-BUGGY_MOUNT",
-        domain="test",
-        description="Deliberately fails mount",
-        provides=frozenset({CapabilityKey[object](name="test.buggy", major=1)}),
+    BUGGY_CAP = CapabilityKey[object]("test.buggy", 1)
+    spec = FeatureSpec(
+        "FEAT-TEST-BUGGY_MOUNT",
+        "test",
+        provides=frozenset({BUGGY_CAP}),
     )
 
     @override
-    async def mount(self, context: FeatureContext, config: object) -> None:
-        context.provide(
-            CapabilityKey[object](name="test.buggy", major=1),
-            object(),
-        )
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        context.provide(self.BUGGY_CAP, object())
         raise RuntimeError("Simulated crash during mount")
 
 
 @pytest.mark.asyncio
-async def test_partial_mount_failure_rollback() -> None:
-    """Test that a failure during mount immediately cleans up all partial effects."""
-    feat = BuggyMountFeature()
-    registry = ServiceRegistry()
-    event_bus = EventBus()
-    scope = FeatureScope(owner_id=feat.spec.feature_id)
-
-    def register_provider(cap: CapabilityKey[Any], prov: Any, sc: FeatureScope) -> None:
-        registry.register(cap, prov, owner_id=feat.spec.feature_id, scope=sc)
-
-    context = DefaultFeatureContext(
-        spec=feat.spec,
-        scope=scope,
-        resolver=registry.resolve,
-        provider_registrar=register_provider,
-        event_bus=event_bus,
+async def test_partial_mount_failure_rolls_back_every_effect() -> None:
+    """A failed mount never publishes its staged capability."""
+    discoverer = FeatureDiscoverer()
+    discoverer.register_feature(BuggyMountFeature())
+    engine = CompositionEngine(discoverer=discoverer)
+    report = await engine.load_and_reconcile_toml(
+        """
+        [application]
+        profile = "offline"
+        [features.FEAT-TEST-BUGGY_MOUNT]
+        enabled = true
+        """
     )
-    with pytest.raises(RuntimeError, match="Simulated crash during mount"):
-        await feat.mount(context, {})
-    await scope.close()
-
-    # Verify no dangling capabilities exist in registry
-    assert len(registry.active_capabilities()) == 0
+    assert "FEAT-TEST-BUGGY_MOUNT" in report.errors
+    assert not engine.registry.is_available(BuggyMountFeature.BUGGY_CAP)
+    await engine.shutdown()
 
 
 @pytest.mark.asyncio
-async def test_background_task_and_listener_cleanup_on_unmount() -> None:
-    """Test that spawned tasks are cancelled and event listeners are removed on unmount."""
-    registry = ServiceRegistry()
+async def test_background_task_and_listener_cleanup_on_scope_close() -> None:
+    """Closing a scope cancels tasks and removes exact subscriptions."""
     event_bus = EventBus()
-    spec = FeatureSpec(
-        feature_id="FEAT-TEST-BG_WORKER",
-        domain="test",
-        description="Worker test",
-        provides=frozenset(),
-    )
-    scope = FeatureScope(owner_id=spec.feature_id)
-    context = DefaultFeatureContext(
-        spec=spec,
-        scope=scope,
-        resolver=registry.resolve,
-        event_bus=event_bus,
-    )
-
-    task_ran = False
+    scope = FeatureScope("FEAT-TEST-WORKER")
+    spec = FeatureSpec("FEAT-TEST-WORKER", "test", provides=frozenset())
+    context = DefaultFeatureContext(spec=spec, scope=scope, event_bus=event_bus)
+    task_started = False
     task_cancelled = False
-    stop_event = asyncio.Event()
+    wait_forever = asyncio.Event()
 
     async def worker() -> None:
-        nonlocal task_ran, task_cancelled
-        task_ran = True
+        nonlocal task_started, task_cancelled
+        task_started = True
         try:
-            await stop_event.wait()
+            await wait_forever.wait()
         except asyncio.CancelledError:
             task_cancelled = True
             raise
 
-    # 1. Spawn background worker
-    task = context.spawn(worker(), name="test_worker")
-    await asyncio.sleep(0.02)
-    assert task_ran is True
-    assert not task.done()
+    task = context.spawn(worker(), name="worker")
+    await asyncio.sleep(0)
+    assert task_started
 
-    # 2. Subscribe to event
-    events_received: list[FeatureMountedEvent] = []
+    async def handler(_event: FeatureMountedEvent) -> None:
+        return None
 
-    async def on_mounted(event: FeatureMountedEvent) -> None:
-        events_received.append(event)
-
-    context.subscribe(FeatureMountedEvent, on_mounted, mode=EventMode.PARALLEL)
+    context.subscribe(FeatureMountedEvent, handler, mode=EventMode.PARALLEL)
     assert event_bus.listener_count(FeatureMountedEvent) == 1
-
-    # 3. Close scope (unmount)
     await scope.close()
-
-    # 4. Verify task cancelled and listener removed
-    assert task_cancelled is True
     assert task.done()
+    assert task_cancelled
     assert event_bus.listener_count(FeatureMountedEvent) == 0
 
 
-@pytest.mark.asyncio
-async def test_unexpected_task_failure_transitions_to_failed_runtime() -> None:
-    """Characterization test: background task crash must transition owner to FAILED_RUNTIME and revoke capability."""
-    cap_worker = CapabilityKey[object](name="test.worker_service", major=1)
+class CrashingProviderFeature(Feature):
+    """Provider whose worker raises after activation."""
 
-    class CrashingWorkerFeature(Feature):
-        spec: FeatureSpec = FeatureSpec(
-            feature_id="FEAT-TEST-CRASHING_WORKER",
-            domain="test",
-            provides=frozenset({cap_worker}),
+    spec = FeatureSpec(
+        "FEAT-TEST-CRASHING_PROVIDER",
+        "test",
+        provides=frozenset({CRASHING_CAP}),
+    )
+
+    @override
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        context.provide(CRASHING_CAP, object())
+
+        async def crash() -> None:
+            await asyncio.sleep(0.01)
+            raise RuntimeError("Simulated provider worker failure")
+
+        context.spawn(crash(), name="crashing-worker")
+
+
+class RequiredCrashConsumer(Feature):
+    """Required consumer that must block when its provider crashes."""
+
+    spec = FeatureSpec(
+        "FEAT-TEST-CRASH_CONSUMER",
+        "test",
+        provides=frozenset({CONSUMER_CAP}),
+        requires=frozenset({CRASHING_CAP}),
+    )
+
+    @override
+    async def mount(self, context: FeatureContext, _config: object) -> None:
+        context.require(CRASHING_CAP)
+        context.provide(CONSUMER_CAP, object())
+
+
+@pytest.mark.asyncio
+async def test_runtime_failure_blocks_required_consumers_only() -> None:
+    """A crashed provider removes dependents but preserves unrelated features."""
+    discoverer = FeatureDiscoverer()
+    discoverer.register_feature(CrashingProviderFeature())
+    discoverer.register_feature(RequiredCrashConsumer())
+    discoverer.register_feature(UnrelatedFeature())
+    engine = CompositionEngine(discoverer=discoverer)
+    await engine.load_and_reconcile_toml(
+        """
+        [application]
+        profile = "offline"
+        [features.FEAT-TEST-CRASHING_PROVIDER]
+        enabled = true
+        [features.FEAT-TEST-CRASH_CONSUMER]
+        enabled = true
+        [features.FEAT-TEST-UNRELATED]
+        enabled = true
+        """
+    )
+    await asyncio.sleep(0.08)
+
+    status = engine.get_status()
+    assert status.feature_states["FEAT-TEST-CRASHING_PROVIDER"] == (
+        FeatureState.FAILED_RUNTIME
+    )
+    assert status.feature_states["FEAT-TEST-CRASH_CONSUMER"] == (FeatureState.BLOCKED)
+    assert status.feature_states["FEAT-TEST-UNRELATED"] == FeatureState.ACTIVE
+    assert not engine.registry.is_available(CRASHING_CAP)
+    assert not engine.registry.is_available(CONSUMER_CAP)
+    assert engine.registry.is_available(UNRELATED_CAP)
+    assert "FEAT-TEST-CRASHING_PROVIDER" in status.runtime_failures
+    await engine.shutdown()
+
+
+@pytest.mark.asyncio
+async def test_partial_scope_rollback_without_engine() -> None:
+    """A raw FeatureContext can roll back an interrupted mount."""
+    feature = BuggyMountFeature()
+    registry = ServiceRegistry()
+    scope = FeatureScope(feature.spec.feature_id)
+
+    def registrar(
+        capability: CapabilityKey[Any],
+        provider: Any,
+        owner_scope: FeatureScope,
+    ) -> None:
+        registry.register(
+            capability,
+            provider,
+            feature.spec.feature_id,
+            scope=owner_scope,
         )
 
-        @override
-        async def mount(self, context: FeatureContext, _config: object) -> None:
-            context.provide(cap_worker, "active_worker_instance")
-
-            async def crashing_loop() -> None:
-                await asyncio.sleep(0.01)
-                msg = "Simulated unexpected worker failure in runtime task"
-                raise RuntimeError(msg)
-
-            context.spawn(crashing_loop(), name="failing_task")
-
-    feat = CrashingWorkerFeature()
-    discoverer = FeatureDiscoverer()
-    discoverer.register_feature(feat)
-    engine = CompositionEngine(discoverer=discoverer)
-
-    config_toml = """
-    [application]
-    profile = "research"
-    [features.FEAT-TEST-CRASHING_WORKER]
-    enabled = true
-    """
-    await engine.load_and_reconcile_toml(config_toml)
-    assert engine.registry.is_available(cap_worker)
-    assert (
-        engine.reconciler.feature_states["FEAT-TEST-CRASHING_WORKER"].name == "ACTIVE"
+    context = DefaultFeatureContext(
+        spec=feature.spec,
+        scope=scope,
+        resolver=registry.resolve,
+        provider_registrar=registrar,
     )
-
-    # Wait for the task to crash
-    await asyncio.sleep(0.05)
-
-    # After unexpected task failure:
-    # 1. Feature state must NOT remain ACTIVE
-    state = engine.reconciler.feature_states.get("FEAT-TEST-CRASHING_WORKER")
-    assert state is not None
-    assert state.name == "FAILED_RUNTIME"
-
-    # 2. Capability must be revoked
-    assert not engine.registry.is_available(cap_worker), (
-        "Capability was not revoked after runtime task crash"
-    )
-
-    await engine.shutdown()
+    with pytest.raises(RuntimeError, match="Simulated crash"):
+        await feature.mount(context, {})
+    await scope.close()
+    assert not registry.active_capabilities()

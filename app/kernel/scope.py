@@ -1,5 +1,7 @@
 """Temporal scope ownership for reversible feature runtime effects."""
 
+from __future__ import annotations
+
 import asyncio
 from collections.abc import Awaitable, Callable, Coroutine, Sequence
 from contextlib import (
@@ -13,14 +15,13 @@ from enum import StrEnum
 from typing import Any, TypeVar
 
 T = TypeVar("T")
-
 TaskFailureCallback = Callable[
     [str, str, BaseException], Coroutine[Any, Any, None] | None
 ]
 
 
 class ScopeClosedError(RuntimeError):
-    """Raised when attempting to register an effect onto a closed FeatureScope."""
+    """Raised when a closed feature scope attempts to acquire an effect."""
 
 
 class EffectType(StrEnum):
@@ -36,16 +37,7 @@ class EffectType(StrEnum):
 
 @dataclass(slots=True)
 class EffectRecord:
-    """Diagnostic tracking record for an active effect owned by a scope.
-
-    Attributes:
-        owner_id: Feature ID that owns this effect.
-        effect_type: Classification of the effect.
-        resource_name: Descriptive name of the registered resource.
-        created_at: Timestamp when effect was registered.
-        cleaned_up: Whether the effect disposal has completed.
-        last_error: Error message if cleanup failed.
-    """
+    """Diagnostic record for one lifecycle-managed effect."""
 
     owner_id: str
     effect_type: EffectType
@@ -56,30 +48,21 @@ class EffectRecord:
 
 
 async def cancel_and_wait(task: asyncio.Task[Any]) -> None:
-    """Cancel an asyncio task and await its completion safely.
-
-    Args:
-        task: The task to cancel and await.
-    """
+    """Cancel an asyncio task and await its completion safely."""
     if not task.done():
         task.cancel()
     await asyncio.gather(task, return_exceptions=True)
 
 
 class FeatureScope:
-    """Owns and tracks all reversible runtime effects of one mounted feature."""
+    """Own and dispose all reversible effects of one mounted feature."""
 
     def __init__(
         self,
         owner_id: str,
         on_failure: TaskFailureCallback | None = None,
     ) -> None:
-        """Initialize a new feature scope.
-
-        Args:
-            owner_id: Unique identifier of the owning feature.
-            on_failure: Optional callback triggered on unexpected background task crash.
-        """
+        """Initialize an open scope for a feature."""
         self.owner_id = owner_id
         self._stack = AsyncExitStack()
         self._effects: list[EffectRecord] = []
@@ -87,31 +70,39 @@ class FeatureScope:
         self._on_failure = on_failure
         self._tracked_failure_tasks: set[asyncio.Task[Any]] = set()
 
-    def set_failure_callback(self, callback: TaskFailureCallback | None) -> None:
-        """Set or update the runtime failure callback.
-
-        Args:
-            callback: Failure handler callback.
-        """
-        self._on_failure = callback
-
     @property
     def is_closed(self) -> bool:
-        """Return whether this scope has been closed and disposed.
-
-        Returns:
-            True if closed, False otherwise.
-        """
+        """Return whether the scope has been closed."""
         return self._closed
 
     @property
     def effects(self) -> Sequence[EffectRecord]:
-        """Return an immutable snapshot of all tracked effect records.
-
-        Returns:
-            Sequence of effect records registered in this scope.
-        """
+        """Return an immutable snapshot of tracked effects."""
         return tuple(self._effects)
+
+    @property
+    def active_effect_count(self) -> int:
+        """Return the number of effects not yet cleaned up."""
+        return sum(not effect.cleaned_up for effect in self._effects)
+
+    @property
+    def cleaned_effect_count(self) -> int:
+        """Return the number of effects already cleaned up."""
+        return sum(effect.cleaned_up for effect in self._effects)
+
+    def set_failure_callback(self, callback: TaskFailureCallback | None) -> None:
+        """Set the callback used for unexpected background-task failures."""
+        self._on_failure = callback
+
+    def ensure_open(self) -> None:
+        """Raise ScopeClosedError when the scope is already closed.
+
+        Raises:
+            ScopeClosedError: If the scope is closed.
+        """
+        if self._closed:
+            msg = f"Feature scope '{self.owner_id}' is already closed"
+            raise ScopeClosedError(msg)
 
     def callback(
         self,
@@ -120,21 +111,8 @@ class FeatureScope:
         name: str = "",
         effect_type: EffectType = EffectType.CLEANUP_CALLBACK,
     ) -> None:
-        """Register a synchronous cleanup callback.
-
-        Args:
-            callback_fn: Callable to invoke on scope closure.
-            *args: Positional arguments to pass to the callback.
-            name: Optional descriptive resource name.
-            effect_type: Category of this effect.
-
-        Raises:
-            ScopeClosedError: If this scope has already been closed.
-        """
-        if self._closed:
-            msg = f"Cannot register callback on closed FeatureScope '{self.owner_id}'"
-            raise ScopeClosedError(msg)
-
+        """Register a synchronous cleanup callback."""
+        self.ensure_open()
         record = EffectRecord(
             owner_id=self.owner_id,
             effect_type=effect_type,
@@ -146,11 +124,11 @@ class FeatureScope:
         def wrapped_disposer() -> None:
             try:
                 callback_fn(*args)
-                record.cleaned_up = True
-            except Exception as err:
-                record.last_error = str(err)
-                record.cleaned_up = True
+            except Exception as error:
+                record.last_error = str(error)
                 raise
+            finally:
+                record.cleaned_up = True
 
         self._stack.callback(wrapped_disposer)
 
@@ -161,21 +139,8 @@ class FeatureScope:
         name: str = "",
         effect_type: EffectType = EffectType.CLEANUP_CALLBACK,
     ) -> None:
-        """Register an asynchronous cleanup callback.
-
-        Args:
-            callback_fn: Coroutine function to invoke on scope closure.
-            *args: Positional arguments to pass to the callback.
-            name: Optional descriptive resource name.
-            effect_type: Category of this effect.
-
-        Raises:
-            ScopeClosedError: If this scope has already been closed.
-        """
-        if self._closed:
-            msg = f"Cannot register callback on closed FeatureScope '{self.owner_id}'"
-            raise ScopeClosedError(msg)
-
+        """Register an asynchronous cleanup callback."""
+        self.ensure_open()
         record = EffectRecord(
             owner_id=self.owner_id,
             effect_type=effect_type,
@@ -184,16 +149,16 @@ class FeatureScope:
         )
         self._effects.append(record)
 
-        async def wrapped_async_disposer() -> None:
+        async def wrapped_disposer() -> None:
             try:
                 await callback_fn(*args)
-                record.cleaned_up = True
-            except Exception as err:
-                record.last_error = str(err)
-                record.cleaned_up = True
+            except Exception as error:
+                record.last_error = str(error)
                 raise
+            finally:
+                record.cleaned_up = True
 
-        self._stack.push_async_callback(wrapped_async_disposer)
+        self._stack.push_async_callback(wrapped_disposer)
 
     def spawn(
         self,
@@ -201,21 +166,19 @@ class FeatureScope:
         *,
         name: str,
     ) -> asyncio.Task[T]:
-        """Spawn a managed background task that will be cancelled on unmount.
-
-        Args:
-            coroutine: Coroutine to execute.
-            name: Diagnostic name for the task.
+        """Spawn and supervise a background task owned by this scope.
 
         Returns:
-            Tracked asyncio Task.
+            Managed asyncio task.
 
         Raises:
-            ScopeClosedError: If this scope has already been closed.
+            ScopeClosedError: If the scope is closed.
         """
-        if self._closed:
-            msg = f"Cannot spawn task on closed FeatureScope '{self.owner_id}'"
-            raise ScopeClosedError(msg)
+        try:
+            self.ensure_open()
+        except ScopeClosedError:
+            coroutine.close()
+            raise
 
         task_name = f"{self.owner_id}:{name}"
         task = asyncio.create_task(coroutine, name=task_name)
@@ -227,109 +190,101 @@ class FeatureScope:
         )
         self._effects.append(record)
 
-        def _on_task_done(t: asyncio.Task[Any]) -> None:
-            if self._closed or t.cancelled():
+        def on_task_done(done_task: asyncio.Task[T]) -> None:
+            if self._closed or done_task.cancelled():
                 return
-            exc = t.exception()
-            if exc is not None and self._on_failure is not None:
-                coro = self._on_failure(self.owner_id, name, exc)
-                if coro is not None:
-                    bg_task = asyncio.create_task(coro)
-                    self._tracked_failure_tasks.add(bg_task)
-                    bg_task.add_done_callback(self._tracked_failure_tasks.discard)
+            error = done_task.exception()
+            if error is None:
+                return
+            record.last_error = str(error)
+            if self._on_failure is None:
+                return
+            failure_coro = self._on_failure(self.owner_id, name, error)
+            if failure_coro is None:
+                return
+            failure_task = asyncio.create_task(
+                failure_coro,
+                name=f"{self.owner_id}:runtime-failure",
+            )
+            self._tracked_failure_tasks.add(failure_task)
+            failure_task.add_done_callback(self._tracked_failure_tasks.discard)
 
-        task.add_done_callback(_on_task_done)
+        task.add_done_callback(on_task_done)
 
         async def teardown_task() -> None:
             try:
                 await cancel_and_wait(task)
-                record.cleaned_up = True
-            except Exception as err:
-                record.last_error = str(err)
-                record.cleaned_up = True
+            except Exception as error:
+                record.last_error = str(error)
                 raise
+            finally:
+                record.cleaned_up = True
 
         self._stack.push_async_callback(teardown_task)
         return task
 
     def enter_context[ContextT](
         self,
-        cm: AbstractContextManager[ContextT],
+        context_manager: AbstractContextManager[ContextT],
         *,
         name: str = "",
     ) -> ContextT:
-        """Enter a synchronous context manager and track its cleanup.
-
-        Args:
-            cm: Context manager to enter.
-            name: Optional descriptive resource name.
+        """Enter a synchronous context manager owned by this scope.
 
         Returns:
-            Resource yielded by the context manager.
-
-        Raises:
-            ScopeClosedError: If this scope has already been closed.
+            Resource returned by the context manager.
         """
-        if self._closed:
-            msg = (
-                f"Cannot enter context manager on closed FeatureScope '{self.owner_id}'"
-            )
-            raise ScopeClosedError(msg)
-
+        self.ensure_open()
         record = EffectRecord(
             owner_id=self.owner_id,
             effect_type=EffectType.CONTEXT_MANAGER,
-            resource_name=name or type(cm).__name__,
+            resource_name=name or type(context_manager).__name__,
             created_at=datetime.now(UTC),
         )
         self._effects.append(record)
-        res = self._stack.enter_context(cm)
+        resource = self._stack.enter_context(context_manager)
         self._stack.callback(lambda: setattr(record, "cleaned_up", True))
-        return res
+        return resource
 
     async def enter_async_context[ContextT](
         self,
-        cm: AbstractAsyncContextManager[ContextT],
+        context_manager: AbstractAsyncContextManager[ContextT],
         *,
         name: str = "",
     ) -> ContextT:
-        """Enter an asynchronous context manager and track its cleanup.
-
-        Args:
-            cm: Async context manager to enter.
-            name: Optional descriptive resource name.
+        """Enter an asynchronous context manager owned by this scope.
 
         Returns:
-            Resource yielded by the context manager.
-
-        Raises:
-            ScopeClosedError: If this scope has already been closed.
+            Resource returned by the context manager.
         """
-        if self._closed:
-            msg = f"Cannot enter async context on closed FeatureScope '{self.owner_id}'"
-            raise ScopeClosedError(msg)
-
+        self.ensure_open()
         record = EffectRecord(
             owner_id=self.owner_id,
             effect_type=EffectType.CONTEXT_MANAGER,
-            resource_name=name or type(cm).__name__,
+            resource_name=name or type(context_manager).__name__,
             created_at=datetime.now(UTC),
         )
         self._effects.append(record)
-        res = await self._stack.enter_async_context(cm)
+        resource = await self._stack.enter_async_context(context_manager)
 
-        async def mark_done() -> None:
+        async def mark_cleaned() -> None:
             record.cleaned_up = True
 
-        self._stack.push_async_callback(mark_done)
-        return res
+        self._stack.push_async_callback(mark_cleaned)
+        return resource
 
     async def close(self) -> None:
-        """Close this scope and invoke all disposers in reverse order.
-
-        This method is idempotent.
-        """
+        """Close the scope and run every disposer in reverse order."""
         if self._closed:
             return
         self._closed = True
         await self._stack.aclose()
+
+        current = asyncio.current_task()
+        pending_failures = [
+            task
+            for task in tuple(self._tracked_failure_tasks)
+            if task is not current and not task.done()
+        ]
+        if pending_failures:
+            await asyncio.gather(*pending_failures, return_exceptions=True)

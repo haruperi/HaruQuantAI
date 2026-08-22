@@ -1,4 +1,6 @@
-"""Configuration validation for Historical Bars feature."""
+"""Configuration validation for Historical Bars."""
+
+from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
@@ -6,41 +8,38 @@ from typing import Any
 VALID_TIMEFRAMES: frozenset[str] = frozenset(
     {"M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN1"}
 )
+_ALLOWED_CONFIG_KEYS = frozenset({"default_timeframe"})
 
 
 @dataclass(frozen=True, slots=True)
 class HistoricalBarsConfig:
-    """Configuration options for historical bars retrieval.
-
-    Satisfies:
-        FR-DATA-VALIDATE_CONFIG: Validates default timeframe parameter.
-
-    Attributes:
-        default_timeframe: Default fallback timeframe interval.
-    """
+    """Configuration options for historical-bar retrieval."""
 
     default_timeframe: str = "M1"
 
     @classmethod
     def from_dict(cls, data: dict[str, Any] | None) -> HistoricalBarsConfig:
-        """Parse and validate configuration dictionary.
-
-        Args:
-            data: Raw dictionary from application configuration.
+        """Parse and validate a strict historical-bars configuration mapping.
 
         Returns:
-            Validated HistoricalBarsConfig instance.
+            Validated historical-bars configuration.
 
         Raises:
-            ValueError: If timeframe is not supported.
+            ValueError: If a field is unknown or invalid.
         """
         if not data:
             return cls()
-
-        tf = str(data.get("default_timeframe", "M1")).upper()
-        if tf not in VALID_TIMEFRAMES:
-            allowed = sorted(VALID_TIMEFRAMES)
-            msg = f"Unsupported default_timeframe: '{tf}'. Allowed: {allowed}"
+        unknown = set(data) - _ALLOWED_CONFIG_KEYS
+        if unknown:
+            raise ValueError(
+                "Unknown Historical Bars configuration keys: "
+                + ", ".join(sorted(unknown))
+            )
+        timeframe = str(data.get("default_timeframe", "M1")).upper()
+        if timeframe not in VALID_TIMEFRAMES:
+            msg = (
+                f"Unsupported default_timeframe: '{timeframe}'. "
+                f"Allowed: {sorted(VALID_TIMEFRAMES)}"
+            )
             raise ValueError(msg)
-
-        return cls(default_timeframe=tf)
+        return cls(default_timeframe=timeframe)
