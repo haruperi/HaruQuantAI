@@ -168,7 +168,13 @@ def main() -> int:  # noqa: C901
                 ]
                 continue
             seen_feature_ids.add(spec.feature_id)
-            module_file = Path(module.__file__).resolve()
+            module_path = module.__file__
+            if module_path is None:
+                errors_by_feature[entry_point_name] = [
+                    f"Feature module '{module_name}' has no filesystem path"
+                ]
+                continue
+            module_file = Path(module_path).resolve()
             errors = validate_feature_readme(
                 spec,
                 module_file.parent / "README.md",
@@ -177,15 +183,15 @@ def main() -> int:  # noqa: C901
                 errors_by_feature[spec.feature_id] = errors
             else:
                 print(f"[OK] {spec.feature_id}")
-        except Exception as error:  # noqa: BLE001
-            errors_by_feature[entry_point_name] = [str(error)]
+        except Exception as import_error:  # noqa: BLE001
+            errors_by_feature[entry_point_name] = [str(import_error)]
 
     if errors_by_feature:
         print("\n[FAIL] Feature documentation drift detected:")
         for feature_id, errors in sorted(errors_by_feature.items()):
             print(f"  {feature_id}:")
-            for error in errors:
-                print(f"    - {error}")
+            for validation_error in errors:
+                print(f"    - {validation_error}")
         return 1
     print(f"\n[SUCCESS] {len(entry_points)} feature READMEs match runtime truth")
     return 0

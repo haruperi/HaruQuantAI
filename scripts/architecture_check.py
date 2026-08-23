@@ -4,6 +4,7 @@ import ast
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from typing import override
 
 APP_ROOT = Path(__file__).resolve().parent.parent / "app"
 MIN_TARGET_PARTS = 4
@@ -63,6 +64,7 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                 )
             )
 
+    @override
     def visit_Call(self, node: ast.Call) -> None:
         """Check forbidden function and method calls."""
         # Rule 2: asyncio.create_task() only allowed inside app/kernel/
@@ -104,12 +106,14 @@ class ArchitecturalVisitor(ast.NodeVisitor):
 
         self.generic_visit(node)
 
+    @override
     def visit_Import(self, node: ast.Import) -> None:
         """Check forbidden module-level imports."""
         for alias in node.names:
             self._check_import_target(alias.name, node.lineno)
         self.generic_visit(node)
 
+    @override
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         """Check forbidden from-imports."""
         if node.module:

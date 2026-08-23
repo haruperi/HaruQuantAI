@@ -22,10 +22,12 @@ Rather than coupling trading strategies, market data pipelines, and analytics di
 
 ## 2. Architecture & Documentation
 
-- [Capability Catalog & Model](docs/architecture/capability-model.md) — Implemented vs roadmap capabilities, naming conventions, and profiles.
-- [Feature Implementation Pipeline](docs/architecture/feature_implementation_pipeline.md) — 7-step guide to developing, testing, and packaging new features.
-- [External Plugin Packaging](docs/architecture/external_plugin_packaging.md) — Guidelines for distributing third-party plugin packages.
-- [Composability Gap Remediation Plan](docs/architecture/composability_gap_remediation_plan.md) — Comprehensive 11-phase architecture specification and audit trail.
+- [HaruQuantAI Project Specification](docs/PROJECT.md) — Official product behavior, requirements, interfaces, and acceptance gates.
+- [HaruQuantAI Architecture](docs/ARCHITECTURE.md) — Official module, lifecycle, persistence, deployment, and verification architecture.
+- [HaruQuantAI Implementation Order](docs/dev/IMPLEMENTATION_ORDER.md) — Mandatory contracts-first implementation waves and gates.
+- [Domain Specifications](app/services) — Authoritative domain, feature, responsibility, and FR behavior specifications colocated with their implementations.
+
+- [Feature Implementation Pipeline](docs/dev/feature_implementation_pipeline.md) — Code-backed guide to developing, testing, packaging, replacing, and removing features.
 
 ---
 
