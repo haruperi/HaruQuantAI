@@ -2,26 +2,39 @@
 
 > **Status:** Outcome-driven product-delivery sequence; composability foundation already implemented
 > **Architecture baseline:** `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and authoritative domain READMEs
-> **Inventory:** 3 non-domain shared modules, 15 business domains, 142 planned features, 549 business FRs, and 33 retained shared-foundation trace IDs (`FR-KERN-*`)
+> **Inventory:** 3 non-domain shared modules, 15 business domains, 142 planned features, 549 business FRs, and 33
+> retained shared-foundation trace IDs (`FR-KERN-*`)
 > **Last updated:** 2026-08-23
 
 ## 1. How to use this file
 
-This document schedules delivery; it does not restate or weaken product behavior. `PROJECT.md` owns system scope, cross-domain workflows, system NFRs, and phase gates. `ARCHITECTURE.md` owns universal structural/runtime constraints. Each owning package README remains the sole feature/FR registry and acceptance authority.
+This document schedules delivery; it does not restate or weaken product behavior. `PROJECT.md` owns system scope,
+cross-domain workflows, system NFRs, and phase gates. `ARCHITECTURE.md` owns universal structural/runtime constraints.
+Each owning package README remains the sole feature/FR registry and acceptance authority.
 
-The sequence is agile in the strict sense used here: every increment produces a demonstrable vertical outcome through the UI, while preserving headless contract parity and feature removability.
+The sequence is agile in the strict sense used here: every increment produces a demonstrable vertical outcome through
+the UI, while preserving headless contract parity and feature removability.
 
-- Preserve the implemented `app/kernel/` and `app/composition/` runtime plus the `app/contracts/` boundary. Product work extends them through contract-first vertical slices, with public gateways implemented as removable D-IFACE features.
-- Implement the displayed requirement slices in order within an increment unless the documented dependency graph proves two slices independent.
-- A feature may span increments. A heading marked **Partial** advances only the listed requirements and does not complete the feature.
-- Every business `FR-*` checkbox appears exactly once, in the earliest increment where its full acceptance evidence can pass.
+- Preserve the implemented `app/kernel/` and `app/composition/` runtime plus the `app/contracts/` boundary. Product work
+  extends them through contract-first vertical slices, with public gateways implemented as removable D-IFACE features.
+- Implement the displayed requirement slices in order within an increment unless the documented dependency graph proves
+  two slices independent.
+- A feature may span increments. A heading marked **Partial** advances only the listed requirements and does not
+  complete the feature.
+- Every business `FR-*` checkbox appears exactly once, in the earliest increment where its full acceptance evidence can
+  pass.
 - Every product `FEAT-*` completion checkbox appears exactly once, beside that feature's final requirement slice.
-- Mark a requirement complete only after appending executable evidence in the form `— evidence: path/to/file:line` and passing its owning README acceptance conditions.
-- Mark a feature complete only after all its requirement slices, contracts, configuration, lifecycle, dependency, failure, documentation, leak, interface where applicable, and physical-removal gates pass.
-- UI work starts in Increment 1. Each increment verifies loading, empty, stale, unavailable, error, interaction, accessibility, contract-parity, and removal behavior as applicable.
+- Mark a requirement complete only after appending executable evidence in the form `— evidence: path/to/file:line` and
+  passing its owning README acceptance conditions.
+- Mark a feature complete only after all its requirement slices, contracts, configuration, lifecycle, dependency,
+  failure, documentation, leak, interface where applicable, and physical-removal gates pass.
+- UI work starts in Increment 1. Each increment verifies loading, empty, stale, unavailable, error, interaction,
+  accessibility, contract-parity, and removal behavior as applicable.
 - A demo checkpoint proves usable progress; it never changes an unfinished feature from `Partial` to complete.
-- A later increment may begin on an independent capability lane, but no consumer requirement may pass before its hard prerequisite or the prerequisite's earlier ordered slice in the same increment.
-- A phase or advanced capability releases only after its applicable `PROJECT.md` phase gate passes; increment placement never waives a safety, determinism, parity, isolation, or recovery requirement.
+- A later increment may begin on an independent capability lane, but no consumer requirement may pass before its hard
+  prerequisite or the prerequisite's earlier ordered slice in the same increment.
+- A phase or advanced capability releases only after its applicable `PROJECT.md` phase gate passes; increment placement
+  never waives a safety, determinism, parity, isolation, or recovery requirement.
 
 ### Completion notation
 
@@ -41,10 +54,12 @@ When completed:
 
 ## 2. Authoritative domain inventory
 
-Kernel and Composition are implemented non-domain runtime modules; Contracts is the specified shared boundary populated incrementally by real feature slices. “First increment” means the first planned product work in the domain, not domain completion.
+Kernel and Composition are implemented non-domain runtime modules; Contracts is the specified shared boundary populated
+incrementally by real feature slices. “First increment” means the first planned product work in the domain, not domain
+completion.
 
 | First increment | Domain | Features | Business FRs | Authoritative document |
-|---:|---|---:|---:|---|
+| ---: | --- | ---: | ---: | --- |
 | 1 | `D-WS` Workspace | 6 | 18 | [Workspace README](../../app/services/workspace/README.md) |
 | 1 | `D-PLUG` Plugins | 7 | 9 | [Plugins README](../../app/services/plugins/README.md) |
 | 1 | `D-IFACE` Interfaces | 7 | 30 | [Interfaces README](../../app/services/interfaces/README.md) |
@@ -64,7 +79,7 @@ Kernel and Composition are implemented non-domain runtime modules; Contracts is 
 ## 3. Increment and phase map
 
 | Increment | Product outcome | Phase relationship |
-|---:|---|---|
+| ---: | --- | --- |
 | 0 | Preserve executable composability foundation | Foundation evidence; not a claim that every Phase 0 product gate is complete |
 | 1 | Executable Product Shell and Local Workspace | Foundation-preserving product slice; prepares Phase 1 |
 | 2 | Catalogue and Historical-Data Onboarding | Phase 1 input foundation |
@@ -84,33 +99,50 @@ Kernel and Composition are implemented non-domain runtime modules; Contracts is 
 
 **Status:** Composability substrate complete; structured-logging hardening is the first pending delivery prerequisite.
 
-**Purpose:** Freeze the proven composability substrate as the baseline for every product increment; extend it without reimplementing or bypassing it.
+**Purpose:** Freeze the proven composability substrate as the baseline for every product increment; extend it without
+reimplementing or bypassing it.
 
-**Vertical path:** `Feature specification → contracts → composition → D-IFACE gateway where required → provider/consumer/state evidence`
+**Vertical path:** `Feature specification → contracts → composition → D-IFACE gateway where required →
+provider/consumer/state evidence`
 
-**UI demo checkpoint:** This is a preservation increment rather than a new UI slice. Verify that Composition readiness, capability, feature, and failure diagnostics remain available for the Increment 1 D-IFACE/UI shell to project.
+**UI demo checkpoint:** This is a preservation increment rather than a new UI slice. Verify that Composition readiness,
+capability, feature, and failure diagnostics remain available for the Increment 1 D-IFACE/UI shell to project.
 
-**Exit gate:** Existing architecture, composition, feature-documentation, lifecycle, replacement, and removal suites remain green. The structured-logging task below must pass before Increment 1 product work starts.
+**Exit gate:** Existing architecture, composition, feature-documentation, lifecycle, replacement, and removal suites
+remain green. The structured-logging task below must pass before Increment 1 product work starts.
 
 Implemented evidence includes:
 
-1. Independent capability, feature-specification, context/scope, registry, graph, reconciliation, event, task, state, and replacement primitives.
+1. Independent capability, feature-specification, context/scope, registry, graph, reconciliation, event, task, state,
+   and replacement primitives.
 2. Python `haruquantai.features` discovery plus explicit test/embedded registration.
 3. Strict TOML feature/provider configuration, readiness profiles, file watching, and serialized composition mutation.
-4. Direct Composition runtime diagnostics for readiness, active capabilities, feature state, dependency failures, replacement, and cleanup evidence.
-5. Business-neutral test fixtures proving provider/consumer dependency binding, state declarations, and removal without registering product features.
-6. Dependency loss, ambiguity, cycle, rollback, runtime-failure, LIFO cleanup, repeated lifecycle, replacement, documentation-drift, import-boundary, and removal tests.
+4. Direct Composition runtime diagnostics for readiness, active capabilities, feature state, dependency failures,
+   replacement, and cleanup evidence.
+5. Business-neutral test fixtures proving provider/consumer dependency binding, state declarations, and removal without
+   registering product features.
+6. Dependency loss, ambiguity, cycle, rollback, runtime-failure, LIFO cleanup, repeated lifecycle, replacement,
+   documentation-drift, import-boundary, and removal tests.
 
 #### Foundation task 0.1 — [ ] Composition-owned structured logging
 
-This is non-domain runtime infrastructure, not a product `FEAT-*` or business `FR-*`. It implements the logging substrate required by `NFR-OBS-001`, `NFR-OBS-005`, and `NFR-OBS-009` without introducing a shared logger singleton or a fifth shared module.
+This is non-domain runtime infrastructure, not a product `FEAT-*` or business `FR-*`. It implements the logging
+substrate required by `NFR-OBS-001`, `NFR-OBS-005`, and `NFR-OBS-009` without introducing a shared logger singleton or a
+fifth shared module.
 
-1. [ ] Add `app/composition/logging.py` for structured formatting, levels, deterministic redaction, correlation context, retention integration, bounded diagnostic capture, and lifecycle-safe handler cleanup — evidence: path:line
-2. [ ] Configure logging from `app/main.py` before the composition engine begins runtime work, and close owned handlers during shutdown — evidence: path:line
-3. [ ] Use `logger = logging.getLogger(__name__)` only in modules with workflow, lifecycle, I/O, state-transition, retry, decision, or failure boundaries; pure contracts, DTOs, deterministic helpers, trivial accessors, and high-frequency numerical modules remain log-free unless required — evidence: path:line
-4. [ ] Prove structured schema, correlation propagation, redaction, bounded capture/retention behavior, no duplicate handlers, repeated startup/shutdown cleanup, and secret-safe failure output — evidence: path:line
+1. [ ] Add `app/composition/logging.py` for structured formatting, levels, deterministic redaction, correlation context,
+   retention integration, bounded diagnostic capture, and lifecycle-safe handler cleanup — evidence: path:line
+2. [ ] Configure logging from `app/main.py` before the composition engine begins runtime work, and close owned handlers
+   during shutdown — evidence: path:line
+3. [ ] Use `logger = logging.getLogger(__name__)` only in modules with workflow, lifecycle, I/O, state-transition,
+   retry, decision, or failure boundaries; pure contracts, DTOs, deterministic helpers, trivial accessors, and
+   high-frequency numerical modules remain log-free unless required — evidence: path:line
+4. [ ] Prove structured schema, correlation propagation, redaction, bounded capture/retention behavior, no duplicate
+   handlers, repeated startup/shutdown cleanup, and secret-safe failure output — evidence: path:line
 
-Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionContext`, per-FR runtime registrations, domain registries, or another backend lifecycle/effect framework. D-UI uses the documented TypeScript/React feature variant and consumes public capability state.
+Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionContext`, per-FR runtime registrations,
+domain registries, or another backend lifecycle/effect framework. D-UI uses the documented TypeScript/React feature
+variant and consumes public capability state.
 
 ### Increment 1 — Executable Product Shell and Local Workspace
 
@@ -118,15 +150,19 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Scope:** 42 business FRs across 15 feature slices; 7 feature completion gates and 8 partial slices.
 
-**Purpose:** Deliver the first usable application immediately: a secured local workspace, capability-aware public gateway, bounded plugin contribution declarations, and an accessible React shell with truthful diagnostics.
+**Purpose:** Deliver the first usable application immediately: a secured local workspace, capability-aware public
+gateway, bounded plugin contribution declarations, and an accessible React shell with truthful diagnostics.
 
 **Vertical path:** `Launcher → Workspace → D-IFACE capability/readiness gateway → D-UI shell`
 
-**UI demo checkpoint:** Launch React, authenticate locally, open or diagnose a workspace, navigate the shell, inspect capability/readiness state, preserve a draft/layout preference, and observe explicit unavailable/error states.
+**UI demo checkpoint:** Launch React, authenticate locally, open or diagnose a workspace, navigate the shell, inspect
+capability/readiness state, preserve a draft/layout preference, and observe explicit unavailable/error states.
 
-**Exit gate:** The UI starts without waiting for later domains; workspace/configuration/recovery and gateway failures are visible, keyboard focus is deterministic, and deleting any participating feature leaves the remaining substrate healthy.
+**Exit gate:** The UI starts without waiting for later domains; workspace/configuration/recovery and gateway failures
+are visible, keyboard focus is deterministic, and deleting any participating feature leaves the remaining substrate
+healthy.
 
-#### `D-WS` — [Workspace](../../app/services/workspace/README.md)
+#### `D-WS` — [Workspace](../../app/services/workspace/README.md) (Increment 1)
 
 ##### 1.1 [ ] `FEAT-WS-MANAGE_WORKSPACES`
 
@@ -152,7 +188,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-WS-BUILD_DIAGNOSTIC_BUNDLE`
 
-#### `D-PLUG` — [Plugins](../../app/services/plugins/README.md)
+#### `D-PLUG` — [Plugins](../../app/services/plugins/README.md) (Increment 1)
 
 ##### 1.5 [ ] `FEAT-PLUG-DECLARE_MANIFESTS`
 
@@ -162,7 +198,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS`
 
-#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md)
+#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md) (Increment 1)
 
 ##### 1.7 Partial — `FEAT-IFACE-SERVE_API_EVENTS`
 
@@ -179,7 +215,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 1. [ ] `FR-IFACE-DELEGATE_APPLICATION_CALLS`
 2. [ ] `FR-IFACE-TRACK_DURABLE_COMMANDS`
 
-#### `D-UI` — [User Interface](../../app/ui/README.md)
+#### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 1)
 
 ##### 1.9 [ ] `FEAT-UI-COMPOSE_SHELL`
 
@@ -231,11 +267,13 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Vertical path:** `D-UI data/input slices → Catalogue → Data ingestion/quality/versioning → Workspace artifacts`
 
-**UI demo checkpoint:** Create or import catalogue definitions, import historical data, inspect mappings/sessions/quality/lineage, resolve findings, export a pinned version, and bind valid input data.
+**UI demo checkpoint:** Create or import catalogue definitions, import historical data, inspect
+mappings/sessions/quality/lineage, resolve findings, export a pinned version, and bind valid input data.
 
-**Exit gate:** A user can prepare trustworthy pinned data entirely from the UI; incomplete, ambiguous, or invalid input never publishes a committed version.
+**Exit gate:** A user can prepare trustworthy pinned data entirely from the UI; incomplete, ambiguous, or invalid input
+never publishes a committed version.
 
-#### `D-CAT` — [Catalogue](../../app/services/catalogue/README.md)
+#### `D-CAT` — [Catalogue](../../app/services/catalogue/README.md) (Increment 2)
 
 ##### 2.1 [ ] `FEAT-CAT-CATALOG_INSTRUMENTS`
 
@@ -272,7 +310,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-CAT-EXCHANGE_CATALOGUE_DEFINITIONS`
 
-#### `D-DATA` — [Data](../../app/services/data/README.md)
+#### `D-DATA` — [Data](../../app/services/data/README.md) (Increment 2)
 
 ##### 2.8 [ ] `FEAT-DATA-INGEST_HISTORY`
 
@@ -331,7 +369,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 1. [ ] `FR-DATA-BIND_COMMITTED_DATA`
 2. [ ] `FR-DATA-VALIDATE_PRECISION_INPUTS`
 
-#### `D-UI` — [User Interface](../../app/ui/README.md)
+#### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 2)
 
 ##### 2.18 [ ] `FEAT-UI-EDIT_INPUTS`
 
@@ -354,15 +392,18 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Scope:** 33 business FRs across 11 feature slices; 9 feature completion gates and 2 partial slices.
 
-**Purpose:** Add a UI-driven typed strategy language and immutable editing workflow over the proven catalogue/data foundation.
+**Purpose:** Add a UI-driven typed strategy language and immutable editing workflow over the proven catalogue/data
+foundation.
 
 **Vertical path:** `D-UI typed editors → Strategy validation/versioning → Catalogue/Data contracts`
 
-**UI demo checkpoint:** Create, edit, validate, version, clone, import/export, and restore a strategy draft using canonical typed blocks and settings.
+**UI demo checkpoint:** Create, edit, validate, version, clone, import/export, and restore a strategy draft using
+canonical typed blocks and settings.
 
-**Exit gate:** The UI and server validator agree on the canonical strategy version; invalid types, blocks, shifts, or conflicts cannot be published.
+**Exit gate:** The UI and server validator agree on the canonical strategy version; invalid types, blocks, shifts, or
+conflicts cannot be published.
 
-#### `D-STRAT` — [Strategy](../../app/services/strategy/README.md)
+#### `D-STRAT` — [Strategy](../../app/services/strategy/README.md) (Increment 3)
 
 ##### 3.1 [ ] `FEAT-STRAT-DEFINE_AST`
 
@@ -418,7 +459,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-STRAT-MODEL_ATM_EXITS`
 
-#### `D-UI` — [User Interface](../../app/ui/README.md)
+#### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 3)
 
 ##### 3.10 Partial — `FEAT-UI-MANAGE_LAYOUTS`
 
@@ -438,15 +479,18 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Scope:** 80 business FRs across 19 feature slices; 14 feature completion gates and 5 partial slices.
 
-**Purpose:** Close the first end-to-end product loop early: strategy plus data produces a deterministic committed result that is immediately inspectable in the UI.
+**Purpose:** Close the first end-to-end product loop early: strategy plus data produces a deterministic committed result
+that is immediately inspectable in the UI.
 
 **Vertical path:** `D-UI author/test → Simulator → Analytics → D-IFACE queries/events → D-UI results/databank`
 
-**UI demo checkpoint:** Run a pinned backtest, observe truthful progress, inspect metrics/equity/trades/charts, use nonvisual alternatives, save/query a databank view, and export source-linked results.
+**UI demo checkpoint:** Run a pinned backtest, observe truthful progress, inspect metrics/equity/trades/charts, use
+nonvisual alternatives, save/query a databank view, and export source-linked results.
 
-**Exit gate:** Repeated execution produces the required deterministic evidence; only reconciled committed results appear as final, and the complete manual loop is usable from the UI.
+**Exit gate:** Repeated execution produces the required deterministic evidence; only reconciled committed results appear
+as final, and the complete manual loop is usable from the UI.
 
-#### `D-SIM` — [Simulator](../../app/services/simulator/README.md)
+#### `D-SIM` — [Simulator](../../app/services/simulator/README.md) (Increment 4)
 
 ##### 4.1 [ ] `FEAT-SIM-CONFIGURE_ENGINE`
 
@@ -511,7 +555,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-SIM-CACHE_EVALUATIONS`
 
-#### `D-ANA` — [Analytics](../../app/services/analytics/README.md)
+#### `D-ANA` — [Analytics](../../app/services/analytics/README.md) (Increment 4)
 
 ##### 4.9 [ ] `FEAT-ANA-DATABANK_MEMBERSHIP`
 
@@ -554,7 +598,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 2. [ ] `FR-ANA-PACKAGE_RESULT_ARTIFACTS`
 3. [ ] `FR-ANA-IMPORT_EXTERNAL_RESULTS`
 
-#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md)
+#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md) (Increment 4)
 
 ##### 4.14 Partial — `FEAT-IFACE-SERVE_API_EVENTS`
 
@@ -565,7 +609,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-IFACE-PROVIDE_NONVISUAL_CHARTS`
 
-#### `D-UI` — [User Interface](../../app/ui/README.md)
+#### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 4)
 
 ##### 4.16 [ ] `FEAT-UI-AUTHOR_STRATEGIES`
 
@@ -597,15 +641,19 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Scope:** 21 business FRs across 5 feature slices; 2 feature completion gates and 3 partial slices.
 
-**Purpose:** Move deterministic Codegen and MQL5 parity ahead of the research factory, as required by the Phase 1 release gate.
+**Purpose:** Move deterministic Codegen and MQL5 parity ahead of the research factory, as required by the Phase 1
+release gate.
 
-**Vertical path:** `Strategy version → deterministic Codegen → MetaEditor boundary → Simulator/Analytics parity → D-UI source diagnostics`
+**Vertical path:** `Strategy version → deterministic Codegen → MetaEditor boundary → Simulator/Analytics parity → D-UI
+source diagnostics`
 
-**UI demo checkpoint:** Generate an MQL5 package, inspect source and diagnostics, compile against the approved toolchain, and compare target results with the native run.
+**UI demo checkpoint:** Generate an MQL5 package, inspect source and diagnostics, compile against the approved
+toolchain, and compare target results with the native run.
 
-**Exit gate:** The advertised MQL5 path compiles and satisfies identity, dependency, artifact, and parity gates; unsupported targets remain unadvertised.
+**Exit gate:** The advertised MQL5 path compiles and satisfies identity, dependency, artifact, and parity gates;
+unsupported targets remain unadvertised.
 
-#### `D-STRAT` — [Strategy](../../app/services/strategy/README.md)
+#### `D-STRAT` — [Strategy](../../app/services/strategy/README.md) (Increment 5)
 
 ##### 5.1 [ ] `FEAT-STRAT-GENERATE_CODE`
 
@@ -630,13 +678,13 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 8. [ ] `FR-STRAT-MAP_ORDER_IDENTITIES`
 9. [ ] `FR-STRAT-ISOLATE_INDICATOR_FRAGMENTS`
 
-#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md)
+#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md) (Increment 5)
 
 ##### 5.3 Partial — `FEAT-IFACE-AUTOMATE_COMMANDS`
 
 1. [ ] `FR-IFACE-AUTOMATE_CODE_GENERATION`
 
-#### `D-UI` — [User Interface](../../app/ui/README.md)
+#### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 5)
 
 ##### 5.4 Partial — `FEAT-UI-EXPLORE_RESULTS`
 
@@ -653,15 +701,18 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Scope:** 54 business FRs across 15 feature slices; 14 feature completion gates and 1 partial slices.
 
-**Purpose:** Add robustness, optimization, walk-forward, Builder/evolution, acceptance, budgets, bulk databank workflows, and research UI over the trusted manual loop.
+**Purpose:** Add robustness, optimization, walk-forward, Builder/evolution, acceptance, budgets, bulk databank
+workflows, and research UI over the trusted manual loop.
 
 **Vertical path:** `D-UI research/databank → D-IFACE preview/bulk gateways → Research → Simulator/Analytics`
 
-**UI demo checkpoint:** Preview and admit a bounded research run, pause/resume it, inspect progress and robustness evidence, filter results, perform pinned bulk actions, and compare accepted/rejected candidates.
+**UI demo checkpoint:** Preview and admit a bounded research run, pause/resume it, inspect progress and robustness
+evidence, filter results, perform pinned bulk actions, and compare accepted/rejected candidates.
 
-**Exit gate:** Research runs are reproducible across interruption and recovery; budgets, seeds, partitions, acceptance decisions, and bulk scopes are pinned and visible.
+**Exit gate:** Research runs are reproducible across interruption and recovery; budgets, seeds, partitions, acceptance
+decisions, and bulk scopes are pinned and visible.
 
-#### `D-ANA` — [Analytics](../../app/services/analytics/README.md)
+#### `D-ANA` — [Analytics](../../app/services/analytics/README.md) (Increment 6)
 
 ##### 6.1 [ ] `FEAT-ANA-BULK_DATABANK`
 
@@ -673,7 +724,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-ANA-MATCH_RESULT_FINGERPRINTS`
 
-#### `D-RES` — [Research](../../app/services/research/README.md)
+#### `D-RES` — [Research](../../app/services/research/README.md) (Increment 6)
 
 ##### 6.3 [ ] `FEAT-RES-RUN_RESEARCH`
 
@@ -738,7 +789,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 3. [ ] `FR-RES-DESCRIBE_RESEARCH_METHODS`
 4. [ ] `FR-RES-COMPARE_RESEARCH_BATCHES`
 
-#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md)
+#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md) (Increment 6)
 
 ##### 6.11 Partial — `FEAT-IFACE-SERVE_API_EVENTS`
 
@@ -748,7 +799,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-IFACE-PREVIEW_RESEARCH_RUNS`
 
-#### `D-UI` — [User Interface](../../app/ui/README.md)
+#### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 6)
 
 ##### 6.13 [ ] `FEAT-UI-RUN_RESEARCH`
 
@@ -774,15 +825,18 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Scope:** 77 business FRs across 22 feature slices; 21 feature completion gates and 1 partial slices.
 
-**Purpose:** Compose portfolios and durable project graphs through the UI while preserving equivalent HTTP, CLI, and MCP semantics.
+**Purpose:** Compose portfolios and durable project graphs through the UI while preserving equivalent HTTP, CLI, and MCP
+semantics.
 
 **Vertical path:** `D-UI portfolio/project → D-IFACE gateways → Portfolio/Orchestration → owning domain capabilities`
 
-**UI demo checkpoint:** Build and compare a portfolio, define and validate a project graph, run/resume tasks, inspect checkpoints/history, and invoke the same workflow through an automation adapter.
+**UI demo checkpoint:** Build and compare a portfolio, define and validate a project graph, run/resume tasks, inspect
+checkpoints/history, and invoke the same workflow through an automation adapter.
 
-**Exit gate:** Portfolio and project outputs are versioned and reproducible; retries do not duplicate effects, bounded cycles remain bounded, and UI/HTTP/CLI/MCP semantic parity passes.
+**Exit gate:** Portfolio and project outputs are versioned and reproducible; retries do not duplicate effects, bounded
+cycles remain bounded, and UI/HTTP/CLI/MCP semantic parity passes.
 
-#### `D-PORT` — [Portfolio](../../app/services/portfolio/README.md)
+#### `D-PORT` — [Portfolio](../../app/services/portfolio/README.md) (Increment 7)
 
 ##### 7.1 [ ] `FEAT-PORT-COMPOSE_PORTFOLIOS`
 
@@ -828,7 +882,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 1. [ ] `FR-PORT-MERGE_PORTFOLIO_STRATEGIES`
 2. [ ] `FR-PORT-SPLIT_PORTFOLIO_STRATEGIES`
 
-#### `D-ORCH` — [Orchestration](../../app/services/orchestration/README.md)
+#### `D-ORCH` — [Orchestration](../../app/services/orchestration/README.md) (Increment 7)
 
 ##### 7.8 [ ] `FEAT-ORCH-DEFINE_PROJECTS`
 
@@ -880,7 +934,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-ORCH-RETAIN_PROJECT_HISTORY`
 
-#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md)
+#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md) (Increment 7)
 
 ##### 7.14 [ ] `FEAT-IFACE-SERVE_API_EVENTS`
 
@@ -900,7 +954,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-IFACE-OPERATE_PORTFOLIO_BUILDER`
 
-#### `D-UI` — [User Interface](../../app/ui/README.md)
+#### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 7)
 
 ##### 7.18 [ ] `FEAT-UI-START_WORK`
 
@@ -939,15 +993,19 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Scope:** 50 business FRs across 27 feature slices; 25 feature completion gates and 2 partial slices.
 
-**Purpose:** Add isolated plugins, view contributions, additional code targets, distributed workers, Stockpicker/profile methods, AI assistance, neural research, and other advanced capabilities without destabilizing the core loop.
+**Purpose:** Add isolated plugins, view contributions, additional code targets, distributed workers, Stockpicker/profile
+methods, AI assistance, neural research, and other advanced capabilities without destabilizing the core loop.
 
-**Vertical path:** `Plugin/package or advanced request → isolation/admission → owning capability → scoped UI contribution/result`
+**Vertical path:** `Plugin/package or advanced request → isolation/admission → owning capability → scoped UI
+contribution/result`
 
-**UI demo checkpoint:** Install, replace, and remove a constrained contribution; exercise an applicable advanced capability; verify scoped UI cleanup, compatibility diagnostics, and local-reference equivalence where required.
+**UI demo checkpoint:** Install, replace, and remove a constrained contribution; exercise an applicable advanced
+capability; verify scoped UI cleanup, compatibility diagnostics, and local-reference equivalence where required.
 
-**Exit gate:** Each advanced lane passes its own isolation/parity/removal gate; no stable workflow depends on an experimental capability, and removing an extension leaves built-in workflows usable.
+**Exit gate:** Each advanced lane passes its own isolation/parity/removal gate; no stable workflow depends on an
+experimental capability, and removing an extension leaves built-in workflows usable.
 
-#### `D-PLUG` — [Plugins](../../app/services/plugins/README.md)
+#### `D-PLUG` — [Plugins](../../app/services/plugins/README.md) (Increment 8)
 
 ##### 8.1 [ ] `FEAT-PLUG-MANAGE_LIFECYCLE`
 
@@ -971,7 +1029,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 1. [ ] `FR-PLUG-VALIDATE_PLUGIN_PACKAGES`
 2. [ ] `FR-PLUG-DECLARE_PLUGIN_COMPATIBILITY`
 
-#### `D-STRAT` — [Strategy](../../app/services/strategy/README.md)
+#### `D-STRAT` — [Strategy](../../app/services/strategy/README.md) (Increment 8)
 
 ##### 8.6 [ ] `FEAT-STRAT-EXTEND_PLUGIN_NODES`
 
@@ -982,20 +1040,20 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-STRAT-IMPLEMENT_CODE_TARGETS`
 
-#### `D-ANA` — [Analytics](../../app/services/analytics/README.md)
+#### `D-ANA` — [Analytics](../../app/services/analytics/README.md) (Increment 8)
 
 ##### 8.8 [ ] `FEAT-ANA-CUSTOM_PANELS`
 
 1. [ ] `FR-ANA-RUN_CUSTOM_ANALYSIS`
 2. [ ] `FR-ANA-DECLARE_RESULT_PANELS`
 
-#### `D-PORT` — [Portfolio](../../app/services/portfolio/README.md)
+#### `D-PORT` — [Portfolio](../../app/services/portfolio/README.md) (Increment 8)
 
 ##### 8.9 [ ] `FEAT-PORT-EXTEND_PORTFOLIO_METHODS`
 
 1. [ ] `FR-PORT-REGISTER_PORTFOLIO_METHODS`
 
-#### `D-WS` — [Workspace](../../app/services/workspace/README.md)
+#### `D-WS` — [Workspace](../../app/services/workspace/README.md) (Increment 8)
 
 ##### 8.10 [ ] `FEAT-WS-DISTRIBUTE_WORKERS`
 
@@ -1004,7 +1062,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 3. [ ] `FR-WS-SCHEDULE_DATA_LOCALITY`
 4. [ ] `FR-WS-VERIFY_ARTIFACT_TRANSFER`
 
-#### `D-DATA` — [Data](../../app/services/data/README.md)
+#### `D-DATA` — [Data](../../app/services/data/README.md) (Increment 8)
 
 ##### 8.11 [ ] `FEAT-DATA-SYNC_CONNECTORS`
 
@@ -1014,7 +1072,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 4. [ ] `FR-DATA-CONNECT_DATA_PROVIDERS`
 5. [ ] `FR-DATA-PROTECT_CONNECTOR_SECRETS`
 
-#### `D-SIM` — [Simulator](../../app/services/simulator/README.md)
+#### `D-SIM` — [Simulator](../../app/services/simulator/README.md) (Increment 8)
 
 ##### 8.12 [ ] `FEAT-SIM-CALCULATE_PROFILES`
 
@@ -1034,7 +1092,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 2. [ ] `FR-SIM-DEFINE_STOCKPICKER_TIMING`
 3. [ ] `FR-SIM-ENFORCE_DAILY_STOCKPICKER`
 
-#### `D-RES` — [Research](../../app/services/research/README.md)
+#### `D-RES` — [Research](../../app/services/research/README.md) (Increment 8)
 
 ##### 8.16 [ ] `FEAT-RES-RESEARCH_STOCKPICKERS`
 
@@ -1054,19 +1112,19 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 1. [ ] `FR-RES-SCORE_PORTFOLIO_FITNESS`
 
-#### `D-ORCH` — [Orchestration](../../app/services/orchestration/README.md)
+#### `D-ORCH` — [Orchestration](../../app/services/orchestration/README.md) (Increment 8)
 
 ##### 8.20 [ ] `FEAT-ORCH-TRAIN_NETWORKS`
 
 1. [ ] `FR-ORCH-TRAIN_NEURAL_NETWORKS`
 
-#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md)
+#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md) (Increment 8)
 
 ##### 8.21 [ ] `FEAT-IFACE-ADMINISTER_CAPABILITIES`
 
 1. [ ] `FR-IFACE-ADMINISTER_COMPONENTS`
 
-#### `D-UI` — [User Interface](../../app/ui/README.md)
+#### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 8)
 
 ##### 8.22 [ ] `FEAT-UI-MANAGE_LAYOUTS`
 
@@ -1106,15 +1164,19 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Scope:** 21 business FRs across 4 feature slices; 4 feature completion gates and 0 partial slices.
 
-**Purpose:** Introduce nonhistorical and live evidence with explicit provenance, freshness, bounded buffering, replay, and classification.
+**Purpose:** Introduce nonhistorical and live evidence with explicit provenance, freshness, bounded buffering, replay,
+and classification.
 
-**Vertical path:** `Source adapter → Data normalization/versioning → Research drift/intelligence → D-UI data/monitoring states`
+**Vertical path:** `Source adapter → Data normalization/versioning → Research drift/intelligence → D-UI data/monitoring
+states`
 
-**UI demo checkpoint:** Generate a classified scenario, query point-in-time news, reconnect/replay a live feed, and inspect drift/freshness without confusing synthetic or stale evidence with observed authority.
+**UI demo checkpoint:** Generate a classified scenario, query point-in-time news, reconnect/replay a live feed, and
+inspect drift/freshness without confusing synthetic or stale evidence with observed authority.
 
-**Exit gate:** Synthetic, revised, live, stale, and replayed evidence remain distinguishable, bounded, lineage-complete, and incapable of silently altering historical authority.
+**Exit gate:** Synthetic, revised, live, stale, and replayed evidence remain distinguishable, bounded, lineage-complete,
+and incapable of silently altering historical authority.
 
-#### `D-DATA` — [Data](../../app/services/data/README.md)
+#### `D-DATA` — [Data](../../app/services/data/README.md) (Increment 9)
 
 ##### 9.1 [ ] `FEAT-DATA-GENERATE_SCENARIOS`
 
@@ -1140,7 +1202,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 5. [ ] `FR-DATA-RECONNECT_MARKET_FEEDS`
 6. [ ] `FR-DATA-RECORD_MARKET_REPLAYS`
 
-#### `D-RES` — [Research](../../app/services/research/README.md)
+#### `D-RES` — [Research](../../app/services/research/README.md) (Increment 9)
 
 ##### 9.4 [ ] `FEAT-RES-MONITOR_MARKET_DRIFT`
 
@@ -1157,15 +1219,19 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Scope:** 119 business FRs across 27 feature slices; 27 feature completion gates and 0 partial slices.
 
-**Purpose:** Add disabled-by-default paper/demo/live operations through certified Broker transport, fail-closed Runtime Risk, Trading reconciliation, operational analytics, and safety-complete UI controls.
+**Purpose:** Add disabled-by-default paper/demo/live operations through certified Broker transport, fail-closed Runtime
+Risk, Trading reconciliation, operational analytics, and safety-complete UI controls.
 
-**Vertical path:** `D-UI confirmed intent → D-IFACE trading gateway → Trading → Runtime Risk → selected authority → reconciliation/analytics → D-UI`
+**Vertical path:** `D-UI confirmed intent → D-IFACE trading gateway → Trading → Runtime Risk → selected authority →
+reconciliation/analytics → D-UI`
 
-**UI demo checkpoint:** Create an explicitly bound non-live session, inspect readiness, preview and confirm an action, exercise approval/kill-switch behavior, classify the receipt, reconcile authority state, and inspect the audit trail.
+**UI demo checkpoint:** Create an explicitly bound non-live session, inspect readiness, preview and confirm an action,
+exercise approval/kill-switch behavior, classify the receipt, reconcile authority state, and inspect the audit trail.
 
-**Exit gate:** No adapter or UI route bypasses Risk or Trading; unknown outcomes block blind retry, kill-switch and stale-evidence cases fail closed, and live enablement remains a separate owner decision.
+**Exit gate:** No adapter or UI route bypasses Risk or Trading; unknown outcomes block blind retry, kill-switch and
+stale-evidence cases fail closed, and live enablement remains a separate owner decision.
 
-#### `D-BRK` — [Broker Connectivity](../../app/services/broker/README.md)
+#### `D-BRK` — [Broker Connectivity](../../app/services/broker/README.md) (Increment 10)
 
 ##### 10.1 [ ] `FEAT-BRK-DECLARE_CAPABILITIES`
 
@@ -1216,7 +1282,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 2. [ ] `FR-BRK-CERTIFY_BROKER_WRITES`
 3. [ ] `FR-BRK-VERSION_ADAPTER_CERTIFICATION`
 
-#### `D-RISK` — [Runtime Risk](../../app/services/risk/README.md)
+#### `D-RISK` — [Runtime Risk](../../app/services/risk/README.md) (Increment 10)
 
 ##### 10.8 [ ] `FEAT-RISK-DEFINE_RISK_CONTRACTS`
 
@@ -1269,7 +1335,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 3. [ ] `FR-RISK-REPORT_RISK_DECISIONS`
 4. [ ] `FR-RISK-CHAIN_AUDIT_RECORDS`
 
-#### `D-TRD` — [Trading](../../app/services/trading/README.md)
+#### `D-TRD` — [Trading](../../app/services/trading/README.md) (Increment 10)
 
 ##### 10.15 [ ] `FEAT-TRD-MANAGE_TRADING_SESSIONS`
 
@@ -1331,7 +1397,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 3. [ ] `FR-TRD-QUERY_TRADING_STATE`
 4. [ ] `FR-TRD-ENFORCE_ACTION_PARITY`
 
-#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md)
+#### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md) (Increment 10)
 
 ##### 10.23 [ ] `FEAT-IFACE-OPERATE_TRADING`
 
@@ -1344,7 +1410,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 7. [ ] `FR-IFACE-DISPLAY_OPERATOR_ANALYTICS`
 8. [ ] `FR-IFACE-ENFORCE_TRANSPORT_PARITY`
 
-#### `D-ANA` — [Analytics](../../app/services/analytics/README.md)
+#### `D-ANA` — [Analytics](../../app/services/analytics/README.md) (Increment 10)
 
 ##### 10.24 [ ] `FEAT-ANA-QUALIFY_OPERATIONS`
 
@@ -1355,7 +1421,7 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 5. [ ] `FR-ANA-QUALIFY_OPERATORS`
 6. [ ] `FR-ANA-EXPORT_OPERATIONAL_ANALYTICS`
 
-#### `D-UI` — [User Interface](../../app/ui/README.md)
+#### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 10)
 
 ##### 10.25 [ ] `FEAT-UI-MANAGE_DATA`
 
@@ -1383,15 +1449,19 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 **Scope:** 2 business FRs across 1 feature slices; 1 feature completion gates and 0 partial slices.
 
-**Purpose:** Replace local-only trust assumptions with hosted isolation/authorization while retaining identical domain contracts, then run every applicable release gate.
+**Purpose:** Replace local-only trust assumptions with hosted isolation/authorization while retaining identical domain
+contracts, then run every applicable release gate.
 
-**Vertical path:** `Hosted client → authorized workspace boundary → same public capabilities/domains → isolated storage/workers`
+**Vertical path:** `Hosted client → authorized workspace boundary → same public capabilities/domains → isolated
+storage/workers`
 
-**UI demo checkpoint:** Run an approved representative workflow in local and hosted modes and compare contract behavior, isolation, artifacts, events, and recovery.
+**UI demo checkpoint:** Run an approved representative workflow in local and hosted modes and compare contract behavior,
+isolation, artifacts, events, and recovery.
 
-**Exit gate:** Cross-workspace isolation and authorization pass; all 142 feature gates, 549 business requirements, retained foundation guarantees, workflows, removal paths, and applicable phase/NFR gates are green.
+**Exit gate:** Cross-workspace isolation and authorization pass; all 142 feature gates, 549 business requirements,
+retained foundation guarantees, workflows, removal paths, and applicable phase/NFR gates are green.
 
-#### `D-WS` — [Workspace](../../app/services/workspace/README.md)
+#### `D-WS` — [Workspace](../../app/services/workspace/README.md) (Increment 11)
 
 ##### 11.1 [ ] `FEAT-WS-HOST_WORKSPACES`
 
@@ -1400,13 +1470,22 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 
 ## 5. Final completion gate
 
-Implementation is complete only when every Increment 0 preservation gate remains green, all 142 unique feature completion checkboxes and all 549 unique business-FR checkboxes above are complete with executable `path:line` evidence, all 33 retained shared-foundation guarantees remain passing, and:
+Implementation is complete only when every Increment 0 preservation gate remains green, all 142 unique feature
+completion checkboxes and all 549 unique business-FR checkboxes above are complete with executable `path:line` evidence,
+all 33 retained shared-foundation guarantees remain passing, and:
 
-1. Every one of the 15 domains starts or degrades independently and advertises only compatible public capabilities or UI contributions.
-2. Every shared-module guarantee, domain, feature, responsibility, and FR passes its applicable cold-start, dependency-change, live-removal, reinstall, failed-activation, replacement, leak, and deletion-build checks.
-3. All twelve system workflows and every applicable phase/release gate in `PROJECT.md` pass with pinned manifests and no hidden fallback.
-4. Simulator and generated-target parity, deterministic replay, persistence recovery, and distributed/local equivalence fixtures pass where applicable.
-5. UI workflows remain operable throughout delivery and pass applicable keyboard, focus, semantics, nonvisual-data, loading, stale, unavailable, error, contract-parity, and browser/integration evidence.
-6. Broker, Runtime Risk, and Trading remain disabled by default and pass sandbox/testnet, approval, kill-switch, unknown-outcome, reconciliation, protection, ledger, and audit gates before operational release.
+1. Every one of the 15 domains starts or degrades independently and advertises only compatible public capabilities or UI
+   contributions.
+2. Every shared-module guarantee, domain, feature, responsibility, and FR passes its applicable cold-start,
+   dependency-change, live-removal, reinstall, failed-activation, replacement, leak, and deletion-build checks.
+3. All twelve system workflows and every applicable phase/release gate in `PROJECT.md` pass with pinned manifests and no
+   hidden fallback.
+4. Simulator and generated-target parity, deterministic replay, persistence recovery, and distributed/local equivalence
+   fixtures pass where applicable.
+5. UI workflows remain operable throughout delivery and pass applicable keyboard, focus, semantics, nonvisual-data,
+   loading, stale, unavailable, error, contract-parity, and browser/integration evidence.
+6. Broker, Runtime Risk, and Trading remain disabled by default and pass sandbox/testnet, approval, kill-switch,
+   unknown-outcome, reconciliation, protection, ledger, and audit gates before operational release.
 7. Hosted and local modes preserve the same public contracts and pass cross-workspace isolation and authorization.
-8. No requirement is considered implemented solely because related code, tests, databases, migrations, or UI screens exist; its current owning acceptance contract must pass.
+8. No requirement is considered implemented solely because related code, tests, databases, migrations, or UI screens
+   exist; its current owning acceptance contract must pass.

@@ -1,10 +1,10 @@
 # Standards and Principles
 
-**Purpose**: Single Builder operating guide for HaruQuantAI.
+**Purpose**: Three-role Planner, Executor, and Reviewer operating guide for HaruQuantAI.
 
 ## 1. Coding Principles
 
-- **Memory & Truth**: Memory lives in repository files (`AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and owning package READMEs), **never in chat**. Read `AGENTS.md`, then use the context routers in `docs/PROJECT.md` and `docs/ARCHITECTURE.md` to load only the sections and owning READMEs applicable to the task. Read either system document in full only for genuinely system-wide or cross-cutting work.
+- **Memory & Truth**: Permanent truth lives in repository files (`AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and owning package READMEs), **never in chat**. Temporary state for the active development task lives in `docs/dev/task/planner.md`, `docs/dev/task/executor.md`, and `docs/dev/task/reviewer.md`; these journals never override authoritative specifications and are empty between tasks. Read `AGENTS.md`, then use the context routers in `docs/PROJECT.md` and `docs/ARCHITECTURE.md` to load only the sections and owning READMEs applicable to the task. Read either system document in full only for genuinely system-wide or cross-cutting work.
 - **Scoped Authority**: Authority is assigned by subject, not by a linear document override chain. `AGENTS.md` owns contributor process; `docs/PROJECT.md` owns product/system scope, cross-domain workflows, NFRs, and release gates; `docs/ARCHITECTURE.md` owns universal structural/runtime constraints; each topical package README owns its boundary, feature/FR registry, domain semantics, and domain acceptance evidence. When multiple scopes apply, satisfy all of their non-overlapping rules and report any actual conflict before editing.
 - **Feature Registry Authority**: Each owning package README is the sole canonical current-state registry for that package's feature IDs, statuses, module ownership, semantic public contracts, requirements, and usage evidence. The registry may be expressed through the README's `Owns`, package-structure, and composable-feature sections; a redundant heading or second mutable registry is forbidden. `docs/PROJECT.md` indexes domains and owns system-level relationships; it does not duplicate domain feature internals.
 - **Think First Before Coding**: State assumptions explicitly. Surface tradeoffs. If multiple interpretations exist, present them. If unclear, stop and ask.
@@ -30,37 +30,88 @@
     - Feature-owned immutable schema definitions live in that feature's `migrations/` package. A shared composition entry point may aggregate feature manifests without owning or altering their migration steps.
   - **Root-file Rule**: Except for explicitly allowed package infrastructure (`__init__.py`, `_settings.py`, `_limits.py`), production behavior must reside inside its owning feature module folder. A domain may impose a stricter root in its owning README.
   - **Pure Initializers and Public Boundaries**: Every Python `__init__.py` is empty or contains only a module docstring. It performs no re-export, discovery, registration, I/O, task creation, connection, or logging configuration. Cross-feature and cross-domain consumers import DTOs, protocols, events, errors, and capability keys from `app.contracts.<owner>`, declare exact capability dependencies in `FeatureSpec`, and resolve providers through `FeatureContext`; they never import service implementations. Stable external callers use the capability-aware gateways registered by D-IFACE features where applicable.
-- **Dry Run Required**: Before editing, produce a dry-run report EXPLICITLY detailing the following eight (8):
-  - **1. TASK TO DO:** The Selected feature/requirement/task to be implemented/built/edited, list of tests and usage examples.
-  - **2. Files read:** authoritative documents, upstream documentation and related source/test files.
-  - **3. Files to create or edit:** exact paths, purpose of each change, implementation order, and the rationale of why each change is necessary
-  - **4. Dependencies:** prerequisites including  upstream libraries/system/contracts/feature/functional requirements needed.
-  - **5. Blockers:** specification conflicts, missing info/dependencies, design trade-offs, implementation risks, compatibility risks.
-  - **6. Scope boundaries:** explicitly included work, explicitly excluded work.
-  - **7. Validation commands:** commands to validate the changes made, including the formatting, tests, usage-example execution.
-  - **8. Rollback:** undoing the changes made, files to revert, exports or registrations to remove, artifacts to clean up
-- **Approval Gate**: Dry run must explicitly have ALL the listed above eight items. If any item is missing, the dry is not valid, redo. If any item is not relevant to the task, you would rather add "None" or "Not Applicable" to that item than completely exclude it. Presence of all 8 items is important to ensure proper audit was done before code is touched. Do not modify any files during the dry run. Execution is authorized only when the trimmed entire content of a standalone owner message equals exactly `APPROVED: EXECUTE` before modifying files. A message containing additional text does not authorize execution. Merely quoting or referencing the phrase does not authorize execution.
-- **Scope Control**: `APPROVED: EXECUTE` approves only the latest explicitly numbered dry-run or correction plan. It does not approve additional findings, unrelated refactoring, dependency upgrades, architectural redesigns, formatting outside approved scope, commits, pushes, or changes to other domains.
-  - Implement only the selected feature and work only in approved scope.
-  - Do not invent requirements and do not perform broad refactors without explicit approval.
+
+### Three-Agent Development Workflow
+
+- **Role Declaration and Single Writer**: Every development chat is explicitly assigned exactly one role with `ROLE: PLANNER`, `ROLE: EXECUTOR`, or `ROLE: REVIEWER`. An agent must stop if its role is absent, conflicts with the active handoff state, or would require performing another role's work. Only one agent may write to the repository at a time; Planner, Executor, and Reviewer chats never make concurrent changes.
+- **Workflow Journals**: Active-task coordination uses three tracked journals:
+  - `docs/dev/task/planner.md` is written only by the Planner.
+  - `docs/dev/task/executor.md` is written only by the Executor.
+  - `docs/dev/task/reviewer.md` is written only by the Reviewer.
+  - Completed entries are append-only for the duration of the active task. A role may update its current entry until it hands off, but it never rewrites or deletes an earlier numbered dry run, report, or review.
+  - The Reviewer may empty all three journals only after an accepted review as the administrative close-out step.
+  - All three journals are empty when no task is active. They are temporary coordination records, not product specifications, feature registries, decision records, or substitutes for authoritative documentation.
+- **Task Branch and Worktree Isolation**:
+  - Every registered feature is developed on `feature/<feature-id>-<slug>`; every non-feature task uses `task/<task-id>-<slug>`. Names are lowercase and contain only letters, numbers, `/`, `.`, `_`, and `-`. Colons, spaces, and backslashes are forbidden. The Planner validates the complete name with `git check-ref-format --branch` before creating it.
+  - Every task branch has one dedicated sibling worktree at `../<repository-name>-worktrees/<task-slug>`. Resolve the main repository, dedicated worktree root, and proposed task path to absolute paths before creation. The task path must be a new child of that dedicated root, must not equal or sit inside the main worktree, and must not reuse an existing nonempty directory.
+  - Only one active task worktree is permitted. Multiple agents work sequentially inside that same task worktree; parallel task worktrees require a separately approved concurrency design.
+  - The main worktree remains on `main`, clean, and unchanged throughout planning, execution, and review. Product changes, journals, tests, generated artifacts, and task commands belong only to the task worktree.
+  - Every numbered dry run, report, and review records the main repository path, main baseline commit, task branch, task worktree absolute path, task ID, iteration number, and expected changed/untracked paths.
+- **Handoff State Machine**:
+  1. Main is clean on `main`, all journals are empty, and no task worktree exists: the repository is idle and the Planner may create one task branch/worktree.
+  2. Latest dry run has no approval record: execution is `PENDING_APPROVAL`.
+  3. Latest dry run has a valid approval record: the Executor may implement that dry run.
+  4. Latest Executor report is `BLOCKED`: control returns immediately to the Planner.
+  5. Latest Executor report is `READY_FOR_REVIEW`: control passes to the Reviewer.
+  6. Latest review is `CHANGES_REQUESTED`: control returns to the Planner for the next numbered dry run.
+  7. Latest review is `ACCEPTED`: the Reviewer performs final close-out and the one authorized local commit.
+- **Iteration Example**: `clean main → create task branch/worktree → Dry Run 1 → Approval 1 → Report 1 → Review 1 (CHANGES_REQUESTED) → Dry Run 2 → Approval 2 → Report 2 → Review 2 (ACCEPTED) → empty all journals → task commit → fast-forward main → remove worktree → delete merged branch`. An Executor blocker replaces the review step for that iteration and returns directly to the next Planner dry run in the same task worktree.
+
+#### Planner
+
+- **Planner Authority**: The Planner performs repository inspection, research, architecture analysis, gap analysis, and task decomposition. Except for the isolation bootstrap below, it may write only the task worktree's `docs/dev/task/planner.md`; all other repository access is read-only.
+- **Planner Isolation Bootstrap**: Before writing `Dry Run 1`, the Planner operates from the main worktree and:
+  1. verifies the current branch is `main`, `git status --porcelain` is empty, and all three main-worktree journals exist at zero bytes;
+  2. records the main repository's resolved absolute path and main baseline commit;
+  3. verifies `git worktree list --porcelain` contains no active task worktree and the proposed branch does not already exist;
+  4. validates the deterministic task branch with `git check-ref-format --branch`;
+  5. resolves and verifies the dedicated sibling worktree root and new task path under the filesystem safety rules;
+  6. creates only that directory root when absent and creates exactly one task branch/worktree with `git worktree add -b <task-branch> <task-worktree-path> main`;
+  7. verifies the new worktree's repository root, branch, and `HEAD`, then performs all remaining planning inside it.
+  The Planner never switches the main worktree away from `main`, modifies main files, commits, merges, rebases, pulls, fetches, or pushes.
+- **Numbered Dry Runs**: The Planner appends `Dry Run 1`, `Dry Run 2`, and subsequent complete revisions in the task worktree. Each dry run records a stable task ID, iteration number, status, main repository path, main baseline commit, task branch, task worktree absolute path, expected changed/untracked paths, preceding report/review references, assumptions, and the following eight mandatory sections:
+  - **1. TASK TO DO:** Selected feature, requirement, or task; requirements to implement; tests; and usage examples.
+  - **2. Files read:** Authoritative documents, upstream documentation, and related source/test files.
+  - **3. Files to create or edit:** Exact paths, purpose of each change, implementation order, and rationale.
+  - **4. Dependencies:** Upstream libraries, systems, contracts, features, and functional requirements.
+  - **5. Blockers:** Specification conflicts, missing information or dependencies, trade-offs, implementation risks, and compatibility risks.
+  - **6. Scope boundaries:** Explicitly included and excluded work, including whether the final local commit is authorized.
+  - **7. Validation commands:** Formatting, linting, typing, change-scoped tests, validators, usage-example execution, and final review gates.
+  - **8. Rollback:** Files and behavior to restore, exports or registrations to remove, and artifacts to clean.
+- **Dry-Run Completeness**: Every dry run contains all eight sections. Use `None` or `Not Applicable` when necessary; never omit a section. `Dry Run 1` starts from the clean task worktree created at the recorded main baseline, with only `docs/dev/task/planner.md` becoming modified. A correction dry run remains in the same branch/worktree, explicitly inventories every retained changed and untracked path, and states whether each is retained, changed, or rolled back.
+- **Planning Write Exception**: The Planner must not modify implementation, tests, configuration, dependencies, or authoritative documentation. Its only write authorities are the validated branch/worktree creation performed once before `Dry Run 1` and appending the current dry run and approval record to the task worktree's `docs/dev/task/planner.md`.
+- **Approval Record**: Execution is authorized only when the trimmed entire content of a standalone owner message equals exactly `APPROVED: EXECUTE`. A message containing additional text, quoting the phrase, or referring to an earlier approval is invalid. After receiving valid approval, the Planner appends an approval record containing the exact phrase, approved dry-run number, task ID, main baseline commit, task branch, task worktree path, and expected working-tree state. The approved dry-run body is then immutable.
+- **Correction Planning**: An Executor blocker or Reviewer change request never authorizes more implementation. The Planner reads the complete active journal history and repository state, appends the next full dry run, and obtains a new standalone approval.
+- **Planner-Only Cancellation**: If the owner cancels before Executor changes exist, the Planner may close the task only after explicit cancellation direction, emptying `planner.md`, and verifying the task worktree is clean. Normal non-force worktree removal and deletion of a branch still equal to `main` are then permitted. Any dirty or unmerged abandonment follows the separately approved destructive-abandonment process.
+
+#### Executor
+
+- **Executor Entry Gate**: Before editing, the Executor reads `AGENTS.md`, all three journals, every authority/source/test path routed by the latest dry run, and the complete Git status and diff from the recorded main baseline. It verifies the latest dry run has a matching approval record; the current repository root is the exact recorded task worktree; the active branch is the exact task branch; `HEAD`, main baseline, and expected changed/untracked paths match the handoff; and the main worktree remains untouched. Any mismatch returns control to the Planner without implementation.
+- **Executor Scope**: The Executor implements exactly the latest approved dry run inside the task worktree. It may write only the approved implementation/documentation paths and the task worktree's `docs/dev/task/executor.md`; it never edits `docs/dev/task/planner.md` or `docs/dev/task/reviewer.md`, operates from the main worktree, switches branches, creates another worktree, commits, merges, rebases, pulls, fetches, or pushes.
+- **Documentation Implementation**: The Planner identifies documentation impact; the Executor performs approved documentation updates alongside the implementation. Update authoritative documentation first, then contracts/manifests, implementation, tests/usage evidence, and final status/evidence reconciliation. A newly discovered material documentation change is a blocker, not permission to rewrite the specification.
+- **Numbered Reports**: The Executor appends `Report 1`, `Report 2`, and subsequent entries aligned with the approved dry-run iteration. Each report records status, files changed, decisions and implications, affected active documentation, requirements implemented, checklist file-and-line evidence, dependencies/contracts used, deviations, commands and results, tests, usage evidence, known issues, and rollback.
+- **Immediate Blocker Handoff**: When the Executor discovers missing authority, a specification conflict, stale baseline, unapproved path, material scope expansion, unsafe dependency, or other blocker, it stops implementation immediately before making any further change. It preserves partial work, marks the current report `BLOCKED`, records the evidence, affected paths, completed work, safe rollback, and exact Planner/owner decision required, then hands control back to the Planner. It does not guess, implement around the blocker, modify the dry run, or commit.
+- **Ready Handoff**: When all approved work and change-scoped verification are complete, the Executor marks the report `READY_FOR_REVIEW` and stops. The Executor never commits or pushes.
+
+#### Reviewer
+
+- **Reviewer Entry Gate**: The Reviewer works inside the exact recorded task worktree and reads `AGENTS.md`, the complete Planner and Executor histories, applicable authoritative documents, actual source/test files, the complete branch diff from the recorded main baseline, staged and unstaged diffs, and every untracked path. It verifies the current repository root, task branch, `HEAD`, main baseline, and expected path inventory before testing. It independently verifies results rather than treating the Executor report as proof and never reviews implementation from the main worktree.
+- **Reviewer Scope**: The Reviewer may write only `docs/dev/task/reviewer.md`. It never silently fixes implementation, tests, configuration, or authoritative documentation and never authors a dry run.
+- **Numbered Reviews**: The Reviewer appends `Review 1`, `Review 2`, and subsequent entries. Each review records the associated dry run/report, base and reviewed diff, plan compliance, requirements, documentation consistency, contract/boundary correctness, tests and quality gates, usage evidence, deviations, omissions, defects, risks, required corrections, and commit decision.
+- **Changes Requested**: If any defect, omission, unapproved change, insufficient evidence, test failure, hook mutation, or unresolved risk exists, the Reviewer marks the review `CHANGES_REQUESTED`, does not commit, and hands control to the Planner. The Planner alone creates the next dry run, and the owner must approve it again.
+- **Acceptance and Task Commit**: The Reviewer marks a review `ACCEPTED` only when the latest approved dry run is completely satisfied and all applicable verification passes. Inside the task worktree it then empties `docs/dev/task/planner.md`, `docs/dev/task/executor.md`, and `docs/dev/task/reviewer.md`; verifies those files match their empty state at the main baseline; stages only approved changes; and creates the one authorized local task commit. If the commit gate fails or modifies files, no merge or cleanup occurs, acceptance is withdrawn, and control returns to the Planner through a reconstructed `CHANGES_REQUESTED` review.
+- **Fast-Forward Merge Gate**: After the task commit succeeds, the Reviewer operates from the resolved main worktree only for close-out. It verifies main is still on `main`, `git status --porcelain` is empty, all three main journals remain zero bytes, and main `HEAD` exactly equals the recorded baseline. It then runs `git merge --ff-only <task-branch>`. If any precondition fails or fast-forward is impossible, it leaves the task worktree and branch intact, performs no conflict resolution, rebase, squash, merge commit, or cleanup, and returns the issue to the Planner.
+- **Post-Merge Verification and Cleanup**: The Reviewer verifies main `HEAD` equals the reviewed task commit and the main journals remain empty. Before removal it re-resolves the main repository, dedicated sibling worktree root, and registered task worktree; the removal target must exactly match the recorded Git worktree, remain a child of the dedicated root, and remain distinct from main. From the main worktree, it removes only that clean merged task worktree with normal `git worktree remove <task-worktree-path>`, then deletes only the merged branch with `git branch -d <task-branch>`. It never uses `--force` or `-D` during normal close-out and leaves the shared sibling worktree-root directory in place.
+- **Failure and Abandonment**: A blocked, failed, rejected, or damaged task remains isolated in its task worktree; main is never reset or cleaned to abandon it. Force-removing a dirty worktree or deleting an unmerged branch requires a separate owner-approved cleanup dry run identifying the resolved worktree path, branch, changed/untracked files, recovery or patch options, and irreversible consequences. Until then, preserve both branch and worktree.
+
+- **Scope Control**: `APPROVED: EXECUTE` approves only the latest numbered dry run and, only when explicitly included in that dry run, the Reviewer's final local task commit, fast-forward-only merge to local `main`, and safe merged-worktree/branch cleanup after acceptance. It never approves unrelated findings, refactoring, dependency upgrades, architectural redesign, formatting outside scope, changes to other domains, history rewriting, destructive abandonment, remote operations, or pushing.
+  - Implement only the selected feature and approved paths.
+  - Do not invent requirements or perform broad refactors.
   - Preserve domain ownership boundaries.
   - Reuse existing conforming behavior where appropriate.
   - Use only verified upstream contracts and public dependency interfaces.
-  - If execution reveals a new finding that materially expands the approved scope, stop before implementing that additional work, issue a plan delta, and wait for a new standalone `APPROVED: EXECUTE`.
-- **No Guessing**: If info is missing, check active docs. If still missing, stop and report as `Pending`, `Assumption`, or `Proposed Decision`. No silent resolving and guesses or assumptions should be made.
-- **Final Report**: After completing of an implemented dry run task, report:
-  - Files changed.
-  - Decisions made and implications documented
-  - Affected active docs updated.
-  - Requirements implemented
-  - Dependencies and contracts used
-  - Rollback path identified
-  - Validation performed (Definition of Done):
-    - Code quality (Google style, types, docstrings, logging, and secrets) applied during implementation; final pre-commit/CI coverage evidence reported separately.
-    - Tests run and passed
-    - Usage example execution and passed
-    - All commands run
-    - If any issues found, report them.
+  - Every material plan delta returns to the Planner and requires a new approval.
+- **No Guessing**: If information is missing, check active authoritative documentation. If it remains missing, record it as `Pending`, `Assumption`, or `Proposed Decision` in the owning role journal and hand off according to the state machine. Never resolve it silently.
 
 ## 2. Coding Style
 
@@ -92,6 +143,8 @@
 ## 4. Documentation
 
 - **Update Rules**: Current domain features, statuses, semantic public contracts, requirements, database schema, prefix ownership, domain indexing policy, and target-vs-live reconciliation → the owning package `README.md`. Architecture, cross-domain models, universal database conventions, and shared storage policy → `docs/ARCHITECTURE.md`. System relationships and domain index → `docs/PROJECT.md`. Builder workflow → `AGENTS.md`. Delivery sequencing → `docs/dev/IMPLEMENTATION_ORDER.md`. Implemented feature procedure → `docs/dev/feature_implementation_pipeline.md`.
+- **Three-Role Documentation Accountability**: The Planner identifies every affected authoritative document and the intended change in the dry run. The Executor applies only those approved documentation changes and reconciles implementation status/evidence after verification. The Reviewer checks the resulting documentation against requirements, runtime truth, tests, and every overlapping authority; it reports discrepancies but never fixes them.
+- **Journal Hygiene**: `docs/dev/task/planner.md`, `docs/dev/task/executor.md`, and `docs/dev/task/reviewer.md` contain temporary active-task coordination only. They must not become specifications, feature registries, implementation history, or decision records. Entries accumulate during the current task and all three files return to empty only after accepted review.
 - **Schema Model Boundary**: Each owning package README's `### Persistence - Database` section is authoritative for that domain's current and target database model and authorises no migration. Executable schema remains in the owning domain's migration definitions. Where the model and an applied migration disagree, the migration is what the database contains and the README states what it should become.
 - **Decision Hygiene**: `Open Decisions` sections in `docs/PROJECT.md` and domain/module READMEs contain unresolved owner choices only. When an owner resolves a choice, write the outcome as an ordinary requirement, contract, workflow, configuration rule, boundary, or explicit exclusion in the authoritative specification, then delete the decision row and any resolved issue entry. Do not retain resolved, superseded, retired, or deferred-from-initial-scope rows as decision history, and do not create ADR or other standalone decision-record documents.
 - **Update Module/Service Documentation**: Add/update a `README.md` for each module/service as it's built.
@@ -116,6 +169,10 @@
 
 ## 7. Integration
 
+- **Role-Separated Verification**:
+  - The Planner uses read-only inspection and may run a narrowly named baseline check only when necessary to produce an evidence-backed dry run. It does not run coverage or the complete repository gate.
+  - The Executor runs only change-scoped tests and applicable focused quality checks while implementing. It never runs coverage, the complete suite, or the complete repository gate.
+  - The Reviewer independently reruns the affected tests and applicable non-mutating quality checks. For applicable changes, the final accepted local commit invokes pre-commit and its complete coverage gate; this is final integration evidence, not iterative feedback.
 - **Environment Boundaries**: Real integration operations are permitted only against verified non-production targets (`ENVIRONMENT=dev`, demo/testnet/sandbox accounts), except for operator-elected live MetaTrader 5 as defined in §3.
 - **Change-Scoped Testing & Verification**: Iterative development must test only the impact set of the current uncommitted changes. Start from `git diff --name-only`, `git diff --cached --name-only`, and untracked paths reported by `git status --short`; map changed production files to their existing owning tests. Include tests for changed tests, the owning feature, and affected public contracts, consumers, architecture, composition, API, integration, or dependency closure. A test file need not itself be modified to be affected by changed production code. Exclude tests for unrelated code.
   - Run selected tests explicitly with `uv run pytest --no-cov <test_path> [<test_path> ...]`.
@@ -124,4 +181,5 @@
   - Coverage and the complete suite run only through the pre-commit hook for applicable code/test/configuration changes and through automated CI/release verification. They are final integration evidence, not per-edit feedback.
   - Documentation-only changes run no Pytest tests unless they modify executable documentation tooling or another validated runtime surface.
 - **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `git diff --name-only`, `uv run pytest --no-cov <selected_test_path>`, `uv run ruff check .`, `uv run mypy .`.
+- **Git Authority**: The Planner never commits, merges, or pushes; its only Git mutation is the gated creation of one task branch/worktree before `Dry Run 1` and safe cleanup of a cancelled, clean Planner-only task. The Executor never creates or switches branches/worktrees, commits, merges, or pushes. After an `ACCEPTED` review, the Reviewer may create exactly one local task commit, fast-forward local `main`, remove the clean merged worktree, and delete the merged branch only when the latest approved dry run explicitly includes those actions. No workflow state authorizes `git push`, force-push, pull, fetch, rebase, reset, clean, amend, force worktree removal, unmerged-branch deletion, or other history mutation; each requires separate applicable owner authorization.
 - **Restricted Commands (Require `APPROVED: EXECUTE`)**: `rm -rf`, `git reset`, `git clean`, `uv add`/`uv remove`, `docker compose`, live broker calls, real email/Telegram sends, destructive SQL.
