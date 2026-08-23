@@ -17,30 +17,29 @@
 - **Research Workflow**: 1. **WebSearch** (landscape) → 2. **Context7** (verify syntax/deprecations) → 3. **DeepWiki** (design intent). Handle disagreements by explicitly calling out tradeoffs.
 - **Focused Domain Architecture (Domain Scoping)**: In `app/services/[DOMAIN]`, everything must be focused:
   - A **Module folder** inside a domain is dedicated to ONE feature / capability only (e.g., feature `FEAT-DATA-01: Retrieve historical data` has its own module folder inside the data domain focused solely on that feature).
-  - **Feature-group namespace exception**: A domain may define a documented non-feature organizational namespace that contains related feature module folders. The namespace may contain only `README.md`, `__init__.py`, and registered feature folders; it must not own feature behavior, requirements, persistence, or a second feature registry. Each child feature still satisfies one feature = one module folder, and the domain package root remains import-pure. Cross-boundary types live in `app/contracts/`; stable application access is capability-aware through `app/api/`. React UI capabilities are the separate `D-UI` domain and live at `app/ui/src/features/<feature>/` under the authority of `app/ui/README.md`; they do not live in a Python service namespace.
+  - **Feature-group namespace exception**: A domain may define a documented non-feature organizational namespace that contains related feature module folders. The namespace may contain only `README.md`, `__init__.py`, and registered feature folders; it must not own feature behavior, requirements, persistence, or a second feature registry. Each child feature still satisfies one feature = one module folder, and the domain package root remains import-pure. Cross-boundary types live in `app/contracts/`; public HTTP, SSE, CLI, MCP, and automation access is owned by registered features in `app/services/interfaces/`. React UI capabilities are the separate `D-UI` domain and live at `app/ui/src/features/<feature>/` under the authority of `app/ui/README.md`; they do not live in a Python service namespace.
   - A **File** inside a module folder is for ONE use case or focused responsibility only.
   - A **Class / function / method** inside a file addresses ONE functional requirement behavior at a time.
   - One feature = One module folder = One designated primary domain-logic file containing that service feature's executable usage example. The example is an `if __name__ == "__main__":` harness in the production module, not a pytest file or a second implementation location.
   - **UI Usage and Verification Exception**: Registered `FEAT-UI-*` features under `app/ui/src/features/` document one bounded interactive usage workflow in their feature README and expose it through the running UI. Executable tests under `tests/ui/` verify that workflow but are not themselves usage examples. Every completed UI feature must cite tests covering its public behavior and relevant loading, empty, stale, unavailable, error, interaction, and accessibility states. Page-level or multi-component workflows require integration or browser evidence when component tests cannot prove the complete interaction, and typed-client features require request plus backend/frontend contract-parity evidence.
   - **Reconciliation Exclusions**: For feature-count reconciliation, count only README-registered production feature directories. Exclude cache directories (`__pycache__`), generated artifacts, package metadata (`py.typed`), migration infrastructure (`migrations/`), and explicitly documented non-feature support directories (`contracts/`, `schemas/`, `_shared/`). Support directories must have documented ownership and may not become a second implementation location for feature behavior.
-  - **Shared-Infrastructure Exception**: `app/kernel/`, `app/contracts/`, `app/composition/`, and `app/api/` are non-domain shared modules. They own no product `FEAT-*` registry. `app/kernel/` defines business-neutral capability, feature, graph, scope, registry, event, state, and lifecycle primitives; `app/contracts/` defines cross-boundary DTOs, protocols, events, errors, and capability keys; `app/composition/` defines discovery, TOML configuration, readiness, provider selection, reconciliation, replacement, and runtime infrastructure policy; and `app/api/` defines stable capability-aware facades and shared transport substrate.
+  - **Shared-Infrastructure Exception**: `app/kernel/`, `app/contracts/`, and `app/composition/` are non-domain shared modules. They own no product `FEAT-*` registry. `app/kernel/` defines business-neutral capability, feature, graph, scope, registry, event, state, and lifecycle primitives; `app/contracts/` defines cross-boundary DTOs, protocols, events, errors, and capability keys; and `app/composition/` defines discovery, TOML configuration, readiness, provider selection, reconciliation, replacement, diagnostics, and runtime infrastructure policy. Product-facing transports and gateways are removable D-IFACE features.
   - **Three-Feature Shared-Support Threshold**: A domain-level support folder or module is permitted only when at least three distinct registered features consume the same coherent capability. Count feature consumers, not import occurrences, composition wiring, package-root re-exports, or tests. Code used by one or two features remains inside one explicit owning feature; consumers depend on that owner rather than creating a horizontal catch-all. Registered standalone capabilities remain valid feature folders regardless of consumer count.
   - **Domain Persistence Support**: A persistent domain may define one documented non-feature `persistence/` support package containing exactly `__init__.py`, `create.py`, `read.py`, `update.py`, and `delete.py`. The package owns only domain-record CRUD statement construction, execution delegation through a Data-owned public capability resolved from `FeatureContext`, and normalized row handoff; authorization, validation, policy, orchestration, and public behavior remain in the owning feature modules. Classify atomic multi-statement operations by their domain effect and never split one transaction across CRUD files. Unsupported verbs retain an empty module. Immutable schema definitions remain in `migrations/`. `app/services/data/persistence/` is exempt from this five-file layout because it owns shared database connection, transaction, locking, migration-ledger, backup, and recovery infrastructure in addition to Data-owned CRUD.
     - If fewer than three registered features consume the persistence capability, put the same five-file package inside the owning feature folder instead of at the domain root.
     - Feature-owned immutable schema definitions live in that feature's `migrations/` package. A shared composition entry point may aggregate feature manifests without owning or altering their migration steps.
-  - **Root-file Rule**: Except for explicitly allowed package infrastructure (`__init__.py`, `_settings.py`, `_limits.py`), production behavior must reside inside its owning feature module folder. A domain may impose a stricter root in its owning README; the API root permits only `__init__.py` as production Python, with bootstrap configuration and API-wide limits owned by `workstation/settings/`.
-  - **Pure Initializers and Public Boundaries**: Every Python `__init__.py` is empty or contains only a module docstring. It performs no re-export, discovery, registration, I/O, task creation, connection, or logging configuration. Cross-feature and cross-domain consumers import DTOs, protocols, events, errors, and capability keys from `app.contracts.<owner>`, declare exact capability dependencies in `FeatureSpec`, and resolve providers through `FeatureContext`; they never import service implementations. Stable application callers use capability-aware facades under `app/api/` where applicable.
-- **Dry Run Required**: Before editing, produce a dry-run report detailing:
-  - Selected feature to be built/edited and rationale
-  - Files read: authoritative documents, upstream dependency documentation, related source/test files.
-  - Files to create or edit; exact paths, purpose of each change, implementation order
-  - Requirements; exact `FR-*` requirements to be implemented, tests, usage evidence.
-  - Dependencies and contracts; upstream library/system/API/feature/contract, unresolved dependencies.
-  - Validation commands: formatting, tests, usage-example execution, feature-integration tests
-  - Scope boundaries: explicitly included work, explicitly excluded work,
-  - Blockers/risks; specification conflicts, missing info/dependencies, design trade-offs, implementation risks, compatibility risks
-  - Rollback path; files to revert, exports or registrations to remove, artifacts to clean up, verification commands after rollback
-- **Approval Gate**: Do not modify any files during the dry run. Execution is authorized only when the trimmed entire content of a standalone owner message equals exactly `APPROVED: EXECUTE` before modifying files. A message containing additional text does not authorize execution. Merely quoting or referencing the phrase does not authorize execution.
+  - **Root-file Rule**: Except for explicitly allowed package infrastructure (`__init__.py`, `_settings.py`, `_limits.py`), production behavior must reside inside its owning feature module folder. A domain may impose a stricter root in its owning README.
+  - **Pure Initializers and Public Boundaries**: Every Python `__init__.py` is empty or contains only a module docstring. It performs no re-export, discovery, registration, I/O, task creation, connection, or logging configuration. Cross-feature and cross-domain consumers import DTOs, protocols, events, errors, and capability keys from `app.contracts.<owner>`, declare exact capability dependencies in `FeatureSpec`, and resolve providers through `FeatureContext`; they never import service implementations. Stable external callers use the capability-aware gateways registered by D-IFACE features where applicable.
+- **Dry Run Required**: Before editing, produce a dry-run report EXPLICITLY detailing the following eight (8):
+  - **1. TASK TO DO:** The Selected feature/requirement/task to be implemented/built/edited, list of tests and usage examples.
+  - **2. Files read:** authoritative documents, upstream documentation and related source/test files.
+  - **3. Files to create or edit:** exact paths, purpose of each change, implementation order, and the rationale of why each change is necessary
+  - **4. Dependencies:** prerequisites including  upstream libraries/system/contracts/feature/functional requirements needed.
+  - **5. Blockers:** specification conflicts, missing info/dependencies, design trade-offs, implementation risks, compatibility risks.
+  - **6. Scope boundaries:** explicitly included work, explicitly excluded work.
+  - **7. Validation commands:** commands to validate the changes made, including the formatting, tests, usage-example execution.
+  - **8. Rollback:** undoing the changes made, files to revert, exports or registrations to remove, artifacts to clean up
+- **Approval Gate**: Dry run must explicitly have ALL the listed above eight items. If any item is missing, the dry is not valid, redo. If any item is not relevant to the task, you would rather add "None" or "Not Applicable" to that item than completely exclude it. Presence of all 8 items is important to ensure proper audit was done before code is touched. Do not modify any files during the dry run. Execution is authorized only when the trimmed entire content of a standalone owner message equals exactly `APPROVED: EXECUTE` before modifying files. A message containing additional text does not authorize execution. Merely quoting or referencing the phrase does not authorize execution.
 - **Scope Control**: `APPROVED: EXECUTE` approves only the latest explicitly numbered dry-run or correction plan. It does not approve additional findings, unrelated refactoring, dependency upgrades, architectural redesigns, formatting outside approved scope, commits, pushes, or changes to other domains.
   - Implement only the selected feature and work only in approved scope.
   - Do not invent requirements and do not perform broad refactors without explicit approval.
@@ -48,25 +47,25 @@
   - Reuse existing conforming behavior where appropriate.
   - Use only verified upstream contracts and public dependency interfaces.
   - If execution reveals a new finding that materially expands the approved scope, stop before implementing that additional work, issue a plan delta, and wait for a new standalone `APPROVED: EXECUTE`.
-- **No Guessing**: If info is missing, check active docs. If still missing, stop and report as `Pending`, `Assumption`, or `Proposed Decision`.
-- **Final Report Checklist**: After any requirement task, report:
-  - [ ] Scope strictly followed.
-    - Files changed.
-    - Decisions made and implications documented
-    - Requirements implemented
-    - Dependencies and contracts used
-    - Rollback path identified
-  - [ ] Validation performed
-    - Code quality (Google style, types, docstrings, logging, 80% coverage, secrets) applied.
+- **No Guessing**: If info is missing, check active docs. If still missing, stop and report as `Pending`, `Assumption`, or `Proposed Decision`. No silent resolving and guesses or assumptions should be made.
+- **Final Report**: After completing of an implemented dry run task, report:
+  - Files changed.
+  - Decisions made and implications documented
+  - Affected active docs updated.
+  - Requirements implemented
+  - Dependencies and contracts used
+  - Rollback path identified
+  - Validation performed (Definition of Done):
+    - Code quality (Google style, types, docstrings, logging, and secrets) applied during implementation; final pre-commit/CI coverage evidence reported separately.
     - Tests run and passed
     - Usage example execution and passed
     - All commands run
-  - [ ] Affected active docs updated.
+    - If any issues found, report them.
 
 ## 2. Coding Style
 
 - **Strict Adherence**: [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).
-- **Format**: 4 spaces, formatted via `ruff format` (double quotes, magic trailing comma respected). Pre-commit order: `trailing-whitespace` → `end-of-file-fixer` → `check-yaml/toml` → `check-added-large-files` → `ruff --fix` → `ruff-format` → `detect-secrets` → `mypy` → `pytest`.
+- **Format**: 4 spaces, formatted via `ruff format` (double quotes, magic trailing comma respected). Pre-commit runs repository hygiene, Ruff, secret detection, and the full Pytest coverage gate when application/test/configuration files are included; pre-push runs Mypy.
 - **Typing & Docs**: `mypy` type-checked (see `docs/ARCHITECTURE.md` for current strictness settings).
   - Explicit type hints on all signatures.
   - Every module, class, and function should be properly fitted with Google-style docstrings.
@@ -74,7 +73,7 @@
   - Modules that log use the standard-library pattern `logger = logging.getLogger(__name__)`; there is no shared logger singleton import. Composition owns application logging configuration, handlers, formatters, redaction, correlation context, retention, and cleanup. Log at workflow boundaries, public service entry points, external interactions, state transitions, side-effect boundaries, important decisions, retries, and failures. Pure helpers, DTOs/contracts, trivial accessors, deterministic transformations, and high-frequency numerical functions do not require logging unless specified. Logs must not expose secrets, credentials, personal information, full payloads, or sensitive trading data.
 - **Imports**: Absolute imports, grouped (stdlib, 3rd-party, local).
 - **Versioning**: Always confirm library versions before coding. Default to `pyproject.toml` pinned version.
-- **Quality**: 80% `pytest` coverage minimum. No bare `except:`. Application and library code uses `logger`, never `print`. Directly executable teaching and usage-example scripts may use `print` to display bounded, secret-safe results. No silent failures.
+- **Quality**: 80% `pytest` coverage minimum, enforced by pre-commit and automated CI/release verification rather than iterative test commands. No bare `except:`. Application and library code uses `logger`, never `print`. Directly executable teaching and usage-example scripts may use `print` to display bounded, secret-safe results. No silent failures.
 - **Usage Evidence**: Every service feature designates one primary domain-logic module. Every core capability module documents its purpose, key capabilities, Python API usage, and executable module command; the primary module ends with a bounded, deterministic, secret-safe `if __name__ == "__main__":` harness that demonstrates the feature and fails nonzero when verification fails. The owning README maps applicable FRs to named harness scenarios. Usage examples never live under `tests/`. `FEAT-UI-*` features document bounded interactive workflows in their README and expose them through the running UI; automated UI tests verify but do not replace that usage documentation.
 - **Test and Example Placement**: Feature-level automated tests live under `tests/services/<domain>/<feature>/`; system-level removability, dependency-graph, lifecycle, composition, API, and other verification suites retain their documented test locations. Tests verify behavior and never own public usage demonstrations. Provider-specific usage demonstrations live only in the provider feature's designated primary domain-logic module and use safe fakes, fixtures, sandbox/demo targets, or explicitly supplied safe inputs. No second example implementation is created.
 - **Clean Resource Lifecycles**: Always close SQLite handles, open sockets, and background sub-processes explicitly in test teardown or context managers to eliminate `ResourceWarning` leaks.
@@ -118,6 +117,11 @@
 ## 7. Integration
 
 - **Environment Boundaries**: Real integration operations are permitted only against verified non-production targets (`ENVIRONMENT=dev`, demo/testnet/sandbox accounts), except for operator-elected live MetaTrader 5 as defined in §3.
-- **Targeted Testing & Verification**: Development verification uses targeted test commands (`uv run pytest <test_file_path>`). Full test suites are restricted during iterative development to optimize time.
-- **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `uv run pytest <test_file_path>`, `uv run ruff check .`, `uv run mypy .`.
+- **Change-Scoped Testing & Verification**: Iterative development must test only the impact set of the current uncommitted changes. Start from `git diff --name-only`, `git diff --cached --name-only`, and untracked paths reported by `git status --short`; map changed production files to their existing owning tests. Include tests for changed tests, the owning feature, and affected public contracts, consumers, architecture, composition, API, integration, or dependency closure. A test file need not itself be modified to be affected by changed production code. Exclude tests for unrelated code.
+  - Run selected tests explicitly with `uv run pytest --no-cov <test_path> [<test_path> ...]`.
+  - `uv run pytest --no-cov --testmon` may assist selection only when its cache is valid; it must not be allowed to fall back to an unfiltered first run. `--lf`, `--ff`, and `-n auto` may be combined only with an already bounded test selection.
+  - Never run bare `uv run pytest`, `pytest` without selected paths, `uv run python scripts/ci_check.py`, or any `--cov` command during implementation or iterative verification.
+  - Coverage and the complete suite run only through the pre-commit hook for applicable code/test/configuration changes and through automated CI/release verification. They are final integration evidence, not per-edit feedback.
+  - Documentation-only changes run no Pytest tests unless they modify executable documentation tooling or another validated runtime surface.
+- **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `git diff --name-only`, `uv run pytest --no-cov <selected_test_path>`, `uv run ruff check .`, `uv run mypy .`.
 - **Restricted Commands (Require `APPROVED: EXECUTE`)**: `rm -rf`, `git reset`, `git clean`, `uv add`/`uv remove`, `docker compose`, live broker calls, real email/Telegram sends, destructive SQL.

@@ -2,7 +2,7 @@
 
 > **Package:** `app/contracts/`
 > **Category:** Non-domain shared substrate
-> **Status:** Initial contracts `Implemented`; domain inventory remains incremental
+> **Status:** Contract inventory specified; production contract slices `Missing`
 > **Planned inventory:** Maintained in this README
 
 ## Purpose
@@ -14,17 +14,17 @@
 ## Dependency boundary
 
 - Contracts may import the kernel `CapabilityKey` primitive plus the standard library and approved schema/serialization libraries.
-- Contracts never import composition, API, services, adapters, persistence implementations, provider SDKs, or UI code.
+- Contracts never import composition, services, adapters, persistence implementations, provider SDKs, or UI code.
 - A type that crosses a feature/application/process/API boundary belongs here; private implementation types remain inside their owning feature.
 - Services depend on public contracts and kernel primitives, never another feature implementation.
 
 ```text
-app/kernel  <-  app/contracts  <-  app/composition  <-  app/api
+app/kernel  <-  app/contracts  <-  app/composition
      ^               ^
      └──────── app/services/<domain>/<feature>
 ```
 
-Arrows point toward dependencies. `app/api/` and services have no implementation dependency on one another.
+Arrows point toward dependencies. Service features depend on public contracts and Kernel primitives, while Composition never imports their implementations.
 
 ## Contract shape
 
@@ -160,7 +160,7 @@ A contract slice is complete only when:
 2. Its feature uses the same keys in `FeatureSpec.provides`/`requires`/`optional`.
 3. Serialization, schema, compatibility, and provider/consumer tests pass where applicable.
 4. No duplicate public contract is defined under a service implementation.
-5. Contract imports remain independent of composition, API, and services.
+5. Contract imports remain independent of composition and services.
 6. The owning feature and feature-local README pass the repository's documentation, architecture, lifecycle, and physical-removal gates.
 
 ---
@@ -321,7 +321,7 @@ This dictionary defines the domain shape; §22.2 adds every common physical fiel
 | --- | --- |
 | `Workspace` | `id`, `schema_version:int`, `default_timezone:iana`, `settings:json`, `artifact_root`, `created_at`. One active local workspace. |
 | `FeatureSpec` | `feature_id`, `domain`, `provides`, `requires`, `optional`, `conflicts`, `description`, optional `StateDeclaration`, and exact `config_keys`. Immutable and validated in code. |
-| `FeatureRuntimeStatus` | Feature ID, actual `FeatureState`, stable blocked/failure reason where applicable, and active capability owner/generation evidence exposed by `RuntimeStatus`/`SystemAPI`. It is diagnostic runtime state, not a required database row. |
+| `FeatureRuntimeStatus` | Feature ID, actual `FeatureState`, stable blocked/failure reason where applicable, and active capability owner/generation evidence exposed by Composition `RuntimeStatus`. It is diagnostic runtime state, not a required database row. |
 | `CapabilityKey` | Lowercase capability name plus positive major version, formatted `<name>@<major>`. Provider implementations are held in the in-memory `ServiceRegistry` with owner/generation metadata. |
 | `FeatureScope` effect record | Owner feature, effect type, resource name, creation time, cleanup state, and last cleanup error. Records support diagnostics and exact LIFO cleanup; the kernel does not require them to be persisted. |
 | `CapabilitySnapshot` | Product record derived from active capability identifiers, provider feature IDs/generations, relevant configuration hashes, and creation/causal evidence. Durable runs reference this application contract when implemented. |

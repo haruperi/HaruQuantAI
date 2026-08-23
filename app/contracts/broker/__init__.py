@@ -1,1 +1,0 @@
-"""Broker domain capability contracts."""

@@ -14,12 +14,12 @@ from app.composition.config import (
     load_config_from_toml_string,
 )
 from app.composition.discovery import DiscoveryResult, FeatureDiscoverer
-from app.composition.readiness import check_profile_readiness
-from app.contracts.events.system import (
+from app.composition.events import (
     ConfigurationReloadedEvent,
     FeatureReconfiguredEvent,
     FeatureRuntimeFailedEvent,
 )
+from app.composition.readiness import check_profile_readiness
 from app.kernel.events import EventBus
 from app.kernel.feature import FeatureState
 from app.kernel.reconciler import Reconciler, ReconciliationReport

@@ -33,9 +33,7 @@ def test_init_purity_violation(tmp_path: Path) -> None:
 
 def test_unmanaged_task_violation(tmp_path: Path) -> None:
     """Test ARCH-002: direct asyncio.create_task in a service is flagged."""
-    service_file = (
-        tmp_path / "app" / "services" / "data" / "historical_bars" / "worker.py"
-    )
+    service_file = tmp_path / "app" / "services" / "alpha" / "consumer" / "worker.py"
     service_file.parent.mkdir(parents=True, exist_ok=True)
     service_file.write_text(
         "import asyncio\nasync def run(): asyncio.create_task(run())\n",
@@ -52,7 +50,7 @@ def test_unmanaged_task_violation(tmp_path: Path) -> None:
 
 def test_logging_basic_config_violation(tmp_path: Path) -> None:
     """Test ARCH-003: logging.basicConfig in a service is flagged."""
-    service_file = tmp_path / "app" / "services" / "broker" / "mock_feed" / "setup.py"
+    service_file = tmp_path / "app" / "services" / "beta" / "provider" / "setup.py"
     service_file.parent.mkdir(parents=True, exist_ok=True)
     service_file.write_text(
         "import logging\nlogging.basicConfig(level=logging.INFO)\n",
@@ -72,7 +70,7 @@ def test_contract_purity_violation(tmp_path: Path) -> None:
     contract_file = tmp_path / "app" / "contracts" / "data" / "bad_contract.py"
     contract_file.parent.mkdir(parents=True, exist_ok=True)
     contract_file.write_text(
-        "from app.services.data.historical_bars.feed import Foo\n",
+        "from app.services.alpha.consumer.worker import Foo\n",
         encoding="utf-8",
     )
 
@@ -84,31 +82,12 @@ def test_contract_purity_violation(tmp_path: Path) -> None:
     assert "ARCH-004-CONTRACT-PURITY" in rules
 
 
-def test_api_purity_violation(tmp_path: Path) -> None:
-    """Test ARCH-005: API facade importing a concrete service is flagged."""
-    api_file = tmp_path / "app" / "api" / "bad_facade.py"
-    api_file.parent.mkdir(parents=True, exist_ok=True)
-    api_file.write_text(
-        "from app.services.broker.mock_feed.feed import MockFeed\n",
-        encoding="utf-8",
-    )
-
-    tree = ast.parse(api_file.read_text(encoding="utf-8"))
-    visitor = ArchitecturalVisitor(api_file)
-    visitor.visit(tree)
-
-    rules = [v.rule for v in visitor.violations]
-    assert "ARCH-005-API-PURITY" in rules
-
-
 def test_feature_independence_violation(tmp_path: Path) -> None:
     """Test ARCH-006: Feature A importing Feature B is flagged."""
-    feature_file = (
-        tmp_path / "app" / "services" / "data" / "historical_bars" / "consumer.py"
-    )
+    feature_file = tmp_path / "app" / "services" / "alpha" / "consumer" / "consumer.py"
     feature_file.parent.mkdir(parents=True, exist_ok=True)
     feature_file.write_text(
-        "from app.services.broker.mock_feed.feed import MockBrokerMarketData\n",
+        "from app.services.beta.provider.service import Provider\n",
         encoding="utf-8",
     )
 

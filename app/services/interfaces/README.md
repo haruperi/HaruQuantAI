@@ -39,7 +39,7 @@ The Interfaces domain delivers presentation-neutral HTTP, SSE, CLI, MCP, automat
 ### Does not own
 
 - Business policy or direct database/filesystem/compiler access; adapters delegate every operation to application capabilities.
-- The business-neutral capability facade, application bootstrap, system diagnostics, or generic transport substrate; `app/api/` owns those shared mechanisms.
+- Application bootstrap, composition lifecycle, or the business-neutral runtime diagnostic model. Interfaces owns product-facing transport adapters over those capabilities without duplicating their source state.
 - React rendering, routes, layouts, drafts, focus, accessibility behavior, or human interaction; those belong to `D-UI` under `app/ui/`.
 - Composition lifecycle, dependency resolution, effect reversal, and transactional replacement; those belong to the non-domain shared substrate (`app/contracts/`, `app/kernel/`, and `app/composition/`).
 - **Deletion boundary:** deleting `app/services/interfaces/` withdraws its presentation-neutral gateways and automation/transport adapters; D-UI renders explicit capability-unavailable states, while domain/application services remain executable through tests or another installed adapter. The kernel and unrelated domains shall remain healthy.
@@ -756,11 +756,11 @@ The stable `§x.y` labels below are preserved for cross-document references. The
 
 | Method and route | Purpose |
 | --- | --- |
-| `GET /system/liveness` | Implemented lightweight runtime liveness and kernel status. |
-| `GET /system/readiness` | Implemented selected-profile readiness and missing-capability list. |
-| `GET /system/capabilities` | Implemented active capability availability, provider feature ID, generation, and registration time. |
-| `GET /system/features` | Implemented feature states plus package, capability, runtime, replacement, cleanup, and consumer diagnostics. |
-| `GET /api/v1/system/health`, `/readiness`, `/capabilities`, `/features` | Target versioned D-IFACE adapters over the same implemented system facade; they may add product fields but cannot invent a second runtime model. |
+| `GET /system/liveness` | Missing D-IFACE lightweight runtime liveness projection. |
+| `GET /system/readiness` | Missing D-IFACE selected-profile readiness and missing-capability projection. |
+| `GET /system/capabilities` | Missing D-IFACE active capability availability, provider feature ID, generation, and registration-time projection. |
+| `GET /system/features` | Missing D-IFACE feature-state and diagnostic projection. |
+| `GET /api/v1/system/health`, `/readiness`, `/capabilities`, `/features` | Target versioned D-IFACE adapters over Composition runtime diagnostics; they may add product fields but cannot invent a second runtime model. |
 | `POST /api/v1/features/{feature_id}/{enable,disable}` | Target administrative desired-state change through validated configuration/reconciliation; physical package deletion remains a deployment action. |
 | `POST /api/v1/features/{feature_id}/replace` | Target administrative adapter over implemented transactional feature replacement. |
 | `GET/PATCH /api/v1/workspace/settings` | Read or version-update workspace settings. |

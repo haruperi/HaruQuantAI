@@ -2,10 +2,6 @@
 
 import pytest
 
-from app.contracts.broker.market_data import BROKER_MARKET_DATA
-from app.contracts.data.bar_cache import BAR_CACHE
-from app.contracts.data.historical_bars import HISTORICAL_BARS
-from app.contracts.system.clock import SYSTEM_CLOCK
 from app.kernel.capability import CapabilityKey
 from app.kernel.feature import FeatureSpec
 from app.kernel.graph import (
@@ -13,6 +9,12 @@ from app.kernel.graph import (
     DependencyCycleError,
     DependencyGraph,
     ProviderSelectionError,
+)
+from tests._support.composability import (
+    CONSUMER_CAPABILITY,
+    OPTIONAL_CAPABILITY,
+    PROVIDER_CAPABILITY,
+    ROOT_CAPABILITY,
 )
 
 CAP_RESEARCH = CapabilityKey[object](name="research.dataset", major=1)
@@ -22,25 +24,25 @@ CAP_ALPHA = CapabilityKey[object](name="research.alpha", major=1)
 def test_graph_linear_dependency_resolution() -> None:
     """Test linear dependency chain start and stop order."""
     clock_spec = FeatureSpec(
-        "FEAT-SYS-PROVIDE_CLOCK", "system", provides=frozenset({SYSTEM_CLOCK})
+        "FEAT-TEST-PROVIDE_ROOT", "system", provides=frozenset({ROOT_CAPABILITY})
     )
     broker_spec = FeatureSpec(
-        "FEAT-BROKER-FEED_MT5",
+        "FEAT-TEST-PROVIDE_SERVICE",
         "broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
-        requires=frozenset({SYSTEM_CLOCK}),
+        provides=frozenset({PROVIDER_CAPABILITY}),
+        requires=frozenset({ROOT_CAPABILITY}),
     )
     data_spec = FeatureSpec(
-        "FEAT-DATA-RETRIEVE_BARS",
+        "FEAT-TEST-CONSUME_SERVICE",
         "data",
-        provides=frozenset({HISTORICAL_BARS}),
-        requires=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        requires=frozenset({PROVIDER_CAPABILITY}),
     )
     res_spec = FeatureSpec(
-        "FEAT-RESEARCH-PREPARE_DATASET",
+        "FEAT-TEST-CONSUME_CHAIN",
         "research",
         provides=frozenset({CAP_RESEARCH}),
-        requires=frozenset({HISTORICAL_BARS}),
+        requires=frozenset({CONSUMER_CAPABILITY}),
     )
 
     specs = {s.feature_id: s for s in [clock_spec, broker_spec, data_spec, res_spec]}
@@ -48,64 +50,62 @@ def test_graph_linear_dependency_resolution() -> None:
     resolution = graph.resolve(specs.keys())
 
     assert resolution.start_order == (
-        "FEAT-SYS-PROVIDE_CLOCK",
-        "FEAT-BROKER-FEED_MT5",
-        "FEAT-DATA-RETRIEVE_BARS",
-        "FEAT-RESEARCH-PREPARE_DATASET",
+        "FEAT-TEST-PROVIDE_ROOT",
+        "FEAT-TEST-PROVIDE_SERVICE",
+        "FEAT-TEST-CONSUME_SERVICE",
+        "FEAT-TEST-CONSUME_CHAIN",
     )
     assert resolution.stop_order == (
-        "FEAT-RESEARCH-PREPARE_DATASET",
-        "FEAT-DATA-RETRIEVE_BARS",
-        "FEAT-BROKER-FEED_MT5",
-        "FEAT-SYS-PROVIDE_CLOCK",
+        "FEAT-TEST-CONSUME_CHAIN",
+        "FEAT-TEST-CONSUME_SERVICE",
+        "FEAT-TEST-PROVIDE_SERVICE",
+        "FEAT-TEST-PROVIDE_ROOT",
     )
     assert len(resolution.blocked_features) == 0
 
     # Test transitive closures
-    clock_dependents = resolution.get_transitive_dependents("FEAT-SYS-PROVIDE_CLOCK")
+    clock_dependents = resolution.get_transitive_dependents("FEAT-TEST-PROVIDE_ROOT")
     assert clock_dependents == {
-        "FEAT-BROKER-FEED_MT5",
-        "FEAT-DATA-RETRIEVE_BARS",
-        "FEAT-RESEARCH-PREPARE_DATASET",
+        "FEAT-TEST-PROVIDE_SERVICE",
+        "FEAT-TEST-CONSUME_SERVICE",
+        "FEAT-TEST-CONSUME_CHAIN",
     }
 
     dataset_dependencies = resolution.get_transitive_dependencies(
-        "FEAT-RESEARCH-PREPARE_DATASET"
+        "FEAT-TEST-CONSUME_CHAIN"
     )
     assert dataset_dependencies == {
-        "FEAT-SYS-PROVIDE_CLOCK",
-        "FEAT-BROKER-FEED_MT5",
-        "FEAT-DATA-RETRIEVE_BARS",
+        "FEAT-TEST-PROVIDE_ROOT",
+        "FEAT-TEST-PROVIDE_SERVICE",
+        "FEAT-TEST-CONSUME_SERVICE",
     }
 
 
 def test_graph_missing_dependency_blocks_dependents() -> None:
     """Test missing provider leaves consumer in blocked_features."""
     data_spec = FeatureSpec(
-        "FEAT-DATA-RETRIEVE_BARS",
+        "FEAT-TEST-CONSUME_SERVICE",
         "data",
-        provides=frozenset({HISTORICAL_BARS}),
-        requires=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        requires=frozenset({PROVIDER_CAPABILITY}),
     )
     res_spec = FeatureSpec(
-        "FEAT-RESEARCH-PREPARE_DATASET",
+        "FEAT-TEST-CONSUME_CHAIN",
         "research",
         provides=frozenset({CAP_RESEARCH}),
-        requires=frozenset({HISTORICAL_BARS}),
+        requires=frozenset({CONSUMER_CAPABILITY}),
     )
 
-    # Note: BROKER_MARKET_DATA provider is NOT enabled/provided
+    # Note: PROVIDER_CAPABILITY provider is NOT enabled/provided
     specs = {data_spec.feature_id: data_spec, res_spec.feature_id: res_spec}
     graph = DependencyGraph(specs)
     resolution = graph.resolve(specs.keys())
 
     assert resolution.eligible_features == ()
     assert resolution.start_order == ()
-    assert "FEAT-DATA-RETRIEVE_BARS" in resolution.blocked_features
-    assert "FEAT-RESEARCH-PREPARE_DATASET" in resolution.blocked_features
-    assert (
-        "broker.market-data@1" in resolution.blocked_features["FEAT-DATA-RETRIEVE_BARS"]
-    )
+    assert "FEAT-TEST-CONSUME_SERVICE" in resolution.blocked_features
+    assert "FEAT-TEST-CONSUME_CHAIN" in resolution.blocked_features
+    assert "test.provider@1" in resolution.blocked_features["FEAT-TEST-CONSUME_SERVICE"]
 
 
 def test_graph_cycle_detection_raises_error() -> None:
@@ -133,13 +133,13 @@ def test_graph_cycle_detection_raises_error() -> None:
 def test_graph_optional_dependency_ordering() -> None:
     """Test optional dependency respects topological order when provider is enabled."""
     cache_spec = FeatureSpec(
-        "FEAT-DATA-CACHE_BARS", "data", provides=frozenset({BAR_CACHE})
+        "FEAT-TEST-PROVIDE_OPTIONAL", "data", provides=frozenset({OPTIONAL_CAPABILITY})
     )
     data_spec = FeatureSpec(
-        "FEAT-DATA-RETRIEVE_BARS",
+        "FEAT-TEST-CONSUME_SERVICE",
         "data",
-        provides=frozenset({HISTORICAL_BARS}),
-        optional=frozenset({BAR_CACHE}),
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        optional=frozenset({OPTIONAL_CAPABILITY}),
     )
 
     specs = {cache_spec.feature_id: cache_spec, data_spec.feature_id: data_spec}
@@ -147,24 +147,24 @@ def test_graph_optional_dependency_ordering() -> None:
     resolution = graph.resolve(specs.keys())
 
     assert resolution.start_order == (
-        "FEAT-DATA-CACHE_BARS",
-        "FEAT-DATA-RETRIEVE_BARS",
+        "FEAT-TEST-PROVIDE_OPTIONAL",
+        "FEAT-TEST-CONSUME_SERVICE",
     )
 
 
 def test_graph_conflict_detection() -> None:
     """Test feature conflicts block activation."""
     spec_mt5 = FeatureSpec(
-        "FEAT-BROKER-FEED_MT5",
+        "FEAT-TEST-PROVIDE_SERVICE",
         "broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
-        conflicts=frozenset({"FEAT-BROKER-FEED_BINANCE"}),
+        provides=frozenset({PROVIDER_CAPABILITY}),
+        conflicts=frozenset({"FEAT-TEST-PROVIDE_ALTERNATE"}),
     )
     spec_binance = FeatureSpec(
-        "FEAT-BROKER-FEED_BINANCE",
-        "broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
-        conflicts=frozenset({"FEAT-BROKER-FEED_MT5"}),
+        "FEAT-TEST-PROVIDE_ALTERNATE",
+        "test",
+        provides=frozenset({PROVIDER_CAPABILITY}),
+        conflicts=frozenset({"FEAT-TEST-PROVIDE_SERVICE"}),
     )
 
     specs = {spec_mt5.feature_id: spec_mt5, spec_binance.feature_id: spec_binance}
@@ -172,22 +172,22 @@ def test_graph_conflict_detection() -> None:
     resolution = graph.resolve(specs.keys())
 
     assert resolution.eligible_features == ()
-    assert "FEAT-BROKER-FEED_MT5" in resolution.blocked_features
-    assert "FEAT-BROKER-FEED_BINANCE" in resolution.blocked_features
-    assert "Conflicts" in resolution.blocked_features["FEAT-BROKER-FEED_MT5"]
+    assert "FEAT-TEST-PROVIDE_SERVICE" in resolution.blocked_features
+    assert "FEAT-TEST-PROVIDE_ALTERNATE" in resolution.blocked_features
+    assert "Conflicts" in resolution.blocked_features["FEAT-TEST-PROVIDE_SERVICE"]
 
 
 def test_ambiguous_providers_rejected_without_selection() -> None:
     """Test two enabled providers for one capability without explicit selection raises AmbiguousProviderError."""
     spec_prov_a = FeatureSpec(
-        "FEAT-BROKER-FEED_MT5",
+        "FEAT-TEST-PROVIDE_SERVICE",
         "broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({PROVIDER_CAPABILITY}),
     )
     spec_prov_b = FeatureSpec(
-        "FEAT-BROKER-FEED_CTRADER",
+        "FEAT-TEST-PROVIDE_ALTERNATE",
         "broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({PROVIDER_CAPABILITY}),
     )
 
     specs = {
@@ -197,7 +197,7 @@ def test_ambiguous_providers_rejected_without_selection() -> None:
     graph = DependencyGraph(specs)
 
     with pytest.raises(
-        AmbiguousProviderError, match=r"(?i)ambiguous.*broker\.market-data@1"
+        AmbiguousProviderError, match=r"(?i)ambiguous.*test\.provider@1"
     ):
         graph.resolve(specs.keys())
 
@@ -205,14 +205,14 @@ def test_ambiguous_providers_rejected_without_selection() -> None:
 def test_explicit_selection_resolves_ambiguous_providers() -> None:
     """Test providing explicit selection in provider_selections resolves ambiguity."""
     spec_prov_a = FeatureSpec(
-        "FEAT-BROKER-FEED_MT5",
+        "FEAT-TEST-PROVIDE_SERVICE",
         "broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({PROVIDER_CAPABILITY}),
     )
     spec_prov_b = FeatureSpec(
-        "FEAT-BROKER-FEED_CTRADER",
+        "FEAT-TEST-PROVIDE_ALTERNATE",
         "broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({PROVIDER_CAPABILITY}),
     )
 
     specs = {
@@ -222,24 +222,24 @@ def test_explicit_selection_resolves_ambiguous_providers() -> None:
     graph = DependencyGraph(specs)
     resolution = graph.resolve(
         specs.keys(),
-        provider_selections={"broker.market-data@1": "FEAT-BROKER-FEED_CTRADER"},
+        provider_selections={"test.provider@1": "FEAT-TEST-PROVIDE_ALTERNATE"},
     )
 
-    assert resolution.provider_map["broker.market-data@1"] == "FEAT-BROKER-FEED_CTRADER"
-    assert "FEAT-BROKER-FEED_CTRADER" in resolution.eligible_features
+    assert resolution.provider_map["test.provider@1"] == "FEAT-TEST-PROVIDE_ALTERNATE"
+    assert "FEAT-TEST-PROVIDE_ALTERNATE" in resolution.eligible_features
 
 
 def test_invalid_provider_selection_raises_error() -> None:
     """Test selecting a non-existent or disabled feature raises ProviderSelectionError."""
     spec_prov_a = FeatureSpec(
-        "FEAT-BROKER-FEED_MT5",
+        "FEAT-TEST-PROVIDE_SERVICE",
         "broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({PROVIDER_CAPABILITY}),
     )
     spec_prov_b = FeatureSpec(
-        "FEAT-BROKER-FEED_CTRADER",
+        "FEAT-TEST-PROVIDE_ALTERNATE",
         "broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({PROVIDER_CAPABILITY}),
     )
 
     specs = {
@@ -253,21 +253,21 @@ def test_invalid_provider_selection_raises_error() -> None:
     ):
         graph.resolve(
             specs.keys(),
-            provider_selections={"broker.market-data@1": "FEAT-NONEXISTENT"},
+            provider_selections={"test.provider@1": "FEAT-NONEXISTENT"},
         )
 
 
 def test_selection_of_feature_not_providing_capability_raises_error() -> None:
     """Test selecting a feature that does not provide the capability raises ProviderSelectionError."""
     clock_spec = FeatureSpec(
-        "FEAT-SYS-PROVIDE_CLOCK",
+        "FEAT-TEST-PROVIDE_ROOT",
         "system",
-        provides=frozenset({SYSTEM_CLOCK}),
+        provides=frozenset({ROOT_CAPABILITY}),
     )
     broker_spec = FeatureSpec(
-        "FEAT-BROKER-FEED_MT5",
+        "FEAT-TEST-PROVIDE_SERVICE",
         "broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({PROVIDER_CAPABILITY}),
     )
 
     specs = {clock_spec.feature_id: clock_spec, broker_spec.feature_id: broker_spec}
@@ -278,7 +278,7 @@ def test_selection_of_feature_not_providing_capability_raises_error() -> None:
     ):
         graph.resolve(
             specs.keys(),
-            provider_selections={"broker.market-data@1": "FEAT-SYS-PROVIDE_CLOCK"},
+            provider_selections={"test.provider@1": "FEAT-TEST-PROVIDE_ROOT"},
         )
 
 

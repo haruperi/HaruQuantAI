@@ -16,20 +16,20 @@ SAMPLE_TOML = """
 [application]
 profile = "research"
 
-[features."FEAT-SYS-PROVIDE_CLOCK"]
+[features."FEAT-TEST-PROVIDE_ROOT"]
 enabled = true
 
-[features."FEAT-DATA-RETRIEVE_BARS"]
+[features."FEAT-TEST-CONSUME_SERVICE"]
 enabled = true
 
-[features."FEAT-DATA-RETRIEVE_BARS".config]
+[features."FEAT-TEST-CONSUME_SERVICE".config]
 default_timeframe = "M1"
 
 [features."FEAT-TEST-DISABLE_ME"]
 enabled = false
 
 [providers]
-"broker.market-data@1" = "FEAT-BROKER-FEED_MOCK"
+"test.provider@1" = "FEAT-TEST-PROVIDE_SERVICE"
 """
 
 
@@ -37,18 +37,18 @@ def test_load_config_from_toml_string() -> None:
     """A complete canonical configuration is parsed exactly."""
     config = load_config_from_toml_string(SAMPLE_TOML)
     assert config.profile == "research"
-    assert config.is_feature_enabled("FEAT-SYS-PROVIDE_CLOCK")
-    assert config.is_feature_enabled("FEAT-DATA-RETRIEVE_BARS")
+    assert config.is_feature_enabled("FEAT-TEST-PROVIDE_ROOT")
+    assert config.is_feature_enabled("FEAT-TEST-CONSUME_SERVICE")
     assert not config.is_feature_enabled("FEAT-TEST-DISABLE_ME")
     assert not config.is_feature_enabled("FEAT-TEST-NONEXISTENT")
-    assert config.get_feature_config("FEAT-DATA-RETRIEVE_BARS") == {
+    assert config.get_feature_config("FEAT-TEST-CONSUME_SERVICE") == {
         "default_timeframe": "M1"
     }
-    assert config.get_feature_config("FEAT-SYS-PROVIDE_CLOCK") == {}
-    assert config.get_selected_provider("broker.market-data@1") == (
-        "FEAT-BROKER-FEED_MOCK"
+    assert config.get_feature_config("FEAT-TEST-PROVIDE_ROOT") == {}
+    assert config.get_selected_provider("test.provider@1") == (
+        "FEAT-TEST-PROVIDE_SERVICE"
     )
-    assert config.get_selected_provider("system.clock@1") is None
+    assert config.get_selected_provider("test.root@1") is None
 
 
 def test_load_config_from_file(tmp_path: Path) -> None:
@@ -90,7 +90,7 @@ def test_missing_or_blank_profile_rejected() -> None:
     """File-based configuration always declares its profile explicitly."""
     with pytest.raises(InvalidProfileError, match=r"(?i)missing required"):
         load_config_from_toml_string(
-            '[features."FEAT-BROKER-FEED_MOCK"]\nenabled = true\n'
+            '[features."FEAT-TEST-PROVIDE_SERVICE"]\nenabled = true\n'
         )
     with pytest.raises(InvalidProfileError, match=r"(?i)missing or blank"):
         load_config_from_toml_string('[application]\nprofile = "   "\n')
@@ -119,7 +119,7 @@ def test_invalid_provider_selection_raises_configuration_error() -> None:
             [application]
             profile = "research"
             [providers]
-            "data.historical-bars@1" = ""
+            "test.consumer@1" = ""
             """
         )
 

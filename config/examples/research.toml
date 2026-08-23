@@ -4,14 +4,4 @@
 [application]
 profile = "research"
 
-[features.FEAT-SYS-PROVIDE_CLOCK]
-enabled = true
-
-[features.FEAT-BROKER-FEED_MOCK]
-enabled = true
-
-[features.FEAT-DATA-RETRIEVE_BARS]
-enabled = true
-
-[features.FEAT-DATA-RETRIEVE_BARS.config]
-default_timeframe = "M1"
+# Add real feature registrations here as their implementation increments land.

@@ -9,15 +9,15 @@ from app.kernel.state import RetentionPolicy, StateDeclaration
 def test_state_declaration_valid() -> None:
     """Test valid StateDeclaration creation and defaults."""
     decl = StateDeclaration(
-        namespace="data.historical_bars",
+        namespace="test.retained-state",
         schema_version=2,
         retention_policy=RetentionPolicy.RETAIN,
-        description="Historical bars DuckDB store",
+        description="Test retained state",
     )
-    assert decl.namespace == "data.historical_bars"
+    assert decl.namespace == "test.retained-state"
     assert decl.schema_version == 2
     assert decl.retention_policy == RetentionPolicy.RETAIN
-    assert decl.description == "Historical bars DuckDB store"
+    assert decl.description == "Test retained state"
 
 
 def test_state_declaration_invalid_namespace() -> None:

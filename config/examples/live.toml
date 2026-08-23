@@ -4,8 +4,4 @@
 [application]
 profile = "live"
 
-[features.FEAT-SYS-PROVIDE_CLOCK]
-enabled = true
-
-[features.FEAT-BROKER-FEED_MOCK]
-enabled = true
+# Add real feature registrations here only after their safety gates pass.

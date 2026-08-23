@@ -37,7 +37,6 @@ class ArchitecturalVisitor(ast.NodeVisitor):
         self._is_kernel = "kernel" in self.app_parts
         self._is_service = "services" in self.app_parts
         self._is_contract = "contracts" in self.app_parts
-        self._is_api = "api" in self.app_parts
         self._is_init = self.file_path.name == "__init__.py"
 
     def check_init_purity(self, node: ast.Module) -> None:
@@ -121,25 +120,14 @@ class ArchitecturalVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _check_import_target(self, target_module: str, lineno: int) -> None:
-        # Rule 4: Contracts must never import services or api
-        if self._is_contract and target_module.startswith(("app.services", "app.api")):
+        # Rule 4: Contracts must never import service implementations.
+        if self._is_contract and target_module.startswith("app.services"):
             self.violations.append(
                 ArchitecturalViolation(
                     file_path=self.file_path,
                     line_number=lineno,
                     rule="ARCH-004-CONTRACT-PURITY",
                     message=f"Contract must not import '{target_module}'.",
-                )
-            )
-
-        # Rule 5: API facade must never import services
-        if self._is_api and target_module.startswith("app.services"):
-            self.violations.append(
-                ArchitecturalViolation(
-                    file_path=self.file_path,
-                    line_number=lineno,
-                    rule="ARCH-005-API-PURITY",
-                    message=f"API facade must not import '{target_module}'.",
                 )
             )
 

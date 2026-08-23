@@ -2,7 +2,7 @@
 
 > **Status:** Outcome-driven product-delivery sequence; composability foundation already implemented
 > **Architecture baseline:** `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and authoritative domain READMEs
-> **Inventory:** 4 non-domain shared modules, 15 business domains, 142 planned features, 549 business FRs, and 33 retained shared-foundation trace IDs (`FR-KERN-*`)
+> **Inventory:** 3 non-domain shared modules, 15 business domains, 142 planned features, 549 business FRs, and 33 retained shared-foundation trace IDs (`FR-KERN-*`)
 > **Last updated:** 2026-08-23
 
 ## 1. How to use this file
@@ -11,7 +11,7 @@ This document schedules delivery; it does not restate or weaken product behavior
 
 The sequence is agile in the strict sense used here: every increment produces a demonstrable vertical outcome through the UI, while preserving headless contract parity and feature removability.
 
-- Preserve the implemented `app/kernel/`, `app/contracts/`, `app/composition/`, and `app/api/` foundation. Product work extends it through contract-first vertical slices.
+- Preserve the implemented `app/kernel/` and `app/composition/` runtime plus the `app/contracts/` boundary. Product work extends them through contract-first vertical slices, with public gateways implemented as removable D-IFACE features.
 - Implement the displayed requirement slices in order within an increment unless the documented dependency graph proves two slices independent.
 - A feature may span increments. A heading marked **Partial** advances only the listed requirements and does not complete the feature.
 - Every business `FR-*` checkbox appears exactly once, in the earliest increment where its full acceptance evidence can pass.
@@ -41,7 +41,7 @@ When completed:
 
 ## 2. Authoritative domain inventory
 
-Kernel, Contracts, Composition, and API are implemented non-domain shared modules. “First increment” means the first planned product work in the domain, not domain completion.
+Kernel and Composition are implemented non-domain runtime modules; Contracts is the specified shared boundary populated incrementally by real feature slices. “First increment” means the first planned product work in the domain, not domain completion.
 
 | First increment | Domain | Features | Business FRs | Authoritative document |
 |---:|---|---:|---:|---|
@@ -86,9 +86,9 @@ Kernel, Contracts, Composition, and API are implemented non-domain shared module
 
 **Purpose:** Freeze the proven composability substrate as the baseline for every product increment; extend it without reimplementing or bypassing it.
 
-**Vertical path:** `Feature specification → composition → contracts → capability-aware API → provider/consumer/state evidence`
+**Vertical path:** `Feature specification → contracts → composition → D-IFACE gateway where required → provider/consumer/state evidence`
 
-**UI demo checkpoint:** This is a preservation increment rather than a new UI slice. Verify that its readiness, capability, feature, and failure diagnostics remain available for the Increment 1 shell to consume.
+**UI demo checkpoint:** This is a preservation increment rather than a new UI slice. Verify that Composition readiness, capability, feature, and failure diagnostics remain available for the Increment 1 D-IFACE/UI shell to project.
 
 **Exit gate:** Existing architecture, composition, feature-documentation, lifecycle, replacement, and removal suites remain green. The structured-logging task below must pass before Increment 1 product work starts.
 
@@ -97,8 +97,8 @@ Implemented evidence includes:
 1. Independent capability, feature-specification, context/scope, registry, graph, reconciliation, event, task, state, and replacement primitives.
 2. Python `haruquantai.features` discovery plus explicit test/embedded registration.
 3. Strict TOML feature/provider configuration, readiness profiles, file watching, and serialized composition mutation.
-4. Capability-aware API facades and implemented system liveness/readiness/capability/feature diagnostics.
-5. `FEAT-BROKER-FEED_MOCK`, `FEAT-DATA-RETRIEVE_BARS`, and `FEAT-SYS-PERSIST_STORAGE` as executable provider/consumer/state evidence.
+4. Direct Composition runtime diagnostics for readiness, active capabilities, feature state, dependency failures, replacement, and cleanup evidence.
+5. Business-neutral test fixtures proving provider/consumer dependency binding, state declarations, and removal without registering product features.
 6. Dependency loss, ambiguity, cycle, rollback, runtime-failure, LIFO cleanup, repeated lifecycle, replacement, documentation-drift, import-boundary, and removal tests.
 
 #### Foundation task 0.1 — [ ] Composition-owned structured logging

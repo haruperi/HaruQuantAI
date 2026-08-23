@@ -96,7 +96,7 @@ brokers/
 └── isolation_uncertainty/
 ```
 
-Each feature folder contains pure `__init__.py`, mandatory `README.md`, `manifest.py`, `config.py`, `feature.py`, and focused responsibility modules. The package root is import-pure; public contracts live in `app/contracts/broker/`, stable application access is capability-aware through `app/api/`, and provider SDK types and secrets remain private adapters.
+Each feature folder contains pure `__init__.py`, mandatory `README.md`, `manifest.py`, `config.py`, `feature.py`, and focused responsibility modules. The package root is import-pure; public contracts live in `app/contracts/broker/`, stable external access is exposed through capability-aware Interfaces features, and provider SDK types and secrets remain private adapters.
 
 | Feature | Responsibility file | Requirement implementation traces |
 |---|---|---|

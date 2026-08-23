@@ -9,17 +9,19 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from app.api.facade import create_api
-from app.api.http import SystemHttpServer
 from app.composition.engine import CompositionEngine
 
 
 def _status_payload(engine: CompositionEngine) -> dict[str, object]:
-    api = create_api(engine=engine)
-    status = api.system.get_runtime_status()
-    capabilities = api.system.list_capabilities()
-    if status is None:
-        return {"profile": "unknown", "is_ready": False}
+    """Build a serialization-safe snapshot from the composition runtime.
+
+    Args:
+        engine: Active composition engine.
+
+    Returns:
+        Runtime status suitable for diagnostic JSON output.
+    """
+    status = engine.get_status()
     return {
         "profile": status.profile,
         "is_ready": status.is_ready,
@@ -54,15 +56,14 @@ def _status_payload(engine: CompositionEngine) -> dict[str, object]:
         "errors": status.errors,
         "capabilities": {
             identifier: {
-                "identifier": info.identifier,
-                "is_available": info.is_available,
-                "provider_feature_id": info.provider_feature_id,
+                "identifier": identifier,
+                "is_available": True,
+                "provider_feature_id": info.owner_id,
                 "generation": info.generation,
-                "registered_at": (
-                    info.registered_at.isoformat() if info.registered_at else None
-                ),
+                "registered_at": binding.registered_at.isoformat(),
             }
-            for identifier, info in capabilities.items()
+            for identifier, info in engine.registry.active_capabilities().items()
+            if (binding := engine.registry.get_binding(identifier)) is not None
         },
     }
 
@@ -79,9 +80,6 @@ async def async_main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument("--config", type=str, default=None)
     parser.add_argument("--status", action="store_true")
-    parser.add_argument("--serve", action="store_true")
-    parser.add_argument("--host", type=str, default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args(args=argv if argv is not None else sys.argv[1:])
 
     engine = CompositionEngine()
@@ -97,23 +95,10 @@ async def async_main(argv: Sequence[str] | None = None) -> int:
             print(json.dumps(_status_payload(engine), indent=2))
             return 0
 
-        if args.serve:
-            api = create_api(engine=engine)
-            server = SystemHttpServer(api=api, host=args.host, port=args.port)
-            print(
-                "[INFO] HaruQuantAI system control plane running at "
-                f"http://{args.host}:{args.port}"
-            )
-            try:
-                await server.serve_forever()
-            finally:
-                await server.stop()
-            return 0
-
         print(
             f"HaruQuantAI initialized (profile='{engine.config.profile}', "
             f"active_features={len(engine.reconciler.active_features)}). "
-            "Use --status or --serve."
+            "Use --status for composition diagnostics."
         )
         return 0
     finally:

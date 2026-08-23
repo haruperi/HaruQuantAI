@@ -15,9 +15,9 @@ flowchart LR
     EntryPoint --> Discovery[4. Discovery and graph resolution]
     Discovery --> Mount[5. Staged FeatureContext.mount]
     Mount --> Commit[6. Atomic capability publication]
-    Commit --> API[7. Capability-aware app/api facade]
-    API --> Usage[8. Documented executable usage harness]
-    Usage --> Tests[9. Feature, composition, API, and removal tests]
+    Commit --> Interface[7. D-IFACE gateway when publicly required]
+    Interface --> Usage[8. Documented executable usage harness]
+    Usage --> Tests[9. Feature, composition, Interfaces, and removal tests]
     Tests --> CI[10. Complete CI gate]
 ```
 
@@ -30,7 +30,7 @@ The current Python service-feature architecture consists of:
 - dependency resolution by versioned capability keys rather than service imports;
 - reversible effects owned by a `FeatureScope` and accessed through `FeatureContext`;
 - staged mounting and atomic capability-bundle publication;
-- capability-aware public facades under `app/api/`;
+- capability-aware public gateways implemented as removable D-IFACE features when required;
 - comprehensive core-module usage documentation and one executable primary-module demonstration per service feature;
 - executable conformance, documentation-drift, lifecycle, replacement, and physical-removal checks.
 
@@ -42,9 +42,9 @@ These boundaries are enforced by `.importlinter`, `scripts/architecture_check.py
 
 | Rule | Implemented constraint |
 | --- | --- |
-| Kernel independence | `app.kernel` does not import contracts, composition, services, or API packages. |
-| Contract purity | `app.contracts` does not import composition, services, or API packages. Contracts may use kernel primitives such as `CapabilityKey`. |
-| API purity | `app.api` imports contracts and resolves registry capabilities; it never imports service implementations. |
+| Kernel independence | `app.kernel` does not import contracts, composition, or services. |
+| Contract purity | `app.contracts` does not import composition or services. Contracts may use kernel primitives such as `CapabilityKey`. |
+| Interfaces purity | D-IFACE features depend on public contracts and declared capabilities; they never import another feature implementation or duplicate business policy. |
 | Feature independence | A service feature package never imports another feature implementation, including a sibling in the same domain. |
 | Pure package initializers | Every `__init__.py` is empty or contains only a module docstring. |
 | Managed tasks | Direct `asyncio.create_task()` is prohibited outside `app/kernel`; features use `context.spawn()`. |
@@ -64,7 +64,7 @@ consumer feature
     X never imports app/services/<owner>/<provider>/
 ```
 
-When adding a registered in-repository feature, also add its package to the `modules` list in the `.importlinter` `features-independent` contract. That list is explicit; registration in `pyproject.toml` does not update it automatically.
+When adding a registered in-repository feature, ensure `scripts/architecture_check.py` recognizes its feature-package boundary and rejects imports of other feature implementations. Import Linter continues to enforce the shared-module dependency direction.
 
 ## 3. Phase 1 — Establish ownership and public contracts
 
@@ -78,11 +78,11 @@ Registered feature IDs satisfy the generic contract-test format:
 FEAT-<DOMAIN_TOKEN>-<ACTION_WORDS>
 ```
 
-Examples from the implementation are:
+Valid target examples from the owning domain registries include:
 
-- `FEAT-BROKER-FEED_MOCK`
-- `FEAT-DATA-RETRIEVE_BARS`
-- `FEAT-SYS-PERSIST_STORAGE`
+- `FEAT-DATA-INGEST_HISTORY`
+- `FEAT-IFACE-SERVE_API_EVENTS`
+- `FEAT-UI-OPERATE_WORKSPACE`
 
 The manifest's `domain` is the lowercase semantic domain such as `broker`, `data`, or `system`; it need not repeat the abbreviated feature-ID token verbatim. IDs are permanent diagnostic and configuration identities. Renaming one requires an explicit configuration and compatibility migration.
 
@@ -164,7 +164,7 @@ Do not import, re-export, discover, register, configure logging, or perform work
 Export one immutable `SPEC`:
 
 ```python
-from app.contracts.broker.market_data import BROKER_MARKET_DATA
+from app.contracts.example.source import EXAMPLE_SOURCE
 from app.contracts.data.custom_service import CUSTOM_SERVICE
 from app.kernel.feature import FeatureSpec
 
@@ -173,7 +173,7 @@ SPEC = FeatureSpec(
     feature_id="FEAT-DATA-CUSTOM_SERVICE",
     domain="data",
     provides=frozenset({CUSTOM_SERVICE}),
-    requires=frozenset({BROKER_MARKET_DATA}),
+    requires=frozenset({EXAMPLE_SOURCE}),
     optional=frozenset(),
     conflicts=frozenset(),
     description="Provide normalized custom data results",
@@ -265,21 +265,21 @@ Every core capability module starts with an accurate header docstring containing
 The examples use public contracts, capability-aware application paths, or public symbols owned by the same feature. They use realistic, bounded, deterministic, and secret-safe inputs. They never instruct consumers to import another feature's implementation.
 
 ```python
-"""Historical bar normalization.
+"""Custom service normalization.
 
 Purpose:
-    Validate and normalize provider bars into the canonical data contract.
+    Validate and normalize bounded inputs into the public contract.
 
 Key capabilities:
-    * Reject malformed or non-monotonic input deterministically.
-    * Preserve canonical timestamp and price semantics.
+    * Reject malformed input deterministically.
+    * Preserve the documented canonical representation.
 
 Python API usage:
-    request = NormalizeBarsRequest(...)
-    result = normalize_bars(request)
+    request = NormalizeRequest(...)
+    result = normalize_request(request)
 
 CLI usage:
-    uv run python -m app.services.data.historical_bars.normalize
+    uv run python -m app.services.example.custom_service.normalize
 """
 ```
 
@@ -320,7 +320,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from app.contracts.broker.market_data import BROKER_MARKET_DATA
+from app.contracts.example.source import EXAMPLE_SOURCE
 from app.contracts.data.custom_service import CUSTOM_SERVICE
 from app.services.data.custom_service.config import CustomConfig
 from app.services.data.custom_service.manifest import SPEC
@@ -337,7 +337,7 @@ class CustomFeature:
     async def mount(self, context: FeatureContext, config: object) -> None:
         raw_config = config if isinstance(config, dict) else {}
         parsed = CustomConfig.from_dict(raw_config)
-        dependency = context.require(BROKER_MARKET_DATA)
+        dependency = context.require(EXAMPLE_SOURCE)
         service = CustomServiceImpl(dependency, parsed.batch_size)
         context.provide(CUSTOM_SERVICE, service)
 
@@ -424,33 +424,20 @@ batch_size = 100
 timeout_seconds = 5.0
 
 [providers]
-"broker.market-data@1" = "FEAT-BROKER-FEED_MOCK"
+"example.source@1" = "FEAT-EXAMPLE-PROVIDE_SOURCE"
 ```
 
 Supported profiles are `offline`, `research`, `backtest`, and `live`. Unknown profiles and unknown top-level sections fail validation. Feature configuration may be inline or under `.config`, but the two forms cannot be mixed. The nested `.config` form is preferred for clarity.
 
 The `providers` table is required when multiple enabled features provide the same capability. With one candidate the provider is selected automatically; with multiple candidates and no selection, resolution fails as ambiguous. A feature providing an atomic bundle cannot be selected for only some overlapping capabilities while another provider is selected for the rest.
 
-### 6.3 Expose a capability-aware public facade
+### 6.3 Expose a capability-aware Interfaces gateway when required
 
-Add or update `app/api/<domain>.py` when the capability is part of the stable application API. The facade imports contracts, never service implementations:
+When a capability requires HTTP, SSE, CLI, MCP, automation, or another stable external surface, add or update the owning registered feature under `app/services/interfaces/`. The D-IFACE feature imports public contracts, declares the required capability keys in its own `FeatureSpec`, and resolves them through `FeatureContext`; it never imports the provider implementation.
 
-```python
-class DataAPI:
-    def __init__(self, registry: ServiceRegistry) -> None:
-        self._registry = registry
+Absence remains observable as the owning Interfaces contract's stable `CAPABILITY_UNAVAILABLE` result or withdrawal behavior. It is not hidden by a null service, a second business implementation, or a direct implementation import. Update the owning D-IFACE feature README, usage harness, transport routing, contract-parity tests, and removal tests together.
 
-    @property
-    def is_custom_service_available(self) -> bool:
-        return self._registry.is_available(CUSTOM_SERVICE)
-
-    def get_custom_service(self) -> CustomService:
-        return self._registry.require(CUSTOM_SERVICE)
-```
-
-Absence is observable through availability checks and `CapabilityUnavailableError`; it is not hidden by a null service or a direct implementation import. Update `HaruQuantAPI`, HTTP routing, and their tests only when the capability requires those surfaces.
-
-`SystemAPI` already exposes active capability owner/generation metadata plus package, capability, runtime, replacement, consumer, and cleanup diagnostics. New feature behavior must remain visible through these existing diagnostic models.
+Composition `RuntimeStatus` remains the source for active capability owner/generation metadata plus package, capability, runtime, replacement, and cleanup diagnostics. A D-IFACE diagnostic projection may translate that model but must not invent a second runtime state.
 
 ## 7. Implemented composition and lifecycle semantics
 
@@ -590,7 +577,7 @@ Add or extend tests for applicable behavior:
 | Provider selection | Ambiguity fails; explicit selection mounts only the selected provider. |
 | Reconfiguration | Configuration/provider changes remount the exact affected closure. |
 | Replacement | Success, pre-commit rollback, health failure, dependent remount, quiesce/drain, and degraded cleanup are covered. |
-| API | Availability and absence behavior use the public facade and `CapabilityUnavailableError`. |
+| D-IFACE gateway | Availability and absence behavior resolve the declared capability dynamically and expose the registered interface feature's stable unavailable response. Python callers receive `CapabilityUnavailableError` from failed capability resolution. |
 | Readiness | Relevant profiles report ready/degraded independently from process liveness. |
 | External packaging | Separately installed entry-point discovery and package-vs-capability diagnostics remain distinct. |
 
@@ -620,26 +607,36 @@ Use `--all` to verify every registered feature. `--report <path>.json` writes a 
 
 For a UI feature, document the public interactive usage workflow in the feature README and make it reachable through the running UI. Separately verify that behavior with executable tests under `tests/ui/`: component behavior and boundary states; keyboard, focus, semantics, contrast, and nonvisual alternatives where applicable; loading, empty, stale, unavailable, and error states; confirmation and recovery for consequential actions; request/response and generated-contract parity; page-level integration or browser workflows when component tests cannot prove the interaction; and removal with unrelated navigation and features still usable. Tests are verification evidence, not the usage documentation itself. Screenshots and manual observation remain supplementary evidence only.
 
-## 10. Phase 7 — Run focused checks and the complete gate
+## 10. Phase 7 — Run change-scoped checks and the commit/CI gate
 
 ### 10.1 Fast local iteration
 
+Build the test impact set from all current uncommitted paths: unstaged changes, staged changes, and untracked files. A changed production file selects its existing owning tests even when those test files are untouched. Public-contract, Kernel, Composition, D-IFACE gateway, dependency, or integration changes also select the relevant producer, consumer, architecture, lifecycle, and integration tests. Unrelated tests are excluded.
+
 ```powershell
+# Inspect the complete uncommitted change set
+git diff --name-only
+git diff --cached --name-only
+git status --short
+
 # One feature
 uv run pytest --no-cov tests/services/<domain>/<feature_slug>/
 
-# Tests affected by changed executed lines
+# Explicit affected files or suites
+uv run pytest --no-cov <affected_test_path> [<affected_test_path> ...]
+
+# Tests affected by changed executed lines, only with an existing valid cache
 uv run pytest --no-cov --testmon
 
-# Previous failures only, or failures first
-uv run pytest --no-cov --lf
-uv run pytest --no-cov --ff
+# Previous failures only, or failures first, within a bounded selection
+uv run pytest --no-cov --lf <affected_test_path>
+uv run pytest --no-cov --ff <affected_test_path>
 
-# Parallel test execution
-uv run pytest --no-cov -n auto
+# Parallel execution of the bounded selection
+uv run pytest --no-cov -n auto <affected_test_path> [<affected_test_path> ...]
 ```
 
-`pytest-testmon` and `pytest-xdist` are project development dependencies. Timing depends on machine, cache state, and selected tests; no fixed duration is an architectural guarantee.
+Never run bare `pytest`, an unfiltered `uv run pytest`, `scripts/ci_check.py`, or coverage during implementation. `pytest-testmon` is an optional selection aid, not permission for a first-run/full-suite fallback. `pytest-testmon` and `pytest-xdist` are project development dependencies; timing depends on machine, cache state, and selected tests.
 
 ### 10.2 Individual verification commands
 
@@ -650,7 +647,7 @@ uv run mypy
 uv run lint-imports
 uv run python scripts/architecture_check.py
 uv run python scripts/validate_feature_docs.py
-uv run pytest
+uv run pytest --no-cov <affected_test_path> [<affected_test_path> ...]
 ```
 
 Use `uv run ruff format .` and `uv run ruff check --fix .` only when intentionally applying formatting or safe lint repairs. They are mutating repair commands, not proof that the tree was already clean.
@@ -661,7 +658,7 @@ Use `uv run ruff format .` and `uv run ruff check --fix .` only when intentional
 uv run python scripts/ci_check.py
 ```
 
-The current gate runs Ruff format checking, Ruff linting, strict mypy, Import Linter, AST architecture checks, feature-documentation validation, and pytest with branch coverage and an 80 percent project floor. Coverage is a floor, not a substitute for lifecycle, failure, dependency, replacement, durability, or removal assertions.
+Do not invoke this command during feature implementation or iterative verification. The pre-commit hook runs the complete Pytest coverage gate for applicable code/test/configuration commits, and automated CI/release verification may invoke the repository gate. The gate runs Ruff format checking, Ruff linting, strict mypy, Import Linter, AST architecture checks, feature-documentation validation, and pytest with branch coverage and an 80 percent project floor. Coverage is final integration evidence, not a substitute for lifecycle, failure, dependency, replacement, durability, or removal assertions.
 
 ## 11. Definition of Done
 
@@ -702,7 +699,7 @@ For D-UI, replace the six Python package items above with `README.md`, `manifest
 - [ ] Every optional dependency has tested absent, arrival, removal, and recovery behavior.
 - [ ] Provider ambiguity and explicit selection behavior are tested when multiple providers can exist.
 - [ ] Configuration changes and transactional replacement remount the correct consumer closure.
-- [ ] Public API surfaces resolve contracts dynamically and handle absence with `CapabilityUnavailableError`.
+- [ ] Registered D-IFACE gateways resolve declared capabilities dynamically and expose their documented unavailable behavior; Python capability resolution fails with `CapabilityUnavailableError`.
 - [ ] Profile readiness reflects the new capability only when the profile truly requires it.
 
 ### Documentation and verification
@@ -712,7 +709,7 @@ For D-UI, replace the six Python package items above with `README.md`, `manifest
 - [ ] Exactly one primary domain-logic module owns a bounded `if __name__ == "__main__":` usage and verification harness, and that harness passes.
 - [ ] Feature-local unit and lifecycle tests cover success, boundaries, and stable failures.
 - [ ] Every planned business FR maps to a named usage-harness scenario; D-UI maps FRs to its documented interactive usage workflow instead.
-- [ ] Architecture, composition, API, durability, and external-package tests are added where applicable.
+- [ ] Architecture, composition, interface, durability, and external-package tests are added where applicable.
 - [ ] Targeted physical-removal verification passes.
 - [ ] The complete repository gate passes with coverage at or above the configured floor.
 
@@ -729,8 +726,8 @@ For every new feature or feature change:
 7. Execute the usage harness and verify every mapped FR scenario.
 8. Implement `mount()` using only declared dependencies and scoped operations.
 9. Register the entry point and Import Linter feature package.
-10. Add or update capability-aware API surfaces only when publicly required.
-11. Add feature-local, generic, composition, lifecycle, failure, replacement, readiness, and API tests as applicable.
+10. Add or update capability-aware D-IFACE surfaces only when publicly required.
+11. Add feature-local, generic, composition, lifecycle, failure, replacement, readiness, and Interfaces tests as applicable.
 12. Run focused tests while iterating.
 13. Run targeted physical-removal verification.
 14. Run the complete repository gate.

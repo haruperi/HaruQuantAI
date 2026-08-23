@@ -73,9 +73,9 @@ Persisted state partitions are owned exclusively by features in this domain. Ext
 | Code Level | Represents | Example |
 |---|---|---|
 | **Package** | Domain Package | `app/services/data/` |
-| **Module Folder** | Composable Feature Package | `app/services/data/historical_bars/` (`FEAT-DATA-RETRIEVE_BARS`) |
-| **File** | Lifecycle / Manifest / Use Case | `manifest.py`, `feature.py`, `config.py`, `retrieve.py` |
-| **Class / Function / Method** | Functional Requirement Behavior | `FR-DATA-RETRIEVE_BARS` (`HistoricalBarsService.retrieve()`) |
+| **Module Folder** | Composable Feature Package | `app/services/data/ingest_history/` (`FEAT-DATA-INGEST_HISTORY`) |
+| **File** | Lifecycle / Manifest / Use Case | `manifest.py`, `feature.py`, `config.py`, `ingest_history.py` |
+| **Class / Function / Method** | Functional Requirement Behavior | `FR-DATA-IMPORT_LOCAL_FILES` (`ingest_history()`) |
 
 ```text
 app/services/[domain]/
@@ -325,7 +325,7 @@ Run it with `uv run python -m app.services.[domain].[feature].[use_case_1]`. Map
 | Missing | `ARCH-002` | Managed Tasks | Coroutines are spawned exclusively via `FeatureContext.spawn()`. | `scripts/architecture_check.py` |
 | Missing | `ARCH-003` | Logging Hygiene | No root `logging.basicConfig()` calls in service packages. | `scripts/architecture_check.py` |
 | Missing | `ARCH-004` | Contract Purity | Contracts live exclusively in `app/contracts/` and have no service dependencies. | Import Linter & AST |
-| Missing | `ARCH-005` | API Purity | Public API facade does not directly import service implementations. | Import Linter & AST |
+| Missing | `ARCH-005` | Interfaces Purity | D-IFACE features use public contracts and declared capabilities without importing service implementations. | Import Linter & AST |
 | Missing | `ARCH-006` | Feature Independence | Features never import other features directly. | Import Linter & AST |
 | Missing | `NFR-[DOM]-001` | Maintainability | Every file has exactly one focused responsibility. | Code Review & AST |
 | Missing | `NFR-[DOM]-002` | Type Safety | Python 3.14 strict typing with zero `type: ignore` bypasses. | `mypy` |
@@ -354,9 +354,9 @@ tests/
 │   ├── test_manifest.py                   # FeatureSpec verification
 │   ├── test_feature.py                    # Mount / scope-teardown lifecycle
 │   └── test_[use_case].py                 # Core business algorithms & failure paths
-├── services/test_feature_contracts.py     # Generic feature contract test suite (Category B)
-├── services/test_lifecycle_leak.py        # Lifecycle leak & 100x churn suite (Category C)
-└── api/test_[domain]_api.py               # Public API facade & capability tests
+├── architecture/test_registered_feature_contracts.py # Generic feature contract suite
+├── composition/test_lifecycle_leak.py     # Lifecycle leak & 100x churn suite
+└── services/interfaces/<feature>/         # D-IFACE gateway and parity tests
 ```
 
 ### Commands
@@ -399,7 +399,7 @@ A feature within this domain is not complete until all 20 criteria are verified:
 - [ ] 13. **Persistent State Documented:** State namespace partition, schema version, and retention policy documented.
 - [ ] 14. **Irreversible Action Safety:** Idempotency, reconciliation, and audit persistence verified.
 - [ ] 15. **Starts Feature-Absent:** Application starts and operates cleanly with the feature deleted from disk.
-- [ ] 16. **API / UI Degradation Handled:** Public API facade raises `CapabilityUnavailableError` when feature is absent.
+- [ ] 16. **Interfaces / UI Degradation Handled:** Public gateways expose stable unavailability or withdraw affected surfaces when the feature is absent.
 - [ ] 17. **README Complete:** README documents purpose, capability, dependencies, effects, state, and removal behavior.
 - [ ] 18. **Module Usage Documented:** Every core capability module documents purpose, key capabilities, Python API usage, and its executable command.
 - [ ] 19. **Usage Harness Green:** Exactly one primary domain-logic module owns a passing, bounded `if __name__ == "__main__":` harness covering every mapped FR scenario.

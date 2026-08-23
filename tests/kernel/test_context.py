@@ -1,76 +1,38 @@
 """Tests for DefaultFeatureContext capability operations and boundary enforcement."""
 
 import asyncio
-from collections.abc import Sequence
 from contextlib import asynccontextmanager, contextmanager
-from typing import Any, override
+from typing import Any
 
 import pytest
 
-from app.contracts.broker.market_data import (
-    BROKER_MARKET_DATA,
-    BrokerBarsRequest,
-    BrokerMarketData,
-    BrokerRawBar,
-)
-from app.contracts.data.bar_cache import BAR_CACHE, BarCache
-from app.contracts.data.historical_bars import (
-    HISTORICAL_BARS,
-    Bar,
-    HistoricalBarsRequest,
-)
-from app.contracts.data.realtime_ticks import REALTIME_TICKS
 from app.kernel.capability import CapabilityKey, CapabilityUnavailableError
 from app.kernel.context import DefaultFeatureContext
 from app.kernel.feature import FeatureSpec
 from app.kernel.scope import FeatureScope
-
-
-class StubBrokerMarketData(BrokerMarketData):
-    """Protocol-compatible broker test double."""
-
-    @override
-    async def retrieve_bars(
-        self,
-        _request: BrokerBarsRequest,
-    ) -> Sequence[BrokerRawBar]:
-        return ()
-
-
-class StubBarCache(BarCache):
-    """Protocol-compatible bar-cache test double."""
-
-    @override
-    async def get_bars(
-        self,
-        _request: HistoricalBarsRequest,
-    ) -> Sequence[Bar] | None:
-        return None
-
-    @override
-    async def put_bars(
-        self,
-        _request: HistoricalBarsRequest,
-        _bars: Sequence[Bar],
-    ) -> None:
-        return None
+from tests._support.composability import (
+    CONSUMER_CAPABILITY,
+    OPTIONAL_CAPABILITY,
+    PROVIDER_CAPABILITY,
+    UNDECLARED_CAPABILITY,
+)
 
 
 def test_context_require_and_optional_declared() -> None:
     """Test resolving declared required and optional capabilities."""
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
-        domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
-        requires=frozenset({BROKER_MARKET_DATA}),
-        optional=frozenset({BAR_CACHE}),
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
+        domain="test",
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        requires=frozenset({PROVIDER_CAPABILITY}),
+        optional=frozenset({OPTIONAL_CAPABILITY}),
     )
-    scope = FeatureScope("FEAT-DATA-RETRIEVE_BARS")
-    broker_service = StubBrokerMarketData()
-    bar_cache = StubBarCache()
+    scope = FeatureScope("FEAT-TEST-CONSUME_SERVICE")
+    provider_service = object()
+    optional_service = object()
     registry: dict[str, object] = {
-        BROKER_MARKET_DATA.identifier: broker_service,
-        BAR_CACHE.identifier: bar_cache,
+        PROVIDER_CAPABILITY.identifier: provider_service,
+        OPTIONAL_CAPABILITY.identifier: optional_service,
     }
 
     def resolver(key: CapabilityKey[Any]) -> Any | None:
@@ -78,67 +40,67 @@ def test_context_require_and_optional_declared() -> None:
 
     ctx = DefaultFeatureContext(spec=spec, scope=scope, resolver=resolver)
 
-    assert ctx.require(BROKER_MARKET_DATA) is broker_service
-    assert ctx.optional(BAR_CACHE) is bar_cache
+    assert ctx.require(PROVIDER_CAPABILITY) is provider_service
+    assert ctx.optional(OPTIONAL_CAPABILITY) is optional_service
 
 
 def test_context_require_undeclared_raises() -> None:
     """Test requiring undeclared capability raises ValueError."""
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
-        domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
-        requires=frozenset({BROKER_MARKET_DATA}),
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
+        domain="test",
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        requires=frozenset({PROVIDER_CAPABILITY}),
     )
-    scope = FeatureScope("FEAT-DATA-RETRIEVE_BARS")
+    scope = FeatureScope("FEAT-TEST-CONSUME_SERVICE")
     ctx = DefaultFeatureContext(spec=spec, scope=scope)
 
     with pytest.raises(ValueError, match="attempted to require undeclared capability"):
-        ctx.require(REALTIME_TICKS)
+        ctx.require(UNDECLARED_CAPABILITY)
 
 
 def test_context_require_missing_raises_unavailable() -> None:
     """Test requiring declared capability with no provider raises CapabilityUnavailableError."""
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
-        domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
-        requires=frozenset({BROKER_MARKET_DATA}),
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
+        domain="test",
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        requires=frozenset({PROVIDER_CAPABILITY}),
     )
-    scope = FeatureScope("FEAT-DATA-RETRIEVE_BARS")
+    scope = FeatureScope("FEAT-TEST-CONSUME_SERVICE")
     ctx = DefaultFeatureContext(spec=spec, scope=scope, resolver=lambda _key: None)
 
     with pytest.raises(
         CapabilityUnavailableError,
-        match=r"Capability 'broker\.market-data@1' is unavailable",
+        match=r"Capability 'test\.provider@1' is unavailable",
     ):
-        ctx.require(BROKER_MARKET_DATA)
+        ctx.require(PROVIDER_CAPABILITY)
 
 
 def test_context_optional_undeclared_raises() -> None:
     """Test accessing undeclared optional capability raises ValueError."""
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
-        domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
+        domain="test",
+        provides=frozenset({CONSUMER_CAPABILITY}),
     )
-    scope = FeatureScope("FEAT-DATA-RETRIEVE_BARS")
+    scope = FeatureScope("FEAT-TEST-CONSUME_SERVICE")
     ctx = DefaultFeatureContext(spec=spec, scope=scope)
 
     with pytest.raises(
         ValueError, match="attempted to access undeclared optional capability"
     ):
-        ctx.optional(REALTIME_TICKS)
+        ctx.optional(UNDECLARED_CAPABILITY)
 
 
 def test_context_provide_declared_success() -> None:
     """Test providing a declared capability invokes the provider registrar."""
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
-        domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
+        domain="test",
+        provides=frozenset({CONSUMER_CAPABILITY}),
     )
-    scope = FeatureScope("FEAT-DATA-RETRIEVE_BARS")
+    scope = FeatureScope("FEAT-TEST-CONSUME_SERVICE")
     provided: dict[str, object] = {}
 
     def registrar(key: CapabilityKey[Any], impl: object, sc: FeatureScope) -> None:
@@ -146,23 +108,23 @@ def test_context_provide_declared_success() -> None:
         sc.callback(lambda: provided.pop(key.identifier, None))
 
     ctx = DefaultFeatureContext(spec=spec, scope=scope, provider_registrar=registrar)
-    ctx.provide(HISTORICAL_BARS, "dummy_historical_bars_impl")
+    ctx.provide(CONSUMER_CAPABILITY, "consumer_service")
 
-    assert provided[HISTORICAL_BARS.identifier] == "dummy_historical_bars_impl"
+    assert provided[CONSUMER_CAPABILITY.identifier] == "consumer_service"
 
 
 def test_context_provide_undeclared_raises() -> None:
     """Test providing an undeclared capability raises ValueError."""
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
-        domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
+        domain="test",
+        provides=frozenset({CONSUMER_CAPABILITY}),
     )
-    scope = FeatureScope("FEAT-DATA-RETRIEVE_BARS")
+    scope = FeatureScope("FEAT-TEST-CONSUME_SERVICE")
     ctx = DefaultFeatureContext(spec=spec, scope=scope)
 
     with pytest.raises(ValueError, match="attempted to provide undeclared capability"):
-        ctx.provide(REALTIME_TICKS, "invalid_impl")
+        ctx.provide(UNDECLARED_CAPABILITY, "invalid_impl")
 
 
 @pytest.mark.asyncio

@@ -13,9 +13,6 @@ dependencies = []
 haruquantai = "app.main:run"
 
 [project.entry-points."haruquantai.features"]
-broker-mock-feed = "app.services.broker.mock_feed.feature:create_feature"
-data-historical-bars = "app.services.data.historical_bars.feature:create_feature"
-system-persist-storage = "app.services.system.storage.feature:create_feature"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]

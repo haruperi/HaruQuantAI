@@ -2,9 +2,11 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from app.contracts.broker.market_data import BROKER_MARKET_DATA
-from app.contracts.data.historical_bars import HISTORICAL_BARS
 from app.kernel.feature import Feature, FeatureSpec, FeatureState
+from tests._support.composability import (
+    CONSUMER_CAPABILITY,
+    PROVIDER_CAPABILITY,
+)
 
 if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
@@ -34,16 +36,16 @@ def test_feature_states_completeness() -> None:
 def test_feature_spec_creation_and_immutability() -> None:
     """Test FeatureSpec instantiation, default values, and immutability."""
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
         domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
-        requires=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        requires=frozenset({PROVIDER_CAPABILITY}),
         description="Historical bars data provider",
     )
-    assert spec.feature_id == "FEAT-DATA-RETRIEVE_BARS"
+    assert spec.feature_id == "FEAT-TEST-CONSUME_SERVICE"
     assert spec.domain == "data"
-    assert HISTORICAL_BARS in spec.provides
-    assert BROKER_MARKET_DATA in spec.requires
+    assert CONSUMER_CAPABILITY in spec.provides
+    assert PROVIDER_CAPABILITY in spec.requires
     assert spec.optional == frozenset()
     assert spec.conflicts == frozenset()
     assert spec.description == "Historical bars data provider"
@@ -56,10 +58,10 @@ def test_feature_spec_creation_and_immutability() -> None:
 def test_feature_spec_validation_success() -> None:
     """Test valid feature spec validation."""
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
         domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
-        requires=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        requires=frozenset({PROVIDER_CAPABILITY}),
     )
     spec.validate()  # Should not raise
 
@@ -69,7 +71,7 @@ def test_feature_spec_validation_empty_id() -> None:
     spec = FeatureSpec(
         feature_id="   ",
         domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
+        provides=frozenset({CONSUMER_CAPABILITY}),
     )
     with pytest.raises(ValueError, match="Feature ID must not be empty"):
         spec.validate()
@@ -78,9 +80,9 @@ def test_feature_spec_validation_empty_id() -> None:
 def test_feature_spec_validation_empty_domain() -> None:
     """Test that empty domain raises ValueError."""
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
         domain="",
-        provides=frozenset({HISTORICAL_BARS}),
+        provides=frozenset({CONSUMER_CAPABILITY}),
     )
     with pytest.raises(ValueError, match="Domain must not be empty"):
         spec.validate()
@@ -89,10 +91,10 @@ def test_feature_spec_validation_empty_domain() -> None:
 def test_feature_spec_validation_overlap() -> None:
     """Test that providing and requiring same capability raises ValueError."""
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
         domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
-        requires=frozenset({HISTORICAL_BARS}),
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        requires=frozenset({CONSUMER_CAPABILITY}),
     )
     with pytest.raises(ValueError, match="cannot both provide and require capability"):
         spec.validate()

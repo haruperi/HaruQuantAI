@@ -21,9 +21,9 @@
 
 ## Boundary
 
-`app/kernel/` may use the standard library and approved low-level libraries only. It must not import `app/contracts/`, `app/composition/`, `app/api/`, or `app/services/`. Import Linter, AST architecture checks, strict typing, and kernel tests enforce this direction.
+`app/kernel/` may use the standard library and approved low-level libraries only. It must not import `app/contracts/`, `app/composition/`, or `app/services/`. Import Linter, AST architecture checks, strict typing, and kernel tests enforce this direction.
 
-Discovery, TOML configuration, readiness profiles, file watching, and application orchestration belong to `app/composition/`. Cross-boundary application/domain DTOs, ports, events, and capability constants belong to `app/contracts/`. Public facades/transports belong to `app/api/`. Business implementations belong to feature packages.
+Discovery, TOML configuration, readiness profiles, file watching, runtime diagnostics, and application orchestration belong to `app/composition/`. Cross-boundary application/domain DTOs, ports, events, and capability constants belong to `app/contracts/`. Product-facing facades and transports belong to registered Interfaces features. Business implementations belong to feature packages.
 
 ## Lifecycle rule
 
@@ -57,7 +57,7 @@ The stable `FR-KERN-*` IDs below provide product traceability aligned to the imp
 | ID | Status | Code-aligned requirement and acceptance |
 |---|---|---|
 | `FR-KERN-DEFINE_REQUIREMENT_BEHAVIOR` | Implemented | Every runtime unit has one validated `FeatureSpec`; FR IDs remain documented/tested behaviors inside the owning feature. |
-| `FR-KERN-DEFINE_LIFECYCLE_CONTEXT` | Implemented | Kernel, contracts, composition, API, and services obey the enforced import boundaries and substrate code contains no business-domain policy. |
+| `FR-KERN-DEFINE_LIFECYCLE_CONTEXT` | Implemented | Kernel, contracts, composition, and services obey the enforced import boundaries and substrate code contains no business-domain policy. |
 | `FR-KERN-DECLARE_BEHAVIOR_DEPENDENCIES` | Implemented | Cross-feature needs are declared at feature granularity in `requires`/`optional`, never inferred from service imports. |
 | `FR-KERN-REGISTER_FEATURE_MODULES` | Implemented | Each installed feature is independently discoverable through `haruquantai.features`; sibling implementations are never imported. |
 | `FR-KERN-DEFINE_RESPONSIBILITY_FILES` | Implemented convention | Focused responsibility modules remain internal to one feature and do not self-register as components. |
@@ -82,7 +82,7 @@ The stable `FR-KERN-*` IDs below provide product traceability aligned to the imp
 | `FR-KERN-DRAIN_REMOVED_BEHAVIORS` | Implemented replacement hook | `drain()` is optional for explicit replacement; background tasks and other ordinary effects terminalize through scope cleanup. |
 | `FR-KERN-CLASSIFY_COMPONENT_EFFECTS` | Implemented boundary | Reversible effects are scope-owned; durable state/external emissions are documented explicitly and are not blindly reversed. |
 | `FR-KERN-NAMESPACE_COMPONENT_STATE` | Implemented declaration | Optional `StateDeclaration` records namespace/schema/retention; storage adapters enforce it and reconciliation does not auto-purge. |
-| `FR-KERN-REGISTER_EXTENSION_POINTS` | Implemented primitives | Event contributions and capability-aware API surfaces have exact owner disposal; new adapters use the same scope callback contract. |
+| `FR-KERN-REGISTER_EXTENSION_POINTS` | Implemented primitives | Event contributions and capability-aware Interfaces surfaces have exact owner disposal; new adapters use the same scope callback contract. |
 | `FR-KERN-EMIT_CAUSAL_EVENTS` | Implemented baseline | Configuration reload, reconfiguration, and runtime failure publish typed system events; domain events use the same typed bus. |
 | `FR-KERN-REJECT_DEPENDENCY_CYCLES` | Implemented | Required cycles block with diagnostics; optional-only cycles do not gate activation. |
 | `FR-KERN-PIN_CAPABILITY_SNAPSHOTS` | Product rule | Durable runs pin active capability/provider/configuration evidence exposed by runtime diagnostics. |

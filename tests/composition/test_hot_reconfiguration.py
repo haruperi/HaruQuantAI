@@ -1,7 +1,7 @@
 """Tests verifying Phase 15: hot reconfiguration and transactional feature replacement."""
 
 import asyncio
-from collections.abc import Awaitable, Sequence
+from collections.abc import Awaitable
 from pathlib import Path
 from typing import TYPE_CHECKING, override
 
@@ -10,44 +10,26 @@ import pytest
 from app.composition.config import load_config_from_toml_string
 from app.composition.discovery import FeatureDiscoverer
 from app.composition.engine import CompositionEngine
-from app.composition.watcher import ConfigFileWatcher
-from app.contracts.broker.market_data import (
-    BROKER_MARKET_DATA,
-    BrokerBarsRequest,
-    BrokerMarketData,
-    BrokerRawBar,
-)
-from app.contracts.events.system import (
+from app.composition.events import (
     ConfigurationReloadedEvent,
     FeatureReconfiguredEvent,
 )
+from app.composition.watcher import ConfigFileWatcher
 from app.kernel.feature import Feature, FeatureSpec
+from tests._support.composability import PROVIDER_CAPABILITY
 
 if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
 
 
-class ConfigurableBrokerService(BrokerMarketData):
-    """Broker test double capturing configuration state."""
+class ConfigurableService:
+    """Test service capturing configuration state."""
 
-    def __init__(self, base_price: float = 1.0) -> None:
-        self.base_price = base_price
-
-    @override
-    async def retrieve_bars(self, request: BrokerBarsRequest) -> Sequence[BrokerRawBar]:
-        return (
-            BrokerRawBar(
-                timestamp=request.start,
-                open_price=self.base_price,
-                high_price=self.base_price + 1.0,
-                low_price=self.base_price - 1.0,
-                close_price=self.base_price,
-                volume=100.0,
-            ),
-        )
+    def __init__(self, value: float = 1.0) -> None:
+        self.value = value
 
 
-class ConfigurableBrokerFeature(Feature):
+class ConfigurableFeature(Feature):
     """Feature supporting dynamic reconfiguration and health check."""
 
     def __init__(self, should_fail_mount: bool = False) -> None:
@@ -56,10 +38,10 @@ class ConfigurableBrokerFeature(Feature):
         self.active_base_price = 1.0
 
     spec: FeatureSpec = FeatureSpec(
-        feature_id="FEAT-BROKER-CONFIGURABLE",
-        domain="broker",
-        description="Configurable broker feature",
-        provides=frozenset({BROKER_MARKET_DATA}),
+        feature_id="FEAT-TEST-CONFIGURABLE",
+        domain="test",
+        description="Configurable test feature",
+        provides=frozenset({PROVIDER_CAPABILITY}),
         requires=frozenset(),
     )
 
@@ -71,14 +53,14 @@ class ConfigurableBrokerFeature(Feature):
         self.mount_count += 1
         cfg_dict = config if isinstance(config, dict) else {}
         self.active_base_price = float(cfg_dict.get("base_price", 1.0))
-        service = ConfigurableBrokerService(base_price=self.active_base_price)
-        context.provide(BROKER_MARKET_DATA, service)
+        service = ConfigurableService(value=self.active_base_price)
+        context.provide(PROVIDER_CAPABILITY, service)
 
 
 @pytest.mark.asyncio
 async def test_live_configuration_hot_reload() -> None:
     """Test hot reloading config updates and remounting only modified features."""
-    feat = ConfigurableBrokerFeature()
+    feat = ConfigurableFeature()
     discoverer = FeatureDiscoverer()
     discoverer.register_feature(feat)
 
@@ -94,7 +76,7 @@ async def test_live_configuration_hot_reload() -> None:
     initial_toml = """
     [application]
     profile = "research"
-    [features.FEAT-BROKER-CONFIGURABLE]
+    [features.FEAT-TEST-CONFIGURABLE]
     enabled = true
     base_price = 1.10
     """
@@ -106,18 +88,18 @@ async def test_live_configuration_hot_reload() -> None:
     updated_toml = """
     [application]
     profile = "research"
-    [features.FEAT-BROKER-CONFIGURABLE]
+    [features.FEAT-TEST-CONFIGURABLE]
     enabled = true
     base_price = 1.25
     """
     updated_cfg = load_config_from_toml_string(updated_toml)
     report = await engine.hot_reload_config(updated_cfg)
 
-    assert "FEAT-BROKER-CONFIGURABLE" in report.started
+    assert "FEAT-TEST-CONFIGURABLE" in report.started
     assert feat.mount_count == 2
     assert feat.active_base_price == 1.25
     assert len(events_received) == 1
-    assert "FEAT-BROKER-CONFIGURABLE" in events_received[0].modified_features
+    assert "FEAT-TEST-CONFIGURABLE" in events_received[0].modified_features
 
     await engine.shutdown()
 
@@ -125,7 +107,7 @@ async def test_live_configuration_hot_reload() -> None:
 @pytest.mark.asyncio
 async def test_transactional_feature_replacement_success() -> None:
     """Test zero-downtime transactional feature replacement via shadow scopes."""
-    feat = ConfigurableBrokerFeature()
+    feat = ConfigurableFeature()
     discoverer = FeatureDiscoverer()
     discoverer.register_feature(feat)
 
@@ -140,18 +122,18 @@ async def test_transactional_feature_replacement_success() -> None:
     initial_toml = """
     [application]
     profile = "research"
-    [features.FEAT-BROKER-CONFIGURABLE]
+    [features.FEAT-TEST-CONFIGURABLE]
     enabled = true
     base_price = 2.0
     """
     await engine.load_and_reconcile_toml(initial_toml)
-    initial_binding = engine.registry.get_binding(BROKER_MARKET_DATA.identifier)
+    initial_binding = engine.registry.get_binding(PROVIDER_CAPABILITY.identifier)
     assert initial_binding is not None
     assert initial_binding.token.generation == 1
 
     # Perform transactional swap
     success, err = await engine.replace_feature_transactional(
-        "FEAT-BROKER-CONFIGURABLE",
+        "FEAT-TEST-CONFIGURABLE",
         new_config={"base_price": 3.5},
     )
     assert success is True
@@ -159,7 +141,7 @@ async def test_transactional_feature_replacement_success() -> None:
     assert feat.active_base_price == 3.5
 
     # Generation counter must increment
-    swapped_binding = engine.registry.get_binding(BROKER_MARKET_DATA.identifier)
+    swapped_binding = engine.registry.get_binding(PROVIDER_CAPABILITY.identifier)
     assert swapped_binding is not None
     assert swapped_binding.token.generation == 2
     assert len(reconfigured_events) == 1
@@ -171,7 +153,7 @@ async def test_transactional_feature_replacement_success() -> None:
 @pytest.mark.asyncio
 async def test_transactional_feature_replacement_failure_rollback() -> None:
     """Test that failure during shadow mount rolls back without affecting active provider."""
-    good_feat = ConfigurableBrokerFeature(should_fail_mount=False)
+    good_feat = ConfigurableFeature(should_fail_mount=False)
     discoverer = FeatureDiscoverer()
     discoverer.register_feature(good_feat)
 
@@ -179,20 +161,20 @@ async def test_transactional_feature_replacement_failure_rollback() -> None:
     initial_toml = """
     [application]
     profile = "research"
-    [features.FEAT-BROKER-CONFIGURABLE]
+    [features.FEAT-TEST-CONFIGURABLE]
     enabled = true
     base_price = 10.0
     """
     await engine.load_and_reconcile_toml(initial_toml)
-    active_service = engine.registry.require(BROKER_MARKET_DATA)
-    assert isinstance(active_service, ConfigurableBrokerService)
-    assert active_service.base_price == 10.0
+    active_service = engine.registry.require(PROVIDER_CAPABILITY)
+    assert isinstance(active_service, ConfigurableService)
+    assert active_service.value == 10.0
 
     # Configure feature to fail on next mount
     good_feat.should_fail_mount = True
 
     success, err = await engine.replace_feature_transactional(
-        "FEAT-BROKER-CONFIGURABLE",
+        "FEAT-TEST-CONFIGURABLE",
         new_config={"base_price": 99.0},
     )
     assert success is False
@@ -200,9 +182,9 @@ async def test_transactional_feature_replacement_failure_rollback() -> None:
     assert "Simulated shadow mount crash" in err
 
     # Active provider MUST still be active, untouched, and functional!
-    current_service = engine.registry.require(BROKER_MARKET_DATA)
+    current_service = engine.registry.require(PROVIDER_CAPABILITY)
     assert current_service is active_service
-    assert current_service.base_price == 10.0
+    assert current_service.value == 10.0
 
     await engine.shutdown()
 
@@ -211,7 +193,7 @@ async def test_transactional_feature_replacement_failure_rollback() -> None:
 async def test_config_file_watcher_polling(tmp_path: Path) -> None:
     """Test ConfigFileWatcher detects file changes and triggers reconciliation."""
     config_file = tmp_path / "app.toml"
-    feat = ConfigurableBrokerFeature()
+    feat = ConfigurableFeature()
     discoverer = FeatureDiscoverer()
     discoverer.register_feature(feat)
 
@@ -222,7 +204,7 @@ async def test_config_file_watcher_polling(tmp_path: Path) -> None:
         """
         [application]
         profile = "research"
-        [features.FEAT-BROKER-CONFIGURABLE]
+        [features.FEAT-TEST-CONFIGURABLE]
         enabled = true
         base_price = 5.0
         """,
@@ -247,7 +229,7 @@ async def test_config_file_watcher_polling(tmp_path: Path) -> None:
             """
             [application]
             profile = "research"
-            [features.FEAT-BROKER-CONFIGURABLE]
+            [features.FEAT-TEST-CONFIGURABLE]
             enabled = true
             base_price = 8.5
             """,
@@ -276,11 +258,11 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
         "callback_cleaned": False,
     }
 
-    class RichLifecycleBrokerFeature(Feature):
+    class RichLifecycleFeature(Feature):
         spec: FeatureSpec = FeatureSpec(
-            feature_id="FEAT-BROKER-RICH_LIFECYCLE",
-            domain="broker",
-            provides=frozenset({BROKER_MARKET_DATA}),
+            feature_id="FEAT-TEST-RICH_LIFECYCLE",
+            domain="test",
+            provides=frozenset({PROVIDER_CAPABILITY}),
         )
 
         def __init__(self) -> None:
@@ -289,8 +271,8 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
         @override
         async def mount(self, context: FeatureContext, config: object) -> None:
             self.mount_count += 1
-            service = ConfigurableBrokerService(base_price=99.0)
-            context.provide(BROKER_MARKET_DATA, service)
+            service = ConfigurableService(value=99.0)
+            context.provide(PROVIDER_CAPABILITY, service)
 
             if self.mount_count > 1:
                 stop_evt = asyncio.Event()
@@ -318,7 +300,7 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
 
                 context.register_callback(cleanup_cb)
 
-    feat = RichLifecycleBrokerFeature()
+    feat = RichLifecycleFeature()
     discoverer = FeatureDiscoverer()
     discoverer.register_feature(feat)
     engine = CompositionEngine(discoverer=discoverer)
@@ -326,7 +308,7 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
     initial_toml = """
     [application]
     profile = "research"
-    [features.FEAT-BROKER-RICH_LIFECYCLE]
+    [features.FEAT-TEST-RICH_LIFECYCLE]
     enabled = true
     """
     await engine.load_and_reconcile_toml(initial_toml)
@@ -334,7 +316,7 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
 
     # Perform transactional swap to generation 2
     success, err = await engine.replace_feature_transactional(
-        "FEAT-BROKER-RICH_LIFECYCLE",
+        "FEAT-TEST-RICH_LIFECYCLE",
         new_config={"base_price": 100.0},
     )
     assert success is True
@@ -366,11 +348,11 @@ async def test_transactional_replacement_preserves_staged_effects_after_commit()
 async def test_transactional_replacement_health_check_failure_rolls_back() -> None:
     """Test feature with health_check hook rolling back on failure."""
 
-    class HealthCheckingBrokerFeature(Feature):
+    class HealthCheckingFeature(Feature):
         spec: FeatureSpec = FeatureSpec(
-            feature_id="FEAT-BROKER-HEALTH_CHECK",
-            domain="broker",
-            provides=frozenset({BROKER_MARKET_DATA}),
+            feature_id="FEAT-TEST-HEALTH_CHECK",
+            domain="test",
+            provides=frozenset({PROVIDER_CAPABILITY}),
         )
 
         def __init__(self) -> None:
@@ -381,8 +363,8 @@ async def test_transactional_replacement_health_check_failure_rolls_back() -> No
         async def mount(self, context: FeatureContext, _config: object) -> None:
             self.mount_count += 1
             context.provide(
-                BROKER_MARKET_DATA,
-                ConfigurableBrokerService(base_price=float(self.mount_count)),
+                PROVIDER_CAPABILITY,
+                ConfigurableService(value=float(self.mount_count)),
             )
 
         def health_check(self) -> None:
@@ -390,7 +372,7 @@ async def test_transactional_replacement_health_check_failure_rolls_back() -> No
                 msg = "Upstream broker health check timeout"
                 raise RuntimeError(msg)
 
-    feat = HealthCheckingBrokerFeature()
+    feat = HealthCheckingFeature()
     discoverer = FeatureDiscoverer()
     discoverer.register_feature(feat)
     engine = CompositionEngine(discoverer=discoverer)
@@ -398,7 +380,7 @@ async def test_transactional_replacement_health_check_failure_rolls_back() -> No
     initial_toml = """
     [application]
     profile = "research"
-    [features.FEAT-BROKER-HEALTH_CHECK]
+    [features.FEAT-TEST-HEALTH_CHECK]
     enabled = true
     """
     await engine.load_and_reconcile_toml(initial_toml)
@@ -408,7 +390,7 @@ async def test_transactional_replacement_health_check_failure_rolls_back() -> No
     feat.should_fail_health = True
 
     report = await engine.replace_feature_transactional_detailed(
-        "FEAT-BROKER-HEALTH_CHECK"
+        "FEAT-TEST-HEALTH_CHECK"
     )
     assert report.committed is False
     assert report.rolled_back is True
@@ -424,11 +406,11 @@ async def test_transactional_replacement_quiesce_and_drain() -> None:
     quiesced = False
     drained = False
 
-    class QuiescingBrokerFeature(Feature):
+    class QuiescingFeature(Feature):
         spec: FeatureSpec = FeatureSpec(
-            feature_id="FEAT-BROKER-QUIESCE",
-            domain="broker",
-            provides=frozenset({BROKER_MARKET_DATA}),
+            feature_id="FEAT-TEST-QUIESCE",
+            domain="test",
+            provides=frozenset({PROVIDER_CAPABILITY}),
         )
 
         def __init__(self) -> None:
@@ -437,7 +419,7 @@ async def test_transactional_replacement_quiesce_and_drain() -> None:
         @override
         async def mount(self, context: FeatureContext, _config: object) -> None:
             self.mount_count += 1
-            context.provide(BROKER_MARKET_DATA, ConfigurableBrokerService())
+            context.provide(PROVIDER_CAPABILITY, ConfigurableService())
 
         def quiesce(self) -> Awaitable[None] | None:
             nonlocal quiesced
@@ -449,7 +431,7 @@ async def test_transactional_replacement_quiesce_and_drain() -> None:
             drained = True
             return None
 
-    feat = QuiescingBrokerFeature()
+    feat = QuiescingFeature()
     discoverer = FeatureDiscoverer()
     discoverer.register_feature(feat)
     engine = CompositionEngine(discoverer=discoverer)
@@ -457,14 +439,14 @@ async def test_transactional_replacement_quiesce_and_drain() -> None:
     initial_toml = """
     [application]
     profile = "research"
-    [features.FEAT-BROKER-QUIESCE]
+    [features.FEAT-TEST-QUIESCE]
     enabled = true
     """
     await engine.load_and_reconcile_toml(initial_toml)
     assert feat.mount_count == 1
 
     report = await engine.replace_feature_transactional_detailed(
-        "FEAT-BROKER-QUIESCE", new_config={"reloaded": True}
+        "FEAT-TEST-QUIESCE", new_config={"reloaded": True}
     )
     assert report.committed is True
     assert report.rolled_back is False
@@ -479,11 +461,11 @@ async def test_transactional_replacement_quiesce_and_drain() -> None:
 async def test_transactional_replacement_cleanup_error_degrades_status() -> None:
     """Test post-commit cleanup error in old scope marks status degraded without rolling back."""
 
-    class FailingCleanupBrokerFeature(Feature):
+    class FailingCleanupFeature(Feature):
         spec: FeatureSpec = FeatureSpec(
-            feature_id="FEAT-BROKER-CLEANUP_ERR",
-            domain="broker",
-            provides=frozenset({BROKER_MARKET_DATA}),
+            feature_id="FEAT-TEST-CLEANUP_ERR",
+            domain="test",
+            provides=frozenset({PROVIDER_CAPABILITY}),
         )
 
         def __init__(self) -> None:
@@ -492,7 +474,7 @@ async def test_transactional_replacement_cleanup_error_degrades_status() -> None
         @override
         async def mount(self, context: FeatureContext, _config: object) -> None:
             self.mount_count += 1
-            context.provide(BROKER_MARKET_DATA, ConfigurableBrokerService())
+            context.provide(PROVIDER_CAPABILITY, ConfigurableService())
 
             if self.mount_count == 1:
 
@@ -502,7 +484,7 @@ async def test_transactional_replacement_cleanup_error_degrades_status() -> None
 
                 context.register_callback(broken_cleanup)
 
-    feat = FailingCleanupBrokerFeature()
+    feat = FailingCleanupFeature()
     discoverer = FeatureDiscoverer()
     discoverer.register_feature(feat)
     engine = CompositionEngine(discoverer=discoverer)
@@ -510,13 +492,13 @@ async def test_transactional_replacement_cleanup_error_degrades_status() -> None
     initial_toml = """
     [application]
     profile = "research"
-    [features.FEAT-BROKER-CLEANUP_ERR]
+    [features.FEAT-TEST-CLEANUP_ERR]
     enabled = true
     """
     await engine.load_and_reconcile_toml(initial_toml)
 
     report = await engine.replace_feature_transactional_detailed(
-        "FEAT-BROKER-CLEANUP_ERR", new_config={"gen": 2}
+        "FEAT-TEST-CLEANUP_ERR", new_config={"gen": 2}
     )
     assert report.committed is True
     assert report.rolled_back is False

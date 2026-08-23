@@ -7,33 +7,36 @@
 
 ## 1. Project Overview
 
-**HaruQuantAI** is a high-performance quantitative trading and financial research platform designed with strict architectural isolation and dynamic runtime composability.
+**HaruQuantAI** is a quantitative trading and financial research platform designed around strict architectural isolation and dynamic runtime composability.
 
-Rather than coupling trading strategies, market data pipelines, and analytics directly to concrete broker APIs or specific infrastructure implementations, HaruQuantAI coordinates all domain operations through **versioned capability contracts**.
+Trading strategies, market-data pipelines, analytics, interfaces, and infrastructure communicate through typed, versioned capability contracts instead of importing one another's implementations.
+
+The current repository is the clean composability foundation from which registered product features will be built. It implements the Kernel and Composition runtime, but it does not yet provide completed research, simulation, broker, trading, or D-IFACE HTTP features.
 
 ### Key Architectural Pillars
 
-- **Zero Coupling Between Service Features**: Feature packages never import or call each other directly. All interactions flow through typed, versioned capability contracts (e.g. `data.historical-bars@1`, `broker.market-data@1`, `system.storage@1`).
-- **Spatiotemporal Scoping**: Every feature executes within an isolated `FeatureScope` that tracks all bound services, spawned background tasks, context managers, and event subscriptions. Unmounting or replacing a feature completely and safely disposes of all associated resources without leaks.
-- **Graceful Absence & Physical Removability**: Any feature package (code and local tests) can be physically deleted from disk without breaking the core application or failing unrelated tests. The system detects missing dependencies, transitions dependents to `BLOCKED`, and continues running in degraded modes.
-- **Profile-Driven Readiness**: Deployments select runtime profiles (`research`, `backtest`, `live`, `offline`). The system control plane observes `/system/liveness` independently from `/system/readiness`.
+- **Zero Coupling Between Service Features**: Feature packages never import or call one another directly. They interact through exact versioned capability contracts declared in `FeatureSpec`.
+- **Spatiotemporal Scoping**: Every feature executes within an isolated `FeatureScope` that owns its services, background tasks, context managers, and event subscriptions. Closing or replacing the feature disposes of those effects safely.
+- **Graceful Absence and Physical Removability**: A feature package and its local tests can be physically removed without breaking the shared runtime or unrelated features. Missing requirements block only the affected dependency closure.
+- **Profile-Driven Readiness**: Runtime profiles declare required capabilities. Composition reports liveness, readiness, active capabilities, feature states, and missing dependencies independently of any future transport.
+- **Interface Ownership**: Product-facing HTTP, CLI, MCP, and other gateways are registered D-IFACE features owned by `app/services/interfaces/`; they are not part of the shared composability foundation.
 
 ---
 
-## 2. Architecture & Documentation
+## 2. Architecture and Documentation
 
-- [HaruQuantAI Project Specification](docs/PROJECT.md) — Official product behavior, requirements, interfaces, and acceptance gates.
-- [HaruQuantAI Architecture](docs/ARCHITECTURE.md) — Official module, lifecycle, persistence, deployment, and verification architecture.
-- [HaruQuantAI Implementation Order](docs/dev/IMPLEMENTATION_ORDER.md) — Mandatory contracts-first implementation waves and gates.
-- [Domain Specifications](app/services) — Authoritative domain, feature, responsibility, and FR behavior specifications colocated with their implementations.
-
-- [Feature Implementation Pipeline](docs/dev/feature_implementation_pipeline.md) — Code-backed guide to developing, testing, packaging, replacing, and removing features.
+- [Project Specification](docs/PROJECT.md) — Product scope, system workflows, requirements, NFRs, and release gates.
+- [Architecture](docs/ARCHITECTURE.md) — Universal structural, lifecycle, persistence, and runtime constraints.
+- [Implementation Order](docs/dev/IMPLEMENTATION_ORDER.md) — Incremental, UI-visible delivery sequence.
+- [Domain Specifications](app/services) — Authoritative domain boundaries, feature registries, responsibilities, and acceptance evidence.
+- [Feature Implementation Pipeline](docs/dev/feature_implementation_pipeline.md) — Procedure for designing, implementing, demonstrating, testing, replacing, and removing features.
+- [Builder Guide](AGENTS.md) — Contributor process, approval gates, coding standards, and verification policy.
 
 ---
 
-## 3. Getting Started & Development Setup
+## 3. Getting Started
 
-HaruQuantAI uses `uv` for deterministic, high-speed Python dependency management and environments.
+HaruQuantAI uses `uv` for deterministic dependency and environment management.
 
 ### Prerequisites
 
@@ -42,94 +45,53 @@ HaruQuantAI uses `uv` for deterministic, high-speed Python dependency management
 
 ### Installation
 
-```bash
-# Clone repository
+```powershell
 git clone https://github.com/haruperi/HaruQuantAI.git
 cd HaruQuantAI
-
-# Create virtual environment and synchronize dependencies
 uv sync --frozen --dev
 ```
 
 ---
 
-## 4. Running the Application (Non-Production)
+## 4. Running the Implemented Foundation
 
 > [!WARNING]
-> **Safety Notice:** HaruQuantAI is currently under active quantitative development. The existing foundation provides research, backtesting, and mock simulation capabilities. **It does not authorize or support unmonitored live capital execution.**
+> HaruQuantAI is under active development. The current foundation exposes diagnostics only and does not authorize research claims, simulated performance claims, broker operations, or live-capital execution.
 
-### Print Machine-Readable Status Diagnostics
+Print machine-readable Composition diagnostics:
 
-```bash
-# Inspect runtime diagnostics for the research profile
+```powershell
+# Default configuration status
+uv run haruquantai --status
+
+# Research profile readiness; missing product capabilities are reported explicitly
 uv run haruquantai --config config/examples/research.toml --status
-
-# Inspect status for live profile (demonstrates graceful capability degradation)
-uv run haruquantai --config config/examples/live.toml --status
 ```
 
-### Start System HTTP Control Plane
-
-```bash
-# Start async HTTP control plane server on port 8000
-uv run haruquantai --config config/examples/research.toml --serve --host 127.0.0.1 --port 8000
-```
-
-### Query Control Plane Endpoints
-
-```bash
-# Check kernel liveness (200 OK)
-curl http://127.0.0.1:8000/system/liveness
-
-# Check profile readiness (200 OK or 503 Service Unavailable with missing capabilities)
-curl http://127.0.0.1:8000/system/readiness
-
-# List active capabilities and provider metadata
-curl http://127.0.0.1:8000/system/capabilities
-
-# Inspect feature lifecycle states and dependency health
-curl http://127.0.0.1:8000/system/features
-```
+The `/system/*` diagnostic projections and `/api/v1/*` product routes specified by D-IFACE are targets, not currently running endpoints. They will become available only through implemented and registered Interfaces features.
 
 ---
 
-## 5. Quality Assurance & CI Verification
+## 5. Development Verification
 
-HaruQuantAI enforces strict architectural invariants, formatting standards, type safety, and physical-removal testing.
+During implementation, derive the affected test set from all uncommitted files and run only those tests:
 
-### Run All Quality Gates
+```powershell
+git diff --name-only
+git diff --cached --name-only
+git status --short
+uv run pytest --no-cov <affected_test_path> [<affected_test_path> ...]
+```
 
-```bash
+Run focused formatting, linting, typing, architecture, and documentation checks applicable to the changed paths. Do not run bare pytest, coverage, or the complete repository gate during iterative implementation.
+
+The complete repository gate is reserved for pre-commit, CI, and release verification:
+
+```powershell
 uv run python scripts/ci_check.py
 ```
 
-### Individual Quality Commands
-
-```bash
-# Format check
-uv run ruff format --check .
-
-# Lint check
-uv run ruff check .
-
-# Static type check
-uv run mypy
-
-# Architectural import boundary contracts
-uv run lint-imports
-
-# AST invariant verification
-uv run python scripts/architecture_check.py
-
-# Feature documentation synchronization
-uv run python scripts/validate_feature_docs.py
-
-# Full test suite with coverage
-uv run pytest --cov=app --cov-report=term-missing --cov-fail-under=80
-
-# Physical feature removability matrix verification
-uv run python scripts/verify_feature_removal.py --all --report removability-report.json
-```
+The authoritative testing and completion procedure is defined in [AGENTS.md](AGENTS.md) and the [Feature Implementation Pipeline](docs/dev/feature_implementation_pipeline.md).
 
 ---
 

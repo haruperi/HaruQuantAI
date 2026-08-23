@@ -2,12 +2,14 @@ from typing import TYPE_CHECKING, override
 
 import pytest
 
-from app.contracts.broker.market_data import BROKER_MARKET_DATA
-from app.contracts.data.historical_bars import HISTORICAL_BARS
-from app.contracts.system.clock import SYSTEM_CLOCK
 from app.kernel.feature import Feature, FeatureSpec, FeatureState
 from app.kernel.reconciler import Reconciler
 from app.kernel.registry import ServiceRegistry
+from tests._support.composability import (
+    CONSUMER_CAPABILITY,
+    PROVIDER_CAPABILITY,
+    ROOT_CAPABILITY,
+)
 
 if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
@@ -20,41 +22,41 @@ def _active_feature_ids(reconciler: Reconciler) -> set[str]:
 
 class MockClockFeature(Feature):
     spec: FeatureSpec = FeatureSpec(
-        feature_id="FEAT-SYS-PROVIDE_CLOCK",
+        feature_id="FEAT-TEST-PROVIDE_ROOT",
         domain="system",
-        provides=frozenset({SYSTEM_CLOCK}),
+        provides=frozenset({ROOT_CAPABILITY}),
     )
 
     @override
     async def mount(self, context: FeatureContext, _config: object) -> None:
-        context.provide(SYSTEM_CLOCK, "clock_service_instance")
+        context.provide(ROOT_CAPABILITY, "clock_service_instance")
 
 
 class MockBrokerFeature(Feature):
     spec: FeatureSpec = FeatureSpec(
-        feature_id="FEAT-BROKER-FEED_MT5",
+        feature_id="FEAT-TEST-PROVIDE_SERVICE",
         domain="broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
-        requires=frozenset({SYSTEM_CLOCK}),
+        provides=frozenset({PROVIDER_CAPABILITY}),
+        requires=frozenset({ROOT_CAPABILITY}),
     )
 
     @override
     async def mount(self, context: FeatureContext, _config: object) -> None:
-        clock = context.require(SYSTEM_CLOCK)
-        context.provide(BROKER_MARKET_DATA, f"broker_service_using_{clock}")
+        clock = context.require(ROOT_CAPABILITY)
+        context.provide(PROVIDER_CAPABILITY, f"broker_service_using_{clock}")
 
 
 class MockDataFeature(Feature):
     spec: FeatureSpec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
         domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
-        requires=frozenset({BROKER_MARKET_DATA}),
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        requires=frozenset({PROVIDER_CAPABILITY}),
     )
 
     @override
     async def mount(self, context: FeatureContext, _config: object) -> None:
-        context.provide(HISTORICAL_BARS, "data_service_instance")
+        context.provide(CONSUMER_CAPABILITY, "data_service_instance")
 
 
 class FailingFeature(Feature):
@@ -77,9 +79,9 @@ async def test_reconciler_topological_mounting_flow() -> None:
     reconciler = Reconciler(registry)
 
     features: dict[str, Feature] = {
-        "FEAT-SYS-PROVIDE_CLOCK": MockClockFeature(),
-        "FEAT-BROKER-FEED_MT5": MockBrokerFeature(),
-        "FEAT-DATA-RETRIEVE_BARS": MockDataFeature(),
+        "FEAT-TEST-PROVIDE_ROOT": MockClockFeature(),
+        "FEAT-TEST-PROVIDE_SERVICE": MockBrokerFeature(),
+        "FEAT-TEST-CONSUME_SERVICE": MockDataFeature(),
     }
 
     report = await reconciler.reconcile(
@@ -88,24 +90,24 @@ async def test_reconciler_topological_mounting_flow() -> None:
     )
 
     assert report.started == (
-        "FEAT-SYS-PROVIDE_CLOCK",
-        "FEAT-BROKER-FEED_MT5",
-        "FEAT-DATA-RETRIEVE_BARS",
+        "FEAT-TEST-PROVIDE_ROOT",
+        "FEAT-TEST-PROVIDE_SERVICE",
+        "FEAT-TEST-CONSUME_SERVICE",
     )
     assert report.stopped == ()
     assert report.active_features == (
-        "FEAT-SYS-PROVIDE_CLOCK",
-        "FEAT-BROKER-FEED_MT5",
-        "FEAT-DATA-RETRIEVE_BARS",
+        "FEAT-TEST-PROVIDE_ROOT",
+        "FEAT-TEST-PROVIDE_SERVICE",
+        "FEAT-TEST-CONSUME_SERVICE",
     )
-    assert registry.is_available(SYSTEM_CLOCK)
-    assert registry.is_available(BROKER_MARKET_DATA)
-    assert registry.is_available(HISTORICAL_BARS)
+    assert registry.is_available(ROOT_CAPABILITY)
+    assert registry.is_available(PROVIDER_CAPABILITY)
+    assert registry.is_available(CONSUMER_CAPABILITY)
 
     states = reconciler.feature_states
-    assert states["FEAT-SYS-PROVIDE_CLOCK"] == FeatureState.ACTIVE
-    assert states["FEAT-BROKER-FEED_MT5"] == FeatureState.ACTIVE
-    assert states["FEAT-DATA-RETRIEVE_BARS"] == FeatureState.ACTIVE
+    assert states["FEAT-TEST-PROVIDE_ROOT"] == FeatureState.ACTIVE
+    assert states["FEAT-TEST-PROVIDE_SERVICE"] == FeatureState.ACTIVE
+    assert states["FEAT-TEST-CONSUME_SERVICE"] == FeatureState.ACTIVE
 
 
 @pytest.mark.asyncio
@@ -136,9 +138,9 @@ async def test_reconciler_graceful_provider_removal_and_dependent_unmount() -> N
     reconciler = Reconciler(registry)
 
     features: dict[str, Feature] = {
-        "FEAT-SYS-PROVIDE_CLOCK": MockClockFeature(),
-        "FEAT-BROKER-FEED_MT5": MockBrokerFeature(),
-        "FEAT-DATA-RETRIEVE_BARS": MockDataFeature(),
+        "FEAT-TEST-PROVIDE_ROOT": MockClockFeature(),
+        "FEAT-TEST-PROVIDE_SERVICE": MockBrokerFeature(),
+        "FEAT-TEST-CONSUME_SERVICE": MockDataFeature(),
     }
 
     await reconciler.reconcile(
@@ -150,19 +152,23 @@ async def test_reconciler_graceful_provider_removal_and_dependent_unmount() -> N
     report2 = await reconciler.reconcile(
         discovered_features=features,
         enabled_feature_ids=[
-            "FEAT-SYS-PROVIDE_CLOCK",
-            "FEAT-DATA-RETRIEVE_BARS",
+            "FEAT-TEST-PROVIDE_ROOT",
+            "FEAT-TEST-CONSUME_SERVICE",
         ],
     )
 
-    assert "FEAT-DATA-RETRIEVE_BARS" in report2.stopped
-    assert "FEAT-BROKER-FEED_MT5" in report2.stopped
-    assert _active_feature_ids(reconciler) == {"FEAT-SYS-PROVIDE_CLOCK"}
-    assert not registry.is_available(HISTORICAL_BARS)
-    assert not registry.is_available(BROKER_MARKET_DATA)
-    assert registry.is_available(SYSTEM_CLOCK)
-    assert reconciler.feature_states["FEAT-DATA-RETRIEVE_BARS"] == FeatureState.BLOCKED
-    assert reconciler.feature_states["FEAT-BROKER-FEED_MT5"] == FeatureState.DISABLED
+    assert "FEAT-TEST-CONSUME_SERVICE" in report2.stopped
+    assert "FEAT-TEST-PROVIDE_SERVICE" in report2.stopped
+    assert _active_feature_ids(reconciler) == {"FEAT-TEST-PROVIDE_ROOT"}
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+    assert not registry.is_available(PROVIDER_CAPABILITY)
+    assert registry.is_available(ROOT_CAPABILITY)
+    assert (
+        reconciler.feature_states["FEAT-TEST-CONSUME_SERVICE"] == FeatureState.BLOCKED
+    )
+    assert (
+        reconciler.feature_states["FEAT-TEST-PROVIDE_SERVICE"] == FeatureState.DISABLED
+    )
 
 
 @pytest.mark.asyncio
@@ -171,24 +177,24 @@ async def test_reconciler_config_change_triggers_remount() -> None:
     registry = ServiceRegistry()
     reconciler = Reconciler(registry)
 
-    features: dict[str, Feature] = {"FEAT-SYS-PROVIDE_CLOCK": MockClockFeature()}
+    features: dict[str, Feature] = {"FEAT-TEST-PROVIDE_ROOT": MockClockFeature()}
 
     await reconciler.reconcile(
         discovered_features=features,
-        enabled_feature_ids=["FEAT-SYS-PROVIDE_CLOCK"],
-        configs={"FEAT-SYS-PROVIDE_CLOCK": {"mode": "utc"}},
+        enabled_feature_ids=["FEAT-TEST-PROVIDE_ROOT"],
+        configs={"FEAT-TEST-PROVIDE_ROOT": {"mode": "utc"}},
     )
-    assert _active_feature_ids(reconciler) == {"FEAT-SYS-PROVIDE_CLOCK"}
+    assert _active_feature_ids(reconciler) == {"FEAT-TEST-PROVIDE_ROOT"}
 
     report = await reconciler.reconcile(
         discovered_features=features,
-        enabled_feature_ids=["FEAT-SYS-PROVIDE_CLOCK"],
-        configs={"FEAT-SYS-PROVIDE_CLOCK": {"mode": "simulated"}},
+        enabled_feature_ids=["FEAT-TEST-PROVIDE_ROOT"],
+        configs={"FEAT-TEST-PROVIDE_ROOT": {"mode": "simulated"}},
     )
 
-    assert "FEAT-SYS-PROVIDE_CLOCK" in report.stopped
-    assert "FEAT-SYS-PROVIDE_CLOCK" in report.started
-    assert _active_feature_ids(reconciler) == {"FEAT-SYS-PROVIDE_CLOCK"}
+    assert "FEAT-TEST-PROVIDE_ROOT" in report.stopped
+    assert "FEAT-TEST-PROVIDE_ROOT" in report.started
+    assert _active_feature_ids(reconciler) == {"FEAT-TEST-PROVIDE_ROOT"}
 
 
 @pytest.mark.asyncio
@@ -198,8 +204,8 @@ async def test_reconciler_stop_all() -> None:
     reconciler = Reconciler(registry)
 
     features: dict[str, Feature] = {
-        "FEAT-SYS-PROVIDE_CLOCK": MockClockFeature(),
-        "FEAT-BROKER-FEED_MT5": MockBrokerFeature(),
+        "FEAT-TEST-PROVIDE_ROOT": MockClockFeature(),
+        "FEAT-TEST-PROVIDE_SERVICE": MockBrokerFeature(),
     }
 
     await reconciler.reconcile(
@@ -210,8 +216,8 @@ async def test_reconciler_stop_all() -> None:
 
     await reconciler.stop_all()
     assert not _active_feature_ids(reconciler)
-    assert not registry.is_available(SYSTEM_CLOCK)
-    assert not registry.is_available(BROKER_MARKET_DATA)
+    assert not registry.is_available(ROOT_CAPABILITY)
+    assert not registry.is_available(PROVIDER_CAPABILITY)
 
 
 @pytest.mark.asyncio
@@ -222,9 +228,9 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
 
     class CountingClockFeature(Feature):
         spec: FeatureSpec = FeatureSpec(
-            feature_id="FEAT-SYS-PROVIDE_CLOCK",
+            feature_id="FEAT-TEST-PROVIDE_ROOT",
             domain="system",
-            provides=frozenset({SYSTEM_CLOCK}),
+            provides=frozenset({ROOT_CAPABILITY}),
         )
 
         def __init__(self) -> None:
@@ -236,14 +242,14 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
             mode = "default"
             if isinstance(config, dict):
                 mode = config.get("mode", "default")
-            context.provide(SYSTEM_CLOCK, {"mode": mode, "gen": self.mount_count})
+            context.provide(ROOT_CAPABILITY, {"mode": mode, "gen": self.mount_count})
 
     class CountingBrokerFeature(Feature):
         spec: FeatureSpec = FeatureSpec(
-            feature_id="FEAT-BROKER-FEED_MT5",
+            feature_id="FEAT-TEST-PROVIDE_SERVICE",
             domain="broker",
-            provides=frozenset({BROKER_MARKET_DATA}),
-            requires=frozenset({SYSTEM_CLOCK}),
+            provides=frozenset({PROVIDER_CAPABILITY}),
+            requires=frozenset({ROOT_CAPABILITY}),
         )
 
         def __init__(self) -> None:
@@ -253,15 +259,15 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
         @override
         async def mount(self, context: FeatureContext, _config: object) -> None:
             self.mount_count += 1
-            self.captured_clock = context.require(SYSTEM_CLOCK)
-            context.provide(BROKER_MARKET_DATA, {"broker_gen": self.mount_count})
+            self.captured_clock = context.require(ROOT_CAPABILITY)
+            context.provide(PROVIDER_CAPABILITY, {"broker_gen": self.mount_count})
 
     class CountingDataFeature(Feature):
         spec: FeatureSpec = FeatureSpec(
-            feature_id="FEAT-DATA-RETRIEVE_BARS",
+            feature_id="FEAT-TEST-CONSUME_SERVICE",
             domain="data",
-            provides=frozenset({HISTORICAL_BARS}),
-            requires=frozenset({BROKER_MARKET_DATA}),
+            provides=frozenset({CONSUMER_CAPABILITY}),
+            requires=frozenset({PROVIDER_CAPABILITY}),
         )
 
         def __init__(self) -> None:
@@ -271,23 +277,23 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
         @override
         async def mount(self, context: FeatureContext, _config: object) -> None:
             self.mount_count += 1
-            self.captured_broker = context.require(BROKER_MARKET_DATA)
-            context.provide(HISTORICAL_BARS, {"data_gen": self.mount_count})
+            self.captured_broker = context.require(PROVIDER_CAPABILITY)
+            context.provide(CONSUMER_CAPABILITY, {"data_gen": self.mount_count})
 
     clock_feat = CountingClockFeature()
     broker_feat = CountingBrokerFeature()
     data_feat = CountingDataFeature()
 
     features: dict[str, Feature] = {
-        "FEAT-SYS-PROVIDE_CLOCK": clock_feat,
-        "FEAT-BROKER-FEED_MT5": broker_feat,
-        "FEAT-DATA-RETRIEVE_BARS": data_feat,
+        "FEAT-TEST-PROVIDE_ROOT": clock_feat,
+        "FEAT-TEST-PROVIDE_SERVICE": broker_feat,
+        "FEAT-TEST-CONSUME_SERVICE": data_feat,
     }
 
     await reconciler.reconcile(
         discovered_features=features,
         enabled_feature_ids=features.keys(),
-        configs={"FEAT-SYS-PROVIDE_CLOCK": {"mode": "v1"}},
+        configs={"FEAT-TEST-PROVIDE_ROOT": {"mode": "v1"}},
     )
 
     assert clock_feat.mount_count == 1
@@ -299,7 +305,7 @@ async def test_provider_reconfiguration_remounts_transitive_consumers() -> None:
     await reconciler.reconcile(
         discovered_features=features,
         enabled_feature_ids=features.keys(),
-        configs={"FEAT-SYS-PROVIDE_CLOCK": {"mode": "v2"}},
+        configs={"FEAT-TEST-PROVIDE_ROOT": {"mode": "v2"}},
     )
 
     assert clock_feat.mount_count == 2

@@ -144,8 +144,8 @@ def main() -> int:  # noqa: C901
         print(f"[ERROR] {error}")
         return 1
     if not entry_points:
-        print("[ERROR] No registered feature entry points")
-        return 1
+        print("[OK] No production features are currently registered")
+        return 0
 
     errors_by_feature: dict[str, list[str]] = {}
     seen_feature_ids: set[str] = set()

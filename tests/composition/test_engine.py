@@ -3,63 +3,65 @@ from typing import TYPE_CHECKING
 import pytest
 
 from app.composition.engine import CompositionEngine
-from app.contracts.broker.market_data import BROKER_MARKET_DATA
-from app.contracts.data.historical_bars import HISTORICAL_BARS
-from app.contracts.system.clock import SYSTEM_CLOCK
 from app.kernel.feature import FeatureSpec, FeatureState
+from tests._support.composability import (
+    CONSUMER_CAPABILITY,
+    PROVIDER_CAPABILITY,
+    ROOT_CAPABILITY,
+)
 
 if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
 
 
-class MockClockFeature:
+class RootFeature:
     spec = FeatureSpec(
-        feature_id="FEAT-SYS-PROVIDE_CLOCK",
-        domain="system",
-        provides=frozenset({SYSTEM_CLOCK}),
+        feature_id="FEAT-TEST-PROVIDE_ROOT",
+        domain="test",
+        provides=frozenset({ROOT_CAPABILITY}),
     )
 
     async def mount(self, context: FeatureContext, _config: object) -> None:
-        context.provide(SYSTEM_CLOCK, "clock_impl")
+        context.provide(ROOT_CAPABILITY, "root_impl")
 
 
-class MockBrokerFeature:
+class ProviderFeature:
     spec = FeatureSpec(
-        feature_id="FEAT-BROKER-FEED_MT5",
-        domain="broker",
-        provides=frozenset({BROKER_MARKET_DATA}),
-        requires=frozenset({SYSTEM_CLOCK}),
+        feature_id="FEAT-TEST-PROVIDE_SERVICE",
+        domain="test",
+        provides=frozenset({PROVIDER_CAPABILITY}),
+        requires=frozenset({ROOT_CAPABILITY}),
     )
 
     async def mount(self, context: FeatureContext, _config: object) -> None:
-        clock = context.require(SYSTEM_CLOCK)
-        context.provide(BROKER_MARKET_DATA, f"broker_impl_{clock}")
+        root = context.require(ROOT_CAPABILITY)
+        context.provide(PROVIDER_CAPABILITY, f"provider_impl_{root}")
 
 
-class MockDataFeature:
+class ConsumerFeature:
     spec = FeatureSpec(
-        feature_id="FEAT-DATA-RETRIEVE_BARS",
-        domain="data",
-        provides=frozenset({HISTORICAL_BARS}),
-        requires=frozenset({BROKER_MARKET_DATA}),
+        feature_id="FEAT-TEST-CONSUME_SERVICE",
+        domain="test",
+        provides=frozenset({CONSUMER_CAPABILITY}),
+        requires=frozenset({PROVIDER_CAPABILITY}),
     )
 
     async def mount(self, context: FeatureContext, _config: object) -> None:
-        broker = context.require(BROKER_MARKET_DATA)
-        context.provide(HISTORICAL_BARS, f"data_impl_{broker}")
+        provider = context.require(PROVIDER_CAPABILITY)
+        context.provide(CONSUMER_CAPABILITY, f"consumer_impl_{provider}")
 
 
 SAMPLE_TOML_ALL = """
 [application]
-profile = "research"
+profile = "offline"
 
-[features."FEAT-SYS-PROVIDE_CLOCK"]
+[features."FEAT-TEST-PROVIDE_ROOT"]
 enabled = true
 
-[features."FEAT-BROKER-FEED_MT5"]
+[features."FEAT-TEST-PROVIDE_SERVICE"]
 enabled = true
 
-[features."FEAT-DATA-RETRIEVE_BARS"]
+[features."FEAT-TEST-CONSUME_SERVICE"]
 enabled = true
 """
 
@@ -68,23 +70,23 @@ enabled = true
 async def test_engine_load_and_reconcile_toml() -> None:
     """Test full bootstrap and readiness calculation via CompositionEngine."""
     engine = CompositionEngine()
-    engine.discoverer.register_feature(MockClockFeature())
-    engine.discoverer.register_feature(MockBrokerFeature())
-    engine.discoverer.register_feature(MockDataFeature())
+    engine.discoverer.register_feature(RootFeature())
+    engine.discoverer.register_feature(ProviderFeature())
+    engine.discoverer.register_feature(ConsumerFeature())
 
     report = await engine.load_and_reconcile_toml(SAMPLE_TOML_ALL)
     assert report.started == (
-        "FEAT-SYS-PROVIDE_CLOCK",
-        "FEAT-BROKER-FEED_MT5",
-        "FEAT-DATA-RETRIEVE_BARS",
+        "FEAT-TEST-PROVIDE_ROOT",
+        "FEAT-TEST-PROVIDE_SERVICE",
+        "FEAT-TEST-CONSUME_SERVICE",
     )
 
     status = engine.get_status()
-    assert status.profile == "research"
+    assert status.profile == "offline"
     assert status.is_ready is True
     assert status.missing_profile_capabilities == ()
-    assert "data.historical-bars@1" in status.active_capabilities
-    assert status.feature_states["FEAT-DATA-RETRIEVE_BARS"] == FeatureState.ACTIVE
+    assert "test.consumer@1" in status.active_capabilities
+    assert status.feature_states["FEAT-TEST-CONSUME_SERVICE"] == FeatureState.ACTIVE
 
     await engine.shutdown()
     assert len(engine.reconciler.active_features) == 0
@@ -92,31 +94,31 @@ async def test_engine_load_and_reconcile_toml() -> None:
 
 
 @pytest.mark.asyncio
-async def test_engine_graceful_missing_feature_readiness() -> None:
-    """Test when required feature is missing from configuration."""
+async def test_engine_reports_blocked_feature_with_missing_dependency() -> None:
+    """Test a configured consumer remains blocked without its provider."""
     engine = CompositionEngine()
-    engine.discoverer.register_feature(MockClockFeature())
-    # Note: Broker is not registered or enabled
-    engine.discoverer.register_feature(MockDataFeature())
+    engine.discoverer.register_feature(RootFeature())
+    # The provider is intentionally not registered or enabled.
+    engine.discoverer.register_feature(ConsumerFeature())
 
     incomplete_toml = """
     [application]
-    profile = "research"
+    profile = "offline"
 
-    [features."FEAT-SYS-PROVIDE_CLOCK"]
+    [features."FEAT-TEST-PROVIDE_ROOT"]
     enabled = true
 
-    [features."FEAT-DATA-RETRIEVE_BARS"]
+    [features."FEAT-TEST-CONSUME_SERVICE"]
     enabled = true
     """
 
     report = await engine.load_and_reconcile_toml(incomplete_toml)
-    assert "FEAT-DATA-RETRIEVE_BARS" in report.blocked_features
+    assert "FEAT-TEST-CONSUME_SERVICE" in report.blocked_features
 
     status = engine.get_status()
-    assert status.is_ready is False
-    assert "data.historical-bars@1" in status.missing_profile_capabilities
-    assert status.feature_states["FEAT-DATA-RETRIEVE_BARS"] == FeatureState.BLOCKED
+    assert status.is_ready is True
+    assert status.missing_profile_capabilities == ()
+    assert status.feature_states["FEAT-TEST-CONSUME_SERVICE"] == FeatureState.BLOCKED
 
     await engine.shutdown()
 
@@ -131,15 +133,15 @@ async def test_engine_load_and_reconcile_file(tmp_path: object) -> None:
     config_file.write_text(SAMPLE_TOML_ALL, encoding="utf-8")
 
     engine = CompositionEngine()
-    engine.discoverer.register_feature(MockClockFeature())
-    engine.discoverer.register_feature(MockBrokerFeature())
-    engine.discoverer.register_feature(MockDataFeature())
+    engine.discoverer.register_feature(RootFeature())
+    engine.discoverer.register_feature(ProviderFeature())
+    engine.discoverer.register_feature(ConsumerFeature())
 
     report = await engine.load_and_reconcile_file(config_file)
     assert report.started == (
-        "FEAT-SYS-PROVIDE_CLOCK",
-        "FEAT-BROKER-FEED_MT5",
-        "FEAT-DATA-RETRIEVE_BARS",
+        "FEAT-TEST-PROVIDE_ROOT",
+        "FEAT-TEST-PROVIDE_SERVICE",
+        "FEAT-TEST-CONSUME_SERVICE",
     )
     assert engine.get_status().is_ready is True
 

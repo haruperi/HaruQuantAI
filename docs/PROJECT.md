@@ -42,7 +42,7 @@ The system is a deterministic, reproducible strategy-research and governed tradi
 
 - The complete local-first research lifecycle from data onboarding through strategy generation, simulation, analysis, code export, robustness research, portfolio construction, and automation.
 - An optional, disabled-by-default operational lifecycle from certified broker connection through deterministic Runtime Risk admission, paper/demo/live dispatch, reconciliation, protection management, and operational accounting.
-- Four non-domain shared modules: `app/kernel/` for independent composability primitives, `app/contracts/` for cross-boundary application/domain contracts, `app/composition/` for discovery/configuration/readiness/orchestration, and `app/api/` for capability-aware application interfaces.
+- Three non-domain shared modules: `app/kernel/` for independent composability primitives, `app/contracts/` for cross-boundary application/domain contracts, and `app/composition/` for discovery/configuration/readiness/orchestration and runtime diagnostics. Product-facing gateways are removable features owned by the Interfaces domain.
 - Immutable/versioned domain artifacts, deterministic algorithms, explicit failure behavior, conformance fixtures, and phase release gates.
 
 ### System does not own
@@ -54,15 +54,7 @@ The system is a deterministic, reproducible strategy-research and governed tradi
 
 ### Already implemented foundation evidence
 
-The current repository includes three executable features that prove the substrate but do not, by themselves, complete the product feature or FR catalogue:
-
-| Implemented feature | Capability | Role in the product |
-|---|---|---|
-| `FEAT-BROKER-FEED_MOCK` | `broker.market-data@1` | Deterministic root provider used to prove discovery, configuration, provider publication, and removal; it does not complete the governed Broker Connectivity domain. |
-| `FEAT-DATA-RETRIEVE_BARS` | `data.historical-bars@1` requiring `broker.market-data@1` | Proves required dependency binding and a real provider→consumer vertical slice; it does not complete the historical ingestion/versioning requirements. |
-| `FEAT-SYS-PERSIST_STORAGE` | `system.storage@1` | Proves retained state declarations and storage-provider lifecycle; it does not complete the Workspace domain. |
-
-Their feature-local READMEs and runtime specifications remain authoritative for what they actually implement. Product statuses change only when the owning requirement's acceptance evidence passes.
+The repository implements the business-neutral composability substrate and verifies it with test-only provider/consumer fixtures. No product `FEAT-*` is currently registered or implemented. Product statuses change only when the owning feature's runtime specification, usage evidence, and acceptance tests pass.
 
 ### Primary users / actors
 
@@ -356,7 +348,7 @@ Rules:
 
 | Runtime unit | Contains domains | Environment | Started by | Scaling / instances |
 |---|---|---|---|---|
-| FastAPI control plane | Workspace application services and all enabled domain facades | Desktop/hosted | Launcher/service manager | One writer/control authority per workspace |
+| D-IFACE application gateway | Workspace application services and enabled domain capabilities | Desktop/hosted | Launcher/service manager | One writer/control authority per workspace |
 | React client | User Interface | Desktop/browser | Launcher/user | One or more clients |
 | Isolated workers | Data, Simulator, Research, Portfolio, Strategy Codegen | Desktop/hosted | Workspace supervisor | Bounded local/remote pool |
 | Operational control services | Broker Connectivity, Runtime Risk, Trading | Desktop/hosted, disabled by default | Workspace supervisor/operator enablement | One fenced writer/authority coordinator per trading session/account |
@@ -367,13 +359,13 @@ Rules:
 
 ```mermaid
 flowchart LR
-    U[UI / CLI / MCP] --> API[FastAPI control plane]
-    API --> META[(Metadata)]
-    API --> Q[Durable queue]
+    U[UI / CLI / MCP] --> IFACE[D-IFACE application gateway]
+    IFACE --> META[(Metadata)]
+    IFACE --> Q[Durable queue]
     Q --> W[Isolated workers]
     W --> ART[(Content-addressed artifacts)]
     W --> EXT[Plugin / connector / compiler boundaries]
-    API --> EVT[SSE / audit / metrics]
+    IFACE --> EVT[SSE / audit / metrics]
 ```
 
 Rules:
@@ -386,7 +378,7 @@ Rules:
 
 ## 10. System Usage
 
-The composability runtime already has executable discovery, configuration, readiness, system diagnostics, and capability-aware facade entry points. The complete product launcher and the product routes listed below remain targets. The first complete product usage workflow must start the documented launcher, wait for readiness, create/open a workspace, and exercise the same application capabilities through `/api/v1`.
+The composability runtime already has executable discovery, configuration, readiness, and system diagnostics. Capability-aware product gateways are owned by registered D-IFACE features and are not implemented by the shared foundation. The complete product launcher and the product routes listed below remain targets. The first complete product usage workflow must start the documented launcher, wait for readiness, create/open a workspace, and exercise the same application capabilities through `/api/v1`.
 
 The implemented composability foundation and the incomplete product are different completion states. Until the product gates pass, only the non-production commands and safety constraints in the repository root `README.md` apply. Documentation status, a running control plane, or a ready research profile never grants live-trading authority.
 
@@ -402,7 +394,7 @@ POST /api/v1/trading/actions
 GET /api/v1/trading/operations/{id}
 ```
 
-Full-system usage is documented in this section and executed through the product launcher and public API. Service-feature usage lives in the designated primary domain-logic module's `if __name__ == "__main__":` harness; every core capability module documents its Python API and executable command. Usage examples never live under `tests/`. Feature-local automated tests belong in `tests/services/<domain>/<feature>/`; broader architecture, composition, API, integration, and system verification retain their documented test locations.
+Full-system usage is documented in this section and executed through the product launcher and registered D-IFACE gateways. Service-feature usage lives in the designated primary domain-logic module's `if __name__ == "__main__":` harness; every core capability module documents its Python API and executable command. Usage examples never live under `tests/`. Feature-local automated tests belong in `tests/services/<domain>/<feature>/`; broader architecture, composition, interface, integration, and system verification retain their documented test locations.
 
 ---
 

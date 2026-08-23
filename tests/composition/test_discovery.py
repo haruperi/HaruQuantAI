@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 from app.composition.discovery import FeatureDiscoverer
-from app.contracts.system.clock import SYSTEM_CLOCK
 from app.kernel.feature import Feature, FeatureSpec
+from tests._support.composability import ROOT_CAPABILITY
 
 if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
@@ -13,9 +13,9 @@ if TYPE_CHECKING:
 
 class MockFeature:
     spec = FeatureSpec(
-        "FEAT-SYS-PROVIDE_CLOCK",
-        "system",
-        provides=frozenset({SYSTEM_CLOCK}),
+        "FEAT-TEST-PROVIDE_ROOT",
+        "test",
+        provides=frozenset({ROOT_CAPABILITY}),
     )
 
     async def mount(self, _context: FeatureContext, _config: object) -> None:
@@ -24,8 +24,8 @@ class MockFeature:
 
 class SecondMockFeature:
     spec = FeatureSpec(
-        "FEAT-SYS-PROVIDE_CLOCK_SECOND",
-        "system",
+        "FEAT-TEST-PROVIDE_ROOT_SECOND",
+        "test",
         provides=frozenset(),
     )
 
@@ -34,7 +34,7 @@ class SecondMockFeature:
 
 
 class InvalidSpecFeature:
-    spec = FeatureSpec("   ", "system", provides=frozenset())
+    spec = FeatureSpec("   ", "test", provides=frozenset())
 
     async def mount(self, _context: FeatureContext, _config: object) -> None:
         return None
@@ -48,8 +48,8 @@ def test_discover_manual_instance_and_factory() -> None:
         discoverer.register_feature(SecondMockFeature)
         result = discoverer.discover()
     assert set(result.discovered) == {
-        "FEAT-SYS-PROVIDE_CLOCK",
-        "FEAT-SYS-PROVIDE_CLOCK_SECOND",
+        "FEAT-TEST-PROVIDE_ROOT",
+        "FEAT-TEST-PROVIDE_ROOT_SECOND",
     }
     assert not result.failed_specs
     assert not result.failed_imports
@@ -64,7 +64,7 @@ def test_duplicate_feature_id_is_rejected_without_overwrite() -> None:
         discoverer.register_feature(first, feature_id="first")
         discoverer.register_feature(second, feature_id="second")
         result = discoverer.discover()
-    assert result.discovered["FEAT-SYS-PROVIDE_CLOCK"] is first
+    assert result.discovered["FEAT-TEST-PROVIDE_ROOT"] is first
     assert "second" in result.failed_specs
     assert "Duplicate feature ID" in result.failed_specs["second"]
 
@@ -86,7 +86,7 @@ def test_entry_point_success() -> None:
     entry_point.load.return_value = MockFeature
     with patch("importlib.metadata.entry_points", return_value=[entry_point]):
         result = FeatureDiscoverer().discover()
-    assert "FEAT-SYS-PROVIDE_CLOCK" in result.discovered
+    assert "FEAT-TEST-PROVIDE_ROOT" in result.discovered
     assert not result.missing_targets
 
 

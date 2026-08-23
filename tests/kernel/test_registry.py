@@ -2,9 +2,6 @@
 
 import pytest
 
-from app.contracts.broker.market_data import BROKER_MARKET_DATA
-from app.contracts.data.historical_bars import HISTORICAL_BARS
-from app.contracts.system.clock import SYSTEM_CLOCK
 from app.kernel.capability import CapabilityUnavailableError
 from app.kernel.registry import (
     BindingToken,
@@ -12,6 +9,11 @@ from app.kernel.registry import (
     ServiceRegistry,
 )
 from app.kernel.scope import FeatureScope
+from tests._support.composability import (
+    CONSUMER_CAPABILITY,
+    PROVIDER_CAPABILITY,
+    ROOT_CAPABILITY,
+)
 
 
 def test_registry_register_and_resolve() -> None:
@@ -19,26 +21,26 @@ def test_registry_register_and_resolve() -> None:
     registry = ServiceRegistry()
     dummy_service = object()
 
-    assert not registry.is_available(HISTORICAL_BARS)
-    assert not registry.is_available(HISTORICAL_BARS.identifier)
-    assert registry.resolve(HISTORICAL_BARS) is None
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+    assert not registry.is_available(CONSUMER_CAPABILITY.identifier)
+    assert registry.resolve(CONSUMER_CAPABILITY) is None
 
     token = registry.register(
-        capability=HISTORICAL_BARS,
+        capability=CONSUMER_CAPABILITY,
         provider=dummy_service,
-        owner_id="FEAT-DATA-RETRIEVE_BARS",
+        owner_id="FEAT-TEST-CONSUME_SERVICE",
     )
 
-    assert token.capability == "data.historical-bars@1"
-    assert token.owner_id == "FEAT-DATA-RETRIEVE_BARS"
+    assert token.capability == "test.consumer@1"
+    assert token.owner_id == "FEAT-TEST-CONSUME_SERVICE"
     assert token.generation == 1
 
-    assert registry.is_available(HISTORICAL_BARS)
-    assert registry.is_available(HISTORICAL_BARS.identifier)
-    assert registry.resolve(HISTORICAL_BARS) is dummy_service
-    assert registry.require(HISTORICAL_BARS) is dummy_service
+    assert registry.is_available(CONSUMER_CAPABILITY)
+    assert registry.is_available(CONSUMER_CAPABILITY.identifier)
+    assert registry.resolve(CONSUMER_CAPABILITY) is dummy_service
+    assert registry.require(CONSUMER_CAPABILITY) is dummy_service
 
-    binding = registry.get_binding(HISTORICAL_BARS.identifier)
+    binding = registry.get_binding(CONSUMER_CAPABILITY.identifier)
     assert binding is not None
     assert binding.token == token
     assert binding.provider is dummy_service
@@ -48,19 +50,19 @@ def test_registry_register_duplicate_raises_error() -> None:
     """Test that ordinary register() raises CapabilityAlreadyBoundError if already bound."""
     registry = ServiceRegistry()
     registry.register(
-        capability=HISTORICAL_BARS,
+        capability=CONSUMER_CAPABILITY,
         provider=object(),
-        owner_id="FEAT-DATA-RETRIEVE_BARS",
+        owner_id="FEAT-TEST-CONSUME_SERVICE",
     )
 
     with pytest.raises(
         CapabilityAlreadyBoundError,
-        match=r"(?i)already registered to 'FEAT-DATA-RETRIEVE_BARS'",
+        match=r"(?i)already registered to 'FEAT-TEST-CONSUME_SERVICE'",
     ):
         registry.register(
-            capability=HISTORICAL_BARS,
+            capability=CONSUMER_CAPABILITY,
             provider=object(),
-            owner_id="FEAT-DATA-MOCK_BARS",
+            owner_id="FEAT-TEST-PROVIDE_ALTERNATE",
         )
 
 
@@ -69,24 +71,24 @@ def test_registry_require_missing_raises() -> None:
     registry = ServiceRegistry()
     with pytest.raises(
         CapabilityUnavailableError,
-        match=r"Capability 'broker\.market-data@1' is unavailable",
+        match=r"Capability 'test\.provider@1' is unavailable",
     ):
-        registry.require(BROKER_MARKET_DATA)
+        registry.require(PROVIDER_CAPABILITY)
 
 
 def test_registry_revoke_active_token() -> None:
     """Test revoking an active provider binding."""
     registry = ServiceRegistry()
     token = registry.register(
-        capability=HISTORICAL_BARS,
+        capability=CONSUMER_CAPABILITY,
         provider=object(),
-        owner_id="FEAT-DATA-RETRIEVE_BARS",
+        owner_id="FEAT-TEST-CONSUME_SERVICE",
     )
-    assert registry.is_available(HISTORICAL_BARS)
+    assert registry.is_available(CONSUMER_CAPABILITY)
 
     assert registry.revoke(token) is True
-    assert not registry.is_available(HISTORICAL_BARS)
-    assert registry.resolve(HISTORICAL_BARS) is None
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+    assert registry.resolve(CONSUMER_CAPABILITY) is None
 
     # Revoking again returns False
     assert registry.revoke(token) is False
@@ -99,51 +101,51 @@ def test_registry_generation_stale_token_protection() -> None:
     service_v2 = object()
 
     token_v1 = registry.register(
-        capability=HISTORICAL_BARS,
+        capability=CONSUMER_CAPABILITY,
         provider=service_v1,
-        owner_id="FEAT-DATA-RETRIEVE_BARS",
+        owner_id="FEAT-TEST-CONSUME_SERVICE",
     )
     assert token_v1.generation == 1
 
     # Replace via explicit replace_binding
     token_v2 = registry.replace_binding(
-        capability=HISTORICAL_BARS,
+        capability=CONSUMER_CAPABILITY,
         provider=service_v2,
-        owner_id="FEAT-DATA-MOCK_BARS",
+        owner_id="FEAT-TEST-PROVIDE_ALTERNATE",
     )
     assert token_v2.generation == 2
-    assert registry.resolve(HISTORICAL_BARS) is service_v2
+    assert registry.resolve(CONSUMER_CAPABILITY) is service_v2
 
     # Old disposer for token_v1 attempts revocation
     revoked = registry.revoke(token_v1)
     assert revoked is False
     # Newer provider is still active and safe
-    assert registry.resolve(HISTORICAL_BARS) is service_v2
+    assert registry.resolve(CONSUMER_CAPABILITY) is service_v2
 
     # New disposer revokes successfully
     assert registry.revoke(token_v2) is True
-    assert registry.resolve(HISTORICAL_BARS) is None
+    assert registry.resolve(CONSUMER_CAPABILITY) is None
 
 
 @pytest.mark.asyncio
 async def test_registry_scope_automatic_revocation() -> None:
     """Test passing scope to register automatically revokes binding on scope close."""
     registry = ServiceRegistry()
-    scope = FeatureScope("FEAT-DATA-RETRIEVE_BARS")
+    scope = FeatureScope("FEAT-TEST-CONSUME_SERVICE")
     service = object()
 
     token = registry.register(
-        capability=HISTORICAL_BARS,
+        capability=CONSUMER_CAPABILITY,
         provider=service,
-        owner_id="FEAT-DATA-RETRIEVE_BARS",
+        owner_id="FEAT-TEST-CONSUME_SERVICE",
         scope=scope,
     )
     assert isinstance(token, BindingToken)
-    assert registry.is_available(HISTORICAL_BARS)
+    assert registry.is_available(CONSUMER_CAPABILITY)
 
     await scope.close()
-    assert not registry.is_available(HISTORICAL_BARS)
-    assert registry.resolve(HISTORICAL_BARS) is None
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+    assert registry.resolve(CONSUMER_CAPABILITY) is None
 
 
 def test_registry_register_many_atomic() -> None:
@@ -154,37 +156,41 @@ def test_registry_register_many_atomic() -> None:
 
     tokens = registry.register_many(
         [
-            (SYSTEM_CLOCK, clock_service, "FEAT-SYS-PROVIDE_CLOCK"),
-            (BROKER_MARKET_DATA, market_service, "FEAT-BROKER-FEED_MT5"),
+            (ROOT_CAPABILITY, clock_service, "FEAT-TEST-PROVIDE_ROOT"),
+            (PROVIDER_CAPABILITY, market_service, "FEAT-TEST-PROVIDE_SERVICE"),
         ]
     )
     assert len(tokens) == 2
-    assert registry.resolve(SYSTEM_CLOCK) is clock_service
-    assert registry.resolve(BROKER_MARKET_DATA) is market_service
+    assert registry.resolve(ROOT_CAPABILITY) is clock_service
+    assert registry.resolve(PROVIDER_CAPABILITY) is market_service
 
     # Attempt register_many with one conflicting capability
     with pytest.raises(CapabilityAlreadyBoundError):
         registry.register_many(
             [
-                (HISTORICAL_BARS, object(), "FEAT-DATA-RETRIEVE_BARS"),
-                (SYSTEM_CLOCK, object(), "FEAT-ANOTHER-CLOCK"),
+                (CONSUMER_CAPABILITY, object(), "FEAT-TEST-CONSUME_SERVICE"),
+                (ROOT_CAPABILITY, object(), "FEAT-ANOTHER-CLOCK"),
             ]
         )
 
     # Historical bars should NOT have been registered due to all-or-nothing validation
-    assert not registry.is_available(HISTORICAL_BARS)
+    assert not registry.is_available(CONSUMER_CAPABILITY)
 
 
 def test_registry_active_capabilities_and_clear() -> None:
     """Test active_capabilities snapshot and registry clear."""
     registry = ServiceRegistry()
-    token1 = registry.register(HISTORICAL_BARS, object(), "FEAT-DATA-RETRIEVE_BARS")
-    token2 = registry.register(BROKER_MARKET_DATA, object(), "FEAT-BROKER-FEED_MT5")
+    token1 = registry.register(
+        CONSUMER_CAPABILITY, object(), "FEAT-TEST-CONSUME_SERVICE"
+    )
+    token2 = registry.register(
+        PROVIDER_CAPABILITY, object(), "FEAT-TEST-PROVIDE_SERVICE"
+    )
 
     active = registry.active_capabilities()
-    assert active[HISTORICAL_BARS.identifier] == token1
-    assert active[BROKER_MARKET_DATA.identifier] == token2
+    assert active[CONSUMER_CAPABILITY.identifier] == token1
+    assert active[PROVIDER_CAPABILITY.identifier] == token2
 
     registry.clear()
     assert len(registry.active_capabilities()) == 0
-    assert not registry.is_available(HISTORICAL_BARS)
+    assert not registry.is_available(CONSUMER_CAPABILITY)

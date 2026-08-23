@@ -29,7 +29,7 @@ Stable specification labels retained here (`§10.1`, `§23.14`, and `§23.15`) a
 
 ## 1. Purpose and authority
 
-The implemented `app/kernel/`, `app/composition/`, `app/api/`, and initial removable features are the architectural baseline. The executable `FEAT-BROKER-FEED_MOCK → FEAT-DATA-RETRIEVE_BARS` slice and `FEAT-SYS-PERSIST_STORAGE` prove the substrate; they do not imply completion of product requirements with similar names.
+The implemented `app/kernel/` and `app/composition/` runtime plus the `app/contracts/` boundary are the architectural baseline. Business-neutral test fixtures prove discovery, capability publication, dependency resolution, lifecycle cleanup, replacement, and physical removal without registering demonstration product features.
 
 Authority is assigned by subject:
 
@@ -62,11 +62,11 @@ For the implemented composability foundation, executable code plus architecture 
 
 ## 3. Universal invariants
 
-1. `app/kernel/`, `app/contracts/`, `app/composition/`, and `app/api/` are shared modules, not business domains.
-2. Kernel imports no application contracts, composition/API policy, or service implementation.
-3. Contracts may import only the kernel capability-key primitive; Composition may import Kernel and Contracts; API may import Kernel, Contracts, and Composition.
+1. `app/kernel/`, `app/contracts/`, and `app/composition/` are shared modules, not business domains.
+2. Kernel imports no application contracts, composition policy, or service implementation.
+3. Contracts may import only the kernel capability-key primitive; Composition may import Kernel and Contracts.
 4. Shared modules never import service implementations. A service/UI feature never imports another feature implementation.
-5. Cross-feature calls resolve declared capabilities through `FeatureContext`; stable application callers use `app/api/` facades where applicable.
+5. Cross-feature calls resolve declared capabilities through `FeatureContext`; stable external callers use registered D-IFACE gateways where applicable.
 6. Each domain writes only its own state and artifacts. Cross-domain consistency uses contracts, immutable references, events, and orchestration.
 7. Features receive no raw database handle, unrestricted path, provider SDK object, process global, or undeclared network/process authority.
 8. Reversible effects belong to one `FeatureScope` and close exactly once in last-in-first-out order.
@@ -84,7 +84,6 @@ HaruQuantAI/
 │   ├── kernel/                   # independent composability primitives
 │   ├── contracts/                # cross-boundary application/domain contracts
 │   ├── composition/              # discovery, configuration, readiness, runtime policy
-│   ├── api/                      # stable capability-aware facades/transport substrate
 │   ├── services/<domain>/        # removable Python domain features
 │   └── ui/src/features/          # removable React UI features
 └── tests/                        # unit and cross-cutting verification
@@ -95,7 +94,6 @@ HaruQuantAI/
 | Kernel | `CapabilityKey`, `FeatureSpec`, lifecycle/state protocols, context/scope, registry, graph, reconciler, event/task primitives, replacement models | Application DTOs, discovery/config-file policy, routes, SDKs, domain behavior |
 | Contracts | DTOs, ports, commands, queries, results, events, errors, capability declarations, wire schemas | Runtime behavior, feature specs, adapters, persistence, SDKs, UI |
 | Composition | Entry-point discovery, TOML policy, provider selection, readiness, watching, serialized runtime mutation, logging infrastructure | Kernel primitives, business policy, provider SDKs, persistence, hard-coded feature imports |
-| API | Capability-aware facades, system diagnostics, shared transport substrate | Service imports or duplicated domain policy |
 
 Arrows mean “is depended upon by”:
 
@@ -104,9 +102,6 @@ flowchart LR
     K[Kernel] --> C[Contracts]
     K --> O[Composition]
     C --> O
-    K --> A[API]
-    C --> A
-    O --> A
     K --> S[Service features]
     C --> S
     C --> U[UI features]
@@ -114,7 +109,7 @@ flowchart LR
 
 Importing a package performs no network, database, filesystem, route, event, task, process, registry, or log-handler mutation. Optional SDKs remain inside their removable adapter boundary. Public cross-boundary types live only under Contracts; services contain implementations.
 
-Composition's runtime orchestration is generic discovery, selection, activation, reconciliation, replacement, and reload serialization. It is distinct from the Orchestration domain's user-authored durable project graphs. API is business-neutral substrate; Interfaces owns product-facing transport semantics; UI owns presentation and interaction.
+Composition's runtime orchestration is generic discovery, selection, activation, reconciliation, replacement, diagnostics, and reload serialization. It is distinct from the Orchestration domain's user-authored durable project graphs. Interfaces owns product-facing transport semantics; UI owns presentation and interaction.
 
 ## 5. Feature architecture
 
@@ -292,7 +287,7 @@ System conformance covers all twelve `PROJECT.md` workflows, determinism/parity 
 
 ## 15. Decisions and change governance
 
-Ratified decisions are: four non-domain shared modules; Kernel-owned composability primitives; centralized physical contracts with distributed semantic ownership; vertical contract-first slices; Python entry-point discovery; local-first modular monolith; capability binding instead of service imports; one writer per domain state; content-addressed artifacts; process isolation for untrusted/heavy work; separate Interfaces/UI over one application contract; disabled-by-default operational trading; identical domain packages across deployment modes; and no ambient authority.
+Ratified decisions are: three non-domain shared modules; Kernel-owned composability primitives; centralized physical contracts with distributed semantic ownership; vertical contract-first slices; Python entry-point discovery; local-first modular monolith; capability binding instead of service imports; one writer per domain state; content-addressed artifacts; process isolation for untrusted/heavy work; separate Interfaces/UI over one application contract; disabled-by-default operational trading; identical domain packages across deployment modes; and no ambient authority.
 
 There are no unresolved architecture decisions. Unspecified behavior is unsupported and fails validation rather than being guessed.
 

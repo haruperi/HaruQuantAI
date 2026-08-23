@@ -1,1 +1,0 @@
-"""System domain capability contracts."""
