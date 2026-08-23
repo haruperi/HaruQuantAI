@@ -250,7 +250,7 @@ A reproducible manifest pins exact strategy/data/catalogue/profile/plugin/config
 
 Requests, commands, jobs, attempts, runs, lifecycle/dependency changes, effects, commits, operational decisions, and reconciliation emit causally linkable telemetry where applicable. Required dimensions include request, correlation, causation, reconciliation, workspace, component, job/run/task, strategy/result, provider generation, and trading operation IDs.
 
-Logging is a Composition-owned infrastructure effect. The first delivery prerequisite adds `app/composition/logging.py`, invoked by `app/main.py`, for handlers, structured formatting, redaction, correlation context, retention integration, and deterministic cleanup. Emitting modules use `logging.getLogger(__name__)`; Kernel, Contracts, API, and services never import a logger singleton or depend on Composition merely to emit. Domain audit meaning stays with its domain.
+Logging is an implemented Composition-owned infrastructure effect. `app/composition/logging.py`, initialized by `app/main.py`, owns handler configuration, structured JSON formatting, deterministic secret redaction with diagnostic SHA-256 fingerprints, contextvars-based correlation context, bounded diagnostic capture/expiry, and owned lifecycle cleanup. Emitting modules use standard `logger = logging.getLogger(__name__)` at workflow, lifecycle, state-transition, retry, decision, and failure boundaries; Kernel, Contracts, API, and services never import a logger singleton or depend on Composition merely to emit. Domain audit meaning stays with its domain.
 
 ### Failure containment
 

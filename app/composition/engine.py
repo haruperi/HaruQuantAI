@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -25,6 +26,8 @@ from app.kernel.feature import FeatureState
 from app.kernel.reconciler import Reconciler, ReconciliationReport
 from app.kernel.registry import ServiceRegistry
 from app.kernel.replacement import ReplacementReport
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,6 +79,18 @@ class CompositionEngine:
         error: BaseException,
     ) -> None:
         """Serialize runtime-failure reconciliation and publish its event."""
+        logger.error(
+            "Feature runtime failure encountered in background task",
+            extra={
+                "event": "FEATURE_RUNTIME_FAILED",
+                "fields": {
+                    "feature_id": feature_id,
+                    "task_name": task_name,
+                    "error_type": type(error).__name__,
+                    "error_message": str(error),
+                },
+            },
+        )
         async with self._mutation_lock:
             await self._reconciler.handle_runtime_failure(
                 feature_id,
@@ -145,6 +160,16 @@ class CompositionEngine:
         self,
         config: AppConfig,
     ) -> ReconciliationReport:
+        logger.debug(
+            "Starting configuration reconciliation pass",
+            extra={
+                "event": "RECONCILIATION_START",
+                "fields": {
+                    "profile": config.profile,
+                    "features_count": len(config.features),
+                },
+            },
+        )
         discovery = self._discoverer.discover()
         enabled_ids = [
             feature_id
@@ -164,6 +189,19 @@ class CompositionEngine:
         self._config = config
         self._last_discovery = discovery
         self._last_report = report
+        logger.info(
+            "Configuration reconciliation finished",
+            extra={
+                "event": "RECONCILIATION_COMPLETE",
+                "fields": {
+                    "profile": config.profile,
+                    "started_features": list(report.started),
+                    "stopped_features": list(report.stopped),
+                    "blocked_count": len(report.blocked_features),
+                    "errors_count": len(report.errors),
+                },
+            },
+        )
         return report
 
     async def reconcile_with_config(
@@ -187,9 +225,26 @@ class CompositionEngine:
         Returns:
             Report describing lifecycle transitions.
         """
+        logger.info(
+            "Initiating configuration hot reload",
+            extra={
+                "event": "HOT_RELOAD_START",
+                "fields": {"profile": new_config.profile},
+            },
+        )
         async with self._mutation_lock:
             report = await self._reconcile_unlocked(new_config)
         modified = tuple(sorted(set(report.started) | set(report.stopped)))
+        logger.info(
+            "Configuration hot reload completed",
+            extra={
+                "event": "HOT_RELOAD_COMPLETE",
+                "fields": {
+                    "profile": self._config.profile,
+                    "modified_count": len(modified),
+                },
+            },
+        )
         await self._event_bus.publish(
             ConfigurationReloadedEvent(
                 profile=self._config.profile,
@@ -234,10 +289,25 @@ class CompositionEngine:
         Returns:
             Detailed replacement and cleanup report.
         """
+        logger.info(
+            "Starting transactional feature replacement",
+            extra={
+                "event": "FEATURE_REPLACEMENT_START",
+                "fields": {"feature_id": feature_id},
+            },
+        )
         async with self._mutation_lock:
             discovery = self._discoverer.discover()
             feature = discovery.discovered.get(feature_id)
             if feature is None:
+                err_msg = f"Feature '{feature_id}' not found in discovery"
+                logger.warning(
+                    "Feature replacement failed: feature not discovered",
+                    extra={
+                        "event": "FEATURE_REPLACEMENT_NOT_FOUND",
+                        "fields": {"feature_id": feature_id},
+                    },
+                )
                 return ReplacementReport(
                     feature_id=feature_id,
                     old_generation=0,
@@ -245,7 +315,7 @@ class CompositionEngine:
                     committed=False,
                     rolled_back=True,
                     status="rolled_back",
-                    error=f"Feature '{feature_id}' not found in discovery",
+                    error=err_msg,
                 )
             config = (
                 new_config
@@ -272,12 +342,34 @@ class CompositionEngine:
                 )
 
         if report.committed:
+            logger.info(
+                "Feature replacement committed successfully",
+                extra={
+                    "event": "FEATURE_REPLACEMENT_COMMITTED",
+                    "fields": {
+                        "feature_id": feature_id,
+                        "new_generation": report.new_generation,
+                        "is_degraded": report.is_degraded,
+                    },
+                },
+            )
             await self._event_bus.publish(
                 FeatureReconfiguredEvent(
                     feature_id=feature_id,
                     generation=report.new_generation,
                     timestamp=datetime.now(UTC),
                 )
+            )
+        else:
+            logger.warning(
+                "Feature replacement rolled back",
+                extra={
+                    "event": "FEATURE_REPLACEMENT_ROLLED_BACK",
+                    "fields": {
+                        "feature_id": feature_id,
+                        "error": report.error,
+                    },
+                },
             )
         return report
 
@@ -347,7 +439,15 @@ class CompositionEngine:
 
     async def shutdown(self) -> None:
         """Serialize shutdown and release all lifecycle-owned resources."""
+        logger.info(
+            "Starting composition engine shutdown",
+            extra={"event": "ENGINE_SHUTDOWN_START"},
+        )
         async with self._mutation_lock:
             await self._reconciler.stop_all()
             self._registry.clear()
             self._event_bus.clear()
+        logger.info(
+            "Composition engine shutdown completed",
+            extra={"event": "ENGINE_SHUTDOWN_COMPLETE"},
+        )

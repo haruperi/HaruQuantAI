@@ -1,8 +1,14 @@
+import asyncio
 from typing import TYPE_CHECKING
 
 import pytest
 
 from app.composition.engine import CompositionEngine
+from app.composition.logging import (
+    LoggingConfig,
+    compute_secret_fingerprint,
+    configure_logging,
+)
 from app.kernel.feature import FeatureSpec, FeatureState
 from tests._support.composability import (
     CONSUMER_CAPABILITY,
@@ -146,3 +152,58 @@ async def test_engine_load_and_reconcile_file(tmp_path: object) -> None:
     assert engine.get_status().is_ready is True
 
     await engine.shutdown()
+
+
+@pytest.mark.asyncio
+async def test_engine_logging_boundary_events_and_secret_safety() -> None:
+    """Engine reconciliation, runtime failure, and shutdown emit structured, secret-safe log events."""
+    canary = "secret_engine_runtime_canary_key_12345"
+    fp = compute_secret_fingerprint(canary)
+
+    class FailingRuntimeFeature:
+        spec = FeatureSpec(
+            feature_id="FEAT-TEST-FAILING_RUNTIME",
+            domain="test",
+            provides=frozenset({ROOT_CAPABILITY}),
+        )
+
+        async def mount(self, context: FeatureContext, _config: object) -> None:
+            context.provide(ROOT_CAPABILITY, "impl")
+
+            async def faulty_task() -> None:
+                msg = f"Crash with credential: {canary}"
+                raise RuntimeError(msg)
+
+            context.spawn(faulty_task(), name="faulty_bg_task")
+
+    cfg = LoggingConfig(level="DEBUG", console=False, capture_capacity=50)
+    with configure_logging(cfg) as handle:
+        engine = CompositionEngine()
+        engine.discoverer.register_feature(FailingRuntimeFeature())
+
+        toml_content = """
+        [application]
+        profile = "offline"
+
+        [features."FEAT-TEST-FAILING_RUNTIME"]
+        enabled = true
+        """
+        await engine.load_and_reconcile_toml(toml_content)
+        await asyncio.sleep(0.01)
+
+        await engine.shutdown()
+
+        capture = handle.capture_handler
+        assert capture is not None
+        records = capture.get_records()
+        event_names = [r.event for r in records]
+
+        assert "RECONCILIATION_START" in event_names
+        assert "RECONCILIATION_COMPLETE" in event_names
+        assert "FEATURE_RUNTIME_FAILED" in event_names
+        assert "ENGINE_SHUTDOWN_START" in event_names
+        assert "ENGINE_SHUTDOWN_COMPLETE" in event_names
+
+        all_text = " ".join(str(r) for r in records)
+        assert canary not in all_text
+        assert fp in all_text

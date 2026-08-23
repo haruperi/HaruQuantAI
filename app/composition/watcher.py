@@ -2,12 +2,17 @@
 
 import asyncio
 import contextlib
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
+
+from app.composition.logging import compute_secret_fingerprint
 
 if TYPE_CHECKING:
     from app.composition.engine import CompositionEngine
     from app.kernel.scope import FeatureScope
+
+logger = logging.getLogger(__name__)
 
 
 class ConfigFileWatcher:
@@ -41,6 +46,7 @@ class ConfigFileWatcher:
         self._scope = scope
         self._poll_interval = poll_interval
         self._debounce = debounce
+        self._config_ref = compute_secret_fingerprint(str(config_path))
         self._task: asyncio.Task[None] | None = None
         self._running = False
         self._last_mtime: float | None = None
@@ -65,6 +71,16 @@ class ConfigFileWatcher:
         current_mtime = self._config_path.stat().st_mtime
         if self._last_mtime is None or current_mtime > self._last_mtime:
             self._last_mtime = current_mtime
+            logger.info(
+                "Configuration file modification detected, triggering reload",
+                extra={
+                    "event": "WATCHER_FILE_CHANGED",
+                    "fields": {
+                        "config_ref": self._config_ref,
+                        "mtime": current_mtime,
+                    },
+                },
+            )
             if self._debounce > 0:
                 await asyncio.sleep(self._debounce)
             await self._engine.load_and_reconcile_file(self._config_path)
@@ -78,14 +94,39 @@ class ConfigFileWatcher:
                 await self.check_and_reload()
                 await asyncio.sleep(self._poll_interval)
             except asyncio.CancelledError:
+                logger.debug(
+                    "Configuration watcher loop cancelled",
+                    extra={"event": "WATCHER_LOOP_CANCELLED"},
+                )
                 break
-            except Exception:  # noqa: BLE001
+            except Exception as error:
+                logger.warning(
+                    "Configuration watcher loop error during poll/reload",
+                    exc_info=True,
+                    extra={
+                        "event": "WATCHER_POLL_ERROR",
+                        "fields": {
+                            "config_ref": self._config_ref,
+                            "error_type": type(error).__name__,
+                        },
+                    },
+                )
                 await asyncio.sleep(self._poll_interval)
 
     def start(self) -> None:
         """Start the background configuration watcher task."""
         if not self._running:
             self._running = True
+            logger.info(
+                "Starting configuration file watcher",
+                extra={
+                    "event": "WATCHER_START",
+                    "fields": {
+                        "config_ref": self._config_ref,
+                        "poll_interval": self._poll_interval,
+                    },
+                },
+            )
             if self._scope is not None:
                 self._task = self._scope.spawn(
                     self._watch_loop(), name="config_file_watcher"
@@ -99,6 +140,13 @@ class ConfigFileWatcher:
     async def stop(self) -> None:
         """Stop the background watcher task and await its completion."""
         self._running = False
+        logger.info(
+            "Stopping configuration file watcher",
+            extra={
+                "event": "WATCHER_STOP",
+                "fields": {"config_ref": self._config_ref},
+            },
+        )
         if self._task is not None:
             self._task.cancel()
             with contextlib.suppress(asyncio.CancelledError):

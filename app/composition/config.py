@@ -8,11 +8,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from app.composition.logging import LoggingConfig
 from app.composition.readiness import KNOWN_PROFILES
 
 _CAPABILITY_ID_PATTERN = re.compile(r"^[a-z][a-z0-9_.-]*@[1-9][0-9]*$")
 _FEATURE_ID_PATTERN = re.compile(r"^FEAT-[A-Z0-9_-]+$")
-_ALLOWED_TOP_LEVEL = frozenset({"application", "features", "providers"})
+_ALLOWED_TOP_LEVEL = frozenset({"application", "features", "providers", "logging"})
 
 
 class ConfigurationError(ValueError):
@@ -38,13 +39,14 @@ class AppConfig:
     profile: str = "research"
     features: dict[str, FeatureConfig] = field(default_factory=dict)
     provider_selections: dict[str, str] = field(default_factory=dict)
+    logging: LoggingConfig = field(default_factory=LoggingConfig)
 
     def __post_init__(self) -> None:
         """Normalize and validate direct AppConfig construction.
 
         Raises:
             InvalidProfileError: If the deployment profile is unsupported.
-            ConfigurationError: If a provider selection identifier is invalid.
+            ConfigurationError: If provider selection or logging config is invalid.
         """
         normalized = self.profile.strip().lower()
         if normalized not in KNOWN_PROFILES:
@@ -56,6 +58,10 @@ class AppConfig:
         object.__setattr__(self, "profile", normalized)
         for capability, feature_id in self.provider_selections.items():
             _validate_provider_selection(capability, feature_id)
+        try:
+            self.logging.validate()
+        except ValueError as err:
+            raise ConfigurationError(str(err)) from err
 
     def is_feature_enabled(self, feature_id: str) -> bool:
         """Return whether a feature is declared and enabled."""
@@ -176,6 +182,65 @@ def _parse_providers(raw: dict[str, Any]) -> dict[str, str]:
     return providers
 
 
+def _parse_logging(raw: dict[str, Any]) -> LoggingConfig:  # noqa: C901
+    logging_raw = raw.get("logging")
+    if logging_raw is None:
+        return LoggingConfig()
+    if not isinstance(logging_raw, dict):
+        raise ConfigurationError("'[logging]' must be a TOML table")
+
+    unknown_keys = set(logging_raw) - {
+        "level",
+        "console",
+        "file_path",
+        "max_bytes",
+        "backup_count",
+        "capture_capacity",
+    }
+    if unknown_keys:
+        raise ConfigurationError(
+            "Unknown keys in [logging]: " + ", ".join(sorted(unknown_keys))
+        )
+
+    level = logging_raw.get("level", "INFO")
+    if not isinstance(level, str):
+        raise ConfigurationError("'[logging].level' must be a string")
+
+    console = logging_raw.get("console", True)
+    if not isinstance(console, bool):
+        raise ConfigurationError("'[logging].console' must be a boolean")
+
+    file_path = logging_raw.get("file_path")
+    if file_path is not None and not isinstance(file_path, (str, Path)):
+        raise ConfigurationError("'[logging].file_path' must be a string or path")
+
+    max_bytes = logging_raw.get("max_bytes", 10 * 1024 * 1024)
+    if not isinstance(max_bytes, int) or isinstance(max_bytes, bool):
+        raise ConfigurationError("'[logging].max_bytes' must be an integer")
+
+    backup_count = logging_raw.get("backup_count", 5)
+    if not isinstance(backup_count, int) or isinstance(backup_count, bool):
+        raise ConfigurationError("'[logging].backup_count' must be an integer")
+
+    capture_capacity = logging_raw.get("capture_capacity", 1000)
+    if not isinstance(capture_capacity, int) or isinstance(capture_capacity, bool):
+        raise ConfigurationError("'[logging].capture_capacity' must be an integer")
+
+    cfg = LoggingConfig(
+        level=level,
+        console=console,
+        file_path=file_path,
+        max_bytes=max_bytes,
+        backup_count=backup_count,
+        capture_capacity=capture_capacity,
+    )
+    try:
+        cfg.validate()
+    except ValueError as err:
+        raise ConfigurationError(str(err)) from err
+    return cfg
+
+
 def load_config_from_toml_string(content: str) -> AppConfig:
     """Parse and validate application configuration from TOML text.
 
@@ -203,6 +268,7 @@ def load_config_from_toml_string(content: str) -> AppConfig:
         profile=_parse_profile(raw),
         features=_parse_features(raw),
         provider_selections=_parse_providers(raw),
+        logging=_parse_logging(raw),
     )
 
 

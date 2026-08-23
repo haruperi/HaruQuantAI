@@ -156,3 +156,102 @@ def test_unknown_sections_and_invalid_feature_shapes_are_rejected() -> None:
             nested_value = 2
             """
         )
+
+
+def test_logging_section_parsing_and_defaults() -> None:
+    """The [logging] section is parsed into AppConfig.logging with proper overrides."""
+    # Test default logging when omitted
+    config_default = load_config_from_toml_string(
+        """
+        [application]
+        profile = "research"
+        """
+    )
+    assert config_default.logging.level == "INFO"
+    assert config_default.logging.console is True
+    assert config_default.logging.file_path is None
+    assert config_default.logging.max_bytes == 10 * 1024 * 1024
+    assert config_default.logging.backup_count == 5
+    assert config_default.logging.capture_capacity == 1000
+
+    # Test explicit [logging] section
+    config_explicit = load_config_from_toml_string(
+        """
+        [application]
+        profile = "research"
+
+        [logging]
+        level = "DEBUG"
+        console = false
+        file_path = "logs/test.log"
+        max_bytes = 2097152
+        backup_count = 3
+        capture_capacity = 500
+        """
+    )
+    assert config_explicit.logging.level == "DEBUG"
+    assert config_explicit.logging.console is False
+    assert config_explicit.logging.file_path == "logs/test.log"
+    assert config_explicit.logging.max_bytes == 2097152
+    assert config_explicit.logging.backup_count == 3
+    assert config_explicit.logging.capture_capacity == 500
+
+
+def test_logging_section_validation_errors() -> None:
+    """Invalid [logging] sections fail closed with ConfigurationError."""
+    # Unknown key
+    with pytest.raises(ConfigurationError, match="Unknown keys in \\[logging\\]"):
+        load_config_from_toml_string(
+            """
+            [application]
+            profile = "research"
+            [logging]
+            unknown_prop = 123
+            """
+        )
+
+    # Invalid level
+    with pytest.raises(ConfigurationError, match="Unsupported logging level"):
+        load_config_from_toml_string(
+            """
+            [application]
+            profile = "research"
+            [logging]
+            level = "INVALID_LEVEL"
+            """
+        )
+
+    # Invalid type for console
+    with pytest.raises(ConfigurationError, match="must be a boolean"):
+        load_config_from_toml_string(
+            """
+            [application]
+            profile = "research"
+            [logging]
+            console = "yes"
+            """
+        )
+
+    # Invalid non-positive max_bytes
+    with pytest.raises(ConfigurationError, match="max_bytes must be strictly positive"):
+        load_config_from_toml_string(
+            """
+            [application]
+            profile = "research"
+            [logging]
+            max_bytes = 0
+            """
+        )
+
+    # Invalid non-positive backup_count
+    with pytest.raises(
+        ConfigurationError, match="backup_count must be strictly positive"
+    ):
+        load_config_from_toml_string(
+            """
+            [application]
+            profile = "research"
+            [logging]
+            backup_count = -1
+            """
+        )

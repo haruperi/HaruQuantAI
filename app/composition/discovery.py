@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import importlib.metadata
+import logging
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 
 from app.kernel.feature import Feature
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,6 +63,13 @@ class FeatureDiscoverer:
         Returns:
             Successfully discovered features and categorized failures.
         """
+        logger.debug(
+            "Starting feature discovery pass",
+            extra={
+                "event": "DISCOVERY_START",
+                "fields": {"group": self._group},
+            },
+        )
         discovered: dict[str, Feature] = {}
         missing_targets: dict[str, str] = {}
         failed_imports: dict[str, str] = {}
@@ -72,6 +82,30 @@ class FeatureDiscoverer:
             failed_imports,
             failed_specs,
         )
+
+        has_warnings = bool(missing_targets or failed_imports or failed_specs)
+        if has_warnings:
+            logger.warning(
+                "Feature discovery pass completed with diagnostic errors",
+                extra={
+                    "event": "DISCOVERY_COMPLETED_WITH_WARNINGS",
+                    "fields": {
+                        "discovered_count": len(discovered),
+                        "missing_targets_count": len(missing_targets),
+                        "failed_imports_count": len(failed_imports),
+                        "failed_specs_count": len(failed_specs),
+                    },
+                },
+            )
+        else:
+            logger.info(
+                "Feature discovery pass completed successfully",
+                extra={
+                    "event": "DISCOVERY_COMPLETED",
+                    "fields": {"discovered_count": len(discovered)},
+                },
+            )
+
         return DiscoveryResult(
             discovered=discovered,
             missing_targets=missing_targets,
@@ -89,10 +123,21 @@ class FeatureDiscoverer:
         feature.spec.validate()
         feature_id = feature.spec.feature_id
         if feature_id in discovered:
-            failed_specs[diagnostic_name] = (
+            msg = (
                 f"Duplicate feature ID '{feature_id}' discovered; the existing "
                 "feature was retained and the duplicate was rejected"
             )
+            logger.warning(
+                "Duplicate feature ID rejected during discovery",
+                extra={
+                    "event": "DISCOVERY_DUPLICATE_REJECTED",
+                    "fields": {
+                        "feature_id": feature_id,
+                        "diagnostic_name": diagnostic_name,
+                    },
+                },
+            )
+            failed_specs[diagnostic_name] = msg
             return
         discovered[feature_id] = feature
 
@@ -112,8 +157,29 @@ class FeatureDiscoverer:
                     failed_specs,
                 )
             except ValueError as error:
+                logger.warning(
+                    "Invalid feature specification in manual registration",
+                    extra={
+                        "event": "DISCOVERY_MANUAL_SPEC_FAILED",
+                        "fields": {
+                            "diagnostic_name": diagnostic_name,
+                            "error": str(error),
+                        },
+                    },
+                )
                 failed_specs[diagnostic_name] = str(error)
             except Exception as error:  # noqa: BLE001
+                logger.warning(
+                    "Manual feature factory instantiation failure",
+                    extra={
+                        "event": "DISCOVERY_MANUAL_FACTORY_FAILED",
+                        "fields": {
+                            "diagnostic_name": diagnostic_name,
+                            "error_type": type(error).__name__,
+                            "error": str(error),
+                        },
+                    },
+                )
                 failed_imports[diagnostic_name] = str(error)
 
     def _load_entry_points(
@@ -126,7 +192,14 @@ class FeatureDiscoverer:
         entry_points: Sequence[importlib.metadata.EntryPoint]
         try:
             entry_points = tuple(importlib.metadata.entry_points(group=self._group))
-        except Exception as error:  # noqa: BLE001
+        except Exception as error:
+            logger.exception(
+                "Failed to query entry points group",
+                extra={
+                    "event": "DISCOVERY_ENTRY_POINTS_QUERY_FAILED",
+                    "fields": {"group": self._group, "error": str(error)},
+                },
+            )
             failed_imports["__entry_points__"] = str(error)
             return
 
@@ -136,9 +209,17 @@ class FeatureDiscoverer:
                 target = entry_point.load()
                 feature = target() if callable(target) else target
                 if not isinstance(feature, Feature):
-                    failed_specs[diagnostic_name] = (
+                    msg = (
                         f"Target '{diagnostic_name}' does not satisfy Feature protocol"
                     )
+                    logger.warning(
+                        "Entry point target does not satisfy Feature protocol",
+                        extra={
+                            "event": "DISCOVERY_PROTOCOL_MISMATCH",
+                            "fields": {"entry_point": diagnostic_name},
+                        },
+                    )
+                    failed_specs[diagnostic_name] = msg
                     continue
                 self._record_feature(
                     feature,
@@ -152,14 +233,53 @@ class FeatureDiscoverer:
                     error.name == target_module
                     or target_module.startswith(f"{error.name}.")
                 ):
-                    missing_targets[diagnostic_name] = (
-                        f"Entry point module '{target_module}' is missing"
+                    msg = f"Entry point module '{target_module}' is missing"
+                    logger.warning(
+                        "Entry point target module is missing",
+                        extra={
+                            "event": "DISCOVERY_TARGET_MODULE_MISSING",
+                            "fields": {
+                                "entry_point": diagnostic_name,
+                                "target_module": target_module,
+                            },
+                        },
                     )
+                    missing_targets[diagnostic_name] = msg
                 else:
-                    failed_imports[diagnostic_name] = (
-                        f"Feature dependency '{error.name}' missing: {error}"
+                    msg = f"Feature dependency '{error.name}' missing: {error}"
+                    logger.warning(
+                        "Entry point feature dependency missing",
+                        extra={
+                            "event": "DISCOVERY_DEPENDENCY_MISSING",
+                            "fields": {
+                                "entry_point": diagnostic_name,
+                                "missing_module": error.name,
+                            },
+                        },
                     )
+                    failed_imports[diagnostic_name] = msg
             except ValueError as error:
+                logger.warning(
+                    "Invalid feature spec from entry point",
+                    extra={
+                        "event": "DISCOVERY_ENTRY_POINT_SPEC_FAILED",
+                        "fields": {
+                            "entry_point": diagnostic_name,
+                            "error": str(error),
+                        },
+                    },
+                )
                 failed_specs[diagnostic_name] = str(error)
             except Exception as error:  # noqa: BLE001
+                logger.warning(
+                    "Entry point load failure",
+                    extra={
+                        "event": "DISCOVERY_ENTRY_POINT_FAILED",
+                        "fields": {
+                            "entry_point": diagnostic_name,
+                            "error_type": type(error).__name__,
+                            "error": str(error),
+                        },
+                    },
+                )
                 failed_imports[diagnostic_name] = str(error)

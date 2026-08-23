@@ -4,12 +4,23 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import contextlib
 import json
+import logging
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from app.composition.config import AppConfig, load_config_from_file
 from app.composition.engine import CompositionEngine
+from app.composition.logging import (
+    LoggingConfig,
+    compute_secret_fingerprint,
+    configure_logging,
+    emit_cleanup_diagnostics,
+)
+
+logger = logging.getLogger(__name__)
 
 
 def _status_payload(engine: CompositionEngine) -> dict[str, object]:
@@ -68,7 +79,7 @@ def _status_payload(engine: CompositionEngine) -> dict[str, object]:
     }
 
 
-async def async_main(argv: Sequence[str] | None = None) -> int:
+async def async_main(argv: Sequence[str] | None = None) -> int:  # noqa: C901, PLR0912, PLR0915
     """Run the composition runtime and return a process exit code.
 
     Returns:
@@ -80,29 +91,148 @@ async def async_main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument("--config", type=str, default=None)
     parser.add_argument("--status", action="store_true")
+    parser.add_argument(
+        "--log-level",
+        type=str,
+        default=None,
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Logging level threshold",
+    )
+    parser.add_argument(
+        "--log-file",
+        type=str,
+        default=None,
+        help="Optional destination file for structured log records",
+    )
     args = parser.parse_args(args=argv if argv is not None else sys.argv[1:])
 
-    engine = CompositionEngine()
+    loaded_app_config: AppConfig | None = None
+    config_ref: str | None = None
+    config_file_not_found = False
+
+    if args.config is not None:
+        config_path = Path(args.config)
+        config_ref = compute_secret_fingerprint(str(config_path))
+        if not config_path.is_file():  # noqa: ASYNC240
+            config_file_not_found = True
+        else:
+            with contextlib.suppress(Exception):
+                loaded_app_config = load_config_from_file(config_path)
+
+    base_log_cfg = (
+        loaded_app_config.logging if loaded_app_config is not None else LoggingConfig()
+    )
+    log_level = args.log_level if args.log_level is not None else base_log_cfg.level
+    log_file = args.log_file if args.log_file is not None else base_log_cfg.file_path
+
+    log_cfg = LoggingConfig(
+        level=log_level,
+        console=base_log_cfg.console,
+        file_path=log_file,
+        max_bytes=base_log_cfg.max_bytes,
+        backup_count=base_log_cfg.backup_count,
+        capture_capacity=base_log_cfg.capture_capacity,
+    )
+    logging_handle = configure_logging(log_cfg)
+
+    engine: CompositionEngine | None = None
+    exit_code = 0
     try:
-        if args.config is not None:
-            config_path = Path(args.config)
-            if not config_path.is_file():  # noqa: ASYNC240
-                print(f"[ERROR] Configuration file not found: {config_path}")
-                return 1
-            await engine.load_and_reconcile_file(config_path)
+        try:
+            logger.info(
+                "HaruQuantAI launcher starting",
+                extra={
+                    "event": "LAUNCHER_START",
+                    "fields": {
+                        "config_supplied": args.config is not None,
+                        "config_ref": config_ref,
+                        "status_mode": args.status,
+                    },
+                },
+            )
 
-        if args.status:
-            print(json.dumps(_status_payload(engine), indent=2))
-            return 0
+            if config_file_not_found:
+                logger.error(
+                    "Configuration file not found",
+                    extra={
+                        "event": "CONFIG_FILE_NOT_FOUND",
+                        "fields": {"config_ref": config_ref},
+                    },
+                )
+                print(f"[ERROR] Configuration file not found: {config_ref}")
+                exit_code = 1
+            elif args.config is not None and loaded_app_config is None:
+                logger.error(
+                    "Failed to parse configuration file",
+                    extra={
+                        "event": "CONFIG_PARSE_FAILED",
+                        "fields": {"config_ref": config_ref},
+                    },
+                )
+                print(f"[ERROR] Failed to parse configuration file: {config_ref}")
+                exit_code = 1
+            else:
+                engine = CompositionEngine()
+                if loaded_app_config is not None:
+                    report = await engine.reconcile_with_config(loaded_app_config)
+                    logger.info(
+                        "Configuration reconciled successfully",
+                        extra={
+                            "event": "CONFIG_RECONCILED",
+                            "fields": {
+                                "profile": engine.config.profile,
+                                "started_count": len(report.started),
+                                "stopped_count": len(report.stopped),
+                            },
+                        },
+                    )
 
-        print(
-            f"HaruQuantAI initialized (profile='{engine.config.profile}', "
-            f"active_features={len(engine.reconciler.active_features)}). "
-            "Use --status for composition diagnostics."
-        )
-        return 0
+                if args.status:
+                    print(json.dumps(_status_payload(engine), indent=2))
+                else:
+                    print(
+                        f"HaruQuantAI initialized (profile='{engine.config.profile}', "
+                        f"active_features={len(engine.reconciler.active_features)}). "
+                        "Use --status for composition diagnostics."
+                    )
+        except Exception as error:
+            with contextlib.suppress(Exception):
+                logger.exception(
+                    "Launcher execution failure",
+                    extra={
+                        "event": "LAUNCHER_FAILURE",
+                        "fields": {"error_type": type(error).__name__},
+                    },
+                )
+            exit_code = 1
+        finally:
+            if engine is not None:
+                try:
+                    await engine.shutdown()
+                except Exception as error:
+                    exit_code = 1
+                    with contextlib.suppress(Exception):
+                        logger.exception(
+                            "Composition engine shutdown failed",
+                            extra={
+                                "event": "LAUNCHER_ENGINE_SHUTDOWN_FAILED",
+                                "fields": {"error_type": type(error).__name__},
+                            },
+                        )
+            try:
+                logger.info(
+                    "HaruQuantAI launcher shutdown complete",
+                    extra={"event": "LAUNCHER_SHUTDOWN"},
+                )
+            except Exception:  # noqa: BLE001
+                exit_code = 1
     finally:
-        await engine.shutdown()
+        cleanup_diagnostics = logging_handle.close()
+        if cleanup_diagnostics:
+            with contextlib.suppress(Exception):
+                emit_cleanup_diagnostics(cleanup_diagnostics)
+            exit_code = 1
+    return exit_code
 
 
 def run() -> None:

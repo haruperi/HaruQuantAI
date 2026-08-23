@@ -317,7 +317,8 @@ Rules:
 | Missing | `NFR-DUR-001..010` | Durability | Atomic commit, recovery, lease fencing, checkpoints, backups, and retained compatibility metadata. | Fault/recovery corpus |
 | Missing | `NFR-PERF-001..015` | Performance | Named latency, throughput, resource, and benchmark gates. | Performance corpus |
 | Missing | `NFR-ISO-001..007` | Isolation/security | Loopback/authentication, paths, secrets, processes, workspaces, and deny-by-default permissions. | Isolation corpus |
-| Missing | `NFR-OBS-001..007` | Observability | Structured causal events, logs, metrics, traces, lineage, and redaction. | Reconstruction test |
+| Implemented foundation | `NFR-OBS-001, NFR-OBS-005, NFR-OBS-009` | Observability | Composition-owned structured logging, bounded rotation/capture with explicit recent-reference expiry, deterministic redaction fingerprints, and correlation context provide shared substrate only; system-wide emission coverage, durable referenced-log retention, and requirement-level completion remain pending. | Logging harness, schema/redaction/retention tests, and lifecycle validation |
+| Missing | `NFR-OBS-002..004, NFR-OBS-006..008` | Observability | Stable product failure envelopes, worker/operator metrics, differential reconstruction evidence, causal product events, and distributed tracing remain unimplemented. | Failure, metrics, reconstruction, lineage, and trace-continuity corpora |
 | Missing | `NFR-COMP-001..013` | Compatibility | API/schema/package/provider evolution, deletion builds, and conformance. | Compatibility corpus |
 
 ---

@@ -142,3 +142,34 @@ def test_manual_factory_error_is_categorized() -> None:
         discoverer.register_feature(broken_factory, feature_id="broken-feat")
         result = discoverer.discover()
     assert "Factory init error" in result.failed_imports["broken-feat"]
+
+
+def test_discovery_logging_is_structured_and_secret_safe() -> None:
+    """Categorized discovery failures emit structured, secret-safe log events."""
+    from app.composition.logging import (
+        LoggingConfig,
+        compute_secret_fingerprint,
+        configure_logging,
+    )
+
+    canary_secret = "super_secret_canary_token_value_xyz"  # pragma: allowlist secret
+    entry_point = MagicMock()
+    entry_point.name = "failing-entry"
+    entry_point.value = "app.services.broken.feature:create"
+    entry_point.load.side_effect = RuntimeError(f"Failed with token: {canary_secret}")
+
+    cfg = LoggingConfig(level="DEBUG", console=False, capture_capacity=20)
+    with configure_logging(cfg) as handle:
+        with patch("importlib.metadata.entry_points", return_value=[entry_point]):
+            result = FeatureDiscoverer().discover()
+
+        assert "failing-entry" in result.failed_imports
+        capture = handle.capture_handler
+        assert capture is not None
+        records = capture.get_records()
+        assert len(records) >= 1
+
+        rec_texts = [str(r) for r in records]
+        assert not any(canary_secret in text for text in rec_texts)
+        fp = compute_secret_fingerprint(canary_secret)
+        assert any(fp in text for text in rec_texts)

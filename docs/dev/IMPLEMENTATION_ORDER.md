@@ -97,7 +97,7 @@ completion.
 
 ### Increment 0 — Implemented composability foundation (preserve)
 
-**Status:** Composability substrate complete; structured-logging hardening is the first pending delivery prerequisite.
+**Status:** Composability substrate preserved; the Composition logging foundation is complete for the applicable portions of `NFR-OBS-001`, `NFR-OBS-005`, and `NFR-OBS-009`. System-wide observability completion remains pending later product increments.
 
 **Purpose:** Freeze the proven composability substrate as the baseline for every product increment; extend it without
 reimplementing or bypassing it.
@@ -124,21 +124,21 @@ Implemented evidence includes:
 6. Dependency loss, ambiguity, cycle, rollback, runtime-failure, LIFO cleanup, repeated lifecycle, replacement,
    documentation-drift, import-boundary, and removal tests.
 
-#### Foundation task 0.1 — [ ] Composition-owned structured logging
+#### Foundation task 0.1 — [x] Composition-owned structured logging
 
 This is non-domain runtime infrastructure, not a product `FEAT-*` or business `FR-*`. It implements the logging
 substrate required by `NFR-OBS-001`, `NFR-OBS-005`, and `NFR-OBS-009` without introducing a shared logger singleton or a
 fifth shared module.
 
-1. [ ] Add `app/composition/logging.py` for structured formatting, levels, deterministic redaction, correlation context,
-   retention integration, bounded diagnostic capture, and lifecycle-safe handler cleanup — evidence: path:line
-2. [ ] Configure logging from `app/main.py` before the composition engine begins runtime work, and close owned handlers
-   during shutdown — evidence: path:line
-3. [ ] Use `logger = logging.getLogger(__name__)` only in modules with workflow, lifecycle, I/O, state-transition,
+1. [x] Add `app/composition/logging.py` for structured formatting, levels, deterministic redaction, correlation context,
+   retention integration, bounded diagnostic capture, and lifecycle-safe handler cleanup — evidence: app/composition/logging.py:319, app/composition/logging.py:492, app/composition/logging.py:595, app/composition/logging.py:663, app/composition/logging.py:852
+2. [x] Configure logging from `app/main.py` before the composition engine begins runtime work, and close owned handlers
+   during shutdown — evidence: app/main.py:112, app/main.py:207
+3. [x] Use `logger = logging.getLogger(__name__)` only in modules with workflow, lifecycle, I/O, state-transition,
    retry, decision, or failure boundaries; pure contracts, DTOs, deterministic helpers, trivial accessors, and
-   high-frequency numerical modules remain log-free unless required — evidence: path:line
-4. [ ] Prove structured schema, correlation propagation, redaction, bounded capture/retention behavior, no duplicate
-   handlers, repeated startup/shutdown cleanup, and secret-safe failure output — evidence: path:line
+   high-frequency numerical modules remain log-free unless required — evidence: app/main.py:21, app/composition/discovery.py:12, app/composition/engine.py:30, app/composition/watcher.py:15
+4. [x] Prove structured schema, correlation propagation, redaction, bounded capture/retention behavior, no duplicate
+   handlers, repeated startup/shutdown cleanup, and secret-safe failure output — evidence: tests/composition/test_logging.py:43, tests/composition/test_hot_reconfiguration.py:513, tests/test_main.py:144, tests/test_main.py:164
 
 Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionContext`, per-FR runtime registrations,
 domain registries, or another backend lifecycle/effect framework. D-UI uses the documented TypeScript/React feature

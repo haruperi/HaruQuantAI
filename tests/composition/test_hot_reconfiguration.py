@@ -507,3 +507,69 @@ async def test_transactional_replacement_cleanup_error_degrades_status() -> None
     assert "Corrupted connection release" in report.cleanup_errors[0]
 
     await engine.shutdown()
+
+
+@pytest.mark.asyncio
+async def test_watcher_logging_lifecycle_and_error_capture(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Watcher deterministically emits change, poll-error, start, and stop evidence."""
+    from app.composition.logging import (
+        LoggingConfig,
+        compute_secret_fingerprint,
+        configure_logging,
+    )
+
+    path_canary = "path_secret=watcher_path_canary_7319"
+    error_canary = "poll_secret=watcher_error_canary_2984"
+    config_file = tmp_path / f"{path_canary}.toml"
+    config_file.write_text(
+        """
+        [application]
+        profile = "offline"
+        """,
+        encoding="utf-8",
+    )
+
+    cfg = LoggingConfig(level="DEBUG", console=False, capture_capacity=50)
+    with configure_logging(cfg) as handle:
+        engine = CompositionEngine()
+        watcher = ConfigFileWatcher(
+            config_file,
+            engine,
+            poll_interval=0.01,
+            debounce=0.0,
+        )
+
+        watcher._last_mtime = float("-inf")
+        assert await watcher.check_and_reload() is True
+
+        poll_called = asyncio.Event()
+
+        async def fail_poll() -> bool:
+            poll_called.set()
+            raise RuntimeError(error_canary)
+
+        monkeypatch.setattr(watcher, "check_and_reload", fail_poll)
+        watcher.start()
+        assert bool(watcher.is_running)
+        await asyncio.wait_for(poll_called.wait(), timeout=0.1)
+        await watcher.stop()
+        assert not bool(watcher.is_running)
+        await engine.shutdown()
+
+        capture = handle.capture_handler
+        assert capture is not None
+        records = capture.get_records()
+        event_names = [r.event for r in records]
+
+        assert "WATCHER_START" in event_names
+        assert "WATCHER_FILE_CHANGED" in event_names
+        assert "WATCHER_POLL_ERROR" in event_names
+        assert "WATCHER_STOP" in event_names
+        rendered = str(records)
+        assert path_canary not in rendered
+        assert error_canary not in rendered
+        assert compute_secret_fingerprint(str(config_file)) in rendered
+        assert compute_secret_fingerprint("watcher_error_canary_2984") in rendered
