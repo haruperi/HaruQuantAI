@@ -2,7 +2,7 @@
 
 > **Package:** `app/ui/` (React + TypeScript)
 > **Status:** `Missing`
-> **Last updated:** `2026-08-23`
+> **Last updated:** `2026-08-24`
 > **Domain ID:** `D-UI`
 
 > This README is the package's single source of truth for UI requirements, final structure, implementation sequence, deletion behavior, and tests.
@@ -106,6 +106,7 @@ app/ui/
 │   ├── contracts/
 │   │   └── generated/                 # generated from app/contracts/*/wire
 │   ├── runtime/                       # React capability/composition bridge
+│   ├── mocks/                         # dev-only mock capability provider; never imported by production code
 │   └── features/
 │       ├── compose_shell/             # FEAT-UI-COMPOSE_SHELL
 │       ├── start_work/                # FEAT-UI-START_WORK
@@ -413,6 +414,23 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 - Content Security Policy, safe URL handling, sanitized rich text, isolated extension roots, and secret redaction are mandatory.
 - Determinism applies to serialized UI commands, drafts, manifests, filters, and exported data, not animation timing.
 - Every safety-critical trading state must be sourced from a current authoritative projection and fail closed.
+
+### Mock-Data Mode (Increment 1 UI-first delivery)
+
+`app/ui/src/mocks/` is a documented non-feature support directory owned by this README. It supplies the dev-only mock
+capability provider that backs the Increment 1 mock-built UI surface defined in `docs/dev/IMPLEMENTATION_ORDER.md`:
+
+- **Ownership and shape:** the folder contains only mock capability/workspace/dataset registrations and mock contract
+  fixtures implementing the ratified contracts from `app/contracts/`. It never becomes a second feature registry,
+  implementation location, or hand-written public wire-contract source.
+- **Gating:** mocks register only through an explicit dev-mode gate (development builds or an explicit dev opt-in).
+  Production feature modules never import from `app/ui/src/mocks/`, and the folder is excluded from production
+  bundles.
+- **Truthfulness:** mock-derived data is visibly labeled non-authoritative in the UI. Mock datasets, results, metrics,
+  and events never render as authoritative backtest, live, or operational evidence (AGENTS.md §3 "No Invented Data").
+- **Deletion:** the folder is organized for whole-folder deletion. When a backend increment's de-mock gate switches a
+  `FEAT-UI-*` slice to live capability connections, that slice's mock registrations are deleted, and the final release
+  gate requires the folder to be fully deletable without touching production behavior.
 
 ---
 

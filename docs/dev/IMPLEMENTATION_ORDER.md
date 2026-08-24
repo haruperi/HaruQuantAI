@@ -4,7 +4,7 @@
 > **Architecture baseline:** `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and authoritative domain READMEs
 > **Inventory:** 3 non-domain shared modules, 15 business domains, 142 planned features, 549 business FRs, and 33
 > retained shared-foundation trace IDs (`FR-KERN-*`)
-> **Last updated:** 2026-08-23
+> **Last updated:** 2026-08-24
 
 ## 1. How to use this file
 
@@ -12,8 +12,10 @@ This document schedules delivery; it does not restate or weaken product behavior
 cross-domain workflows, system NFRs, and phase gates. `ARCHITECTURE.md` owns universal structural/runtime constraints.
 Each owning package README remains the sole feature/FR registry and acceptance authority.
 
-The sequence is agile in the strict sense used here: every increment produces a demonstrable vertical outcome through
-the UI, while preserving headless contract parity and feature removability.
+The sequence is agile in the strict sense used here: every increment produces a demonstrable outcome through the UI,
+while preserving headless contract parity and feature removability. Increment 1 is the deliberate **horizontal
+exception**: it authors the whole-app contract boundary and builds the complete mock-backed UI surface in one pass so
+that later backend increments integrate and verify directly from the frontend.
 
 - Preserve the implemented `app/kernel/` and `app/composition/` runtime plus the `app/contracts/` boundary. Product work
   extends them through contract-first vertical slices, with public gateways implemented as removable D-IFACE features.
@@ -30,6 +32,18 @@ the UI, while preserving headless contract parity and feature removability.
   failure, documentation, leak, interface where applicable, and physical-removal gates pass.
 - UI work starts in Increment 1. Each increment verifies loading, empty, stale, unavailable, error, interaction,
   accessibility, contract-parity, and removal behavior as applicable.
+- **Mock-build notation:** a mock-build line (`- FR-… (mock build; completes at Increment N de-mock gate)`) records UI
+  behavior built in Increment 1 against the dev-only mock capability provider in `app/ui/src/mocks/`. It is not a
+  completion checkbox and carries no acceptance claim. The requirement's single `[ ]` checkbox appears exactly once, at
+  the de-mock increment where live capability evidence can pass.
+- **Mock truthfulness:** mock-derived data is visibly labeled non-authoritative in the UI. Mock datasets, results,
+  metrics, and events must never render as authoritative backtest, live, or operational evidence (AGENTS.md §3
+  "No Invented Data").
+- **De-mock gates:** each backend increment from Increment 2 onward lists the `FEAT-UI-*` slices that switch from the
+  mock provider to live capability connections there. A relocated `FR-UI-*` checkbox completes only with UI↔backend
+  contract-parity evidence at its de-mock increment.
+- The "no consumer requirement may pass before its hard prerequisite" rule applies to completion checkboxes. Mock-build
+  lines may precede their producers because they claim no completion.
 - A demo checkpoint proves usable progress; it never changes an unfinished feature from `Partial` to complete.
 - A later increment may begin on an independent capability lane, but no consumer requirement may pass before its hard
   prerequisite or the prerequisite's earlier ordered slice in the same increment.
@@ -55,8 +69,8 @@ When completed:
 ## 2. Authoritative domain inventory
 
 Kernel and Composition are implemented non-domain runtime modules; Contracts is the specified shared boundary populated
-incrementally by real feature slices. “First increment” means the first planned product work in the domain, not domain
-completion.
+upfront by the Increment 1 whole-app contract-authoring task and extended afterward by real feature slices. “First
+increment” means the first planned product work in the domain, not domain completion.
 
 | First increment | Domain | Features | Business FRs | Authoritative document |
 | ---: | --- | ---: | ---: | --- |
@@ -81,7 +95,7 @@ completion.
 | Increment | Product outcome | Phase relationship |
 | ---: | --- | --- |
 | 0 | Preserve executable composability foundation | Foundation evidence; not a claim that every Phase 0 product gate is complete |
-| 1 | Executable Product Shell and Local Workspace | Foundation-preserving product slice; prepares Phase 1 |
+| 1 | Whole-App Contracts and Complete Mock-Backed User Interface | Foundation-preserving product slice; prepares Phase 1 |
 | 2 | Catalogue and Historical-Data Onboarding | Phase 1 input foundation |
 | 3 | Typed Strategy Authoring | Phase 1 authoring slice |
 | 4 | First Deterministic Backtest and Results | Phase 1 execution and analytics slice |
@@ -144,23 +158,49 @@ Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionC
 domain registries, or another backend lifecycle/effect framework. D-UI uses the documented TypeScript/React feature
 variant and consumes public capability state.
 
-### Increment 1 — Executable Product Shell and Local Workspace
+### Increment 1 — Whole-App Contracts and Complete Mock-Backed User Interface
 
 **Phase alignment:** Foundation-preserving product slice; prepares Phase 1
 
-**Scope:** 42 business FRs across 15 feature slices; 7 feature completion gates and 8 partial slices.
+**Scope:** 44 business FRs across 25 feature slices (16 completable `FR-UI-*` checkboxes plus 78 mock-build lines
+consolidating the remaining 94 `FR-UI-*` behaviors); 8 feature completion gates and 17 partial slices, plus the
+non-FR Foundation task 1.0.
 
-**Purpose:** Deliver the first usable application immediately: a secured local workspace, capability-aware public
-gateway, bounded plugin contribution declarations, and an accessible React shell with truthful diagnostics.
+**Purpose:** Author the whole-app contract boundary first, then deliver the complete mock-backed UI surface of the
+product in one pass: a secured local workspace, capability-aware public gateway, bounded plugin contribution
+declarations, an accessible React shell with truthful diagnostics, and every remaining `FEAT-UI-*` workspace built
+against the dev-only mock capability provider so later backend increments integrate and verify directly from the
+frontend.
 
-**Vertical path:** `Launcher → Workspace → D-IFACE capability/readiness gateway → D-UI shell`
+**Vertical path:** `Contract authoring (task 1.0) → Launcher → Workspace → D-IFACE capability/readiness gateway →
+D-UI shell → complete D-UI workspaces on mock capability data`
 
 **UI demo checkpoint:** Launch React, authenticate locally, open or diagnose a workspace, navigate the shell, inspect
-capability/readiness state, preserve a draft/layout preference, and observe explicit unavailable/error states.
+capability/readiness state, preserve a draft/layout preference, and walk through every mock-backed workspace
+(strategy authoring, data, research, results, projects, portfolios, code, administration, trading visuals) with
+mock-derived data visibly labeled non-authoritative — a clickable, mock-driven walkthrough of the complete product
+surface.
 
 **Exit gate:** The UI starts without waiting for later domains; workspace/configuration/recovery and gateway failures
-are visible, keyboard focus is deterministic, and deleting any participating feature leaves the remaining substrate
-healthy.
+are visible, keyboard focus is deterministic, every `FR-UI-*` behavior exists either as a completed checkbox with
+acceptance evidence or as a mock-build line with its de-mock increment recorded, mock data is visibly labeled
+non-authoritative, and deleting any participating feature leaves the remaining substrate healthy.
+
+#### Foundation task 1.0 — Whole-app contract authoring
+
+This is non-domain runtime infrastructure, not a product `FEAT-*` or business `FR-*`. It populates the shared contract
+boundary before any mock-backed UI slice is built, so mocks implement ratified contracts instead of inventing shapes.
+Contracts are authored from the owning domain READMEs (the semantic authorities) and may be revised by later real
+feature slices through their documented change processes.
+
+1. [ ] Enumerate every cross-boundary contract requirement from the 15 business-domain READMEs plus the existing
+   `app/contracts/ui/` package, and record the owner, consumers, and version for each.
+2. [ ] Author the Python/Pydantic definitions and wire schemas into `app/contracts/<owner>/` packages for all listed
+   contracts, including the 17 versioned UI feature capability ports and their request/result/failure/event unions.
+3. [ ] Regenerate the TypeScript clients and types under `app/ui/src/contracts/generated/` from the new contracts and
+   verify the existing generation flow stays the sole source (no hand-written public wire contracts under `app/ui/`).
+4. [ ] Prove contract-roundtrip parity (schema validation, versioning, and generated-type equality) and update
+   `app/contracts/README.md` to reflect the complete public contract inventory.
 
 #### `D-WS` — [Workspace](../../app/services/workspace/README.md) (Increment 1)
 
@@ -231,33 +271,145 @@ healthy.
 
 1. [ ] `FR-UI-PRESENT_HOME`
 2. [ ] `FR-UI-SHOW_PRODUCT_NEWS`
+3. `FR-UI-RESUME_RECENT_WORK` (mock build; completes at Increment 7 de-mock gate — 7.18)
+4. `FR-UI-LAUNCH_SHORTCUTS` (mock build; completes at Increment 7 de-mock gate — 7.18)
 
-##### 1.11 Partial — `FEAT-UI-MANAGE_LAYOUTS`
+##### 1.11 [ ] `FEAT-UI-MANAGE_LAYOUTS`
 
 1. [ ] `FR-UI-PERSIST_LAYOUTS`
 2. [ ] `FR-UI-RESTORE_LAYOUTS`
 3. [ ] `FR-UI-SCALE_VIEWS`
+4. [ ] `FR-UI-COMPOSE_PANELS` (relocated from former 8.22; UI-only dependencies — completable in Increment 1)
+5. [ ] `FR-UI-MANAGE_TABS` (relocated from former 3.10; UI-only dependencies — completable in Increment 1)
 
 ##### 1.12 Partial — `FEAT-UI-EDIT_INPUTS`
 
 1. [ ] `FR-UI-PRESERVE_DRAFTS`
+2. `FR-UI-RENDER_FIELDS` (mock build; completes at Increment 2 de-mock gate — 2.18)
+3. `FR-UI-VALIDATE_INPUT` (mock build; completes at Increment 2 de-mock gate — 2.18)
+4. `FR-UI-RESOLVE_CONFLICTS` (mock build; completes at Increment 2 de-mock gate — 2.18)
+5. `FR-UI-CONFIRM_IMPACT` (mock build; completes at Increment 2 de-mock gate — 2.18)
 
 ##### 1.13 Partial — `FEAT-UI-MONITOR_WORK`
 
 1. [ ] `FR-UI-TRACK_PROGRESS`
 2. [ ] `FR-UI-STREAM_ACTIVITY`
 3. [ ] `FR-UI-PRESENT_FAILURES`
+4. `FR-UI-CONTROL_JOBS` (mock build; completes at Increment 7 de-mock gate — 7.21)
+5. `FR-UI-NOTIFY_OUTCOMES` (mock build; completes at Increment 7 de-mock gate — 7.21)
 
 ##### 1.14 Partial — `FEAT-UI-ADMINISTER_SYSTEM`
 
 1. [ ] `FR-UI-SET_APPEARANCE`
 2. [ ] `FR-UI-CONFIGURE_CLIENT`
 3. [ ] `FR-UI-MANAGE_LICENSE`
+4. `FR-UI-MANAGE_UPDATES` (mock build; completes at Increment 7 de-mock gate — 7.22)
+5. `FR-UI-SET_LANGUAGE` (mock build; completes at Increment 8 de-mock gate — 8.25)
+6. `FR-UI-ADMINISTER_CAPABILITIES` (mock build; completes at Increment 8 de-mock gate — 8.25)
 
 ##### 1.15 Partial — `FEAT-UI-ENSURE_ACCESS`
 
 1. [ ] `FR-UI-MANAGE_FOCUS`
 2. [ ] `FR-UI-DISTINGUISH_STATE`
+3. `FR-UI-PROVIDE_DATA_ALTERNATIVES` (mock build; completes at Increment 4 de-mock gate — 4.19)
+4. `FR-UI-PRESERVE_USABILITY` (mock build; completes at Increment 8 de-mock gate — 8.26; locale-expansion
+   acceptance requires `FR-UI-SET_LANGUAGE`)
+5. `FR-UI-OPERATE_BY_KEYBOARD` (mock build; completes at Increment 10 de-mock gate — 10.27)
+6. `FR-UI-LABEL_CONTROLS` (mock build; completes at Increment 10 de-mock gate — 10.27)
+
+##### 1.16 Partial — `FEAT-UI-MANAGE_DATA` (mock build)
+
+1. `FR-UI-BROWSE_DATASETS` (mock build; completes at Increment 2 de-mock gate — 2.19)
+2. `FR-UI-IMPORT_DATA` (mock build; completes at Increment 2 de-mock gate — 2.19)
+3. `FR-UI-EXPORT_DATA` (mock build; completes at Increment 2 de-mock gate — 2.19)
+4. `FR-UI-EDIT_INSTRUMENTS` (mock build; completes at Increment 2 de-mock gate — 2.19)
+5. `FR-UI-EDIT_SESSIONS` (mock build; completes at Increment 2 de-mock gate — 2.19)
+6. `FR-UI-SYNC_DATA` (mock build; completes at Increment 8 de-mock gate — 8.23; requires `FEAT-DATA-SYNC_CONNECTORS` and
+   Orchestration)
+7. `FR-UI-ADMINISTER_DATA` (mock build; completes at Increment 10 de-mock gate — 10.25; requires Broker Connectivity)
+
+##### 1.17 Partial — `FEAT-UI-AUTHOR_STRATEGIES` (mock build)
+
+1. `FR-UI-EDIT_STRATEGY_TREE` (mock build; completes at Increment 3 de-mock gate — 3.11)
+2. `FR-UI-BROWSE_BLOCKS` (mock build; completes at Increment 3 de-mock gate — 3.11)
+3. `FR-UI-CONFIGURE_STRATEGY` (mock build; completes at Increment 3 de-mock gate — 3.11)
+4. `FR-UI-VALIDATE_STRATEGY` (mock build; completes at Increment 3 de-mock gate — 3.11)
+5. `FR-UI-USE_STRATEGY_EXAMPLES` (mock build; completes at Increment 3 de-mock gate — 3.11)
+6. `FR-UI-TEST_STRATEGY` (mock build; completes at Increment 4 de-mock gate — 4.16; requires Simulator and Analytics)
+
+##### 1.18 Partial — `FEAT-UI-OPERATE_DATABANKS` (mock build)
+
+1. `FR-UI-QUERY_DATABANKS` (mock build; completes at Increment 4 de-mock gate — 4.17)
+2. `FR-UI-CONFIGURE_COLUMNS` (mock build; completes at Increment 4 de-mock gate — 4.17)
+3. `FR-UI-SELECT_DATABANK_ROWS` (mock build; completes at Increment 4 de-mock gate — 4.17)
+4. `FR-UI-OPEN_DATABANK_RESULT` (mock build; completes at Increment 4 de-mock gate — 4.17)
+5. `FR-UI-FILTER_DATABANKS` (mock build; completes at Increment 6 de-mock gate — 6.14)
+6. `FR-UI-RUN_BULK_ACTIONS` (mock build; completes at Increment 6 de-mock gate — 6.14)
+
+##### 1.19 Partial — `FEAT-UI-EXPLORE_RESULTS` (mock build)
+
+1. `FR-UI-SUMMARIZE_RESULTS` (mock build; completes at Increment 4 de-mock gate — 4.18)
+2. `FR-UI-PLOT_EQUITY` (mock build; completes at Increment 4 de-mock gate — 4.18)
+3. `FR-UI-LIST_TRADES` (mock build; completes at Increment 4 de-mock gate — 4.18)
+4. `FR-UI-PLOT_TRADES` (mock build; completes at Increment 4 de-mock gate — 4.18)
+5. `FR-UI-ANALYZE_TRADES` (mock build; completes at Increment 4 de-mock gate — 4.18)
+6. `FR-UI-EXPORT_RESULTS` (mock build; completes at Increment 4 de-mock gate — 4.18)
+7. `FR-UI-INSPECT_SOURCE` (mock build; completes at Increment 5 de-mock gate — 5.4)
+8. `FR-UI-INSPECT_ROBUSTNESS` (mock build; completes at Increment 6 de-mock gate — 6.15)
+
+##### 1.20 Partial — `FEAT-UI-EDIT_CODE` (mock build)
+
+1. `FR-UI-NAVIGATE_CODE` (mock build; completes at Increment 5 de-mock gate — 5.5)
+2. `FR-UI-SEARCH_CODE` (mock build; completes at Increment 5 de-mock gate — 5.5)
+3. `FR-UI-EDIT_CODE_TABS` (mock build; completes at Increment 8 de-mock gate — 8.24)
+4. `FR-UI-MANAGE_CODE_FILES` (mock build; completes at Increment 8 de-mock gate — 8.24)
+5. `FR-UI-SHOW_CODE_DIAGNOSTICS` (mock build; completes at Increment 8 de-mock gate — 8.24)
+6. `FR-UI-TEST_EXTENSIONS` (mock build; completes at Increment 8 de-mock gate — 8.24)
+
+##### 1.21 Partial — `FEAT-UI-RUN_RESEARCH` (mock build)
+
+1. `FR-UI-SELECT_RESEARCH_MODE` (mock build; completes at Increment 6 de-mock gate — 6.13)
+2. `FR-UI-CONFIGURE_RESEARCH` (mock build; completes at Increment 6 de-mock gate — 6.13)
+3. `FR-UI-PREVIEW_RESEARCH` (mock build; completes at Increment 6 de-mock gate — 6.13)
+4. `FR-UI-CONTROL_RESEARCH` (mock build; completes at Increment 6 de-mock gate — 6.13)
+5. `FR-UI-COMPARE_RESEARCH` (mock build; completes at Increment 6 de-mock gate — 6.13)
+6. `FR-UI-REUSE_RESEARCH_SETTINGS` (mock build; completes at Increment 6 de-mock gate — 6.13)
+
+##### 1.22 Partial — `FEAT-UI-EDIT_PROJECTS` (mock build)
+
+1. `FR-UI-MANAGE_PROJECTS` (mock build; completes at Increment 7 de-mock gate — 7.19)
+2. `FR-UI-EDIT_TASKS` (mock build; completes at Increment 7 de-mock gate — 7.19)
+3. `FR-UI-EDIT_PROJECT_GRAPH` (mock build; completes at Increment 7 de-mock gate — 7.19)
+4. `FR-UI-COMPARE_PROJECTS` (mock build; completes at Increment 7 de-mock gate — 7.19)
+5. `FR-UI-CONTROL_PROJECTS` (mock build; completes at Increment 7 de-mock gate — 7.19)
+6. `FR-UI-INSPECT_PROJECTS` (mock build; completes at Increment 7 de-mock gate — 7.19)
+
+##### 1.23 Partial — `FEAT-UI-COMPOSE_PORTFOLIOS` (mock build)
+
+1. `FR-UI-SELECT_CONSTITUENTS` (mock build; completes at Increment 7 de-mock gate — 7.20)
+2. `FR-UI-EDIT_PORTFOLIO` (mock build; completes at Increment 7 de-mock gate — 7.20)
+3. `FR-UI-INSPECT_CORRELATION` (mock build; completes at Increment 7 de-mock gate — 7.20)
+4. `FR-UI-RUN_PORTFOLIO` (mock build; completes at Increment 7 de-mock gate — 7.20)
+5. `FR-UI-COMPARE_PORTFOLIOS` (mock build; completes at Increment 7 de-mock gate — 7.20)
+
+##### 1.24 Partial — `FEAT-UI-OPERATE_TRADING` (mock build)
+
+1. `FR-UI-MANAGE_TRADING_SESSIONS` (mock build; completes at Increment 10 de-mock gate — 10.26)
+2. `FR-UI-SHOW_TRADING_READINESS` (mock build; completes at Increment 10 de-mock gate — 10.26)
+3. `FR-UI-PREVIEW_TRADING_ACTION` (mock build; completes at Increment 10 de-mock gate — 10.26)
+4. `FR-UI-COMMIT_TRADING_ACTION` (mock build; completes at Increment 10 de-mock gate — 10.26)
+5. `FR-UI-OPERATE_KILL_SWITCH` (mock build; completes at Increment 10 de-mock gate — 10.26)
+6. `FR-UI-WATCH_TRADING_EVENTS` (mock build; completes at Increment 10 de-mock gate — 10.26)
+7. `FR-UI-WATCH_MARKETS` (mock build; completes at Increment 10 de-mock gate — 10.26)
+8. `FR-UI-INSPECT_OPERATOR_ANALYTICS` (mock build; completes at Increment 10 de-mock gate — 10.26)
+
+##### 1.25 Partial — `FEAT-UI-EXTEND_VIEWS` (mock build)
+
+1. `FR-UI-DECLARE_VIEW_CONTRIBUTIONS` (mock build; completes at Increment 8 de-mock gate — 8.27)
+2. `FR-UI-VALIDATE_VIEW_CONTRIBUTIONS` (mock build; completes at Increment 8 de-mock gate — 8.27)
+3. `FR-UI-SCOPE_VIEW_EFFECTS` (mock build; completes at Increment 8 de-mock gate — 8.27)
+4. `FR-UI-REPLACE_VIEW_PROVIDERS` (mock build; completes at Increment 8 de-mock gate — 8.27)
+5. `FR-UI-REMOVE_VIEW_CONTRIBUTIONS` (mock build; completes at Increment 8 de-mock gate — 8.27)
 
 ### Increment 2 — Catalogue and Historical-Data Onboarding
 
@@ -274,6 +426,12 @@ mappings/sessions/quality/lineage, resolve findings, export a pinned version, an
 
 **Exit gate:** A user can prepare trustworthy pinned data entirely from the UI; incomplete, ambiguous, or invalid input
 never publishes a committed version.
+
+**De-mock gate:** `FEAT-UI-EDIT_INPUTS` (2.18: `FR-UI-RENDER_FIELDS`, `FR-UI-VALIDATE_INPUT`,
+`FR-UI-RESOLVE_CONFLICTS`, `FR-UI-CONFIRM_IMPACT`) and `FEAT-UI-MANAGE_DATA` (2.19: `FR-UI-BROWSE_DATASETS`,
+`FR-UI-IMPORT_DATA`, `FR-UI-EXPORT_DATA`, `FR-UI-EDIT_INSTRUMENTS`, `FR-UI-EDIT_SESSIONS`) switch from
+`app/ui/src/mocks/` to live Catalogue/Data capability connections here; each checkbox below completes only with
+UI↔backend contract-parity evidence.
 
 #### `D-CAT` — [Catalogue](../../app/services/catalogue/README.md) (Increment 2)
 
@@ -392,7 +550,7 @@ never publishes a committed version.
 
 **Phase alignment:** Phase 1 authoring slice
 
-**Scope:** 33 business FRs across 11 feature slices; 9 feature completion gates and 2 partial slices.
+**Scope:** 32 business FRs across 10 feature slices; 9 feature completion gates and 1 partial slice.
 
 **Purpose:** Add a UI-driven typed strategy language and immutable editing workflow over the proven catalogue/data
 foundation.
@@ -404,6 +562,11 @@ canonical typed blocks and settings.
 
 **Exit gate:** The UI and server validator agree on the canonical strategy version; invalid types, blocks, shifts, or
 conflicts cannot be published.
+
+**De-mock gate:** `FEAT-UI-AUTHOR_STRATEGIES` (3.11: `FR-UI-EDIT_STRATEGY_TREE`, `FR-UI-BROWSE_BLOCKS`,
+`FR-UI-CONFIGURE_STRATEGY`, `FR-UI-VALIDATE_STRATEGY`, `FR-UI-USE_STRATEGY_EXAMPLES`) switches from
+`app/ui/src/mocks/` to live Strategy/Catalogue capability connections here; each checkbox below completes only with
+UI↔backend contract-parity evidence.
 
 #### `D-STRAT` — [Strategy](../../app/services/strategy/README.md) (Increment 3)
 
@@ -463,10 +626,6 @@ conflicts cannot be published.
 
 #### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 3)
 
-##### 3.10 Partial — `FEAT-UI-MANAGE_LAYOUTS`
-
-1. [ ] `FR-UI-MANAGE_TABS`
-
 ##### 3.11 Partial — `FEAT-UI-AUTHOR_STRATEGIES`
 
 1. [ ] `FR-UI-EDIT_STRATEGY_TREE`
@@ -491,6 +650,13 @@ nonvisual alternatives, save/query a databank view, and export source-linked res
 
 **Exit gate:** Repeated execution produces the required deterministic evidence; only reconciled committed results appear
 as final, and the complete manual loop is usable from the UI.
+
+**De-mock gate:** `FEAT-UI-AUTHOR_STRATEGIES` (4.16: `FR-UI-TEST_STRATEGY`), `FEAT-UI-OPERATE_DATABANKS` (4.17:
+`FR-UI-QUERY_DATABANKS`, `FR-UI-CONFIGURE_COLUMNS`, `FR-UI-SELECT_DATABANK_ROWS`, `FR-UI-OPEN_DATABANK_RESULT`),
+`FEAT-UI-EXPLORE_RESULTS` (4.18: `FR-UI-SUMMARIZE_RESULTS`, `FR-UI-PLOT_EQUITY`, `FR-UI-LIST_TRADES`,
+`FR-UI-PLOT_TRADES`, `FR-UI-ANALYZE_TRADES`, `FR-UI-EXPORT_RESULTS`), and `FEAT-UI-ENSURE_ACCESS` (4.19:
+`FR-UI-PROVIDE_DATA_ALTERNATIVES`) switch from `app/ui/src/mocks/` to live Simulator/Analytics capability connections
+here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 #### `D-SIM` — [Simulator](../../app/services/simulator/README.md) (Increment 4)
 
@@ -655,6 +821,10 @@ toolchain, and compare target results with the native run.
 **Exit gate:** The advertised MQL5 path compiles and satisfies identity, dependency, artifact, and parity gates;
 unsupported targets remain unadvertised.
 
+**De-mock gate:** `FEAT-UI-EXPLORE_RESULTS` (5.4: `FR-UI-INSPECT_SOURCE`) and `FEAT-UI-EDIT_CODE` (5.5:
+`FR-UI-NAVIGATE_CODE`, `FR-UI-SEARCH_CODE`) switch from `app/ui/src/mocks/` to live code-generation capability
+connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
+
 #### `D-STRAT` — [Strategy](../../app/services/strategy/README.md) (Increment 5)
 
 ##### 5.1 [ ] `FEAT-STRAT-GENERATE_CODE`
@@ -713,6 +883,11 @@ evidence, filter results, perform pinned bulk actions, and compare accepted/reje
 
 **Exit gate:** Research runs are reproducible across interruption and recovery; budgets, seeds, partitions, acceptance
 decisions, and bulk scopes are pinned and visible.
+
+**De-mock gate:** `FEAT-UI-RUN_RESEARCH` (6.13: all six requirements), `FEAT-UI-OPERATE_DATABANKS` (6.14:
+`FR-UI-FILTER_DATABANKS`, `FR-UI-RUN_BULK_ACTIONS`), and `FEAT-UI-EXPLORE_RESULTS` (6.15:
+`FR-UI-INSPECT_ROBUSTNESS`) switch from `app/ui/src/mocks/` to live Research capability connections here; each
+checkbox below completes only with UI↔backend contract-parity evidence.
 
 #### `D-ANA` — [Analytics](../../app/services/analytics/README.md) (Increment 6)
 
@@ -837,6 +1012,12 @@ checkpoints/history, and invoke the same workflow through an automation adapter.
 
 **Exit gate:** Portfolio and project outputs are versioned and reproducible; retries do not duplicate effects, bounded
 cycles remain bounded, and UI/HTTP/CLI/MCP semantic parity passes.
+
+**De-mock gate:** `FEAT-UI-START_WORK` (7.18: `FR-UI-RESUME_RECENT_WORK`, `FR-UI-LAUNCH_SHORTCUTS`),
+`FEAT-UI-EDIT_PROJECTS` (7.19: all six requirements), `FEAT-UI-COMPOSE_PORTFOLIOS` (7.20: all five requirements),
+`FEAT-UI-MONITOR_WORK` (7.21: `FR-UI-CONTROL_JOBS`, `FR-UI-NOTIFY_OUTCOMES`), and `FEAT-UI-ADMINISTER_SYSTEM`
+(7.22: `FR-UI-MANAGE_UPDATES`) switch from `app/ui/src/mocks/` to live Portfolio/Orchestration capability
+connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 #### `D-PORT` — [Portfolio](../../app/services/portfolio/README.md) (Increment 7)
 
@@ -993,7 +1174,7 @@ cycles remain bounded, and UI/HTTP/CLI/MCP semantic parity passes.
 
 **Phase alignment:** Phase 3 extensions plus independently gated Phase 4 capabilities
 
-**Scope:** 50 business FRs across 27 feature slices; 25 feature completion gates and 2 partial slices.
+**Scope:** 49 business FRs across 26 feature slices; 24 feature completion gates and 2 partial slices.
 
 **Purpose:** Add isolated plugins, view contributions, additional code targets, distributed workers, Stockpicker/profile
 methods, AI assistance, neural research, and other advanced capabilities without destabilizing the core loop.
@@ -1006,6 +1187,14 @@ capability; verify scoped UI cleanup, compatibility diagnostics, and local-refer
 
 **Exit gate:** Each advanced lane passes its own isolation/parity/removal gate; no stable workflow depends on an
 experimental capability, and removing an extension leaves built-in workflows usable.
+
+**De-mock gate:** `FEAT-UI-MANAGE_DATA` (8.23: `FR-UI-SYNC_DATA`), `FEAT-UI-EDIT_CODE` (8.24:
+`FR-UI-EDIT_CODE_TABS`, `FR-UI-MANAGE_CODE_FILES`, `FR-UI-SHOW_CODE_DIAGNOSTICS`, `FR-UI-TEST_EXTENSIONS`, and the
+feature completion gate), `FEAT-UI-ADMINISTER_SYSTEM` (8.25: `FR-UI-SET_LANGUAGE`,
+`FR-UI-ADMINISTER_CAPABILITIES`, and the feature completion gate), `FEAT-UI-ENSURE_ACCESS` (8.26:
+`FR-UI-PRESERVE_USABILITY`), and `FEAT-UI-EXTEND_VIEWS` (8.27: all five requirements) switch from
+`app/ui/src/mocks/` to live extension/plugin capability connections here; each checkbox below completes only with
+UI↔backend contract-parity evidence.
 
 #### `D-PLUG` — [Plugins](../../app/services/plugins/README.md) (Increment 8)
 
@@ -1128,10 +1317,6 @@ experimental capability, and removing an extension leaves built-in workflows usa
 
 #### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 8)
 
-##### 8.22 [ ] `FEAT-UI-MANAGE_LAYOUTS`
-
-1. [ ] `FR-UI-COMPOSE_PANELS`
-
 ##### 8.23 Partial — `FEAT-UI-MANAGE_DATA`
 
 1. [ ] `FR-UI-SYNC_DATA`
@@ -1177,6 +1362,9 @@ inspect drift/freshness without confusing synthetic or stale evidence with obser
 
 **Exit gate:** Synthetic, revised, live, stale, and replayed evidence remain distinguishable, bounded, lineage-complete,
 and incapable of silently altering historical authority.
+
+**De-mock gate:** None — this increment holds no `FR-UI-*` completion checkboxes; its evidence capabilities surface
+through the Data/Research UI slices de-mocked at Increments 2, 8, and 10.
 
 #### `D-DATA` — [Data](../../app/services/data/README.md) (Increment 9)
 
@@ -1232,6 +1420,12 @@ exercise approval/kill-switch behavior, classify the receipt, reconcile authorit
 
 **Exit gate:** No adapter or UI route bypasses Risk or Trading; unknown outcomes block blind retry, kill-switch and
 stale-evidence cases fail closed, and live enablement remains a separate owner decision.
+
+**De-mock gate:** `FEAT-UI-MANAGE_DATA` (10.25: `FR-UI-ADMINISTER_DATA`), `FEAT-UI-OPERATE_TRADING` (10.26: all
+eight requirements; the mock-built Increment 1 visuals carry no operational claim and every fail-closed acceptance
+condition is proven here), and `FEAT-UI-ENSURE_ACCESS` (10.27: `FR-UI-OPERATE_BY_KEYBOARD`,
+`FR-UI-LABEL_CONTROLS`) switch from `app/ui/src/mocks/` to live governed Broker/Risk/Trading capability connections
+here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 #### `D-BRK` — [Broker Connectivity](../../app/services/broker/README.md) (Increment 10)
 
@@ -1463,6 +1657,10 @@ isolation, artifacts, events, and recovery.
 **Exit gate:** Cross-workspace isolation and authorization pass; all 142 feature gates, 549 business requirements,
 retained foundation guarantees, workflows, removal paths, and applicable phase/NFR gates are green.
 
+**De-mock gate:** Final — the mock capability provider must be fully retired by this point (final completion gate
+item 9): no production bundle imports `app/ui/src/mocks/` and the folder is deletable without touching production
+behavior.
+
 #### `D-WS` — [Workspace](../../app/services/workspace/README.md) (Increment 11)
 
 ##### 11.1 [ ] `FEAT-WS-HOST_WORKSPACES`
@@ -1491,3 +1689,6 @@ all 33 retained shared-foundation guarantees remain passing, and:
 7. Hosted and local modes preserve the same public contracts and pass cross-workspace isolation and authorization.
 8. No requirement is considered implemented solely because related code, tests, databases, migrations, or UI screens
    exist; its current owning acceptance contract must pass.
+9. The mock capability provider is fully retired: no production bundle imports `app/ui/src/mocks/`, the folder is
+   deletable without touching production behavior, and every mock-build line that reached its de-mock increment has
+   contract-parity evidence at the increment holding its completion checkbox.
