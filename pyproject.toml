@@ -16,6 +16,7 @@ dependencies = [
 haruquantai = "app.main:run"
 
 [project.entry-points."haruquantai.features"]
+"workspace.workspace_lifecycle" = "app.services.workspace.workspace_lifecycle.feature:feature"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]

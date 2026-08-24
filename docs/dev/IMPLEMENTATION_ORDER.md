@@ -164,13 +164,13 @@ healthy.
 
 #### `D-WS` — [Workspace](../../app/services/workspace/README.md) (Increment 1)
 
-##### 1.1 [ ] `FEAT-WS-MANAGE_WORKSPACES`
+##### 1.1 [x] `FEAT-WS-MANAGE_WORKSPACES`
 
-1. [ ] `FR-WS-INITIALIZE_WORKSPACE`
-2. [ ] `FR-WS-MIGRATE_WORKSPACE_SCHEMA`
-3. [ ] `FR-WS-FENCE_WORKSPACE_WRITERS`
-4. [ ] `FR-WS-RECOVER_WORKSPACE_STATE`
-5. [ ] `FR-WS-BACKUP_WORKSPACE`
+1. [x] `FR-WS-INITIALIZE_WORKSPACE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:53
+2. [x] `FR-WS-MIGRATE_WORKSPACE_SCHEMA` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:102
+3. [x] `FR-WS-FENCE_WORKSPACE_WRITERS` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:120
+4. [x] `FR-WS-RECOVER_WORKSPACE_STATE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:177
+5. [x] `FR-WS-BACKUP_WORKSPACE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:210
 
 ##### 1.2 [ ] `FEAT-WS-CONFIGURE_RUNTIME`
 

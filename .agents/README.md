@@ -1,5 +1,8 @@
 # .agents — Multi-Mode Agent Workflow System
 
+**Full operating procedure: [PROCEDURE.md](PROCEDURE.md)** — setup, task
+generation, kick-off prompt, gates, resume, completion, and maintenance.
+
 Automates the `AGENTS.md` three-role workflow (Planner → Executor → Reviewer)
 in four interchangeable modes. Roles never talk to each other directly — the
 task journals in `docs/dev/task/` are the shared memory, and every journal
