@@ -192,9 +192,9 @@ healthy.
 
 #### `D-PLUG` — [Plugins](../../app/services/plugins/README.md) (Increment 1)
 
-##### 1.5 [ ] `FEAT-PLUG-DECLARE_MANIFESTS`
+##### 1.5 [x] `FEAT-PLUG-DECLARE_MANIFESTS`
 
-1. [ ] `FR-PLUG-DECLARE_PLUGIN_MANIFESTS`
+1. [x] `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` — evidence: tests/services/plugins/manifests/test_plugin_manifests.py:53
 
 ##### 1.6 [ ] `FEAT-PLUG-REGISTER_CONTRIBUTIONS`
 

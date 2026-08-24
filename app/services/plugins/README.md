@@ -52,7 +52,7 @@ Rows labelled `FEAT-* capability surface` describe planned semantic contract bun
 
 | Status | Contract | Version | Counterparty | Purpose |
 |---|---|---|---|---|
-| Missing | `FEAT-PLUG-DECLARE_MANIFESTS` capability surface | `v1` | Workspace | Manifests. |
+| Implemented | `FEAT-PLUG-DECLARE_MANIFESTS` capability surface | `v1` | Workspace | Manifests. |
 | Missing | `FEAT-PLUG-MANAGE_LIFECYCLE` capability surface | `v1` | Workspace | Lifecycle. |
 | Missing | `FEAT-PLUG-SANDBOX_PERMISSIONS` capability surface | `v1` | Workspace | Permissions and Sandbox. |
 | Missing | `FEAT-PLUG-REGISTER_CONTRIBUTIONS` capability surface | `v1` | Workspace | Contributions. |
@@ -200,7 +200,7 @@ flowchart LR
 
 | Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
 |---|---|---|---|---|---|---|
-| Missing | `WF-PLUG-001` | Internal | Manifests | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` |
+| Implemented | `WF-PLUG-001` | Internal | Manifests | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` |
 | Missing | `WF-PLUG-002` | Cross-domain | Lifecycle | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-REPLACE_PLUGINS_TRANSACTIONALLY` |
 | Missing | `WF-PLUG-003` | Cross-domain | Permissions and Sandbox | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-ISOLATE_PLUGIN_EXECUTION` → `FR-PLUG-RESTRICT_PLUGIN_SECRETS` |
 | Missing | `WF-PLUG-004` | Internal | Contributions | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS` |
@@ -269,15 +269,15 @@ validated input and capability bindings
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `plugin_manifests.py` | Validate plugin identity, package integrity, compatibility, capabilities, and resource declarations | `fr_plug_declare_plugin_manifests` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Missing | `feature.py` | Mount `FEAT-PLUG-DECLARE_MANIFESTS` through `FeatureContext` and stage its declared providers/effects | `FEAT-PLUG-DECLARE_MANIFESTS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Missing | `manifest.py` | Define the immutable `FEAT-PLUG-DECLARE_MANIFESTS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-PLUG-DECLARE_MANIFESTS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+| Implemented | `plugin_manifests.py` | Validate plugin identity, package integrity, compatibility, capabilities, and resource declarations | `fr_plug_declare_plugin_manifests` | **Standard library:** `dataclasses`, `typing`, `pathlib`, `json`, `hashlib`, `re`, `zipfile`<br>**Required third-party:** None<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
+| Implemented | `feature.py` | Mount `FEAT-PLUG-DECLARE_MANIFESTS` through `FeatureContext` and stage its declared providers/effects | `FEAT-PLUG-DECLARE_MANIFESTS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
+| Implemented | `manifest.py` | Define the immutable `FEAT-PLUG-DECLARE_MANIFESTS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-PLUG-DECLARE_MANIFESTS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
 
 #### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `FEAT-PLUG-DECLARE_MANIFESTS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `plugin_manifests.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
+| Implemented | `FEAT-PLUG-DECLARE_MANIFESTS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `plugin_manifests.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
 
 #### `plugin_manifests.py` — Validate plugin identity, package integrity, compatibility, capabilities, and resource declarations
 
@@ -285,7 +285,7 @@ validated input and capability bindings
 
 | Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Missing | `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` | Target | P0 | A plugin manifest shall declare stable identity, version, plugin API range, type, entry point, schemas, capabilities, permissions, resources, and package hash/signature metadata. | `fr_plug_declare_plugin_manifests` implementation trace | Read-only | Malformed, incompatible, or altered packages do not load. | FR-PLUG-ISOLATE_PLUGIN_EXECUTION | Plugin baseline | **Usage:** `app/services/plugins/manifests/manifests.py::__main__` scenario `FR-PLUG-DECLARE_PLUGIN_MANIFESTS`<br>**Unit:** `tests/services/plugins/unit/test_plugin_manifests.py::test_plug_declare_plugin_manifests()` |
+| Implemented | `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` | Target | P0 | A plugin manifest shall declare stable identity, version, plugin API range, type, entry point, schemas, capabilities, permissions, resources, and package hash/signature metadata. | `fr_plug_declare_plugin_manifests` implementation trace | Read-only | Malformed, incompatible, or altered packages do not load. | FR-PLUG-ISOLATE_PLUGIN_EXECUTION | Plugin baseline | **Usage:** `app/services/plugins/manifests/plugin_manifests.py::__main__` scenario `FR-PLUG-DECLARE_PLUGIN_MANIFESTS`<br>**Unit:** `tests/services/plugins/manifests/test_plugin_manifests.py::test_plug_declare_plugin_manifests()` |
 
 **Rules:**
 
@@ -302,7 +302,7 @@ validated input and capability bindings
 
 #### Feature usage examples
 
-The primary domain-logic module `app/services/plugins/manifests/manifests.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+The primary domain-logic module `app/services/plugins/manifests/plugin_manifests.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
 
 ---
 

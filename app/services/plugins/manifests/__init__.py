@@ -1,0 +1,1 @@
+"""Plugin Manifests feature package."""

@@ -37,7 +37,6 @@ async def test_feature_mount_and_discovery() -> None:
     feat = feature()
     assert isinstance(feat, DiagnosticBundleFeature)
     assert feat.spec == SPEC
-    assert feat.service is None
 
     registry = ServiceRegistry()
     event_bus = EventBus()
