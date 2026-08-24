@@ -43,6 +43,11 @@ plan → owner gate → approval record → execute → review → close-out.
 - After every dry run you get the **owner gate**. To authorize, reply with
   exactly: `APPROVED: EXECUTE`. To send it back to the Planner, reject and
   give one line of feedback (it becomes the next dry run's owner direction).
+- When the Reviewer's verification passes you get the **owner commit gate**:
+  nothing is committed yet. Inspect the branch yourself if you want a human
+  look (`git diff <baseline>..HEAD`), then authorize with exactly:
+  `APPROVED: COMMIT` — or reject with feedback to return the task to the
+  Planner.
 - `BLOCKED` is a normal outcome (e.g. an unapproved path discovered
   mid-work): the next dry run is a minimal blocker-resolution plan — the
   original scope is explicitly suspended and resumes afterwards. Approve it
@@ -62,6 +67,8 @@ Everything is file-based; nothing is lost.
   # relay a pending gate decision non-interactively:
   uv run .agents/orchestrator.py resume --approved
   uv run .agents/orchestrator.py resume --reject-feedback "widen the scope"
+  uv run .agents/orchestrator.py resume --approved-commit
+  uv run .agents/orchestrator.py resume --reject-commit-feedback "..."
   ```
 - Modes 1–2: open a fresh chat and send:
   > Read `AGENTS.md` and `.agents/ORCHESTRATOR.md`, then resume the active
@@ -69,10 +76,11 @@ Everything is file-based; nothing is lost.
 
 ## Step 5 — Completion
 
-On Reviewer `ACCEPTED` the close-out happens automatically: journals are
-emptied, the one task commit is created (pre-commit coverage gate included),
-merged to `main` fast-forward only, the task branch is deleted, and the
-implementation-order entry is marked `[x]` with `— evidence:` lines. Verify:
+When you authorize with `APPROVED: COMMIT`, the Reviewer performs the
+close-out: journals are emptied, the one task commit is created (pre-commit
+coverage gate included), merged to `main` fast-forward only, the task branch
+is deleted, and the implementation-order entry is marked `[x]` with
+`— evidence:` lines. Verify:
 
 ```bash
 git log --oneline -1     # the task commit is on main

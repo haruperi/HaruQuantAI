@@ -91,6 +91,12 @@ start ──▶ PLANNER (dry run N) ─▶ PENDING_APPROVAL ─▶ OWNER GATE �
   feedback, or `abort`). The approval is relayed to a fresh Planner invocation
   which appends the approval record itself, per AGENTS.md writer rules.
   `--auto-approve` exists but bypasses a deliberate safety latch — avoid it.
+- **Owner commit gate preserved**: when the Reviewer's verification passes,
+  the review ends `PENDING_COMMIT` and nothing is committed. The orchestrator
+  pauses for the exact message `APPROVED: COMMIT` (or reject with feedback →
+  back to the Planner), giving a human the chance to inspect the branch diff
+  before the close-out commit, ff-only merge, and branch cleanup. Chat-driven
+  runs relay this gate with `--approved-commit` / `--reject-commit-feedback`.
 - **Live agent output**: every agent invocation streams its stdout/stderr into
   the terminal as it happens (`| ` = agent stdout, `! ` = agent stderr), and a
   heartbeat line (`[123s] agent still running...`) appears after

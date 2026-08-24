@@ -43,12 +43,20 @@ PLANNER dry run N → PENDING_APPROVAL → owner gate ─┬─ APPROVED: EXECUT
                │                                   └─ reject (feedback) → PLANNER N+1
                │                                     EXECUTOR → READY_FOR_REVIEW → REVIEWER
                └── BLOCKED / CHANGES_REQUESTED ◀────────────────────┘
-                                                 REVIEWER → ACCEPTED → close-out, done
+               REVIEWER → PENDING_COMMIT → owner commit gate (APPROVED: COMMIT)
+                        → authorized close-out (commit, ff-merge, cleanup) → done
 ```
 
 **Owner gate.** After every dry run, ask the owner. Authorization is ONLY the
 exact standalone message `APPROVED: EXECUTE`. A rejection collects feedback and
 returns to the Planner as the next iteration with the owner direction injected.
+
+**Owner commit gate.** When the Reviewer's verification passes, the review
+ends `PENDING_COMMIT` and nothing is committed. Ask the owner to authorize the
+final task commit — the exact standalone message `APPROVED: COMMIT` — giving
+them the chance to inspect the branch (`git diff <baseline>..HEAD`) first.
+Only then re-invoke the Reviewer to perform the close-out. A rejection returns
+the task to the Planner with the owner's feedback.
 
 **Blockers.** An Executor `BLOCKED` (missing authority, unapproved path,
 spec conflict...) is recorded with the agent's own NEXT AGENT NOTES as the
@@ -70,10 +78,11 @@ phase, branch, baseline, blocker ledger, history) and write every composed
 prompt under `.agents/logs/`. Everything must survive a chat or terminal
 crash; a fresh chat resumes from journals + run state.
 
-**Close-out (Reviewer ACCEPTED).** Per the reviewer template: empty all three
-journals, create the one task commit (pre-commit coverage gate included),
-verify clean unchanged `main`, `git merge --ff-only`, delete the merged branch.
-Never push.
+**Close-out (authorized Reviewer ACCEPTED).** Only after the owner's
+`APPROVED: COMMIT`: per the reviewer close-out template — append the commit
+authorization record, empty all three journals, create the one task commit
+(pre-commit coverage gate included), verify clean unchanged `main`,
+`git merge --ff-only`, delete the merged branch. Never push.
 
 ## 2. Mode: SOLO
 
@@ -109,6 +118,8 @@ python .agents/orchestrator.py doctor
 python .agents/orchestrator.py start --task-file <task.toml>   # or: resume
 python .agents/orchestrator.py resume --approved               # relay owner approval
 python .agents/orchestrator.py resume --reject-feedback "..."  # relay rejection
+python .agents/orchestrator.py resume --approved-commit        # relay commit authorization
+python .agents/orchestrator.py resume --reject-commit-feedback "..."  # relay commit rejection
 ```
 
 Run it via your shell tool and watch the streamed output; on failure, read

@@ -53,6 +53,7 @@ VALID_HANDOFFS = {
     "PENDING_APPROVAL",
     "APPROVED_EXECUTE",
     "READY_FOR_REVIEW",
+    "PENDING_COMMIT",
     "CHANGES_REQUESTED",
     "ACCEPTED",
     "BLOCKED",
@@ -129,6 +130,7 @@ def assemble_config(repo_override: str | None = None) -> dict[str, Any]:
         "planner_approval": repo / ".agents/templates/planner_approval.md",
         "executor": repo / ".agents/templates/executor.md",
         "reviewer": repo / ".agents/templates/reviewer.md",
+        "reviewer_commit": repo / ".agents/templates/reviewer_commit.md",
     }
     roles: dict[str, dict[str, Any]] = {}
     roles_cfg: dict[str, Any] = orch.get("roles", {})
@@ -690,6 +692,7 @@ def resolve_handoff(
     log_path: Path,
     stopped_expected: str,
     activating_expected: str | dict[str, str],
+    prefer_stdout: bool = False,
 ) -> dict[str, str] | None:
     """Validate the journal handoff block; accept a stdout block as fallback.
 
@@ -707,10 +710,18 @@ def resolve_handoff(
         activating_expected: Expected ACTIVATING value, either a single string
             or a per-HANDOFF mapping (e.g. {'READY_FOR_REVIEW': 'REVIEWER',
             'BLOCKED': 'PLANNER'}) so correct blocked routings never warn.
+        prefer_stdout: Check the agent's final answer first. Used for the
+            close-out invocation, which legitimately empties the journals as
+            part of the task commit, leaving the block only in stdout.
 
     Returns:
         The validated handoff block if valid, otherwise None.
     """
+    if prefer_stdout:
+        alt = stdout_handoff_block(stdout)
+        if alt and alt["stopped"] == stopped_expected and alt["handoff"] in allowed:
+            _warn_activating_mismatch(alt, activating_expected, role_name)
+            return alt
     block = latest_handoff_block(journal)
     if block and block["stopped"] == stopped_expected and block["handoff"] in allowed:
         _warn_activating_mismatch(block, activating_expected, role_name)
@@ -1119,6 +1130,57 @@ def request_approval(
         print("Unrecognized input; type APPROVED: EXECUTE, reject, or abort.")
 
 
+def _request_commit_authorization(
+    auto_approve: bool,
+    *,
+    approved: bool = False,
+    reject_feedback: str | None = None,
+) -> tuple[bool, str]:
+    """Prompt the owner to authorize the final task commit, or reject it.
+
+    Args:
+        auto_approve: If True, bypass the commit gate automatically (tests).
+        approved: Scripted relay of an explicit --approved-commit decision.
+        reject_feedback: Scripted owner rejection (--reject-commit-feedback);
+            implies rejection when not None.
+
+    Returns:
+        Tuple of (authorized_bool, owner_feedback_for_next_dry_run).
+
+    Raises:
+        KeyboardInterrupt: If the user chooses to abort execution.
+    """
+    if approved:
+        print("[gate] --approved-commit: relaying explicit commit authorization.")
+        return True, ""
+    if reject_feedback is not None:
+        print("[gate] --reject-commit-feedback: returning the task to the Planner.")
+        return False, reject_feedback
+    if auto_approve:
+        print("[warn] auto-approving the commit gate (test mode only).")
+        return True, ""
+    print("\nCommit authorization required. All verification passed.")
+    print("  Inspect the branch yourself first if you want a human look, e.g.:")
+    print("    git diff <baseline>..HEAD   /   git show --stat HEAD")
+    print("  APPROVED: COMMIT     authorize the close-out commit and merge")
+    print("  reject               send back to the Planner with feedback")
+    print("  abort                stop (state saved, resumable)\n")
+    while True:
+        try:
+            answer = input("Authorize commit? > ").strip()
+        except EOFError:
+            answer = "abort"
+        if answer == "APPROVED: COMMIT":
+            return True, ""
+        lowered = answer.lower()
+        if lowered in ("reject", "r"):
+            feedback = _collect_rejection_feedback()
+            return False, feedback
+        if lowered in ("abort", "a"):
+            raise KeyboardInterrupt
+        print("Unrecognized input; type APPROVED: COMMIT, reject, or abort.")
+
+
 def _record_blocker(state: dict[str, Any], raised_by: str, *, journal: Path) -> None:
     """Record an OPEN blocker in the run state and update ``last_event``.
 
@@ -1464,11 +1526,15 @@ def _handle_reviewer_phase(
     block = resolve_handoff(
         cfg["journals"]["reviewer"],
         out,
-        {"ACCEPTED", "CHANGES_REQUESTED"},
+        {"ACCEPTED", "CHANGES_REQUESTED", "PENDING_COMMIT"},
         "Reviewer",
         log_path=log,
         stopped_expected="REVIEWER",
-        activating_expected={"ACCEPTED": "NONE", "CHANGES_REQUESTED": "PLANNER"},
+        activating_expected={
+            "ACCEPTED": "NONE",
+            "CHANGES_REQUESTED": "PLANNER",
+            "PENDING_COMMIT": "REVIEWER",
+        },
     )
     record(state, "reviewer", block, log)
     marker = block["handoff"] if block else None
@@ -1485,7 +1551,15 @@ def _handle_reviewer_phase(
         state["phase"] = "plan"
         save_state(cfg["runs_dir"], state)
         return True
+    if marker == "PENDING_COMMIT":
+        state["phase"] = "commit_gate"
+        save_state(cfg["runs_dir"], state)
+        return True
 
+    print(
+        "[warn] Reviewer reached ACCEPTED without pausing at PENDING_COMMIT; "
+        "the owner commit gate was bypassed. Prompt compliance issue."
+    )
     state["status"] = "ACCEPTED"
     state["handoff_notes"] = None
     state["phase"] = "done"
@@ -1520,6 +1594,187 @@ def _verify_close_out(cfg: dict[str, Any], *, self_test: bool) -> None:
         print("[warn] close-out state unexpected; inspect manually.")
 
 
+def _handle_commit_gate_phase(
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+    *,
+    auto_approve: bool,
+    approved: bool = False,
+    reject_feedback: str | None = None,
+) -> None:
+    """Execute the owner commit gate after Reviewer verification passed.
+
+    Args:
+        cfg: Consolidated orchestration configuration mapping.
+        state: Mutable orchestrator state mapping.
+        auto_approve: Whether to auto-approve without interactive prompt.
+        approved: Scripted commit authorization relay (--approved-commit).
+        reject_feedback: Scripted rejection (--reject-commit-feedback).
+    """
+    it = state["iteration"]
+    banner(f"OWNER COMMIT GATE — Review {it} passed; authorize the task commit")
+    baseline = state.get("baseline") or "<baseline>"
+    print(f"    human review hint: git diff {baseline}..HEAD  /  git show --stat HEAD")
+    authorized, feedback = _request_commit_authorization(
+        auto_approve, approved=approved, reject_feedback=reject_feedback
+    )
+    if authorized:
+        state["phase"] = "commit_record"
+    else:
+        state["last_event"] = f"owner rejected the commit after Review {it}"
+        state["owner_feedback"] = feedback
+        state["iteration"] = it + 1
+        state["phase"] = "plan"
+    save_state(cfg["runs_dir"], state)
+
+
+def _handle_commit_record_phase(
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+    *,
+    self_test: bool,
+) -> bool:
+    """Execute the authorized Reviewer close-out (commit, merge, cleanup).
+
+    Args:
+        cfg: Consolidated orchestration configuration mapping.
+        state: Mutable orchestrator state mapping.
+        self_test: Whether running in self-test sandbox mode.
+
+    Returns:
+        True if routing should continue, False if the task is complete.
+
+    Raises:
+        OrchestratorError: If the close-out yields no valid marker.
+    """
+    it = state["iteration"]
+    banner(f"REVIEWER — authorized close-out for Review {it}")
+    fields = build_fields(state["task"], state, cfg)
+    commit_fields = {
+        "repo_path": fields["repo_path"],
+        "branch": state["branch"],
+        "task_id": fields["task_id"],
+        "iteration": it,
+        "baseline_commit": state.get("baseline") or fields["baseline_commit"],
+    }
+    prompt = compose_prompt(cfg["templates"]["reviewer_commit"], commit_fields)
+    tag = f"{state['run_id']}-reviewer-commit-{it}"
+    _, out, log = run_agent(
+        cfg["roles"]["reviewer"],
+        prompt,
+        cfg["repo"],
+        cfg["logs_dir"],
+        tag,
+        timeout=cfg["timeout"],
+        stream=cfg["stream_agent_output"],
+        heartbeat=cfg["stream_heartbeat_seconds"],
+        retries=cfg["agent_retry_attempts"],
+        approval=True,
+    )
+    # The close-out empties the journals, so the final-answer block is the
+    # expected source for the ACCEPTED marker here.
+    block = resolve_handoff(
+        cfg["journals"]["reviewer"],
+        out,
+        {"ACCEPTED", "CHANGES_REQUESTED", "BLOCKED"},
+        "Reviewer (close-out)",
+        log_path=log,
+        stopped_expected="REVIEWER",
+        activating_expected={
+            "ACCEPTED": "NONE",
+            "CHANGES_REQUESTED": "PLANNER",
+            "BLOCKED": "NONE",
+        },
+        prefer_stdout=True,
+    )
+    record(state, "commit_record", block, log)
+    marker = block["handoff"] if block else None
+    if marker == "ACCEPTED":
+        state["status"] = "ACCEPTED"
+        state["handoff_notes"] = None
+        state["phase"] = "done"
+        save_state(cfg["runs_dir"], state)
+        banner("REVIEWER ACCEPTED — verifying close-out")
+        _verify_close_out(cfg, self_test=self_test)
+        return False
+    if marker == "CHANGES_REQUESTED":
+        state["last_event"] = f"Reviewer close-out failed after Review {it}"
+        state["owner_feedback"] = ""
+        state["iteration"] = it + 1
+        state["phase"] = "plan"
+        save_state(cfg["runs_dir"], state)
+        return True
+    state["status"] = "FAILED"
+    save_state(cfg["runs_dir"], state)
+    msg = "Reviewer close-out produced no ACCEPTED block; stopping (fail closed)."
+    raise OrchestratorError(msg)
+
+
+def _route_phase(
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+    *,
+    auto_approve: bool,
+    self_test: bool,
+    approved: bool,
+    reject_feedback: str | None,
+    commit_approved: bool,
+    commit_reject_feedback: str | None,
+) -> bool:
+    """Execute a single state-machine phase.
+
+    Args:
+        cfg: Consolidated orchestration configuration mapping.
+        state: Mutable orchestrator state mapping.
+        auto_approve: Whether gates may be bypassed (self-test only).
+        self_test: Whether running in self-test sandbox mode.
+        approved: Scripted owner approval for one gate.
+        reject_feedback: Scripted owner rejection for one gate.
+        commit_approved: Scripted commit authorization for one commit gate.
+        commit_reject_feedback: Scripted commit-gate rejection.
+
+    Returns:
+        True while the router loop should continue; False when the run is
+        complete or terminal.
+
+    Raises:
+        OrchestratorError: If the saved phase is unrecognized.
+    """
+    phase = state["phase"]
+    if phase == "plan":
+        _handle_plan_phase(cfg, state, self_test=self_test)
+    elif phase == "approve":
+        _handle_approve_phase(
+            cfg,
+            state,
+            auto_approve=auto_approve,
+            approved=approved,
+            reject_feedback=reject_feedback,
+        )
+    elif phase == "approval_record":
+        _handle_approval_record_phase(cfg, state)
+    elif phase == "executor":
+        _handle_executor_phase(cfg, state)
+    elif phase == "reviewer":
+        return _handle_reviewer_phase(cfg, state, self_test=self_test)
+    elif phase == "commit_gate":
+        _handle_commit_gate_phase(
+            cfg,
+            state,
+            auto_approve=auto_approve,
+            approved=commit_approved,
+            reject_feedback=commit_reject_feedback,
+        )
+    elif phase == "commit_record":
+        return _handle_commit_record_phase(cfg, state, self_test=self_test)
+    elif phase == "done":
+        return False
+    else:
+        msg = f"Unknown phase {phase!r} in saved state."
+        raise OrchestratorError(msg)
+    return True
+
+
 def router(
     cfg: dict[str, Any],
     state: dict[str, Any],
@@ -1528,6 +1783,8 @@ def router(
     self_test: bool = False,
     approved: bool = False,
     reject_feedback: str | None = None,
+    commit_approved: bool = False,
+    commit_reject_feedback: str | None = None,
 ) -> dict[str, Any]:
     """Run phases until ACCEPTED, a stop condition, or owner interruption.
 
@@ -1539,6 +1796,11 @@ def router(
         approved: Scripted owner approval relayed for one gate (--approved).
         reject_feedback: Scripted owner rejection for one gate
             (--reject-feedback); takes precedence over `approved`.
+        commit_approved: Scripted commit authorization for one commit gate
+            (--approved-commit).
+        commit_reject_feedback: Scripted commit-gate rejection
+            (--reject-commit-feedback); takes precedence over
+            `commit_approved`.
 
     Returns:
         Final state dictionary upon completion or stop condition.
@@ -1554,34 +1816,27 @@ def router(
             return state
 
         phase = state["phase"]
-        if phase == "plan":
-            _handle_plan_phase(cfg, state, self_test=self_test)
-        elif phase == "approve":
-            _handle_approve_phase(
-                cfg,
-                state,
-                auto_approve=auto_approve,
-                approved=approved,
-                reject_feedback=reject_feedback,
-            )
-            # Scripted gate decisions are one-shot: never reuse them for a
-            # later gate reached in the same router loop (e.g. after a
-            # rejection loops back through planning to another gate).
+        should_continue = _route_phase(
+            cfg,
+            state,
+            auto_approve=auto_approve,
+            self_test=self_test,
+            approved=approved,
+            reject_feedback=reject_feedback,
+            commit_approved=commit_approved,
+            commit_reject_feedback=commit_reject_feedback,
+        )
+        # Scripted gate decisions are one-shot: never reuse them for a later
+        # gate reached in the same router loop (e.g. after a rejection loops
+        # back through planning to another gate).
+        if phase == "approve":
             approved = False
             reject_feedback = None
-        elif phase == "approval_record":
-            _handle_approval_record_phase(cfg, state)
-        elif phase == "executor":
-            _handle_executor_phase(cfg, state)
-        elif phase == "reviewer":
-            should_continue = _handle_reviewer_phase(cfg, state, self_test=self_test)
-            if not should_continue:
-                return state
-        elif phase == "done":
+        elif phase == "commit_gate":
+            commit_approved = False
+            commit_reject_feedback = None
+        if not should_continue:
             return state
-        else:
-            msg = f"Unknown phase {phase!r} in saved state."
-            raise OrchestratorError(msg)
 
 
 # ---------------------------------------------------------------------------
@@ -1677,6 +1932,8 @@ def cmd_start(args: argparse.Namespace) -> int:
             auto_approve=args.auto_approve,
             approved=args.approved,
             reject_feedback=args.reject_feedback,
+            commit_approved=args.approved_commit,
+            commit_reject_feedback=args.reject_commit_feedback,
         )
     except KeyboardInterrupt:
         state["status"] = "INTERRUPTED"
@@ -1735,6 +1992,8 @@ def cmd_resume(args: argparse.Namespace) -> int:
             auto_approve=args.auto_approve,
             approved=args.approved,
             reject_feedback=args.reject_feedback,
+            commit_approved=args.approved_commit,
+            commit_reject_feedback=args.reject_commit_feedback,
         )
     except KeyboardInterrupt:
         state["status"] = "INTERRUPTED"
@@ -1901,7 +2160,12 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
                 "approval_command": approval_cmd,
             },
             "executor": stub_role("executor"),
-            "reviewer": stub_role("reviewer"),
+            "reviewer": {
+                **stub_role("reviewer"),
+                "approval_command": stub_role("reviewer", ["--mode", "commit"])[
+                    "command"
+                ],
+            },
         },
     }
     state: dict[str, Any] = {
@@ -1937,12 +2201,15 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
 
     planner_text = journals["planner"].read_text(encoding="utf-8")
     executor_text = journals["executor"].read_text(encoding="utf-8")
+    reviewer_text = journals["reviewer"].read_text(encoding="utf-8")
     log_files = list((tmp / "logs").glob("*"))
     reviewer_block = latest_handoff_block(journals["reviewer"])
     rev_ok = reviewer_block is not None and reviewer_block["handoff"] == "ACCEPTED"
     rev_activating_ok = (
         reviewer_block is not None and reviewer_block["activating"] == "NONE"
     )
+    rev_pause_ok = "HANDOFF : PENDING_COMMIT" in reviewer_text
+    rev_commit_ok = "APPROVED: COMMIT" in reviewer_text
     logs_path = tmp / "logs"
 
     def _prompt_has(path: Path | None, needle: str) -> bool:
@@ -1987,6 +2254,8 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
         ),
         ("reviewer journal ends ACCEPTED", rev_ok),
         ("reviewer journal activates NONE on acceptance", rev_activating_ok),
+        ("reviewer paused at PENDING_COMMIT before the commit", rev_pause_ok),
+        ("reviewer journal has APPROVED: COMMIT record", rev_commit_ok),
         (
             "planner notes reached the executor prompt",
             _prompt_has(exec1_prompt, "From PLANNER:"),
@@ -2047,6 +2316,18 @@ def _add_common_args(parser: argparse.ArgumentParser) -> None:
         dest="reject_feedback",
         default=None,
         help="relay an owner rejection with feedback for the current gate only",
+    )
+    parser.add_argument(
+        "--approved-commit",
+        dest="approved_commit",
+        action="store_true",
+        help="relay commit authorization for the current commit gate only",
+    )
+    parser.add_argument(
+        "--reject-commit-feedback",
+        dest="reject_commit_feedback",
+        default=None,
+        help="relay a commit-gate rejection with feedback (one-shot)",
     )
     parser.add_argument(
         "--max-iterations",
