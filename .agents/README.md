@@ -28,9 +28,11 @@ This tooling lives outside the AGENTS.md workflow by owner decision
 ## Quick start
 
 ```bash
+python .agents/make_task.py --list                    # open entries in the implementation order
+python .agents/make_task.py 1.1                       # generate .agents/task.toml for entry 1.1
 python .agents/orchestrator.py doctor                 # check configs/CLIs/repo
 python .agents/orchestrator.py self-test              # stub end-to-end run
-python .agents/orchestrator.py start --task-file .agents/task.example.toml  # task template
+python .agents/orchestrator.py start --task-file .agents/task.toml
 python .agents/orchestrator.py resume                 # continue after interrupt
 ```
 

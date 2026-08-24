@@ -27,7 +27,9 @@ HANDOFF : <PENDING_APPROVAL|APPROVED_EXECUTE|READY_FOR_REVIEW|CHANGES_REQUESTED|
 role templates need: task ids, request, exclusions, and optionally
 `implementation_file`/`implementation_entry` — when present, completing the
 feature includes marking that tracker entry `[x]` with `— evidence: path:line`
-as an approved changed path (never in a blocker-resolution dry run).
+as an approved changed path (never in a blocker-resolution dry run). Generate
+a spec from an implementation-order entry with
+`python .agents/make_task.py <entry>` (e.g. `1.1`); `--list` shows open entries.
 
 **Entry gate (new task).** `main` checked out and clean (untracked `.agents/`
 is ignorable), all three journals zero bytes. Record the baseline commit.
