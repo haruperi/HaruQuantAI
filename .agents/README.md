@@ -79,6 +79,10 @@ start ──▶ PLANNER (dry run N) ─▶ PENDING_APPROVAL ─▶ OWNER GATE �
   Disable per-terminal echo with `stream_agent_output = false` in
   `orchestrator.toml`; the full transcript is always captured in `.agents/logs/`
   regardless. On timeout the whole process tree is killed (`taskkill /T`).
+  Transient non-zero exits are automatically retried (`agent_retry_attempts`,
+  default 1, 5s apart); timeouts are never auto-retried. Note agy's own
+  `--print-timeout` (default 5m) caps headless runs — the executor command
+  raises it to 110m below the orchestrator's ceiling.
 - **Fail closed**: missing/invalid marker, non-branch repo state, or timeouts
   stop the run with the invocation log tail; state is saved for `resume`.
 

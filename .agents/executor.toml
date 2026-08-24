@@ -11,6 +11,10 @@ command = [
   "agy",
   "--dangerously-skip-permissions",
   "--model", "gemini-3.7-flash-high",
+  # agy's print mode waits at most --print-timeout (default 5m) for the
+  # response; real executor tasks exceed that. 110m stays under the
+  # orchestrator's 7200s ceiling so the orchestrator remains the governor.
+  "--print-timeout", "110m",
   "-p",
 ]
 prompt_delivery = "file"          # file | arg | stdin

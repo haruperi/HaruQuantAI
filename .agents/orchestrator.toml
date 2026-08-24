@@ -19,6 +19,9 @@ invocation_timeout_seconds = 7200
 # still captured in .agents/logs/).
 stream_agent_output = true
 stream_heartbeat_seconds = 60
+# Automatic re-launches when an agent CLI exits non-zero (transient crashes,
+# network errors). Timeouts are never auto-retried. 0 disables.
+agent_retry_attempts = 1
 
 [paths]
 # Shared-memory journals (relative to repo_path). These are the ONLY

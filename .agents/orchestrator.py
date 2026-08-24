@@ -145,6 +145,7 @@ def assemble_config(repo_override: str | None = None) -> dict[str, Any]:
         "timeout": int(run_cfg.get("invocation_timeout_seconds", 3600)),
         "stream_agent_output": bool(run_cfg.get("stream_agent_output", True)),
         "stream_heartbeat_seconds": int(run_cfg.get("stream_heartbeat_seconds", 60)),
+        "agent_retry_attempts": int(run_cfg.get("agent_retry_attempts", 1)),
         "journals": journals,
         "templates": templates,
         "logs_dir": (repo / paths.get("logs_dir", ".agents/logs")).resolve(),
@@ -330,65 +331,34 @@ def _start_agent_process(
         raise OrchestratorError(msg) from exc
 
 
-def run_agent(
-    role_cfg: dict[str, Any],
-    prompt: str,
+def _run_attempt(
+    cmd: list[str],
     cwd: Path,
-    logs_dir: Path,
-    tag: str,
+    stdin_text: str | None,
+    log_context: tuple[Path, str, str],
     *,
     timeout: int,
-    approval: bool = False,
-    stream: bool = True,
-    heartbeat: int = 60,
+    stream: bool,
+    heartbeat: int,
 ) -> tuple[int, str, Path]:
-    """Run one headless agent invocation; return (exit_code, stdout, log_path).
-
-    Prompt delivery defaults to "file": the composed prompt is written under
-    logs_dir and the agent receives a short pointer argument. This avoids
-    passing megabyte prompts through argv, which is fragile on Windows where
-    npm CLIs are .cmd shims re-parsed by cmd.exe.
-
-    Agent output is streamed live to the terminal ('| ' = agent stdout,
-    '! ' = agent stderr) and a heartbeat line appears whenever the agent is
-    quiet for `heartbeat` seconds, so long invocations are never silent.
+    """Run a single agent attempt with live streaming, capture, and logging.
 
     Args:
-        role_cfg: Configuration dictionary for the agent role.
-        prompt: Composed prompt string.
+        cmd: Resolved command line (executable plus arguments).
         cwd: Working directory for the process.
-        logs_dir: Directory for writing run logs and prompt files.
-        tag: Identifier tag used in log file naming.
+        stdin_text: Optional prompt text piped via stdin.
+        log_context: (logs_dir, timestamp_stamp, tag) tuple used for logging.
         timeout: Maximum seconds before the process tree is killed.
-        approval: Whether this invocation is for approval recording.
         stream: Echo agent output lines live to the terminal.
-        heartbeat: Quiet seconds before printing a heartbeat line (0 = off).
+        heartbeat: Quiet seconds before a heartbeat line (0 = off).
 
     Returns:
         Tuple of (exit_code, stdout_content, log_file_path).
 
     Raises:
-        OrchestratorError: If the CLI executable is missing or times out.
+        OrchestratorError: If the process exceeds the timeout.
     """
-    logs_dir.mkdir(parents=True, exist_ok=True)
-    now_utc = _dt.datetime.now(tz=_dt.UTC)
-    stamp = now_utc.strftime("%Y%m%d-%H%M%S")
-    prompt_file = logs_dir / f"{stamp}-{tag}-prompt.md"
-
-    cmd, stdin_text = _build_agent_cmd(role_cfg, prompt, prompt_file, approval=approval)
-
-    exe = shutil.which(cmd[0])
-    if exe is None:
-        cmd_str = role_cfg.get("command")
-        msg = f"Agent CLI '{cmd[0]}' not found on PATH (role command: {cmd_str})"
-        raise OrchestratorError(msg)
-    cmd[0] = exe
-
-    preview_tokens = " ".join(cmd[:MAX_CMD_PREVIEW])
-    ellipsis_suffix = " ..." if len(cmd) > MAX_CMD_PREVIEW else ""
-    print(f"    launching: {preview_tokens}{ellipsis_suffix}")
-    if stream:
-        print("    (live output: '|' = agent stdout, '!' = agent stderr)")
+    logs_dir, stamp, tag = log_context
     proc = _start_agent_process(cmd, cwd, stdin_text)
 
     out_lines: list[str] = []
@@ -447,6 +417,91 @@ def run_agent(
     err = "\n".join(err_lines)
 
     log_path = _write_log(logs_dir, stamp, tag, cmd, code, out=out, err=err)
+    return code, out, log_path
+
+
+def run_agent(
+    role_cfg: dict[str, Any],
+    prompt: str,
+    cwd: Path,
+    logs_dir: Path,
+    tag: str,
+    *,
+    timeout: int,
+    approval: bool = False,
+    stream: bool = True,
+    heartbeat: int = 60,
+    retries: int = 1,
+) -> tuple[int, str, Path]:
+    """Run one headless agent invocation; return (exit_code, stdout, log_path).
+
+    Prompt delivery defaults to "file": the composed prompt is written under
+    logs_dir and the agent receives a short pointer argument. This avoids
+    passing megabyte prompts through argv, which is fragile on Windows where
+    npm CLIs are .cmd shims re-parsed by cmd.exe.
+
+    Agent output is streamed live to the terminal ('| ' = agent stdout,
+    '! ' = agent stderr) and a heartbeat line appears whenever the agent is
+    quiet for `heartbeat` seconds, so long invocations are never silent.
+
+    Args:
+        role_cfg: Configuration dictionary for the agent role.
+        prompt: Composed prompt string.
+        cwd: Working directory for the process.
+        logs_dir: Directory for writing run logs and prompt files.
+        tag: Identifier tag used in log file naming.
+        timeout: Maximum seconds before the process tree is killed.
+        approval: Whether this invocation is for approval recording.
+        stream: Echo agent output lines live to the terminal.
+        heartbeat: Quiet seconds before printing a heartbeat line (0 = off).
+        retries: Automatic re-launches (5s apart) when the agent exits
+            non-zero, so transient CLI/network failures do not kill the phase.
+            Timeouts are never retried automatically.
+
+    Returns:
+        Tuple of (exit_code, stdout_content, log_file_path).
+
+    Raises:
+        OrchestratorError: If the CLI executable is missing or times out.
+    """
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    now_utc = _dt.datetime.now(tz=_dt.UTC)
+    stamp = now_utc.strftime("%Y%m%d-%H%M%S")
+    prompt_file = logs_dir / f"{stamp}-{tag}-prompt.md"
+
+    cmd, stdin_text = _build_agent_cmd(role_cfg, prompt, prompt_file, approval=approval)
+
+    exe = shutil.which(cmd[0])
+    if exe is None:
+        cmd_str = role_cfg.get("command")
+        msg = f"Agent CLI '{cmd[0]}' not found on PATH (role command: {cmd_str})"
+        raise OrchestratorError(msg)
+    cmd[0] = exe
+
+    preview_tokens = " ".join(cmd[:MAX_CMD_PREVIEW])
+    ellipsis_suffix = " ..." if len(cmd) > MAX_CMD_PREVIEW else ""
+    print(f"    launching: {preview_tokens}{ellipsis_suffix}")
+    if stream:
+        print("    (live output: '|' = agent stdout, '!' = agent stderr)")
+
+    attempts = max(1, int(retries) + 1)
+    code, out, log_path = 1, "", logs_dir / f"{stamp}-{tag}.log"
+    for attempt in range(1, attempts + 1):
+        attempt_tag = tag if attempt == 1 else f"{tag}-retry{attempt - 1}"
+        if attempt > 1:
+            print(f"    [retry] agent failed; attempt {attempt}/{attempts}", flush=True)
+            time.sleep(5)
+        code, out, log_path = _run_attempt(
+            cmd,
+            cwd,
+            stdin_text,
+            (logs_dir, stamp, attempt_tag),
+            timeout=timeout,
+            stream=stream,
+            heartbeat=heartbeat,
+        )
+        if code == 0:
+            break
     if code != 0:
         print(f"[warn] agent exited with code {code}; see {log_path}")
     return code, out, log_path
@@ -1145,6 +1200,7 @@ def _handle_plan_phase(
         timeout=cfg["timeout"],
         stream=cfg["stream_agent_output"],
         heartbeat=cfg["stream_heartbeat_seconds"],
+        retries=cfg["agent_retry_attempts"],
     )
     block = resolve_handoff(
         cfg["journals"]["planner"],
@@ -1253,6 +1309,7 @@ def _handle_approval_record_phase(
         timeout=cfg["timeout"],
         stream=cfg["stream_agent_output"],
         heartbeat=cfg["stream_heartbeat_seconds"],
+        retries=cfg["agent_retry_attempts"],
         approval=True,
     )
     block = resolve_handoff(
@@ -1306,6 +1363,7 @@ def _handle_executor_phase(
         timeout=cfg["timeout"],
         stream=cfg["stream_agent_output"],
         heartbeat=cfg["stream_heartbeat_seconds"],
+        retries=cfg["agent_retry_attempts"],
     )
     block = resolve_handoff(
         cfg["journals"]["executor"],
@@ -1371,6 +1429,7 @@ def _handle_reviewer_phase(
         timeout=cfg["timeout"],
         stream=cfg["stream_agent_output"],
         heartbeat=cfg["stream_heartbeat_seconds"],
+        retries=cfg["agent_retry_attempts"],
     )
     block = resolve_handoff(
         cfg["journals"]["reviewer"],
@@ -1773,6 +1832,7 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
         "timeout": 120,
         "stream_agent_output": False,
         "stream_heartbeat_seconds": 0,
+        "agent_retry_attempts": 0,
         "journals": journals,
         "templates": cfg["templates"],
         "logs_dir": tmp / "logs",
