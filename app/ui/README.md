@@ -27,7 +27,7 @@ The UI is a first-class product domain rather than an HTTP, CLI, or MCP adapter.
 
 | Status | Feature ID | Capability | FRs | Deletion outcome |
 |---|---|---|---:|---|
-| Missing | `FEAT-UI-COMPOSE_SHELL` | Capability-aware application shell and navigation | 5 | The graphical shell disappears; non-UI clients remain available. |
+| Implemented | `FEAT-UI-COMPOSE_SHELL` | Capability-aware application shell and navigation | 5 | The graphical shell disappears; non-UI clients remain available. |
 | Missing | `FEAT-UI-START_WORK` | Home, onboarding, recents, and launch shortcuts | 4 | Home disappears; direct authorized routes remain available. |
 | Missing | `FEAT-UI-MANAGE_LAYOUTS` | Tabs, panels, splitters, overlays, and saved view state | 5 | Custom layouts disappear; the shell uses its minimal outlet. |
 | Missing | `FEAT-UI-EDIT_INPUTS` | Forms, pickers, tables, validation, drafts, and confirmations | 5 | Generic editors disappear; read-only routes may remain. |
@@ -167,11 +167,11 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 
 | Status | Requirement ID | Responsibility | Depends | Acceptance / evidence |
 |---|---|---|---|---|
-| Missing | `FR-UI-ASSEMBLE_SHELL` | Compose header, navigation, workspace outlet, global status, and optional footer from the active capability snapshot. | KERN, COMP, WS | Missing optional regions do not block startup. |
-| Missing | `FR-UI-DISCOVER_WORKSPACES` | Discover authorized workspace routes and commands from compatible contributions. | PLUG, IFACE | No hard-coded provider import or registration-order dependency; App modules. |
-| Missing | `FR-UI-SWITCH_WORKSPACES` | Switch workspaces while preserving scoped state and preventing hidden workspaces from intercepting input. | FR-UI-DISCOVER_WORKSPACES | Exactly one workspace owns the active interaction target. |
-| Missing | `FR-UI-SHOW_CAPABILITY_STATE` | Distinguish loading, unavailable, incompatible, disabled, degraded, unauthorized, and ready capabilities. | KERN, WS, IFACE | A missing domain never appears as a blank or indefinitely loading screen. |
-| Missing | `FR-UI-RESTORE_ROUTE` | Restore only a still-authorized, compatible route and otherwise select a deterministic fallback. | WS, FR-UI-DISCOVER_WORKSPACES | Removed routes cannot be resurrected by saved client state. |
+| Implemented | `FR-UI-ASSEMBLE_SHELL` | Compose header, navigation, workspace outlet, global status, and optional footer from the active capability snapshot. | KERN, COMP, WS | Missing optional regions do not block startup. `— evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:24` |
+| Implemented | `FR-UI-DISCOVER_WORKSPACES` | Discover authorized workspace routes and commands from compatible contributions. | PLUG, IFACE | No hard-coded provider import or registration-order dependency; App modules. `— evidence: tests/ui/unit/test_compose_shell.py:107, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:48` |
+| Implemented | `FR-UI-SWITCH_WORKSPACES` | Switch workspaces while preserving scoped state and preventing hidden workspaces from intercepting input. | FR-UI-DISCOVER_WORKSPACES | Exactly one workspace owns the active interaction target. `— evidence: tests/ui/unit/test_compose_shell.py:146, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:102` |
+| Implemented | `FR-UI-SHOW_CAPABILITY_STATE` | Distinguish loading, unavailable, incompatible, disabled, degraded, unauthorized, and ready capabilities. | KERN, WS, IFACE | A missing domain never appears as a blank or indefinitely loading screen. `— evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:149` |
+| Implemented | `FR-UI-RESTORE_ROUTE` | Restore only a still-authorized, compatible route and otherwise select a deterministic fallback. | WS, FR-UI-DISCOVER_WORKSPACES | Removed routes cannot be resurrected by saved client state. `— evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:189` |
 
 ### 4.2 `start_work/` — `FEAT-UI-START_WORK`
 

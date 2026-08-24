@@ -162,6 +162,7 @@ app/ui/test-results/
 app/ui/playwright-report/
 app/ui/blob-report/
 app/ui/.playwright/
+gui-test-screenshots/
 
 # ============================================================================
 # SQLite Databases
@@ -345,6 +346,8 @@ app/configs/
 *.html
 !docs/**/*.html
 !templates/**/*.html
+!app/ui/index.html
+!app/ui/**/*.html
 
 # Job queue files
 job_queue/

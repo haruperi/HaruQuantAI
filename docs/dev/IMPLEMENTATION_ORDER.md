@@ -219,13 +219,13 @@ healthy.
 
 #### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 1)
 
-##### 1.9 [ ] `FEAT-UI-COMPOSE_SHELL`
+##### 1.9 [x] `FEAT-UI-COMPOSE_SHELL`
 
-1. [ ] `FR-UI-ASSEMBLE_SHELL`
-2. [ ] `FR-UI-DISCOVER_WORKSPACES`
-3. [ ] `FR-UI-SWITCH_WORKSPACES`
-4. [ ] `FR-UI-SHOW_CAPABILITY_STATE`
-5. [ ] `FR-UI-RESTORE_ROUTE`
+1. [x] `FR-UI-ASSEMBLE_SHELL` — evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:24
+2. [x] `FR-UI-DISCOVER_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:107, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:48
+3. [x] `FR-UI-SWITCH_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:146, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:102
+4. [x] `FR-UI-SHOW_CAPABILITY_STATE` — evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:149
+5. [x] `FR-UI-RESTORE_ROUTE` — evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:189
 
 ##### 1.10 Partial — `FEAT-UI-START_WORK`
 
