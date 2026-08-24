@@ -166,3 +166,201 @@ class WorkspaceRecoverySummary:
     expired_leases_released: int = 0
     orphaned_jobs_reconciled: int = 0
     findings: tuple[str, ...] = field(default_factory=tuple)
+
+
+class AuthenticationMode(StrEnum):
+    """Authentication mode required by the launcher/server runtime."""
+
+    LOCAL_SESSION = "LOCAL_SESSION"
+    NONLOCAL_TOKEN = "NONLOCAL_TOKEN"  # noqa: S105 - auth mode name
+
+
+class JobKind(StrEnum):
+    """Job categories admitted through workspace storage guards."""
+
+    DATA_IMPORT = "DATA_IMPORT"
+    BACKTEST = "BACKTEST"
+    CODE_GENERATION = "CODE_GENERATION"
+
+
+@dataclass(frozen=True, slots=True)
+class WorkspaceSettings:
+    """Validated, versioned workspace runtime settings.
+
+    Attributes:
+        timezone: IANA timezone identifier.
+        locale: BCP 47 locale tag.
+        worker_count: Number of local workers (>= 1).
+        worker_memory_mb: Per-worker memory limit in MiB (> 0).
+        max_artifact_size_mb: Maximum admitted single-artifact size in MiB (> 0).
+        max_total_artifact_gb: Maximum total artifact storage in GiB (> 0).
+        artifacts_dir: Workspace-relative artifacts directory.
+        logs_dir: Workspace-relative logs directory.
+        cache_dir: Workspace-relative cache directory.
+        exports_dir: Workspace-relative exports directory.
+        log_level: Structured-log level name.
+        log_retention_days: Log retention window in days (> 0).
+        retention_days: Workspace metadata retention window in days (> 0).
+    """
+
+    timezone: str
+    locale: str
+    worker_count: int
+    worker_memory_mb: int
+    max_artifact_size_mb: int
+    max_total_artifact_gb: int
+    artifacts_dir: str = "artifacts"
+    logs_dir: str = "logs"
+    cache_dir: str = "cache"
+    exports_dir: str = "exports"
+    log_level: str = "INFO"
+    log_retention_days: int = 30
+    retention_days: int = 365
+
+
+@dataclass(frozen=True, slots=True)
+class WorkspaceSettingsVersion:
+    """Immutable persisted version of workspace settings.
+
+    Attributes:
+        workspace_id: Owning workspace identifier.
+        version: Monotonic settings version number.
+        settings: The validated settings payload.
+        created_at: ISO 8601 UTC timestamp of the version.
+    """
+
+    workspace_id: str
+    version: int
+    settings: WorkspaceSettings
+    created_at: str
+
+
+@dataclass(frozen=True, slots=True)
+class StorageGuardLimits:
+    """Configurable workspace storage guard thresholds.
+
+    Attributes:
+        min_free_space_mb: Minimum free workspace disk space in MiB.
+        max_artifact_size_mb: Maximum admitted projected artifact size in MiB.
+    """
+
+    min_free_space_mb: int = 512
+    max_artifact_size_mb: int = 4096
+
+
+@dataclass(frozen=True, slots=True)
+class StorageGuardDecision:
+    """Admission decision produced by the storage guards.
+
+    Attributes:
+        admitted: True when the job may be queued.
+        job_kind: The guarded job category.
+        required_mb: Projected storage requirement in MiB including the
+            minimum free-space reserve.
+        available_mb: Currently available workspace disk space in MiB.
+        reason: Empty when admitted, otherwise a stable rejection reason.
+    """
+
+    admitted: bool
+    job_kind: JobKind
+    required_mb: float
+    available_mb: float
+    reason: str = ""
+
+
+@dataclass(frozen=True, slots=True)
+class ServerRuntimeSettings:
+    """Launcher/server runtime settings subject to pre-launch validation.
+
+    Attributes:
+        bind_address: IP address to bind; loopback by default.
+        port: TCP port (1-65535).
+        headless: True to run without the browser UI.
+        authentication_mode: Authentication mode required for the binding.
+        allow_non_loopback: Explicit non-loopback opt-in.
+        worker_cpu_percent: Per-worker CPU limit percentage (1-100).
+        global_cpu_percent: Global CPU limit percentage (1-100).
+        worker_memory_mb: Per-worker memory limit in MiB (> 0).
+        global_memory_mb: Global memory limit in MiB (> 0).
+    """
+
+    port: int
+    bind_address: str = "127.0.0.1"
+    headless: bool = False
+    authentication_mode: AuthenticationMode = AuthenticationMode.LOCAL_SESSION
+    allow_non_loopback: bool = False
+    worker_cpu_percent: int = 100
+    global_cpu_percent: int = 100
+    worker_memory_mb: int = 1024
+    global_memory_mb: int = 4096
+
+
+@dataclass(frozen=True, slots=True)
+class ServerRuntimeValidation:
+    """Result of pre-launch server runtime validation.
+
+    Attributes:
+        valid: True when the settings may launch.
+        errors: Field-level validation errors; empty when valid.
+        port_available: False when the configured port cannot be bound.
+    """
+
+    valid: bool
+    errors: tuple[str, ...] = ()
+    port_available: bool = True
+
+
+@dataclass(frozen=True, slots=True)
+class ResourceRequirements:
+    """Minimum and recommended resource levels of a support profile.
+
+    Attributes:
+        minimum_cpu_cores: Minimum CPU core count.
+        recommended_cpu_cores: Recommended CPU core count.
+        minimum_memory_gb: Minimum total memory in GiB.
+        recommended_memory_gb: Recommended total memory in GiB.
+        minimum_free_storage_gb: Minimum free storage in GiB.
+        recommended_free_storage_gb: Recommended free storage in GiB.
+    """
+
+    minimum_cpu_cores: int
+    recommended_cpu_cores: int
+    minimum_memory_gb: int
+    recommended_memory_gb: int
+    minimum_free_storage_gb: int
+    recommended_free_storage_gb: int
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeSupportProfile:
+    """Versioned runtime support profile published by each release.
+
+    Attributes:
+        profile_version: Monotonic support-profile version.
+        os_families: Supported operating-system families.
+        architectures: Supported machine architectures.
+        resources: Minimum and recommended resource levels.
+        filesystems: Supported filesystem semantics.
+        browsers: Supported browsers.
+        required_compilers: Required external compilers and minimum versions.
+    """
+
+    profile_version: int
+    os_families: tuple[str, ...]
+    architectures: tuple[str, ...]
+    resources: ResourceRequirements
+    filesystems: tuple[str, ...]
+    browsers: tuple[str, ...]
+    required_compilers: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeResourceReport:
+    """Below-recommended resource findings; empty when resources suffice.
+
+    Attributes:
+        warnings: Human-readable below-recommended findings; never a
+            capability claim.
+    """
+
+    warnings: tuple[str, ...] = ()

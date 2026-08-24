@@ -99,3 +99,56 @@ class WorkspaceStorageError(WorkspaceError):
             message: Error description.
         """
         super().__init__(message, error_code="WORKSPACE_STORAGE_ERROR")
+
+
+class SettingsValidationError(WorkspaceError):
+    """Raised when workspace settings fail field validation.
+
+    Attributes:
+        field_errors: Mapping of settings field name to error description.
+    """
+
+    def __init__(self, field_errors: dict[str, str]) -> None:
+        """Initialize the settings validation error.
+
+        Args:
+            field_errors: Mapping of invalid field name to error description.
+        """
+        self.field_errors = field_errors
+        detail = "; ".join(f"{k}: {v}" for k, v in sorted(field_errors.items()))
+        super().__init__(
+            f"Workspace settings validation failed: {detail}",
+            error_code="SETTINGS_VALIDATION_FAILED",
+        )
+
+
+class ServerRuntimeValidationError(WorkspaceError):
+    """Raised when launcher/server runtime settings are invalid.
+
+    Attributes:
+        errors: Tuple of field-level validation error descriptions.
+    """
+
+    def __init__(self, errors: tuple[str, ...]) -> None:
+        """Initialize the server runtime validation error.
+
+        Args:
+            errors: Validation error descriptions.
+        """
+        self.errors = errors
+        super().__init__(
+            f"Server runtime settings invalid: {'; '.join(errors)}",
+            error_code="SERVER_RUNTIME_INVALID",
+        )
+
+
+class UnsupportedRuntimeError(WorkspaceError):
+    """Raised when the host platform violates the runtime support profile."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the unsupported runtime error.
+
+        Args:
+            message: Details of the unsupported architecture or filesystem.
+        """
+        super().__init__(message, error_code="RUNTIME_UNSUPPORTED")

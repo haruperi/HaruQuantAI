@@ -172,12 +172,12 @@ healthy.
 4. [x] `FR-WS-RECOVER_WORKSPACE_STATE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:177
 5. [x] `FR-WS-BACKUP_WORKSPACE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:210
 
-##### 1.2 [ ] `FEAT-WS-CONFIGURE_RUNTIME`
+##### 1.2 [x] `FEAT-WS-CONFIGURE_RUNTIME`
 
-1. [ ] `FR-WS-CONFIGURE_WORKSPACE`
-2. [ ] `FR-WS-ENFORCE_STORAGE_GUARDS`
-3. [ ] `FR-WS-CONFIGURE_SERVER_RUNTIME`
-4. [ ] `FR-WS-PUBLISH_RUNTIME_SUPPORT`
+1. [x] `FR-WS-CONFIGURE_WORKSPACE` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:64
+2. [x] `FR-WS-ENFORCE_STORAGE_GUARDS` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:109
+3. [x] `FR-WS-CONFIGURE_SERVER_RUNTIME` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:148
+4. [x] `FR-WS-PUBLISH_RUNTIME_SUPPORT` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:214
 
 ##### 1.3 [ ] `FEAT-WS-SECURE_LOCAL_ACCESS`
 

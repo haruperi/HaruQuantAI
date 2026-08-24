@@ -32,7 +32,7 @@ before starting; it is gitignored scratch.
 Open a fresh chat with your chosen orchestrator and send:
 
 > Read `docs\PROJECT.md` and `docs\ARCHITECTURE.md` for project context.
-> Read `AGENTS.md` and `.agents/ORCHESTRATOR.md` in order to implement the
+> Read `docs\dev\feature_implementation_pipeline.md`, `AGENTS.md` and `.agents/ORCHESTRATOR.md` in order to implement the
 > next task `.agents/task.toml`.
 
 The chat reads the mode from `run-config.toml` and drives the whole loop:

@@ -201,14 +201,41 @@ def run_step(
     return StepResult(step_name, False, elapsed, output)
 
 
+def _remove_importing_tests(workspace: Path, pkg_rel_path: str) -> None:
+    """Delete sandbox test files that import the removed feature package.
+
+    A physical removal takes a feature's importing tests with it; the
+    isolated verification workspace must mirror that so its quality gates
+    check a truthful post-removal tree. The real repository is untouched.
+
+    Args:
+        workspace: Isolated verification workspace root.
+        pkg_rel_path: Feature package path relative to the repository root.
+    """
+    module_prefix = pkg_rel_path.replace("/", ".")
+    tests_root = workspace / "tests"
+    if not tests_root.is_dir():
+        return
+    for candidate in sorted(tests_root.rglob("*.py")):
+        try:
+            content = candidate.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        if f"from {module_prefix}" in content or f"import {module_prefix}" in content:
+            candidate.unlink()
+
+
 def remove_entry_point(pyproject_path: Path, entry_point_name: str) -> None:
     """Remove one exact feature entry-point declaration.
+
+    Matches both quoted and unquoted TOML keys; dotted keys such as
+    "workspace.runtime_configuration" are always quoted in TOML.
 
     Raises:
         RuntimeError: If exactly one matching declaration is not removed.
     """
     content = pyproject_path.read_text(encoding="utf-8")
-    pattern = rf"^{re.escape(entry_point_name)}\s*=.*$\n?"
+    pattern = rf'^"?{re.escape(entry_point_name)}"?\s*=.*$\n?'
     updated, count = re.subn(pattern, "", content, flags=re.MULTILINE)
     if count != 1:
         msg = f"Expected one entry point named '{entry_point_name}', removed {count}"
@@ -379,6 +406,7 @@ def verify_target(
         shutil.rmtree(package_path)
         if test_path.exists():
             shutil.rmtree(test_path)
+        _remove_importing_tests(workspace, target.pkg_rel_path)
 
         remove_entry_point(
             workspace / "pyproject.toml",
@@ -408,7 +436,7 @@ def verify_target(
                 ["uv", "run", "python", "scripts/validate_feature_docs.py"],
                 "Feature documentation",
             ),
-            (["uv", "run", "pytest"], "Complete remaining test suite"),
+            (["uv", "run", "pytest", "--no-cov"], "Complete remaining test suite"),
             (
                 [
                     "uv",
