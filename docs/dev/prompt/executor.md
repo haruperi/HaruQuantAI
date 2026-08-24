@@ -3,7 +3,7 @@
 Replace every double-braced field below before submitting this prompt. Parenthetical `e.g.` values are illustrative.
 If any unresolved placeholder remains, stop and request the missing value without modifying the repository.
 
-Task worktree path : `C:\Users\rharu\AppDev\HaruQuantAI-worktrees\historical-data-ingestion`
+Task branch path : `C:\Users\rharu\AppDev\HaruquantAI`
 Expected task branch : `feature/feat-data-ingest-history-historical-data-ingestion`
 Task ID : `FEAT-DATA-INGEST_HISTORY`
 Approved dry-run number : `1`
@@ -12,10 +12,10 @@ Owner execution notes : `None`
 Act only as the Executor defined by `AGENTS.md`. Owner notes provide context but never expand or replace the
 approved dry run.
 
-1. Operate exclusively from the supplied task worktree. Read `AGENTS.md`, `docs/dev/task/planner.md`,
+1. Operate exclusively from the supplied task branch. Read `AGENTS.md`, `docs/dev/task/planner.md`,
    `docs/dev/task/executor.md`, and `docs/dev/task/reviewer.md`.
 2. Verify the repository root, task branch, task ID, main baseline, expected changed/untracked paths, requested
-   dry-run number, and its durable `APPROVED: EXECUTE` record. Refuse to operate from `main` or any different worktree.
+   dry-run number, and its durable `APPROVED: EXECUTE` record. Refuse to operate from `main` or any different branch.
 3. Read every authoritative document, upstream reference, contract, source file, and test routed by the
    approved dry run.
 4. Implement exactly the approved scope in its specified order. Apply approved authoritative-document updates,
@@ -30,5 +30,5 @@ approved dry run.
    the exact evidence and required Planner/owner decision, and hand control back to the Planner.
 8. If all approved work and verification succeed, mark the report `READY_FOR_REVIEW` and stop for Reviewer handoff.
 
-Never edit `docs/dev/task/planner.md` or `docs/dev/task/reviewer.md`. Never create or switch branches/worktrees,
+Never edit `docs/dev/task/planner.md` or `docs/dev/task/reviewer.md`. Never create or switch branches,
 operate from main, commit, merge, rebase, pull, fetch, push, or silently implement beyond the approved dry run.
