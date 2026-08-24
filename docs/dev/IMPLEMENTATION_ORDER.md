@@ -204,13 +204,13 @@ healthy.
 
 ##### 1.7 Partial — `FEAT-IFACE-SERVE_API_EVENTS`
 
-1. [ ] `FR-IFACE-SERVE_VERSIONED_API`
-2. [ ] `FR-IFACE-ENFORCE_CONCURRENCY_TOKENS`
-3. [ ] `FR-IFACE-DEDUPLICATE_MUTATIONS`
-4. [ ] `FR-IFACE-REPLAY_INTERFACE_EVENTS`
-5. [ ] `FR-IFACE-TRACK_ASYNC_JOBS`
-6. [ ] `FR-IFACE-VALIDATE_ARTIFACT_DOWNLOADS`
-7. [ ] `FR-IFACE-EVOLVE_API_COMPATIBLY`
+1. [x] `FR-IFACE-SERVE_VERSIONED_API` — evidence: tests/services/interfaces/api_events/test_api_events.py:34
+2. [x] `FR-IFACE-ENFORCE_CONCURRENCY_TOKENS` — evidence: tests/services/interfaces/api_events/test_api_events.py:74
+3. [x] `FR-IFACE-DEDUPLICATE_MUTATIONS` — evidence: tests/services/interfaces/api_events/test_api_events.py:106
+4. [x] `FR-IFACE-REPLAY_INTERFACE_EVENTS` — evidence: tests/services/interfaces/api_events/test_api_events.py:189
+5. [x] `FR-IFACE-TRACK_ASYNC_JOBS` — evidence: tests/services/interfaces/api_events/test_api_events.py:241
+6. [x] `FR-IFACE-VALIDATE_ARTIFACT_DOWNLOADS` — evidence: tests/services/interfaces/api_events/test_api_events.py:307
+7. [x] `FR-IFACE-EVOLVE_API_COMPATIBLY` — evidence: tests/services/interfaces/api_events/test_api_events.py:415
 
 ##### 1.8 Partial — `FEAT-IFACE-AUTOMATE_COMMANDS`
 
