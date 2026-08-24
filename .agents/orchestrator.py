@@ -1069,11 +1069,19 @@ def _collect_rejection_feedback() -> str:
     return "\n".join(lines).strip()
 
 
-def request_approval(auto_approve: bool) -> tuple[bool, str]:
+def request_approval(
+    auto_approve: bool,
+    *,
+    approved: bool = False,
+    reject_feedback: str | None = None,
+) -> tuple[bool, str]:
     """Prompt the owner to approve, reject, or abort a planned dry run.
 
     Args:
         auto_approve: If True, bypass the owner gate automatically.
+        approved: Scripted relay of an explicit owner approval (--approved).
+        reject_feedback: Scripted relay of an owner rejection with feedback
+            (--reject-feedback); implies rejection when not None.
 
     Returns:
         Tuple of (approved_bool, owner_feedback_for_next_dry_run).
@@ -1081,6 +1089,12 @@ def request_approval(auto_approve: bool) -> tuple[bool, str]:
     Raises:
         KeyboardInterrupt: If the user chooses to abort execution.
     """
+    if approved:
+        print("[gate] --approved: relaying explicit owner approval.")
+        return True, ""
+    if reject_feedback is not None:
+        print("[gate] --reject-feedback: relaying owner rejection to the Planner.")
+        return False, reject_feedback
     if auto_approve:
         print("[warn] --auto-approve: bypassing the owner approval gate.")
         return True, ""
@@ -1266,6 +1280,8 @@ def _handle_approve_phase(
     state: dict[str, Any],
     *,
     auto_approve: bool,
+    approved: bool = False,
+    reject_feedback: str | None = None,
 ) -> None:
     """Execute the Owner approval phase.
 
@@ -1273,11 +1289,15 @@ def _handle_approve_phase(
         cfg: Consolidated orchestration configuration mapping.
         state: Mutable orchestrator state mapping.
         auto_approve: Whether to auto-approve without interactive prompt.
+        approved: Scripted owner approval relay (--approved).
+        reject_feedback: Scripted owner rejection feedback (--reject-feedback).
     """
     it = state["iteration"]
     banner(f"OWNER GATE — approve Dry Run {it}")
-    approved, feedback = request_approval(auto_approve)
-    if approved:
+    approved_decision, feedback = request_approval(
+        auto_approve, approved=approved, reject_feedback=reject_feedback
+    )
+    if approved_decision:
         state["phase"] = "approval_record"
     else:
         state["last_event"] = f"owner rejected Dry Run {it}"
@@ -1506,6 +1526,8 @@ def router(
     *,
     auto_approve: bool = False,
     self_test: bool = False,
+    approved: bool = False,
+    reject_feedback: str | None = None,
 ) -> dict[str, Any]:
     """Run phases until ACCEPTED, a stop condition, or owner interruption.
 
@@ -1514,6 +1536,9 @@ def router(
         state: Mutable orchestrator state mapping.
         auto_approve: If True, bypass the owner gate.
         self_test: If True, operate in self-test stub mode.
+        approved: Scripted owner approval relayed for one gate (--approved).
+        reject_feedback: Scripted owner rejection for one gate
+            (--reject-feedback); takes precedence over `approved`.
 
     Returns:
         Final state dictionary upon completion or stop condition.
@@ -1532,7 +1557,18 @@ def router(
         if phase == "plan":
             _handle_plan_phase(cfg, state, self_test=self_test)
         elif phase == "approve":
-            _handle_approve_phase(cfg, state, auto_approve=auto_approve)
+            _handle_approve_phase(
+                cfg,
+                state,
+                auto_approve=auto_approve,
+                approved=approved,
+                reject_feedback=reject_feedback,
+            )
+            # Scripted gate decisions are one-shot: never reuse them for a
+            # later gate reached in the same router loop (e.g. after a
+            # rejection loops back through planning to another gate).
+            approved = False
+            reject_feedback = None
         elif phase == "approval_record":
             _handle_approval_record_phase(cfg, state)
         elif phase == "executor":
@@ -1635,7 +1671,13 @@ def cmd_start(args: argparse.Namespace) -> int:
     path = save_state(cfg["runs_dir"], state)
     print(f"[ok] run {state['run_id']} started; state: {path}")
     try:
-        router(cfg, state, auto_approve=args.auto_approve)
+        router(
+            cfg,
+            state,
+            auto_approve=args.auto_approve,
+            approved=args.approved,
+            reject_feedback=args.reject_feedback,
+        )
     except KeyboardInterrupt:
         state["status"] = "INTERRUPTED"
         save_state(cfg["runs_dir"], state)
@@ -1687,7 +1729,13 @@ def cmd_resume(args: argparse.Namespace) -> int:
         return 0
     state["status"] = "RUNNING"
     try:
-        router(cfg, state, auto_approve=args.auto_approve)
+        router(
+            cfg,
+            state,
+            auto_approve=args.auto_approve,
+            approved=args.approved,
+            reject_feedback=args.reject_feedback,
+        )
     except KeyboardInterrupt:
         state["status"] = "INTERRUPTED"
         save_state(cfg["runs_dir"], state)
@@ -1987,6 +2035,18 @@ def _add_common_args(parser: argparse.ArgumentParser) -> None:
         "--auto-approve",
         action="store_true",
         help="DANGEROUS: skip the owner APPROVED: EXECUTE gate",
+    )
+    parser.add_argument(
+        "--approved",
+        action="store_true",
+        help="relay an explicit owner approval for the current gate only "
+        "(for chat-driven orchestration)",
+    )
+    parser.add_argument(
+        "--reject-feedback",
+        dest="reject_feedback",
+        default=None,
+        help="relay an owner rejection with feedback for the current gate only",
     )
     parser.add_argument(
         "--max-iterations",

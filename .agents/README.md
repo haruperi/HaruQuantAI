@@ -1,12 +1,26 @@
-# .agents — Cross-Brand Agent Orchestrator
+# .agents — Multi-Mode Agent Workflow System
 
-Automates the `AGENTS.md` three-role workflow: when the Planner finishes a dry
-run, the orchestrator collects owner approval, then launches the Executor;
-when the Executor finishes, it launches the Reviewer; `CHANGES_REQUESTED` /
-`BLOCKED` loop back to the Planner for the next numbered dry run. Roles may be
-any mix of CLI brands (claude, codex, agy, gemini, qwen, ...) because agents
-never talk to each other directly — the task journals in `docs/dev/task/` are
-the shared memory and each agent is launched headlessly with one role.
+Automates the `AGENTS.md` three-role workflow (Planner → Executor → Reviewer)
+in four interchangeable modes. Roles never talk to each other directly — the
+task journals in `docs/dev/task/` are the shared memory, and every journal
+entry ends with the three-line handoff block plus NEXT AGENT NOTES.
+
+| Mode | What runs the roles | Typical use |
+| --- | --- | --- |
+| `solo` | The orchestrating chat itself, sequentially wearing each hat | Fast small tasks; one context |
+| `delegate` | Same-brand subagents spawned by the chat (per-role model/effort, e.g. Sol-High plans, Luna-High executes, Terra-High reviews) | Division of reasoning tiers in one brand |
+| `multi-delegate` | Cross-vendor headless CLIs driven by `orchestrator.py` (codex/agy/cline/...) | Best tool per phase |
+| `manual` | Separate chats; the user relays prompts between roles | The original hand workflow |
+
+Modes 1–3 run in one chat with that chat as the orchestrator following
+`.agents/ORCHESTRATOR.md`; mode 4 runs across chats. Choose and configure a
+mode with the picker — menus cascade (vendor → vendor-specific model list →
+effort, per role), and in multi-delegate mode the picker also regenerates the
+three `.agents/<role>.toml` files with correct per-vendor CLI flags:
+
+```bash
+python .agents/configure.py        # writes .agents/run-config.toml
+```
 
 This tooling lives outside the AGENTS.md workflow by owner decision
 (2026-08-24). It orchestrates that workflow; it is not part of the product.

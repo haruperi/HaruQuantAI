@@ -374,3 +374,4 @@ artifacts/
 # ============================================================================
 .agents/logs/
 .agents/runs/
+.agents/run-config.toml
