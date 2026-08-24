@@ -52,9 +52,11 @@ start ──▶ PLANNER (dry run N) ─▶ PENDING_APPROVAL ─▶ OWNER GATE �
   is accepted as a warned fallback. `ACTIVATING : NONE` marks terminal states
   (Reviewer ACCEPTED, Planner BLOCKED awaiting an owner decision).
 - **Blocker memory**: every BLOCKED outcome (Planner gate failure or Executor
-  blocker) is recorded as an OPEN blocker in the run state, optionally with a
-  one-line owner description. The next Planner iteration becomes a minimal
-  blocker-resolution dry run (the original scope is explicitly suspended);
+  blocker) is recorded as an OPEN blocker in the run state. The description is
+  extracted automatically from the blocking agent's NEXT AGENT NOTES and shown
+  with a journal evidence pointer — the owner is never asked to re-describe
+  what the agent already documented. The next Planner iteration becomes a
+  minimal blocker-resolution dry run (the original scope is explicitly suspended);
   once that dry run is implemented, the blocker is marked RESOLVED and the
   following dry runs continue the ORIGINAL task. The blocker ledger is
   injected into correction contexts and the reviewer prompt, and the reviewer

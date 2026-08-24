@@ -78,6 +78,7 @@ EXPECTED_SELF_TEST_ITERATION = 3
 BLOCK_FIELD_COUNT = 3
 MIN_SELF_TEST_LOG_FILES = 16
 DEFAULT_TAIL_LINES = 30
+MAX_BLOCKER_DESC_LEN = 400
 
 
 class OrchestratorError(RuntimeError):
@@ -688,7 +689,7 @@ def resolve_handoff(
     *,
     log_path: Path,
     stopped_expected: str,
-    activating_expected: str,
+    activating_expected: str | dict[str, str],
 ) -> dict[str, str] | None:
     """Validate the journal handoff block; accept a stdout block as fallback.
 
@@ -703,7 +704,9 @@ def resolve_handoff(
         role_name: Role display name for messages.
         log_path: Path to the invocation log file for diagnostics.
         stopped_expected: Expected STOPPED value (e.g. 'EXECUTOR').
-        activating_expected: Expected ACTIVATING value (e.g. 'REVIEWER').
+        activating_expected: Expected ACTIVATING value, either a single string
+            or a per-HANDOFF mapping (e.g. {'READY_FOR_REVIEW': 'REVIEWER',
+            'BLOCKED': 'PLANNER'}) so correct blocked routings never warn.
 
     Returns:
         The validated handoff block if valid, otherwise None.
@@ -732,19 +735,25 @@ def resolve_handoff(
 
 
 def _warn_activating_mismatch(
-    block: dict[str, str], activating_expected: str, role_name: str
+    block: dict[str, str],
+    activating_expected: str | dict[str, str],
+    role_name: str,
 ) -> None:
     """Warn when the agent's ACTIVATING line disagrees with the router plan.
 
     Args:
         block: Validated handoff block mapping.
-        activating_expected: Expected ACTIVATING value.
+        activating_expected: Expected ACTIVATING value, or a per-HANDOFF map.
         role_name: Role display name for messages.
     """
-    if block["activating"] != activating_expected:
+    if isinstance(activating_expected, dict):
+        expected = activating_expected.get(block["handoff"], "?")
+    else:
+        expected = activating_expected
+    if block["activating"] != expected:
         print(
             f"[warn] {role_name} wrote ACTIVATING {block['activating']}; "
-            f"expected {activating_expected}. Routing follows HANDOFF."
+            f"expected {expected}. Routing follows HANDOFF."
         )
 
 
@@ -1096,22 +1105,25 @@ def request_approval(auto_approve: bool) -> tuple[bool, str]:
         print("Unrecognized input; type APPROVED: EXECUTE, reject, or abort.")
 
 
-def _record_blocker(state: dict[str, Any], raised_by: str, *, auto: bool) -> None:
+def _record_blocker(state: dict[str, Any], raised_by: str, *, journal: Path) -> None:
     """Record an OPEN blocker in the run state and update ``last_event``.
+
+    The description is extracted automatically from the blocking agent's
+    latest NEXT AGENT NOTES (the agent's own targeted summary of the blocker),
+    so the owner is never asked to re-describe what the agent already
+    documented in its journal.
 
     Args:
         state: Mutable orchestrator state mapping.
         raised_by: Role that raised the blocker ('PLANNER' or 'EXECUTOR').
-        auto: When True, skip the interactive one-line description prompt.
+        journal: Path to the blocking role's journal.
     """
     description = ""
-    if not auto:
-        try:
-            description = input(
-                "Describe the blocker in one line (Enter to skip): "
-            ).strip()
-        except EOFError:
-            description = ""
+    if journal.exists():
+        lines = journal.read_text(encoding="utf-8", errors="replace").splitlines()
+        description = parse_next_notes(lines)
+    if len(description) > MAX_BLOCKER_DESC_LEN:
+        description = description[:MAX_BLOCKER_DESC_LEN].rstrip() + " ..."
     now_utc = _dt.datetime.now(tz=_dt.UTC)
     state.setdefault("blockers", []).append(
         {
@@ -1122,10 +1134,11 @@ def _record_blocker(state: dict[str, Any], raised_by: str, *, auto: bool) -> Non
             "time": now_utc.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
         }
     )
-    detail = f": {description}" if description else ""
-    state["last_event"] = (
-        f"{raised_by.title()} iteration {state['iteration']} BLOCKED{detail}"
-    )
+    state["last_event"] = f"{raised_by.title()} iteration {state['iteration']} BLOCKED"
+    print(f"\n[blocker] {state['last_event']}")
+    print(f"    evidence: {journal}")
+    if description:
+        print(f"    agent notes: {description}")
 
 
 def blocker_ledger_text(state: dict[str, Any]) -> str:
@@ -1220,7 +1233,7 @@ def _handle_plan_phase(
         raise OrchestratorError(msg)
     capture_notes(state, cfg["journals"]["planner"], "PLANNER")
     if marker == "BLOCKED":
-        _record_blocker(state, "PLANNER", auto=self_test)
+        _record_blocker(state, "PLANNER", journal=cfg["journals"]["planner"])
         state["status"] = "PLANNER_BLOCKED"
         state["phase"] = "done"
         save_state(cfg["runs_dir"], state)
@@ -1336,15 +1349,12 @@ def _handle_approval_record_phase(
 def _handle_executor_phase(
     cfg: dict[str, Any],
     state: dict[str, Any],
-    *,
-    self_test: bool,
 ) -> None:
     """Execute the Executor implementation phase.
 
     Args:
         cfg: Consolidated orchestration configuration mapping.
         state: Mutable orchestrator state mapping.
-        self_test: Whether running in self-test sandbox mode.
 
     Raises:
         OrchestratorError: If execution yields no valid marker.
@@ -1372,7 +1382,7 @@ def _handle_executor_phase(
         "Executor",
         log_path=log,
         stopped_expected="EXECUTOR",
-        activating_expected="REVIEWER",
+        activating_expected={"READY_FOR_REVIEW": "REVIEWER", "BLOCKED": "PLANNER"},
     )
     record(state, "executor", block, log)
     marker = block["handoff"] if block else None
@@ -1383,7 +1393,7 @@ def _handle_executor_phase(
         raise OrchestratorError(msg)
     capture_notes(state, cfg["journals"]["executor"], "EXECUTOR")
     if marker == "BLOCKED":
-        _record_blocker(state, "EXECUTOR", auto=self_test)
+        _record_blocker(state, "EXECUTOR", journal=cfg["journals"]["executor"])
         state["owner_feedback"] = ""
         state["iteration"] = it + 1
         state["phase"] = "plan"
@@ -1438,7 +1448,7 @@ def _handle_reviewer_phase(
         "Reviewer",
         log_path=log,
         stopped_expected="REVIEWER",
-        activating_expected="NONE",
+        activating_expected={"ACCEPTED": "NONE", "CHANGES_REQUESTED": "PLANNER"},
     )
     record(state, "reviewer", block, log)
     marker = block["handoff"] if block else None
@@ -1526,7 +1536,7 @@ def router(
         elif phase == "approval_record":
             _handle_approval_record_phase(cfg, state)
         elif phase == "executor":
-            _handle_executor_phase(cfg, state, self_test=self_test)
+            _handle_executor_phase(cfg, state)
         elif phase == "reviewer":
             should_continue = _handle_reviewer_phase(cfg, state, self_test=self_test)
             if not should_continue:
