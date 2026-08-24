@@ -21,8 +21,8 @@ AGENTS_DIR = Path(__file__).resolve().parent
 REPO = AGENTS_DIR.parent
 
 ENTRY_RE = re.compile(
-    r"^#####\s+(\d+\.\d+)\s+(?P<partial>Partial\s+—\s+)?\[?(?P<mark>[ xX])\]?"
-    r"\s*`?(?P<feature>FEAT-[A-Z0-9_-]+)`?"
+    r"^#####\s+(\d+\.\d+)\s+(?P<partial>Partial\s+—\s+)?(?:\[(?P<mark>[ xX])\]\s*)?"
+    r"`?(?P<feature>FEAT-[A-Z0-9_-]+)`?"
 )
 FR_RE = re.compile(r"^\d+\.\s+\[?([ xX])\]?\s*`?(FR-[A-Z0-9_-]+)`?")
 
@@ -34,9 +34,10 @@ def parse_entries(path: Path) -> dict[str, dict]:
     for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
         match = ENTRY_RE.match(line)
         if match:
+            mark = match.group("mark")
             current = {
                 "feature": match.group("feature"),
-                "done": match.group("mark").lower() == "x",
+                "done": mark.lower() == "x" if mark else False,
                 "partial": bool(match.group("partial")),
                 "frs": [],
             }
