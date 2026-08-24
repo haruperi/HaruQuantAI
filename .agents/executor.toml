@@ -1,9 +1,17 @@
 # Executor agent — Google Antigravity CLI (gemini-3.7-flash-high).
 # See planner.toml for the brand cheat-sheet and delivery-mode notes.
+#
+# agy's `-p` takes the NEXT token as its prompt value (it is not a boolean
+# flag), so it must be the LAST token — the orchestrator appends the prompt
+# pointer after `command` + `model_args`, hence the model args live inside
+# `command` and model_args stays empty here.
 
 brand = "agy"
-command = ["agy", "-p", "--dangerously-skip-permissions"]
-# The "-high" reasoning level is part of the agy model slug.
-model_args = ["--model", "gemini-3.7-flash-high"]
+command = [
+  "agy",
+  "--dangerously-skip-permissions",
+  "--model", "gemini-3.7-flash-high",
+  "-p",
+]
 prompt_delivery = "file"          # file | arg | stdin
 template = ".agents/templates/executor.md"

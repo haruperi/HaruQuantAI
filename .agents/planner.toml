@@ -6,7 +6,8 @@
 #
 # Brand cheat-sheet (verify flags with each CLI's --help):
 #   codex  : ["codex", "exec", "-s", "workspace-write"]  + -m <model> -c model_reasoning_effort=high
-#   agy    : ["agy", "-p", "--dangerously-skip-permissions"]  + --model <slug>
+#   agy    : ["agy", "--dangerously-skip-permissions", "--model", "<slug>", "-p"]
+#            (agy's -p takes the next token as its prompt, so it must be last)
 #   claude : ["claude", "-p", "--dangerously-skip-permissions"]
 #   cline  : ["cline", "-P", "<provider>", ...]  (WARNING: cline's -p is PLAN mode)
 

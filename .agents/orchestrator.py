@@ -41,9 +41,11 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import tomllib
 from pathlib import Path
-from typing import Any, cast
+from typing import IO, Any, cast
 
 AGENTS_DIR = Path(__file__).resolve().parent
 
@@ -141,6 +143,8 @@ def assemble_config(repo_override: str | None = None) -> dict[str, Any]:
         "main_branch": run_cfg.get("main_branch", "main"),
         "max_iterations": int(run_cfg.get("max_iterations", 5)),
         "timeout": int(run_cfg.get("invocation_timeout_seconds", 3600)),
+        "stream_agent_output": bool(run_cfg.get("stream_agent_output", True)),
+        "stream_heartbeat_seconds": int(run_cfg.get("stream_heartbeat_seconds", 60)),
         "journals": journals,
         "templates": templates,
         "logs_dir": (repo / paths.get("logs_dir", ".agents/logs")).resolve(),
@@ -222,6 +226,110 @@ def _build_agent_cmd(
     return cmd, stdin_text
 
 
+def _stream_pump(
+    stream: IO[str],
+    sink: list[str],
+    prefix: str,
+    last_activity: dict[str, float],
+    stream_enabled: bool,
+) -> None:
+    """Drain a process pipe line-by-line, echoing lines to the terminal.
+
+    Args:
+        stream: Text pipe (stdout or stderr) of the agent process.
+        sink: List accumulating the captured lines for the log file.
+        prefix: Terminal prefix ('| ' for stdout, '! ' for stderr).
+        last_activity: Shared monotonic timestamp of the latest output line.
+        stream_enabled: Whether to echo lines live to the terminal.
+    """
+    try:
+        for raw in stream:
+            line = raw.rstrip("\r\n")
+            sink.append(line)
+            last_activity["t"] = time.monotonic()
+            if stream_enabled and line.strip():
+                print(f"{prefix}{line}", flush=True)
+    finally:
+        stream.close()
+
+
+def _heartbeat_monitor(
+    proc: subprocess.Popen[str],
+    started: float,
+    last_activity: dict[str, float],
+    stop: threading.Event,
+    interval: int,
+) -> None:
+    """Print a heartbeat line while the agent produces no output.
+
+    Args:
+        proc: Agent process being watched.
+        started: Monotonic timestamp of invocation start.
+        last_activity: Shared timestamp of the latest output line.
+        stop: Event set when the invocation finishes.
+        interval: Minimum quiet seconds before a heartbeat is printed.
+    """
+    last_beat = started
+    while not stop.wait(1.0):
+        now = time.monotonic()
+        if now - last_activity["t"] >= interval and now - last_beat >= interval:
+            state = "running" if proc.poll() is None else "finishing"
+            print(f"    [{int(now - started)}s] agent still {state}...", flush=True)
+            last_beat = now
+
+
+def _kill_process_tree(proc: subprocess.Popen[str]) -> None:
+    """Kill the agent process and, on Windows, its whole child tree.
+
+    Args:
+        proc: Agent process to terminate.
+    """
+    with contextlib.suppress(OSError):
+        proc.kill()
+    if sys.platform == "win32" and proc.pid:
+        taskkill = shutil.which("taskkill")
+        if taskkill:
+            subprocess.run(  # noqa: S603
+                [taskkill, "/PID", str(proc.pid), "/T", "/F"],
+                capture_output=True,
+                check=False,
+            )
+
+
+def _start_agent_process(
+    cmd: list[str],
+    cwd: Path,
+    stdin_text: str | None,
+) -> subprocess.Popen[str]:
+    """Launch the configured agent process and surface launch errors.
+
+    Args:
+        cmd: Command arguments to execute.
+        cwd: Working directory for the agent process.
+        stdin_text: Optional prompt payload sent to stdin instead of DEVNULL.
+
+    Returns:
+        The started subprocess object.
+
+    Raises:
+        OrchestratorError: If the process cannot be launched.
+    """
+    try:
+        return subprocess.Popen(  # noqa: S603
+            cmd,
+            cwd=str(cwd),
+            stdin=subprocess.PIPE if stdin_text is not None else subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+    except OSError as exc:
+        msg = f"Failed to launch agent command {cmd[0]!r}: {exc}"
+        raise OrchestratorError(msg) from exc
+
+
 def run_agent(
     role_cfg: dict[str, Any],
     prompt: str,
@@ -231,6 +339,8 @@ def run_agent(
     *,
     timeout: int,
     approval: bool = False,
+    stream: bool = True,
+    heartbeat: int = 60,
 ) -> tuple[int, str, Path]:
     """Run one headless agent invocation; return (exit_code, stdout, log_path).
 
@@ -239,14 +349,20 @@ def run_agent(
     passing megabyte prompts through argv, which is fragile on Windows where
     npm CLIs are .cmd shims re-parsed by cmd.exe.
 
+    Agent output is streamed live to the terminal ('| ' = agent stdout,
+    '! ' = agent stderr) and a heartbeat line appears whenever the agent is
+    quiet for `heartbeat` seconds, so long invocations are never silent.
+
     Args:
         role_cfg: Configuration dictionary for the agent role.
         prompt: Composed prompt string.
         cwd: Working directory for the process.
         logs_dir: Directory for writing run logs and prompt files.
         tag: Identifier tag used in log file naming.
-        timeout: Maximum seconds before process is killed.
+        timeout: Maximum seconds before the process tree is killed.
         approval: Whether this invocation is for approval recording.
+        stream: Echo agent output lines live to the terminal.
+        heartbeat: Quiet seconds before printing a heartbeat line (0 = off).
 
     Returns:
         Tuple of (exit_code, stdout_content, log_file_path).
@@ -271,35 +387,46 @@ def run_agent(
     preview_tokens = " ".join(cmd[:MAX_CMD_PREVIEW])
     ellipsis_suffix = " ..." if len(cmd) > MAX_CMD_PREVIEW else ""
     print(f"    launching: {preview_tokens}{ellipsis_suffix}")
-    try:
-        proc = subprocess.run(  # noqa: S603
-            cmd,
-            cwd=str(cwd),
-            input=stdin_text,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            timeout=timeout,
-            check=False,
-        )
-        code = proc.returncode
-        out = proc.stdout or ""
-        err = proc.stderr or ""
-    except subprocess.TimeoutExpired as exc:
-        raw_out: Any = exc.stdout
-        out = (
-            raw_out.decode("utf-8", errors="replace")
-            if isinstance(raw_out, bytes)
-            else (raw_out or "")
-        )
-        raw_err: Any = exc.stderr
-        err = (
-            raw_err.decode("utf-8", errors="replace")
-            if isinstance(raw_err, bytes)
-            else (raw_err or "")
-        )
+    if stream:
+        print("    (live output: '|' = agent stdout, '!' = agent stderr)")
+    proc = _start_agent_process(cmd, cwd, stdin_text)
 
+    out_lines: list[str] = []
+    err_lines: list[str] = []
+    last_activity = {"t": time.monotonic()}
+    started = time.monotonic()
+    stop_heartbeat = threading.Event()
+    pumps = [
+        threading.Thread(
+            target=_stream_pump,
+            args=(proc.stdout, out_lines, "    | ", last_activity, stream),
+            daemon=True,
+        ),
+        threading.Thread(
+            target=_stream_pump,
+            args=(proc.stderr, err_lines, "    ! ", last_activity, stream),
+            daemon=True,
+        ),
+    ]
+    for pump in pumps:
+        pump.start()
+    if heartbeat > 0:
+        threading.Thread(
+            target=_heartbeat_monitor,
+            args=(proc, started, last_activity, stop_heartbeat, heartbeat),
+            daemon=True,
+        ).start()
+
+    try:
+        if stdin_text is not None and proc.stdin is not None:
+            proc.stdin.write(stdin_text)
+            proc.stdin.close()
+        code = proc.wait(timeout=timeout)
+    except subprocess.TimeoutExpired as exc:
+        _kill_process_tree(proc)
+        stop_heartbeat.set()
+        out = "\n".join(out_lines)
+        err = "\n".join(err_lines)
         _write_log(
             logs_dir,
             stamp,
@@ -312,6 +439,12 @@ def run_agent(
         )
         timeout_msg = f"Agent invocation '{tag}' timed out after {timeout}s"
         raise OrchestratorError(timeout_msg) from exc
+
+    stop_heartbeat.set()
+    for pump in pumps:
+        pump.join(timeout=5)
+    out = "\n".join(out_lines)
+    err = "\n".join(err_lines)
 
     log_path = _write_log(logs_dir, stamp, tag, cmd, code, out=out, err=err)
     if code != 0:
@@ -1010,6 +1143,8 @@ def _handle_plan_phase(
         cfg["logs_dir"],
         tag,
         timeout=cfg["timeout"],
+        stream=cfg["stream_agent_output"],
+        heartbeat=cfg["stream_heartbeat_seconds"],
     )
     block = resolve_handoff(
         cfg["journals"]["planner"],
@@ -1116,6 +1251,8 @@ def _handle_approval_record_phase(
         cfg["logs_dir"],
         tag,
         timeout=cfg["timeout"],
+        stream=cfg["stream_agent_output"],
+        heartbeat=cfg["stream_heartbeat_seconds"],
         approval=True,
     )
     block = resolve_handoff(
@@ -1167,6 +1304,8 @@ def _handle_executor_phase(
         cfg["logs_dir"],
         tag,
         timeout=cfg["timeout"],
+        stream=cfg["stream_agent_output"],
+        heartbeat=cfg["stream_heartbeat_seconds"],
     )
     block = resolve_handoff(
         cfg["journals"]["executor"],
@@ -1230,6 +1369,8 @@ def _handle_reviewer_phase(
         cfg["logs_dir"],
         tag,
         timeout=cfg["timeout"],
+        stream=cfg["stream_agent_output"],
+        heartbeat=cfg["stream_heartbeat_seconds"],
     )
     block = resolve_handoff(
         cfg["journals"]["reviewer"],
@@ -1630,6 +1771,8 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
         "main_branch": "main",
         "max_iterations": 3,
         "timeout": 120,
+        "stream_agent_output": False,
+        "stream_heartbeat_seconds": 0,
         "journals": journals,
         "templates": cfg["templates"],
         "logs_dir": tmp / "logs",

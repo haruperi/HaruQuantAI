@@ -72,6 +72,13 @@ start ──▶ PLANNER (dry run N) ─▶ PENDING_APPROVAL ─▶ OWNER GATE �
   feedback, or `abort`). The approval is relayed to a fresh Planner invocation
   which appends the approval record itself, per AGENTS.md writer rules.
   `--auto-approve` exists but bypasses a deliberate safety latch — avoid it.
+- **Live agent output**: every agent invocation streams its stdout/stderr into
+  the terminal as it happens (`| ` = agent stdout, `! ` = agent stderr), and a
+  heartbeat line (`[123s] agent still running...`) appears after
+  `stream_heartbeat_seconds` of quiet, so long invocations are never silent.
+  Disable per-terminal echo with `stream_agent_output = false` in
+  `orchestrator.toml`; the full transcript is always captured in `.agents/logs/`
+  regardless. On timeout the whole process tree is killed (`taskkill /T`).
 - **Fail closed**: missing/invalid marker, non-branch repo state, or timeouts
   stop the run with the invocation log tail; state is saved for `resume`.
 
@@ -101,9 +108,10 @@ gets a short pointer argument; safest with Windows `.cmd` shims), `arg`
 command = ["codex", "exec", "-s", "workspace-write"]
 model_args = ["-m", "gpt-5.6-sol", "-c", "model_reasoning_effort=high"]
 
-# agy (current executor): reasoning level is part of the slug
-command = ["agy", "-p", "--dangerously-skip-permissions"]
-model_args = ["--model", "gemini-3.7-flash-high"]
+# agy (current executor): reasoning level is part of the slug. NOTE: agy's -p
+# takes the NEXT token as its prompt value, so -p must be the LAST token and
+# the orchestrator-appended prompt pointer becomes its value.
+command = ["agy", "--dangerously-skip-permissions", "--model", "gemini-3.7-flash-high", "-p"]
 
 # cline (current reviewer): Z.ai GLM via the provider id in ~/.cline.
 # WARNING: cline's `-p` flag is PLAN mode (not print mode) — the Reviewer
