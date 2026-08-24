@@ -43,9 +43,9 @@ architecture/composition suites green.
 
 #### `D-TEST` — Test (temporary domain; physically removable)
 
-##### T.1 [ ] `FEAT-TEST-GREETING`
+##### T.1 [x] `FEAT-TEST-GREETING`
 
-1. [ ] `FR-TEST-GENERATE_GREETING`
+1. [x] `FR-TEST-GENERATE_GREETING` — evidence: tests/services/test/greeting/test_greeting.py:15
 
 Minimal pure capability: generate a deterministic greeting for a validated caller name (trimmed,
 non-empty, bounded length) through one registered feature — module folder, `manifest.py` with

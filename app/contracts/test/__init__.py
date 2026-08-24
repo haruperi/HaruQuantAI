@@ -1,0 +1,1 @@
+"""Test domain public contracts."""
