@@ -11,9 +11,11 @@
 #   cline  : ["cline", "-P", "<provider>", ...]  (WARNING: cline's -p is PLAN mode)
 
 brand = "codex"
-# --full-auto was removed in current Codex; -s workspace-write is the sandboxed
-# equivalent that permits branch creation and journal writes inside the repo.
-command = ["codex", "exec", "-s", "workspace-write"]
+# -s danger-full-access is required because workspace-write denies writes to
+# .git/ (first real run failed creating .git/index.lock for `git checkout -b`).
+# Safety backstops are unchanged: entry gate, owner approval, branch isolation,
+# and the reviewer's close-out verification.
+command = ["codex", "exec", "-s", "danger-full-access"]
 model_args = ["-m", "gpt-5.6-sol", "-c", "model_reasoning_effort=high"]
 prompt_delivery = "file"          # file | arg | stdin
 template = ".agents/templates/planner.md"

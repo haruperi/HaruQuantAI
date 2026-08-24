@@ -787,10 +787,15 @@ def correction_text(state: dict[str, Any]) -> str:
     if iteration <= 1:
         return ""
     blockers: list[dict[str, Any]] = state.get("blockers", [])
+    # Only EXECUTOR-raised blockers turn a dry run into a minimal
+    # blocker-resolution plan; PLANNER gate failures are retried as the
+    # original dry run after the owner resolves the cause.
     pending = [
         b
         for b in blockers
-        if b.get("status") == "OPEN" and b.get("iteration") == iteration - 1
+        if b.get("status") == "OPEN"
+        and b.get("iteration") == iteration - 1
+        and b.get("raised_by") == "EXECUTOR"
     ]
     parts: list[str] = []
     if pending:
@@ -1450,12 +1455,22 @@ def cmd_resume(args: argparse.Namespace) -> int:
         f"iteration {state['iteration']}, status {state['status']}"
     )
     if state["phase"] == "done" and state.get("status") == "PLANNER_BLOCKED":
-        state["iteration"] = int(state["iteration"]) + 1
+        repo_branch = git(cfg["repo"], "branch", "--show-current").stdout.strip()
+        if repo_branch == cfg["main_branch"]:
+            dirty = porcelain_outside_agents(cfg["repo"])
+            if dirty:
+                print(
+                    "[FAIL] main must be clean before retrying the planner "
+                    "(the agent would block again); commit or stash first:"
+                )
+                for line in dirty:
+                    print(f"    {line}")
+                return 2
         state["status"] = "RUNNING"
         state["phase"] = "plan"
         print(
-            "[ok] planner blocker on record; resuming with a blocker dry run "
-            f"at iteration {state['iteration']}."
+            "[ok] planner blocker on record and cause resolved; retrying "
+            f"Dry Run {state['iteration']} from a clean gate state."
         )
     elif state["phase"] == "done":
         print("Run already finished; nothing to do.")
