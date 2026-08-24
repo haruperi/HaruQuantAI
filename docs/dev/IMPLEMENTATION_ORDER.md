@@ -32,6 +32,13 @@ that later backend increments integrate and verify directly from the frontend.
   failure, documentation, leak, interface where applicable, and physical-removal gates pass.
 - UI work starts in Increment 1. Each increment verifies loading, empty, stale, unavailable, error, interaction,
   accessibility, contract-parity, and removal behavior as applicable.
+- D-UI is delivered as one coordinated UI-first workstation increment with ordered internal foundations and widget
+  slices, not as simultaneous unordered implementation. Feature IDs remain acceptance/removal units; feature-owned
+  widget types and instances do not add feature IDs or completion gates.
+- Increment 1 establishes the typed widget registry/host, Dockview adapter and layout schema, explicit temporal context,
+  generated-client boundary, dev-only mock provider, accessibility foundation, and blank/template workspace behavior
+  before product widgets depend on them. Browser routes select workstation/workspace entry points rather than isolated
+  route-per-tool implementations.
 - **Mock-build notation:** a mock-build line (`- FR-… (mock build; completes at Increment N de-mock gate)`) records UI
   behavior built in Increment 1 against the dev-only mock capability provider in `app/ui/src/mocks/`. It is not a
   completion checkbox and carries no acceptance claim. The requirement's single `[ ]` checkbox appears exactly once, at
@@ -107,7 +114,7 @@ increment” means the first planned product work in the domain, not domain comp
 | 10 | Governed Broker, Risk, and Trading Operations | Optional Phase 5 governed-operations slice |
 | 11 | Hosted Workspace Boundary and Final Release | Hosted Phase 4 capability plus complete release matrix |
 
-## 4. Agile vertical implementation sequence
+## 4. Ordered vertical implementation sequence
 
 ### Increment 0 — Implemented composability foundation (preserve)
 
@@ -155,36 +162,40 @@ fifth shared module.
    handlers, repeated startup/shutdown cleanup, and secret-safe failure output — evidence: tests/composition/test_logging.py:43, tests/composition/test_hot_reconfiguration.py:513, tests/test_main.py:144, tests/test_main.py:164
 
 Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionContext`, per-FR runtime registrations,
-domain registries, or another backend lifecycle/effect framework. D-UI uses the documented TypeScript/React feature
-variant and consumes public capability state.
+domain registries, or another backend lifecycle/effect framework. D-UI uses the documented TypeScript/React
+single-page workstation variant: feature-owned visual contributions target `app/ui/src/widgets/<widget>/`, support
+infrastructure stays in its documented boundaries, and all widgets consume public capability state.
 
 ### Increment 1 — Whole-App Contracts and Complete Mock-Backed User Interface
 
 **Phase alignment:** Foundation-preserving product slice; prepares Phase 1
 
 **Scope:** 44 business FRs across 25 feature slices (16 completable `FR-UI-*` checkboxes plus 78 mock-build lines
-consolidating the remaining 94 `FR-UI-*` behaviors); 8 feature completion gates and 17 partial slices, plus the
-non-FR Foundation task 1.0.
+consolidating the remaining 94 `FR-UI-*` behaviors); 8 feature completion gates and 17 partial slices, plus non-FR
+Foundation tasks 1.0 and 1.A.
 
-**Purpose:** Author the whole-app contract boundary first, then deliver the complete mock-backed UI surface of the
-product in one pass: a secured local workspace, capability-aware public gateway, bounded plugin contribution
-declarations, an accessible React shell with truthful diagnostics, and every remaining `FEAT-UI-*` workspace built
-against the dev-only mock capability provider so later backend increments integrate and verify directly from the
-frontend.
+**Purpose:** Author the whole-app contract boundary first, then deliver the complete mock-backed UI surface in one
+coordinated pass: a secured local workspace, capability-aware public gateway, bounded plugin/widget contribution
+declarations, an accessible React workstation with truthful diagnostics, and every remaining `FEAT-UI-*`
+feature-owned widget surface built against the dev-only mock capability provider so later backend increments integrate
+and verify directly from the frontend.
 
-**Vertical path:** `Contract authoring (task 1.0) → Launcher → Workspace → D-IFACE capability/readiness gateway →
-D-UI shell → complete D-UI workspaces on mock capability data`
+**Vertical path:** `Contract authoring (task 1.0) → workstation architecture foundation (task 1.A) → Launcher →
+Workspace → D-IFACE capability/readiness gateway → D-UI widget host/canvas → ordered feature-owned widgets on mock
+capability data`
 
-**UI demo checkpoint:** Launch React, authenticate locally, open or diagnose a workspace, navigate the shell, inspect
-capability/readiness state, preserve a draft/layout preference, and walk through every mock-backed workspace
-(strategy authoring, data, research, results, projects, portfolios, code, administration, trading visuals) with
-mock-derived data visibly labeled non-authoritative — a clickable, mock-driven walkthrough of the complete product
-surface.
+**UI demo checkpoint:** Launch React, authenticate locally, create a blank workspace or apply a versioned template,
+add/remove/dock/tab/split/resize/minimize/maximize compatible widget instances, inspect capability/readiness and explicit
+time-domain state, preserve a draft/layout preference, and walk through every mock-backed feature surface (strategy
+authoring, data, research, results, projects, portfolios, code, administration, trading visuals) with mock-derived data
+visibly labeled non-authoritative.
 
 **Exit gate:** The UI starts without waiting for later domains; workspace/configuration/recovery and gateway failures
-are visible, keyboard focus is deterministic, every `FR-UI-*` behavior exists either as a completed checkbox with
-acceptance evidence or as a mock-build line with its de-mock increment recorded, mock data is visibly labeled
-non-authoritative, and deleting any participating feature leaves the remaining substrate healthy.
+are visible; keyboard focus is deterministic; spatial layout round-trip, missing-widget restoration, temporal
+identity/order/gap/resync, incompatible-domain failure, and exact disposal pass; every `FR-UI-*` behavior exists either
+as a completed checkbox with acceptance evidence or as a mock-build line with its de-mock increment recorded; mock data
+is visibly labeled non-authoritative; and deleting any participating feature/widget leaves the remaining substrate
+healthy.
 
 #### Foundation task 1.0 — Whole-app contract authoring
 
@@ -201,6 +212,26 @@ feature slices through their documented change processes.
    verify the existing generation flow stays the sole source (no hand-written public wire contracts under `app/ui/`).
 4. [ ] Prove contract-roundtrip parity (schema validation, versioning, and generated-type equality) and update
    `app/contracts/README.md` to reflect the complete public contract inventory.
+
+#### Foundation task 1.A — D-UI spatiotemporal workstation foundation
+
+This ordered non-FR foundation enables the existing 17 D-UI feature slices; it creates no product feature or FR ID and
+cannot mark `FEAT-UI-MANAGE_LAYOUTS`, `FEAT-UI-EXTEND_VIEWS`, or any other feature complete by itself.
+
+1. [ ] Implement the typed widget registry/host so every widget type names exactly one owning `FEAT-UI-*`, validates
+   manifest/configuration/state-schema metadata, reverses lifecycle effects exactly once, and derives runtime state
+   without a second product registry.
+2. [ ] Pin and integrate the then-verified `dockview-react` version behind a HaruQuantAI-owned adapter; implement blank
+   workspaces, versioned templates, add/remove/dock/tab/split/resize/minimize/maximize, bounded layout persistence,
+   migration, dirty-close resolution, and explicit missing/incompatible-widget restoration.
+3. [ ] Implement explicit selection and temporal presentation contexts for live, delayed, historical, playback,
+   simulation, and job-event sources with source/clock identity, timestamp, sequence/cursor order, stale/gap/resync,
+   incompatible-domain failure, bounded coalescing, and exact subscription disposal.
+4. [ ] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue,
+   and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts.
+5. [ ] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout
+   round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and
+   listener/timer/subscription leak freedom before dependent widget slices proceed.
 
 #### `D-WS` — [Workspace](../../app/services/workspace/README.md) (Increment 1)
 
@@ -258,6 +289,10 @@ feature slices through their documented change processes.
 2. [x] `FR-IFACE-TRACK_DURABLE_COMMANDS` — evidence: tests/services/interfaces/cli_mcp_automation/test_cli_mcp_automation.py:127
 
 #### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 1)
+
+The completed compose-shell evidence below remains at its current legacy `app/ui/src/features/compose_shell/` path until
+a separately approved feature migration moves it into the target widget/support architecture. The evidence paths are
+current truth and are not target-path mandates.
 
 ##### 1.9 [x] `FEAT-UI-COMPOSE_SHELL`
 

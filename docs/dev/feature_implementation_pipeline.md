@@ -348,22 +348,25 @@ def create_feature() -> CustomFeature:
 
 There is no mandatory feature-owned `unmount()` protocol. The reconciler closes the owning `FeatureScope`; repeated `scope.close()` calls are safe. Optional `health_check()`, `quiesce()`, and `drain()` methods participate in transactional replacement.
 
-### 4.8 D-UI TypeScript/React feature variant
+### 4.8 D-UI TypeScript/React workstation variant
 
-UI features use this physical shape instead of the Python service package in §4.1:
+The UI preserves `Domain → Feature → Responsibility → FR` identities while rendering one single-page composable workstation. A `FEAT-UI-*` is the capability/acceptance/removal owner; a widget is a visual contribution owned by exactly one feature; and a workspace arranges widget instances. One feature may contribute multiple widgets. Visual contributions use this target shape instead of the Python service package in §4.1:
 
 ```text
-app/ui/src/features/<feature_slug>/
+app/ui/src/widgets/<widget_slug>/
 ├── README.md
-├── manifest.ts       # typed FEAT-UI-* identity, dependencies, contributions, and removal metadata
-├── config.ts         # strict feature configuration
+├── manifest.ts       # owning FEAT-UI-*, widget type/version, dependencies, placement, effects
+├── config.ts         # strict widget configuration and persisted-state schema version
 ├── feature.tsx       # lifecycle/render adapter
+├── <focused>.tsx     # focused presentation or interaction responsibility
 └── index.ts          # deliberate public exports only
 ```
 
-The complete target inventory and per-feature acceptance requirements remain authoritative in `app/ui/README.md`. UI contracts live in `app/contracts/ui/`; generated business clients and wire types are consumed rather than rewritten. A UI feature may own navigation, layouts, drafts, focus, accessibility, visual status, and confirmation behavior. It may not own business validation, authorization, authoritative domain state, storage schemas, workers, compilers, or provider transport.
+The complete target inventory, sole feature-to-widget ownership map, and per-feature acceptance requirements remain authoritative in `app/ui/README.md`. Nonvisual infrastructure may live only in the documented `runtime/`, `workspaces/`, `clients/`, `context/`, `contracts/generated/`, and dev-only `mocks/` support folders. Support code owns no product registry, product policy, authoritative state, or second implementation of widget behavior. UI contracts live in `app/contracts/ui/`; generated clients and wire types are consumed rather than rewritten. The UI may own navigation, layouts, drafts, focus, accessibility, visual/temporal status, subscription lifecycle, and confirmation behavior. It may not own business validation, authorization, authoritative domain state/time, storage schemas, workers, compilers, or provider transport.
 
-UI feature dependencies are declared in typed `manifest.ts` data and resolved through the UI composition boundary. Missing required capabilities withdraw or disable only the affected contribution and render an explicit unavailable/degraded state. Each UI feature documents a bounded interactive usage workflow in its README and exposes it through the running UI; UI tests under `tests/ui/` verify that workflow but are not the usage example itself. Component, accessibility, integration/browser, contract-parity, and removal evidence remain mandatory. Frontend build and test commands must be recorded once the UI toolchain exists; this guide does not invent a package manager or command before that implementation decision is encoded in the repository.
+Widget dependencies are declared in typed `manifest.ts` data and resolved through the UI composition boundary. Implement each slice contract/owner first, then manifest/configuration, lifecycle-safe registration/disposal, bounded presentation states, widget-catalogue registration, blank/template workspace use, and focused plus cross-widget evidence. Missing required capabilities withdraw or disable only the affected contribution and render an explicit unavailable/degraded state. Manifests declare feature/widget type/version identities, placement/dimensions, configuration and persisted-state schemas, commands/subscriptions, accessibility metadata, and removal effects. Widgets coordinate through typed capability, contribution, selection, and temporal-context boundaries and never import sibling implementations.
+
+Spatial evidence covers add/remove/dock/tab/split/resize/minimize/maximize, layout round-trip/migration, dirty close, and missing-widget restoration. Temporal evidence covers source/clock identity, timestamp, sequence/cursor order, stale/gap/resync behavior, incompatible-domain failure, bounded coalescing, and exact subscription disposal. Each owning README documents a bounded workflow exposed through the workstation. Focused component tests may be colocated; cross-widget, workspace, contract, accessibility, removal, and browser evidence lives under `tests/ui/`. Tests verify the workflow but are not the usage example itself.
 
 ## 5. Phase 3 — Own every runtime effect
 
@@ -406,7 +409,7 @@ data-custom-service = "app.services.data.custom_service.feature:create_feature"
 
 Separately installed packages use the same entry-point group and `Feature` protocol. Optional external distributions must not become unconditional core dependencies.
 
-D-UI features are not registered in the Python entry-point group or `.importlinter` service-feature list. Their typed manifests are composed by the UI runtime and must retain the same stable `FEAT-UI-*` identity declared in `app/ui/README.md`.
+D-UI features and widgets are not registered in the Python entry-point group or `.importlinter` service-feature list. Typed widget manifests are composed by the UI runtime, name exactly one stable owning `FEAT-UI-*` declared in `app/ui/README.md`, and use separate widget type/instance identities that never become a second feature registry.
 
 ### 6.2 Configure desired state
 
@@ -605,7 +608,7 @@ Use `--all` to verify every registered feature. `--report <path>.json` writes a 
 
 ### 9.5 D-UI verification
 
-For a UI feature, document the public interactive usage workflow in the feature README and make it reachable through the running UI. Separately verify that behavior with executable tests under `tests/ui/`: component behavior and boundary states; keyboard, focus, semantics, contrast, and nonvisual alternatives where applicable; loading, empty, stale, unavailable, and error states; confirmation and recovery for consequential actions; request/response and generated-contract parity; page-level integration or browser workflows when component tests cannot prove the interaction; and removal with unrelated navigation and features still usable. Tests are verification evidence, not the usage documentation itself. Screenshots and manual observation remain supplementary evidence only.
+For a UI feature and each owned widget, document the public interactive workflow in the owning README and make it reachable through the workstation. Focused component tests may be colocated. Separately verify cross-widget/workspace behavior under `tests/ui/`: keyboard, focus, semantics, contrast, reflow and nonvisual alternatives; loading, empty, stale, unavailable, degraded, unauthorized, incompatible, error and recovery states; confirmation for consequential actions; request/response and generated-contract parity; blank/template workspace composition; Dockview spatial operations and layout round-trip/migration; temporal identity/order/gap/resync and incompatible-domain failure; exact disposal; browser workflows; and removal with unrelated widgets/navigation still usable. Tests are verification evidence, not usage documentation. Screenshots and manual observation remain supplementary only.
 
 ## 10. Phase 7 — Run change-scoped checks and the commit/CI gate
 

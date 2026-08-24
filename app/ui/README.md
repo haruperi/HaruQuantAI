@@ -2,7 +2,7 @@
 
 > **Package:** `app/ui/` (React + TypeScript)
 > **Status:** `Missing`
-> **Last updated:** `2026-08-24`
+> **Last updated:** `2026-08-25`
 > **Domain ID:** `D-UI`
 
 > This README is the package's single source of truth for UI requirements, final structure, implementation sequence, deletion behavior, and tests.
@@ -13,7 +13,9 @@
 
 This README is the sole current target registry for the UI domain's feature IDs and statuses, functional requirements, UI-local workflows, semantic contract ownership, client-state model, acceptance evidence, and deletion behavior. `PROJECT.md` owns system scope and cross-domain workflows; `ARCHITECTURE.md` owns package, dependency, runtime, and deployment constraints. Feature-local READMEs, typed manifests, generated clients, implementation modules, and executable tests provide current implementation evidence without silently changing this registry.
 
-UI features live under `app/ui/src/features/<feature>/` and use a typed TypeScript `manifest.ts`, strict `config.ts`, lifecycle-aware `feature.tsx`, a public `index.ts`, and focused behavior modules. UI features consume generated clients and public wire contracts; they never import Python implementations, define business policy, or persist authoritative domain state. UI tests live under `tests/ui/`; production UI code is not verification evidence by itself.
+D-UI is a Vite + React single-page workstation. A registered `FEAT-UI-*` is the independently selectable/removable capability and acceptance owner; a widget is a visual contribution owned by exactly one feature; a widget instance is one runtime placement with instance-scoped presentation state; and a workspace is a persisted spatial arrangement of widget instances. One feature may contribute multiple widgets. Visual modules target `app/ui/src/widgets/<widget>/`; the feature-to-widget map in this README is the sole canonical ownership map.
+
+Documented `runtime/`, `workspaces/`, `clients/`, `context/`, `contracts/generated/`, and dev-only `mocks/` directories are non-feature support boundaries. They own shared registration, layout, generated-client, presentation-context, and development-fixture infrastructure only; they own no product registry, business policy, authoritative domain state, or second implementation of widget behavior. Widgets consume generated clients and public wire contracts, coordinate through typed contribution/context boundaries, and never import sibling or Python implementations. Focused component tests may be colocated; cross-widget, workspace, accessibility, browser, contract-parity, removal, and leak evidence lives under `tests/ui/`. Production UI code is not verification evidence by itself.
 
 ## 1. Purpose and Boundary
 
@@ -22,6 +24,14 @@ UI features live under `app/ui/src/features/<feature>/` and use a typed TypeScri
 The UI domain is the React + TypeScript human-facing client of HaruQuantAI. It composes capability-aware workspaces, presents projections, collects and validates operator intent, and delegates commands and queries to the Python/FastAPI backend through generated public contracts. It shall make long-running quantitative workflows understandable and safe without acquiring Data, Strategy, Research, Portfolio, Trading, Risk, or orchestration policy.
 
 The UI is a first-class product domain rather than an HTTP, CLI, or MCP adapter. `D-IFACE` owns presentation-neutral gateways and transport parity; `D-UI` owns human interaction and rendering over those gateways.
+
+### Architectural Paradigm: Spatiotemporal Composability
+
+The product presents one unified workstation canvas rather than isolated full-page tools. Browser routes select an authorized workstation or workspace entry point; they do not own separate copies of tool behavior. Blank workspaces and versioned templates compose feature-owned widgets at runtime.
+
+- **Spatial composition:** through a HaruQuantAI-owned Dockview adapter, users and authorized presets may add, remove, dock, tab, split horizontally or vertically, resize, minimize, maximize, and restore widget instances. Layout restoration is actor/workspace/capability/schema scoped, dirty state is resolved before close, and a missing or incompatible widget yields an explicit diagnostic or the documented deterministic drop behavior.
+- **Temporal composition:** widgets may observe independent live, delayed, historical, playback, simulation, and job-event time domains. Every update preserves source/clock identity, authoritative timestamp, monotonic sequence or cursor where supplied, and freshness/gap/resynchronization state. Rendering may coalesce bounded updates without reordering or inventing events. Incompatible time domains never silently mix, and removal disposes subscriptions, listeners, timers, commands, focus, and layout effects exactly once.
+- **Plugin/widget lifecycle:** typed manifests declare feature and widget type/version identities, dependencies, configuration and state schema versions, placements and minimum dimensions, commands/subscriptions, accessibility metadata, presentation states, effects, replacement, and deletion outcomes. Runtime registries derive from those manifests and are not a second product registry.
 
 ### Feature Registry
 
@@ -47,6 +57,30 @@ The UI is a first-class product domain rather than an HTTP, CLI, or MCP adapter.
 
 **Domain inventory:** 17 Features and 99 Functional Requirements.
 
+### Canonical Feature-to-Widget Contribution Map
+
+This table maps product ownership to target visual contributions; it is part of the feature registry above, not a second registry. Widget names are stable target module slugs, not additional `FEAT-*` identities. Nonvisual responsibilities remain in the named feature's support adapter and do not become fake widgets.
+
+| Owning feature | Target widget contributions | Nonvisual/support responsibility |
+|---|---|---|
+| `FEAT-UI-COMPOSE_SHELL` | `system_status`, `workspace_switcher` | application chrome, authorized workspace entry, fallback routing |
+| `FEAT-UI-START_WORK` | `home`, `recent_work`, `product_news` | launch-intent coordination |
+| `FEAT-UI-MANAGE_LAYOUTS` | `widget_catalogue`, `workspace_templates` | Dockview adapter, layout persistence/restoration, instance lifecycle |
+| `FEAT-UI-EDIT_INPUTS` | `schema_form`, `selection_table`, `confirmation` | draft/conflict coordination |
+| `FEAT-UI-AUTHOR_STRATEGIES` | `strategy_tree`, `block_catalogue`, `strategy_inspector` | authoring selection context |
+| `FEAT-UI-RUN_RESEARCH` | `research_builder`, `research_monitor`, `research_comparison` | research-run presentation context |
+| `FEAT-UI-EDIT_PROJECTS` | `project_editor`, `task_graph`, `project_run` | project draft/context coordination |
+| `FEAT-UI-MANAGE_DATA` | `datasets`, `instruments`, `sessions`, `data_quality` | data-selection context |
+| `FEAT-UI-OPERATE_DATABANKS` | `databank_browser`, `databank_bulk_actions` | pinned-selection context |
+| `FEAT-UI-EXPLORE_RESULTS` | `result_overview`, `result_charts`, `result_trades`, `result_robustness`, `result_provenance` | pinned-result/time context |
+| `FEAT-UI-COMPOSE_PORTFOLIOS` | `portfolio_builder`, `portfolio_comparison`, `portfolio_results` | constituent-selection context |
+| `FEAT-UI-EDIT_CODE` | `code_editor`, `diagnostics`, `test_output` | editor session/draft coordination |
+| `FEAT-UI-MONITOR_WORK` | `job_progress`, `activity_log`, `notifications` | job-event cursor and resynchronization context |
+| `FEAT-UI-ADMINISTER_SYSTEM` | `settings`, `capability_admin`, `updates` | preference/localization context |
+| `FEAT-UI-OPERATE_TRADING` | `order_ticket`, `positions_orders`, `price_ladder`, `trading_session` | governed-operation and market-clock context |
+| `FEAT-UI-ENSURE_ACCESS` | None; cross-cutting acceptance feature | keyboard, focus, semantics, reflow, nonvisual alternatives |
+| `FEAT-UI-EXTEND_VIEWS` | `extension_catalogue` | widget manifest validation, scoped effects, replacement/removal |
+
 ### Does not own
 
 - HTTP/SSE, CLI, MCP, automation schemas, idempotency, pagination, or transport parity; those remain in `D-IFACE`.
@@ -71,7 +105,8 @@ The authoritative Python/Pydantic definitions and wire schemas live in `app/cont
 - shell manifest, navigation contribution, route target, command descriptor, keyboard binding;
 - view projection, field/schema description, selection, sort/filter/page state, chart/table alternative;
 - draft envelope, conflict state, confirmation plan, notification, progress and error presentation;
-- layout snapshot, panel/tab contribution, view preference and accessibility preference;
+- widget descriptor and instance identity, workspace/template/layout snapshot, panel/tab contribution, view preference and accessibility preference;
+- temporal context, source/clock identity, freshness, sequence/cursor, gap/resynchronization and lifecycle/removal events;
 - all 17 versioned feature capability ports and their request/result/failure/event unions.
 
 Consumed contracts include `app/contracts/interfaces/` plus the public projections and commands of Workspace, Catalogue, Data, Strategy, Simulator, Analytics, Research, Portfolio, Orchestration, Plugins, Broker Connectivity, Runtime Risk, and Trading. UI code shall never import another domain's private implementation.
@@ -85,15 +120,15 @@ The UI may persist only actor/workspace-scoped presentation state: layouts, rece
 | Code level | Represents | UI package |
 |---|---|---|
 | Package | Domain | `app/ui/` / `D-UI` |
-| Feature folder | Independently removable UI capability | `app/ui/src/features/<feature>/` |
+| Widget folder | Feature-owned visual contribution | target `app/ui/src/widgets/<widget>/` |
 | Focused module | One interaction or presentation responsibility | Component, hook, adapter, or focused behavior module |
 | Function/component/hook | One `FR-UI-*` behavior | Typed implementation with executable component or browser evidence |
 
-Feature identity controls capability selection, diagnostics, replacement, and deletion. A UI requirement is an acceptance and traceability identity; it is not automatically a separately registered runtime provider.
+Feature identity controls capability selection, diagnostics, replacement, and deletion. Widget type and instance identities control visual registration and placement without becoming product feature IDs. A UI requirement is an acceptance and traceability identity; it is not automatically a separately registered runtime provider.
 
 ---
 
-## 2. Final Package Structure and Feature Independence
+## 2. Target Package Structure and Feature Independence
 
 ```text
 app/ui/
@@ -105,36 +140,25 @@ app/ui/
 │   ├── main.tsx
 │   ├── contracts/
 │   │   └── generated/                 # generated from app/contracts/*/wire
-│   ├── runtime/                       # React capability/composition bridge
-│   ├── mocks/                         # dev-only mock capability provider; never imported by production code
-│   └── features/
-│       ├── compose_shell/             # FEAT-UI-COMPOSE_SHELL
-│       ├── start_work/                # FEAT-UI-START_WORK
-│       ├── manage_layouts/            # FEAT-UI-MANAGE_LAYOUTS
-│       ├── edit_inputs/               # FEAT-UI-EDIT_INPUTS
-│       ├── author_strategies/         # FEAT-UI-AUTHOR_STRATEGIES
-│       ├── run_research/              # FEAT-UI-RUN_RESEARCH
-│       ├── edit_projects/             # FEAT-UI-EDIT_PROJECTS
-│       ├── manage_data/               # FEAT-UI-MANAGE_DATA
-│       ├── operate_databanks/         # FEAT-UI-OPERATE_DATABANKS
-│       ├── explore_results/           # FEAT-UI-EXPLORE_RESULTS
-│       ├── compose_portfolios/        # FEAT-UI-COMPOSE_PORTFOLIOS
-│       ├── edit_code/                 # FEAT-UI-EDIT_CODE
-│       ├── monitor_work/              # FEAT-UI-MONITOR_WORK
-│       ├── administer_system/         # FEAT-UI-ADMINISTER_SYSTEM
-│       ├── operate_trading/           # FEAT-UI-OPERATE_TRADING
-│       ├── ensure_access/             # FEAT-UI-ENSURE_ACCESS
-│       └── extend_views/              # FEAT-UI-EXTEND_VIEWS
+│   ├── runtime/                       # registry, lifecycle, contribution reconciliation
+│   ├── workspaces/                    # Dockview adapter, layouts, templates, restoration
+│   ├── clients/                       # generated-contract adapters
+│   ├── context/                       # selection and temporal presentation contexts
+│   ├── mocks/                         # dev-only contract fakes; absent from production bundles
+│   └── widgets/
+│       └── <widget>/                  # one visual contribution, one owning FEAT-UI-*
 ```
 
-Every feature folder contains a public `index.ts`, typed `manifest.ts`, strict `config.ts`, lifecycle-aware `feature.tsx`, React components/hooks, focused behavior modules, and no hand-written public wire-contract definitions. Each `FR-UI-*` row maps to one focused TypeScript behavior and executable acceptance evidence. Cross-feature coordination uses typed capability keys through the UI composition bridge; direct private imports are prohibited.
+The tree above is the target, not current implementation evidence. `FEAT-UI-COMPOSE_SHELL` remains under `app/ui/src/features/compose_shell/` until a later approved feature migration. No target widget or support folder is implemented merely because it appears in this specification.
+
+The final target replaces `src/features/` with feature-owned visual modules under `src/widgets/<widget>/` and adds documented `workspaces/`, `clients/`, `context/`, and `mocks/` support alongside the existing `runtime/` and `contracts/generated/` boundaries. Every widget folder contains a public `index.ts`, typed `manifest.ts`, strict configuration, lifecycle-aware render adapter, owning workflow README, focused React components/hooks, and no hand-written public wire-contract definitions. Cross-feature coordination uses typed capability keys and UI contribution/context boundaries; direct private imports are prohibited.
 
 ```mermaid
 flowchart LR
     R[[UI composition bridge]]
     I[[D-IFACE gateways]]
     U[[D-UI shell]]
-    P[[UI feature providers]]
+    P[[Feature-owned widget providers]]
     D[[Business-domain public contracts]]
     I --> R --> P --> U
     D --> I --> P
@@ -156,6 +180,13 @@ flowchart LR
 | `WF-UI-008` Remove/replace view | Capability graph change | quiesce route → cancel subscriptions → preserve compatible draft/state → remove effects → install replacement/fallback | Exact removal without stale controls/listeners/state leaks |
 
 ---
+
+The workstation adds two cross-feature workflows without adding product feature or FR identities:
+
+| Workflow | Trigger | UI sequence | Outcome |
+|---|---|---|---|
+| `WF-UI-009` Compose workspace | Blank workspace or template request | validate widget manifests → add instances → dock/tab/split/resize → persist versioned layout | Reproducible spatial arrangement or explicit incompatible-widget diagnostic |
+| `WF-UI-010` Synchronize time context | Live/playback/simulation/job update | bind source/clock → validate time-domain compatibility → apply ordered cursor/sequence → detect gap/staleness → resync or fail closed | Widgets show causally consistent evidence without silent time-domain mixing |
 
 ## 4. Composable Feature Specifications
 
@@ -193,9 +224,9 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 
 | Status | Requirement ID | Responsibility | Depends | Acceptance / evidence |
 |---|---|---|---|---|
-| Missing | `FR-UI-COMPOSE_PANELS` | Compose tabs, cards, split panes, toolbars, overlays, and detail regions from typed view contributions. | FEAT-UI-EXTEND_VIEWS | Panel removal leaves no orphan region; shared directives/card panels. |
-| Missing | `FR-UI-PERSIST_LAYOUTS` | Persist actor/workspace/capability-version-scoped layout snapshots. | WS | Incompatible panels are dropped with a diagnostic, not silently remapped. |
-| Missing | `FR-UI-RESTORE_LAYOUTS` | Restore layout after contributions reconcile and choose deterministic defaults for new/missing panels. | FR-UI-PERSIST_LAYOUTS | Cold start and reinstall produce stable placement. |
+| Missing | `FR-UI-COMPOSE_PANELS` | Compose widget instances through the Dockview adapter; add/remove, dock, tab, split, resize, minimize, maximize, and populate blank or templated workspaces from typed contributions. | FEAT-UI-EXTEND_VIEWS | Panel removal leaves no orphan region and browser evidence proves the complete spatial interaction. |
+| Missing | `FR-UI-PERSIST_LAYOUTS` | Persist actor/workspace/capability/layout-schema-scoped Dockview snapshots with widget type, instance, configuration, and presentation-state versions. | WS | Incompatible widgets are diagnosed and never silently remapped. |
+| Missing | `FR-UI-RESTORE_LAYOUTS` | Restore after contributions reconcile, migrate supported layout versions, and choose deterministic diagnostics/defaults for new, missing, or incompatible widgets. | FR-UI-PERSIST_LAYOUTS | Cold start, reinstall, and missing-widget restoration produce stable placement and explicit outcomes. |
 | Missing | `FR-UI-MANAGE_TABS` | Support open, select, reorder, close, dirty-state guard, and bounded tab restoration. | FEAT-UI-EDIT_INPUTS | Closing a dirty tab requires an explicit resolution. |
 | Missing | `FR-UI-SCALE_VIEWS` | Support zoom, fullscreen, responsive reflow, and minimum usable regions without hiding safety state. | FEAT-UI-ENSURE_ACCESS | Global zoom/fullscreen evidence in shared header. |
 
@@ -335,7 +366,7 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 |---|---|---|---|---|
 | Missing | `FR-UI-TRACK_PROGRESS` | Show bounded progress, stage, counts, estimates, resource state, and last event time without fabricating precision. | IFACE, ORCH | Indeterminate work is labeled indeterminate. |
 | Missing | `FR-UI-CONTROL_JOBS` | Offer pause/resume/cancel/retry only when supported by the current job state and authority. | ORCH | Stale controls fail safely and refresh. |
-| Missing | `FR-UI-STREAM_ACTIVITY` | Present ordered events/logs with severity, source, correlation, redaction, reconnect replay, and resync gaps. | IFACE, WS | Event loss is explicitly marked. |
+| Missing | `FR-UI-STREAM_ACTIVITY` | Present ordered events/logs with source/clock identity, authoritative timestamp, sequence/cursor, severity, correlation, redaction, reconnect replay, staleness and resync gaps. | IFACE, WS | Event loss, reordering, and incompatible time domains are explicitly marked and never presented as continuous truth. |
 | Missing | `FR-UI-PRESENT_FAILURES` | Present structured failures, validation findings, causal references, retryability, and safe next actions. | IFACE | Unknown errors remain causal and never appear as success. |
 | Missing | `FR-UI-NOTIFY_OUTCOMES` | Deliver in-client notices for configured milestones/outcomes with deduplication and links to owning work. | ORCH, WS | Notification is not authoritative job state. |
 
@@ -389,9 +420,9 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 
 | Status | Requirement ID | Responsibility | Depends | Acceptance / evidence |
 |---|---|---|---|---|
-| Missing | `FR-UI-DECLARE_VIEW_CONTRIBUTIONS` | Declare route, navigation, panel, tab, action, column, renderer, settings, locale and command contributions with version/dependencies/permissions. | PLUG, KERN | Undeclared global mutation is rejected. |
-| Missing | `FR-UI-VALIDATE_VIEW_CONTRIBUTIONS` | Validate compatibility, placement, schema, permission, localization, accessibility and effect declarations before activation. | PLUG, FEAT-UI-ENSURE_ACCESS | Invalid contribution has no partial visual effect. |
-| Missing | `FR-UI-SCOPE_VIEW_EFFECTS` | Scope DOM roots, styles, events, timers, subscriptions, shortcuts, drafts, cache and layout state to contribution lifetime. | KERN, COMP | One feature cannot capture or style another feature's private surface. |
+| Missing | `FR-UI-DECLARE_VIEW_CONTRIBUTIONS` | Declare feature/widget type and version, route/workspace entry, placement/dimensions, configuration/state schemas, panel/tab/action/renderer/settings/locale/command contributions, subscriptions, dependencies and permissions. | PLUG, KERN | Undeclared global mutation or ownerless/multiply owned widget is rejected. |
+| Missing | `FR-UI-VALIDATE_VIEW_CONTRIBUTIONS` | Validate owner, compatibility, placement, schema version, permission, localization, accessibility, time-domain and effect declarations before activation. | PLUG, FEAT-UI-ENSURE_ACCESS | Invalid contribution has no partial visual effect or subscription. |
+| Missing | `FR-UI-SCOPE_VIEW_EFFECTS` | Scope DOM roots, styles, events, clocks, timers, subscriptions, shortcuts, drafts, cache, temporal context and layout state to widget-instance lifetime. | KERN, COMP | One feature cannot capture or style another feature's private surface, and disposal closes each effect exactly once. |
 | Missing | `FR-UI-REPLACE_VIEW_PROVIDERS` | Quiesce and transactionally replace view providers while pinning in-flight interaction snapshots. | KERN, COMP | Failed replacement restores the previous provider and state. |
 | Missing | `FR-UI-REMOVE_VIEW_CONTRIBUTIONS` | Reverse effects, cancel work, remove routes/commands/state and focus a deterministic fallback on cold/live deletion. | KERN, COMP | Deletion tests find no stale listener, timer, subscription, shortcut, route or control. |
 
@@ -403,7 +434,12 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 |---|---|---|---|
 | `ui.enabled_features` | ordered feature-ID set | required | Selects typed feature manifests; unknown or duplicate IDs fail startup. |
 | `ui.default_route` | capability route/none | `None` | Home is used only when installed and authorized; otherwise deterministic diagnostic route. |
+| `ui.default_workspace_template` | template ID/none | `None` | A template creates a versioned layout; absence creates a blank authorized workspace. |
+| `ui.max_workspaces` | positive integer | `20` | Workspace creation is bounded and never evicts dirty state silently. |
+| `ui.max_widget_instances` | positive integer | `100` per workspace | Instance creation fails visibly at the limit. |
 | `ui.max_restored_tabs` | positive integer | `20` | Restoration is bounded; dirty/pinned tabs follow explicit retention policy. |
+| `ui.layout_schema_version` | positive integer | required | Unsupported future layouts open read-only or fail explicitly; supported older layouts migrate deterministically. |
+| `ui.layout_autosave_interval_ms` | integer | `1000` | Autosave coalesces presentation state only and never persists secrets or authoritative business state. |
 | `ui.draft_retention` | duration | `30 days` | Non-secret drafts are actor/workspace/schema/version scoped and purgeable. |
 | `ui.event_batch_window_ms` | integer | `100` | Presentation coalescing cannot alter authoritative ordering or hide resync gaps. |
 | `ui.locale` | supported locale | workspace/user default | User-visible content is localized; identifiers/contracts are not translated. |
@@ -424,7 +460,7 @@ capability provider that backs the Increment 1 mock-built UI surface defined in 
   fixtures implementing the ratified contracts from `app/contracts/`. It never becomes a second feature registry,
   implementation location, or hand-written public wire-contract source.
 - **Gating:** mocks register only through an explicit dev-mode gate (development builds or an explicit dev opt-in).
-  Production feature modules never import from `app/ui/src/mocks/`, and the folder is excluded from production
+  Production widgets and support modules never import from `app/ui/src/mocks/`, and the folder is excluded from production
   bundles.
 - **Truthfulness:** mock-derived data is visibly labeled non-authoritative in the UI. Mock datasets, results, metrics,
   and events never render as authoritative backtest, live, or operational evidence (AGENTS.md §3 "No Invented Data").
@@ -454,11 +490,13 @@ tests/ui/
 
 Required verification:
 
-- Every one of the 17 typed feature manifests and 99 unique `FR-UI-*` behaviors is registered and tested.
+- Every one of the 17 typed feature manifests, every owned widget contribution, and all 99 unique `FR-UI-*` behaviors are registered and tested.
 - UI/API/CLI/MCP parity tests prove the UI has neither a privileged bypass nor missing validation.
 - Empty, loading, ready, partial, stale, degraded, unauthorized, incompatible, offline, replay-gap, failure and recovery states are tested.
 - Keyboard/nonvisual journeys cover strategy authoring, research, data onboarding, projects, databanks, results, portfolios, code, administration, and trading.
-- Cold deletion, live removal, reinstall, failed activation/disposal, replacement rollback and leak tests pass per feature.
+- Blank workspace, template instantiation, duplicate instances, add/remove/dock/tab/split/resize/minimize/maximize, layout round-trip/migration, missing-widget restoration, and dirty-close behavior have component plus browser evidence.
+- Cross-widget live/delayed/historical/playback/simulation/job contexts prove clock identity, order, stale/gap/resync behavior, incompatible-domain failure, bounded coalescing, and exact subscription disposal.
+- Cold deletion, live removal, reinstall, failed activation/disposal, replacement rollback and leak tests pass per feature and widget instance.
 - No authoritative public contract is hand-written under `app/ui/`; generated clients match `app/contracts/*/wire`, and no React module imports a private Python service or domain implementation.
 - Production UI code is never accepted as verification evidence without unit/component tests and applicable integration, browser, accessibility, parity, removal, and leak evidence.
 
@@ -468,9 +506,9 @@ Required verification:
 
 1. Update this README first for UI-local features, requirements, workflows, ownership, state, and acceptance.
 2. Update `PROJECT.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ORDER.md`, and `app/contracts/README.md` when system inventory, boundaries, sequencing, or public contract inventory changes.
-3. Add or change one descriptive `FEAT-UI-*` / `FR-UI-*` identity per independently removable behavior.
-4. Record dependencies, effects, degraded behavior, authoritative source, tests, and accessibility consequences.
-5. Implement through public capability bindings, run the documented interactive usage workflow, then run unit, integration, accessibility, parity, deletion, and leak tests. Tests verify the workflow but are not the usage example itself.
+3. Add or change one descriptive `FEAT-UI-*` / `FR-UI-*` identity per independently removable behavior, then update the sole feature-to-widget map without turning widget instances into feature IDs.
+4. Record widget ownership, dependencies, spatial placement, temporal context, effects, degraded behavior, authoritative source, tests, and accessibility consequences.
+5. Implement through public capability bindings, run the documented interactive usage workflow, then run focused component plus applicable cross-widget, workspace, integration, browser, accessibility, parity, deletion, and leak tests. Tests verify the workflow but are not the usage example itself.
 6. Mark a row `Implemented` only when its implementation and all applicable gates pass.
 
 ---

@@ -50,7 +50,7 @@ For the implemented composability foundation, executable code plus architecture 
 
 | Driver | Required response |
 | --- | --- |
-| Spatiotemporal composability | Features declare capabilities, dependencies, config, conflicts, state, and lifecycle effects; reconciliation preserves unrelated branches. |
+| Spatiotemporal composability | Features declare capabilities, dependencies, config, conflicts, state, and lifecycle effects; D-UI composes feature-owned widget instances in workspaces while explicit time-domain context and reconciliation preserve unrelated branches. |
 | Deletion safety | Feature packages are discoverable and physically removable without static domain registries or implementation imports. |
 | Determinism | Immutable manifests pin inputs, providers, versions, hashes, configuration, and named RNG streams. |
 | Local-first operation | Reference deployment is a modular monolith with local metadata and content-addressed artifacts. |
@@ -74,6 +74,8 @@ For the implemented composability foundation, executable code plus architecture 
 10. Reproducible work pins contracts, providers, implementation/configuration hashes, inputs, and seeds.
 11. Paper/demo/live mutation is fail-closed and cannot bypass Runtime Risk.
 12. Every Python `__init__.py` is empty or docstring-only and causes no discovery, registration, I/O, task creation, or logging configuration.
+13. A D-UI widget has exactly one owning `FEAT-UI-*`; a feature may contribute multiple widgets, and the owning UI README is the sole feature-to-widget map.
+14. UI workspace layout and temporal context are presentation state only. Source clock, timestamp, sequence/cursor, freshness, gap, and resynchronization evidence remain explicit, and incompatible live/playback contexts fail closed.
 
 ## 4. Static module architecture
 
@@ -85,7 +87,7 @@ HaruQuantAI/
 │   ├── contracts/                # cross-boundary application/domain contracts
 │   ├── composition/              # discovery, configuration, readiness, runtime policy
 │   ├── services/<domain>/        # removable Python domain features
-│   └── ui/src/features/          # removable React UI features
+│   └── ui/src/                   # React workstation, feature-owned widgets, and support
 └── tests/                        # unit and cross-cutting verification
 ```
 
@@ -104,7 +106,7 @@ flowchart LR
     C --> O
     K --> S[Service features]
     C --> S
-    C --> U[UI features]
+    C --> U[UI feature-owned widgets]
 ```
 
 Importing a package performs no network, database, filesystem, route, event, task, process, registry, or log-handler mutation. Optional SDKs remain inside their removable adapter boundary. Public cross-boundary types live only under Contracts; services contain implementations.
@@ -135,7 +137,30 @@ app/services/<domain>/
 - A feature README mirrors implemented registration and evidence; its domain README remains the complete target registry.
 - Domain support packages and persistence exceptions must satisfy the rules in `AGENTS.md` and the owning README.
 
-UI uses `app/ui/src/features/<feature>/` with `README.md`, `manifest.ts`, `config.ts`, `feature.tsx`, and `index.ts`. UI features consume generated public contracts, own only interaction/presentation/client state, and retain unit/component/accessibility/integration/removal evidence under `tests/ui/`.
+### D-UI workstation variant
+
+D-UI is a Vite + React single-page workstation rather than a route-per-tool application. Browser routes select a workstation or workspace entry point; they do not define isolated tool silos. A product feature remains the independently selectable/removable capability and acceptance unit, while a widget is a visual contribution owned by exactly one feature and a workspace is a persisted spatial arrangement of widget instances. One feature may contribute multiple widgets. The owning `app/ui/README.md` is the sole feature-to-widget map.
+
+The target UI shape is:
+
+```text
+app/ui/src/
+├── widgets/<widget>/        # feature-owned visual contribution
+├── runtime/                 # typed registry, lifecycle, contribution reconciliation
+├── workspaces/              # Dockview host, layouts, templates, restoration
+├── clients/                 # generated-contract adapters only
+├── context/                 # bounded selection and temporal presentation context
+├── contracts/generated/     # generated public wire types; never hand-edited
+└── mocks/                   # development-only contract fakes, removable before release
+```
+
+Each widget target folder contains its owning workflow documentation, typed manifest/configuration, lifecycle/render adapter, public barrel, and focused components. Manifests declare stable feature and widget type/version identities, required/optional capabilities, placements and dimensions, configuration and persisted-state schema versions, commands/subscriptions, accessibility metadata, bounded presentation states, effects, disposal, replacement, and deletion behavior. Support folders own no product registry, business policy, authoritative state, or second implementation of widget behavior; widgets never import sibling implementations.
+
+Spatial composition uses Dockview as the target layout engine behind a HaruQuantAI-owned adapter. Users or presets may create blank workspaces and add, remove, dock, tab, split, resize, minimize, maximize, and restore compatible widget instances. Persisted layouts are actor/workspace/capability/schema scoped; incompatible or missing widgets restore as explicit diagnostics or are dropped only by the documented deterministic policy. Dirty state is resolved before close, and removal reverses focus, commands, listeners, timers, subscriptions, and layout effects.
+
+Temporal composition treats live, delayed, historical, playback, simulation, and job-event clocks as explicit presentation contexts. Every update retains source/clock identity, authoritative timestamp, monotonic sequence or cursor where supplied, and freshness/gap/resynchronization state. Bounded coalescing may reduce rendering frequency but never reorder or fabricate authoritative events. Widgets independently acquire and dispose subscriptions; incompatible time domains never silently synchronize or mix.
+
+The currently implemented `FEAT-UI-COMPOSE_SHELL` remains under `app/ui/src/features/compose_shell/` until a later approved feature migration. That path is current implementation evidence, not the target architecture. D-UI consumes generated public contracts, owns only interaction/presentation/client state, and retains focused component evidence plus cross-widget/workspace/accessibility/browser/removal evidence under `tests/ui/` as applicable.
 
 ## 6. Capability and composition runtime
 
