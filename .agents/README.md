@@ -30,8 +30,7 @@ This tooling lives outside the AGENTS.md workflow by owner decision
 ```bash
 python .agents/orchestrator.py doctor                 # check configs/CLIs/repo
 python .agents/orchestrator.py self-test              # stub end-to-end run
-python .agents/orchestrator.py start --task-file .agents/task.test.toml   # real end-to-end test
-python .agents/orchestrator.py start --task-file .agents/task.example.toml  # real task template
+python .agents/orchestrator.py start --task-file .agents/task.example.toml  # task template
 python .agents/orchestrator.py resume                 # continue after interrupt
 ```
 
@@ -39,8 +38,7 @@ Task specs may reference an implementation tracker (`implementation_file` +
 `implementation_entry`, e.g. `docs/dev/IMPLEMENTATION_ORDER.md` entry `2.8`). The
 Planner then includes marking that entry complete (`[x]` plus `— evidence: path:line`)
 among the approved changed paths, so progress lands in the tracker through the normal
-reviewed merge — never as an out-of-band edit. `.agents/task.test.toml` pairs with
-`docs/dev/IMPLEMENTATION_TEST.md` (temporary `D-TEST` domain) for the first real run.
+reviewed merge — never as an out-of-band edit.
 
 ## How it works
 

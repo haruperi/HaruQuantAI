@@ -114,7 +114,6 @@ The owning README is the sole mutable feature/FR authority. Counts reconcile to 
 | Broker Connectivity | `D-BRK` | 7 | [README](../app/services/broker/README.md) |
 | Runtime Risk | `D-RISK` | 7 | [README](../app/services/risk/README.md) |
 | Trading | `D-TRD` | 8 | [README](../app/services/trading/README.md) |
-| Test (Temporary) | `D-TEST` | 1 | [README](../app/services/test/README.md) |
 
 ---
 
