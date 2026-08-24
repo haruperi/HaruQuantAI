@@ -368,3 +368,9 @@ artifacts/
 !app/web/src/lib/
 !app/web/src/lib/**
 !app/services/research/artifacts/
+
+# ============================================================================
+# Agent orchestrator (.agents tooling may be committed; runtime state may not)
+# ============================================================================
+.agents/logs/
+.agents/runs/

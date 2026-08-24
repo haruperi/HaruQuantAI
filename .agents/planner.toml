@@ -1,0 +1,22 @@
+# Planner agent — codex (GPT-5.6-Sol, high reasoning effort).
+#
+# The orchestrator writes the composed prompt to a file under .agents/logs and
+# passes a short pointer argument (prompt_delivery = "file"). This is the
+# safest mode on Windows where npm CLIs are .cmd shims re-parsed by cmd.exe.
+#
+# Brand cheat-sheet (verify flags with each CLI's --help):
+#   codex  : ["codex", "exec", "-s", "workspace-write"]  + -m <model> -c model_reasoning_effort=high
+#   agy    : ["agy", "-p", "--dangerously-skip-permissions"]  + --model <slug>
+#   claude : ["claude", "-p", "--dangerously-skip-permissions"]
+#   cline  : ["cline", "-P", "<provider>", ...]  (WARNING: cline's -p is PLAN mode)
+
+brand = "codex"
+# --full-auto was removed in current Codex; -s workspace-write is the sandboxed
+# equivalent that permits branch creation and journal writes inside the repo.
+command = ["codex", "exec", "-s", "workspace-write"]
+model_args = ["-m", "gpt-5.6-sol", "-c", "model_reasoning_effort=high"]
+prompt_delivery = "file"          # file | arg | stdin
+template = ".agents/templates/planner.md"
+# Optional separate command for the approval-record follow-up invocation.
+# Use a resume flag here if your brand supports continuing the same session:
+# approval_command = ["codex", "exec", "--full-auto", "resume", "--last"]

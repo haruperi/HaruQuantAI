@@ -1,0 +1,29 @@
+# HaruQuantAI agent orchestrator — global wiring.
+# Docs: .agents/README.md
+
+[run]
+# Absolute path of the repository the agents work in.
+repo_path = 'C:\Users\rharu\AppDev\HaruquantAI'
+main_branch = "main"
+# manual = pause in the terminal for the owner's APPROVED: EXECUTE message.
+approval_mode = "manual"
+max_iterations = 5
+# Per-invocation ceiling for each headless agent call (seconds). Kept generous
+# because the Reviewer's accepted close-out runs pre-commit with the full
+# coverage gate inside a single invocation.
+invocation_timeout_seconds = 7200
+
+[paths]
+# Shared-memory journals (relative to repo_path). These are the ONLY
+# coordination channel between agents.
+planner_journal = "docs/dev/task/planner.md"
+executor_journal = "docs/dev/task/executor.md"
+reviewer_journal = "docs/dev/task/reviewer.md"
+# Orchestrator-owned runtime state (gitignored, never committed).
+logs_dir = ".agents/logs"
+runs_dir = ".agents/runs"
+
+[roles]
+planner = "planner.toml"
+executor = "executor.toml"
+reviewer = "reviewer.toml"

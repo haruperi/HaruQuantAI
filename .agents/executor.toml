@@ -1,0 +1,9 @@
+# Executor agent — Google Antigravity CLI (gemini-3.7-flash-high).
+# See planner.toml for the brand cheat-sheet and delivery-mode notes.
+
+brand = "agy"
+command = ["agy", "-p", "--dangerously-skip-permissions"]
+# The "-high" reasoning level is part of the agy model slug.
+model_args = ["--model", "gemini-3.7-flash-high"]
+prompt_delivery = "file"          # file | arg | stdin
+template = ".agents/templates/executor.md"
