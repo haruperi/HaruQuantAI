@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from app.contracts.workspace.models import (
+        DiagnosticBundleRef,
         JobKind,
         LocalSession,
         RuntimeSupportProfile,
@@ -337,5 +338,32 @@ class SecureLocalAccessCapability(Protocol):
 
         Returns:
             SystemReadiness describing readiness, schema, and worker status.
+        """
+        ...
+
+
+@runtime_checkable
+class BuildDiagnosticsCapability(Protocol):
+    """Capability protocol for generating redacted diagnostic bundles."""
+
+    def build_diagnostic_bundle(
+        self,
+        *,
+        workspace: Path | WorkspaceRef | None = None,
+        include_logs: bool = True,
+        output_path: Path | None = None,
+    ) -> DiagnosticBundleRef:
+        """Produce a redacted diagnostic bundle for troubleshooting.
+
+        Args:
+            workspace: Optional workspace root or WorkspaceRef to inspect.
+            include_logs: Whether to collect recent structured log entries.
+            output_path: Optional destination directory or file path for the archive.
+
+        Returns:
+            DiagnosticBundleRef containing the archive path, checksum, and manifest.
+
+        Raises:
+            DiagnosticBundleError: If bundle construction or packaging fails.
         """
         ...

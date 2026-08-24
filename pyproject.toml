@@ -19,6 +19,8 @@ haruquantai = "app.main:run"
 "workspace.workspace_lifecycle" = "app.services.workspace.workspace_lifecycle.feature:feature"
 "workspace.runtime_configuration" = "app.services.workspace.runtime_configuration.feature:feature"
 "workspace.local_access_health" = "app.services.workspace.local_access_health.feature:feature"
+"workspace.diagnostic_bundle" = "app.services.workspace.diagnostic_bundle.feature:feature"
+
 
 
 [build-system]

@@ -238,3 +238,18 @@ class SystemNotReadyError(WorkspaceError):
             f"System is not ready: {'; '.join(reasons)}",
             error_code="SYSTEM_NOT_READY",
         )
+
+
+class DiagnosticBundleError(WorkspaceError):
+    """Raised when diagnostic bundle generation, redaction, or packaging fails."""
+
+    def __init__(
+        self, message: str, error_code: str = "DIAGNOSTIC_BUNDLE_FAILED"
+    ) -> None:
+        """Initialize the diagnostic bundle error.
+
+        Args:
+            message: Error description.
+            error_code: Stable machine-readable error token.
+        """
+        super().__init__(message, error_code=error_code)

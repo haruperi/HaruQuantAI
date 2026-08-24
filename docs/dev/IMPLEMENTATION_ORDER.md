@@ -185,9 +185,10 @@ healthy.
 2. [x] `FR-WS-REPORT_SYSTEM_READINESS` — evidence: tests/services/workspace/local_access_health/test_local_access_health.py:136
 
 
-##### 1.4 [ ] `FEAT-WS-BUILD_DIAGNOSTICS`
+##### 1.4 [x] `FEAT-WS-BUILD_DIAGNOSTICS`
 
-1. [ ] `FR-WS-BUILD_DIAGNOSTIC_BUNDLE`
+1. [x] `FR-WS-BUILD_DIAGNOSTIC_BUNDLE` — evidence: tests/services/workspace/diagnostic_bundle/test_diagnostic_bundle.py:90
+
 
 #### `D-PLUG` — [Plugins](../../app/services/plugins/README.md) (Increment 1)
 

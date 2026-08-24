@@ -47,11 +47,11 @@ This is the planned product contract inventory, not a prerequisite that must be 
 
 ### 4.1 `app/contracts/workspace/`
 
-**Status:** `ManageWorkspacesCapability`, `ConfigureRuntimeCapability`, and `SecureLocalAccessCapability` implemented; remaining domain capability surfaces planned.
+**Status:** `ManageWorkspacesCapability`, `ConfigureRuntimeCapability`, `SecureLocalAccessCapability`, and `BuildDiagnosticsCapability` implemented; remaining domain capability surfaces planned.
 
-**Public records:** `WorkspaceRef`, `WorkspaceVersion`, `WorkspaceConfiguration`, `RuntimeConfiguration`, `StorageGuardPolicy`, `WorkspaceWriterLease`, `WorkspaceWriterFence`, `WorkspaceBackupManifest`, `WorkspaceRestorePlan`, `SecretRef`, `PrincipalRef`, `LocalSession`, `SystemHealth`, `SystemReadiness`, `DiagnosticBundleRef`, `WorkerCapabilityDescriptor`, `WorkerRegistration`, `WorkerLease`, `WorkerTaskEnvelope`, `ArtifactManifest`, `HostedWorkspaceContext`, and `WorkspaceAuthorizationDecision`.
+**Public records:** `WorkspaceRef`, `WorkspaceVersion`, `WorkspaceConfiguration`, `RuntimeConfiguration`, `StorageGuardPolicy`, `WorkspaceWriterLease`, `WorkspaceWriterFence`, `WorkspaceBackupManifest`, `WorkspaceRestorePlan`, `SecretRef`, `PrincipalRef`, `LocalSession`, `SystemHealth`, `SystemReadiness`, `DiagnosticBundleRef`, `DiagnosticBundleManifest`, `WorkerCapabilityDescriptor`, `WorkerRegistration`, `WorkerLease`, `WorkerTaskEnvelope`, `ArtifactManifest`, `HostedWorkspaceContext`, and `WorkspaceAuthorizationDecision`.
 
-**Capability bundles (6):** `ManageWorkspacesCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability`, `DistributeWorkersCapability`, and `HostWorkspacesCapability`.
+**Capability bundles (6):** `ManageWorkspacesCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability` (implemented), `DistributeWorkersCapability`, and `HostWorkspacesCapability`.
 
 ### 4.2 `app/contracts/catalogue/`
 

@@ -445,3 +445,51 @@ class SystemReadiness:
     active_workers: int
     checked_at: str
     reasons: tuple[str, ...] = field(default_factory=tuple)
+
+
+@dataclass(frozen=True, slots=True)
+class DiagnosticBundleManifest:
+    """Manifest metadata for an exported redacted diagnostic bundle.
+
+    Attributes:
+        bundle_id: Unique UUID identifier for the diagnostic bundle.
+        created_at: ISO 8601 UTC timestamp of bundle creation.
+        build_version: Application release version string.
+        build_commit: Git commit or build identifier.
+        schema_version: Schema version of the target workspace if available.
+        workspace_id: ID of the inspected workspace if available.
+        log_entries_count: Number of redacted structured log records included.
+        job_records_count: Number of job state records included.
+        integrity_findings: Integrity check findings (empty if healthy).
+        redaction_summary: Count of redacted secrets, tokens, or paths.
+    """
+
+    bundle_id: str
+    created_at: str
+    build_version: str
+    build_commit: str
+    schema_version: int | None
+    workspace_id: str | None
+    log_entries_count: int
+    job_records_count: int
+    integrity_findings: tuple[str, ...] = field(default_factory=tuple)
+    redaction_summary: dict[str, int] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class DiagnosticBundleRef:
+    """Reference to a generated diagnostic bundle archive and its manifest.
+
+    Attributes:
+        bundle_id: Unique UUID identifier for the bundle.
+        archive_path: Filesystem path to the generated zip archive.
+        checksum_sha256: Cryptographic SHA-256 digest of the archive file.
+        file_size_bytes: Size of the bundle archive in bytes.
+        manifest: Detailed manifest describing bundle contents and findings.
+    """
+
+    bundle_id: str
+    archive_path: Path
+    checksum_sha256: str
+    file_size_bytes: int
+    manifest: DiagnosticBundleManifest

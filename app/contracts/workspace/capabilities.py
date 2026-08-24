@@ -6,6 +6,7 @@ from app.kernel.capability import CapabilityKey
 
 if TYPE_CHECKING:
     from app.contracts.workspace.ports import (
+        BuildDiagnosticsCapability,
         ConfigureRuntimeCapability,
         ManageWorkspacesCapability,
         SecureLocalAccessCapability,
@@ -26,4 +27,9 @@ SECURE_LOCAL_ACCESS_CAPABILITY: CapabilityKey[SecureLocalAccessCapability] = (
         name="workspace.secure-local-access",
         major=1,
     )
+)
+
+BUILD_DIAGNOSTICS_CAPABILITY: CapabilityKey[BuildDiagnosticsCapability] = CapabilityKey(
+    name="workspace.build-diagnostics",
+    major=1,
 )
