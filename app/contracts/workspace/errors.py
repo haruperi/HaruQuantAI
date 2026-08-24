@@ -152,3 +152,89 @@ class UnsupportedRuntimeError(WorkspaceError):
             message: Details of the unsupported architecture or filesystem.
         """
         super().__init__(message, error_code="RUNTIME_UNSUPPORTED")
+
+
+class LocalSessionError(WorkspaceError):
+    """Base exception for local session and access authentication failures."""
+
+    def __init__(self, message: str, error_code: str = "SESSION_ERROR") -> None:
+        """Initialize the local session error.
+
+        Args:
+            message: Error description.
+            error_code: Stable machine-readable error token.
+        """
+        super().__init__(message, error_code=error_code)
+
+
+class SessionDeniedError(LocalSessionError):
+    """Raised when session issuance or verification is denied."""
+
+    def __init__(
+        self,
+        message: str = "Session access denied",
+        reason: str | None = None,
+    ) -> None:
+        """Initialize the session denied error.
+
+        Args:
+            message: Error description.
+            reason: Optional failure reason detail.
+        """
+        detail = f": {reason}" if reason else ""
+        super().__init__(f"{message}{detail}", error_code="SESSION_DENIED")
+
+
+class SessionExpiredError(LocalSessionError):
+    """Raised when a local session token has expired."""
+
+    def __init__(
+        self,
+        message: str = "Local session has expired",
+        expired_at: str | None = None,
+    ) -> None:
+        """Initialize the session expired error.
+
+        Args:
+            message: Error description.
+            expired_at: Optional ISO 8601 UTC timestamp of expiry.
+        """
+        detail = f" at {expired_at}" if expired_at else ""
+        super().__init__(f"{message}{detail}", error_code="SESSION_EXPIRED")
+
+
+class NonLoopbackAccessDeniedError(LocalSessionError):
+    """Raised when access from a non-loopback address is denied."""
+
+    def __init__(
+        self,
+        client_host: str,
+        message: str = "Access denied for non-loopback client without authorization",
+    ) -> None:
+        """Initialize the non-loopback access denied error.
+
+        Args:
+            client_host: Client host IP address that was rejected.
+            message: Error description.
+        """
+        self.client_host = client_host
+        super().__init__(
+            f"{message} (client_host={client_host})",
+            error_code="NON_LOOPBACK_ACCESS_DENIED",
+        )
+
+
+class SystemNotReadyError(WorkspaceError):
+    """Raised when an operation requires full readiness but the system is degraded."""
+
+    def __init__(self, reasons: tuple[str, ...]) -> None:
+        """Initialize the system not ready error.
+
+        Args:
+            reasons: Tuple of reasons why the system is not ready.
+        """
+        self.reasons = reasons
+        super().__init__(
+            f"System is not ready: {'; '.join(reasons)}",
+            error_code="SYSTEM_NOT_READY",
+        )

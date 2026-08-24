@@ -364,3 +364,84 @@ class RuntimeResourceReport:
     """
 
     warnings: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class LocalSession:
+    """Ephemeral session issued for local launcher client access.
+
+    Attributes:
+        session_id: Unique UUID identifier for the session.
+        token: Cryptographically secure ephemeral session token.
+        client_id: Identifier of the connecting launcher client.
+        client_host: Host IP address of the client connection.
+        issued_at: ISO 8601 UTC timestamp of token issuance.
+        expires_at: ISO 8601 UTC timestamp when session expires.
+        is_loopback: True if client connection is bound to loopback.
+        is_launcher_connected: True if caller is verified launcher-connected.
+    """
+
+    session_id: str
+    token: str
+    client_id: str
+    client_host: str
+    issued_at: str
+    expires_at: str
+    is_loopback: bool = True
+    is_launcher_connected: bool = True
+
+
+class HealthStatus(StrEnum):
+    """Operational health classification."""
+
+    HEALTHY = "HEALTHY"
+    DEGRADED = "DEGRADED"
+    UNHEALTHY = "UNHEALTHY"
+
+
+@dataclass(frozen=True, slots=True)
+class SystemHealth:
+    """Diagnostic system health summary available before full readiness.
+
+    Attributes:
+        status: Overall health classification.
+        healthy: True when runtime health checks succeed.
+        checked_at: ISO 8601 UTC timestamp of the health check.
+        components: Mapping of component names to health status strings.
+    """
+
+    status: HealthStatus = HealthStatus.HEALTHY
+    healthy: bool = True
+    checked_at: str = ""
+    components: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class SystemReadiness:
+    """Readiness status exposing operational readiness without secret disclosure.
+
+    Attributes:
+        ready: True only after schema migrations and state recovery succeed.
+        healthy: Overall runtime health status.
+        build_version: Application release version string.
+        build_commit: Git commit or build identifier.
+        schema_version: Current workspace metadata schema version if open.
+        migrations_current: True if all workspace migrations are applied.
+        state_recovered: True if startup workspace state recovery is complete.
+        worker_capacity: Configured worker execution capacity.
+        active_workers: Count of currently active workers.
+        checked_at: ISO 8601 UTC timestamp of readiness check.
+        reasons: Diagnostic reasons if system is not fully ready.
+    """
+
+    ready: bool
+    healthy: bool
+    build_version: str
+    build_commit: str
+    schema_version: int | None
+    migrations_current: bool
+    state_recovered: bool
+    worker_capacity: int
+    active_workers: int
+    checked_at: str
+    reasons: tuple[str, ...] = field(default_factory=tuple)

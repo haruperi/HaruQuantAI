@@ -179,10 +179,11 @@ healthy.
 3. [x] `FR-WS-CONFIGURE_SERVER_RUNTIME` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:148
 4. [x] `FR-WS-PUBLISH_RUNTIME_SUPPORT` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:214
 
-##### 1.3 [ ] `FEAT-WS-SECURE_LOCAL_ACCESS`
+##### 1.3 [x] `FEAT-WS-SECURE_LOCAL_ACCESS`
 
-1. [ ] `FR-WS-ISSUE_LOCAL_SESSION`
-2. [ ] `FR-WS-REPORT_SYSTEM_READINESS`
+1. [x] `FR-WS-ISSUE_LOCAL_SESSION` — evidence: tests/services/workspace/local_access_health/test_local_access_health.py:49
+2. [x] `FR-WS-REPORT_SYSTEM_READINESS` — evidence: tests/services/workspace/local_access_health/test_local_access_health.py:136
+
 
 ##### 1.4 [ ] `FEAT-WS-BUILD_DIAGNOSTICS`
 

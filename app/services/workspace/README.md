@@ -54,7 +54,7 @@ Rows labelled `FEAT-* capability surface` describe planned semantic contract bun
 |---|---|---|---|---|
 | Implemented | `FEAT-WS-MANAGE_WORKSPACES` capability surface | `v1` | Interfaces, Orchestration, Simulator | Workspace Lifecycle. |
 | Implemented | `FEAT-WS-CONFIGURE_RUNTIME` capability surface | `v1` | Interfaces, Orchestration, Simulator | Runtime Configuration and Admission. |
-| Missing | `FEAT-WS-SECURE_LOCAL_ACCESS` capability surface | `v1` | Interfaces, Orchestration, Simulator | Local Access and Health. |
+| Implemented | `FEAT-WS-SECURE_LOCAL_ACCESS` capability surface | `v1` | Interfaces, Orchestration, Simulator | Local Access and Health. |
 | Missing | `FEAT-WS-BUILD_DIAGNOSTICS` capability surface | `v1` | Interfaces, Orchestration, Simulator | Diagnostics. |
 | Missing | `FEAT-WS-DISTRIBUTE_WORKERS` capability surface | `v1` | Interfaces, Orchestration, Simulator | Distributed Worker Pool. |
 | Missing | `FEAT-WS-HOST_WORKSPACES` capability surface | `v1` | Interfaces, Orchestration, Simulator | Hosted Workspace Boundary. |
@@ -193,7 +193,7 @@ flowchart LR
 |---|---|---|---|---|---|---|
 | Implemented | `WF-WS-001` | Cross-domain | Workspace Lifecycle | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-INITIALIZE_WORKSPACE` → `FR-WS-MIGRATE_WORKSPACE_SCHEMA` → `FR-WS-FENCE_WORKSPACE_WRITERS` → `FR-WS-RECOVER_WORKSPACE_STATE` → `FR-WS-BACKUP_WORKSPACE` |
 | Implemented | `WF-WS-002` | Internal | Runtime Configuration and Admission | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-CONFIGURE_WORKSPACE` → `FR-WS-ENFORCE_STORAGE_GUARDS` → `FR-WS-CONFIGURE_SERVER_RUNTIME` → `FR-WS-PUBLISH_RUNTIME_SUPPORT` |
-| Missing | `WF-WS-003` | Internal | Local Access and Health | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-ISSUE_LOCAL_SESSION` → `FR-WS-REPORT_SYSTEM_READINESS` |
+| Implemented | `WF-WS-003` | Internal | Local Access and Health | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-ISSUE_LOCAL_SESSION` → `FR-WS-REPORT_SYSTEM_READINESS` |
 | Missing | `WF-WS-004` | Internal | Diagnostics | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-BUILD_DIAGNOSTIC_BUNDLE` |
 | Missing | `WF-WS-005` | Cross-domain | Distributed Worker Pool | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-REGISTER_WORKER_CAPABILITIES` → `FR-WS-SECURE_REMOTE_WORKERS` → `FR-WS-SCHEDULE_DATA_LOCALITY` → `FR-WS-VERIFY_ARTIFACT_TRANSFER` |
 | Missing | `WF-WS-006` | Cross-domain | Hosted Workspace Boundary | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-ISOLATE_HOSTED_WORKSPACES` → `FR-WS-AUTHORIZE_HOSTED_WORKSPACES` |
@@ -382,15 +382,15 @@ validated input and capability bindings
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `local_access_health.py` | Issue local credentials and report health/readiness | `fr_ws_issue_local_session`, `fr_ws_report_system_readiness` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Missing | `feature.py` | Mount `FEAT-WS-SECURE_LOCAL_ACCESS` through `FeatureContext` and stage its declared providers/effects | `FEAT-WS-SECURE_LOCAL_ACCESS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Missing | `manifest.py` | Define the immutable `FEAT-WS-SECURE_LOCAL_ACCESS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-WS-SECURE_LOCAL_ACCESS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+| Implemented | `local_access_health.py` | Issue local credentials and report health/readiness | `fr_ws_issue_local_session`, `fr_ws_report_system_readiness` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
+| Implemented | `feature.py` | Mount `FEAT-WS-SECURE_LOCAL_ACCESS` through `FeatureContext` and stage its declared providers/effects | `FEAT-WS-SECURE_LOCAL_ACCESS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
+| Implemented | `manifest.py` | Define the immutable `FEAT-WS-SECURE_LOCAL_ACCESS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-WS-SECURE_LOCAL_ACCESS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
 
 #### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `FEAT-WS-SECURE_LOCAL_ACCESS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `local_access_health.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
+| Implemented | `FEAT-WS-SECURE_LOCAL_ACCESS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `local_access_health.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
 
 #### `local_access_health.py` — Issue local credentials and report health/readiness
 
@@ -398,8 +398,8 @@ validated input and capability bindings
 
 | Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Missing | `FR-WS-ISSUE_LOCAL_SESSION` | Target | P0 | The system shall issue an ephemeral local-session token only to a launcher-connected client and shall bind the API to loopback by default. | `fr_ws_issue_local_session` implementation trace | Local state mutation | A request without the token or from a non-loopback source is denied before application service execution. | FR-WS-INITIALIZE_WORKSPACE | `BD-01`; Target | **Usage:** `app/services/workspace/local_access_health/local_access_health.py::__main__` scenario `FR-WS-ISSUE_LOCAL_SESSION`<br>**Unit:** `tests/services/workspace/local_access_health/test_local_access_health.py::test_ws_issue_local_session()` |
-| Missing | `FR-WS-REPORT_SYSTEM_READINESS` | Target | P1 | The system shall expose health, readiness, build, schema, and worker-capacity status without disclosing secrets or absolute user paths. | `fr_ws_report_system_readiness` implementation trace | Read-only | Health works before full readiness; readiness becomes true only after migrations and job recovery. | FR-WS-MIGRATE_WORKSPACE_SCHEMA | Baseline §15; Target | **Usage:** `app/services/workspace/local_access_health/local_access_health.py::__main__` scenario `FR-WS-REPORT_SYSTEM_READINESS`<br>**Unit:** `tests/services/workspace/local_access_health/test_local_access_health.py::test_ws_report_system_readiness()` |
+| Implemented | `FR-WS-ISSUE_LOCAL_SESSION` | Target | P0 | The system shall issue an ephemeral local-session token only to a launcher-connected client and shall bind the API to loopback by default. | `fr_ws_issue_local_session` implementation trace | Local state mutation | A request without the token or from a non-loopback source is denied before application service execution. | FR-WS-INITIALIZE_WORKSPACE | `BD-01`; Target | **Usage:** `app/services/workspace/local_access_health/local_access_health.py::__main__` scenario `FR-WS-ISSUE_LOCAL_SESSION`<br>**Unit:** `tests/services/workspace/local_access_health/test_local_access_health.py::test_ws_issue_local_session()` |
+| Implemented | `FR-WS-REPORT_SYSTEM_READINESS` | Target | P1 | The system shall expose health, readiness, build, schema, and worker-capacity status without disclosing secrets or absolute user paths. | `fr_ws_report_system_readiness` implementation trace | Read-only | Health works before full readiness; readiness becomes true only after migrations and job recovery. | FR-WS-MIGRATE_WORKSPACE_SCHEMA | Baseline §15; Target | **Usage:** `app/services/workspace/local_access_health/local_access_health.py::__main__` scenario `FR-WS-REPORT_SYSTEM_READINESS`<br>**Unit:** `tests/services/workspace/local_access_health/test_local_access_health.py::test_ws_report_system_readiness()` |
 
 **Rules:**
 

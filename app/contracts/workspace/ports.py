@@ -9,11 +9,14 @@ if TYPE_CHECKING:
 
     from app.contracts.workspace.models import (
         JobKind,
+        LocalSession,
         RuntimeSupportProfile,
         ServerRuntimeSettings,
         ServerRuntimeValidation,
         StorageGuardDecision,
         StorageGuardLimits,
+        SystemHealth,
+        SystemReadiness,
         WorkspaceBackupManifest,
         WorkspaceRecoverySummary,
         WorkspaceRef,
@@ -249,5 +252,90 @@ class ConfigureRuntimeCapability(Protocol):
 
         Raises:
             UnsupportedRuntimeError: If the host platform is unsupported.
+        """
+        ...
+
+
+@runtime_checkable
+class SecureLocalAccessCapability(Protocol):
+    """Capability protocol for local access security, health, and readiness."""
+
+    def issue_local_session(
+        self,
+        *,
+        client_id: str,
+        is_launcher_connected: bool,
+        client_host: str = "127.0.0.1",
+        ttl_seconds: int | None = None,
+    ) -> LocalSession:
+        """Issue an ephemeral local-session token to a launcher client.
+
+        Args:
+            client_id: Identifier of the launcher client requesting the session.
+            is_launcher_connected: True if caller is launcher-connected.
+            client_host: Host IP of the client connection (loopback by default).
+            ttl_seconds: Optional session lifetime in seconds.
+
+        Returns:
+            LocalSession with unique token and expiry timestamp.
+
+        Raises:
+            SessionDeniedError: If the client is not launcher-connected or
+                source host is not loopback.
+        """
+        ...
+
+    def verify_local_session(
+        self,
+        *,
+        token: str,
+        client_host: str = "127.0.0.1",
+    ) -> LocalSession:
+        """Verify an ephemeral local-session token and enforce loopback binding.
+
+        Args:
+            token: Session token to validate.
+            client_host: Source host IP of the request.
+
+        Returns:
+            LocalSession if the token is valid, unexpired, and permitted.
+
+        Raises:
+            SessionDeniedError: If the token is unknown or revoked.
+            SessionExpiredError: If the session TTL has elapsed.
+            NonLoopbackAccessDeniedError: If a non-loopback source attempts access
+                without nonlocal authorization.
+        """
+        ...
+
+    def revoke_local_session(self, token: str) -> None:
+        """Revoke a previously issued local session token.
+
+        Args:
+            token: Session token to invalidate immediately.
+        """
+        ...
+
+    def check_system_health(self) -> SystemHealth:
+        """Expose operational health status, functional before full readiness.
+
+        Returns:
+            SystemHealth describing runtime component health.
+        """
+        ...
+
+    def report_system_readiness(
+        self,
+        workspace: Path | WorkspaceRef | None = None,
+    ) -> SystemReadiness:
+        """Expose system readiness without disclosing secrets or absolute user paths.
+
+        Readiness becomes true only after migrations and job recovery succeed.
+
+        Args:
+            workspace: Optional workspace root or WorkspaceRef to verify.
+
+        Returns:
+            SystemReadiness describing readiness, schema, and worker status.
         """
         ...
