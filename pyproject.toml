@@ -23,6 +23,7 @@ haruquantai = "app.main:run"
 "plugins.manifests" = "app.services.plugins.manifests.feature:feature"
 "plugins.contributions" = "app.services.plugins.contributions.feature:feature"
 "interfaces.api_events" = "app.services.interfaces.api_events.feature:feature"
+"interfaces.cli_mcp_automation" = "app.services.interfaces.cli_mcp_automation.feature:feature"
 
 
 

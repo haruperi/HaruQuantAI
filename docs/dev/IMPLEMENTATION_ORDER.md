@@ -212,10 +212,10 @@ healthy.
 6. [x] `FR-IFACE-VALIDATE_ARTIFACT_DOWNLOADS` — evidence: tests/services/interfaces/api_events/test_api_events.py:307
 7. [x] `FR-IFACE-EVOLVE_API_COMPATIBLY` — evidence: tests/services/interfaces/api_events/test_api_events.py:415
 
-##### 1.8 Partial — `FEAT-IFACE-AUTOMATE_COMMANDS`
+##### 1.8 Partial — [x] `FEAT-IFACE-AUTOMATE_COMMANDS`
 
-1. [ ] `FR-IFACE-DELEGATE_APPLICATION_CALLS`
-2. [ ] `FR-IFACE-TRACK_DURABLE_COMMANDS`
+1. [x] `FR-IFACE-DELEGATE_APPLICATION_CALLS` — evidence: tests/services/interfaces/cli_mcp_automation/test_cli_mcp_automation.py:27
+2. [x] `FR-IFACE-TRACK_DURABLE_COMMANDS` — evidence: tests/services/interfaces/cli_mcp_automation/test_cli_mcp_automation.py:127
 
 #### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 1)
 

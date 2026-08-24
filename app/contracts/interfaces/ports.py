@@ -11,10 +11,14 @@ if TYPE_CHECKING:
     from app.contracts.interfaces.models import (
         ApiCompatibilityReport,
         ApiDeprecationNotice,
+        ApplicationCommandRequest,
+        ApplicationCommandResult,
         ArtifactDownloadRequest,
         ArtifactDownloadResponse,
         AsyncJobRef,
         AsyncJobState,
+        DurableCommandRef,
+        DurableJobStatus,
         EventReplayBatch,
         InterfaceEventEnvelope,
         OpenApiManifest,
@@ -227,5 +231,117 @@ class ServeApiEventsCapability(Protocol):
 
         Returns:
             Tuple of ApiDeprecationNotice descriptors.
+        """
+        ...
+
+
+@runtime_checkable
+class AutomateCommandsCapability(Protocol):
+    """Protocol for unified CLI, MCP, and application command automation."""
+
+    def delegate_application_call(
+        self,
+        request: ApplicationCommandRequest,
+    ) -> ApplicationCommandResult:
+        """Execute a normalized application command across UI, CLI, or MCP callers.
+
+        Args:
+            request: Standardized command invocation request.
+
+        Returns:
+            ApplicationCommandResult describing status, data, and errors.
+        """
+        ...
+
+    def register_command_handler(
+        self,
+        command_name: str,
+        handler: Callable[[dict[str, object]], dict[str, object]],
+    ) -> None:
+        """Register a handler callback for an application command name.
+
+        Args:
+            command_name: Canonical registered command name string.
+            handler: Callable taking payload dictionary and returning output dictionary.
+        """
+        ...
+
+    def track_durable_command(
+        self,
+        command_name: str,
+        payload: dict[str, object],
+        runner_fn: Callable[[DurableCommandRef], None] | None = None,
+    ) -> DurableCommandRef:
+        """Admit a durable long-running CLI or MCP command and return reference.
+
+        Args:
+            command_name: Target action or command name.
+            payload: Parameter dictionary.
+            runner_fn: Optional synchronous runner callable.
+
+        Returns:
+            DurableCommandRef with unique job ID and initial QUEUED state.
+        """
+        ...
+
+    def get_durable_command_status(
+        self,
+        durable_job_id: str,
+    ) -> DurableCommandRef:
+        """Query lifecycle state and progress of a durable command.
+
+        Args:
+            durable_job_id: Unique durable job UUID string.
+
+        Returns:
+            DurableCommandRef describing current status, progress, and stage.
+
+        Raises:
+            DurableJobNotFoundError: If durable job is not registered.
+        """
+        ...
+
+    def cancel_durable_command(
+        self,
+        durable_job_id: str,
+    ) -> DurableCommandRef:
+        """Request cooperative cancellation of an active durable command.
+
+        Args:
+            durable_job_id: Target durable job UUID string.
+
+        Returns:
+            Updated DurableCommandRef marked with cancellation requested.
+
+        Raises:
+            DurableJobNotFoundError: If durable job is not registered.
+        """
+        ...
+
+    def update_durable_command(
+        self,
+        durable_job_id: str,
+        *,
+        status: DurableJobStatus | None = None,
+        progress: float | None = None,
+        stage: str | None = None,
+        result: dict[str, object] | None = None,
+        error: str | None = None,
+    ) -> DurableCommandRef:
+        """Update lifecycle state or progress of a durable command.
+
+        Args:
+            durable_job_id: Target durable job UUID string.
+            status: Optional updated lifecycle state.
+            progress: Optional progress float between 0.0 and 1.0.
+            stage: Optional stage description.
+            result: Optional completed result payload dictionary.
+            error: Optional error description string.
+
+        Returns:
+            Updated DurableCommandRef.
+
+        Raises:
+            DurableJobNotFoundError: If durable job is not registered.
         """
         ...

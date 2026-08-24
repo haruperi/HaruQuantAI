@@ -24,6 +24,36 @@ class AsyncJobState(StrEnum):
     CANCELLED = "CANCELLED"
 
 
+class CommandSource(StrEnum):
+    """Originating interface source of an application command."""
+
+    CLI = "CLI"
+    UI = "UI"
+    MCP = "MCP"
+    API = "API"
+    SYSTEM = "SYSTEM"
+
+
+class CommandStatus(StrEnum):
+    """Execution status outcome of an application command."""
+
+    SUCCESS = "SUCCESS"
+    VALIDATION_FAILED = "VALIDATION_FAILED"
+    EXECUTION_FAILED = "EXECUTION_FAILED"
+    CANCELLED = "CANCELLED"
+    PENDING = "PENDING"
+
+
+class DurableJobStatus(StrEnum):
+    """Lifecycle state of a durable long-running CLI/MCP command."""
+
+    QUEUED = "QUEUED"
+    RUNNING = "RUNNING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+
+
 @dataclass(frozen=True, slots=True)
 class ApiVersion:
     """Semantic version descriptor for an API surface.
@@ -177,7 +207,7 @@ class EventReplayBatch:
         events: Tuple of event envelopes in sequence order.
         next_cursor: Cursor identifier for the next batch or latest event.
         has_more: True if additional events remain beyond this batch.
-        is_resync_required: True if requested cursor expired and full resync is needed.
+        is_resync_required: True if requested cursor expired and resync needed.
     """
 
     events: tuple[InterfaceEventEnvelope, ...] = ()
@@ -302,3 +332,72 @@ class ApiCompatibilityReport:
     client_version: str
     deprecations: tuple[ApiDeprecationNotice, ...] = ()
     breaking_changes: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class ApplicationCommandRequest:
+    """Presentation-neutral application command invocation request.
+
+    Attributes:
+        command_name: Canonical registered command name.
+        payload: Input argument mapping.
+        source: Calling interface type (CLI, UI, MCP, API, SYSTEM).
+        correlation_id: Distributed tracing correlation UUID string.
+        session_id: Client or session scope identifier.
+    """
+
+    command_name: str
+    payload: dict[str, object] = field(default_factory=dict)
+    source: CommandSource = CommandSource.CLI
+    correlation_id: str = ""
+    session_id: str = ""
+
+
+@dataclass(frozen=True, slots=True)
+class ApplicationCommandResult:
+    """Normalized application command execution result.
+
+    Attributes:
+        command_name: Invoked command name.
+        status: Execution status (SUCCESS, VALIDATION_FAILED, etc.).
+        data: Execution result payload if successful.
+        errors: Tuple of validation or execution error messages.
+        correlation_id: Propagated correlation UUID string.
+        durable_job_id: Associated durable job UUID string if asynchronous.
+    """
+
+    command_name: str
+    status: CommandStatus = CommandStatus.SUCCESS
+    data: dict[str, object] | None = None
+    errors: tuple[str, ...] = ()
+    correlation_id: str = ""
+    durable_job_id: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class DurableCommandRef:
+    """Handle to a durable long-running CLI or MCP command execution.
+
+    Attributes:
+        durable_job_id: Unique durable job UUID string.
+        command_name: Associated command name.
+        status: Current lifecycle state (QUEUED, RUNNING, etc.).
+        progress: Progress ratio between 0.0 and 1.0.
+        stage: Human-readable stage description.
+        is_cancel_requested: True if cancellation was requested.
+        result: Completed result dictionary if finished successfully.
+        error: Error description if execution failed.
+        created_at: ISO 8601 UTC timestamp of job creation.
+        updated_at: ISO 8601 UTC timestamp of last status update.
+    """
+
+    durable_job_id: str
+    command_name: str
+    status: DurableJobStatus = DurableJobStatus.QUEUED
+    progress: float = 0.0
+    stage: str = ""
+    is_cancel_requested: bool = False
+    result: dict[str, object] | None = None
+    error: str | None = None
+    created_at: str = ""
+    updated_at: str = ""

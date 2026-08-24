@@ -140,3 +140,72 @@ class ApiIncompatibleError(InterfaceError):
             f"{message} (requested={client_version}, supported={versions_str})",
             error_code="UPGRADE_REQUIRED",
         )
+
+
+class CommandNotFoundError(InterfaceError):
+    """Raised when an automation command name is not registered."""
+
+    def __init__(self, command_name: str) -> None:
+        """Initialize command not found error.
+
+        Args:
+            command_name: Unrecognized command name string.
+        """
+        self.command_name = command_name
+        super().__init__(
+            f"Command '{command_name}' is not recognized",
+            error_code="COMMAND_NOT_FOUND",
+        )
+
+
+class CommandValidationError(InterfaceError):
+    """Raised when an automation command payload fails schema validation."""
+
+    def __init__(self, command_name: str, validation_errors: tuple[str, ...]) -> None:
+        """Initialize command validation error.
+
+        Args:
+            command_name: Target command name string.
+            validation_errors: Tuple of validation failure messages.
+        """
+        self.command_name = command_name
+        self.validation_errors = validation_errors
+        errors_str = "; ".join(validation_errors)
+        super().__init__(
+            f"Validation failed for command '{command_name}': {errors_str}",
+            error_code="COMMAND_VALIDATION_FAILED",
+        )
+
+
+class CommandExecutionError(InterfaceError):
+    """Raised when an automation command fails during execution."""
+
+    def __init__(self, command_name: str, reason: str) -> None:
+        """Initialize command execution error.
+
+        Args:
+            command_name: Target command name string.
+            reason: Specific execution failure reason.
+        """
+        self.command_name = command_name
+        self.reason = reason
+        super().__init__(
+            f"Execution failed for command '{command_name}': {reason}",
+            error_code="COMMAND_EXECUTION_FAILED",
+        )
+
+
+class DurableJobNotFoundError(InterfaceError):
+    """Raised when a durable command run cannot be found."""
+
+    def __init__(self, durable_job_id: str) -> None:
+        """Initialize durable job not found error.
+
+        Args:
+            durable_job_id: ID of the missing durable job.
+        """
+        self.durable_job_id = durable_job_id
+        super().__init__(
+            f"Durable job '{durable_job_id}' was not found",
+            error_code="DURABLE_JOB_NOT_FOUND",
+        )
