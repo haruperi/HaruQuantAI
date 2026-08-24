@@ -196,9 +196,9 @@ healthy.
 
 1. [x] `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` — evidence: tests/services/plugins/manifests/test_plugin_manifests.py:53
 
-##### 1.6 [ ] `FEAT-PLUG-REGISTER_CONTRIBUTIONS`
+##### 1.6 [x] `FEAT-PLUG-REGISTER_CONTRIBUTIONS`
 
-1. [ ] `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS`
+1. [x] `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS` — evidence: tests/services/plugins/contributions/test_plugin_contributions.py:34
 
 #### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md) (Increment 1)
 

@@ -8,8 +8,12 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from app.contracts.plugins.models import (
+        ContributionRegistrationResult,
+        ContributionTestResult,
+        PluginContributionDescriptor,
         PluginManifest,
         PluginPackageValidation,
+        PluginType,
     )
 
 
@@ -69,5 +73,85 @@ class DeclareManifestsCapability(Protocol):
 
         Returns:
             Hexadecimal SHA-256 string representing the canonical package hash.
+        """
+        ...
+
+
+@runtime_checkable
+class RegisterContributionsCapability(Protocol):
+    """Capability protocol for registering and contract-testing plugin contributions."""
+
+    def register_contributions(
+        self,
+        manifest: PluginManifest,
+        contributions: tuple[PluginContributionDescriptor, ...],
+        implementations: dict[str, object] | None = None,
+    ) -> ContributionRegistrationResult:
+        """Register typed contributions declared by a plugin manifest.
+
+        Args:
+            manifest: Validated plugin manifest.
+            contributions: Descriptors of contributions to register.
+            implementations: Optional mapping of contribution IDs to implementation.
+
+        Returns:
+            ContributionRegistrationResult containing descriptors and test outcomes.
+
+        Raises:
+            PluginContributionError: If registration fails or violates boundaries.
+            PluginContractTestError: If strict contract verification fails.
+        """
+        ...
+
+    def unregister_contributions(self, plugin_id: str) -> int:
+        """Unregister all contributions associated with a plugin ID.
+
+        Args:
+            plugin_id: Identifier of the plugin to withdraw.
+
+        Returns:
+            Count of removed contribution descriptors.
+        """
+        ...
+
+    def get_contributions(
+        self, plugin_type: PluginType | None = None
+    ) -> tuple[PluginContributionDescriptor, ...]:
+        """Query currently registered plugin contributions.
+
+        Args:
+            plugin_type: Optional filter by PluginType.
+
+        Returns:
+            Tuple of active contribution descriptors matching criteria.
+        """
+        ...
+
+    def get_contribution(
+        self, contribution_id: str
+    ) -> PluginContributionDescriptor | None:
+        """Retrieve a registered contribution by its ID.
+
+        Args:
+            contribution_id: Unique contribution identifier.
+
+        Returns:
+            PluginContributionDescriptor if found, or None.
+        """
+        ...
+
+    def run_contract_test(
+        self,
+        contribution: PluginContributionDescriptor,
+        implementation: object | None = None,
+    ) -> ContributionTestResult:
+        """Execute type-specific contract tests against a contribution.
+
+        Args:
+            contribution: Contribution descriptor to test.
+            implementation: Optional concrete implementation object or mock.
+
+        Returns:
+            ContributionTestResult indicating whether contract rules were satisfied.
         """
         ...

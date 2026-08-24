@@ -21,6 +21,7 @@ haruquantai = "app.main:run"
 "workspace.local_access_health" = "app.services.workspace.local_access_health.feature:feature"
 "workspace.diagnostic_bundle" = "app.services.workspace.diagnostic_bundle.feature:feature"
 "plugins.manifests" = "app.services.plugins.manifests.feature:feature"
+"plugins.contributions" = "app.services.plugins.contributions.feature:feature"
 
 
 

@@ -87,3 +87,38 @@ class PluginPackageRef:
     version: str
     package_path: str
     package_hash: str
+
+
+@dataclass(frozen=True, slots=True)
+class PluginContributionDescriptor:
+    """Descriptor declaring a single typed plugin contribution."""
+
+    plugin_id: str
+    plugin_type: PluginType
+    contribution_id: str
+    name: str
+    description: str = ""
+    schema_ref: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class ContributionTestResult:
+    """Result of executing contract verification on a plugin contribution."""
+
+    contribution_id: str
+    plugin_type: PluginType
+    passed: bool
+    details: str = ""
+    errors: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class ContributionRegistrationResult:
+    """Outcome of registering one or more contributions from a plugin manifest."""
+
+    plugin_id: str
+    contributions: tuple[PluginContributionDescriptor, ...] = ()
+    test_results: tuple[ContributionTestResult, ...] = ()
+    is_successful: bool = True
+    errors: tuple[str, ...] = ()

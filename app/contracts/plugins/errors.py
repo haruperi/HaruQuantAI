@@ -17,3 +17,11 @@ class PluginPackageValidationError(PluginError):
 
 class PluginSignatureError(PluginError):
     """Raised when a plugin signature cannot be verified or is invalid."""
+
+
+class PluginContributionError(PluginError):
+    """Raised when registering or validating a plugin contribution fails."""
+
+
+class PluginContractTestError(PluginContributionError):
+    """Raised when a contribution fails its type-specific contract test."""

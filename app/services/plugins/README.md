@@ -55,7 +55,7 @@ Rows labelled `FEAT-* capability surface` describe planned semantic contract bun
 | Implemented | `FEAT-PLUG-DECLARE_MANIFESTS` capability surface | `v1` | Workspace | Manifests. |
 | Missing | `FEAT-PLUG-MANAGE_LIFECYCLE` capability surface | `v1` | Workspace | Lifecycle. |
 | Missing | `FEAT-PLUG-SANDBOX_PERMISSIONS` capability surface | `v1` | Workspace | Permissions and Sandbox. |
-| Missing | `FEAT-PLUG-REGISTER_CONTRIBUTIONS` capability surface | `v1` | Workspace | Contributions. |
+| Implemented | `FEAT-PLUG-REGISTER_CONTRIBUTIONS` capability surface | `v1` | Workspace | Contributions. |
 | Missing | `FEAT-PLUG-ISOLATE_ANALYSIS` capability surface | `v1` | Workspace | Analysis Boundary. |
 | Missing | `FEAT-PLUG-RENDER_RESULT_PANELS` capability surface | `v1` | Workspace | Result Panels. |
 | Missing | `FEAT-PLUG-MAINTAIN_COMPATIBILITY` capability surface | `v1` | Workspace | Development and Compatibility. |
@@ -203,7 +203,7 @@ flowchart LR
 | Implemented | `WF-PLUG-001` | Internal | Manifests | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` |
 | Missing | `WF-PLUG-002` | Cross-domain | Lifecycle | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-REPLACE_PLUGINS_TRANSACTIONALLY` |
 | Missing | `WF-PLUG-003` | Cross-domain | Permissions and Sandbox | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-ISOLATE_PLUGIN_EXECUTION` → `FR-PLUG-RESTRICT_PLUGIN_SECRETS` |
-| Missing | `WF-PLUG-004` | Internal | Contributions | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS` |
+| Implemented | `WF-PLUG-004` | Internal | Contributions | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS` |
 | Missing | `WF-PLUG-005` | Internal | Analysis Boundary | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-PASS_ARTIFACT_HANDLES` |
 | Missing | `WF-PLUG-006` | Internal | Result Panels | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-SANDBOX_RESULT_PANELS` |
 | Missing | `WF-PLUG-007` | Internal | Development and Compatibility | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-PLUG-VALIDATE_PLUGIN_PACKAGES` → `FR-PLUG-DECLARE_PLUGIN_COMPATIBILITY` |
@@ -444,15 +444,15 @@ validated input and capability bindings
 
 | Status | File | Responsibility | Key exports | Dependencies |
 |---|---|---|---|---|
-| Missing | `plugin_contributions.py` | Register typed plugin contribution capabilities | `fr_plug_register_plugin_contributions` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Missing | `feature.py` | Mount `FEAT-PLUG-REGISTER_CONTRIBUTIONS` through `FeatureContext` and stage its declared providers/effects | `FEAT-PLUG-REGISTER_CONTRIBUTIONS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Missing | `manifest.py` | Define the immutable `FEAT-PLUG-REGISTER_CONTRIBUTIONS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-PLUG-REGISTER_CONTRIBUTIONS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+| Implemented | `plugin_contributions.py` | Register typed plugin contribution capabilities | `fr_plug_register_plugin_contributions` | **Standard library:** `typing`, `enum`<br>**Required third-party:** None<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
+| Implemented | `feature.py` | Mount `FEAT-PLUG-REGISTER_CONTRIBUTIONS` through `FeatureContext` and stage its declared providers/effects | `FEAT-PLUG-REGISTER_CONTRIBUTIONS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
+| Implemented | `manifest.py` | Define the immutable `FEAT-PLUG-REGISTER_CONTRIBUTIONS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-PLUG-REGISTER_CONTRIBUTIONS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
 
 #### Configuration and Limits Manifest
 
 | Status | Setting / Limit | Type | Default | Required | Used by | Description |
 |---|---|---|---|---|---|---|
-| Missing | `FEAT-PLUG-REGISTER_CONTRIBUTIONS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `plugin_contributions.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
+| Implemented | `FEAT-PLUG-REGISTER_CONTRIBUTIONS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `plugin_contributions.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
 
 #### `plugin_contributions.py` — Register typed plugin contribution capabilities
 
@@ -460,7 +460,7 @@ validated input and capability bindings
 
 | Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Missing | `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS` | Target | P0 | Plugin types shall include blocks, indicators, metrics, filters, fitness methods, research methods, data connectors, tasks, source emitters, and Results panels. | `fr_plug_register_plugin_contributions` implementation trace | Event publication | Each type passes a contract-test kit before stable enablement. | FR-PLUG-DECLARE_PLUGIN_MANIFESTS | Plugin baseline | **Usage:** `app/services/plugins/contributions/contributions.py::__main__` scenario `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS`<br>**Unit:** `tests/services/plugins/unit/test_plugin_contributions.py::test_plug_register_plugin_contributions()` |
+| Implemented | `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS` | Target | P0 | Plugin types shall include blocks, indicators, metrics, filters, fitness methods, research methods, data connectors, tasks, source emitters, and Results panels. | `fr_plug_register_plugin_contributions` implementation trace | Event publication | Each type passes a contract-test kit before stable enablement. | FR-PLUG-DECLARE_PLUGIN_MANIFESTS | Plugin baseline | **Usage:** `app/services/plugins/contributions/plugin_contributions.py::__main__` scenario `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS`<br>**Unit:** `tests/services/plugins/contributions/test_plugin_contributions.py::test_plug_register_plugin_contributions()` |
 
 **Rules:**
 
@@ -477,7 +477,7 @@ validated input and capability bindings
 
 #### Feature usage examples
 
-The primary domain-logic module `app/services/plugins/contributions/contributions.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+The primary domain-logic module `app/services/plugins/contributions/plugin_contributions.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
 
 ---
 
