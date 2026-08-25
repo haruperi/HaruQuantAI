@@ -1,0 +1,72 @@
+{
+  "run_id": "20260824-151730-feat-ws-manage_workspaces",
+  "task": {
+    "task_kind": "feature",
+    "task_id": "FEAT-WS-MANAGE_WORKSPACES",
+    "task_slug": "manage-workspaces",
+    "task_name": "Manage Workspaces",
+    "task_request": "Implement entry 1.1 FEAT-WS-MANAGE_WORKSPACES from docs/dev/IMPLEMENTATION_ORDER.md: FR-WS-INITIALIZE_WORKSPACE, FR-WS-MIGRATE_WORKSPACE_SCHEMA, FR-WS-FENCE_WORKSPACE_WRITERS, FR-WS-RECOVER_WORKSPACE_STATE, FR-WS-BACKUP_WORKSPACE. Follow the owning README as the sole feature/FR registry and AGENTS.md for all workflow rules. Mark the tracker entry complete with evidence when every gate passes.",
+    "additional_context": "Owning README is the acceptance authority.",
+    "exclusions": "No unrelated features; no scope beyond the listed requirements.",
+    "owner_execution_notes": "None",
+    "review_focus": "None",
+    "implementation_file": "docs/dev/IMPLEMENTATION_ORDER.md",
+    "implementation_entry": "1.1"
+  },
+  "baseline": "773013f285ab23c3a9d77dd3b3634f717d6e6878",
+  "branch": "feature/feat-ws-manage_workspaces-manage-workspaces",
+  "iteration": 1,
+  "phase": "complete",
+  "blockers": [],
+  "history": [
+    {
+      "time": "2026-08-24T15:17:40+00:00",
+      "phase": "planner",
+      "iteration": 1,
+      "stopped": "PLANNER",
+      "activating": "PLANNER",
+      "handoff": "PENDING_APPROVAL",
+      "log": ".agents/logs/20260824-151730-planner.log"
+    },
+    {
+      "time": "2026-08-24T15:24:55+00:00",
+      "phase": "planner_approval",
+      "iteration": 1,
+      "stopped": "PLANNER",
+      "activating": "EXECUTOR",
+      "handoff": "APPROVED_EXECUTE",
+      "log": ".agents/logs/20260824-152455-planner_approval.log"
+    },
+    {
+      "time": "2026-08-24T15:33:30+00:00",
+      "phase": "executor",
+      "iteration": 1,
+      "stopped": "EXECUTOR",
+      "activating": "REVIEWER",
+      "handoff": "READY_FOR_REVIEW",
+      "log": ".agents/logs/20260824-153330-executor.log"
+    },
+    {
+      "time": "2026-08-24T15:34:10+00:00",
+      "phase": "reviewer",
+      "iteration": 1,
+      "stopped": "REVIEWER",
+      "activating": "REVIEWER",
+      "handoff": "ACCEPTED",
+      "log": ".agents/logs/20260824-153410-reviewer.log"
+    },
+    {
+      "time": "2026-08-24T15:36:40+00:00",
+      "phase": "complete",
+      "iteration": 1,
+      "stopped": "REVIEWER",
+      "activating": "NONE",
+      "handoff": "COMPLETE",
+      "commit": "8b076da6fdbd3f7690f8aacca245319754715d90"
+    }
+  ],
+  "handoff_notes": {
+    "from": "REVIEWER",
+    "notes": "FEAT-WS-MANAGE_WORKSPACES fully completed, merged to main, branch deleted, all CI checks green."
+  }
+}

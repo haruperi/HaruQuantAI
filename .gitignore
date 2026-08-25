@@ -373,9 +373,6 @@ artifacts/
 !app/services/research/artifacts/
 
 # ============================================================================
-# Agent orchestrator (.agents tooling may be committed; runtime state may not)
+# Agent orchestrator logs
 # ============================================================================
 .agents/logs/
-.agents/runs/
-.agents/run-config.toml
-.agents/task.toml

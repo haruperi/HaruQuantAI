@@ -4,6 +4,8 @@ default_install_hook_types:
   - pre-commit
   - pre-push
 
+exclude: ^\.agents/
+
 repos:
   # Repository hygiene
   - repo: https://github.com/pre-commit/pre-commit-hooks

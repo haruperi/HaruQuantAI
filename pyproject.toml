@@ -67,6 +67,7 @@ src = ["app", "tests"]
 extend-exclude = [
     "docs",
     "htmlcov",
+    ".agents",
 ]
 
 [tool.ruff.format]
@@ -224,6 +225,7 @@ show_error_code_links = true
 
 exclude = [
     "^scripts/",
+    "(^|/)\\.agents(/|$)",
     '(^|/)(build|dist)(/|$)',
     '(^|/)(generated|vendor|migrations)(/|$)',
 ]
