@@ -172,6 +172,8 @@ Catalogue
 
 **Status:** Composability substrate preserved; the Composition logging foundation is complete for the applicable portions of `NFR-OBS-001`, `NFR-OBS-005`, and `NFR-OBS-009`. System-wide observability completion remains pending later product increments.
 
+**Scope:** 33 retained foundation trace IDs across Kernel, Composition, Logging, and whole-app contract authoring.
+
 **Purpose:** Freeze the proven composability substrate as the baseline for every product increment; extend it without reimplementing or bypassing it.
 
 **Vertical path:** `Feature specification → contracts → composition → D-IFACE gateway where required → provider/consumer/state evidence`
@@ -211,11 +213,17 @@ This is non-domain runtime infrastructure, not a product `FEAT-*` or business `F
 
 **Authority:** [User Interface README](../../app/ui/README.md)
 
+**Scope:** 1 foundation task (`1.01`), 1 completed feature (`1.1`), 16 UI mock-build features (`1.2` to `1.17`, totaling 16 completable `FR-UI-*` checkboxes plus 78 mock-build lines).
+
 **Purpose:** Deliver the complete mock-backed UI surface in one coordinated pass: a secured local workspace, capability-aware public gateway, bounded plugin/widget contribution declarations, an accessible React workstation with truthful diagnostics, and every remaining `FEAT-UI-*` feature-owned widget surface built against the dev-only mock capability provider so later backend increments integrate and verify directly from the frontend.
 
 **Vertical path:** `Contract authoring (task 1.0) → workstation architecture foundation (task 1.01) → Launcher → Workspace → D-IFACE capability/readiness gateway → D-UI widget host/canvas → ordered feature-owned widgets on mock capability data`
 
 **UI demo checkpoint:** Launch React, authenticate locally, create a blank workspace or apply a versioned template, add/remove/dock/tab/split/resize/minimize/maximize compatible widget instances, inspect capability/readiness and explicit time-domain state, preserve a draft/layout preference, and walk through every mock-backed feature surface with mock-derived data visibly labeled non-authoritative.
+
+**Exit gate:** The UI starts without waiting for later domains; workspace/configuration/recovery and gateway failures are visible, keyboard focus is deterministic, every `FR-UI-*` behavior exists either as a completed checkbox with acceptance evidence or as a mock-build line with its de-mock stage recorded, mock data is visibly labeled non-authoritative, and deleting any participating feature leaves the remaining substrate healthy.
+
+**De-mock gate:** Initial mock construction baseline — establishes all 17 feature-owned widget surfaces against `app/ui/src/mocks/`.
 
 ##### 1.01 [ ] Foundation task — D-UI spatiotemporal workstation foundation
 
@@ -384,7 +392,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Workspace README](../../app/services/workspace/README.md)
 
-**Purpose:** The Workspace domain delivers workspace lifecycle, runtime configuration, local/hosted access, worker pools, backup, and diagnostics.
+
+**Scope:** 18 business FRs across 6 feature slices.
+
+
+**Purpose:** Manage workspace lifecycle, runtime configuration, local/hosted access, diagnostic bundles, distributed worker pools, and isolated storage/database fences.
+
+
+**Vertical path:** `CLI/Launcher/UI → Workspace lifecycle/storage → SQLite WAL isolation → diagnostic capture`
+
+
+**UI demo checkpoint:** Initialize, configure, backup, and restore workspaces, inspect readiness/diagnostics, and verify process isolation.
+
+
+**Exit gate:** Workspace schema migrations are idempotent; multi-process writer fencing prevents database corruption; local and hosted workspace isolation pass.
+
+
+**De-mock gate:** None — Workspace connects directly to shell/runtime.
 
 
 ##### 2.1 [x] `FEAT-WS-MANAGE_WORKSPACES`
@@ -429,7 +453,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Plugins README](../../app/services/plugins/README.md)
 
-**Purpose:** The Plugins domain provides plugin manifests, sandboxed runtime permissions, UI result panels, and plugin node extensions.
+
+**Scope:** 9 domain FRs across 7 feature slices plus 11 de-mock FRs across 4 UI feature slices.
+
+
+**Purpose:** Manage plugin manifests, contributions, lifecycle, sandboxed execution, isolation, compatibility, and UI view extensions.
+
+
+**Vertical path:** `Plugin manifest/package → sandbox runtime → contribution registry → D-UI view contributions`
+
+
+**UI demo checkpoint:** Install, discover, replace, and remove an isolated plugin; verify view contributions, code tabs, and localized labels dynamically reflect state.
+
+
+**Exit gate:** Sandboxed plugins cannot access unauthorized resources; live plugin replacement reverses subscriptions cleanly; removing a plugin gracefully degrades contributed UI panels without crashes.
+
+
+**De-mock gate:** `FEAT-UI-EXTEND_VIEWS` (3.8: all five requirements), `FEAT-UI-EDIT_CODE` (3.9: `FR-UI-EDIT_CODE_TABS`, `FR-UI-MANAGE_CODE_FILES`, `FR-UI-SHOW_CODE_DIAGNOSTICS`, `FR-UI-TEST_EXTENSIONS`), `FEAT-UI-ADMINISTER_SYSTEM` (3.10: `FR-UI-SET_LANGUAGE`), and `FEAT-UI-ENSURE_ACCESS` (3.11: `FR-UI-PRESERVE_USABILITY`) switch from `app/ui/src/mocks/` to live Plugin capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 3.1 [x] `FEAT-PLUG-DECLARE_MANIFESTS`
@@ -494,7 +534,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Catalogue README](../../app/services/catalogue/README.md)
 
-**Purpose:** The Catalogue domain manages instruments, provider and broker symbol mappings, trading sessions/calendars, trading rules, universes, currency conversion, and catalogue interchange.
+
+**Scope:** 14 domain FRs across 7 feature slices plus 2 de-mock FRs across 1 UI feature slice.
+
+
+**Purpose:** Manage financial instruments, multi-provider and broker symbol mappings, trading sessions/calendars, trading rules, dynamic universes, currency conversion, and catalogue interchange.
+
+
+**Vertical path:** `D-UI data/catalogue → Catalogue service → Session/Calendar engine → Universe definitions`
+
+
+**UI demo checkpoint:** Define instruments, inspect provider symbol mappings, edit trading sessions and holiday calendars, create dynamic asset universes, and exchange definitions via JSON/YAML.
+
+
+**Exit gate:** All instrument definitions validate against asset-class constraints; currency conversion handles cross-rates deterministically; trading sessions enforce correct market-open/close boundaries.
+
+
+**De-mock gate:** `FEAT-UI-MANAGE_DATA` (4.8: `FR-UI-EDIT_INSTRUMENTS`, `FR-UI-EDIT_SESSIONS`) switches from `app/ui/src/mocks/` to live Catalogue capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 4.1 [ ] `FEAT-CAT-CATALOG_INSTRUMENTS`
@@ -546,7 +602,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Broker Connectivity README](../../app/services/broker/README.md)
 
-**Purpose:** The Broker Connectivity domain manages broker profiles, environment/session isolation, live reads/events, order transport, adapter certification, and safe offline behavior.
+
+**Scope:** 28 domain FRs across 7 feature slices plus 1 de-mock FR across 1 UI feature slice.
+
+
+**Purpose:** Manage broker profiles, environment/session isolation, read-only state/events, order transport, adapter certification suites, and safe offline behavior.
+
+
+**Vertical path:** `Broker adapter → Session/Environment isolation → Read state / Order transport → Certified adapter boundary`
+
+
+**UI demo checkpoint:** Configure broker connections, verify environment isolation (Demo vs Live), inspect provider readiness/health, and view adapter certification reports.
+
+
+**Exit gate:** Live trading remains disabled by default; broker adapters pass the certification suite; session disconnection triggers fail-closed safety without data loss.
+
+
+**De-mock gate:** `FEAT-UI-MANAGE_DATA` (5.8: `FR-UI-ADMINISTER_DATA`) switches from `app/ui/src/mocks/` to live Broker capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 5.1 [ ] `FEAT-BRK-DECLARE_CAPABILITIES`
@@ -611,7 +683,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Data README](../../app/services/data/README.md)
 
-**Purpose:** The Data domain handles historical ingestion, tick normalization, quality resolution, bar aggregation, retention, external series alignment, connectors, scenario generation, market news, and event streaming.
+
+**Scope:** 47 domain FRs across 14 feature slices plus 8 de-mock FRs across 2 UI feature slices.
+
+
+**Purpose:** Handle historical ingestion, QuantData/CSV import, tick normalization, quality resolution, bar aggregation, retention policies, series alignment, connectors, scenario generation, market news, and event streaming.
+
+
+**Vertical path:** `Data source/connector → Tick normalization → Bar aggregation → Quality resolution → Pinned data cache`
+
+
+**UI demo checkpoint:** Import historical data (CSV/QuantData), inspect data quality/gaps, configure timeframes and custom bars, generate market scenarios, and stream live events.
+
+
+**Exit gate:** Bar aggregation matches tick precision; quality resolver flags bad ticks and gaps deterministically; historical data partitions are immutable and verifiable.
+
+
+**De-mock gate:** `FEAT-UI-EDIT_INPUTS` (6.15: `FR-UI-RENDER_FIELDS`, `FR-UI-VALIDATE_INPUT`, `FR-UI-RESOLVE_CONFLICTS`, `FR-UI-CONFIRM_IMPACT`) and `FEAT-UI-MANAGE_DATA` (6.16: `FR-UI-BROWSE_DATASETS`, `FR-UI-IMPORT_DATA`, `FR-UI-EXPORT_DATA`, `FR-UI-SYNC_DATA`) switch from `app/ui/src/mocks/` to live Data capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 6.1 [ ] `FEAT-DATA-INGEST_HISTORY`
@@ -726,7 +814,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Strategy README](../../app/services/strategy/README.md)
 
-**Purpose:** The Strategy domain defines the typed strategy AST, block catalogue, chart configurations, versioning, template editing, interchange, architectures, indicators, ATM exits, code generation, MQL5, and targets.
+
+**Scope:** 47 domain FRs across 13 feature slices plus 8 de-mock FRs across 3 UI feature slices.
+
+
+**Purpose:** Define the typed strategy AST, building block catalogue, chart configurations, strategy versioning, template editing, interchange (JSON/XML), indicator engine, ATM exit rules, and multi-target code generation (MQL5, Python, C++).
+
+
+**Vertical path:** `D-UI strategy editor → Typed Strategy AST → Validator/Versioning → Deterministic Codegen (MQL5/Python/C++)`
+
+
+**UI demo checkpoint:** Build and edit strategies visually via AST blocks, validate logic rules, configure indicators/ATM exits, and generate clean MQL5 / Python source code.
+
+
+**Exit gate:** Strategy AST is strictly typed and validates all inputs; code generation produces deterministic, compilable MQL5 / Python code; versioning preserves strategy lineage without mutation.
+
+
+**De-mock gate:** `FEAT-UI-AUTHOR_STRATEGIES` (7.14: `FR-UI-EDIT_STRATEGY_TREE`, `FR-UI-BROWSE_BLOCKS`, `FR-UI-CONFIGURE_STRATEGY`, `FR-UI-VALIDATE_STRATEGY`, `FR-UI-USE_STRATEGY_EXAMPLES`), `FEAT-UI-EDIT_CODE` (7.15: `FR-UI-NAVIGATE_CODE`, `FR-UI-SEARCH_CODE`), and `FEAT-UI-EXPLORE_RESULTS` (7.16: `FR-UI-INSPECT_SOURCE`) switch from `app/ui/src/mocks/` to live Strategy capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 7.1 [ ] `FEAT-STRAT-DEFINE_AST`
@@ -841,7 +945,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Runtime Risk README](../../app/services/risk/README.md)
 
-**Purpose:** The Runtime Risk domain defines pre-trade and runtime risk contracts, risk calculation, deterministic kill-switch controls, order admission, human approvals, allocation governance, and audit trails.
+
+**Scope:** 30 domain FRs across 7 feature slices.
+
+
+**Purpose:** Define pre-trade and runtime risk contracts, risk calculations, deterministic kill-switch controls, order admission, human approvals, allocation governance, and cryptographically chained audit trails.
+
+
+**Vertical path:** `Proposed trade action → Runtime Risk Governor → Kill-switch check → Capacity/Approval check → Admission decision`
+
+
+**UI demo checkpoint:** Configure risk limits, trigger/reset kill switches, manage manual approval tokens, and inspect risk audit records.
+
+
+**Exit gate:** All trade admission decisions are strictly evaluated against active limits; kill switch immediately halts new order submissions; audit logs are immutable and tamper-evident.
+
+
+**De-mock gate:** None — Runtime Risk connects directly into Trading and D-IFACE gateways.
 
 
 ##### 8.1 [ ] `FEAT-RISK-DEFINE_RISK_CONTRACTS`
@@ -901,7 +1021,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Trading README](../../app/services/trading/README.md)
 
-**Purpose:** The Trading domain delivers the single canonical business execution lifecycle across SIM, PAPER, DEMO, and LIVE execution routes, trade plan validation, account operations, order dispatch, reconciliation, protective orders, and transaction journaling.
+
+**Scope:** 36 domain FRs across 8 feature slices plus 10 de-mock FRs across 2 UI feature slices.
+
+
+**Purpose:** Deliver the single canonical business execution lifecycle across SIM, PAPER, DEMO, and LIVE routes, trade plan validation, account operations, order dispatch, reconciliation, protective orders, and execution journaling.
+
+
+**Vertical path:** `D-UI trading intent → Trading session → Risk admission → Selected execution authority → Execution journal`
+
+
+**UI demo checkpoint:** Start/stop trading sessions, preview and submit trade plans, monitor orders/positions, trigger emergency protections, and inspect the transactional ledger.
+
+
+**Exit gate:** Execution parity is strictly enforced across SIM, PAPER, DEMO, and LIVE; unknown broker outcomes block blind retries; transaction ledger balances to zero discrepancy.
+
+
+**De-mock gate:** `FEAT-UI-OPERATE_TRADING` (9.9: all eight requirements) and `FEAT-UI-ENSURE_ACCESS` (9.10: `FR-UI-OPERATE_BY_KEYBOARD`, `FR-UI-LABEL_CONTROLS`) switch from `app/ui/src/mocks/` to live Trading capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 9.1 [ ] `FEAT-TRD-MANAGE_TRADING_SESSIONS`
@@ -989,7 +1125,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Simulator README](../../app/services/simulator/README.md)
 
-**Purpose:** The Simulator domain provides deterministic backtesting and order simulation as the SIM/PAPER execution authority, precision fill models, execution cost calculations, authority-side exit mechanics, indicators, result commit/checkpointing, evaluation caching, and stockpicker simulation.
+
+**Scope:** 45 domain FRs across 12 feature slices plus 6 de-mock FRs across 3 UI feature slices.
+
+
+**Purpose:** Provide deterministic backtesting and order simulation as the SIM/PAPER execution authority, precision fill models, execution cost calculations, authority-side exit mechanics, indicators, result commit/checkpointing, evaluation caching, and stockpicker simulation.
+
+
+**Vertical path:** `Strategy AST + Pinned Data → Simulation Engine → Fill models & Costs → Trading/Risk lifecycle → Committed backtest results`
+
+
+**UI demo checkpoint:** Run high-speed backtests, inspect precision fill logs, examine equity curves and trade lists, and test input perturbations.
+
+
+**Exit gate:** Repeated backtests on identical data yield byte-identical results; fill models accurately simulate slippage, spread, and commissions; evaluations are cached idempotently.
+
+
+**De-mock gate:** `FEAT-UI-AUTHOR_STRATEGIES` (10.13: `FR-UI-TEST_STRATEGY`), `FEAT-UI-EXPLORE_RESULTS` (10.14: `FR-UI-SUMMARIZE_RESULTS`, `FR-UI-PLOT_EQUITY`, `FR-UI-LIST_TRADES`, `FR-UI-PLOT_TRADES`), and `FEAT-UI-ENSURE_ACCESS` (10.15: `FR-UI-PROVIDE_DATA_ALTERNATIVES`) switch from `app/ui/src/mocks/` to live Simulator capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 10.1 [ ] `FEAT-SIM-CONFIGURE_ENGINE`
@@ -1097,7 +1249,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Analytics README](../../app/services/analytics/README.md)
 
-**Purpose:** The Analytics domain provides databank membership, result queries/views, result interpretation and comparisons, trade and benchmark analysis, result interchange, bulk databank operations, similarity matching, custom panels, and operational journals.
+
+**Scope:** 38 domain FRs across 9 feature slices plus 8 de-mock FRs across 2 UI feature slices.
+
+
+**Purpose:** Manage databank membership, result queries/views, result interpretation and comparisons, trade and benchmark analysis, result interchange, bulk databank operations, similarity matching, custom panels, and operational journals.
+
+
+**Vertical path:** `Committed backtest/live results → Analytics engine → Databank storage → Query/Filter/View API → D-UI explorer`
+
+
+**UI demo checkpoint:** Query and filter databanks, compare strategy results side-by-side, analyze trade distributions and drawdown profiles, and export databank packages.
+
+
+**Exit gate:** Databank filters and column calculations are deterministic; result comparisons accurately calculate correlations and statistical metrics; bulk actions are atomic.
+
+
+**De-mock gate:** `FEAT-UI-OPERATE_DATABANKS` (11.10: all six requirements) and `FEAT-UI-EXPLORE_RESULTS` (11.11: `FR-UI-ANALYZE_TRADES`, `FR-UI-EXPORT_RESULTS`) switch from `app/ui/src/mocks/` to live Analytics capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 11.1 [ ] `FEAT-ANA-DATABANK_MEMBERSHIP`
@@ -1188,7 +1356,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Research README](../../app/services/research/README.md)
 
-**Purpose:** The Research domain powers strategy generation (Builder), evolutionary improvement, parameter optimization, robustness testing, walk-forward validation, acceptance criteria, budget governance, stockpicker research, AI/neural models, portfolio fitness, and market drift detection.
+
+**Scope:** 51 domain FRs across 13 feature slices plus 7 de-mock FRs across 2 UI feature slices.
+
+
+**Purpose:** Power strategy generation (Builder), evolutionary improvement, parameter optimization, robustness testing (Monte Carlo, multi-market, slippage), walk-forward matrix validation, acceptance criteria, budget governance, stockpicker research, AI/neural models, portfolio fitness, and market drift detection.
+
+
+**Vertical path:** `Research configuration & budget → Generation/Optimization engine → Parallel Simulator tasks → Acceptance filter → Databank commit`
+
+
+**UI demo checkpoint:** Launch Builder/evolutionary strategy search, run Monte Carlo and Walk-Forward tests, monitor research resource budgets, and inspect market drift alerts.
+
+
+**Exit gate:** Strategy generation and optimization runs are reproducible from seeds; budget governance enforces hard CPU/memory limits; robustness test metrics match mathematical definitions.
+
+
+**De-mock gate:** `FEAT-UI-RUN_RESEARCH` (12.14: all six requirements) and `FEAT-UI-EXPLORE_RESULTS` (12.15: `FR-UI-INSPECT_ROBUSTNESS`) switch from `app/ui/src/mocks/` to live Research capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 12.1 [ ] `FEAT-RES-RUN_RESEARCH`
@@ -1303,7 +1487,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Portfolio README](../../app/services/portfolio/README.md)
 
-**Purpose:** The Portfolio domain enables portfolio composition, correlation analysis, aggregate simulation and constraints, automatic portfolio search, risk analysis, Markowitz optimization, portfolio merge/split, and research method plugins.
+
+**Scope:** 24 domain FRs across 8 feature slices plus 5 de-mock FRs across 1 UI feature slice.
+
+
+**Purpose:** Enable portfolio composition, correlation analysis, aggregate simulation and constraints, automatic portfolio search, risk analysis, Markowitz mean-variance optimization, portfolio merge/split, and research method plugins.
+
+
+**Vertical path:** `Constituent strategies → Portfolio correlation/aggregation → Markowitz optimizer → Portfolio backtest → D-UI Portfolio Studio`
+
+
+**UI demo checkpoint:** Construct multi-strategy portfolios, inspect correlation matrices, run Markowitz optimization, analyze combined drawdowns, and export merged strategies.
+
+
+**Exit gate:** Correlation calculations are mathematically verified; Markowitz optimization handles singularity and constraints robustly; aggregate portfolio equity equals constituent sum.
+
+
+**De-mock gate:** `FEAT-UI-COMPOSE_PORTFOLIOS` (13.9: all five requirements) switches from `app/ui/src/mocks/` to live Portfolio capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 13.1 [ ] `FEAT-PORT-COMPOSE_PORTFOLIOS`
@@ -1371,7 +1571,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Orchestration README](../../app/services/orchestration/README.md)
 
-**Purpose:** The Orchestration domain delivers project workflows, task execution engine, condition evaluation, domain delegation, external utilities, neural network training, and execution run history.
+
+**Scope:** 33 domain FRs across 7 feature slices plus 11 de-mock FRs across 4 UI feature slices.
+
+
+**Purpose:** Deliver project workflows, task execution engine, condition evaluation, domain delegation, external utilities, neural network training, and execution run history.
+
+
+**Vertical path:** `D-UI project graph / CLI → Orchestration engine → Task dependency DAG → Domain execution → Checkpoints & Run history`
+
+
+**UI demo checkpoint:** Create visual project workflows, chain automated tasks (ingest -> build -> test -> deploy), pause/resume execution, and inspect run histories.
+
+
+**Exit gate:** Project task graphs execute in topological order without race conditions; task failure triggers configured rollback/retry; execution history is durably logged.
+
+
+**De-mock gate:** `FEAT-UI-START_WORK` (14.8: `FR-UI-RESUME_RECENT_WORK`, `FR-UI-LAUNCH_SHORTCUTS`), `FEAT-UI-EDIT_PROJECTS` (14.9: all six requirements), `FEAT-UI-MONITOR_WORK` (14.10: `FR-UI-CONTROL_JOBS`, `FR-UI-NOTIFY_OUTCOMES`), and `FEAT-UI-ADMINISTER_SYSTEM` (14.11: `FR-UI-MANAGE_UPDATES`) switch from `app/ui/src/mocks/` to live Orchestration capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 14.1 [ ] `FEAT-ORCH-DEFINE_PROJECTS`
@@ -1460,7 +1676,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Interfaces README](../../app/services/interfaces/README.md)
 
-**Purpose:** The Interfaces domain exposes the public HTTP, WebSocket, event streaming, CLI, MCP, and operator gateways across research, projects, portfolios, capability administration, and trading.
+
+**Scope:** 30 domain FRs across 7 feature slices plus 1 de-mock FR across 1 UI feature slice.
+
+
+**Purpose:** Expose public HTTP REST, WebSocket event streaming, CLI, MCP, and operator gateways across research, projects, portfolios, capability administration, and trading.
+
+
+**Vertical path:** `External HTTP/WS/CLI/MCP client → Gateway security & validation → Public domain capabilities → Event broadcasting`
+
+
+**UI demo checkpoint:** Test all REST endpoints via Swagger/OpenAPI, stream real-time events over WebSocket, execute CLI commands, and connect MCP tools.
+
+
+**Exit gate:** HTTP, WebSocket, CLI, and MCP gateways maintain strict semantic parity; concurrency tokens prevent lost updates; event streaming recovers from disconnections without dropped messages.
+
+
+**De-mock gate:** `FEAT-UI-ADMINISTER_SYSTEM` (15.8: `FR-UI-ADMINISTER_CAPABILITIES`) switches from `app/ui/src/mocks/` to live Interfaces capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
 
 ##### 15.1 [ ] `FEAT-IFACE-SERVE_API_EVENTS`
@@ -1524,7 +1756,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 ### Stage 16 — Final System Integration and Complete-System Release Gate
 
+**Authority:** [`docs/PROJECT.md`](../../docs/PROJECT.md) and [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md)
+
+**Scope:** Complete repository-wide integration, mock retirement, multi-domain workflows, hosted/local parity, and release criteria.
+
 **Purpose:** Complete the final end-to-end integration across all 15 business domains, verify full retirement of the dev mock provider, validate hosted/local parity, and pass all system workflows and release criteria.
+
+**Vertical path:** `Complete React Workstation → Live D-IFACE gateways → All 15 Production Domains → Verified Storage/Execution`
+
+**UI demo checkpoint:** Run full end-to-end trading workflows (data onboarding -> strategy design -> backtesting -> optimization -> portfolio creation -> live trading session) in both local and hosted environments.
+
+**Exit gate:** All 142 features and 549 business FRs pass; zero references to `app/ui/src/mocks/` remain in production builds; all 12 system workflows in `docs/PROJECT.md` pass green.
+
+**De-mock gate:** Final — the mock capability provider must be fully retired by this point (final completion gate item 9): no production bundle imports `app/ui/src/mocks/` and the folder is deletable without touching production behavior.
 
 **Completion gates:**
 
