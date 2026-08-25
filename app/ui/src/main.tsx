@@ -13,6 +13,7 @@ import {
   ViewScaleProvider,
   ScaleControls,
 } from "./features/manage_layouts";
+import { createFeature as createEditInputsFeature } from "./features/edit_inputs";
 import { systemStatusWidgetDefinition } from "./widgets/system_status";
 import { widgetCatalogueWidgetDefinition } from "./widgets/widget_catalogue";
 import { homeWidgetDefinition } from "./widgets/home";
@@ -38,6 +39,9 @@ function bootstrapApp() {
     presentationClient: new MockUiPresentationProvider(),
   });
   bridge.registerFeature(manageLayouts);
+
+  // FEAT-UI-EDIT_INPUTS owns local draft preservation (Partial slice).
+  bridge.registerFeature(createEditInputsFeature());
 
   // FEAT-UI-START_WORK owns the /home landing workspace and product news.
   // Dev runtime uses the gated mock capability provider; production injects

@@ -260,7 +260,7 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 ##### 1.4 Partial — `FEAT-UI-EDIT_INPUTS`
 
-1. [ ] `FR-UI-PRESERVE_DRAFTS`
+1. [X] `FR-UI-PRESERVE_DRAFTS` — evidence: tests/ui/unit/test_edit_inputs.py:127, app/ui/src/features/edit_inputs/__tests__/edit_inputs.test.tsx:59
 2. `FR-UI-RENDER_FIELDS` (mock build; completes at Stage 6 Data de-mock gate — 6.15)
 3. `FR-UI-VALIDATE_INPUT` (mock build; completes at Stage 6 Data de-mock gate — 6.15)
 4. `FR-UI-RESOLVE_CONFLICTS` (mock build; completes at Stage 6 Data de-mock gate — 6.15)

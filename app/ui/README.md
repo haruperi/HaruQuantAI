@@ -40,7 +40,7 @@ The product presents one unified workstation canvas rather than isolated full-pa
 | Implemented | `FEAT-UI-COMPOSE_SHELL` | Capability-aware application shell and navigation | 5 | The graphical shell disappears; non-UI clients remain available. |
 | Partial (2 of 4; 2 mock-build pending 14.8) | `FEAT-UI-START_WORK` | Home, onboarding, recents, and launch shortcuts | 4 | Home disappears; direct authorized routes remain available. |
 | Implemented | `FEAT-UI-MANAGE_LAYOUTS` | Tabs, panels, splitters, overlays, and saved view state | 5 | Custom layouts disappear; the shell uses its minimal outlet. |
-| Missing | `FEAT-UI-EDIT_INPUTS` | Forms, pickers, tables, validation, drafts, and confirmations | 5 | Generic editors disappear; read-only routes may remain. |
+| Partial (1 of 5; 4 mock-build pending 6.15) | `FEAT-UI-EDIT_INPUTS` | Forms, pickers, tables, validation, drafts, and confirmations | 5 | Generic editors disappear; read-only routes may remain. |
 | Missing | `FEAT-UI-AUTHOR_STRATEGIES` | Visual strategy authoring and immediate inspection | 6 | Visual authoring disappears; Strategy contracts remain available. |
 | Missing | `FEAT-UI-RUN_RESEARCH` | Builder, retester, optimizer, and trainer workspaces | 6 | Research workspaces disappear; admitted server work continues. |
 | Missing | `FEAT-UI-EDIT_PROJECTS` | Project/task authoring, validation, progress, and results | 6 | Project editing disappears; Orchestration remains available. |
@@ -316,7 +316,7 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 |---|---|---|---|---|
 | Missing | `FR-UI-RENDER_FIELDS` | Render typed fields, groups, choices, ranges, dates, instruments, timeframes, files, and parameter tables from versioned schemas. | IFACE, CAT | Unsupported schema elements fail visibly; shared input/picker directives. |
 | Missing | `FR-UI-VALIDATE_INPUT` | Show field and cross-field findings from the authoritative validator without replacing server validation. | IFACE | Published input is accepted by the same validator or publication is blocked. |
-| Missing | `FR-UI-PRESERVE_DRAFTS` | Preserve non-secret drafts locally with schema, workspace, actor, entity version, and capability identity. | IFACE, WS | Refresh restores compatible drafts; mismatches require resolution. |
+| Implemented | `FR-UI-PRESERVE_DRAFTS` | Preserve non-secret drafts locally with schema, workspace, actor, entity version, and capability identity. | IFACE, WS | Refresh restores compatible drafts; mismatches require resolution. `— evidence: tests/ui/unit/test_edit_inputs.py:127, app/ui/src/features/edit_inputs/__tests__/edit_inputs.test.tsx:59` |
 | Missing | `FR-UI-RESOLVE_CONFLICTS` | Compare draft/base/current versions and require an explicit discard, merge, reload, or retry choice. | FR-UI-PRESERVE_DRAFTS | No last-write-wins overwrite occurs from the UI. |
 | Missing | `FR-UI-CONFIRM_IMPACT` | Present exact target, impact, dependency findings, authority and reversibility before destructive or high-impact commands. | IFACE, owning domain | Confirmation drift invalidates the confirmation; shared confirm dialogs. |
 
