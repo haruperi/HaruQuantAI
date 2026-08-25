@@ -129,7 +129,7 @@ Only after this gate does the next waterfall domain begin.
 | Stage | Target | Completion intent |
 | ---: | --- | --- |
 | 0 | Shared Foundation: Contracts -> Kernel -> Composition | Preserve implemented composability substrate and ratified whole-app contracts; no product-domain completion claim. |
-| 1 | UI-first Workstation Construction | Build the complete workstation surface against generated contracts and truthful dev mocks; D-UI remains formally open. |
+| 1 | `D-UI` User Interface & Workstation Construction | Build the complete workstation surface, typed widget host, and all 17 feature-owned UI surfaces against generated contracts and dev mocks. |
 | 2 | `D-WS` Workspace | Finish the complete Workspace domain and freeze it. |
 | 3 | `D-PLUG` Plugins | Finish plugin lifecycle, isolation, contributions, compatibility, and removal. |
 | 4 | `D-CAT` Catalogue | Finish instruments, provider mappings, sessions/calendars, trading rules, universes, currencies, and exchange. |
@@ -144,7 +144,7 @@ Only after this gate does the next waterfall domain begin.
 | 13 | `D-PORT` Portfolio | Finish portfolio construction/simulation/search/risk/Markowitz/merge methods, then prove real Portfolio evidence submission into the already-complete Runtime Risk boundary without reopening Risk ownership. |
 | 14 | `D-ORCH` Orchestration | Finish durable projects/tasks/conditions/domain delegation/utilities/history/training workflows over the completed business domains. |
 | 15 | `D-IFACE` Interfaces | Finish HTTP/events/CLI/MCP/research/project/portfolio/trading/admin gateways against the completed application capability set. |
-| 16 | `D-UI` Finalization and Complete-System Integration | Remove remaining mocks, finish every D-UI feature, run all system workflows, hosted/local parity, and final release gates. |
+| 16 | Final System Integration & Complete-System Release Gate | Remove remaining mocks, run all system workflows, hosted/local parity, and final release gates across the completed product. |
 
 The critical execution core is:
 
@@ -161,7 +161,7 @@ Catalogue
    -> Portfolio
    -> Orchestration
    -> Interfaces
-   -> UI
+   -> System Integration
 ```
 
 ---
@@ -205,11 +205,14 @@ This is non-domain runtime infrastructure, not a product `FEAT-*` or business `F
 3. [X] Regenerate the TypeScript clients and types under `app/ui/src/contracts/generated/` from the new contracts and verify the existing generation flow stays the sole source (no hand-written public wire contracts under `app/ui/`). — evidence: `scripts/generate_contracts.py` (write/`--check`); 33 artifacts byte-identical across consecutive checks per `tests/contracts/test_contract_generation.py`; `ui_contracts.ts` deleted (zero references repo-wide); `npm --prefix app/ui run typecheck`, `test`, and `build` pass against the generated barrel.
 4. [X] Prove contract-roundtrip parity (schema validation, versioning, and generated-type equality) and update `app/contracts/README.md` to reflect the complete public contract inventory. — evidence: `tests/contracts/test_contract_roundtrip.py` (33 fixtures across every owner: JSON round-trip, extra field rejection, frozen mutation), `tests/contracts/test_contract_versions.py` (schema-version and key/major integrity), `tests/contracts/test_contract_boundaries.py`; `app/contracts/README.md` status header reconciled to the implemented wire-contract state.
 
+
 ---
 
-### Stage 1 — UI-First Workstation Construction (D-UI Shell & Mocks)
+### Stage 1 — User Interface (D-UI) & Workstation Construction
 
-**Purpose:** Deliver the complete mock-backed UI surface in one coordinated pass: a secured local workspace, capability-aware public gateway, bounded plugin/widget contribution declarations, an accessible React workstation with truthful diagnostics, and every remaining `FEAT-UI-*` feature-owned widget surface built against the dev-only mock capability provider so later backend increments integrate and verify directly from the frontend.
+**Authority:** [User Interface README](../../app/ui/README.md)
+
+**Purpose:** The User Interface domain delivers the complete React/TypeScript single-page trading workstation, feature-owned widget surfaces, accessibility, layout persistence, and full de-mock capability integration across all business domains.
 
 **Vertical path:** `Contract authoring (task 1.0) → workstation architecture foundation (task 1.01) → Launcher → Workspace → D-IFACE capability/readiness gateway → D-UI widget host/canvas → ordered feature-owned widgets on mock capability data`
 
@@ -225,6 +228,7 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 4. [ ] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue, and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts.
 5. [ ] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and listener/timer/subscription leak freedom before dependent widget slices proceed.
 
+
 ##### 1.1 [x] `FEAT-UI-COMPOSE_SHELL`
 
 1. [X] `FR-UI-ASSEMBLE_SHELL` — evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:24
@@ -233,6 +237,147 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 4. [X] `FR-UI-SHOW_CAPABILITY_STATE` — evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:149
 5. [X] `FR-UI-RESTORE_ROUTE` — evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:189
 
+##### 1.2 [ ] `FEAT-UI-START_WORK`
+
+1. [ ] `FR-UI-PRESENT_HOME`
+2. [ ] `FR-UI-SHOW_PRODUCT_NEWS`
+3. [ ] `FR-UI-RESUME_RECENT_WORK`
+4. [ ] `FR-UI-LAUNCH_SHORTCUTS`
+
+##### 1.3 [ ] `FEAT-UI-MANAGE_LAYOUTS`
+
+1. [ ] `FR-UI-PERSIST_LAYOUTS`
+2. [ ] `FR-UI-RESTORE_LAYOUTS`
+3. [ ] `FR-UI-SCALE_VIEWS`
+4. [ ] `FR-UI-COMPOSE_PANELS` (relocated from former 8.22; UI-only dependencies — completable in Increment 1)
+5. [ ] `FR-UI-MANAGE_TABS` (relocated from former 3.10; UI-only dependencies — completable in Increment 1)
+
+##### 1.4 [ ] `FEAT-UI-EDIT_INPUTS`
+
+1. [ ] `FR-UI-PRESERVE_DRAFTS`
+2. [ ] `FR-UI-RENDER_FIELDS`
+3. [ ] `FR-UI-VALIDATE_INPUT`
+4. [ ] `FR-UI-RESOLVE_CONFLICTS`
+5. [ ] `FR-UI-CONFIRM_IMPACT`
+
+##### 1.5 [ ] `FEAT-UI-MONITOR_WORK`
+
+1. [ ] `FR-UI-TRACK_PROGRESS`
+2. [ ] `FR-UI-STREAM_ACTIVITY`
+3. [ ] `FR-UI-PRESENT_FAILURES`
+4. [ ] `FR-UI-CONTROL_JOBS`
+5. [ ] `FR-UI-NOTIFY_OUTCOMES`
+
+##### 1.6 [ ] `FEAT-UI-ADMINISTER_SYSTEM`
+
+1. [ ] `FR-UI-SET_APPEARANCE`
+2. [ ] `FR-UI-CONFIGURE_CLIENT`
+3. [ ] `FR-UI-MANAGE_LICENSE`
+4. [ ] `FR-UI-MANAGE_UPDATES`
+5. [ ] `FR-UI-SET_LANGUAGE`
+6. [ ] `FR-UI-ADMINISTER_CAPABILITIES`
+
+##### 1.7 [ ] `FEAT-UI-ENSURE_ACCESS`
+
+1. [ ] `FR-UI-MANAGE_FOCUS`
+2. [ ] `FR-UI-DISTINGUISH_STATE`
+3. [ ] `FR-UI-PROVIDE_DATA_ALTERNATIVES`
+4. [ ] `FR-UI-PRESERVE_USABILITY`
+5. [ ] `FR-UI-OPERATE_BY_KEYBOARD`
+6. [ ] `FR-UI-LABEL_CONTROLS`
+
+##### 1.8 [ ] `FEAT-UI-MANAGE_DATA`
+
+1. [ ] `FR-UI-BROWSE_DATASETS`
+2. [ ] `FR-UI-IMPORT_DATA`
+3. [ ] `FR-UI-EXPORT_DATA`
+4. [ ] `FR-UI-EDIT_INSTRUMENTS`
+5. [ ] `FR-UI-EDIT_SESSIONS`
+6. [ ] `FR-UI-SYNC_DATA`
+7. [ ] `FR-UI-ADMINISTER_DATA`
+
+##### 1.9 [ ] `FEAT-UI-AUTHOR_STRATEGIES`
+
+1. [ ] `FR-UI-EDIT_STRATEGY_TREE`
+2. [ ] `FR-UI-BROWSE_BLOCKS`
+3. [ ] `FR-UI-CONFIGURE_STRATEGY`
+4. [ ] `FR-UI-VALIDATE_STRATEGY`
+5. [ ] `FR-UI-USE_STRATEGY_EXAMPLES`
+6. [ ] `FR-UI-TEST_STRATEGY`
+
+##### 1.10 [ ] `FEAT-UI-OPERATE_DATABANKS`
+
+1. [ ] `FR-UI-QUERY_DATABANKS`
+2. [ ] `FR-UI-CONFIGURE_COLUMNS`
+3. [ ] `FR-UI-SELECT_DATABANK_ROWS`
+4. [ ] `FR-UI-OPEN_DATABANK_RESULT`
+5. [ ] `FR-UI-FILTER_DATABANKS`
+6. [ ] `FR-UI-RUN_BULK_ACTIONS`
+
+##### 1.11 [ ] `FEAT-UI-EXPLORE_RESULTS`
+
+1. [ ] `FR-UI-SUMMARIZE_RESULTS`
+2. [ ] `FR-UI-PLOT_EQUITY`
+3. [ ] `FR-UI-LIST_TRADES`
+4. [ ] `FR-UI-PLOT_TRADES`
+5. [ ] `FR-UI-ANALYZE_TRADES`
+6. [ ] `FR-UI-EXPORT_RESULTS`
+7. [ ] `FR-UI-INSPECT_SOURCE`
+8. [ ] `FR-UI-INSPECT_ROBUSTNESS`
+
+##### 1.12 [ ] `FEAT-UI-EDIT_CODE`
+
+1. [ ] `FR-UI-NAVIGATE_CODE`
+2. [ ] `FR-UI-SEARCH_CODE`
+3. [ ] `FR-UI-EDIT_CODE_TABS`
+4. [ ] `FR-UI-MANAGE_CODE_FILES`
+5. [ ] `FR-UI-SHOW_CODE_DIAGNOSTICS`
+6. [ ] `FR-UI-TEST_EXTENSIONS`
+
+##### 1.13 [ ] `FEAT-UI-RUN_RESEARCH`
+
+1. [ ] `FR-UI-SELECT_RESEARCH_MODE`
+2. [ ] `FR-UI-CONFIGURE_RESEARCH`
+3. [ ] `FR-UI-PREVIEW_RESEARCH`
+4. [ ] `FR-UI-CONTROL_RESEARCH`
+5. [ ] `FR-UI-COMPARE_RESEARCH`
+6. [ ] `FR-UI-REUSE_RESEARCH_SETTINGS`
+
+##### 1.14 [ ] `FEAT-UI-EDIT_PROJECTS`
+
+1. [ ] `FR-UI-MANAGE_PROJECTS`
+2. [ ] `FR-UI-EDIT_TASKS`
+3. [ ] `FR-UI-EDIT_PROJECT_GRAPH`
+4. [ ] `FR-UI-COMPARE_PROJECTS`
+5. [ ] `FR-UI-CONTROL_PROJECTS`
+6. [ ] `FR-UI-INSPECT_PROJECTS`
+
+##### 1.15 [ ] `FEAT-UI-COMPOSE_PORTFOLIOS`
+
+1. [ ] `FR-UI-SELECT_CONSTITUENTS`
+2. [ ] `FR-UI-EDIT_PORTFOLIO`
+3. [ ] `FR-UI-INSPECT_CORRELATION`
+4. [ ] `FR-UI-RUN_PORTFOLIO`
+5. [ ] `FR-UI-COMPARE_PORTFOLIOS`
+
+##### 1.16 [ ] `FEAT-UI-OPERATE_TRADING`
+
+1. [ ] `FR-UI-MANAGE_TRADING_SESSIONS`
+2. [ ] `FR-UI-SHOW_TRADING_READINESS`
+3. [ ] `FR-UI-PREVIEW_TRADING_ACTION`
+4. [ ] `FR-UI-COMMIT_TRADING_ACTION`
+5. [ ] `FR-UI-OPERATE_KILL_SWITCH`
+6. [ ] `FR-UI-WATCH_TRADING_EVENTS`
+7. [ ] `FR-UI-WATCH_MARKETS`
+8. [ ] `FR-UI-INSPECT_OPERATOR_ANALYTICS`
+
+##### 1.17 [ ] `FEAT-UI-EXTEND_VIEWS`
+
+1. [ ] `FR-UI-DECLARE_VIEW_CONTRIBUTIONS`
+2. [ ] `FR-UI-VALIDATE_VIEW_CONTRIBUTIONS`
+3. [ ] `FR-UI-SCOPE_VIEW_EFFECTS`
+4. [ ] `FR-UI-REPLACE_VIEW_PROVIDERS`
+5. [ ] `FR-UI-REMOVE_VIEW_CONTRIBUTIONS`
 
 ---
 
@@ -1184,166 +1329,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 6. [ ] `FR-IFACE-DISPLAY_MARKET_DATA`
 7. [ ] `FR-IFACE-DISPLAY_OPERATOR_ANALYTICS`
 8. [ ] `FR-IFACE-ENFORCE_TRANSPORT_PARITY`
-
 ---
 
-### Stage 16 — User Interface (D-UI)
+### Stage 16 — Final System Integration and Complete-System Release Gate
 
-**Authority:** [User Interface README](../../app/ui/README.md)
+**Purpose:** Complete the final end-to-end integration across all 15 business domains, verify full retirement of the dev mock provider, validate hosted/local parity, and pass all system workflows and release criteria.
 
-**Purpose:** The User Interface domain delivers the complete React/TypeScript single-page trading workstation, feature-owned widget surfaces, accessibility, layout persistence, and full de-mock capability integration across all business domains.
+**Completion gates:**
 
-
-##### 16.1 [ ] `FEAT-UI-START_WORK`
-
-1. [ ] `FR-UI-PRESENT_HOME`
-2. [ ] `FR-UI-SHOW_PRODUCT_NEWS`
-3. [ ] `FR-UI-RESUME_RECENT_WORK`
-4. [ ] `FR-UI-LAUNCH_SHORTCUTS`
-
-##### 16.2 [ ] `FEAT-UI-MANAGE_LAYOUTS`
-
-1. [ ] `FR-UI-PERSIST_LAYOUTS`
-2. [ ] `FR-UI-RESTORE_LAYOUTS`
-3. [ ] `FR-UI-SCALE_VIEWS`
-4. [ ] `FR-UI-COMPOSE_PANELS` (relocated from former 8.22; UI-only dependencies — completable in Increment 1)
-5. [ ] `FR-UI-MANAGE_TABS` (relocated from former 3.10; UI-only dependencies — completable in Increment 1)
-
-##### 16.3 [ ] `FEAT-UI-EDIT_INPUTS`
-
-1. [ ] `FR-UI-PRESERVE_DRAFTS`
-2. [ ] `FR-UI-RENDER_FIELDS`
-3. [ ] `FR-UI-VALIDATE_INPUT`
-4. [ ] `FR-UI-RESOLVE_CONFLICTS`
-5. [ ] `FR-UI-CONFIRM_IMPACT`
-
-##### 16.4 [ ] `FEAT-UI-MONITOR_WORK`
-
-1. [ ] `FR-UI-TRACK_PROGRESS`
-2. [ ] `FR-UI-STREAM_ACTIVITY`
-3. [ ] `FR-UI-PRESENT_FAILURES`
-4. [ ] `FR-UI-CONTROL_JOBS`
-5. [ ] `FR-UI-NOTIFY_OUTCOMES`
-
-##### 16.5 [ ] `FEAT-UI-ADMINISTER_SYSTEM`
-
-1. [ ] `FR-UI-SET_APPEARANCE`
-2. [ ] `FR-UI-CONFIGURE_CLIENT`
-3. [ ] `FR-UI-MANAGE_LICENSE`
-4. [ ] `FR-UI-MANAGE_UPDATES`
-5. [ ] `FR-UI-SET_LANGUAGE`
-6. [ ] `FR-UI-ADMINISTER_CAPABILITIES`
-
-##### 16.6 [ ] `FEAT-UI-ENSURE_ACCESS`
-
-1. [ ] `FR-UI-MANAGE_FOCUS`
-2. [ ] `FR-UI-DISTINGUISH_STATE`
-3. [ ] `FR-UI-PROVIDE_DATA_ALTERNATIVES`
-4. [ ] `FR-UI-PRESERVE_USABILITY`
-5. [ ] `FR-UI-OPERATE_BY_KEYBOARD`
-6. [ ] `FR-UI-LABEL_CONTROLS`
-
-##### 16.7 [ ] `FEAT-UI-MANAGE_DATA`
-
-1. [ ] `FR-UI-BROWSE_DATASETS`
-2. [ ] `FR-UI-IMPORT_DATA`
-3. [ ] `FR-UI-EXPORT_DATA`
-4. [ ] `FR-UI-EDIT_INSTRUMENTS`
-5. [ ] `FR-UI-EDIT_SESSIONS`
-6. [ ] `FR-UI-SYNC_DATA`
-7. [ ] `FR-UI-ADMINISTER_DATA`
-
-##### 16.8 [ ] `FEAT-UI-AUTHOR_STRATEGIES`
-
-1. [ ] `FR-UI-EDIT_STRATEGY_TREE`
-2. [ ] `FR-UI-BROWSE_BLOCKS`
-3. [ ] `FR-UI-CONFIGURE_STRATEGY`
-4. [ ] `FR-UI-VALIDATE_STRATEGY`
-5. [ ] `FR-UI-USE_STRATEGY_EXAMPLES`
-6. [ ] `FR-UI-TEST_STRATEGY`
-
-##### 16.9 [ ] `FEAT-UI-OPERATE_DATABANKS`
-
-1. [ ] `FR-UI-QUERY_DATABANKS`
-2. [ ] `FR-UI-CONFIGURE_COLUMNS`
-3. [ ] `FR-UI-SELECT_DATABANK_ROWS`
-4. [ ] `FR-UI-OPEN_DATABANK_RESULT`
-5. [ ] `FR-UI-FILTER_DATABANKS`
-6. [ ] `FR-UI-RUN_BULK_ACTIONS`
-
-##### 16.10 [ ] `FEAT-UI-EXPLORE_RESULTS`
-
-1. [ ] `FR-UI-SUMMARIZE_RESULTS`
-2. [ ] `FR-UI-PLOT_EQUITY`
-3. [ ] `FR-UI-LIST_TRADES`
-4. [ ] `FR-UI-PLOT_TRADES`
-5. [ ] `FR-UI-ANALYZE_TRADES`
-6. [ ] `FR-UI-EXPORT_RESULTS`
-7. [ ] `FR-UI-INSPECT_SOURCE`
-8. [ ] `FR-UI-INSPECT_ROBUSTNESS`
-
-##### 16.11 [ ] `FEAT-UI-EDIT_CODE`
-
-1. [ ] `FR-UI-NAVIGATE_CODE`
-2. [ ] `FR-UI-SEARCH_CODE`
-3. [ ] `FR-UI-EDIT_CODE_TABS`
-4. [ ] `FR-UI-MANAGE_CODE_FILES`
-5. [ ] `FR-UI-SHOW_CODE_DIAGNOSTICS`
-6. [ ] `FR-UI-TEST_EXTENSIONS`
-
-##### 16.12 [ ] `FEAT-UI-RUN_RESEARCH`
-
-1. [ ] `FR-UI-SELECT_RESEARCH_MODE`
-2. [ ] `FR-UI-CONFIGURE_RESEARCH`
-3. [ ] `FR-UI-PREVIEW_RESEARCH`
-4. [ ] `FR-UI-CONTROL_RESEARCH`
-5. [ ] `FR-UI-COMPARE_RESEARCH`
-6. [ ] `FR-UI-REUSE_RESEARCH_SETTINGS`
-
-##### 16.13 [ ] `FEAT-UI-EDIT_PROJECTS`
-
-1. [ ] `FR-UI-MANAGE_PROJECTS`
-2. [ ] `FR-UI-EDIT_TASKS`
-3. [ ] `FR-UI-EDIT_PROJECT_GRAPH`
-4. [ ] `FR-UI-COMPARE_PROJECTS`
-5. [ ] `FR-UI-CONTROL_PROJECTS`
-6. [ ] `FR-UI-INSPECT_PROJECTS`
-
-##### 16.14 [ ] `FEAT-UI-COMPOSE_PORTFOLIOS`
-
-1. [ ] `FR-UI-SELECT_CONSTITUENTS`
-2. [ ] `FR-UI-EDIT_PORTFOLIO`
-3. [ ] `FR-UI-INSPECT_CORRELATION`
-4. [ ] `FR-UI-RUN_PORTFOLIO`
-5. [ ] `FR-UI-COMPARE_PORTFOLIOS`
-
-##### 16.15 [ ] `FEAT-UI-OPERATE_TRADING`
-
-1. [ ] `FR-UI-MANAGE_TRADING_SESSIONS`
-2. [ ] `FR-UI-SHOW_TRADING_READINESS`
-3. [ ] `FR-UI-PREVIEW_TRADING_ACTION`
-4. [ ] `FR-UI-COMMIT_TRADING_ACTION`
-5. [ ] `FR-UI-OPERATE_KILL_SWITCH`
-6. [ ] `FR-UI-WATCH_TRADING_EVENTS`
-7. [ ] `FR-UI-WATCH_MARKETS`
-8. [ ] `FR-UI-INSPECT_OPERATOR_ANALYTICS`
-
-##### 16.16 [ ] `FEAT-UI-EXTEND_VIEWS`
-
-1. [ ] `FR-UI-DECLARE_VIEW_CONTRIBUTIONS`
-2. [ ] `FR-UI-VALIDATE_VIEW_CONTRIBUTIONS`
-3. [ ] `FR-UI-SCOPE_VIEW_EFFECTS`
-4. [ ] `FR-UI-REPLACE_VIEW_PROVIDERS`
-5. [ ] `FR-UI-REMOVE_VIEW_CONTRIBUTIONS`
-
-##### 16.17 [x] `FEAT-UI-COMPOSE_SHELL`
-
-1. [X] `FR-UI-ASSEMBLE_SHELL` — evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:24
-2. [X] `FR-UI-DISCOVER_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:107, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:48
-3. [X] `FR-UI-SWITCH_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:146, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:102
-4. [X] `FR-UI-SHOW_CAPABILITY_STATE` — evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:149
-5. [X] `FR-UI-RESTORE_ROUTE` — evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:189
-
+1. **Mock Provider Retirement:** Verify no production bundle imports `app/ui/src/mocks/`, the folder is deletable without affecting production behavior, and all 17 D-UI widget surfaces connect to live backend capabilities.
+2. **End-to-End System Workflows:** Verify all twelve multi-domain workflows defined in `docs/PROJECT.md` execute successfully from the React workstation.
+3. **Execution Parity Verification:** Verify deterministic equivalence across SIM, PAPER, DEMO, and LIVE routes according to `docs/EXECUTION_PARITY.md`.
+4. **Cross-Workspace Isolation:** Verify hosted and local modes preserve identical public contracts and pass multi-user isolation checks.
+5. **Physical Removability & Degradation:** Verify that removing any optional domain or plugin results in clean, documented graceful degradation without runtime crashes.
 
 ---
 
@@ -1365,7 +1363,7 @@ This preserves domain waterfall discipline without sacrificing HaruQuantAI's spa
 
 ## 24. UI de-mock rule
 
-Stage 1 may build any UI workflow against the dev-only mock provider, but mocks carry no business-authority claim.
+Stage 1 builds the initial UI workstation surfaces against the dev-only mock provider, but mocks carry no business-authority claim.
 
 After each domain stage:
 
