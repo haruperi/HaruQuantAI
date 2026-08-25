@@ -1,22 +1,23 @@
 # HaruQuantAI Unified Trading Execution Parity
 
-> **Status:** Ratified architecture decision
+> **Status:** Ratified architecture decision; canonical documentation reconciled
 > **Ratified:** 2026-08-25
-> **Scope:** Runtime Risk, Trading, Simulator, Broker Connectivity, Portfolio, Analytics, Research, Interfaces, and UI sequencing where affected
-> **Origin:** Restores the proven HaruQuantAI-V2 design intent: make simulation exercise the real trading lifecycle rather than maintain a parallel simulated trading lifecycle.
+> **Reconciled:** 2026-08-25
+> **Scope:** Runtime Risk, Trading, Simulator, Broker Connectivity, Portfolio, Analytics, Research, Interfaces, UI, and implementation sequencing where affected
+> **Origin:** Restores the proven HaruQuantAI-V2 design intent: simulation exercises the real Trading lifecycle rather than maintaining a parallel simulated trading lifecycle.
 
 > [!IMPORTANT]
-> This document is a ratified cross-domain architecture amendment. Until the large canonical registries in `docs/PROJECT.md`, `docs/dev/IMPLEMENTATION_ORDER.md`, `app/services/risk/README.md`, `app/services/trading/README.md`, `app/services/simulator/README.md`, and their ratified contract inventories are mechanically reconciled, the rules in this document **supersede conflicting statements only for the Trading/Simulation/Runtime-Risk ownership and sequencing described here**. No existing product `FEAT-*` or `FR-*` status changes merely because this decision is ratified.
+> This document is the cross-domain authority for Trading/Simulation/Runtime-Risk execution ownership. `docs/PROJECT.md`, `docs/dev/IMPLEMENTATION_ORDER.md`, and the Runtime Risk, Trading, and Simulator domain READMEs have been reconciled to it. No product `FEAT-*` or `FR-*` status changes merely because the architecture is ratified. Physical wire schemas/generated clients remain implementation artifacts and change only through their normal contract implementation/version process.
 
 ---
 
 ## 1. Decision
 
-HaruQuantAI shall implement **one governed Trading lifecycle with multiple execution authorities**.
+HaruQuantAI implements **one governed Trading lifecycle with multiple execution authorities**.
 
-Simulation is not a second implementation of trading. Historical simulation and paper execution must exercise the same Trading-owned business lifecycle, risk admission, order intent, operation state, protection, receipt, reconciliation, and execution-evidence semantics used by demo/live execution.
+Simulation is not a second implementation of trading. Historical simulation and paper execution exercise the same Trading-owned business lifecycle, Runtime Risk admission, operation state, protection ownership, receipt classification, reconciliation, and execution-evidence semantics used by demo/live execution.
 
-The authority changes by route; the business trading lifecycle does not.
+The authority changes by route; the business Trading lifecycle does not.
 
 ```text
 Strategy / authenticated manual action
@@ -32,24 +33,21 @@ Strategy / authenticated manual action
      +----------+-----------+-----------+
      |                      |           |
      v                      v           v
-Historical/Paper          Demo         Live
-Simulator authority       Broker       Broker
-     |                   authority    authority
+  SIM/PAPER                DEMO        LIVE
+  Simulator               Broker      Broker
+  authority              authority   authority
+     |                      |           |
      +----------+-----------+-----------+
                 |
                 v
       canonical Trading evidence
 ```
 
-The design principle is:
-
 > **One Trading lifecycle, multiple execution authorities.**
 
 ---
 
 ## 2. Route model
-
-The product retains four useful operating contexts rather than conflating historical replay with forward paper trading:
 
 | Route / mode | Time source | Execution authority | External capital mutation | Purpose |
 | --- | --- | --- | --- | --- |
@@ -60,7 +58,7 @@ The product retains four useful operating contexts rather than conflating histor
 
 `SIM` and `PAPER` may use different Simulator profiles and clocks, but neither may bypass Trading to create an independent business order lifecycle.
 
-Route-specific differences are allowed only where reality requires them: authority transport, time/deadline source, matching/fill mechanics, market microstructure, credentials, connectivity, and explicit safety gates. Business/risk gates must remain semantically paired.
+Route-specific differences are allowed only where reality requires them: authority transport, time/deadline source, matching/fill mechanics, market microstructure, credentials, connectivity, and explicit safety gates. Business/risk gates remain semantically paired.
 
 ---
 
@@ -68,305 +66,296 @@ Route-specific differences are allowed only where reality requires them: authori
 
 ### 3.1 Trading owns the business execution lifecycle
 
-Trading owns the canonical semantics for all routes:
+Trading owns canonical semantics for all four routes:
 
-- approved executable request / trade-plan normalization;
+- executable request/trade-plan normalization;
 - logical operation identity and idempotency;
 - route and execution-authority selection;
 - common business/risk gate ordering;
-- canonical order lifecycle and order state;
+- canonical order lifecycle/state;
 - canonical deal/fill acceptance into execution history;
 - canonical position projection derived from execution evidence;
 - protective-order ownership and mutation policy;
-- dispatch receipt classification, including unknown outcomes;
+- receipt classification, including unknown outcomes;
 - retry blocking and reconciliation policy;
 - session/operation recovery semantics;
 - immutable execution journal and trace chain;
-- execution evidence exposed to Analytics, Portfolio, Interfaces, and UI.
+- canonical execution evidence exposed to Analytics, Portfolio, Interfaces, and UI.
 
-Trading may depend on capability contracts for an authority, but it must not import Simulator or Broker implementation internals.
+Trading may call an injected execution-authority capability but never imports Simulator or Broker implementation internals.
 
 ### 3.2 Runtime Risk owns admission for every executable route
 
-Runtime Risk remains the non-bypassable admission authority for any executable action that enters the common Trading lifecycle, including `SIM` when parity mode is requested.
+Runtime Risk is the non-bypassable admission authority for executable actions entering the common Trading lifecycle, including `SIM` when parity execution is requested.
 
 Risk owns:
 
-- route-appropriate risk profiles and limits;
+- route/profile-appropriate risk limits;
 - source-evidence validation;
 - sizing approval / maximum executable size;
 - stop and exposure checks;
 - approval tokens where required;
 - capacity reservation;
 - kill-switch semantics;
-- decision expiry and revalidation.
+- decision expiry/revalidation.
 
-A simulation can intentionally use a simulation-specific risk profile, but it must not recreate a separate sizing/admission engine inside Simulator when the goal is execution parity.
+A simulation may use a simulation-specific risk profile, but Simulator must not recreate a separate executable sizing/admission engine.
 
-### 3.3 Simulator owns execution mechanics, not a second trading business model
+### 3.3 Simulator owns execution mechanics, not a second business model
 
-Simulator owns the deterministic historical/forward synthetic authority mechanics needed to emulate execution:
+Simulator owns deterministic historical/forward synthetic authority mechanics:
 
-- run manifests, pinned inputs, deterministic seeds, and engine profiles;
-- simulation scheduler / time authority;
+- run manifests, pinned inputs/seeds/engine profiles;
+- scheduler/time authority;
 - intrabar path and precision models;
-- order matching mechanics;
-- spread, slippage, commission, swap, and other simulation cost models;
-- provider/venue semantic emulation;
-- simulated authority-side pending-order and account state required to produce truthful authority evidence;
-- deterministic fills/deals and authority snapshots;
-- checkpoint/replay behavior;
-- perturbation and distributed simulation mechanics;
-- parity evidence and first-divergence diagnostics.
+- matching and trigger mechanics;
+- spread/slippage/commission/swap/cost models;
+- target-runtime/provider semantic emulation;
+- authority-side pending-order/fill/position state needed for truthful evidence;
+- checkpoint/replay and perturbation/distribution mechanics;
+- result projections, parity evidence, and first-divergence diagnostics.
 
-Simulator must receive a Trading-approved executable request through a public capability boundary and return authority evidence/receipts that Trading classifies into the canonical lifecycle.
+Simulator receives Trading-approved executable work through a public capability boundary and returns authority evidence that Trading classifies/reconciles into canonical state.
 
 ### 3.4 Broker Connectivity owns demo/live authority transport
 
-Broker Connectivity owns:
+Broker Connectivity owns provider connections/credentials, environment isolation, capability discovery, request/response adaptation, broker transport, provider-truth reads/events, and demo/live transport/session state.
 
-- provider connections and credentials;
-- environment isolation;
-- provider capability discovery;
-- request/response adaptation;
-- broker order transport;
-- provider-truth reads and normalized provider events;
-- demo/live session transport state.
+It does not decide business admission, construct canonical Trading state, or reinterpret Runtime Risk approval.
 
-Broker Connectivity does not decide business admission, construct a competing Trading lifecycle, or reinterpret Risk approval.
+### 3.5 Portfolio is optional evidence, not a Runtime Risk prerequisite
 
-### 3.5 Portfolio is optional evidence for core Runtime Risk
+Portfolio must not be a hard prerequisite for Runtime Risk.
 
-Portfolio must **not** be a hard prerequisite for Runtime Risk itself.
+Core Runtime Risk can admit/reject a strategy/account action with its required Data/Strategy/Catalogue/Broker evidence when Portfolio is physically absent.
 
-Core Runtime Risk must be able to admit or reject a strategy/account action with Data, Strategy, Catalogue, and applicable Broker evidence even when Portfolio is absent.
+Portfolio-aware allocation/budget governance uses **self-contained, immutable, versioned Portfolio evidence/projections submitted into Risk through receiver-owned public contracts**. Risk does not require a live Portfolio capability/provider to activate, query Portfolio private state, or import Portfolio implementation.
 
-Portfolio-aware allocation/budget governance is an optional/later Risk capability. When Portfolio exists it can supply allocation, portfolio exposure, rebalance, and budget evidence through versioned contracts. Removing Portfolio must not make base Runtime Risk or single-strategy Trading unavailable.
-
-This breaks the previous circular product sequence:
+This avoids the previous cycle:
 
 ```text
 Trading -> Simulator -> Analytics -> Research -> Portfolio -> Risk -> Trading
 ```
 
-and replaces it with an acyclic implementation core:
+The implementation core is:
 
 ```text
-Catalogue / Data / Strategy / Broker evidence
-                   |
-                   v
-             Runtime Risk
-                   |
-                   v
-                Trading
-                   |
-          authority contracts
-              /          \
-             v            v
-        Simulator       Broker
+Catalogue / Broker / Data / Strategy
+                 |
+                 v
+           Runtime Risk
+                 |
+                 v
+              Trading
+                 |
+          authority port
+            /       \
+           v         v
+      Simulator    Broker
 ```
 
-Portfolio may later enrich Risk through an optional capability without becoming a prerequisite of the core Risk domain.
+Portfolio later supplies bounded evidence to an already-complete Risk domain; this is integration, not a second Risk implementation phase.
 
 ---
 
-## 4. Contract migration rule
+## 4. Contract interpretation and migration rule
 
-The current V3 planning contracts were authored before this decision and therefore contain duplicate lifecycle concepts. They must be reconciled before implementation of the affected product features.
+The whole-app contract-authoring foundation was created before this execution-parity decision. The semantic target is now reconciled, while physical schemas/generated clients remain implementation artifacts until their owning feature work updates them through the repository's normal contract process.
 
-### 4.1 Trading contracts become canonical across routes
+### 4.1 Trading contracts are canonical across routes
 
-The Trading contract family remains the canonical business lifecycle surface. The reconciled contract set must support `SIM`, `PAPER`, `DEMO`, and `LIVE` where applicable.
+The Trading contract family is the canonical business lifecycle surface. Its implemented target must represent `SIM`, `PAPER`, `DEMO`, and `LIVE` without route-specific business state machines.
 
-At minimum, route/mode and execution-authority records must be capable of representing all four contexts without inventing route-specific business state machines.
+### 4.2 Simulator lifecycle records are authority/result evidence
 
-### 4.2 Existing Simulator lifecycle records are not a second canonical lifecycle
+Existing planned Simulator record identities are retained for traceability but have reconciled roles:
 
-Current planned records such as `SimOrder`, `SimFill`, `SimPosition`, and `SimTrade` must not remain independent public business lifecycle authorities in parallel with `TradingOrder`, `TradingDeal`, and `TradingPositionProjection`.
-
-During contract reconciliation they must be handled as follows:
-
-| Current Simulator concept | Reconciled role |
+| Simulator concept | Reconciled role |
 | --- | --- |
-| `SimOrder` | Simulator authority-side matching/pending evidence, private or explicitly authority-scoped; not a competing canonical Trading order |
-| `SimFill` | Simulator authority fill/deal evidence returned to Trading; canonical accepted execution becomes Trading-owned deal/evidence |
+| `SimOrder` | Simulator authority-side matching/pending evidence; not a competing canonical Trading order |
+| `SimFill` | Simulator authority fill evidence returned to Trading; accepted canonical execution becomes Trading-owned deal/evidence |
 | `SimPosition` | Simulator authority snapshot/evidence used for reconciliation; canonical application projection remains Trading-owned |
-| `SimTrade` | deterministic simulation/result projection derived from canonical Trading execution evidence; it must not mutate an independent order/position state machine |
-| `SizingDecision` | remove duplicate admission authority; use Runtime Risk sizing/approval for parity execution, with route-appropriate profiles |
+| `SimTrade` | deterministic simulation/result projection derived from reconciled execution; not an independent mutable order/position state machine |
+| `SizingDecision` | Simulator calculation/conformance evidence only; Runtime Risk owns executable sizing/approval |
 
-Simulator may retain authority-local structures internally when required by matching mechanics, but their names, contracts, and tests must make the authority scope explicit and must prove they cannot bypass Trading.
+Authority-local structures may exist where matching requires them, but contracts/tests must make the authority scope explicit and prove they cannot bypass Trading.
 
 ### 4.3 No direct construction bypass
 
-Simulator must not construct canonical Trading orders, deals, positions, approval decisions, or operation states by copying Trading private logic. It consumes public Trading/authority contracts only.
-
-Likewise Trading must not duplicate Simulator matching/fill logic or Broker provider transport.
+Simulator must not construct canonical Trading operations/orders/deals/positions or Risk approvals by copying Trading/Risk private logic. Trading must not duplicate Simulator matching/fill logic or Broker provider transport.
 
 ---
 
-## 5. Gate parity
+## 5. Feature-level cycle avoidance
 
-All four routes traverse the same semantic business/risk gate categories in the same lifecycle order where applicable:
+The domain workflow is intentionally reciprocal at runtime—Trading calls an authority provided by Simulator, while higher-level Simulator orchestration uses Trading—but the required feature-capability graph must remain acyclic.
+
+The pattern is:
+
+```text
+Simulator authority feature
+  provides simulator.execution-authority@N
+  requires only its lower mechanics/data dependencies
+            |
+            v
+Trading dispatch feature
+  optionally consumes simulator.execution-authority@N
+            |
+            v
+Higher Simulator run/result orchestration
+  consumes Trading public capabilities
+```
+
+Therefore:
+
+- Trading never requires the concrete Simulator package to activate; only routes that need Simulator require its authority provider.
+- The Simulator authority provider must not require the higher-level Simulator runner that consumes Trading.
+- Removing Simulator withdraws `SIM`/Simulator-backed `PAPER` while Broker-backed routes remain healthy.
+- Removing Broker withdraws `DEMO`/`LIVE` while Simulator-backed routes remain healthy.
+
+Portfolio-to-Risk interaction does not use a provider edge at all; it is bounded submitted evidence, so it cannot create a required cycle.
+
+---
+
+## 6. Gate parity
+
+All routes traverse the same semantic business/risk categories in the same lifecycle order where applicable:
 
 1. request/intent validation;
-2. unresolved-operation / idempotency guard;
+2. unresolved-operation/idempotency guard;
 3. current evidence validation;
 4. Runtime Risk decision validation;
-5. approved-size and capacity validation;
+5. approved-size/capacity validation;
 6. kill-switch validation;
 7. execution-plan construction;
 8. pre-dispatch authority recheck;
 9. exactly-once dispatch attempt;
 10. receipt classification;
 11. execution-event application;
-12. reconciliation when authority truth is incomplete or conflicts.
+12. reconciliation when authority truth is incomplete/conflicting.
 
-Route-specific safety gates are explicit deltas, not hidden branches. Examples include live-mutation authorization, broker credential/session readiness, simulator scheduler readiness, or historical-data completeness.
+Route-specific safety gates are explicit deltas, not hidden branches—for example live-mutation authorization, broker credential/session readiness, Simulator scheduler readiness, or historical-data completeness.
 
-No route may skip a business/risk gate merely because it is simulated.
+No route skips a business/risk gate merely because it is simulated.
 
 ---
 
-## 6. Time and deadline parity
+## 7. Time and deadline parity
 
 The common Trading lifecycle must not hard-code wall-clock behavior that makes deterministic simulation impossible.
 
-Deadline/time authority is injected:
+Time/deadline authority is injected:
 
 - `SIM` uses deterministic scheduler time;
-- `PAPER`, `DEMO`, and `LIVE` use the appropriate forward monotonic/wall-clock authority;
-- timeout/expiry outcomes retain the same canonical semantic shape across routes;
+- `PAPER`, `DEMO`, and `LIVE` use appropriate forward monotonic/wall-clock authority;
+- timeout/expiry outcomes retain the same canonical semantic shape;
 - no production composition silently defaults an absent time authority.
-
-This preserves deterministic replay while keeping the same Trading code path.
 
 ---
 
-## 7. Revised implementation dependency order
+## 8. Ratified implementation order
 
-This is the ratified dependency milestone order for the affected architecture. The UI-first horizontal shell remains allowed early against truthful mocks; its live de-mock gates follow producer readiness.
+The repository uses a **UI-first, dependency-ordered domain waterfall**. Waterfall is between domains; implementation remains incremental feature-by-feature inside the active domain.
 
-| Stage | Capability/domain milestone |
+| Stage | Target |
 | ---: | --- |
-| 0 | Foundation / composability substrate |
-| 1 | UI-first workstation shell and truthful mock boundary |
+| 0 | Shared Foundation: Contracts -> Kernel -> Composition |
+| 1 | UI-first Workstation Construction (horizontal mock-backed exception; D-UI remains open) |
 | 2 | Workspace |
 | 3 | Plugins |
 | 4 | Catalogue |
 | 5 | Broker Connectivity |
 | 6 | Data |
 | 7 | Strategy |
-| 8 | Runtime Risk core |
-| 9 | Trading core/common execution lifecycle |
-| 10 | Simulator as `SIM`/`PAPER` execution authority |
+| 8 | Runtime Risk — **complete entire domain**, including portfolio-aware operations against self-contained contract fixtures |
+| 9 | Trading — complete common lifecycle before concrete Simulator integration |
+| 10 | Simulator — real `SIM`/`PAPER` authority plus deterministic result engine |
 | 11 | Analytics |
 | 12 | Research |
-| 13 | Portfolio |
-| 14 | Portfolio-aware Runtime Risk extension and remaining portfolio-coupled gates |
-| 15 | Orchestration |
-| 16 | Interfaces live integration |
-| 17 | Final UI de-mock and complete-system integration |
+| 13 | Portfolio — complete domain, then prove real Portfolio-evidence -> existing Risk integration |
+| 14 | Orchestration |
+| 15 | Interfaces |
+| 16 | Final D-UI de-mock and complete-system integration |
 
-The key invariant is the relative core order:
+Critical relative order:
 
 ```text
-Strategy -> Runtime Risk -> Trading -> Simulator -> Analytics -> Research -> Portfolio
+Broker -> Data -> Strategy -> Runtime Risk -> Trading -> Simulator -> Analytics -> Research -> Portfolio
 ```
 
-Broker Connectivity is available before the common execution lifecycle so Trading is designed against the same authority abstraction from the start; demo/live release remains independently safety-gated and disabled by default.
+### 8.1 Runtime Risk is not split across waterfall stages
 
-### 7.1 Risk split required by the new order
+The complete Runtime Risk domain is finished at Stage 8.
 
-`FEAT-RISK-GOVERN_ALLOCATIONS` (or its reconciled successor) is portfolio-coupled and therefore belongs after Portfolio capability exists. It must not force all Runtime Risk implementation to wait for Portfolio.
+Portfolio-aware FRs are implemented at Stage 8 using their receiver-owned Risk contracts plus deterministic self-contained Portfolio projection/evidence fixtures and explicit absent-evidence behavior. They do not require a real Portfolio runtime provider.
 
-Core Risk features—contracts, current risk calculation, kill-switch, admission, approval/capacity, and risk audit—are implemented before Trading.
+Stage 13 does not “finish Risk.” It proves production cross-domain integration by creating real Portfolio evidence and submitting it through the already-ratified Risk boundary. Any incompatibility is an explicit versioned contract change, not a hidden second Risk implementation stage.
 
-### 7.2 Trading before Simulator does not require a concrete Simulator implementation
+### 8.2 Trading before Simulator uses authority conformance fixtures
 
-Trading is implemented and tested first against the versioned execution-authority capability contract plus deterministic fake/conformance authorities. Simulator later provides the real `SIM`/`PAPER` authority implementation.
+Trading is completed/tested against its versioned execution-authority port plus deterministic authority conformance doubles. Simulator then supplies the real `SIM`/`PAPER` authority implementation at Stage 10.
 
-This prevents a package dependency cycle while still making Simulator consume the canonical Trading execution semantics.
-
----
-
-## 8. Required specification reconciliation
-
-Before affected features are considered implementation-ready, the following canonical registries must be mechanically reconciled with this decision:
-
-1. `docs/PROJECT.md`
-   - remove hard `PORT -> RISK` from the core dependency graph;
-   - remove the claim that Trading requires Simulator as a lower implementation layer;
-   - describe Simulator and Broker as runtime execution-authority providers through contracts;
-   - update `SYS-WF-004`, `SYS-WF-010`, `SYS-WF-011`, and parity/release wording so simulation uses the common Trading lifecycle.
-2. `app/services/risk/README.md`
-   - extend core admission applicability to parity simulation;
-   - remove the claim that Simulator owns independent backtest sizing when parity execution is selected;
-   - make Portfolio evidence optional for core Risk;
-   - move portfolio-allocation governance to a later optional capability slice.
-3. `app/services/trading/README.md`
-   - make Trading explicitly canonical for `SIM`, `PAPER`, `DEMO`, and `LIVE` business execution semantics;
-   - replace paper-vs-broker-only authority wording with the four-context authority model;
-   - state that Simulator provides authority mechanics/evidence, not a separate lifecycle.
-4. `app/services/simulator/README.md`
-   - rewrite `FEAT-SIM-SIMULATE_ORDERS` ownership around authority matching/fill mechanics;
-   - remove or reclassify duplicated canonical order/position lifecycle ownership;
-   - remove duplicated sizing/admission authority in parity mode;
-   - add explicit Trading authority-port consumption and route-parity acceptance criteria.
-5. `app/contracts/{risk,trading,simulator}/`, `app/contracts/README.md`, generated schemas/TypeScript, and contract tests
-   - reconcile the ratified v1 planning records before affected feature implementation;
-   - regenerate deterministic contract artifacts;
-   - preserve schema/version discipline rather than silently changing existing shapes.
-6. `docs/dev/IMPLEMENTATION_ORDER.md`
-   - move Broker/Runtime-Risk/Trading core milestones before Simulator;
-   - move Simulator before Analytics/Research/Portfolio;
-   - leave portfolio-aware Risk work after Portfolio;
-   - relocate de-mock gates without duplicating any `FR-*` checkbox.
-
-Until this reconciliation is complete, existing affected registries are planning artifacts with known architectural drift and must not be used to justify implementing a second Simulator-owned trading lifecycle.
+This preserves domain waterfall completion without introducing package or required capability cycles.
 
 ---
 
-## 9. Mandatory acceptance evidence
+## 9. Canonical documentation reconciliation status
 
-The reconciled implementation must eventually prove all of the following:
+The architectural reconciliation requested on 2026-08-25 has been applied to:
 
-1. **Same approved request path:** equivalent strategy/manual intent plus equivalent risk evidence produces the same canonical Trading request shape independent of route-specific authority fields.
-2. **Same business/risk gate sequence:** `SIM`, `PAPER`, `DEMO`, and `LIVE` execute the same registered business/risk gate categories and ordering.
-3. **No size mutation after Risk:** Simulator and Broker authorities cannot increase or replace the Risk-approved executable quantity.
-4. **Authority-only route delta:** switching route changes authority/time/safety behavior, not the Trading business state machine.
-5. **Canonical receipt semantics:** accepted/rejected/unknown/partial/fill outcomes normalize into the same Trading receipt/operation semantics.
-6. **Unknown-outcome safety:** no authority, including Simulator, permits blind mutation retry after an unknown outcome.
-7. **Reconciliation parity:** authority order/deal/position evidence reconciles through the same Trading policy, with route-specific evidence adapters only.
-8. **Deterministic simulation:** identical pinned simulation manifests and seed streams reproduce identical authority evidence and canonical Trading results.
-9. **Risk independence from Portfolio:** core Runtime Risk starts and governs single-strategy/account actions when Portfolio is physically absent.
-10. **Optional portfolio enrichment:** installing/removing Portfolio adds/removes only portfolio-aware risk/allocation capability; it does not break core Risk or Trading.
-11. **Simulator removal:** removing Simulator makes `SIM`/`PAPER` authority unavailable while Broker-backed routes remain healthy when their dependencies exist.
-12. **Broker removal:** removing Broker Connectivity makes `DEMO`/`LIVE` unavailable while Simulator-backed routes remain healthy.
-13. **No reverse implementation imports:** all cross-domain collaboration remains through versioned capability contracts and composition wiring.
-14. **Parity is falsifiable:** route parity claims are bounded by an explicit comparison envelope; empirical spread/slippage/latency equivalence is never claimed without evidence.
+- [x] `docs/dev/IMPLEMENTATION_ORDER.md` — replaced Agile increments/duplicated FR registry with UI-first domain waterfall and Risk -> Trading -> Simulator ordering.
+- [x] `docs/PROJECT.md` — dependency graph/workflows/release semantics reconciled; hard `Portfolio -> Risk` and `Simulator -> Trading` implementation dependencies removed.
+- [x] `app/services/risk/README.md` — common-route admission and Portfolio independence adopted.
+- [x] `app/services/trading/README.md` — canonical four-route Trading lifecycle adopted.
+- [x] `app/services/simulator/README.md` — authority/result ownership adopted; duplicate executable sizing/business lifecycle removed.
+- [ ] `app/contracts/README.md` — semantic inventory wording still requires final documentation sweep.
+- [ ] Physical `app/contracts/{common,risk,trading,simulator}/`, generated schemas/TypeScript, and contract tests — **not modified by this documentation-only reconciliation**. They must be reconciled as implementation artifacts before affected product features are implemented/accepted.
+- [ ] Remaining domain/UI/Interfaces/Analytics/Research/Portfolio documentation — audit stale summary wording where it conflicts with this cross-domain decision.
+
+The checked canonical registries above must be used for planning. Existing physical contract scaffolding never authorizes implementation of the superseded parallel-lifecycle model.
 
 ---
 
-## 10. Non-goals
+## 10. Mandatory acceptance evidence
+
+The implementation must eventually prove:
+
+1. equivalent intent/risk evidence produces same canonical Trading request shape independent of authority-specific fields;
+2. `SIM`, `PAPER`, `DEMO`, `LIVE` execute same business/risk gate categories/order;
+3. Simulator/Broker cannot increase or replace Risk-approved quantity;
+4. switching route changes authority/time/safety mechanics, not Trading state machine;
+5. accepted/rejected/unknown/partial/fill authority outcomes normalize into same Trading semantics;
+6. no authority permits blind retry after unknown outcome;
+7. authority order/deal/position evidence reconciles through same Trading policy;
+8. identical pinned simulation manifests/seeds/providers reproduce identical authority evidence and canonical Trading result;
+9. core Runtime Risk starts/governs account/strategy actions when Portfolio is physically absent;
+10. real Portfolio evidence adds portfolio-aware review without becoming Risk dependency;
+11. removing Simulator withdraws Simulator-backed routes only;
+12. removing Broker withdraws Broker-backed routes only;
+13. no reverse private implementation imports;
+14. required feature-capability graph remains acyclic;
+15. parity claims are bounded/falsifiable; empirical spread/slippage/latency equivalence is never claimed without evidence.
+
+---
+
+## 11. Non-goals
 
 This decision does **not** require simulated fills to equal live fills. Real venues contain latency, queue position, liquidity, spread dynamics, slippage, rejects, outages, and undocumented behavior that historical replay may only model approximately.
 
-The parity target is instead:
+Parity targets:
 
 - same business lifecycle;
-- same risk/admission semantics;
-- same request and response contracts;
-- same state-transition rules;
+- same applicable risk/admission semantics;
+- same canonical request/response families;
+- same business state-transition rules;
 - same safety/idempotency/reconciliation policy;
-- route-specific execution mechanics made explicit and measurable.
+- explicit, measurable route-specific execution mechanics.
 
-Simulation realism is improved by calibrating Simulator authority behavior against real broker evidence, not by cloning the Trading lifecycle inside Simulator.
+Simulation realism improves by calibrating Simulator authority behavior against real broker evidence, not by cloning Trading inside Simulator.
 
 ---
 
-## 11. Final architecture statement
-
-The canonical mental model for HaruQuantAI is now:
+## 12. Final architecture statement
 
 ```text
 Strategy
@@ -375,7 +364,7 @@ Strategy
 Runtime Risk
    |
    v
-Trading  <--- single business execution lifecycle
+Trading  <--- single canonical business execution lifecycle
    |
    +-- SIM   ----> Simulator historical authority
    +-- PAPER ----> Simulator forward-paper authority
@@ -385,10 +374,10 @@ Trading  <--- single business execution lifecycle
    v
 Canonical execution evidence
    |
-   +--> Analytics
+   +--> Simulator result commit / Analytics
    +--> Research
    +--> Portfolio
    +--> Interfaces / UI
 ```
 
-Any future design that introduces a second route-specific business order lifecycle must be treated as an architecture regression unless this decision is explicitly superseded.
+Any future design that introduces a second route-specific business order lifecycle or executable Risk authority inside Simulator is an architecture regression unless this decision is explicitly superseded.
