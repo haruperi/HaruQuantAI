@@ -8,10 +8,16 @@ import { TemporalProvider } from "./context/temporal";
 import { FocusManagerProvider } from "./context/focus";
 import { createFeature as createComposeShellFeature } from "./features/compose_shell";
 import { createFeature as createStartWorkFeature } from "./features/start_work";
+import {
+  createFeature as createManageLayoutsFeature,
+  ViewScaleProvider,
+  ScaleControls,
+} from "./features/manage_layouts";
 import { systemStatusWidgetDefinition } from "./widgets/system_status";
 import { widgetCatalogueWidgetDefinition } from "./widgets/widget_catalogue";
 import { homeWidgetDefinition } from "./widgets/home";
 import { productNewsWidgetDefinition } from "./widgets/product_news";
+import { workspaceTemplatesWidgetDefinition } from "./widgets/workspace_templates";
 import { MockUiPresentationProvider } from "./mocks/mock_provider";
 
 function bootstrapApp() {
@@ -25,6 +31,13 @@ function bootstrapApp() {
   widgetRegistry.registerWidget(widgetCatalogueWidgetDefinition);
   widgetRegistry.registerWidget(homeWidgetDefinition);
   widgetRegistry.registerWidget(productNewsWidgetDefinition);
+  widgetRegistry.registerWidget(workspaceTemplatesWidgetDefinition);
+
+  // FEAT-UI-MANAGE_LAYOUTS owns templates, persistence, and view scale.
+  const manageLayouts = createManageLayoutsFeature({
+    presentationClient: new MockUiPresentationProvider(),
+  });
+  bridge.registerFeature(manageLayouts);
 
   // FEAT-UI-START_WORK owns the /home landing workspace and product news.
   // Dev runtime uses the gated mock capability provider; production injects
@@ -32,6 +45,7 @@ function bootstrapApp() {
   const startWork = createStartWorkFeature({
     presentationClient: new MockUiPresentationProvider(),
     widgetRegistry,
+    layoutController: manageLayouts.layoutController,
   });
   bridge.registerFeature(startWork);
 
@@ -47,13 +61,17 @@ function bootstrapApp() {
     ReactDOM.createRoot(rootElement).render(
       <React.StrictMode>
         <UiRuntimeProvider bridge={bridge}>
-          <FocusManagerProvider>
-            <SelectionProvider>
-              <TemporalProvider workspaceId="global-workspace">
-                {composeShell.render()}
-              </TemporalProvider>
-            </SelectionProvider>
-          </FocusManagerProvider>
+          <ViewScaleProvider>
+            <FocusManagerProvider>
+              <SelectionProvider>
+                <TemporalProvider workspaceId="global-workspace">
+                  {manageLayouts.renderClientProvider(
+                    composeShell.render(<ScaleControls />)
+                  )}
+                </TemporalProvider>
+              </SelectionProvider>
+            </FocusManagerProvider>
+          </ViewScaleProvider>
         </UiRuntimeProvider>
       </React.StrictMode>
     );

@@ -23,6 +23,11 @@ export interface DockviewPanelParams {
   placement?: WidgetPlacement;
   registry: WidgetRegistry;
   isDirty?: boolean;
+  /**
+   * Dirty-signal plumb for FR-UI-MANAGE_TABS: a widget state/config change
+   * marks its panel dirty until the next successful layout persistence.
+   */
+  onDirtyChange?: (panelId: string, isDirty: boolean) => void;
 }
 
 export interface DockviewAdapterProps {
@@ -38,7 +43,14 @@ export interface DockviewAdapterProps {
  * Universal panel component that routes Dockview panel params to WidgetHost.
  */
 const DockviewWidgetPanel: React.FC<IDockviewPanelProps<DockviewPanelParams>> = (props) => {
-  const params = props.params;
+  const params = props.params as DockviewPanelParams | undefined;
+  const dirtyRef = React.useRef(false);
+
+  const markDirty = React.useCallback(() => {
+    if (!params?.onDirtyChange || dirtyRef.current) return;
+    dirtyRef.current = true;
+    params.onDirtyChange(params.instance.instance_id, true);
+  }, [params]);
 
   if (!params || !params.instance || !params.registry) {
     return (
@@ -53,6 +65,8 @@ const DockviewWidgetPanel: React.FC<IDockviewPanelProps<DockviewPanelParams>> = 
       instance={params.instance}
       placement={params.placement}
       registry={params.registry}
+      onStateChange={markDirty}
+      onConfigChange={markDirty}
       onClose={() => props.api.close()}
     />
   );

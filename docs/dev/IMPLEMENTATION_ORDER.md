@@ -250,13 +250,13 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 3. `FR-UI-RESUME_RECENT_WORK` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.8)
 4. `FR-UI-LAUNCH_SHORTCUTS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.8)
 
-##### 1.3 [ ] `FEAT-UI-MANAGE_LAYOUTS`
+##### 1.3 [X] `FEAT-UI-MANAGE_LAYOUTS`
 
-1. [ ] `FR-UI-PERSIST_LAYOUTS`
-2. [ ] `FR-UI-RESTORE_LAYOUTS`
-3. [ ] `FR-UI-SCALE_VIEWS`
-4. [ ] `FR-UI-COMPOSE_PANELS`
-5. [ ] `FR-UI-MANAGE_TABS`
+1. [X] `FR-UI-PERSIST_LAYOUTS` — evidence: tests/ui/unit/test_manage_layouts.py:181, app/ui/src/features/manage_layouts/__tests__/manage_layouts.test.tsx:104
+2. [X] `FR-UI-RESTORE_LAYOUTS` — evidence: tests/ui/unit/test_manage_layouts.py:192, app/ui/src/workspaces/__tests__/dockview_adapter.test.tsx:35
+3. [X] `FR-UI-SCALE_VIEWS` — evidence: tests/ui/unit/test_manage_layouts.py:217, app/ui/src/features/manage_layouts/__tests__/manage_layouts.test.tsx:155
+4. [X] `FR-UI-COMPOSE_PANELS` — evidence: tests/ui/unit/test_manage_layouts.py:170, app/ui/src/workspaces/__tests__/dockview_adapter.test.tsx:99
+5. [X] `FR-UI-MANAGE_TABS` — evidence: tests/ui/unit/test_manage_layouts.py:207, app/ui/src/features/manage_layouts/__tests__/manage_layouts.test.tsx:138
 
 ##### 1.4 Partial — `FEAT-UI-EDIT_INPUTS`
 

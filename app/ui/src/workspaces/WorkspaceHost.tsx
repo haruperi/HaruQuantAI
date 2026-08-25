@@ -6,7 +6,7 @@
  * and dirty-close resolution dialog.
  */
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import type { DockviewApi } from "dockview-react";
 import type {
   WidgetTypeDescriptor,
@@ -18,12 +18,28 @@ import { WidgetCatalogue } from "./WidgetCatalogue";
 import { TemplateManager } from "./template_manager";
 import { restoreLayout, serializeLayout } from "./layout_serializer";
 
+/** Minimal persistence surface consumed by WorkspaceHost (FR-UI-PERSIST_LAYOUTS). */
+export interface LayoutPersistenceLike {
+  save(workspaceId: string, snapshot: WorkspaceLayoutSnapshot): void;
+  load(workspaceId: string): {
+    snapshot: WorkspaceLayoutSnapshot | null;
+    diagnostics: readonly { code: string; detail: string }[];
+  };
+}
+
+/** Subscription surface for external template requests (workspace_templates widget). */
+export interface TemplateRequestSubscriptionLike {
+  subscribe(listener: (templateId: string) => void): () => void;
+}
+
 export interface WorkspaceHostProps {
   workspaceId: string;
   registry: WidgetRegistry;
   templateManager?: TemplateManager;
   initialLayout?: WorkspaceLayoutSnapshot | null;
   onLayoutPersisted?: (snapshot: WorkspaceLayoutSnapshot) => void;
+  layoutPersistence?: LayoutPersistenceLike;
+  templateRequests?: TemplateRequestSubscriptionLike;
   className?: string;
 }
 
@@ -33,23 +49,66 @@ export const WorkspaceHost: React.FC<WorkspaceHostProps> = ({
   templateManager = new TemplateManager(),
   initialLayout,
   onLayoutPersisted,
+  layoutPersistence,
+  templateRequests,
   className = "workspace-host-container",
 }) => {
   const [api, setApi] = useState<DockviewApi | null>(null);
   const [isCatalogueOpen, setIsCatalogueOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("template-research-v1");
-  const [dirtyPrompt] = useState<{
+  const [dirtyPrompt, setDirtyPrompt] = useState<{
     instanceId: string;
     onConfirm: () => void;
     onCancel: () => void;
   } | null>(null);
+  const dirtyPanelsRef = useRef<Set<string>>(new Set());
+  const forceCloseRef = useRef<Set<string>>(new Set());
 
   const handleDockviewReady = useCallback(
     (dockviewApi: DockviewApi) => {
       setApi(dockviewApi);
 
-      if (initialLayout && initialLayout.widget_instances && initialLayout.widget_instances.length > 0) {
-        restoreLayout(dockviewApi, initialLayout, registry);
+      // FR-UI-MANAGE_TABS: veto closing dirty panels until explicit resolution.
+      dockviewApi.onDidAddPanel((panel) => {
+        const originalClose = panel.api.close.bind(panel.api);
+        panel.api.close = () => {
+          if (
+            dirtyPanelsRef.current.has(panel.id) &&
+            !forceCloseRef.current.has(panel.id)
+          ) {
+            setDirtyPrompt({
+              instanceId: panel.id,
+              onConfirm: () => {
+                forceCloseRef.current.add(panel.id);
+                originalClose();
+                dirtyPanelsRef.current.delete(panel.id);
+                forceCloseRef.current.delete(panel.id);
+                setDirtyPrompt(null);
+              },
+              onCancel: () => setDirtyPrompt(null),
+            });
+            return;
+          }
+          originalClose();
+        };
+      });
+
+      let restoreSource: WorkspaceLayoutSnapshot | null = initialLayout ?? null;
+      if (
+        !restoreSource ||
+        (restoreSource.widget_instances?.length ?? 0) === 0
+      ) {
+        const persisted = layoutPersistence?.load(workspaceId);
+        if (persisted?.snapshot) {
+          restoreSource = persisted.snapshot;
+        }
+      }
+      if (
+        restoreSource &&
+        restoreSource.widget_instances &&
+        restoreSource.widget_instances.length > 0
+      ) {
+        restoreLayout(dockviewApi, restoreSource, registry);
       } else {
         // Instantiate default template
         const defaultSnapshot = templateManager.instantiateTemplate(
@@ -59,20 +118,42 @@ export const WorkspaceHost: React.FC<WorkspaceHostProps> = ({
         restoreLayout(dockviewApi, defaultSnapshot, registry);
       }
     },
-    [initialLayout, registry, selectedTemplate, templateManager, workspaceId]
+    [initialLayout, registry, selectedTemplate, templateManager, workspaceId, layoutPersistence]
   );
+
+  // External template requests (workspace_templates widget) apply through
+  // the same engine path as the toolbar select.
+  useEffect(() => {
+    if (!templateRequests || !api) return;
+    return templateRequests.subscribe((templateId) => {
+      handleApplyTemplate(templateId);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateRequests, api]);
 
   const handleLayoutChange = useCallback(
     async (dockviewApi: DockviewApi) => {
       try {
         const snapshot = await serializeLayout(dockviewApi, workspaceId, "actor-current");
         onLayoutPersisted?.(snapshot);
+        if (layoutPersistence) {
+          layoutPersistence.save(workspaceId, snapshot);
+          dirtyPanelsRef.current.clear();
+        }
       } catch (err) {
         console.error("Failed to serialize layout change:", err);
       }
     },
-    [workspaceId, onLayoutPersisted]
+    [workspaceId, onLayoutPersisted, layoutPersistence]
   );
+
+  const handleDirtyChange = useCallback((panelId: string, isDirty: boolean) => {
+    if (isDirty) {
+      dirtyPanelsRef.current.add(panelId);
+    } else {
+      dirtyPanelsRef.current.delete(panelId);
+    }
+  }, []);
 
   const handleAddWidget = (descriptor: WidgetTypeDescriptor) => {
     if (!api) return;
@@ -92,6 +173,7 @@ export const WorkspaceHost: React.FC<WorkspaceHostProps> = ({
           schema_version: 1,
         },
         registry,
+        onDirtyChange: handleDirtyChange,
       },
     });
 

@@ -13,6 +13,11 @@ import type { UiFeatureInstance } from "../../runtime/composition_bridge";
 import type { WorkspaceLayoutSnapshot } from "../../contracts/generated/ui";
 import { WidgetRegistry } from "../../runtime/widget_registry";
 import { WorkspaceHost } from "../../workspaces/WorkspaceHost";
+import type {
+  LayoutPersistenceLike,
+  TemplateRequestSubscriptionLike,
+} from "../../workspaces/WorkspaceHost";
+import { TemplateManager } from "../../workspaces/template_manager";
 import type { IUiPresentationClient } from "../../clients/ui_client";
 import { SPEC } from "./manifest";
 import { parseStartWorkConfig, type StartWorkConfig } from "./config";
@@ -104,6 +109,12 @@ export interface StartWorkFeatureOptions {
   readonly presentationClient: IUiPresentationClient;
   readonly widgetRegistry: WidgetRegistry;
   readonly config?: Record<string, unknown>;
+  /** Optional layout controller supplied by FEAT-UI-MANAGE_LAYOUTS at the composition root. */
+  readonly layoutController?: {
+    readonly templateManager: TemplateManager;
+    readonly persistence: LayoutPersistenceLike;
+    readonly templateRequests: TemplateRequestSubscriptionLike;
+  };
 }
 
 export class StartWorkFeature implements UiFeatureInstance {
@@ -111,11 +122,13 @@ export class StartWorkFeature implements UiFeatureInstance {
   public readonly config: StartWorkConfig;
   private readonly presentationClient: IUiPresentationClient;
   private readonly widgetRegistry: WidgetRegistry;
+  private readonly layoutController?: StartWorkFeatureOptions["layoutController"];
 
   constructor(options: StartWorkFeatureOptions) {
     this.config = parseStartWorkConfig(options.config);
     this.presentationClient = options.presentationClient;
     this.widgetRegistry = options.widgetRegistry;
+    this.layoutController = options.layoutController;
 
     this.manifest = {
       ...SPEC,
@@ -132,6 +145,9 @@ export class StartWorkFeature implements UiFeatureInstance {
                 workspaceId="workstation-main"
                 registry={this.widgetRegistry}
                 initialLayout={createHomeLayout()}
+                templateManager={this.layoutController?.templateManager}
+                layoutPersistence={this.layoutController?.persistence}
+                templateRequests={this.layoutController?.templateRequests}
               />
             </StartWorkClientProvider>
           ),
@@ -146,6 +162,9 @@ export class StartWorkFeature implements UiFeatureInstance {
             <WorkspaceHost
               workspaceId="workstation-research"
               registry={this.widgetRegistry}
+              templateManager={this.layoutController?.templateManager}
+              layoutPersistence={this.layoutController?.persistence}
+              templateRequests={this.layoutController?.templateRequests}
             />
           ),
         },
@@ -159,6 +178,9 @@ export class StartWorkFeature implements UiFeatureInstance {
             <WorkspaceHost
               workspaceId="workstation-data"
               registry={this.widgetRegistry}
+              templateManager={this.layoutController?.templateManager}
+              layoutPersistence={this.layoutController?.persistence}
+              templateRequests={this.layoutController?.templateRequests}
             />
           ),
         },

@@ -39,7 +39,7 @@ The product presents one unified workstation canvas rather than isolated full-pa
 |---|---|---|---:|---|
 | Implemented | `FEAT-UI-COMPOSE_SHELL` | Capability-aware application shell and navigation | 5 | The graphical shell disappears; non-UI clients remain available. |
 | Partial (2 of 4; 2 mock-build pending 14.8) | `FEAT-UI-START_WORK` | Home, onboarding, recents, and launch shortcuts | 4 | Home disappears; direct authorized routes remain available. |
-| Missing | `FEAT-UI-MANAGE_LAYOUTS` | Tabs, panels, splitters, overlays, and saved view state | 5 | Custom layouts disappear; the shell uses its minimal outlet. |
+| Implemented | `FEAT-UI-MANAGE_LAYOUTS` | Tabs, panels, splitters, overlays, and saved view state | 5 | Custom layouts disappear; the shell uses its minimal outlet. |
 | Missing | `FEAT-UI-EDIT_INPUTS` | Forms, pickers, tables, validation, drafts, and confirmations | 5 | Generic editors disappear; read-only routes may remain. |
 | Missing | `FEAT-UI-AUTHOR_STRATEGIES` | Visual strategy authoring and immediate inspection | 6 | Visual authoring disappears; Strategy contracts remain available. |
 | Missing | `FEAT-UI-RUN_RESEARCH` | Builder, retester, optimizer, and trainer workspaces | 6 | Research workspaces disappear; admitted server work continues. |
@@ -301,11 +301,11 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 
 | Status | Requirement ID | Responsibility | Depends | Acceptance / evidence |
 |---|---|---|---|---|
-| Missing | `FR-UI-COMPOSE_PANELS` | Compose widget instances through the Dockview adapter; add/remove, dock, tab, split, resize, minimize, maximize, and populate blank or templated workspaces from typed contributions. | FEAT-UI-EXTEND_VIEWS | Panel removal leaves no orphan region and browser evidence proves the complete spatial interaction. |
-| Missing | `FR-UI-PERSIST_LAYOUTS` | Persist actor/workspace/capability/layout-schema-scoped Dockview snapshots with widget type, instance, configuration, and presentation-state versions. | WS | Incompatible widgets are diagnosed and never silently remapped. |
-| Missing | `FR-UI-RESTORE_LAYOUTS` | Restore after contributions reconcile, migrate supported layout versions, and choose deterministic diagnostics/defaults for new, missing, or incompatible widgets. | FR-UI-PERSIST_LAYOUTS | Cold start, reinstall, and missing-widget restoration produce stable placement and explicit outcomes. |
-| Missing | `FR-UI-MANAGE_TABS` | Support open, select, reorder, close, dirty-state guard, and bounded tab restoration. | FEAT-UI-EDIT_INPUTS | Closing a dirty tab requires an explicit resolution. |
-| Missing | `FR-UI-SCALE_VIEWS` | Support zoom, fullscreen, responsive reflow, and minimum usable regions without hiding safety state. | FEAT-UI-ENSURE_ACCESS | Global zoom/fullscreen evidence in shared header. |
+| Implemented | `FR-UI-COMPOSE_PANELS` | Compose widget instances through the Dockview adapter; add/remove, dock, tab, split, resize, minimize, maximize, and populate blank/templated workspaces from typed contributions. | FEAT-UI-EXTEND_VIEWS | Panel removal leaves no orphan region and browser evidence proves the complete spatial interaction. `— evidence: tests/ui/unit/test_manage_layouts.py:170, app/ui/src/workspaces/__tests__/dockview_adapter.test.tsx:99` |
+| Implemented | `FR-UI-PERSIST_LAYOUTS` | Persist actor/workspace/capability/layout-schema-scoped Dockview snapshots with widget type, instance, configuration, and presentation-state versions. | WS | Incompatible widgets are diagnosed and never silently remapped. `— evidence: tests/ui/unit/test_manage_layouts.py:181, app/ui/src/features/manage_layouts/__tests__/manage_layouts.test.tsx:104` |
+| Implemented | `FR-UI-RESTORE_LAYOUTS` | Restore after contributions reconcile, migrate supported layout versions, and choose deterministic diagnostics/defaults for new, missing, or incompatible widgets. | FR-UI-PERSIST_LAYOUTS | Cold start, reinstall, and missing-widget restoration produce stable placement and explicit outcomes. `— evidence: tests/ui/unit/test_manage_layouts.py:192, app/ui/src/workspaces/__tests__/dockview_adapter.test.tsx:35` |
+| Implemented | `FR-UI-MANAGE_TABS` | Support open, select, reorder, close, dirty-state guard, and bounded tab restoration. | FEAT-UI-EDIT_INPUTS | Closing a dirty tab requires an explicit resolution. `— evidence: tests/ui/unit/test_manage_layouts.py:207, app/ui/src/features/manage_layouts/__tests__/manage_layouts.test.tsx:138` |
+| Implemented | `FR-UI-SCALE_VIEWS` | Support zoom, fullscreen, responsive reflow, and minimum usable regions without hiding safety state. | FEAT-UI-ENSURE_ACCESS | Global zoom/fullscreen evidence in shared header. `— evidence: tests/ui/unit/test_manage_layouts.py:217, app/ui/src/features/manage_layouts/__tests__/manage_layouts.test.tsx:155` |
 
 ### 4.4 `edit_inputs/` — `FEAT-UI-EDIT_INPUTS`
 

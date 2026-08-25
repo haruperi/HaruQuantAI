@@ -72,7 +72,7 @@ Progress legend: `M` mock done · `U` UI migrated · `T` tests ported/passing ·
 
 | V2 widget | Class | Tracker / FEAT | V3 widget slugs | Generated contracts | M U T D |
 |---|---|---|---|---|---|
-| `workspaces` (+`public/templates`) | REPLACE | 1.3 MANAGE_LAYOUTS | (V3 engine exists) presets → `workspace_templates` | `ui.ts`, `workspace.ts` | ☐ ☐ ☐ ☐ |
+| `workspaces` (+`public/templates`) | REPLACE | 1.3 MANAGE_LAYOUTS | (V3 engine exists) presets → `workspace_templates` | `ui.ts`, `workspace.ts` | ☑ ☑ ☑ ☐ | (2026-08-25) donor consumed for templates/persistence algorithms; donor folder retained — family also feeds later rows; deletion at Phase 3 sweep |
 | `components/workflow` (form-heavy pieces) | ADAPT | 1.4 EDIT_INPUTS | `schema_form`, `selection_table`, `confirmation` | `ui.ts` | ☐ ☐ ☐ ☐ |
 | `components/common`, alarm/status patterns | ADAPT | 1.5 MONITOR_WORK | `job_progress`, `activity_log`, `notifications` | `ui.ts`, `orchestration.ts` | ☐ ☐ ☐ ☐ |
 | `system-settings` | ADAPT | 1.6 ADMINISTER_SYSTEM | `settings`, `capability_admin`, `updates` | `ui.ts`, `plugins.ts`, `interfaces.ts`, `orchestration.ts` | ☐ ☐ ☐ ☐ |
@@ -132,7 +132,7 @@ V2 donor widget
 
 Each line is one normal workflow task; donors come from the matrix row. A task's dry run includes "update this plan's §9/§6 row" when it completes.
 
-- [ ] 1.3 `FEAT-UI-MANAGE_LAYOUTS` — donors: `widgets/workspaces` presets, `public/templates`
+- [x] 1.3 `FEAT-UI-MANAGE_LAYOUTS` — donors: `widgets/workspaces` presets, `public/templates` (done 2026-08-25; donor folder retained for later rows)
 - [ ] 1.4 `FEAT-UI-EDIT_INPUTS` — donors: form-heavy `components/workflow` pieces
 - [ ] 1.5 `FEAT-UI-MONITOR_WORK` — donors: alarm/status patterns, `emergency-ux` acknowledgment flow
 - [ ] 1.6 `FEAT-UI-ADMINISTER_SYSTEM` — donors: `system-settings`
