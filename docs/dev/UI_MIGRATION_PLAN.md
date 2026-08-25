@@ -59,12 +59,12 @@ Rationale for placement: `.migration/v2-ui/` lives at the **repository root, out
 
 ## 5. Phase 1 — Conventions adopted (rules land with this document)
 
-- [ ] Per-widget transaction (§7) adopted for every migration
-- [ ] Generated-contracts-only rule adopted (§8.1)
-- [ ] Mock-growth rule adopted (§8.2)
-- [ ] Scoped state rule adopted (§8.3)
-- [ ] Mock-stage streaming rule adopted (§8.4)
-- [ ] Red zones (§8.5) acknowledged
+- [x] Per-widget transaction (§7) adopted for every migration — adopted 2026-08-25 (TASK-UI-MIG-PHASE1; rules landed with a43eef2)
+- [x] Generated-contracts-only rule adopted (§8.1) — adopted 2026-08-25 (TASK-UI-MIG-PHASE1; rules landed with a43eef2)
+- [x] Mock-growth rule adopted (§8.2) — adopted 2026-08-25 (TASK-UI-MIG-PHASE1; rules landed with a43eef2)
+- [x] Scoped state rule adopted (§8.3) — adopted 2026-08-25 (TASK-UI-MIG-PHASE1; rules landed with a43eef2)
+- [x] Mock-stage streaming rule adopted (§8.4) — adopted 2026-08-25 (TASK-UI-MIG-PHASE1; rules landed with a43eef2)
+- [x] Red zones (§8.5) acknowledged — adopted 2026-08-25 (TASK-UI-MIG-PHASE1; rules landed with a43eef2)
 
 ## 6. Widget migration matrix
 
