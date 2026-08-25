@@ -45,17 +45,17 @@ No backend migration, no SSE/streaming layer, no governed preflight, no auth/ses
 
 Rationale for placement: `.migration/v2-ui/` lives at the **repository root, outside `app/ui/`**, so `tsc`, `vitest`, and IDE indexing never see donor code; no exclude churn in protected config files. The donor tree is **untracked**.
 
-- [ ] Copy `C:\Users\rharu\AppDev\HaruquantAI-V2\app\ui\` → `HaruQuantAI\.migration\v2-ui\` (owner, local)
-- [ ] Add `.migration/` to `.gitignore` (own mini-task or first feature task)
-- [ ] Record donor provenance here: V2 commit SHA `____________`, copy date `____________`
-- [ ] Re-verify donor inventory against §6 matrix (20 widget families); record any deltas here: `____________`
-- [ ] Baseline verification before importing any donor component — all green:
-  - [ ] `uv run python scripts/generate_contracts.py --check` (from `app/ui`: `npm run contracts:check`)
-  - [ ] `app/ui`: `npx tsc --noEmit`
-  - [ ] `app/ui`: `npx vitest run`
-  - [ ] `app/ui`: `npm run build`
-  - [ ] `uv run pytest --no-cov tests/ui`
-  - [ ] pre-commit gates (`uv run pre-commit run --all-files` or equivalent)
+- [x] Copy `C:\Users\rharu\AppDev\HaruquantAI-V2\app\ui\` → `HaruQuantAI\.migration\v2-ui\` (owner, local) — done 2026-08-25: 387 files / 16.11 MB, 0 failed; excluded non-source artifacts (`node_modules`, `.next`, `dist`, `coverage`, `test-results`, `htmlcov`, `__pycache__`, `*.log`)
+- [x] Add `.migration/` to `.gitignore` (own mini-task or first feature task) — done 2026-08-25 (TASK-UI-MIG-PHASE0)
+- [x] Record donor provenance here: V2 commit SHA `ba06b61e5b2af1e911f70181528c6f4a492f03bf`, copy date `2026-08-25`
+- [x] Re-verify donor inventory against §6 matrix (20 widget families); record any deltas here: `none — donor src/widgets contains exactly the 20 matrix families (verified 2026-08-25)`
+- [x] Baseline verification before importing any donor component — all green:
+  - [x] `uv run python scripts/generate_contracts.py --check` (from `app/ui`: `npm run contracts:check`) — 33 artifacts, 0 problems (2026-08-25)
+  - [x] `app/ui`: `npx tsc --noEmit` — clean (2026-08-25)
+  - [x] `app/ui`: `npx vitest run` — 10 files / 35 tests passed (2026-08-25)
+  - [x] `app/ui`: `npm run build` — built in 2.44s, chunk-size warning only (2026-08-25)
+  - [x] `uv run pytest --no-cov tests/ui` — 13 passed (2026-08-25)
+  - [x] pre-commit gates (`uv run pre-commit run --all-files` or equivalent) — changed-file run passed (2026-08-25)
 
 ## 5. Phase 1 — Conventions adopted (rules land with this document)
 
