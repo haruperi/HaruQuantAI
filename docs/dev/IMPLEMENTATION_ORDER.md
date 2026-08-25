@@ -22,7 +22,7 @@ The governing rule is:
 
 A domain is not left partially implemented merely to create an early vertical product slice. Once a domain becomes the active waterfall stage, its complete target registry is reviewed, implemented, verified, integrated with every already-available dependency, and frozen as a completed baseline before the next domain begins.
 
-The deliberate exception is the UI-first workstation stage. D-UI is constructed early against ratified contracts and truthful mocks so the product shape is visible from the beginning; formal D-UI completion occurs only after the real provider domains and Interfaces are available.
+The deliberate exception is the UI-first workstation stage. D-UI is constructed early against ratified contracts and truthful mocks so the product shape is visible from the beginning; formal D-UI completion occurs as the real provider domains and Interfaces become available.
 
 ---
 
@@ -131,20 +131,20 @@ Only after this gate does the next waterfall domain begin.
 | 0 | Shared Foundation: Contracts -> Kernel -> Composition | Preserve implemented composability substrate and ratified whole-app contracts; no product-domain completion claim. |
 | 1 | `D-UI` User Interface & Workstation Construction | Build the complete workstation surface, typed widget host, and all 17 feature-owned UI surfaces against generated contracts and dev mocks. |
 | 2 | `D-WS` Workspace | Finish the complete Workspace domain and freeze it. |
-| 3 | `D-PLUG` Plugins | Finish plugin lifecycle, isolation, contributions, compatibility, and removal. |
-| 4 | `D-CAT` Catalogue | Finish instruments, provider mappings, sessions/calendars, trading rules, universes, currencies, and exchange. |
-| 5 | `D-BRK` Broker Connectivity | Finish provider profiles, environment/session isolation, reads/events, transport, certification, and safe unavailable behavior. |
-| 6 | `D-DATA` Data | Finish historical/live/external data, quality, versions, connectors, scenarios/news/events, retention, alignment, and run binding. |
-| 7 | `D-STRAT` Strategy | Finish the complete typed strategy language, editors/templates, indicators, ATM, code generation, MQL5, other targets, and plugin extension contracts. |
-| 8 | `D-RISK` Runtime Risk | Finish the complete Runtime Risk domain before Trading. Portfolio-aware paths use receiver-owned Risk contracts plus self-contained Portfolio evidence/projection fixtures; core Risk never depends on a Portfolio runtime provider. |
-| 9 | `D-TRD` Trading | Finish the single canonical business execution lifecycle and all SIM/PAPER/DEMO/LIVE route semantics before Simulator. |
-| 10 | `D-SIM` Simulator | Finish deterministic simulation as the SIM/PAPER execution authority, using the Trading/Risk lifecycle rather than a parallel business trading model. |
-| 11 | `D-ANA` Analytics | Finish result/databank/trade/operational analytics over canonical committed execution/result evidence. |
-| 12 | `D-RES` Research | Finish robustness, optimization, walk-forward, Builder/evolution, acceptance, AI/neural, drift, and research control. |
-| 13 | `D-PORT` Portfolio | Finish portfolio construction/simulation/search/risk/Markowitz/merge methods, then prove real Portfolio evidence submission into the already-complete Runtime Risk boundary without reopening Risk ownership. |
-| 14 | `D-ORCH` Orchestration | Finish durable projects/tasks/conditions/domain delegation/utilities/history/training workflows over the completed business domains. |
-| 15 | `D-IFACE` Interfaces | Finish HTTP/events/CLI/MCP/research/project/portfolio/trading/admin gateways against the completed application capability set. |
-| 16 | Final System Integration & Complete-System Release Gate | Remove remaining mocks, run all system workflows, hosted/local parity, and final release gates across the completed product. |
+| 3 | `D-PLUG` Plugins | Finish plugin lifecycle, isolation, contributions, compatibility, removal, and de-mock plugin UI views/extensions. |
+| 4 | `D-CAT` Catalogue | Finish instruments, provider mappings, sessions/calendars, trading rules, universes, currencies, exchange, and de-mock instrument/session editors. |
+| 5 | `D-BRK` Broker Connectivity | Finish provider profiles, environment/session isolation, reads/events, transport, certification, safe unavailable behavior, and de-mock broker admin. |
+| 6 | `D-DATA` Data | Finish historical/live/external data, quality, versions, connectors, scenarios/news/events, retention, alignment, run binding, and de-mock dataset management. |
+| 7 | `D-STRAT` Strategy | Finish typed strategy language, editors/templates, indicators, ATM, code generation, MQL5, targets, and de-mock strategy authoring/code workspaces. |
+| 8 | `D-RISK` Runtime Risk | Finish Runtime Risk domain before Trading. Portfolio-aware paths use receiver-owned Risk contracts plus self-contained Portfolio evidence fixtures. |
+| 9 | `D-TRD` Trading | Finish single canonical business execution lifecycle across SIM/PAPER/DEMO/LIVE routes, and de-mock live trading operations console & keyboard controls. |
+| 10 | `D-SIM` Simulator | Finish deterministic simulation as SIM/PAPER execution authority, and de-mock backtest execution, equity curve, trade lists, and data alternatives. |
+| 11 | `D-ANA` Analytics | Finish result/databank/trade/operational analytics over canonical committed execution evidence, and de-mock databank queries, filtering, and trade analysis. |
+| 12 | `D-RES` Research | Finish robustness, optimization, walk-forward, Builder/evolution, acceptance, AI/neural, drift, and de-mock research factory. |
+| 13 | `D-PORT` Portfolio | Finish portfolio construction/simulation/search/risk/Markowitz/merge methods, and de-mock portfolio studio. |
+| 14 | `D-ORCH` Orchestration | Finish durable projects/tasks/conditions/delegation/utilities/history/training, and de-mock project automation canvas, job control, and recent work. |
+| 15 | `D-IFACE` Interfaces | Finish HTTP/events/CLI/MCP/research/project/portfolio/trading/admin gateways, and de-mock capability administration. |
+| 16 | Final System Integration & Complete-System Release Gate | Remove remaining mocks, run all system workflows, verify hosted/local parity, and pass final release gates across the completed product. |
 
 The critical execution core is:
 
@@ -205,14 +205,13 @@ This is non-domain runtime infrastructure, not a product `FEAT-*` or business `F
 3. [X] Regenerate the TypeScript clients and types under `app/ui/src/contracts/generated/` from the new contracts and verify the existing generation flow stays the sole source (no hand-written public wire contracts under `app/ui/`). — evidence: `scripts/generate_contracts.py` (write/`--check`); 33 artifacts byte-identical across consecutive checks per `tests/contracts/test_contract_generation.py`; `ui_contracts.ts` deleted (zero references repo-wide); `npm --prefix app/ui run typecheck`, `test`, and `build` pass against the generated barrel.
 4. [X] Prove contract-roundtrip parity (schema validation, versioning, and generated-type equality) and update `app/contracts/README.md` to reflect the complete public contract inventory. — evidence: `tests/contracts/test_contract_roundtrip.py` (33 fixtures across every owner: JSON round-trip, extra field rejection, frozen mutation), `tests/contracts/test_contract_versions.py` (schema-version and key/major integrity), `tests/contracts/test_contract_boundaries.py`; `app/contracts/README.md` status header reconciled to the implemented wire-contract state.
 
-
 ---
 
 ### Stage 1 — User Interface (D-UI) & Workstation Construction
 
 **Authority:** [User Interface README](../../app/ui/README.md)
 
-**Purpose:** The User Interface domain delivers the complete React/TypeScript single-page trading workstation, feature-owned widget surfaces, accessibility, layout persistence, and full de-mock capability integration across all business domains.
+**Purpose:** Deliver the complete mock-backed UI surface in one coordinated pass: a secured local workspace, capability-aware public gateway, bounded plugin/widget contribution declarations, an accessible React workstation with truthful diagnostics, and every remaining `FEAT-UI-*` feature-owned widget surface built against the dev-only mock capability provider so later backend increments integrate and verify directly from the frontend.
 
 **Vertical path:** `Contract authoring (task 1.0) → workstation architecture foundation (task 1.01) → Launcher → Workspace → D-IFACE capability/readiness gateway → D-UI widget host/canvas → ordered feature-owned widgets on mock capability data`
 
@@ -228,7 +227,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 4. [ ] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue, and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts.
 5. [ ] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and listener/timer/subscription leak freedom before dependent widget slices proceed.
 
-
 ##### 1.1 [x] `FEAT-UI-COMPOSE_SHELL`
 
 1. [X] `FR-UI-ASSEMBLE_SHELL` — evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:24
@@ -237,147 +235,148 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 4. [X] `FR-UI-SHOW_CAPABILITY_STATE` — evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:149
 5. [X] `FR-UI-RESTORE_ROUTE` — evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:189
 
-##### 1.2 [ ] `FEAT-UI-START_WORK`
+##### 1.2 Partial — `FEAT-UI-START_WORK`
 
 1. [ ] `FR-UI-PRESENT_HOME`
 2. [ ] `FR-UI-SHOW_PRODUCT_NEWS`
-3. [ ] `FR-UI-RESUME_RECENT_WORK`
-4. [ ] `FR-UI-LAUNCH_SHORTCUTS`
+3. `FR-UI-RESUME_RECENT_WORK` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.8)
+4. `FR-UI-LAUNCH_SHORTCUTS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.8)
 
 ##### 1.3 [ ] `FEAT-UI-MANAGE_LAYOUTS`
 
 1. [ ] `FR-UI-PERSIST_LAYOUTS`
 2. [ ] `FR-UI-RESTORE_LAYOUTS`
 3. [ ] `FR-UI-SCALE_VIEWS`
-4. [ ] `FR-UI-COMPOSE_PANELS` (relocated from former 8.22; UI-only dependencies — completable in Increment 1)
-5. [ ] `FR-UI-MANAGE_TABS` (relocated from former 3.10; UI-only dependencies — completable in Increment 1)
+4. [ ] `FR-UI-COMPOSE_PANELS`
+5. [ ] `FR-UI-MANAGE_TABS`
 
-##### 1.4 [ ] `FEAT-UI-EDIT_INPUTS`
+##### 1.4 Partial — `FEAT-UI-EDIT_INPUTS`
 
 1. [ ] `FR-UI-PRESERVE_DRAFTS`
-2. [ ] `FR-UI-RENDER_FIELDS`
-3. [ ] `FR-UI-VALIDATE_INPUT`
-4. [ ] `FR-UI-RESOLVE_CONFLICTS`
-5. [ ] `FR-UI-CONFIRM_IMPACT`
+2. `FR-UI-RENDER_FIELDS` (mock build; completes at Stage 6 Data de-mock gate — 6.15)
+3. `FR-UI-VALIDATE_INPUT` (mock build; completes at Stage 6 Data de-mock gate — 6.15)
+4. `FR-UI-RESOLVE_CONFLICTS` (mock build; completes at Stage 6 Data de-mock gate — 6.15)
+5. `FR-UI-CONFIRM_IMPACT` (mock build; completes at Stage 6 Data de-mock gate — 6.15)
 
-##### 1.5 [ ] `FEAT-UI-MONITOR_WORK`
+##### 1.5 Partial — `FEAT-UI-MONITOR_WORK`
 
 1. [ ] `FR-UI-TRACK_PROGRESS`
 2. [ ] `FR-UI-STREAM_ACTIVITY`
 3. [ ] `FR-UI-PRESENT_FAILURES`
-4. [ ] `FR-UI-CONTROL_JOBS`
-5. [ ] `FR-UI-NOTIFY_OUTCOMES`
+4. `FR-UI-CONTROL_JOBS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.10)
+5. `FR-UI-NOTIFY_OUTCOMES` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.10)
 
-##### 1.6 [ ] `FEAT-UI-ADMINISTER_SYSTEM`
+##### 1.6 Partial — `FEAT-UI-ADMINISTER_SYSTEM`
 
 1. [ ] `FR-UI-SET_APPEARANCE`
 2. [ ] `FR-UI-CONFIGURE_CLIENT`
 3. [ ] `FR-UI-MANAGE_LICENSE`
-4. [ ] `FR-UI-MANAGE_UPDATES`
-5. [ ] `FR-UI-SET_LANGUAGE`
-6. [ ] `FR-UI-ADMINISTER_CAPABILITIES`
+4. `FR-UI-MANAGE_UPDATES` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.11)
+5. `FR-UI-SET_LANGUAGE` (mock build; completes at Stage 3 Plugins de-mock gate — 3.10)
+6. `FR-UI-ADMINISTER_CAPABILITIES` (mock build; completes at Stage 15 Interfaces de-mock gate — 15.8)
 
-##### 1.7 [ ] `FEAT-UI-ENSURE_ACCESS`
+##### 1.7 Partial — `FEAT-UI-ENSURE_ACCESS`
 
 1. [ ] `FR-UI-MANAGE_FOCUS`
 2. [ ] `FR-UI-DISTINGUISH_STATE`
-3. [ ] `FR-UI-PROVIDE_DATA_ALTERNATIVES`
-4. [ ] `FR-UI-PRESERVE_USABILITY`
-5. [ ] `FR-UI-OPERATE_BY_KEYBOARD`
-6. [ ] `FR-UI-LABEL_CONTROLS`
+3. `FR-UI-PROVIDE_DATA_ALTERNATIVES` (mock build; completes at Stage 10 Simulator de-mock gate — 10.15)
+4. `FR-UI-PRESERVE_USABILITY` (mock build; completes at Stage 3 Plugins de-mock gate — 3.11; locale-expansion acceptance requires `FR-UI-SET_LANGUAGE`)
+5. `FR-UI-OPERATE_BY_KEYBOARD` (mock build; completes at Stage 9 Trading de-mock gate — 9.10)
+6. `FR-UI-LABEL_CONTROLS` (mock build; completes at Stage 9 Trading de-mock gate — 9.10)
 
-##### 1.8 [ ] `FEAT-UI-MANAGE_DATA`
+##### 1.8 Partial — `FEAT-UI-MANAGE_DATA` (mock build)
 
-1. [ ] `FR-UI-BROWSE_DATASETS`
-2. [ ] `FR-UI-IMPORT_DATA`
-3. [ ] `FR-UI-EXPORT_DATA`
-4. [ ] `FR-UI-EDIT_INSTRUMENTS`
-5. [ ] `FR-UI-EDIT_SESSIONS`
-6. [ ] `FR-UI-SYNC_DATA`
-7. [ ] `FR-UI-ADMINISTER_DATA`
+1. `FR-UI-BROWSE_DATASETS` (mock build; completes at Stage 6 Data de-mock gate — 6.16)
+2. `FR-UI-IMPORT_DATA` (mock build; completes at Stage 6 Data de-mock gate — 6.16)
+3. `FR-UI-EXPORT_DATA` (mock build; completes at Stage 6 Data de-mock gate — 6.16)
+4. `FR-UI-EDIT_INSTRUMENTS` (mock build; completes at Stage 4 Catalogue de-mock gate — 4.8)
+5. `FR-UI-EDIT_SESSIONS` (mock build; completes at Stage 4 Catalogue de-mock gate — 4.8)
+6. `FR-UI-SYNC_DATA` (mock build; completes at Stage 6 Data de-mock gate — 6.16; requires `FEAT-DATA-SYNC_CONNECTORS` and Orchestration)
+7. `FR-UI-ADMINISTER_DATA` (mock build; completes at Stage 5 Broker Connectivity de-mock gate — 5.8; requires Broker Connectivity)
 
-##### 1.9 [ ] `FEAT-UI-AUTHOR_STRATEGIES`
+##### 1.9 Partial — `FEAT-UI-AUTHOR_STRATEGIES` (mock build)
 
-1. [ ] `FR-UI-EDIT_STRATEGY_TREE`
-2. [ ] `FR-UI-BROWSE_BLOCKS`
-3. [ ] `FR-UI-CONFIGURE_STRATEGY`
-4. [ ] `FR-UI-VALIDATE_STRATEGY`
-5. [ ] `FR-UI-USE_STRATEGY_EXAMPLES`
-6. [ ] `FR-UI-TEST_STRATEGY`
+1. `FR-UI-EDIT_STRATEGY_TREE` (mock build; completes at Stage 7 Strategy de-mock gate — 7.14)
+2. `FR-UI-BROWSE_BLOCKS` (mock build; completes at Stage 7 Strategy de-mock gate — 7.14)
+3. `FR-UI-CONFIGURE_STRATEGY` (mock build; completes at Stage 7 Strategy de-mock gate — 7.14)
+4. `FR-UI-VALIDATE_STRATEGY` (mock build; completes at Stage 7 Strategy de-mock gate — 7.14)
+5. `FR-UI-USE_STRATEGY_EXAMPLES` (mock build; completes at Stage 7 Strategy de-mock gate — 7.14)
+6. `FR-UI-TEST_STRATEGY` (mock build; completes at Stage 10 Simulator de-mock gate — 10.13; requires Simulator and Analytics)
 
-##### 1.10 [ ] `FEAT-UI-OPERATE_DATABANKS`
+##### 1.10 Partial — `FEAT-UI-OPERATE_DATABANKS` (mock build)
 
-1. [ ] `FR-UI-QUERY_DATABANKS`
-2. [ ] `FR-UI-CONFIGURE_COLUMNS`
-3. [ ] `FR-UI-SELECT_DATABANK_ROWS`
-4. [ ] `FR-UI-OPEN_DATABANK_RESULT`
-5. [ ] `FR-UI-FILTER_DATABANKS`
-6. [ ] `FR-UI-RUN_BULK_ACTIONS`
+1. `FR-UI-QUERY_DATABANKS` (mock build; completes at Stage 11 Analytics de-mock gate — 11.10)
+2. `FR-UI-CONFIGURE_COLUMNS` (mock build; completes at Stage 11 Analytics de-mock gate — 11.10)
+3. `FR-UI-SELECT_DATABANK_ROWS` (mock build; completes at Stage 11 Analytics de-mock gate — 11.10)
+4. `FR-UI-OPEN_DATABANK_RESULT` (mock build; completes at Stage 11 Analytics de-mock gate — 11.10)
+5. `FR-UI-FILTER_DATABANKS` (mock build; completes at Stage 11 Analytics de-mock gate — 11.10)
+6. `FR-UI-RUN_BULK_ACTIONS` (mock build; completes at Stage 11 Analytics de-mock gate — 11.10)
 
-##### 1.11 [ ] `FEAT-UI-EXPLORE_RESULTS`
+##### 1.11 Partial — `FEAT-UI-EXPLORE_RESULTS` (mock build)
 
-1. [ ] `FR-UI-SUMMARIZE_RESULTS`
-2. [ ] `FR-UI-PLOT_EQUITY`
-3. [ ] `FR-UI-LIST_TRADES`
-4. [ ] `FR-UI-PLOT_TRADES`
-5. [ ] `FR-UI-ANALYZE_TRADES`
-6. [ ] `FR-UI-EXPORT_RESULTS`
-7. [ ] `FR-UI-INSPECT_SOURCE`
-8. [ ] `FR-UI-INSPECT_ROBUSTNESS`
+1. `FR-UI-SUMMARIZE_RESULTS` (mock build; completes at Stage 10 Simulator de-mock gate — 10.14)
+2. `FR-UI-PLOT_EQUITY` (mock build; completes at Stage 10 Simulator de-mock gate — 10.14)
+3. `FR-UI-LIST_TRADES` (mock build; completes at Stage 10 Simulator de-mock gate — 10.14)
+4. `FR-UI-PLOT_TRADES` (mock build; completes at Stage 10 Simulator de-mock gate — 10.14)
+5. `FR-UI-ANALYZE_TRADES` (mock build; completes at Stage 11 Analytics de-mock gate — 11.11)
+6. `FR-UI-EXPORT_RESULTS` (mock build; completes at Stage 11 Analytics de-mock gate — 11.11)
+7. `FR-UI-INSPECT_SOURCE` (mock build; completes at Stage 7 Strategy de-mock gate — 7.16)
+8. `FR-UI-INSPECT_ROBUSTNESS` (mock build; completes at Stage 12 Research de-mock gate — 12.15)
 
-##### 1.12 [ ] `FEAT-UI-EDIT_CODE`
+##### 1.12 Partial — `FEAT-UI-EDIT_CODE` (mock build)
 
-1. [ ] `FR-UI-NAVIGATE_CODE`
-2. [ ] `FR-UI-SEARCH_CODE`
-3. [ ] `FR-UI-EDIT_CODE_TABS`
-4. [ ] `FR-UI-MANAGE_CODE_FILES`
-5. [ ] `FR-UI-SHOW_CODE_DIAGNOSTICS`
-6. [ ] `FR-UI-TEST_EXTENSIONS`
+1. `FR-UI-NAVIGATE_CODE` (mock build; completes at Stage 7 Strategy de-mock gate — 7.15)
+2. `FR-UI-SEARCH_CODE` (mock build; completes at Stage 7 Strategy de-mock gate — 7.15)
+3. `FR-UI-EDIT_CODE_TABS` (mock build; completes at Stage 3 Plugins de-mock gate — 3.9)
+4. `FR-UI-MANAGE_CODE_FILES` (mock build; completes at Stage 3 Plugins de-mock gate — 3.9)
+5. `FR-UI-SHOW_CODE_DIAGNOSTICS` (mock build; completes at Stage 3 Plugins de-mock gate — 3.9)
+6. `FR-UI-TEST_EXTENSIONS` (mock build; completes at Stage 3 Plugins de-mock gate — 3.9)
 
-##### 1.13 [ ] `FEAT-UI-RUN_RESEARCH`
+##### 1.13 Partial — `FEAT-UI-RUN_RESEARCH` (mock build)
 
-1. [ ] `FR-UI-SELECT_RESEARCH_MODE`
-2. [ ] `FR-UI-CONFIGURE_RESEARCH`
-3. [ ] `FR-UI-PREVIEW_RESEARCH`
-4. [ ] `FR-UI-CONTROL_RESEARCH`
-5. [ ] `FR-UI-COMPARE_RESEARCH`
-6. [ ] `FR-UI-REUSE_RESEARCH_SETTINGS`
+1. `FR-UI-SELECT_RESEARCH_MODE` (mock build; completes at Stage 12 Research de-mock gate — 12.14)
+2. `FR-UI-CONFIGURE_RESEARCH` (mock build; completes at Stage 12 Research de-mock gate — 12.14)
+3. `FR-UI-PREVIEW_RESEARCH` (mock build; completes at Stage 12 Research de-mock gate — 12.14)
+4. `FR-UI-CONTROL_RESEARCH` (mock build; completes at Stage 12 Research de-mock gate — 12.14)
+5. `FR-UI-COMPARE_RESEARCH` (mock build; completes at Stage 12 Research de-mock gate — 12.14)
+6. `FR-UI-REUSE_RESEARCH_SETTINGS` (mock build; completes at Stage 12 Research de-mock gate — 12.14)
 
-##### 1.14 [ ] `FEAT-UI-EDIT_PROJECTS`
+##### 1.14 Partial — `FEAT-UI-EDIT_PROJECTS` (mock build)
 
-1. [ ] `FR-UI-MANAGE_PROJECTS`
-2. [ ] `FR-UI-EDIT_TASKS`
-3. [ ] `FR-UI-EDIT_PROJECT_GRAPH`
-4. [ ] `FR-UI-COMPARE_PROJECTS`
-5. [ ] `FR-UI-CONTROL_PROJECTS`
-6. [ ] `FR-UI-INSPECT_PROJECTS`
+1. `FR-UI-MANAGE_PROJECTS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.9)
+2. `FR-UI-EDIT_TASKS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.9)
+3. `FR-UI-EDIT_PROJECT_GRAPH` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.9)
+4. `FR-UI-COMPARE_PROJECTS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.9)
+5. `FR-UI-CONTROL_PROJECTS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.9)
+6. `FR-UI-INSPECT_PROJECTS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.9)
 
-##### 1.15 [ ] `FEAT-UI-COMPOSE_PORTFOLIOS`
+##### 1.15 Partial — `FEAT-UI-COMPOSE_PORTFOLIOS` (mock build)
 
-1. [ ] `FR-UI-SELECT_CONSTITUENTS`
-2. [ ] `FR-UI-EDIT_PORTFOLIO`
-3. [ ] `FR-UI-INSPECT_CORRELATION`
-4. [ ] `FR-UI-RUN_PORTFOLIO`
-5. [ ] `FR-UI-COMPARE_PORTFOLIOS`
+1. `FR-UI-SELECT_CONSTITUENTS` (mock build; completes at Stage 13 Portfolio de-mock gate — 13.9)
+2. `FR-UI-EDIT_PORTFOLIO` (mock build; completes at Stage 13 Portfolio de-mock gate — 13.9)
+3. `FR-UI-INSPECT_CORRELATION` (mock build; completes at Stage 13 Portfolio de-mock gate — 13.9)
+4. `FR-UI-RUN_PORTFOLIO` (mock build; completes at Stage 13 Portfolio de-mock gate — 13.9)
+5. `FR-UI-COMPARE_PORTFOLIOS` (mock build; completes at Stage 13 Portfolio de-mock gate — 13.9)
 
-##### 1.16 [ ] `FEAT-UI-OPERATE_TRADING`
+##### 1.16 Partial — `FEAT-UI-OPERATE_TRADING` (mock build)
 
-1. [ ] `FR-UI-MANAGE_TRADING_SESSIONS`
-2. [ ] `FR-UI-SHOW_TRADING_READINESS`
-3. [ ] `FR-UI-PREVIEW_TRADING_ACTION`
-4. [ ] `FR-UI-COMMIT_TRADING_ACTION`
-5. [ ] `FR-UI-OPERATE_KILL_SWITCH`
-6. [ ] `FR-UI-WATCH_TRADING_EVENTS`
-7. [ ] `FR-UI-WATCH_MARKETS`
-8. [ ] `FR-UI-INSPECT_OPERATOR_ANALYTICS`
+1. `FR-UI-MANAGE_TRADING_SESSIONS` (mock build; completes at Stage 9 Trading de-mock gate — 9.9)
+2. `FR-UI-SHOW_TRADING_READINESS` (mock build; completes at Stage 9 Trading de-mock gate — 9.9)
+3. `FR-UI-PREVIEW_TRADING_ACTION` (mock build; completes at Stage 9 Trading de-mock gate — 9.9)
+4. `FR-UI-COMMIT_TRADING_ACTION` (mock build; completes at Stage 9 Trading de-mock gate — 9.9)
+5. `FR-UI-OPERATE_KILL_SWITCH` (mock build; completes at Stage 9 Trading de-mock gate — 9.9)
+6. `FR-UI-WATCH_TRADING_EVENTS` (mock build; completes at Stage 9 Trading de-mock gate — 9.9)
+7. `FR-UI-WATCH_MARKETS` (mock build; completes at Stage 9 Trading de-mock gate — 9.9)
+8. `FR-UI-INSPECT_OPERATOR_ANALYTICS` (mock build; completes at Stage 9 Trading de-mock gate — 9.9)
 
-##### 1.17 [ ] `FEAT-UI-EXTEND_VIEWS`
+##### 1.17 Partial — `FEAT-UI-EXTEND_VIEWS` (mock build)
 
-1. [ ] `FR-UI-DECLARE_VIEW_CONTRIBUTIONS`
-2. [ ] `FR-UI-VALIDATE_VIEW_CONTRIBUTIONS`
-3. [ ] `FR-UI-SCOPE_VIEW_EFFECTS`
-4. [ ] `FR-UI-REPLACE_VIEW_PROVIDERS`
-5. [ ] `FR-UI-REMOVE_VIEW_CONTRIBUTIONS`
+1. `FR-UI-DECLARE_VIEW_CONTRIBUTIONS` (mock build; completes at Stage 3 Plugins de-mock gate — 3.8)
+2. `FR-UI-VALIDATE_VIEW_CONTRIBUTIONS` (mock build; completes at Stage 3 Plugins de-mock gate — 3.8)
+3. `FR-UI-SCOPE_VIEW_EFFECTS` (mock build; completes at Stage 3 Plugins de-mock gate — 3.8)
+4. `FR-UI-REPLACE_VIEW_PROVIDERS` (mock build; completes at Stage 3 Plugins de-mock gate — 3.8)
+5. `FR-UI-REMOVE_VIEW_CONTRIBUTIONS` (mock build; completes at Stage 3 Plugins de-mock gate — 3.8)
+
 
 ---
 
@@ -463,6 +462,32 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 1. [ ] `FR-PLUG-VALIDATE_PLUGIN_PACKAGES`
 2. [ ] `FR-PLUG-DECLARE_PLUGIN_COMPATIBILITY`
 
+#### `D-UI` — User Interface De-mock Gates (Stage 3)
+
+
+##### 3.8 [ ] `FEAT-UI-EXTEND_VIEWS`
+
+1. [ ] `FR-UI-DECLARE_VIEW_CONTRIBUTIONS`
+2. [ ] `FR-UI-VALIDATE_VIEW_CONTRIBUTIONS`
+3. [ ] `FR-UI-SCOPE_VIEW_EFFECTS`
+4. [ ] `FR-UI-REPLACE_VIEW_PROVIDERS`
+5. [ ] `FR-UI-REMOVE_VIEW_CONTRIBUTIONS`
+
+##### 3.9 [ ] `FEAT-UI-EDIT_CODE`
+
+1. [ ] `FR-UI-EDIT_CODE_TABS`
+2. [ ] `FR-UI-MANAGE_CODE_FILES`
+3. [ ] `FR-UI-SHOW_CODE_DIAGNOSTICS`
+4. [ ] `FR-UI-TEST_EXTENSIONS`
+
+##### 3.10 [ ] `FEAT-UI-ADMINISTER_SYSTEM`
+
+1. [ ] `FR-UI-SET_LANGUAGE`
+
+##### 3.11 [ ] `FEAT-UI-ENSURE_ACCESS`
+
+1. [ ] `FR-UI-PRESERVE_USABILITY`
+
 ---
 
 ### Stage 4 — Catalogue (D-CAT)
@@ -506,6 +531,14 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 ##### 4.7 [ ] `FEAT-CAT-EXCHANGE_CATALOGUE`
 
 1. [ ] `FR-CAT-EXCHANGE_CATALOGUE_DEFINITIONS`
+
+#### `D-UI` — User Interface De-mock Gates (Stage 4)
+
+
+##### 4.8 [ ] `FEAT-UI-MANAGE_DATA`
+
+1. [ ] `FR-UI-EDIT_INSTRUMENTS`
+2. [ ] `FR-UI-EDIT_SESSIONS`
 
 ---
 
@@ -564,6 +597,13 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 1. [ ] `FR-BRK-TEST_ADAPTER_CONFORMANCE`
 2. [ ] `FR-BRK-CERTIFY_BROKER_WRITES`
 3. [ ] `FR-BRK-VERSION_ADAPTER_CERTIFICATION`
+
+#### `D-UI` — User Interface De-mock Gates (Stage 5)
+
+
+##### 5.8 [ ] `FEAT-UI-MANAGE_DATA`
+
+1. [ ] `FR-UI-ADMINISTER_DATA`
 
 ---
 
@@ -663,6 +703,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 5. [ ] `FR-DATA-RECONNECT_MARKET_FEEDS`
 6. [ ] `FR-DATA-RECORD_MARKET_REPLAYS`
 
+#### `D-UI` — User Interface De-mock Gates (Stage 6)
+
+
+##### 6.15 [ ] `FEAT-UI-EDIT_INPUTS`
+
+1. [ ] `FR-UI-RENDER_FIELDS`
+2. [ ] `FR-UI-VALIDATE_INPUT`
+3. [ ] `FR-UI-RESOLVE_CONFLICTS`
+4. [ ] `FR-UI-CONFIRM_IMPACT`
+
+##### 6.16 [ ] `FEAT-UI-MANAGE_DATA`
+
+1. [ ] `FR-UI-BROWSE_DATASETS`
+2. [ ] `FR-UI-IMPORT_DATA`
+3. [ ] `FR-UI-EXPORT_DATA`
+4. [ ] `FR-UI-SYNC_DATA`
+
 ---
 
 ### Stage 7 — Strategy (D-STRAT)
@@ -757,6 +814,26 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 ##### 7.13 [ ] `FEAT-STRAT-GENERATE_TARGETS`
 
 1. [ ] `FR-STRAT-IMPLEMENT_CODE_TARGETS`
+
+#### `D-UI` — User Interface De-mock Gates (Stage 7)
+
+
+##### 7.14 [ ] `FEAT-UI-AUTHOR_STRATEGIES`
+
+1. [ ] `FR-UI-EDIT_STRATEGY_TREE`
+2. [ ] `FR-UI-BROWSE_BLOCKS`
+3. [ ] `FR-UI-CONFIGURE_STRATEGY`
+4. [ ] `FR-UI-VALIDATE_STRATEGY`
+5. [ ] `FR-UI-USE_STRATEGY_EXAMPLES`
+
+##### 7.15 [ ] `FEAT-UI-EDIT_CODE`
+
+1. [ ] `FR-UI-NAVIGATE_CODE`
+2. [ ] `FR-UI-SEARCH_CODE`
+
+##### 7.16 [ ] `FEAT-UI-EXPLORE_RESULTS`
+
+1. [ ] `FR-UI-INSPECT_SOURCE`
 
 ---
 
@@ -887,6 +964,25 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 3. [ ] `FR-TRD-QUERY_TRADING_STATE`
 4. [ ] `FR-TRD-ENFORCE_ACTION_PARITY`
 
+#### `D-UI` — User Interface De-mock Gates (Stage 9)
+
+
+##### 9.9 [ ] `FEAT-UI-OPERATE_TRADING`
+
+1. [ ] `FR-UI-MANAGE_TRADING_SESSIONS`
+2. [ ] `FR-UI-SHOW_TRADING_READINESS`
+3. [ ] `FR-UI-PREVIEW_TRADING_ACTION`
+4. [ ] `FR-UI-COMMIT_TRADING_ACTION`
+5. [ ] `FR-UI-OPERATE_KILL_SWITCH`
+6. [ ] `FR-UI-WATCH_TRADING_EVENTS`
+7. [ ] `FR-UI-WATCH_MARKETS`
+8. [ ] `FR-UI-INSPECT_OPERATOR_ANALYTICS`
+
+##### 9.10 [ ] `FEAT-UI-ENSURE_ACCESS`
+
+1. [ ] `FR-UI-OPERATE_BY_KEYBOARD`
+2. [ ] `FR-UI-LABEL_CONTROLS`
+
 ---
 
 ### Stage 10 — Simulator (D-SIM)
@@ -977,6 +1073,24 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 2. [ ] `FR-SIM-DEFINE_STOCKPICKER_TIMING`
 3. [ ] `FR-SIM-ENFORCE_DAILY_STOCKPICKER`
 
+#### `D-UI` — User Interface De-mock Gates (Stage 10)
+
+
+##### 10.13 [ ] `FEAT-UI-AUTHOR_STRATEGIES`
+
+1. [ ] `FR-UI-TEST_STRATEGY`
+
+##### 10.14 [ ] `FEAT-UI-EXPLORE_RESULTS`
+
+1. [ ] `FR-UI-SUMMARIZE_RESULTS`
+2. [ ] `FR-UI-PLOT_EQUITY`
+3. [ ] `FR-UI-LIST_TRADES`
+4. [ ] `FR-UI-PLOT_TRADES`
+
+##### 10.15 [ ] `FEAT-UI-ENSURE_ACCESS`
+
+1. [ ] `FR-UI-PROVIDE_DATA_ALTERNATIVES`
+
 ---
 
 ### Stage 11 — Analytics (D-ANA)
@@ -1050,6 +1164,23 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 4. [ ] `FR-ANA-ANALYZE_EMERGENCY_RESPONSE`
 5. [ ] `FR-ANA-QUALIFY_OPERATORS`
 6. [ ] `FR-ANA-EXPORT_OPERATIONAL_ANALYTICS`
+
+#### `D-UI` — User Interface De-mock Gates (Stage 11)
+
+
+##### 11.10 [ ] `FEAT-UI-OPERATE_DATABANKS`
+
+1. [ ] `FR-UI-QUERY_DATABANKS`
+2. [ ] `FR-UI-CONFIGURE_COLUMNS`
+3. [ ] `FR-UI-SELECT_DATABANK_ROWS`
+4. [ ] `FR-UI-OPEN_DATABANK_RESULT`
+5. [ ] `FR-UI-FILTER_DATABANKS`
+6. [ ] `FR-UI-RUN_BULK_ACTIONS`
+
+##### 11.11 [ ] `FEAT-UI-EXPLORE_RESULTS`
+
+1. [ ] `FR-UI-ANALYZE_TRADES`
+2. [ ] `FR-UI-EXPORT_RESULTS`
 
 ---
 
@@ -1150,6 +1281,22 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 5. [ ] `FR-RES-CLASSIFY_DRIFT_STATE`
 6. [ ] `FR-RES-RECORD_INTELLIGENCE_LINEAGE`
 
+#### `D-UI` — User Interface De-mock Gates (Stage 12)
+
+
+##### 12.14 [ ] `FEAT-UI-RUN_RESEARCH`
+
+1. [ ] `FR-UI-SELECT_RESEARCH_MODE`
+2. [ ] `FR-UI-CONFIGURE_RESEARCH`
+3. [ ] `FR-UI-PREVIEW_RESEARCH`
+4. [ ] `FR-UI-CONTROL_RESEARCH`
+5. [ ] `FR-UI-COMPARE_RESEARCH`
+6. [ ] `FR-UI-REUSE_RESEARCH_SETTINGS`
+
+##### 12.15 [ ] `FEAT-UI-EXPLORE_RESULTS`
+
+1. [ ] `FR-UI-INSPECT_ROBUSTNESS`
+
 ---
 
 ### Stage 13 — Portfolio (D-PORT)
@@ -1206,6 +1353,17 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 ##### 13.8 [ ] `FEAT-PORT-EXTEND_PORTFOLIO_METHODS`
 
 1. [ ] `FR-PORT-REGISTER_PORTFOLIO_METHODS`
+
+#### `D-UI` — User Interface De-mock Gates (Stage 13)
+
+
+##### 13.9 [ ] `FEAT-UI-COMPOSE_PORTFOLIOS`
+
+1. [ ] `FR-UI-SELECT_CONSTITUENTS`
+2. [ ] `FR-UI-EDIT_PORTFOLIO`
+3. [ ] `FR-UI-INSPECT_CORRELATION`
+4. [ ] `FR-UI-RUN_PORTFOLIO`
+5. [ ] `FR-UI-COMPARE_PORTFOLIOS`
 
 ---
 
@@ -1270,6 +1428,32 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 1. [ ] `FR-ORCH-TRAIN_NEURAL_NETWORKS`
 
+#### `D-UI` — User Interface De-mock Gates (Stage 14)
+
+
+##### 14.8 [ ] `FEAT-UI-START_WORK`
+
+1. [ ] `FR-UI-RESUME_RECENT_WORK`
+2. [ ] `FR-UI-LAUNCH_SHORTCUTS`
+
+##### 14.9 [ ] `FEAT-UI-EDIT_PROJECTS`
+
+1. [ ] `FR-UI-MANAGE_PROJECTS`
+2. [ ] `FR-UI-EDIT_TASKS`
+3. [ ] `FR-UI-EDIT_PROJECT_GRAPH`
+4. [ ] `FR-UI-COMPARE_PROJECTS`
+5. [ ] `FR-UI-CONTROL_PROJECTS`
+6. [ ] `FR-UI-INSPECT_PROJECTS`
+
+##### 14.10 [ ] `FEAT-UI-MONITOR_WORK`
+
+1. [ ] `FR-UI-CONTROL_JOBS`
+2. [ ] `FR-UI-NOTIFY_OUTCOMES`
+
+##### 14.11 [ ] `FEAT-UI-ADMINISTER_SYSTEM`
+
+1. [ ] `FR-UI-MANAGE_UPDATES`
+
 ---
 
 ### Stage 15 — Interfaces (D-IFACE)
@@ -1329,6 +1513,13 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 6. [ ] `FR-IFACE-DISPLAY_MARKET_DATA`
 7. [ ] `FR-IFACE-DISPLAY_OPERATOR_ANALYTICS`
 8. [ ] `FR-IFACE-ENFORCE_TRANSPORT_PARITY`
+
+#### `D-UI` — User Interface De-mock Gates (Stage 15)
+
+
+##### 15.8 [ ] `FEAT-UI-ADMINISTER_SYSTEM`
+
+1. [ ] `FR-UI-ADMINISTER_CAPABILITIES`
 ---
 
 ### Stage 16 — Final System Integration and Complete-System Release Gate
