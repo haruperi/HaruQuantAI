@@ -13,6 +13,12 @@ multi-delegate = "fresh-process"
 manual = "fresh-chat"
 
 [[transitions]]
+source_role = "ORCHESTRATOR"
+handoff = "TASK_ACTIVATED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
 source_role = "PLANNER"
 handoff = "PENDING_APPROVAL"
 target_role = "EXECUTOR"

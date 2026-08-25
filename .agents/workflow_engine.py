@@ -10,24 +10,26 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from workflow_runtime import *  # noqa: F403,E402
 
 
-def _handle_planner(cfg: dict[str, Any], state: dict[str, Any], initial: bool) -> None:
+def _handle_task_activation(cfg: dict[str, Any], state: dict[str, Any]) -> None:
+    print("\n=== ORCHESTRATOR — task activation ===")
+    _activate_task(cfg, state)
+
+
+def _handle_planner(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     iteration = state["iteration"]
     print(f"\n=== PLANNER — Dry Run {iteration} ===")
-    if initial:
-        prompt = compose_prompt(cfg["templates"]["planner"], _build_fields(state, cfg))
-        stdout, log = run_agent(cfg, "planner", prompt, f"{state['run_id']}-planner-{iteration}")
-    else:
-        stdout, log = _invoke_pending(cfg, state, "PLANNER")
+    stdout, log = _invoke_pending(cfg, state, "PLANNER")
     block = _resolve_handoff(
         cfg["journals"]["planner"], stdout, "PLANNER", {"PENDING_APPROVAL", "BLOCKED"}
     )
     _validate_activating(
         block, _transition_for(cfg["transitions"], "PLANNER", block["handoff"])
     )
-    if not state.get("branch"):
-        state["branch"] = _git_ok(cfg["repo"], "branch", "--show-current")
-    if state["branch"] == cfg["main_branch"]:
-        raise OrchestratorError("Planner did not create/switch to the task branch.")
+    current_branch = _git_ok(cfg["repo"], "branch", "--show-current")
+    if current_branch != state.get("branch") or current_branch == cfg["main_branch"]:
+        raise OrchestratorError(
+            f"Planner changed task branch state: current={current_branch!r}, expected={state.get('branch')!r}."
+        )
     state["plan_hash"] = _sha_file(cfg["journals"]["planner"])
     _record(state, "planner", handoff=block["handoff"], log=str(log))
     if block["handoff"] == "BLOCKED":
@@ -229,10 +231,10 @@ def router(
             _save_state(cfg, state)
             return state
         phase = state["phase"]
-        if phase == "initial_planner":
-            _handle_planner(cfg, state, initial=True)
+        if phase == "task_activation":
+            _handle_task_activation(cfg, state)
         elif phase == "planner":
-            _handle_planner(cfg, state, initial=False)
+            _handle_planner(cfg, state)
         elif phase == "planner_blocked":
             print("Planner is BLOCKED. Resolve the documented cause, then run resume.")
             state["phase"] = "planner"

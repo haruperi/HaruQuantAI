@@ -210,6 +210,22 @@ def _entry_gate(cfg: dict[str, Any]) -> str:
     return _git_ok(repo, "rev-parse", "HEAD")
 
 
+def _branch_component(value: str) -> str:
+    component = re.sub(r"[^a-z0-9._-]+", "-", value.lower().replace("_", "-"))
+    component = component.strip("-.")
+    if not component:
+        raise OrchestratorError(f"Cannot derive branch component from {value!r}.")
+    return component
+
+
+def _derive_task_branch(task: dict[str, Any]) -> str:
+    """Derive the deterministic task branch from validated task metadata."""
+    prefix = "feature" if str(task.get("task_kind", "feature")).lower() == "feature" else "task"
+    task_id = _branch_component(str(task["task_id"]))
+    slug = _branch_component(str(task["task_slug"]))
+    return f"{prefix}/{task_id}-{slug}"
+
+
 def _build_fields(state: dict[str, Any], cfg: dict[str, Any]) -> dict[str, Any]:
     task = cast("dict[str, Any]", state["task"])
     return {
@@ -227,7 +243,7 @@ def _build_fields(state: dict[str, Any], cfg: dict[str, Any]) -> dict[str, Any]:
         "implementation_file": task.get("implementation_file", "(none)"),
         "implementation_entry": task.get("implementation_entry", "(none)"),
         "iteration": state["iteration"],
-        "branch": state.get("branch") or "(created by Planner)",
+        "branch": state.get("branch") or "(created by orchestrator during activation)",
         "baseline_commit": state["baseline"],
         "correction_context": state.get("correction_context", "None"),
         "owner_feedback": state.get("owner_feedback", "None") or "None",
@@ -248,6 +264,65 @@ def _blocker_ledger(state: dict[str, Any]) -> str:
         f"{item['raised_by']} iteration {item['iteration']} ({item['status']})"
         for item in blockers
     )
+
+
+def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
+    """Create/verify the task branch and materialize the initial Planner artifact."""
+    repo: Path = cfg["repo"]
+    baseline = str(state["baseline"])
+    branch = str(state.get("branch") or _derive_task_branch(cast("dict[str, Any]", state["task"])))
+    current_branch = _git_ok(repo, "branch", "--show-current")
+    current_head = _git_ok(repo, "rev-parse", "HEAD")
+
+    if state.get("branch"):
+        if current_branch != branch:
+            raise OrchestratorError(
+                f"Task activation expected branch {branch!r}; current branch is {current_branch!r}."
+            )
+        if current_head != baseline:
+            raise OrchestratorError("Task branch HEAD changed before initial Planner activation.")
+    else:
+        if current_branch != cfg["main_branch"] or current_head != baseline:
+            raise OrchestratorError("Task activation must begin from the recorded clean main baseline.")
+        check = _git(repo, "check-ref-format", "--branch", branch)
+        if check.returncode != 0:
+            raise OrchestratorError(f"Derived task branch is invalid: {branch!r}.")
+        exists = _git(repo, "show-ref", "--verify", "--quiet", f"refs/heads/{branch}")
+        if exists.returncode == 0:
+            raise OrchestratorError(f"Task branch already exists: {branch!r}.")
+        _git_ok(repo, "switch", "-c", branch, baseline)
+        state["branch"] = branch
+        state["phase"] = "task_activation"
+        _record(state, "task_branch_created", branch=branch)
+        _save_state(cfg, state)
+
+    body = compose_prompt(cfg["templates"]["planner"], _build_fields(state, cfg))
+    transition = _transition_for(cfg["transitions"], "ORCHESTRATOR", "TASK_ACTIVATED")
+    metadata = {
+        "prompt_schema_version": SCHEMA_VERSION,
+        "run_id": state["run_id"],
+        "task_id": state["task"]["task_id"],
+        "iteration": state["iteration"],
+        "source_role": "ORCHESTRATOR",
+        "target_role": "PLANNER",
+        "handoff": "TASK_ACTIVATED",
+        "branch": branch,
+        "baseline_commit": baseline,
+        "source_head": _git_ok(repo, "rev-parse", "HEAD"),
+        "template_path": transition.target_template or "docs/templates/prompt/planner.md",
+        "requires_owner_gate": False,
+        "owner_gate": "",
+    }
+    cfg["next_agent"].write_text(_render_next_agent(metadata, body), encoding="utf-8")
+    validate_next_agent(
+        cfg,
+        state,
+        expected_source="ORCHESTRATOR",
+        expected_handoff="TASK_ACTIVATED",
+    )
+    state["phase"] = "planner"
+    _record(state, "task_activation", handoff="TASK_ACTIVATED", branch=branch)
+    _save_state(cfg, state)
 
 
 def _append_owner_approval(cfg: dict[str, Any], state: dict[str, Any]) -> None:

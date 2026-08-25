@@ -49,7 +49,7 @@ def cmd_start(args: argparse.Namespace) -> int:
         "baseline": baseline,
         "branch": None,
         "iteration": 1,
-        "phase": "initial_planner",
+        "phase": "task_activation",
         "status": "RUNNING",
         "owner_feedback": "",
         "correction_context": "None",
@@ -245,7 +245,7 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
             "baseline": baseline,
             "branch": None,
             "iteration": 1,
-            "phase": "initial_planner",
+            "phase": "task_activation",
             "status": "RUNNING",
             "owner_feedback": "",
             "correction_context": "None",
@@ -263,6 +263,10 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
             ),
             "owner approval no Planner approval phase": all(
                 item.get("phase") != "approval_record"
+                for item in cast("list[dict[str, Any]]", result.get("history", []))
+            ),
+            "task activation recorded": any(
+                item.get("phase") == "task_activation"
                 for item in cast("list[dict[str, Any]]", result.get("history", []))
             ),
             "all active files empty": all(

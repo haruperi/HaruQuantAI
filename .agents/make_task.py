@@ -148,7 +148,9 @@ implementation_entry = "{args.entry}"
     out_path.write_text(body, encoding="utf-8")
     print(f"[ok] wrote {out_path} for {args.entry} {feature}")
     print(f"     FRs: {', '.join(fr_ids) if fr_ids else '(none parsed)'}")
-    print(f"     start with: read .agents/ORCHESTRATOR.md and run task {out_path}")
+    print("     next: activate this task through the current orchestrator")
+    print(f'     chat: "Activate and run the task defined in {out_path}."')
+    print(f"     CLI:  uv run .agents/orchestrator.py start --task-file {out_path}")
     return 0
 
 

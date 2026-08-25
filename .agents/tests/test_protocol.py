@@ -22,6 +22,16 @@ def test_protocol_has_unique_source_handoff_pairs() -> None:
     assert len(keys) == len(set(keys))
 
 
+def test_protocol_contains_task_activation() -> None:
+    """Initial Planner startup is a protocol-defined artifact transition."""
+    protocol_path = Path(__file__).resolve().parents[1] / "protocol.toml"
+    _, transitions = orchestrator._parse_protocol(protocol_path)
+    activation = orchestrator._transition_for(transitions, "ORCHESTRATOR", "TASK_ACTIVATED")
+    assert activation.target_role == "PLANNER"
+    assert activation.target_template == "docs/templates/prompt/planner.md"
+    assert activation.gate is None
+
+
 def test_protocol_contains_owner_gates() -> None:
     """Execution and commit owner gates remain explicit."""
     protocol_path = Path(__file__).resolve().parents[1] / "protocol.toml"

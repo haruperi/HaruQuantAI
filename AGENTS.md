@@ -26,7 +26,9 @@
 
 ## 2. Three-role development workflow
 
-The workflow is **Planner → Executor → Reviewer**. `.agents/protocol.toml` is the machine-readable transition contract. Canonical role prompts live in `docs/templates/prompt/`; `.agents/task/next-agent.md` is the complete instantiated prompt for the next role.
+The workflow is **Planner → Executor → Reviewer**. `.agents/protocol.toml` is the machine-readable transition contract. Canonical role prompts live in `docs/templates/prompt/`; `.agents/task/next-agent.md` is the complete instantiated prompt for the next reasoning role.
+
+**Role-invocation invariant:** no Planner, Executor, or Reviewer invocation may occur unless its complete prompt already exists in `.agents/task/next-agent.md` and has passed protocol validation. This includes the initial Planner invocation after task activation.
 
 ### 2.1 Active-task workspace
 
@@ -43,7 +45,7 @@ Tracked files:
 Rules:
 
 - `planner.md`, `executor.md`, and `reviewer.md` are append-only during an active task and written only by their owning role, except for the narrow deterministic owner-gate record described below.
-- `next-agent.md` is replace-only. At every non-terminal role transition it contains exactly one complete standalone prompt for the next role.
+- `next-agent.md` is replace-only. Before every reasoning-role invocation it contains exactly one complete standalone prompt for that role.
 - All four files are zero bytes when no task is active and after accepted close-out.
 - They are coordination artifacts, not product specifications, feature registries, or permanent decision history.
 - Every non-terminal journal handoff must agree with a valid `next-agent.md`; missing, stale, contradictory, or partially instantiated prompts fail closed.
@@ -52,22 +54,30 @@ Rules:
 
 Every development agent invocation has exactly one role: `PLANNER`, `EXECUTOR`, or `REVIEWER`. Only one role writes at a time. Roles never run concurrently on the same task branch. A role stops if its authority conflicts with the active handoff.
 
-The orchestrator is not a fourth reasoning role. It may only perform deterministic routing/validation and deterministic owner-gate bookkeeping. It never authors planning, implementation, or review conclusions.
+The orchestrator is not a fourth reasoning role. It may only perform deterministic lifecycle actions, routing/validation, and deterministic owner-gate bookkeeping. It never authors planning, implementation, or review conclusions.
 
-### 2.3 Task branch isolation
+### 2.3 Task activation and branch isolation
 
+- A task specification does not activate work merely by existing on disk.
+- Every new task begins from a clean `main` entry gate and recorded baseline HEAD.
 - Registered features use `feature/<feature-id>-<slug>`; other tasks use `task/<task-id>-<slug>`. Names are lowercase filesystem-safe refs and must pass `git check-ref-format --branch`.
-- Planner creates exactly one task branch from a clean `main` baseline before Dry Run 1.
+- During `ORCHESTRATOR / TASK_ACTIVATED`, the orchestrator deterministically derives, validates, creates, and switches to exactly one task branch from the recorded baseline.
+- After branch creation, the orchestrator instantiates the canonical Planner prompt into `.agents/task/next-agent.md`, validates the full `TASK_ACTIVATED -> PLANNER` artifact, and only then may Planner run.
+- Planner verifies but never creates or switches the task branch.
 - Planner, Executor, and Reviewer work sequentially on that branch until authorized close-out.
 - `main` remains clean and unchanged throughout planning/execution/review.
 - Every dry run/report/review records task ID, iteration, baseline, task branch, and expected changed/untracked paths.
 
 ### 2.4 State machine and owner gates
 
-Normal path:
+Session/task path:
 
 ```text
-clean main
+ORCHESTRATOR READY / TASK NONE
+  → task specification prepared
+  → ORCHESTRATOR: TASK_ACTIVATED
+  → deterministic task branch creation
+  → initial Planner prompt materialized + validated in next-agent.md
   → Planner Dry Run N
   → PENDING_APPROVAL
   → owner: APPROVED: EXECUTE
@@ -78,6 +88,7 @@ clean main
   → owner: APPROVED: COMMIT
   → Reviewer close-out
   → ACCEPTED
+  → ORCHESTRATOR READY / TASK NONE
 ```
 
 Correction paths:
@@ -93,7 +104,9 @@ Execution authorization is valid only when the entire trimmed owner message is e
 
 ### 2.5 `next-agent.md` as the role boundary
 
-Every generated next-role prompt begins with TOML front matter using prompt schema version 1. It records run/task/iteration, source/target role, handoff, branch, baseline, source HEAD, canonical template path, and owner-gate requirement.
+Every reasoning-role prompt begins with TOML front matter using prompt schema version 1. It records run/task/iteration, source/target role, handoff, branch, baseline, source HEAD, canonical template path, and owner-gate requirement.
+
+The initial Planner artifact uses `source_role="ORCHESTRATOR"`, `handoff="TASK_ACTIVATED"`, `target_role="PLANNER"`, and the canonical Planner template. All later role transitions use the same metadata contract.
 
 The orchestrator validates:
 
@@ -103,7 +116,7 @@ The orchestrator validates:
 - canonical incoming-role authority sentinels;
 - no unfilled `{{placeholders}}`;
 - prompt SHA-256 and canonical template SHA-256;
-- complete working-tree fingerprint for gate-protected transitions.
+- complete working-tree fingerprint for protected pending artifacts.
 
 Outgoing roles populate task-specific context and structured handoff facts. They may **not** weaken or rewrite the incoming role's canonical role, authority, methodology, quality criteria, or handoff contract.
 
@@ -122,11 +135,12 @@ Planner performs repository inspection, research, architecture/gap analysis, and
 
 Allowed writes:
 
-- one-time task-branch creation before Dry Run 1;
 - `.agents/task/planner.md`;
 - `.agents/task/next-agent.md`.
 
-Planner never edits implementation/tests/configuration/dependencies/authoritative product docs, commits, merges, rebases, pulls, fetches, or pushes.
+Allowed repository actions are non-mutating inspection and verification of the already-created task branch and recorded baseline.
+
+Planner never creates or switches branches and never edits implementation/tests/configuration/dependencies/authoritative product docs, commits, merges, rebases, pulls, fetches, or pushes.
 
 Each numbered dry run contains all eight sections:
 
@@ -139,7 +153,7 @@ Each numbered dry run contains all eight sections:
 7. Exact validation commands.
 8. Rollback.
 
-Dry Run 1 starts from clean `main`, creates the deterministic branch, then plans on that branch. Correction dry runs explicitly inventory retained/changed/rolled-back paths. Planner generates the complete next-role prompt before stopping; it never waits inside a headless invocation for owner approval.
+Dry Run 1 begins only after the orchestrator has completed `TASK_ACTIVATED`, created the deterministic branch, and materialized/validated the initial Planner prompt. Planner verifies the branch/baseline before planning. Correction dry runs explicitly inventory retained/changed/rolled-back paths. Planner generates the complete next-role prompt before stopping; it never waits inside a headless invocation for owner approval.
 
 ### 2.8 Executor authority
 
@@ -192,12 +206,12 @@ Close-out never force-deletes, rebases, resets, cleans, amends, resolves merge c
 
 ### 2.11 Orchestration modes and isolation
 
-- `solo`: same chat sequentially executes exact prompts; **soft isolation only**. At each role boundary, stop the old role, load `next-agent.md` as the new role contract, re-read repository evidence, and treat conclusions from prior roles as non-evidence. Solo review is self-review under a fresh role contract, not independent review.
-- `delegate`: fresh same-brand subagent per role; fresh role context.
-- `multi-delegate`: fresh configured CLI process per role; cross-vendor diversity possible.
-- `manual`: user pastes exact `next-agent.md` into a fresh role chat.
+- `solo`: same chat sequentially executes exact prompts; **soft isolation only**. Initial Planner and every later role are invoked from exact validated `next-agent.md`. At each role boundary, stop the old role, load `next-agent.md` as the new role contract, re-read repository evidence, and treat conclusions from prior roles as non-evidence. Solo review is self-review under a fresh role contract, not independent review.
+- `delegate`: fresh same-brand subagent per role; fresh role context. Initial Planner is also delegated from the `TASK_ACTIVATED` artifact.
+- `multi-delegate`: fresh configured CLI process per role; cross-vendor diversity possible. Initial Planner is launched from the same validated artifact.
+- `manual`: user pastes exact `next-agent.md` into a fresh role chat, including the initial Planner artifact created by deterministic task activation.
 
-Mode changes transport only; role prompt semantics are identical.
+Mode changes transport only; role prompt semantics and activation artifacts are identical.
 
 ## 3. Coding style and verification
 
@@ -250,7 +264,8 @@ Resolved decisions become ordinary requirements/boundaries in the owning authori
 
 ## 7. Git authority summary
 
-- Planner: only validated task-branch creation; no commits/merge/push.
+- Orchestrator: deterministic clean-main entry gate + one task-branch creation/switch during `TASK_ACTIVATED`; no reasoning conclusions, commits, merge, or push.
+- Planner: no branch creation/switch and no commits/merge/push.
 - Executor: no branch creation/switch, commits/merge/push.
 - Reviewer: one authorized local task commit + ff-only local merge + safe merged-branch deletion only after `APPROVED: COMMIT` and only when the latest approved scope includes close-out.
 - Normal workflow never authorizes push, force-push, pull, fetch, rebase, reset, clean, amend, force deletion, merge-conflict resolution, or destructive abandonment. Such actions require separate explicit applicable owner authorization.

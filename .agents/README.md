@@ -12,9 +12,15 @@ HaruQuantAI delivers development tasks through Planner → Executor → Reviewer
 └── next-agent.md
 ```
 
-The three role journals are append-only during an active task. `next-agent.md` is replace-only and contains the complete standalone prompt for the next role. All four files are zero bytes when no task is active and after successful close-out.
+The three role journals are append-only during an active task. `next-agent.md` is replace-only and contains the complete standalone prompt for the next reasoning role. All four files are zero bytes when no task is active and after successful close-out.
 
 Reusable prompt truth lives only in `docs/templates/prompt/`. Runtime prompts are instantiated into `next-agent.md`; there is no second prompt-template tree under `.agents`.
+
+## Core invariant
+
+**No reasoning role may be invoked unless its complete prompt already exists in `.agents/task/next-agent.md` and has passed protocol validation.**
+
+This includes the very first Planner invocation. Task activation is an explicit `ORCHESTRATOR / TASK_ACTIVATED -> PLANNER` transition: the orchestrator passes the clean-main gate, records the baseline, creates the deterministic task branch, materializes the canonical Planner prompt, validates it, and only then invokes or transports Planner.
 
 ## Modes
 
@@ -25,39 +31,47 @@ Reusable prompt truth lives only in `docs/templates/prompt/`. Runtime prompts ar
 | `multi-delegate` | Fresh configured CLI process per role | Fresh process; cross-vendor diversity available |
 | `manual` | User relays `next-agent.md` to a fresh chat | Fresh chat |
 
-Every mode consumes the same `next-agent.md`. Mode changes transport, not workflow semantics.
+Every mode consumes the same validated `next-agent.md`, including initial Planner. Mode changes transport, not workflow semantics.
 
 ## Canonical workflow truth
 
 - `AGENTS.md` — contributor/role authority.
 - `.agents/protocol.toml` — machine-readable transitions, gates, workspace paths, schema version.
+- `.agents/PROCEDURE.md` — operator procedure and exact copy/paste chat text.
 - `docs/templates/prompt/default.md` — prompt-design standard (MAIN/MINIMAL).
 - `docs/templates/prompt/{planner,executor,reviewer,reviewer-closeout}.md` — canonical role prompts.
 - `.agents/task/next-agent.md` — current instantiated next-role prompt.
 - `.agents/runs/*.json` — runtime audit state (gitignored).
 - `.agents/logs/` — immutable invocation prompt/transcript archive (gitignored).
 
-## State machine
+## Session lifecycle
 
 ```text
-PLANNER Dry Run N
-  └─ PENDING_APPROVAL
-       └─ owner: APPROVED: EXECUTE
-            └─ EXECUTOR Report N
-                 ├─ BLOCKED ────────────────> PLANNER Dry Run N+1
-                 └─ READY_FOR_REVIEW ──────> REVIEWER Review N
-                                                ├─ CHANGES_REQUESTED -> PLANNER N+1
-                                                └─ PENDING_COMMIT
-                                                     └─ owner: APPROVED: COMMIT
-                                                          └─ REVIEWER close-out
-                                                               └─ ACCEPTED
+ORCHESTRATOR READY
+  └─ TASK NONE
+       └─ task spec prepared
+            └─ TASK_ACTIVATED
+                 └─ create task branch
+                      └─ materialize + validate Planner next-agent.md
+                           └─ PLANNER Dry Run N
+                                └─ PENDING_APPROVAL
+                                     └─ owner: APPROVED: EXECUTE
+                                          └─ EXECUTOR Report N
+                                               ├─ BLOCKED ────────────────> PLANNER Dry Run N+1
+                                               └─ READY_FOR_REVIEW ──────> REVIEWER Review N
+                                                                              ├─ CHANGES_REQUESTED -> PLANNER N+1
+                                                                              └─ PENDING_COMMIT
+                                                                                   └─ owner: APPROVED: COMMIT
+                                                                                        └─ REVIEWER close-out
+                                                                                             └─ ACCEPTED
+                                                                                                  └─ ORCHESTRATOR READY / TASK NONE
 ```
 
 Owner approval is deterministic orchestration, not an LLM task. The orchestrator appends the exact execution gate record to `planner.md`; it does not re-invoke Planner merely to transcribe authorization.
 
 ## `next-agent.md` contract
 
-Every non-terminal role handoff writes a complete prompt beginning with TOML front matter:
+Every reasoning-role invocation uses a complete prompt beginning with TOML front matter:
 
 ```toml
 +++
@@ -65,19 +79,19 @@ prompt_schema_version = 1
 run_id = "..."
 task_id = "..."
 iteration = 1
-source_role = "PLANNER"
-target_role = "EXECUTOR"
-handoff = "PENDING_APPROVAL"
+source_role = "ORCHESTRATOR"
+target_role = "PLANNER"
+handoff = "TASK_ACTIVATED"
 branch = "feature/..."
 baseline_commit = "..."
 source_head = "..."
-template_path = "docs/templates/prompt/executor.md"
-requires_owner_gate = true
-owner_gate = "APPROVED: EXECUTE"
+template_path = "docs/templates/prompt/planner.md"
+requires_owner_gate = false
+owner_gate = ""
 +++
 ```
 
-The orchestrator validates schema, transition, target template, branch, baseline, HEAD, protected role sentinels, owner-gate semantics, unfilled placeholders, prompt SHA-256, canonical-template SHA-256, and a working-tree fingerprint. Stale or contradictory artifacts fail closed.
+Later transitions use the same metadata contract. The orchestrator validates schema, transition, target template, branch, baseline, HEAD, protected role sentinels, owner-gate semantics, unfilled placeholders, prompt SHA-256, canonical-template SHA-256, and a working-tree fingerprint. Stale or contradictory artifacts fail closed.
 
 Outgoing roles may populate task-specific facts but may not weaken the incoming role's canonical role, authority, methodology, quality criteria, or handoff rules.
 
@@ -102,14 +116,22 @@ The Reviewer never repairs implementation. Defects produce `CHANGES_REQUESTED`.
 
 ## Quick start
 
+Configure transport when needed:
+
 ```bash
 uv run .agents/configure.py
+```
+
+Then initialize/check the orchestrator before preparing and activating each task:
+
+```bash
+uv run .agents/orchestrator.py doctor
 uv run .agents/make_task.py --list
 uv run .agents/make_task.py 1.1
-uv run .agents/orchestrator.py doctor
-uv run .agents/orchestrator.py self-test
 uv run .agents/orchestrator.py start --task-file .agents/task.toml
 ```
+
+For chat-driven or manual orchestration, use the exact initialization, activation, owner-action, and manual-transport text in `.agents/PROCEDURE.md`.
 
 Resume/gate relay examples:
 
