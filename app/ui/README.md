@@ -38,7 +38,7 @@ The product presents one unified workstation canvas rather than isolated full-pa
 | Status | Feature ID | Capability | FRs | Deletion outcome |
 |---|---|---|---:|---|
 | Implemented | `FEAT-UI-COMPOSE_SHELL` | Capability-aware application shell and navigation | 5 | The graphical shell disappears; non-UI clients remain available. |
-| Missing | `FEAT-UI-START_WORK` | Home, onboarding, recents, and launch shortcuts | 4 | Home disappears; direct authorized routes remain available. |
+| Partial (2 of 4; 2 mock-build pending 14.8) | `FEAT-UI-START_WORK` | Home, onboarding, recents, and launch shortcuts | 4 | Home disappears; direct authorized routes remain available. |
 | Missing | `FEAT-UI-MANAGE_LAYOUTS` | Tabs, panels, splitters, overlays, and saved view state | 5 | Custom layouts disappear; the shell uses its minimal outlet. |
 | Missing | `FEAT-UI-EDIT_INPUTS` | Forms, pickers, tables, validation, drafts, and confirmations | 5 | Generic editors disappear; read-only routes may remain. |
 | Missing | `FEAT-UI-AUTHOR_STRATEGIES` | Visual strategy authoring and immediate inspection | 6 | Visual authoring disappears; Strategy contracts remain available. |
@@ -289,10 +289,10 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 
 | Status | Requirement ID | Responsibility | Depends | Acceptance / evidence |
 |---|---|---|---|---|
-| Missing | `FR-UI-PRESENT_HOME` | Present getting-started actions, product/workspace identity, versions, and capability-aware entry points. | WS, IFACE | No action is shown as available when its capability is absent. |
+| Implemented | `FR-UI-PRESENT_HOME` | Present getting-started actions, product/workspace identity, versions, and capability-aware entry points. | WS, IFACE | No action is shown as available when its capability is absent. `— evidence: tests/ui/unit/test_start_work.py:102, app/ui/src/widgets/home/__tests__/home.test.tsx:80` |
 | Missing | `FR-UI-RESUME_RECENT_WORK` | List recent compatible strategies, projects, runs, and views without leaking another actor/workspace. | WS, STRAT, ORCH, RES | Stale/deleted entries resolve to explicit unavailable state. |
 | Missing | `FR-UI-LAUNCH_SHORTCUTS` | Launch prefilled build/project/authoring flows through the same public commands as their full workspaces. | IFACE, RES, ORCH | Shortcut and normal flow yield the same validated manifest. |
-| Missing | `FR-UI-SHOW_PRODUCT_NEWS` | Present optional release/update/news information separately from authoritative workspace state. | WS | Offline or failed news never blocks work. |
+| Implemented | `FR-UI-SHOW_PRODUCT_NEWS` | Present optional release/update/news information separately from authoritative workspace state. | WS | Offline or failed news never blocks work. `— evidence: tests/ui/unit/test_start_work.py:138, app/ui/src/widgets/product_news/__tests__/product_news.test.tsx:70` |
 
 ### 4.3 `manage_layouts/` — `FEAT-UI-MANAGE_LAYOUTS`
 

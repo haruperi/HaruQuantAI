@@ -245,8 +245,8 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 ##### 1.2 Partial — `FEAT-UI-START_WORK`
 
-1. [ ] `FR-UI-PRESENT_HOME`
-2. [ ] `FR-UI-SHOW_PRODUCT_NEWS`
+1. [X] `FR-UI-PRESENT_HOME` — evidence: tests/ui/unit/test_start_work.py:102, app/ui/src/widgets/home/__tests__/home.test.tsx:80
+2. [X] `FR-UI-SHOW_PRODUCT_NEWS` — evidence: tests/ui/unit/test_start_work.py:138, app/ui/src/widgets/product_news/__tests__/product_news.test.tsx:70
 3. `FR-UI-RESUME_RECENT_WORK` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.8)
 4. `FR-UI-LAUNCH_SHORTCUTS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.8)
 
