@@ -225,15 +225,15 @@ This is non-domain runtime infrastructure, not a product `FEAT-*` or business `F
 
 **De-mock gate:** Initial mock construction baseline — establishes all 17 feature-owned widget surfaces against `app/ui/src/mocks/`.
 
-##### 1.01 [ ] Foundation task — D-UI spatiotemporal workstation foundation
+##### 1.01 [x] Foundation task — D-UI spatiotemporal workstation foundation
 
 This ordered non-FR foundation enables the existing 17 D-UI feature slices; it creates no product feature or FR ID and cannot mark `FEAT-UI-MANAGE_LAYOUTS`, `FEAT-UI-EXTEND_VIEWS`, or any other feature complete by itself.
 
-1. [ ] Implement the typed widget registry/host so every widget type names exactly one owning `FEAT-UI-*`, validates manifest/configuration/state-schema metadata, reverses lifecycle effects exactly once, and derives runtime state without a second product registry.
-2. [ ] Pin and integrate the then-verified `dockview-react` version behind a HaruQuantAI-owned adapter; implement blank workspaces, versioned templates, add/remove/dock/tab/split/resize/minimize/maximize, bounded layout persistence, migration, dirty-close resolution, and explicit missing/incompatible-widget restoration.
-3. [ ] Implement explicit selection and temporal presentation contexts for live, delayed, historical, playback, simulation, and job-event sources with source/clock identity, timestamp, sequence/cursor order, stale/gap/resync, incompatible-domain failure, bounded coalescing, and exact subscription disposal.
-4. [ ] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue, and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts.
-5. [ ] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and listener/timer/subscription leak freedom before dependent widget slices proceed.
+1. [x] Implement the typed widget registry/host so every widget type names exactly one owning `FEAT-UI-*`, validates manifest/configuration/state-schema metadata, reverses lifecycle effects exactly once, and derives runtime state without a second product registry. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:28, app/ui/src/runtime/__tests__/widget_registry.test.ts:6
+2. [x] Pin and integrate the then-verified `dockview-react` version behind a HaruQuantAI-owned adapter; implement blank workspaces, versioned templates, add/remove/dock/tab/split/resize/minimize/maximize, bounded layout persistence, migration, dirty-close resolution, and explicit missing/incompatible-widget restoration. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:44, tests/ui/unit/test_spatiotemporal_foundation.py:84, app/ui/src/workspaces/__tests__/dockview_adapter.test.tsx:11, app/ui/src/workspaces/__tests__/layout_serializer.test.ts:11
+3. [x] Implement explicit selection and temporal presentation contexts for live, delayed, historical, playback, simulation, and job-event sources with source/clock identity, timestamp, sequence/cursor order, stale/gap/resync, incompatible-domain failure, bounded coalescing, and exact subscription disposal. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:106, app/ui/src/context/__tests__/temporal.test.tsx:13, app/ui/src/context/__tests__/selection.test.tsx:9
+4. [x] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue, and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts. — evidence: app/ui/src/accessibility/__tests__/focus_manager.test.tsx:9, app/ui/src/mocks/__tests__/mock_provider.test.ts:7
+5. [x] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and listener/timer/subscription leak freedom before dependent widget slices proceed. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:165, app/ui/src/runtime/__tests__/widget_registry.test.ts:75, app/ui/src/runtime/__tests__/widget_registry.test.ts:99
 
 ##### 1.1 [x] `FEAT-UI-COMPOSE_SHELL`
 
