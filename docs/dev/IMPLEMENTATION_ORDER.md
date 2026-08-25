@@ -79,40 +79,40 @@ Kernel and Composition are implemented non-domain runtime modules; Contracts is 
 upfront by the Increment 1 whole-app contract-authoring task and extended afterward by real feature slices. “First
 increment” means the first planned product work in the domain, not domain completion.
 
-| First increment | Domain | Features | Business FRs | Authoritative document |
-| ---: | --- | ---: | ---: | --- |
-| 1 | `D-WS` Workspace | 6 | 18 | [Workspace README](../../app/services/workspace/README.md) |
-| 1 | `D-PLUG` Plugins | 7 | 9 | [Plugins README](../../app/services/plugins/README.md) |
-| 1 | `D-IFACE` Interfaces | 7 | 30 | [Interfaces README](../../app/services/interfaces/README.md) |
-| 1 | `D-UI` User Interface | 17 | 99 | [User Interface README](../../app/ui/README.md) |
-| 2 | `D-CAT` Catalogue | 7 | 14 | [Catalogue README](../../app/services/catalogue/README.md) |
-| 2 | `D-DATA` Data | 14 | 47 | [Data README](../../app/services/data/README.md) |
-| 3 | `D-STRAT` Strategy | 13 | 47 | [Strategy README](../../app/services/strategy/README.md) |
-| 4 | `D-SIM` Simulator | 12 | 45 | [Simulator README](../../app/services/simulator/README.md) |
-| 4 | `D-ANA` Analytics | 9 | 38 | [Analytics README](../../app/services/analytics/README.md) |
-| 6 | `D-RES` Research | 13 | 51 | [Research README](../../app/services/research/README.md) |
-| 7 | `D-PORT` Portfolio | 8 | 24 | [Portfolio README](../../app/services/portfolio/README.md) |
-| 7 | `D-ORCH` Orchestration | 7 | 33 | [Orchestration README](../../app/services/orchestration/README.md) |
-| 10 | `D-BRK` Broker Connectivity | 7 | 28 | [Broker Connectivity README](../../app/services/broker/README.md) |
-| 10 | `D-RISK` Runtime Risk | 7 | 30 | [Runtime Risk README](../../app/services/risk/README.md) |
-| 10 | `D-TRD` Trading | 8 | 36 | [Trading README](../../app/services/trading/README.md) |
+| First increment | Domain                        | Features | Business FRs | Authoritative document                                            |
+| --------------: | ----------------------------- | -------: | -----------: | ----------------------------------------------------------------- |
+|               1 | `D-WS` Workspace            |        6 |           18 | [Workspace README](../../app/services/workspace/README.md)         |
+|               1 | `D-PLUG` Plugins            |        7 |            9 | [Plugins README](../../app/services/plugins/README.md)             |
+|               1 | `D-IFACE` Interfaces        |        7 |           30 | [Interfaces README](../../app/services/interfaces/README.md)       |
+|               1 | `D-UI` User Interface       |       17 |           99 | [User Interface README](../../app/ui/README.md)                    |
+|               2 | `D-CAT` Catalogue           |        7 |           14 | [Catalogue README](../../app/services/catalogue/README.md)         |
+|               2 | `D-DATA` Data               |       14 |           47 | [Data README](../../app/services/data/README.md)                   |
+|               3 | `D-STRAT` Strategy          |       13 |           47 | [Strategy README](../../app/services/strategy/README.md)           |
+|               4 | `D-SIM` Simulator           |       12 |           45 | [Simulator README](../../app/services/simulator/README.md)         |
+|               4 | `D-ANA` Analytics           |        9 |           38 | [Analytics README](../../app/services/analytics/README.md)         |
+|               6 | `D-RES` Research            |       13 |           51 | [Research README](../../app/services/research/README.md)           |
+|               7 | `D-PORT` Portfolio          |        8 |           24 | [Portfolio README](../../app/services/portfolio/README.md)         |
+|               7 | `D-ORCH` Orchestration      |        7 |           33 | [Orchestration README](../../app/services/orchestration/README.md) |
+|              10 | `D-BRK` Broker Connectivity |        7 |           28 | [Broker Connectivity README](../../app/services/broker/README.md)  |
+|              10 | `D-RISK` Runtime Risk       |        7 |           30 | [Runtime Risk README](../../app/services/risk/README.md)           |
+|              10 | `D-TRD` Trading             |        8 |           36 | [Trading README](../../app/services/trading/README.md)             |
 
 ## 3. Increment and phase map
 
-| Increment | Product outcome | Phase relationship |
-| ---: | --- | --- |
-| 0 | Preserve executable composability foundation | Foundation evidence; not a claim that every Phase 0 product gate is complete |
-| 1 | Whole-App Contracts and Complete Mock-Backed User Interface | Foundation-preserving product slice; prepares Phase 1 |
-| 2 | Catalogue and Historical-Data Onboarding | Phase 1 input foundation |
-| 3 | Typed Strategy Authoring | Phase 1 authoring slice |
-| 4 | First Deterministic Backtest and Results | Phase 1 execution and analytics slice |
-| 5 | MQL5 Code Generation and Parity | Completes the Phase 1 target-parity path |
-| 6 | Reproducible Research Factory | Phase 2 release slice |
-| 7 | Portfolio and Project Workflows | Phase 3 portfolio/project/automation slice |
-| 8 | Extensions, Additional Targets, and Advanced Compute | Phase 3 extensions plus independently gated Phase 4 capabilities |
-| 9 | Synthetic, News, Live-Event, and Drift Evidence | Independently gated Phase 4 evidence capabilities |
-| 10 | Governed Broker, Risk, and Trading Operations | Optional Phase 5 governed-operations slice |
-| 11 | Hosted Workspace Boundary and Final Release | Hosted Phase 4 capability plus complete release matrix |
+| Increment | Product outcome                                             | Phase relationship                                                           |
+| --------: | ----------------------------------------------------------- | ---------------------------------------------------------------------------- |
+|         0 | Preserve executable composability foundation                | Foundation evidence; not a claim that every Phase 0 product gate is complete |
+|         1 | Whole-App Contracts and Complete Mock-Backed User Interface | Foundation-preserving product slice; prepares Phase 1                        |
+|         2 | Catalogue and Historical-Data Onboarding                    | Phase 1 input foundation                                                     |
+|         3 | Typed Strategy Authoring                                    | Phase 1 authoring slice                                                      |
+|         4 | First Deterministic Backtest and Results                    | Phase 1 execution and analytics slice                                        |
+|         5 | MQL5 Code Generation and Parity                             | Completes the Phase 1 target-parity path                                     |
+|         6 | Reproducible Research Factory                               | Phase 2 release slice                                                        |
+|         7 | Portfolio and Project Workflows                             | Phase 3 portfolio/project/automation slice                                   |
+|         8 | Extensions, Additional Targets, and Advanced Compute        | Phase 3 extensions plus independently gated Phase 4 capabilities             |
+|         9 | Synthetic, News, Live-Event, and Drift Evidence             | Independently gated Phase 4 evidence capabilities                            |
+|        10 | Governed Broker, Risk, and Trading Operations               | Optional Phase 5 governed-operations slice                                   |
+|        11 | Hosted Workspace Boundary and Final Release                 | Hosted Phase 4 capability plus complete release matrix                       |
 
 ## 4. Ordered vertical implementation sequence
 
@@ -123,8 +123,7 @@ increment” means the first planned product work in the domain, not domain comp
 **Purpose:** Freeze the proven composability substrate as the baseline for every product increment; extend it without
 reimplementing or bypassing it.
 
-**Vertical path:** `Feature specification → contracts → composition → D-IFACE gateway where required →
-provider/consumer/state evidence`
+**Vertical path:** `Feature specification → contracts → composition → D-IFACE gateway where required → provider/consumer/state evidence`
 
 **UI demo checkpoint:** This is a preservation increment rather than a new UI slice. Verify that Composition readiness,
 capability, feature, and failure diagnostics remain available for the Increment 1 D-IFACE/UI shell to project.
@@ -151,15 +150,15 @@ This is non-domain runtime infrastructure, not a product `FEAT-*` or business `F
 substrate required by `NFR-OBS-001`, `NFR-OBS-005`, and `NFR-OBS-009` without introducing a shared logger singleton or a
 fifth shared module.
 
-1. [x] Add `app/composition/logging.py` for structured formatting, levels, deterministic redaction, correlation context,
-   retention integration, bounded diagnostic capture, and lifecycle-safe handler cleanup — evidence: app/composition/logging.py:319, app/composition/logging.py:492, app/composition/logging.py:595, app/composition/logging.py:663, app/composition/logging.py:852
-2. [x] Configure logging from `app/main.py` before the composition engine begins runtime work, and close owned handlers
-   during shutdown — evidence: app/main.py:112, app/main.py:207
-3. [x] Use `logger = logging.getLogger(__name__)` only in modules with workflow, lifecycle, I/O, state-transition,
-   retry, decision, or failure boundaries; pure contracts, DTOs, deterministic helpers, trivial accessors, and
-   high-frequency numerical modules remain log-free unless required — evidence: app/main.py:21, app/composition/discovery.py:12, app/composition/engine.py:30, app/composition/watcher.py:15
-4. [x] Prove structured schema, correlation propagation, redaction, bounded capture/retention behavior, no duplicate
-   handlers, repeated startup/shutdown cleanup, and secret-safe failure output — evidence: tests/composition/test_logging.py:43, tests/composition/test_hot_reconfiguration.py:513, tests/test_main.py:144, tests/test_main.py:164
+1. [X] Add `app/composition/logging.py` for structured formatting, levels, deterministic redaction, correlation context,
+    retention integration, bounded diagnostic capture, and lifecycle-safe handler cleanup — evidence: app/composition/logging.py:319, app/composition/logging.py:492, app/composition/logging.py:595, app/composition/logging.py:663, app/composition/logging.py:852
+2. [X] Configure logging from `app/main.py` before the composition engine begins runtime work, and close owned handlers
+    during shutdown — evidence: app/main.py:112, app/main.py:207
+3. [X] Use `logger = logging.getLogger(__name__)` only in modules with workflow, lifecycle, I/O, state-transition,
+    retry, decision, or failure boundaries; pure contracts, DTOs, deterministic helpers, trivial accessors, and
+    high-frequency numerical modules remain log-free unless required — evidence: app/main.py:21, app/composition/discovery.py:12, app/composition/engine.py:30, app/composition/watcher.py:15
+4. [X] Prove structured schema, correlation propagation, redaction, bounded capture/retention behavior, no duplicate
+    handlers, repeated startup/shutdown cleanup, and secret-safe failure output — evidence: tests/composition/test_logging.py:43, tests/composition/test_hot_reconfiguration.py:513, tests/test_main.py:144, tests/test_main.py:164
 
 Do not recreate `app/contracts/kernel/`, YAML component manifests, `CompositionContext`, per-FR runtime registrations,
 domain registries, or another backend lifecycle/effect framework. D-UI uses the documented TypeScript/React
@@ -180,9 +179,7 @@ declarations, an accessible React workstation with truthful diagnostics, and eve
 feature-owned widget surface built against the dev-only mock capability provider so later backend increments integrate
 and verify directly from the frontend.
 
-**Vertical path:** `Contract authoring (task 1.0) → workstation architecture foundation (task 1.A) → Launcher →
-Workspace → D-IFACE capability/readiness gateway → D-UI widget host/canvas → ordered feature-owned widgets on mock
-capability data`
+**Vertical path:** `Contract authoring (task 1.0) → workstation architecture foundation (task 1.A) → Launcher → Workspace → D-IFACE capability/readiness gateway → D-UI widget host/canvas → ordered feature-owned widgets on mock capability data`
 
 **UI demo checkpoint:** Launch React, authenticate locally, create a blank workspace or apply a versioned template,
 add/remove/dock/tab/split/resize/minimize/maximize compatible widget instances, inspect capability/readiness and explicit
@@ -204,8 +201,7 @@ boundary before any mock-backed UI slice is built, so mocks implement ratified c
 Contracts are authored from the owning domain READMEs (the semantic authorities) and may be revised by later real
 feature slices through their documented change processes.
 
-**Completion evidence (task 1.0):** all 15 owner READMEs now carry their ratified `Ratified v1 public records and
-capabilities` catalogues; the 16 namespaces under `app/contracts/` implement the inventoried records and capability
+**Completion evidence (task 1.0):** all 15 owner READMEs now carry their ratified `Ratified v1 public records and capabilities` catalogues; the 16 namespaces under `app/contracts/` implement the inventoried records and capability
 bundles as strict frozen Pydantic v2 wire models (compatibility-frozen v1 process classes unchanged; additive
 `<Record>Wire` projections); `scripts/generate_contracts.py` deterministically emits the 16 `wire/schema.json`
 documents and 17 TypeScript modules (byte-reproducible, `--check` wired into `scripts/ci_check.py` and
@@ -213,102 +209,100 @@ documents and 17 TypeScript modules (byte-reproducible, `--check` wired into `sc
 `tests/contracts/` (213 focused tests) proves inventory parity, round-trips, versions, generation determinism, and
 import boundaries. No product `FEAT-*`/`FR-*` status changed.
 
-1. [x] Enumerate every cross-boundary contract requirement from the 15 business-domain READMEs plus the existing
-   `app/contracts/ui/` package, and record the owner, consumers, and version for each.
-   — evidence: `app/contracts/README.md` §§4.1–4.15 inventory reconciled 1:1 by
-   `tests/contracts/test_contract_inventory.py::test_readme_record_counts_match_registries` (486 items, zero removals).
-2. [x] Author the Python/Pydantic definitions and wire schemas into `app/contracts/<owner>/` packages for all listed
-   contracts, including the 17 versioned UI feature capability ports and their request/result/failure/event unions.
-   — evidence: `app/contracts/{workspace,catalogue,data,strategy,simulator,analytics,research,portfolio,orchestration,`
-   `interfaces,ui,plugins,broker,risk,trading}/` plus `app/contracts/common/`; 17-UI-port surface verified by
-   `tests/contracts/test_ui_contracts.py`; strictness/frozen verified by
-   `tests/contracts/test_contract_inventory.py::test_registered_models_are_frozen_and_strict`.
-3. [x] Regenerate the TypeScript clients and types under `app/ui/src/contracts/generated/` from the new contracts and
-   verify the existing generation flow stays the sole source (no hand-written public wire contracts under `app/ui/`).
-   — evidence: `scripts/generate_contracts.py` (write/`--check`); 33 artifacts byte-identical across consecutive
-   checks per `tests/contracts/test_contract_generation.py`; `ui_contracts.ts` deleted (zero references repo-wide);
-   `npm --prefix app/ui run typecheck`, `test`, and `build` pass against the generated barrel.
-4. [x] Prove contract-roundtrip parity (schema validation, versioning, and generated-type equality) and update
-   `app/contracts/README.md` to reflect the complete public contract inventory.
-   — evidence: `tests/contracts/test_contract_roundtrip.py` (33 fixtures across every owner: JSON round-trip, extra
-   field rejection, frozen mutation), `tests/contracts/test_contract_versions.py` (schema-version and key/major
-   integrity), `tests/contracts/test_contract_boundaries.py`; `app/contracts/README.md` status header reconciled to
-   the implemented wire-contract state.
+1. [X] Enumerate every cross-boundary contract requirement from the 15 business-domain READMEs plus the existing
+    `app/contracts/ui/` package, and record the owner, consumers, and version for each.
+    — evidence: `app/contracts/README.md` §§4.1–4.15 inventory reconciled 1:1 by
+    `tests/contracts/test_contract_inventory.py::test_readme_record_counts_match_registries` (486 items, zero removals).
+2. [X] Author the Python/Pydantic definitions and wire schemas into `app/contracts/<owner>/` packages for all listed
+    contracts, including the 17 versioned UI feature capability ports and their request/result/failure/event unions.
+    — evidence: `app/contracts/{workspace,catalogue,data,strategy,simulator,analytics,research,portfolio,orchestration,`
+    `interfaces,ui,plugins,broker,risk,trading}/` plus `app/contracts/common/`; 17-UI-port surface verified by
+    `tests/contracts/test_ui_contracts.py`; strictness/frozen verified by
+    `tests/contracts/test_contract_inventory.py::test_registered_models_are_frozen_and_strict`.
+3. [X] Regenerate the TypeScript clients and types under `app/ui/src/contracts/generated/` from the new contracts and
+    verify the existing generation flow stays the sole source (no hand-written public wire contracts under `app/ui/`).
+    — evidence: `scripts/generate_contracts.py` (write/`--check`); 33 artifacts byte-identical across consecutive
+    checks per `tests/contracts/test_contract_generation.py`; `ui_contracts.ts` deleted (zero references repo-wide);
+    `npm --prefix app/ui run typecheck`, `test`, and `build` pass against the generated barrel.
+4. [X] Prove contract-roundtrip parity (schema validation, versioning, and generated-type equality) and update
+    `app/contracts/README.md` to reflect the complete public contract inventory.
+    — evidence: `tests/contracts/test_contract_roundtrip.py` (33 fixtures across every owner: JSON round-trip, extra
+    field rejection, frozen mutation), `tests/contracts/test_contract_versions.py` (schema-version and key/major
+    integrity), `tests/contracts/test_contract_boundaries.py`; `app/contracts/README.md` status header reconciled to
+    the implemented wire-contract state.
 
-#### Foundation task 1.A — D-UI spatiotemporal workstation foundation
+##### 1.01 [ ] Foundation task — D-UI spatiotemporal workstation foundation
 
 This ordered non-FR foundation enables the existing 17 D-UI feature slices; it creates no product feature or FR ID and
 cannot mark `FEAT-UI-MANAGE_LAYOUTS`, `FEAT-UI-EXTEND_VIEWS`, or any other feature complete by itself.
 
 1. [ ] Implement the typed widget registry/host so every widget type names exactly one owning `FEAT-UI-*`, validates
-   manifest/configuration/state-schema metadata, reverses lifecycle effects exactly once, and derives runtime state
-   without a second product registry.
+    manifest/configuration/state-schema metadata, reverses lifecycle effects exactly once, and derives runtime state
+    without a second product registry.
 2. [ ] Pin and integrate the then-verified `dockview-react` version behind a HaruQuantAI-owned adapter; implement blank
-   workspaces, versioned templates, add/remove/dock/tab/split/resize/minimize/maximize, bounded layout persistence,
-   migration, dirty-close resolution, and explicit missing/incompatible-widget restoration.
+    workspaces, versioned templates, add/remove/dock/tab/split/resize/minimize/maximize, bounded layout persistence,
+    migration, dirty-close resolution, and explicit missing/incompatible-widget restoration.
 3. [ ] Implement explicit selection and temporal presentation contexts for live, delayed, historical, playback,
-   simulation, and job-event sources with source/clock identity, timestamp, sequence/cursor order, stale/gap/resync,
-   incompatible-domain failure, bounded coalescing, and exact subscription disposal.
+    simulation, and job-event sources with source/clock identity, timestamp, sequence/cursor order, stale/gap/resync,
+    incompatible-domain failure, bounded coalescing, and exact subscription disposal.
 4. [ ] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue,
-   and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts.
+    and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts.
 5. [ ] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout
-   round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and
-   listener/timer/subscription leak freedom before dependent widget slices proceed.
+    round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and
+    listener/timer/subscription leak freedom before dependent widget slices proceed.
 
 #### `D-WS` — [Workspace](../../app/services/workspace/README.md) (Increment 1)
 
 ##### 1.1 [x] `FEAT-WS-MANAGE_WORKSPACES`
 
-1. [x] `FR-WS-INITIALIZE_WORKSPACE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:53
-2. [x] `FR-WS-MIGRATE_WORKSPACE_SCHEMA` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:102
-3. [x] `FR-WS-FENCE_WORKSPACE_WRITERS` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:120
-4. [x] `FR-WS-RECOVER_WORKSPACE_STATE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:177
-5. [x] `FR-WS-BACKUP_WORKSPACE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:210
+1. [X] `FR-WS-INITIALIZE_WORKSPACE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:53
+2. [X] `FR-WS-MIGRATE_WORKSPACE_SCHEMA` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:102
+3. [X] `FR-WS-FENCE_WORKSPACE_WRITERS` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:120
+4. [X] `FR-WS-RECOVER_WORKSPACE_STATE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:177
+5. [X] `FR-WS-BACKUP_WORKSPACE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:210
 
 ##### 1.2 [x] `FEAT-WS-CONFIGURE_RUNTIME`
 
-1. [x] `FR-WS-CONFIGURE_WORKSPACE` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:64
-2. [x] `FR-WS-ENFORCE_STORAGE_GUARDS` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:109
-3. [x] `FR-WS-CONFIGURE_SERVER_RUNTIME` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:148
-4. [x] `FR-WS-PUBLISH_RUNTIME_SUPPORT` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:214
+1. [X] `FR-WS-CONFIGURE_WORKSPACE` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:64
+2. [X] `FR-WS-ENFORCE_STORAGE_GUARDS` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:109
+3. [X] `FR-WS-CONFIGURE_SERVER_RUNTIME` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:148
+4. [X] `FR-WS-PUBLISH_RUNTIME_SUPPORT` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:214
 
 ##### 1.3 [x] `FEAT-WS-SECURE_LOCAL_ACCESS`
 
-1. [x] `FR-WS-ISSUE_LOCAL_SESSION` — evidence: tests/services/workspace/local_access_health/test_local_access_health.py:49
-2. [x] `FR-WS-REPORT_SYSTEM_READINESS` — evidence: tests/services/workspace/local_access_health/test_local_access_health.py:136
-
+1. [X] `FR-WS-ISSUE_LOCAL_SESSION` — evidence: tests/services/workspace/local_access_health/test_local_access_health.py:49
+2. [X] `FR-WS-REPORT_SYSTEM_READINESS` — evidence: tests/services/workspace/local_access_health/test_local_access_health.py:136
 
 ##### 1.4 [x] `FEAT-WS-BUILD_DIAGNOSTICS`
 
-1. [x] `FR-WS-BUILD_DIAGNOSTIC_BUNDLE` — evidence: tests/services/workspace/diagnostic_bundle/test_diagnostic_bundle.py:90
-
+1. [X] `FR-WS-BUILD_DIAGNOSTIC_BUNDLE` — evidence: tests/services/workspace/diagnostic_bundle/test_diagnostic_bundle.py:90
 
 #### `D-PLUG` — [Plugins](../../app/services/plugins/README.md) (Increment 1)
 
 ##### 1.5 [x] `FEAT-PLUG-DECLARE_MANIFESTS`
 
-1. [x] `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` — evidence: tests/services/plugins/manifests/test_plugin_manifests.py:53
+1. [X] `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` — evidence: tests/services/plugins/manifests/test_plugin_manifests.py:53
 
 ##### 1.6 [x] `FEAT-PLUG-REGISTER_CONTRIBUTIONS`
 
-1. [x] `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS` — evidence: tests/services/plugins/contributions/test_plugin_contributions.py:34
+1. [X] `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS` — evidence: tests/services/plugins/contributions/test_plugin_contributions.py:34
 
 #### `D-IFACE` — [Interfaces](../../app/services/interfaces/README.md) (Increment 1)
 
 ##### 1.7 Partial — `FEAT-IFACE-SERVE_API_EVENTS`
 
-1. [x] `FR-IFACE-SERVE_VERSIONED_API` — evidence: tests/services/interfaces/api_events/test_api_events.py:34
-2. [x] `FR-IFACE-ENFORCE_CONCURRENCY_TOKENS` — evidence: tests/services/interfaces/api_events/test_api_events.py:74
-3. [x] `FR-IFACE-DEDUPLICATE_MUTATIONS` — evidence: tests/services/interfaces/api_events/test_api_events.py:106
-4. [x] `FR-IFACE-REPLAY_INTERFACE_EVENTS` — evidence: tests/services/interfaces/api_events/test_api_events.py:189
-5. [x] `FR-IFACE-TRACK_ASYNC_JOBS` — evidence: tests/services/interfaces/api_events/test_api_events.py:241
-6. [x] `FR-IFACE-VALIDATE_ARTIFACT_DOWNLOADS` — evidence: tests/services/interfaces/api_events/test_api_events.py:307
-7. [x] `FR-IFACE-EVOLVE_API_COMPATIBLY` — evidence: tests/services/interfaces/api_events/test_api_events.py:415
+1. [X] `FR-IFACE-SERVE_VERSIONED_API` — evidence: tests/services/interfaces/api_events/test_api_events.py:34
+2. [X] `FR-IFACE-ENFORCE_CONCURRENCY_TOKENS` — evidence: tests/services/interfaces/api_events/test_api_events.py:74
+3. [X] `FR-IFACE-DEDUPLICATE_MUTATIONS` — evidence: tests/services/interfaces/api_events/test_api_events.py:106
+4. [X] `FR-IFACE-REPLAY_INTERFACE_EVENTS` — evidence: tests/services/interfaces/api_events/test_api_events.py:189
+5. [X] `FR-IFACE-TRACK_ASYNC_JOBS` — evidence: tests/services/interfaces/api_events/test_api_events.py:241
+6. [X] `FR-IFACE-VALIDATE_ARTIFACT_DOWNLOADS` — evidence: tests/services/interfaces/api_events/test_api_events.py:307
+7. [X] `FR-IFACE-EVOLVE_API_COMPATIBLY` — evidence: tests/services/interfaces/api_events/test_api_events.py:415
 
 ##### 1.8 Partial — [x] `FEAT-IFACE-AUTOMATE_COMMANDS`
 
-1. [x] `FR-IFACE-DELEGATE_APPLICATION_CALLS` — evidence: tests/services/interfaces/cli_mcp_automation/test_cli_mcp_automation.py:27
-2. [x] `FR-IFACE-TRACK_DURABLE_COMMANDS` — evidence: tests/services/interfaces/cli_mcp_automation/test_cli_mcp_automation.py:127
+1. [X] `FR-IFACE-DELEGATE_APPLICATION_CALLS` — evidence: tests/services/interfaces/cli_mcp_automation/test_cli_mcp_automation.py:27
+2. [X] `FR-IFACE-TRACK_DURABLE_COMMANDS` — evidence: tests/services/interfaces/cli_mcp_automation/test_cli_mcp_automation.py:127
 
 #### `D-UI` — [User Interface](../../app/ui/README.md) (Increment 1)
 
@@ -318,16 +312,17 @@ current truth and are not target-path mandates.
 
 ##### 1.9 [x] `FEAT-UI-COMPOSE_SHELL`
 
-1. [x] `FR-UI-ASSEMBLE_SHELL` — evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:24
-2. [x] `FR-UI-DISCOVER_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:107, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:48
-3. [x] `FR-UI-SWITCH_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:146, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:102
-4. [x] `FR-UI-SHOW_CAPABILITY_STATE` — evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:149
-5. [x] `FR-UI-RESTORE_ROUTE` — evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:189
+1. [X] `FR-UI-ASSEMBLE_SHELL` — evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:24
+2. [X] `FR-UI-DISCOVER_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:107, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:48
+3. [X] `FR-UI-SWITCH_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:146, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:102
+4. [X] `FR-UI-SHOW_CAPABILITY_STATE` — evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:149
+5. [X] `FR-UI-RESTORE_ROUTE` — evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:189
 
 ##### 1.10 Partial — `FEAT-UI-START_WORK`
 
 1. [ ] `FR-UI-PRESENT_HOME`
 2. [ ] `FR-UI-SHOW_PRODUCT_NEWS`
+
 3. `FR-UI-RESUME_RECENT_WORK` (mock build; completes at Increment 7 de-mock gate — 7.18)
 4. `FR-UI-LAUNCH_SHORTCUTS` (mock build; completes at Increment 7 de-mock gate — 7.18)
 
@@ -342,6 +337,7 @@ current truth and are not target-path mandates.
 ##### 1.12 Partial — `FEAT-UI-EDIT_INPUTS`
 
 1. [ ] `FR-UI-PRESERVE_DRAFTS`
+
 2. `FR-UI-RENDER_FIELDS` (mock build; completes at Increment 2 de-mock gate — 2.18)
 3. `FR-UI-VALIDATE_INPUT` (mock build; completes at Increment 2 de-mock gate — 2.18)
 4. `FR-UI-RESOLVE_CONFLICTS` (mock build; completes at Increment 2 de-mock gate — 2.18)
@@ -352,6 +348,7 @@ current truth and are not target-path mandates.
 1. [ ] `FR-UI-TRACK_PROGRESS`
 2. [ ] `FR-UI-STREAM_ACTIVITY`
 3. [ ] `FR-UI-PRESENT_FAILURES`
+
 4. `FR-UI-CONTROL_JOBS` (mock build; completes at Increment 7 de-mock gate — 7.21)
 5. `FR-UI-NOTIFY_OUTCOMES` (mock build; completes at Increment 7 de-mock gate — 7.21)
 
@@ -360,6 +357,7 @@ current truth and are not target-path mandates.
 1. [ ] `FR-UI-SET_APPEARANCE`
 2. [ ] `FR-UI-CONFIGURE_CLIENT`
 3. [ ] `FR-UI-MANAGE_LICENSE`
+
 4. `FR-UI-MANAGE_UPDATES` (mock build; completes at Increment 7 de-mock gate — 7.22)
 5. `FR-UI-SET_LANGUAGE` (mock build; completes at Increment 8 de-mock gate — 8.25)
 6. `FR-UI-ADMINISTER_CAPABILITIES` (mock build; completes at Increment 8 de-mock gate — 8.25)
@@ -368,6 +366,7 @@ current truth and are not target-path mandates.
 
 1. [ ] `FR-UI-MANAGE_FOCUS`
 2. [ ] `FR-UI-DISTINGUISH_STATE`
+
 3. `FR-UI-PROVIDE_DATA_ALTERNATIVES` (mock build; completes at Increment 4 de-mock gate — 4.19)
 4. `FR-UI-PRESERVE_USABILITY` (mock build; completes at Increment 8 de-mock gate — 8.26; locale-expansion
    acceptance requires `FR-UI-SET_LANGUAGE`)
@@ -869,8 +868,7 @@ here; each checkbox below completes only with UI↔backend contract-parity evide
 **Purpose:** Move deterministic Codegen and MQL5 parity ahead of the research factory, as required by the Phase 1
 release gate.
 
-**Vertical path:** `Strategy version → deterministic Codegen → MetaEditor boundary → Simulator/Analytics parity → D-UI
-source diagnostics`
+**Vertical path:** `Strategy version → deterministic Codegen → MetaEditor boundary → Simulator/Analytics parity → D-UI source diagnostics`
 
 **UI demo checkpoint:** Generate an MQL5 package, inspect source and diagnostics, compile against the approved
 toolchain, and compare target results with the native run.
@@ -1166,9 +1164,9 @@ connections here; each checkbox below completes only with UI↔backend contract-
 7. [ ] `FR-ORCH-ENFORCE_NOTIFICATION_LIMITS`
 8. [ ] `FR-ORCH-DELIVER_DESKTOP_NOTIFICATIONS`
 9. [ ] `FR-ORCH-DELIVER_EMAIL_NOTIFICATIONS`
-10. [ ] `FR-ORCH-DELIVER_TELEGRAM_NOTIFICATIONS`
-11. [ ] `FR-ORCH-DELIVER_SMS_NOTIFICATIONS`
-12. [ ] `FR-ORCH-SEND_PROJECT_NOTIFICATIONS`
+1. [ ] `FR-ORCH-DELIVER_TELEGRAM_NOTIFICATIONS`
+1. [ ] `FR-ORCH-DELIVER_SMS_NOTIFICATIONS`
+1. [ ] `FR-ORCH-SEND_PROJECT_NOTIFICATIONS`
 
 ##### 7.13 [ ] `FEAT-ORCH-TRACK_RUN_HISTORY`
 
@@ -1236,8 +1234,7 @@ connections here; each checkbox below completes only with UI↔backend contract-
 **Purpose:** Add isolated plugins, view contributions, additional code targets, distributed workers, Stockpicker/profile
 methods, AI assistance, neural research, and other advanced capabilities without destabilizing the core loop.
 
-**Vertical path:** `Plugin/package or advanced request → isolation/admission → owning capability → scoped UI
-contribution/result`
+**Vertical path:** `Plugin/package or advanced request → isolation/admission → owning capability → scoped UI contribution/result`
 
 **UI demo checkpoint:** Install, replace, and remove a constrained contribution; exercise an applicable advanced
 capability; verify scoped UI cleanup, compatibility diagnostics, and local-reference equivalence where required.
@@ -1411,8 +1408,7 @@ UI↔backend contract-parity evidence.
 **Purpose:** Introduce nonhistorical and live evidence with explicit provenance, freshness, bounded buffering, replay,
 and classification.
 
-**Vertical path:** `Source adapter → Data normalization/versioning → Research drift/intelligence → D-UI data/monitoring
-states`
+**Vertical path:** `Source adapter → Data normalization/versioning → Research drift/intelligence → D-UI data/monitoring states`
 
 **UI demo checkpoint:** Generate a classified scenario, query point-in-time news, reconnect/replay a live feed, and
 inspect drift/freshness without confusing synthetic or stale evidence with observed authority.
@@ -1469,8 +1465,7 @@ through the Data/Research UI slices de-mocked at Increments 2, 8, and 10.
 **Purpose:** Add disabled-by-default paper/demo/live operations through certified Broker transport, fail-closed Runtime
 Risk, Trading reconciliation, operational analytics, and safety-complete UI controls.
 
-**Vertical path:** `D-UI confirmed intent → D-IFACE trading gateway → Trading → Runtime Risk → selected authority →
-reconciliation/analytics → D-UI`
+**Vertical path:** `D-UI confirmed intent → D-IFACE trading gateway → Trading → Runtime Risk → selected authority → reconciliation/analytics → D-UI`
 
 **UI demo checkpoint:** Create an explicitly bound non-live session, inspect readiness, preview and confirm an action,
 exercise approval/kill-switch behavior, classify the receipt, reconcile authority state, and inspect the audit trail.
@@ -1705,8 +1700,7 @@ here; each checkbox below completes only with UI↔backend contract-parity evide
 **Purpose:** Replace local-only trust assumptions with hosted isolation/authorization while retaining identical domain
 contracts, then run every applicable release gate.
 
-**Vertical path:** `Hosted client → authorized workspace boundary → same public capabilities/domains → isolated
-storage/workers`
+**Vertical path:** `Hosted client → authorized workspace boundary → same public capabilities/domains → isolated storage/workers`
 
 **UI demo checkpoint:** Run an approved representative workflow in local and hosted modes and compare contract behavior,
 isolation, artifacts, events, and recovery.

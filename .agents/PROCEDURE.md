@@ -77,6 +77,9 @@ uv run .agents/make_task.py 1.1
 ```
 
 This writes runtime-only `.agents/task.toml`. Review or edit it before activation if needed.
+Note that .agents/make_task.py is hardcoded to only recognize product features (FEAT-...)
+and functional requirements (FR-...), other tasks not matching this like foundation task.
+Manually author .agents/task.toml with task_kind = "task" (rather than "feature"):
 
 At this point:
 
