@@ -55,9 +55,7 @@ Stage
 - **Feature** is the removable implementation/acceptance unit defined by the owning README.
 - **Functional Requirement** is the product behavior and traceability unit defined by the owning README.
 
-This file intentionally does **not** reproduce all 549 FR checkboxes. The previous duplication made the scheduling document a second mutable requirement registry and increased drift risk. Feature and FR status, evidence, and exact ordering remain in each authoritative domain README. This document records only cross-domain sequencing and domain-completion gates.
-
-Existing completed evidence is not discarded by this rewrite. Completed `FR-*`, `FEAT-*`, whole-app contract-authoring, Composition logging, Workspace, Plugins, Interfaces, and UI-shell evidence remains authoritative where it is already recorded in the owning README, implementation, and tests.
+Existing completed evidence is preserved. Completed `FR-*`, `FEAT-*`, whole-app contract-authoring, Composition logging, Workspace, Plugins, Interfaces, and UI-shell evidence remains authoritative where it is already recorded in the owning README, implementation, and tests.
 
 ---
 
@@ -161,237 +159,1191 @@ Catalogue
    -> Analytics
    -> Research
    -> Portfolio
+   -> Orchestration
+   -> Interfaces
+   -> UI
 ```
 
-`Broker Connectivity` is deliberately early. Data consumes broker/provider evidence, Runtime Risk consumes broker/account evidence, and Trading should be designed against its real external execution-authority boundary before Simulator implements the simulated authority. Completing Broker early does **not** enable live trading; operational mutation remains disabled by default and release-gated.
+---
+
+## 6. Ordered waterfall sequence
+
+### Stage 0 — Shared Foundation: Contracts -> Kernel -> Composition (Preserve)
+
+**Status:** Composability substrate preserved; the Composition logging foundation is complete for the applicable portions of `NFR-OBS-001`, `NFR-OBS-005`, and `NFR-OBS-009`. System-wide observability completion remains pending later product increments.
+
+**Purpose:** Freeze the proven composability substrate as the baseline for every product increment; extend it without reimplementing or bypassing it.
+
+**Vertical path:** `Feature specification → contracts → composition → D-IFACE gateway where required → provider/consumer/state evidence`
+
+**Exit gate:** Existing architecture, composition, feature-documentation, lifecycle, replacement, and removal suites remain green. The structured-logging task below must pass before Stage 1 product work starts.
+
+Implemented evidence includes:
+
+1. Independent capability, feature-specification, context/scope, registry, graph, reconciliation, event, task, state, and replacement primitives.
+2. Python `haruquantai.features` discovery plus explicit test/embedded registration.
+3. Strict TOML feature/provider configuration, readiness profiles, file watching, and serialized composition mutation.
+4. Direct Composition runtime diagnostics for readiness, active capabilities, feature state, dependency failures, provider conflicts, replacement rollback, and memory/task leak freedom.
+5. In-process SQLite schema/write-lock isolation, structured WAL connection cleanup, deterministic rollback, and migration-ledger idempotence.
+6. Clean component shutdown with explicit resource/subscription disposal, thread termination, unregistration reversals, and signal handling.
+
+#### Foundation Logging Tasks
+
+1. [X] Add `app/composition/logging.py` for structured formatting, levels, deterministic redaction, correlation context, retention integration, bounded diagnostic capture, and lifecycle-safe handler cleanup — evidence: app/composition/logging.py:319, app/composition/logging.py:492, app/composition/logging.py:595, app/composition/logging.py:663, app/composition/logging.py:852
+2. [X] Configure logging from `app/main.py` before the composition engine begins runtime work, and close owned handlers during shutdown — evidence: app/main.py:112, app/main.py:207
+3. [X] Use `logger = logging.getLogger(__name__)` only in modules with workflow, lifecycle, I/O, state-transition, retry, decision, or failure boundaries; pure contracts, DTOs, deterministic helpers, trivial accessors, and high-frequency numerical modules remain log-free unless required — evidence: app/main.py:21, app/composition/discovery.py:12, app/composition/engine.py:30, app/composition/watcher.py:15
+4. [X] Prove structured schema, correlation propagation, redaction, bounded capture/retention behavior, no duplicate handlers, repeated startup/shutdown cleanup, and secret-safe failure output — evidence: tests/composition/test_logging.py:43, tests/composition/test_hot_reconfiguration.py:513, tests/test_main.py:144, tests/test_main.py:164
+
+#### Foundation task 1.0 — Whole-app contract authoring
+
+This is non-domain runtime infrastructure, not a product `FEAT-*` or business `FR-*`. It populates the shared contract boundary before any mock-backed UI slice is built, so mocks implement ratified contracts instead of inventing shapes. Contracts are authored from the owning domain READMEs (the semantic authorities) and may be revised by later real feature slices through their documented change processes.
+
+**Completion evidence (task 1.0):** all 15 owner READMEs now carry their ratified `Ratified v1 public records and capabilities` catalogues; the 16 namespaces under `app/contracts/` implement the inventoried records and capability bundles as strict frozen Pydantic v2 wire models (compatibility-frozen v1 process classes unchanged; additive `<Record>Wire` projections); `scripts/generate_contracts.py` deterministically emits the 16 `wire/schema.json` documents and 17 TypeScript modules (byte-reproducible, `--check` wired into `scripts/ci_check.py` and `app/ui/package.json`); the handwritten `ui_contracts.ts` mirror is deleted with all nine consumers migrated; and `tests/contracts/` (213 focused tests) proves inventory parity, round-trips, versions, generation determinism, and import boundaries. No product `FEAT-*`/`FR-*` status changed.
+
+1. [X] Enumerate every cross-boundary contract requirement from the 15 business-domain READMEs plus the existing `app/contracts/ui/` package, and record the owner, consumers, and version for each. — evidence: `app/contracts/README.md` §§4.1–4.15 inventory reconciled 1:1 by `tests/contracts/test_contract_inventory.py::test_readme_record_counts_match_registries` (486 items, zero removals).
+2. [X] Author the Python/Pydantic definitions and wire schemas into `app/contracts/<owner>/` packages for all listed contracts, including the 17 versioned UI feature capability ports and their request/result/failure/event unions. — evidence: `app/contracts/{workspace,catalogue,data,strategy,simulator,analytics,research,portfolio,orchestration,interfaces,ui,plugins,broker,risk,trading}/` plus `app/contracts/common/`; 17-UI-port surface verified by `tests/contracts/test_ui_contracts.py`; strictness/frozen verified by `tests/contracts/test_contract_inventory.py::test_registered_models_are_frozen_and_strict`.
+3. [X] Regenerate the TypeScript clients and types under `app/ui/src/contracts/generated/` from the new contracts and verify the existing generation flow stays the sole source (no hand-written public wire contracts under `app/ui/`). — evidence: `scripts/generate_contracts.py` (write/`--check`); 33 artifacts byte-identical across consecutive checks per `tests/contracts/test_contract_generation.py`; `ui_contracts.ts` deleted (zero references repo-wide); `npm --prefix app/ui run typecheck`, `test`, and `build` pass against the generated barrel.
+4. [X] Prove contract-roundtrip parity (schema validation, versioning, and generated-type equality) and update `app/contracts/README.md` to reflect the complete public contract inventory. — evidence: `tests/contracts/test_contract_roundtrip.py` (33 fixtures across every owner: JSON round-trip, extra field rejection, frozen mutation), `tests/contracts/test_contract_versions.py` (schema-version and key/major integrity), `tests/contracts/test_contract_boundaries.py`; `app/contracts/README.md` status header reconciled to the implemented wire-contract state.
 
 ---
 
-## 6. Stage 0 — Preserve the implemented foundation
+### Stage 1 — UI-First Workstation Construction (D-UI Shell & Mocks)
 
-**Status:** Baseline implemented; preserve and extend only through approved contracts/composition mechanisms.
+**Purpose:** Deliver the complete mock-backed UI surface in one coordinated pass: a secured local workspace, capability-aware public gateway, bounded plugin/widget contribution declarations, an accessible React workstation with truthful diagnostics, and every remaining `FEAT-UI-*` feature-owned widget surface built against the dev-only mock capability provider so later backend increments integrate and verify directly from the frontend.
 
-Preserve:
+**Vertical path:** `Contract authoring (task 1.0) → workstation architecture foundation (task 1.01) → Launcher → Workspace → D-IFACE capability/readiness gateway → D-UI widget host/canvas → ordered feature-owned widgets on mock capability data`
 
-- `app/contracts/` as the physical public application/domain contract boundary;
-- `app/kernel/` composability primitives;
-- `app/composition/` discovery, dependency resolution, effects, lifecycle, replacement, readiness, diagnostics, and structured logging;
-- Python `haruquantai.features` discovery;
-- strict TOML configuration;
-- capability snapshots and exact removal semantics.
+**UI demo checkpoint:** Launch React, authenticate locally, create a blank workspace or apply a versioned template, add/remove/dock/tab/split/resize/minimize/maximize compatible widget instances, inspect capability/readiness and explicit time-domain state, preserve a draft/layout preference, and walk through every mock-backed feature surface with mock-derived data visibly labeled non-authoritative.
 
-Already completed foundation work includes Composition-owned structured logging and whole-app contract authoring/generation. Their existing evidence remains valid and shall not be recreated as new product features.
+##### 1.01 [ ] Foundation task — D-UI spatiotemporal workstation foundation
 
-**Exit gate:** Existing architecture/composition/contracts/removal suites remain green and no later stage introduces a second lifecycle, registry, effect framework, or private cross-domain implementation import.
+This ordered non-FR foundation enables the existing 17 D-UI feature slices; it creates no product feature or FR ID and cannot mark `FEAT-UI-MANAGE_LAYOUTS`, `FEAT-UI-EXTEND_VIEWS`, or any other feature complete by itself.
 
----
+1. [ ] Implement the typed widget registry/host so every widget type names exactly one owning `FEAT-UI-*`, validates manifest/configuration/state-schema metadata, reverses lifecycle effects exactly once, and derives runtime state without a second product registry.
+2. [ ] Pin and integrate the then-verified `dockview-react` version behind a HaruQuantAI-owned adapter; implement blank workspaces, versioned templates, add/remove/dock/tab/split/resize/minimize/maximize, bounded layout persistence, migration, dirty-close resolution, and explicit missing/incompatible-widget restoration.
+3. [ ] Implement explicit selection and temporal presentation contexts for live, delayed, historical, playback, simulation, and job-event sources with source/clock identity, timestamp, sequence/cursor order, stale/gap/resync, incompatible-domain failure, bounded coalescing, and exact subscription disposal.
+4. [ ] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue, and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts.
+5. [ ] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and listener/timer/subscription leak freedom before dependent widget slices proceed.
 
-## 7. Stage 1 — UI-first workstation construction
+##### 1.1 [x] `FEAT-UI-COMPOSE_SHELL`
 
-**Status:** Horizontal exception; does not constitute formal D-UI completion.
+1. [X] `FR-UI-ASSEMBLE_SHELL` — evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:24
+2. [X] `FR-UI-DISCOVER_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:107, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:48
+3. [X] `FR-UI-SWITCH_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:146, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:102
+4. [X] `FR-UI-SHOW_CAPABILITY_STATE` — evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:149
+5. [X] `FR-UI-RESTORE_ROUTE` — evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:189
 
-The UI is intentionally first because it defines the workstation experience and gives every later domain a concrete consumer to integrate with.
-
-Stage 1 shall:
-
-1. preserve the already implemented D-UI compose shell and existing D-IFACE/Workspace/Plugins foundation evidence;
-2. finish the typed widget registry/host, Dockview adapter, layout schema, temporal context, generated-client boundary, accessibility/focus foundation, and dev-only mock provider;
-3. construct the complete planned feature-owned widget surface against ratified generated contracts;
-4. label every mock-derived dataset, result, metric, event, readiness state, and trading view as non-authoritative;
-5. ensure mock-backed behavior claims **no backend FR completion** merely because the visual workflow exists;
-6. make every widget capability-aware so missing/removable providers produce explicit unavailable/degraded states;
-7. retain exact cleanup/removal and temporal subscription disposal behavior.
-
-Formal D-UI completion remains Stage 16 because `Interfaces -> UI` is the real dependency direction. Stage 1 is therefore a presentation/construction exception, not a false dependency claim.
 
 ---
 
-## 8. Stage 2 — Workspace
+### Stage 2 — Workspace (D-WS)
 
-Complete every Workspace feature in the authoritative [Workspace README](../../app/services/workspace/README.md).
+**Authority:** [Workspace README](../../app/services/workspace/README.md)
 
-Existing completed Workspace features remain completed. The active stage closes the remaining Workspace capability set, including worker distribution and hosted-workspace behavior, so later domains can rely on one stable workspace/job/artifact/runtime substrate.
+**Purpose:** The Workspace domain delivers workspace lifecycle, runtime configuration, local/hosted access, worker pools, backup, and diagnostics.
 
-**Special gate:** local and hosted behavior may be implemented now but hosted release can remain separately gated by `PROJECT.md`. Implementation order does not equal deployment enablement order.
 
----
+##### 2.1 [x] `FEAT-WS-MANAGE_WORKSPACES`
 
-## 9. Stage 3 — Plugins
+1. [X] `FR-WS-INITIALIZE_WORKSPACE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:53
+2. [X] `FR-WS-MIGRATE_WORKSPACE_SCHEMA` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:102
+3. [X] `FR-WS-FENCE_WORKSPACE_WRITERS` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:120
+4. [X] `FR-WS-RECOVER_WORKSPACE_STATE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:177
+5. [X] `FR-WS-BACKUP_WORKSPACE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:210
 
-Complete every Plugins feature in the authoritative [Plugins README](../../app/services/plugins/README.md).
+##### 2.2 [x] `FEAT-WS-CONFIGURE_RUNTIME`
 
-Existing manifest/contribution work remains valid. Finish lifecycle replacement, sandbox/permission boundaries, analysis isolation, result panels, compatibility, secrets, and physical-removal behavior before product domains begin depending on extension points.
+1. [X] `FR-WS-CONFIGURE_WORKSPACE` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:64
+2. [X] `FR-WS-ENFORCE_STORAGE_GUARDS` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:109
+3. [X] `FR-WS-CONFIGURE_SERVER_RUNTIME` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:148
+4. [X] `FR-WS-PUBLISH_RUNTIME_SUPPORT` — evidence: tests/services/workspace/runtime_configuration/test_runtime_configuration.py:214
 
----
+##### 2.3 [x] `FEAT-WS-SECURE_LOCAL_ACCESS`
 
-## 10. Stage 4 — Catalogue
+1. [X] `FR-WS-ISSUE_LOCAL_SESSION` — evidence: tests/services/workspace/local_access_health/test_local_access_health.py:49
+2. [X] `FR-WS-REPORT_SYSTEM_READINESS` — evidence: tests/services/workspace/local_access_health/test_local_access_health.py:136
 
-Complete every Catalogue feature in the authoritative [Catalogue README](../../app/services/catalogue/README.md).
+##### 2.4 [x] `FEAT-WS-BUILD_DIAGNOSTICS`
 
-Catalogue becomes the stable authority for instruments, provider identities/mappings, sessions/calendars, trading rules, cost definitions, universes, and currency topology before Broker/Data/Trading consumers are implemented.
+1. [X] `FR-WS-BUILD_DIAGNOSTIC_BUNDLE` — evidence: tests/services/workspace/diagnostic_bundle/test_diagnostic_bundle.py:90
 
----
+##### 2.5 [ ] `FEAT-WS-DISTRIBUTE_WORKERS`
 
-## 11. Stage 5 — Broker Connectivity
+1. [ ] `FR-WS-REGISTER_WORKER_CAPABILITIES`
+2. [ ] `FR-WS-SECURE_REMOTE_WORKERS`
+3. [ ] `FR-WS-SCHEDULE_DATA_LOCALITY`
+4. [ ] `FR-WS-VERIFY_ARTIFACT_TRANSFER`
 
-Complete every Broker Connectivity feature in the authoritative [Broker README](../../app/services/broker/README.md).
+##### 2.6 [ ] `FEAT-WS-HOST_WORKSPACES`
 
-Broker Connectivity owns transport/provider truth only. It does not own risk admission or the Trading business lifecycle.
-
-Required completion characteristics:
-
-- certified provider capability contracts;
-- environment/account/session isolation;
-- provider state reads and normalized events;
-- order transport with accepted/rejected/unknown classification;
-- no blind retry after uncertain mutation outcome;
-- credential and provider internals confined to the adapter boundary;
-- demo/live mutation disabled unless the independent operational release gates authorize it.
-
-Its early implementation supplies real provider/account evidence to Data and Risk and a real external execution-authority boundary to Trading.
-
----
-
-## 12. Stage 6 — Data
-
-Complete every Data feature in the authoritative [Data README](../../app/services/data/README.md).
-
-This stage includes the complete planned Data domain rather than only historical onboarding: ingestion, QuantData, ticks, quality, aggregation, retention, alignment, profile sources, external indicators, run data binding, connectors, synthetic scenarios, news, live events, and lineage.
-
-De-mock all UI data surfaces whose complete provider set now exists.
+1. [ ] `FR-WS-ISOLATE_HOSTED_WORKSPACES`
+2. [ ] `FR-WS-AUTHORIZE_HOSTED_WORKSPACES`
 
 ---
 
-## 13. Stage 7 — Strategy
+### Stage 3 — Plugins (D-PLUG)
 
-Complete every Strategy feature in the authoritative [Strategy README](../../app/services/strategy/README.md).
+**Authority:** [Plugins README](../../app/services/plugins/README.md)
 
-The Strategy domain is intentionally finished in one conceptual pass: AST/types, block catalogue, charts, versioning, templates, exchange/import, architectures/random groups, indicators, ATM, deterministic code generation, MQL5 parity tooling, additional target contracts, and plugin nodes.
+**Purpose:** The Plugins domain provides plugin manifests, sandboxed runtime permissions, UI result panels, and plugin node extensions.
 
-When StrategyQuantX comparison reveals a useful Strategy-owned capability, resolve it here before declaring the domain complete rather than scheduling it as an unrelated later increment.
 
----
+##### 3.1 [x] `FEAT-PLUG-DECLARE_MANIFESTS`
 
-## 14. Stage 8 — Runtime Risk
+1. [X] `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` — evidence: tests/services/plugins/manifests/test_plugin_manifests.py:53
 
-Complete every Runtime Risk feature in the authoritative [Runtime Risk README](../../app/services/risk/README.md).
+##### 3.2 [x] `FEAT-PLUG-REGISTER_CONTRIBUTIONS`
 
-Runtime Risk is the non-bypassable admission authority for executable Trading actions, including simulation-parity execution where configured.
+1. [X] `FR-PLUG-REGISTER_PLUGIN_CONTRIBUTIONS` — evidence: tests/services/plugins/contributions/test_plugin_contributions.py:34
 
-### Portfolio independence rule
+##### 3.3 [ ] `FEAT-PLUG-MANAGE_LIFECYCLE`
 
-Portfolio is **not** a hard prerequisite of Runtime Risk.
+1. [ ] `FR-PLUG-REPLACE_PLUGINS_TRANSACTIONALLY`
 
-Portfolio-aware allocation/budget features must be fully implemented at this stage against:
+##### 3.4 [ ] `FEAT-PLUG-SANDBOX_PERMISSIONS`
 
-- receiver-owned, versioned Runtime Risk requests/results that accept self-contained Portfolio version/allocation projections;
-- deterministic immutable Portfolio evidence fixtures covering valid, stale, incomplete, conflicting, and missing cases;
-- explicit behavior for actions whose requested scope does not require Portfolio evidence versus portfolio-aware operations whose required submitted evidence is absent.
+1. [ ] `FR-PLUG-ISOLATE_PLUGIN_EXECUTION`
+2. [ ] `FR-PLUG-RESTRICT_PLUGIN_SECRETS`
 
-There is no required Runtime Risk -> Portfolio provider edge. The physical absence of `D-PORT` must leave base Risk and single-strategy/account admission healthy. When Portfolio becomes real at Stage 13, it proves production integration by generating the expected immutable evidence and submitting it through the already-completed Risk boundary. That does not redefine Risk ownership or reopen the completed domain.
+##### 3.5 [ ] `FEAT-PLUG-ISOLATE_ANALYSIS`
 
----
+1. [ ] `FR-PLUG-PASS_ARTIFACT_HANDLES`
 
-## 15. Stage 9 — Trading
+##### 3.6 [ ] `FEAT-PLUG-RENDER_RESULT_PANELS`
 
-Complete every Trading feature in the authoritative [Trading README](../../app/services/trading/README.md).
+1. [ ] `FR-PLUG-SANDBOX_RESULT_PANELS`
 
-The governing invariant is:
+##### 3.7 [ ] `FEAT-PLUG-MAINTAIN_COMPATIBILITY`
 
-> **One Trading lifecycle, multiple execution authorities.**
-
-Trading owns canonical executable-plan normalization, operation/order/position lifecycle semantics, common business/risk gate order, authority selection, idempotency, receipt classification, protections, reconciliation, journals, ledgers, and public action behavior.
-
-At this stage:
-
-- `DEMO`/`LIVE` authority behavior integrates with the already-completed Broker domain but remains release-disabled unless operational gates authorize it;
-- `SIM`/`PAPER` authority ports are implemented and verified with deterministic authority conformance fixtures because the real Simulator provider is the next stage;
-- absence of Simulator must make only Simulator-backed authority routes unavailable, not break Broker-backed Trading behavior;
-- Trading must not contain Simulator matching/fill mechanics or Broker SDK/provider transport.
-
-Trading is declared complete before Simulator so the Simulator cannot invent a parallel business execution model.
+1. [ ] `FR-PLUG-VALIDATE_PLUGIN_PACKAGES`
+2. [ ] `FR-PLUG-DECLARE_PLUGIN_COMPATIBILITY`
 
 ---
 
-## 16. Stage 10 — Simulator
+### Stage 4 — Catalogue (D-CAT)
 
-Complete every Simulator feature in the authoritative [Simulator README](../../app/services/simulator/README.md).
+**Authority:** [Catalogue README](../../app/services/catalogue/README.md)
 
-Simulator owns deterministic authority mechanics and result production, including run manifests, engine/precision profiles, scheduler time, matching, intrabar behavior, spread/slippage/commission/swap models, checkpoints, perturbation, distribution, Stockpicker/profile simulation, and parity evidence.
+**Purpose:** The Catalogue domain manages instruments, provider and broker symbol mappings, trading sessions/calendars, trading rules, universes, currency conversion, and catalogue interchange.
 
-Simulator does **not** own a competing canonical trading lifecycle.
 
-Any retained `SimOrder`, `SimFill`, `SimPosition`, or `SimTrade` records are authority/result-scoped evidence. Canonical business order/deal/position state remains Trading-owned. Executable simulation actions must traverse the common Runtime Risk -> Trading path and return Simulator authority evidence through the versioned execution-authority boundary.
+##### 4.1 [ ] `FEAT-CAT-CATALOG_INSTRUMENTS`
 
-**Mandatory integration gate:** prove that replacing the execution authority changes matching/time/transport mechanics but not the Trading business state machine or common risk-gate sequence.
+1. [ ] `FR-CAT-DEFINE_INSTRUMENTS`
+2. [ ] `FR-CAT-VERSION_INSTRUMENTS`
+3. [ ] `FR-CAT-PROTECT_REFERENCED_VERSIONS`
 
----
+##### 4.2 [ ] `FEAT-CAT-MAP_PROVIDERS`
 
-## 17. Stage 11 — Analytics
+1. [ ] `FR-CAT-MAP_BROKER_SYMBOLS`
+2. [ ] `FR-CAT-MAP_PROVIDER_IDENTITIES`
 
-Complete every Analytics feature in the authoritative [Analytics README](../../app/services/analytics/README.md).
+##### 4.3 [ ] `FEAT-CAT-DEFINE_SESSIONS`
 
-Analytics operates on committed Simulator/Trading evidence and owns databanks, metrics, result interpretation, trade analysis, comparisons, bulk membership, custom panels, and operational qualification. It must not reconstruct a second execution authority or silently reinterpret unresolved Trading state as final execution truth.
+1. [ ] `FR-CAT-DEFINE_TRADING_SESSIONS`
+2. [ ] `FR-CAT-DEFINE_MARKET_CALENDARS`
+3. [ ] `FR-CAT-PREVIEW_TRADING_INTERVALS`
 
----
+##### 4.4 [ ] `FEAT-CAT-DEFINE_TRADING_RULES`
 
-## 18. Stage 12 — Research
+1. [ ] `FR-CAT-ROUND_ORDER_VALUES`
+2. [ ] `FR-CAT-RESOLVE_TRADING_COSTS`
 
-Complete every Research feature in the authoritative [Research README](../../app/services/research/README.md).
+##### 4.5 [ ] `FEAT-CAT-MANAGE_UNIVERSES`
 
-This is one complete research-factory stage: manual/repeatable research runs, robustness, Monte Carlo/scenarios, optimization, walk-forward, Builder/evolution, acceptance, budgets, Stockpicker, AI assistance, neural research, portfolio-fitness scoring, and drift/intelligence.
+1. [ ] `FR-CAT-VERSION_UNIVERSES`
+2. [ ] `FR-CAT-TIMEBOUND_UNIVERSE_MEMBERS`
 
-The Simulator/Analytics substrate is already complete, so StrategyQuantX-inspired research concepts can be evaluated and incorporated without reopening the engine foundation for every incremental research feature.
+##### 4.6 [ ] `FEAT-CAT-CONVERT_CURRENCIES`
 
----
+1. [ ] `FR-CAT-CONVERT_CURRENCIES`
 
-## 19. Stage 13 — Portfolio
+##### 4.7 [ ] `FEAT-CAT-EXCHANGE_CATALOGUE`
 
-Complete every Portfolio feature in the authoritative [Portfolio README](../../app/services/portfolio/README.md).
-
-After the domain itself passes its completion gate, run the deferred production integration proof against the already-completed Runtime Risk domain:
-
-- Portfolio creates self-contained immutable allocation/exposure/rebalance evidence using the ratified versioned shape expected by Runtime Risk;
-- the evidence is submitted through the receiver-owned Risk request boundary rather than discovered through a Risk -> Portfolio runtime capability dependency;
-- removing Portfolio stops creation of new Portfolio evidence/capabilities but does not prevent base Runtime Risk or single-strategy/account Trading from activating;
-- no reverse implementation import or direct foreign-state write is introduced.
-
-This verification is a cross-domain integration gate, not a second Risk implementation stage.
+1. [ ] `FR-CAT-EXCHANGE_CATALOGUE_DEFINITIONS`
 
 ---
 
-## 20. Stage 14 — Orchestration
+### Stage 5 — Broker Connectivity (D-BRK)
 
-Complete every Orchestration feature in the authoritative [Orchestration README](../../app/services/orchestration/README.md).
+**Authority:** [Broker Connectivity README](../../app/services/broker/README.md)
 
-By this point all core business domains exist, so project graphs, durable task attempts/checkpoints, domain delegation, utility/notification tasks, history, and network-training orchestration can be built against stable capabilities instead of placeholder product behavior.
+**Purpose:** The Broker Connectivity domain manages broker profiles, environment/session isolation, live reads/events, order transport, adapter certification, and safe offline behavior.
+
+
+##### 5.1 [ ] `FEAT-BRK-DECLARE_CAPABILITIES`
+
+1. [ ] `FR-BRK-IDENTIFY_PROVIDER_PROFILE`
+2. [ ] `FR-BRK-DECLARE_OPERATION_CAPABILITIES`
+3. [ ] `FR-BRK-RETURN_BROKER_RESULTS`
+4. [ ] `FR-BRK-PAGE_PROVIDER_HISTORY`
+5. [ ] `FR-BRK-HIDE_PROVIDER_INTERNALS`
+
+##### 5.2 [ ] `FEAT-BRK-CONFIGURE_PROVIDERS`
+
+1. [ ] `FR-BRK-OPERATE_MT5_PROFILE`
+2. [ ] `FR-BRK-OPERATE_API_PROFILES`
+3. [ ] `FR-BRK-ENFORCE_READ_ONLY`
+
+##### 5.3 [ ] `FEAT-BRK-ISOLATE_ENVIRONMENTS`
+
+1. [ ] `FR-BRK-ISOLATE_BROKER_ENVIRONMENTS`
+2. [ ] `FR-BRK-SEPARATE_EXECUTION_AUTHORITIES`
+3. [ ] `FR-BRK-BLOCK_BLIND_RETRIES`
+4. [ ] `FR-BRK-CLOSE_ADAPTER_RESOURCES`
+
+##### 5.4 [ ] `FEAT-BRK-MANAGE_SESSIONS`
+
+1. [ ] `FR-BRK-DEFINE_CONNECTION_STATES`
+2. [ ] `FR-BRK-ASSESS_SESSION_READINESS`
+3. [ ] `FR-BRK-RESOLVE_SESSION_CREDENTIALS`
+4. [ ] `FR-BRK-RECONNECT_SESSIONS`
+
+##### 5.5 [ ] `FEAT-BRK-READ_PROVIDER_STATE`
+
+1. [ ] `FR-BRK-READ_ACCOUNT_BALANCES`
+2. [ ] `FR-BRK-READ_TRADING_STATE`
+3. [ ] `FR-BRK-READ_MARKET_STATE`
+4. [ ] `FR-BRK-NORMALIZE_PROVIDER_EVENTS`
+
+##### 5.6 [ ] `FEAT-BRK-TRANSPORT_ORDERS`
+
+1. [ ] `FR-BRK-VALIDATE_TRANSPORT_REQUEST`
+2. [ ] `FR-BRK-CORRELATE_PROVIDER_OPERATIONS`
+3. [ ] `FR-BRK-CLASSIFY_TRANSPORT_OUTCOME`
+4. [ ] `FR-BRK-VALIDATE_ORDER_POLICIES`
+5. [ ] `FR-BRK-JOURNAL_PROVIDER_WRITES`
+
+##### 5.7 [ ] `FEAT-BRK-CERTIFY_ADAPTERS`
+
+1. [ ] `FR-BRK-TEST_ADAPTER_CONFORMANCE`
+2. [ ] `FR-BRK-CERTIFY_BROKER_WRITES`
+3. [ ] `FR-BRK-VERSION_ADAPTER_CERTIFICATION`
 
 ---
 
-## 21. Stage 15 — Interfaces
+### Stage 6 — Data (D-DATA)
 
-Complete every Interfaces feature in the authoritative [Interfaces README](../../app/services/interfaces/README.md).
+**Authority:** [Data README](../../app/services/data/README.md)
 
-Early D-IFACE foundation work remains valid. This stage finishes the real HTTP/events/CLI/MCP/research/project/portfolio/trading/admin gateway set against completed domains and proves transport semantic parity, capability withdrawal, authentication/authorization, pagination/concurrency/idempotency, and physical removal.
+**Purpose:** The Data domain handles historical ingestion, tick normalization, quality resolution, bar aggregation, retention, external series alignment, connectors, scenario generation, market news, and event streaming.
 
-Interfaces must delegate business behavior; they do not become a second application/domain policy layer.
+
+##### 6.1 [ ] `FEAT-DATA-INGEST_HISTORY`
+
+1. [ ] `FR-DATA-REGISTER_DATA_CONNECTIONS`
+2. [ ] `FR-DATA-IMPORT_CSV_DATA`
+3. [ ] `FR-DATA-PUBLISH_DATA_VERSIONS`
+4. [ ] `FR-DATA-PIN_DATA_PROVENANCE`
+5. [ ] `FR-DATA-REPORT_IMPORT_COUNTS`
+
+##### 6.2 [ ] `FEAT-DATA-IMPORT_QUANTDATA`
+
+1. [ ] `FR-DATA-DISCOVER_QUANTDATA_SERIES`
+2. [ ] `FR-DATA-DECODE_QUANTDATA_FILES`
+3. [ ] `FR-DATA-SYNC_QUANTDATA_CATALOGUE`
+4. [ ] `FR-DATA-RECORD_QUANTDATA_LINEAGE`
+
+##### 6.3 [ ] `FEAT-DATA-NORMALIZE_TICKS`
+
+1. [ ] `FR-DATA-PRESERVE_TICK_FIELDS`
+
+##### 6.4 [ ] `FEAT-DATA-RESOLVE_QUALITY`
+
+1. [ ] `FR-DATA-DETECT_DATA_QUALITY`
+2. [ ] `FR-DATA-RESOLVE_QUALITY_FINDINGS`
+3. [ ] `FR-DATA-VALIDATE_OHLC_BARS`
+4. [ ] `FR-DATA-ORDER_MARKET_ROWS`
+5. [ ] `FR-DATA-LOCK_DATA_PUBLICATION`
+
+##### 6.5 [ ] `FEAT-DATA-AGGREGATE_BARS`
+
+1. [ ] `FR-DATA-AGGREGATE_TIMEFRAMES`
+2. [ ] `FR-DATA-RECORD_AGGREGATION_LINEAGE`
+3. [ ] `FR-DATA-DEFINE_CUSTOM_TIMEFRAMES`
+
+##### 6.6 [ ] `FEAT-DATA-MANAGE_RETENTION`
+
+1. [ ] `FR-DATA-PREVIEW_DATA_COVERAGE`
+2. [ ] `FR-DATA-EXPORT_DATA_SERIES`
+3. [ ] `FR-DATA-COLLECT_REACHABLE_ARTIFACTS`
+
+##### 6.7 [ ] `FEAT-DATA-ALIGN_SERIES`
+
+1. [ ] `FR-DATA-ALIGN_EXTERNAL_SERIES`
+2. [ ] `FR-DATA-DEFINE_ALIGNMENT_POLICY`
+
+##### 6.8 [ ] `FEAT-DATA-PREPARE_PROFILES`
+
+1. [ ] `FR-DATA-VALIDATE_PROFILE_SOURCE`
+
+##### 6.9 [ ] `FEAT-DATA-IMPORT_INDICATORS`
+
+1. [ ] `FR-DATA-IMPORT_INDICATOR_VALUES`
+
+##### 6.10 [ ] `FEAT-DATA-BIND_RUN_DATA`
+
+1. [ ] `FR-DATA-BIND_COMMITTED_DATA`
+2. [ ] `FR-DATA-VALIDATE_PRECISION_INPUTS`
+
+##### 6.11 [ ] `FEAT-DATA-SYNC_CONNECTORS`
+
+1. [ ] `FR-DATA-IMPLEMENT_CONNECTOR_LIFECYCLE`
+2. [ ] `FR-DATA-PLAN_INCREMENTAL_SYNC`
+3. [ ] `FR-DATA-VERSION_DATA_TRANSFORMS`
+4. [ ] `FR-DATA-CONNECT_DATA_PROVIDERS`
+5. [ ] `FR-DATA-PROTECT_CONNECTOR_SECRETS`
+
+##### 6.12 [ ] `FEAT-DATA-GENERATE_SCENARIOS`
+
+1. [ ] `FR-DATA-CONFIGURE_SYNTHETIC_MODEL`
+2. [ ] `FR-DATA-GENERATE_SYNTHETIC_SERIES`
+3. [ ] `FR-DATA-TRANSFORM_SCENARIO_DATA`
+4. [ ] `FR-DATA-CLASSIFY_SYNTHETIC_DATA`
+
+##### 6.13 [ ] `FEAT-DATA-TRACK_MARKET_NEWS`
+
+1. [ ] `FR-DATA-RECORD_NEWS_OBSERVATIONS`
+2. [ ] `FR-DATA-VERSION_NEWS_REVISIONS`
+3. [ ] `FR-DATA-QUERY_MARKET_NEWS`
+4. [ ] `FR-DATA-PROJECT_TRADE_RESTRICTIONS`
+5. [ ] `FR-DATA-GOVERN_NETWORK_IMPORTS`
+
+##### 6.14 [ ] `FEAT-DATA-STREAM_MARKET_EVENTS`
+
+1. [ ] `FR-DATA-NORMALIZE_LIVE_EVENTS`
+2. [ ] `FR-DATA-TRACK_FEED_STATE`
+3. [ ] `FR-DATA-ORDER_LIVE_EVENTS`
+4. [ ] `FR-DATA-BOUND_EVENT_BUFFERS`
+5. [ ] `FR-DATA-RECONNECT_MARKET_FEEDS`
+6. [ ] `FR-DATA-RECORD_MARKET_REPLAYS`
 
 ---
 
-## 22. Stage 16 — Final D-UI completion and system integration
+### Stage 7 — Strategy (D-STRAT)
 
-Complete every User Interface feature in the authoritative [UI README](../../app/ui/README.md).
+**Authority:** [Strategy README](../../app/services/strategy/README.md)
 
-Stage 16 retires the horizontal exception:
+**Purpose:** The Strategy domain defines the typed strategy AST, block catalogue, chart configurations, versioning, template editing, interchange, architectures, indicators, ATM exits, code generation, MQL5, and targets.
 
-1. remove every remaining production dependency on `app/ui/src/mocks/`;
-2. connect every feature-owned widget to real D-IFACE/public capabilities;
-3. prove spatial layout, temporal context, stale/gap/resync, accessibility, keyboard/focus, error, unavailable, replacement, and live-removal behavior;
-4. execute all system workflows from the UI and through equivalent nonvisual/automation interfaces;
-5. verify local/hosted contract parity where the hosted profile is enabled;
-6. run the complete release/removal/NFR matrix.
 
-D-UI is **DOMAIN COMPLETE — FROZEN BASELINE** only here.
+##### 7.1 [ ] `FEAT-STRAT-DEFINE_AST`
+
+1. [ ] `FR-STRAT-REPRESENT_TYPED_AST`
+2. [ ] `FR-STRAT-DEFINE_AST_NODES`
+3. [ ] `FR-STRAT-DEFINE_AST_TYPES`
+4. [ ] `FR-STRAT-DESCRIBE_BLOCKS`
+
+##### 7.2 [ ] `FEAT-STRAT-CATALOG_BLOCKS`
+
+1. [ ] `FR-STRAT-SUPPORT_STRATEGY_NODES`
+2. [ ] `FR-STRAT-DEFINE_PARAMETER_DOMAINS`
+3. [ ] `FR-STRAT-CATALOG_REFERENCE_BLOCKS`
+
+##### 7.3 [ ] `FEAT-STRAT-CONFIGURE_CHARTS`
+
+1. [ ] `FR-STRAT-CATALOG_BUILTIN_BLOCKS`
+2. [ ] `FR-STRAT-CONFIGURE_TRADE_DIRECTIONS`
+3. [ ] `FR-STRAT-DEFINE_SERIES_SHIFTS`
+
+##### 7.4 [ ] `FEAT-STRAT-VERSION_STRATEGIES`
+
+1. [ ] `FR-STRAT-VERSION_STRATEGY_DRAFTS`
+2. [ ] `FR-STRAT-NORMALIZE_STRATEGY_AST`
+3. [ ] `FR-STRAT-VALIDATE_STRATEGIES`
+
+##### 7.5 [ ] `FEAT-STRAT-EDIT_TEMPLATES`
+
+1. [ ] `FR-STRAT-DEFINE_STRATEGY_TEMPLATES`
+2. [ ] `FR-STRAT-EDIT_STRATEGIES_VISUALLY`
+3. [ ] `FR-STRAT-FILTER_COMPATIBLE_BLOCKS`
+4. [ ] `FR-STRAT-SNAPSHOT_BACKTEST_DRAFT`
+5. [ ] `FR-STRAT-DEFINE_SEARCH_PARAMETERS`
+6. [ ] `FR-STRAT-CONSTRAIN_TEMPLATE_GRAMMAR`
+
+##### 7.6 [ ] `FEAT-STRAT-EXCHANGE_STRATEGIES`
+
+1. [ ] `FR-STRAT-EXCHANGE_NATIVE_STRATEGIES`
+2. [ ] `FR-STRAT-ISOLATE_LEGACY_IMPORTS`
+3. [ ] `FR-STRAT-IMPORT_LEGACY_STRATEGIES`
+
+##### 7.7 [ ] `FEAT-STRAT-DEFINE_ARCHITECTURES`
+
+1. [ ] `FR-STRAT-DEFINE_STRATEGY_ARCHITECTURES`
+2. [ ] `FR-STRAT-DEFINE_RANDOM_GROUPS`
+3. [ ] `FR-STRAT-MAP_OPPOSITE_BLOCKS`
+
+##### 7.8 [ ] `FEAT-STRAT-DEFINE_INDICATORS`
+
+1. [ ] `FR-STRAT-DEFINE_EXTERNAL_INDICATORS`
+
+##### 7.9 [ ] `FEAT-STRAT-MODEL_ATM_EXITS`
+
+1. [ ] `FR-STRAT-MODEL_ATM_EXITS`
+
+##### 7.10 [ ] `FEAT-STRAT-GENERATE_CODE`
+
+1. [ ] `FR-STRAT-REGISTER_CODE_TARGETS`
+2. [ ] `FR-STRAT-GENERATE_CODE_DETERMINISTICALLY`
+3. [ ] `FR-STRAT-EMBED_CODE_MANIFEST`
+4. [ ] `FR-STRAT-LOWER_TYPED_VALUES`
+5. [ ] `FR-STRAT-DESCRIBE_EMITTER_CAPABILITIES`
+6. [ ] `FR-STRAT-SHARE_TARGET_SEMANTICS`
+7. [ ] `FR-STRAT-GENERATE_PSEUDOCODE`
+8. [ ] `FR-STRAT-ADVERTISE_COMPATIBLE_TARGETS`
+
+##### 7.11 [ ] `FEAT-STRAT-GENERATE_MQL5`
+
+1. [ ] `FR-STRAT-GENERATE_MQL5_TARGET`
+2. [ ] `FR-STRAT-INVOKE_METAEDITOR`
+3. [ ] `FR-STRAT-PARSE_COMPILER_DIAGNOSTICS`
+4. [ ] `FR-STRAT-VERIFY_MQL5_COMPILE`
+5. [ ] `FR-STRAT-COMPARE_MQL5_RESULTS`
+6. [ ] `FR-STRAT-STORE_CODE_ARTIFACTS`
+7. [ ] `FR-STRAT-PACKAGE_TARGET_CODE`
+8. [ ] `FR-STRAT-MAP_ORDER_IDENTITIES`
+9. [ ] `FR-STRAT-ISOLATE_INDICATOR_FRAGMENTS`
+
+##### 7.12 [ ] `FEAT-STRAT-EXTEND_PLUGIN_NODES`
+
+1. [ ] `FR-STRAT-IDENTIFY_PLUGIN_NODES`
+2. [ ] `FR-STRAT-CALCULATE_VOLUME_PROFILES`
+
+##### 7.13 [ ] `FEAT-STRAT-GENERATE_TARGETS`
+
+1. [ ] `FR-STRAT-IMPLEMENT_CODE_TARGETS`
+
+---
+
+### Stage 8 — Runtime Risk (D-RISK)
+
+**Authority:** [Runtime Risk README](../../app/services/risk/README.md)
+
+**Purpose:** The Runtime Risk domain defines pre-trade and runtime risk contracts, risk calculation, deterministic kill-switch controls, order admission, human approvals, allocation governance, and audit trails.
+
+
+##### 8.1 [ ] `FEAT-RISK-DEFINE_RISK_CONTRACTS`
+
+1. [ ] `FR-RISK-DEFINE_DECISION_STATES`
+2. [ ] `FR-RISK-VERSION_RISK_PROFILES`
+3. [ ] `FR-RISK-PIN_RISK_PROVENANCE`
+4. [ ] `FR-RISK-VALIDATE_SOURCE_EVIDENCE`
+
+##### 8.2 [ ] `FEAT-RISK-CALCULATE_RISK`
+
+1. [ ] `FR-RISK-CALCULATE_RISK_SNAPSHOT`
+2. [ ] `FR-RISK-INCLUDE_PENDING_EXPOSURE`
+3. [ ] `FR-RISK-CALCULATE_POSITION_SIZE`
+4. [ ] `FR-RISK-VALIDATE_STOP_LOSS`
+
+##### 8.3 [ ] `FEAT-RISK-CONTROL_KILL_SWITCH`
+
+1. [ ] `FR-RISK-DEFINE_KILL_SCOPES`
+2. [ ] `FR-RISK-CHECK_KILL_SWITCH`
+3. [ ] `FR-RISK-AUTHORIZE_KILL_TRANSITIONS`
+4. [ ] `FR-RISK-AUDIT_KILL_TRANSITIONS`
+
+##### 8.4 [ ] `FEAT-RISK-GOVERN_ADMISSION`
+
+1. [ ] `FR-RISK-BIND_PROPOSED_ACTION`
+2. [ ] `FR-RISK-EVALUATE_RISK_GOVERNOR`
+3. [ ] `FR-RISK-RETURN_RISK_DECISION`
+4. [ ] `FR-RISK-RETURN_NO_TRADE`
+5. [ ] `FR-RISK-PREVENT_EXECUTION_EFFECTS`
+
+##### 8.5 [ ] `FEAT-RISK-MANAGE_APPROVALS`
+
+1. [ ] `FR-RISK-BIND_HUMAN_APPROVAL`
+2. [ ] `FR-RISK-SIGN_APPROVAL_TOKENS`
+3. [ ] `FR-RISK-CONSUME_APPROVAL_ATOMICALLY`
+4. [ ] `FR-RISK-RESERVE_RISK_CAPACITY`
+5. [ ] `FR-RISK-BIND_CAPACITY_RESERVATION`
+
+##### 8.6 [ ] `FEAT-RISK-GOVERN_ALLOCATIONS`
+
+1. [ ] `FR-RISK-ASSESS_STRATEGY_ELIGIBILITY`
+2. [ ] `FR-RISK-REVIEW_PORTFOLIO_ALLOCATION`
+3. [ ] `FR-RISK-AUTHORIZE_ALLOCATION_BUDGET`
+4. [ ] `FR-RISK-VALIDATE_PORTFOLIO_BUDGET`
+
+##### 8.7 [ ] `FEAT-RISK-AUDIT_RISK_DECISIONS`
+
+1. [ ] `FR-RISK-REVALIDATE_RISK_AUTHORITY`
+2. [ ] `FR-RISK-RUN_RISK_SCENARIOS`
+3. [ ] `FR-RISK-REPORT_RISK_DECISIONS`
+4. [ ] `FR-RISK-CHAIN_AUDIT_RECORDS`
+
+---
+
+### Stage 9 — Trading (D-TRD)
+
+**Authority:** [Trading README](../../app/services/trading/README.md)
+
+**Purpose:** The Trading domain delivers the single canonical business execution lifecycle across SIM, PAPER, DEMO, and LIVE execution routes, trade plan validation, account operations, order dispatch, reconciliation, protective orders, and transaction journaling.
+
+
+##### 9.1 [ ] `FEAT-TRD-MANAGE_TRADING_SESSIONS`
+
+1. [ ] `FR-TRD-DEFINE_TRADING_MODES`
+2. [ ] `FR-TRD-BIND_TRADING_SESSION`
+3. [ ] `FR-TRD-DEFINE_SESSION_STATES`
+4. [ ] `FR-TRD-DEFINE_LOGICAL_OPERATION`
+5. [ ] `FR-TRD-DEFINE_OPERATION_STATES`
+
+##### 9.2 [ ] `FEAT-TRD-VALIDATE_TRADE_PLANS`
+
+1. [ ] `FR-TRD-BIND_TRADE_PLAN`
+2. [ ] `FR-TRD-IDENTIFY_MANUAL_ACTIONS`
+3. [ ] `FR-TRD-VALIDATE_TRADING_READINESS`
+4. [ ] `FR-TRD-OBTAIN_RISK_AUTHORITY`
+5. [ ] `FR-TRD-RECHECK_DISPATCH_AUTHORITY`
+
+##### 9.3 [ ] `FEAT-TRD-ACCOUNT_OPERATIONS`
+
+1. [ ] `FR-TRD-PROJECT_OPERATIONAL_ACCOUNTS`
+2. [ ] `FR-TRD-VALUE_OPERATIONAL_ACCOUNTS`
+3. [ ] `FR-TRD-RECONCILE_OPERATIONAL_LEDGER`
+4. [ ] `FR-TRD-POST_ACCOUNT_ADJUSTMENTS`
+
+##### 9.4 [ ] `FEAT-TRD-DISPATCH_ORDERS`
+
+1. [ ] `FR-TRD-SELECT_EXECUTION_AUTHORITY`
+2. [ ] `FR-TRD-NORMALIZE_TRADE_PLAN`
+3. [ ] `FR-TRD-STAGE_DISPATCH_EVIDENCE`
+4. [ ] `FR-TRD-DISPATCH_ONCE`
+5. [ ] `FR-TRD-CLASSIFY_DISPATCH_RECEIPTS`
+
+##### 9.5 [ ] `FEAT-TRD-RECONCILE_TRADING`
+
+1. [ ] `FR-TRD-RECONCILE_TRADING_STATE`
+2. [ ] `FR-TRD-TRUST_EXECUTION_DEALS`
+3. [ ] `FR-TRD-BLOCK_BLIND_RETRY`
+4. [ ] `FR-TRD-RECOVER_TRADING_SESSION`
+5. [ ] `FR-TRD-RECORD_RECONCILIATION_FINDINGS`
+
+##### 9.6 [ ] `FEAT-TRD-MANAGE_PROTECTIONS`
+
+1. [ ] `FR-TRD-OWN_PROTECTIVE_ORDERS`
+2. [ ] `FR-TRD-VALIDATE_PROTECTION_CHANGES`
+3. [ ] `FR-TRD-ALLOCATE_PROTECTED_QUANTITY`
+4. [ ] `FR-TRD-RECOVER_PROTECTIVE_ORDERS`
+
+##### 9.7 [ ] `FEAT-TRD-JOURNAL_EXECUTION`
+
+1. [ ] `FR-TRD-JOURNAL_TRADING_EVENTS`
+2. [ ] `FR-TRD-PIN_EXECUTION_PROVENANCE`
+3. [ ] `FR-TRD-BALANCE_TRANSACTION_LEDGER`
+4. [ ] `FR-TRD-EXPORT_EXECUTION_EVIDENCE`
+
+##### 9.8 [ ] `FEAT-TRD-EXECUTE_PUBLIC_ACTIONS`
+
+1. [ ] `FR-TRD-ROUTE_PUBLIC_ACTIONS`
+2. [ ] `FR-TRD-GOVERN_BULK_ACTIONS`
+3. [ ] `FR-TRD-QUERY_TRADING_STATE`
+4. [ ] `FR-TRD-ENFORCE_ACTION_PARITY`
+
+---
+
+### Stage 10 — Simulator (D-SIM)
+
+**Authority:** [Simulator README](../../app/services/simulator/README.md)
+
+**Purpose:** The Simulator domain provides deterministic backtesting and order simulation as the SIM/PAPER execution authority, precision fill models, execution cost calculations, authority-side exit mechanics, indicators, result commit/checkpointing, evaluation caching, and stockpicker simulation.
+
+
+##### 10.1 [ ] `FEAT-SIM-CONFIGURE_ENGINE`
+
+1. [ ] `FR-SIM-BUILD_RUN_MANIFEST`
+2. [ ] `FR-SIM-PIN_RUN_INPUTS`
+3. [ ] `FR-SIM-PROCESS_EVENT_STREAM`
+4. [ ] `FR-SIM-ENFORCE_CLOSED_INPUTS`
+5. [ ] `FR-SIM-DEFINE_ENGINE_SEMANTICS`
+6. [ ] `FR-SIM-VERSION_ENGINE_PROFILES`
+
+##### 10.2 [ ] `FEAT-SIM-MODEL_PRECISION`
+
+1. [ ] `FR-SIM-MODEL_INTRABAR_PATH`
+2. [ ] `FR-SIM-SIMULATE_FROM_M1`
+3. [ ] `FR-SIM-APPLY_CUSTOM_SPREAD`
+4. [ ] `FR-SIM-APPLY_RECORDED_SPREAD`
+
+##### 10.3 [ ] `FEAT-SIM-SIMULATE_ORDERS`
+
+1. [ ] `FR-SIM-JOURNAL_SIMULATION_EVENTS`
+2. [ ] `FR-SIM-VALIDATE_MARKET_ORDERS`
+3. [ ] `FR-SIM-PROCESS_PENDING_ORDERS`
+4. [ ] `FR-SIM-PROCESS_STOP_LIMITS`
+5. [ ] `FR-SIM-MODEL_POSITION_ACCOUNTING`
+6. [ ] `FR-SIM-TRACK_ENTRY_IDENTITIES`
+
+##### 10.4 [ ] `FEAT-SIM-CALCULATE_COSTS`
+
+1. [ ] `FR-SIM-CALCULATE_POSITION_SIZE`
+2. [ ] `FR-SIM-REJECT_INVALID_SIZE`
+3. [ ] `FR-SIM-APPLY_SPREAD`
+4. [ ] `FR-SIM-APPLY_SLIPPAGE`
+5. [ ] `FR-SIM-APPLY_COMMISSION`
+6. [ ] `FR-SIM-APPLY_SWAP_FINANCING`
+7. [ ] `FR-SIM-RECONCILE_TRADING_COSTS`
+
+##### 10.5 [ ] `FEAT-SIM-MANAGE_EXITS`
+
+1. [ ] `FR-SIM-APPLY_STOP_TARGET`
+2. [ ] `FR-SIM-APPLY_DYNAMIC_EXITS`
+3. [ ] `FR-SIM-RESOLVE_EXIT_COLLISIONS`
+4. [ ] `FR-SIM-ENFORCE_TRADING_SCHEDULE`
+5. [ ] `FR-SIM-DEFINE_RESULT_SEGMENTS`
+6. [ ] `FR-SIM-ENFORCE_TRADE_RESTRICTIONS`
+7. [ ] `FR-SIM-EXECUTE_ATM_STATE`
+8. [ ] `FR-SIM-ALLOCATE_PARTIAL_EXITS`
+9. [ ] `FR-SIM-GENERATE_ATM_SCENARIOS`
+
+##### 10.6 [ ] `FEAT-SIM-RUN_INDICATORS`
+
+1. [ ] `FR-SIM-ISOLATE_INDICATOR_STATE`
+
+##### 10.7 [ ] `FEAT-SIM-COMMIT_RESULTS`
+
+1. [ ] `FR-SIM-COMMIT_SIMULATION_RESULT`
+2. [ ] `FR-SIM-CHECKPOINT_SIMULATION`
+3. [ ] `FR-SIM-PRESERVE_PARTIAL_RESULTS`
+4. [ ] `FR-SIM-COMPARE_EXECUTION_RESULTS`
+5. [ ] `FR-SIM-STREAM_BATCH_PROGRESS`
+
+##### 10.8 [ ] `FEAT-SIM-CACHE_EVALUATIONS`
+
+1. [ ] `FR-SIM-CACHE_EVALUATIONS`
+
+##### 10.9 [ ] `FEAT-SIM-CALCULATE_PROFILES`
+
+1. [ ] `FR-SIM-CALCULATE_VOLUME_PROFILES`
+
+##### 10.10 [ ] `FEAT-SIM-PERTURB_INPUTS`
+
+1. [ ] `FR-SIM-PERTURB_SIMULATION`
+
+##### 10.11 [ ] `FEAT-SIM-DISTRIBUTE_EVALUATIONS`
+
+1. [ ] `FR-SIM-DISTRIBUTE_SIMULATION`
+
+##### 10.12 [ ] `FEAT-SIM-SIMULATE_STOCKPICKERS`
+
+1. [ ] `FR-SIM-SIMULATE_STOCKPICKER`
+2. [ ] `FR-SIM-DEFINE_STOCKPICKER_TIMING`
+3. [ ] `FR-SIM-ENFORCE_DAILY_STOCKPICKER`
+
+---
+
+### Stage 11 — Analytics (D-ANA)
+
+**Authority:** [Analytics README](../../app/services/analytics/README.md)
+
+**Purpose:** The Analytics domain provides databank membership, result queries/views, result interpretation and comparisons, trade and benchmark analysis, result interchange, bulk databank operations, similarity matching, custom panels, and operational journals.
+
+
+##### 11.1 [ ] `FEAT-ANA-DATABANK_MEMBERSHIP`
+
+1. [ ] `FR-ANA-CREATE_DATABANK`
+2. [ ] `FR-ANA-LINK_STRATEGY_RESULT`
+3. [ ] `FR-ANA-MODIFY_DATABANK_ITEMS`
+4. [ ] `FR-ANA-VERSION_DATABANK_MUTATIONS`
+5. [ ] `FR-ANA-DEFINE_MEMBERSHIP_POLICY`
+6. [ ] `FR-ANA-ADMIT_DATABANK_ITEMS`
+
+##### 11.2 [ ] `FEAT-ANA-QUERY_RESULTS`
+
+1. [ ] `FR-ANA-QUERY_RESULTS_TABLE`
+2. [ ] `FR-ANA-VERSION_SAVED_VIEWS`
+3. [ ] `FR-ANA-EVALUATE_FORMULAS_SAFELY`
+4. [ ] `FR-ANA-DEFINE_CORRELATION_POLICY`
+5. [ ] `FR-ANA-BOUND_RESULT_QUERIES`
+
+##### 11.3 [ ] `FEAT-ANA-INTERPRET_RESULTS`
+
+1. [ ] `FR-ANA-APPLY_RESULT_SCOPE`
+2. [ ] `FR-ANA-SHOW_RESULT_OVERVIEW`
+3. [ ] `FR-ANA-LIST_RESULT_TRADES`
+4. [ ] `FR-ANA-CALCULATE_METRICS`
+5. [ ] `FR-ANA-CATALOG_METRICS`
+6. [ ] `FR-ANA-ALIGN_RESULT_COMPARISONS`
+
+##### 11.4 [ ] `FEAT-ANA-ANALYZE_TRADES`
+
+1. [ ] `FR-ANA-DOWNSAMPLE_EQUITY_SERIES`
+2. [ ] `FR-ANA-SHOW_RUN_MANIFEST`
+3. [ ] `FR-ANA-COMPARE_BENCHMARK_EQUITY`
+4. [ ] `FR-ANA-NORMALIZE_BENCHMARK`
+5. [ ] `FR-ANA-ANALYZE_TRADE_TIMING`
+6. [ ] `FR-ANA-RECONSTRUCT_CHART_TRADES`
+
+##### 11.5 [ ] `FEAT-ANA-EXCHANGE_RESULTS`
+
+1. [ ] `FR-ANA-EXPORT_RESULT_ROWS`
+2. [ ] `FR-ANA-PACKAGE_RESULT_ARTIFACTS`
+3. [ ] `FR-ANA-IMPORT_EXTERNAL_RESULTS`
+
+##### 11.6 [ ] `FEAT-ANA-BULK_DATABANK`
+
+1. [ ] `FR-ANA-PIN_BULK_SELECTION`
+2. [ ] `FR-ANA-TRANSFER_DATABANK_ITEMS`
+3. [ ] `FR-ANA-PRESERVE_REFERENCED_ARTIFACTS`
+
+##### 11.7 [ ] `FEAT-ANA-MATCH_RESULTS`
+
+1. [ ] `FR-ANA-MATCH_RESULT_FINGERPRINTS`
+
+##### 11.8 [ ] `FEAT-ANA-CUSTOM_PANELS`
+
+1. [ ] `FR-ANA-RUN_CUSTOM_ANALYSIS`
+2. [ ] `FR-ANA-DECLARE_RESULT_PANELS`
+
+##### 11.9 [ ] `FEAT-ANA-QUALIFY_OPERATIONS`
+
+1. [ ] `FR-ANA-BUILD_OPERATIONAL_JOURNAL`
+2. [ ] `FR-ANA-MEASURE_PLAN_ADHERENCE`
+3. [ ] `FR-ANA-SUMMARIZE_BEHAVIOR`
+4. [ ] `FR-ANA-ANALYZE_EMERGENCY_RESPONSE`
+5. [ ] `FR-ANA-QUALIFY_OPERATORS`
+6. [ ] `FR-ANA-EXPORT_OPERATIONAL_ANALYTICS`
+
+---
+
+### Stage 12 — Research (D-RES)
+
+**Authority:** [Research README](../../app/services/research/README.md)
+
+**Purpose:** The Research domain powers strategy generation (Builder), evolutionary improvement, parameter optimization, robustness testing, walk-forward validation, acceptance criteria, budget governance, stockpicker research, AI/neural models, portfolio fitness, and market drift detection.
+
+
+##### 12.1 [ ] `FEAT-RES-RUN_RESEARCH`
+
+1. [ ] `FR-RES-RUN_MANUAL_BACKTEST`
+2. [ ] `FR-RES-PREVIEW_RESEARCH_INPUTS`
+3. [ ] `FR-RES-CONTROL_RESEARCH_RUNS`
+4. [ ] `FR-RES-REPORT_RESEARCH_PROGRESS`
+5. [ ] `FR-RES-COMMIT_RESEARCH_RESULTS`
+6. [ ] `FR-RES-DUPLICATE_RESEARCH_SETTINGS`
+7. [ ] `FR-RES-CLASSIFY_RESEARCH_FAILURES`
+8. [ ] `FR-RES-SUBMIT_RESEARCH_BATCHES`
+
+##### 12.2 [ ] `FEAT-RES-TEST_ROBUSTNESS`
+
+1. [ ] `FR-RES-PIN_RETEST_INPUTS`
+2. [ ] `FR-RES-UPGRADE_RETEST_PRECISION`
+3. [ ] `FR-RES-TEST_ADDITIONAL_MARKETS`
+4. [ ] `FR-RES-PERTURB_TRADE_HISTORY`
+5. [ ] `FR-RES-PERTURB_SIMULATION_INPUTS`
+6. [ ] `FR-RES-SUMMARIZE_MONTE_CARLO`
+7. [ ] `FR-RES-RUN_SCENARIO_ANALYSIS`
+8. [ ] `FR-RES-PERMUTE_SYSTEM_PARAMETERS`
+
+##### 12.3 [ ] `FEAT-RES-OPTIMIZE_PARAMETERS`
+
+1. [ ] `FR-RES-OPTIMIZE_SEQUENTIALLY`
+2. [ ] `FR-RES-OPTIMIZE_SIMPLE_PARAMETERS`
+3. [ ] `FR-RES-OPTIMIZE_PARAMETER_GRID`
+
+##### 12.4 [ ] `FEAT-RES-VALIDATE_WALK_FORWARD`
+
+1. [ ] `FR-RES-DEFINE_WALKFORWARD_WINDOWS`
+2. [ ] `FR-RES-EXECUTE_WALK_FORWARD`
+3. [ ] `FR-RES-STITCH_WALKFORWARD_RESULTS`
+4. [ ] `FR-RES-EVALUATE_WALKFORWARD_MATRIX`
+5. [ ] `FR-RES-CALCULATE_WALKFORWARD_METRICS`
+
+##### 12.5 [ ] `FEAT-RES-GENERATE_STRATEGIES`
+
+1. [ ] `FR-RES-GENERATE_VALID_STRATEGIES`
+2. [ ] `FR-RES-DEFINE_BUILDER_SEARCH`
+3. [ ] `FR-RES-CALIBRATE_PARAMETER_RANGES`
+4. [ ] `FR-RES-DETECT_STRATEGY_DUPLICATES`
+5. [ ] `FR-RES-CONSTRAIN_RANDOM_GROUPS`
+
+##### 12.6 [ ] `FEAT-RES-EVOLVE_STRATEGIES`
+
+1. [ ] `FR-RES-IMPROVE_STRATEGY_AST`
+2. [ ] `FR-RES-CONFIGURE_GENETIC_SEARCH`
+3. [ ] `FR-RES-CHECKPOINT_GENETIC_SEARCH`
+4. [ ] `FR-RES-MUTATE_ATM_ONLY`
+
+##### 12.7 [ ] `FEAT-RES-ACCEPT_RESEARCH`
+
+1. [ ] `FR-RES-DEFINE_ACCEPTANCE_PIPELINE`
+2. [ ] `FR-RES-RECORD_CANDIDATE_REJECTIONS`
+
+##### 12.8 [ ] `FEAT-RES-GOVERN_RESEARCH_BUDGETS`
+
+1. [ ] `FR-RES-ENFORCE_RESEARCH_BUDGETS`
+2. [ ] `FR-RES-PROMOTE_RESEARCH_CANDIDATES`
+3. [ ] `FR-RES-DESCRIBE_RESEARCH_METHODS`
+4. [ ] `FR-RES-COMPARE_RESEARCH_BATCHES`
+
+##### 12.9 [ ] `FEAT-RES-RESEARCH_STOCKPICKERS`
+
+1. [ ] `FR-RES-RESEARCH_STOCKPICKER`
+
+##### 12.10 [ ] `FEAT-RES-ASSIST_RESEARCH_AI`
+
+1. [ ] `FR-RES-DRAFT_AI_STRATEGIES`
+2. [ ] `FR-RES-GOVERN_AI_IMPROVEMENTS`
+3. [ ] `FR-RES-PROTECT_AI_INPUTS`
+
+##### 12.11 [ ] `FEAT-RES-RESEARCH_NEURAL_MODELS`
+
+1. [ ] `FR-RES-GOVERN_NEURAL_RESEARCH`
+
+##### 12.12 [ ] `FEAT-RES-SCORE_PORTFOLIO_FITNESS`
+
+1. [ ] `FR-RES-SCORE_PORTFOLIO_FITNESS`
+
+##### 12.13 [ ] `FEAT-RES-MONITOR_MARKET_DRIFT`
+
+1. [ ] `FR-RES-CONSUME_MARKET_INTELLIGENCE`
+2. [ ] `FR-RES-ANALYZE_SEASONALITY`
+3. [ ] `FR-RES-ANALYZE_MARKET_STRUCTURE`
+4. [ ] `FR-RES-DETECT_PERFORMANCE_DRIFT`
+5. [ ] `FR-RES-CLASSIFY_DRIFT_STATE`
+6. [ ] `FR-RES-RECORD_INTELLIGENCE_LINEAGE`
+
+---
+
+### Stage 13 — Portfolio (D-PORT)
+
+**Authority:** [Portfolio README](../../app/services/portfolio/README.md)
+
+**Purpose:** The Portfolio domain enables portfolio composition, correlation analysis, aggregate simulation and constraints, automatic portfolio search, risk analysis, Markowitz optimization, portfolio merge/split, and research method plugins.
+
+
+##### 13.1 [ ] `FEAT-PORT-COMPOSE_PORTFOLIOS`
+
+1. [ ] `FR-PORT-VERSION_PORTFOLIOS`
+2. [ ] `FR-PORT-VALIDATE_PORTFOLIO_ADMISSION`
+3. [ ] `FR-PORT-COMPOSE_PORTFOLIOS_MANUALLY`
+
+##### 13.2 [ ] `FEAT-PORT-ANALYZE_CORRELATION`
+
+1. [ ] `FR-PORT-VERSION_CORRELATION_INPUTS`
+2. [ ] `FR-PORT-COMPUTE_CORRELATION_MATRICES`
+
+##### 13.3 [ ] `FEAT-PORT-SIMULATE_PORTFOLIOS`
+
+1. [ ] `FR-PORT-SIMULATE_AGGREGATE_PORTFOLIOS`
+2. [ ] `FR-PORT-CONVERT_PORTFOLIO_CURRENCIES`
+3. [ ] `FR-PORT-APPLY_ALLOCATION_METHODS`
+4. [ ] `FR-PORT-SCHEDULE_REBALANCING`
+5. [ ] `FR-PORT-ENFORCE_EXPOSURE_LIMITS`
+6. [ ] `FR-PORT-RESOLVE_SHARED_INSTRUMENTS`
+
+##### 13.4 [ ] `FEAT-PORT-SEARCH_PORTFOLIOS`
+
+1. [ ] `FR-PORT-DEFINE_PORTFOLIO_SEARCH`
+2. [ ] `FR-PORT-REJECT_INFEASIBLE_SEARCHES`
+3. [ ] `FR-PORT-OPTIMIZE_PORTFOLIO_OBJECTIVES`
+4. [ ] `FR-PORT-CHECKPOINT_PORTFOLIO_SEARCH`
+5. [ ] `FR-PORT-VERSION_PORTFOLIO_CHANGES`
+
+##### 13.5 [ ] `FEAT-PORT-ANALYZE_PORTFOLIO_RISK`
+
+1. [ ] `FR-PORT-REPORT_PORTFOLIO_RESULTS`
+2. [ ] `FR-PORT-DEFINE_PORTFOLIO_METRICS`
+3. [ ] `FR-PORT-EXPORT_PORTFOLIO_RESULTS`
+4. [ ] `FR-PORT-CALCULATE_PORTFOLIO_RISK`
+
+##### 13.6 [ ] `FEAT-PORT-OPTIMIZE_MARKOWITZ`
+
+1. [ ] `FR-PORT-OPTIMIZE_MARKOWITZ_PORTFOLIOS`
+
+##### 13.7 [ ] `FEAT-PORT-MERGE_PORTFOLIOS`
+
+1. [ ] `FR-PORT-MERGE_PORTFOLIO_STRATEGIES`
+2. [ ] `FR-PORT-SPLIT_PORTFOLIO_STRATEGIES`
+
+##### 13.8 [ ] `FEAT-PORT-EXTEND_PORTFOLIO_METHODS`
+
+1. [ ] `FR-PORT-REGISTER_PORTFOLIO_METHODS`
+
+---
+
+### Stage 14 — Orchestration (D-ORCH)
+
+**Authority:** [Orchestration README](../../app/services/orchestration/README.md)
+
+**Purpose:** The Orchestration domain delivers project workflows, task execution engine, condition evaluation, domain delegation, external utilities, neural network training, and execution run history.
+
+
+##### 14.1 [ ] `FEAT-ORCH-DEFINE_PROJECTS`
+
+1. [ ] `FR-ORCH-DEFINE_PROJECT_GRAPHS`
+2. [ ] `FR-ORCH-DECLARE_TASK_CONTRACTS`
+3. [ ] `FR-ORCH-DEFINE_TASK_TRANSITIONS`
+4. [ ] `FR-ORCH-PIN_PROJECT_RUNS`
+
+##### 14.2 [ ] `FEAT-ORCH-RUN_TASKS`
+
+1. [ ] `FR-ORCH-DEFINE_TASK_STATES`
+2. [ ] `FR-ORCH-RETRY_TASKS_IDEMPOTENTLY`
+3. [ ] `FR-ORCH-FENCE_TASK_LEASES`
+4. [ ] `FR-ORCH-VERSION_TASK_ATTEMPTS`
+5. [ ] `FR-ORCH-VERSION_TASK_CHECKPOINTS`
+6. [ ] `FR-ORCH-COMMIT_TASK_OUTPUTS`
+7. [ ] `FR-ORCH-SCOPE_PROJECT_VARIABLES`
+8. [ ] `FR-ORCH-REPORT_PROJECT_PROGRESS`
+
+##### 14.3 [ ] `FEAT-ORCH-EVALUATE_CONDITIONS`
+
+1. [ ] `FR-ORCH-TYPE_PROJECT_VARIABLES`
+2. [ ] `FR-ORCH-EVALUATE_PROJECT_EXPRESSIONS`
+
+##### 14.4 [ ] `FEAT-ORCH-RUN_DOMAIN_TASKS`
+
+1. [ ] `FR-ORCH-DELEGATE_DOMAIN_TASKS`
+2. [ ] `FR-ORCH-PIN_TASK_SELECTIONS`
+3. [ ] `FR-ORCH-SYNC_PROJECT_DATA`
+4. [ ] `FR-ORCH-PIN_PORTFOLIO_INPUTS`
+5. [ ] `FR-ORCH-COMPILE_CONTROL_TRANSITIONS`
+
+##### 14.5 [ ] `FEAT-ORCH-RUN_UTILITY_TASKS`
+
+1. [ ] `FR-ORCH-RUN_APPROVED_EXECUTABLES`
+2. [ ] `FR-ORCH-MANAGE_WORKSPACE_TASKS`
+3. [ ] `FR-ORCH-EVALUATE_DURATION_CONDITIONS`
+4. [ ] `FR-ORCH-CONFIGURE_NOTIFICATION_CHANNELS`
+5. [ ] `FR-ORCH-RENDER_NOTIFICATION_TEMPLATES`
+6. [ ] `FR-ORCH-MANAGE_NOTIFICATION_SESSIONS`
+7. [ ] `FR-ORCH-ENFORCE_NOTIFICATION_LIMITS`
+8. [ ] `FR-ORCH-DELIVER_DESKTOP_NOTIFICATIONS`
+9. [ ] `FR-ORCH-DELIVER_EMAIL_NOTIFICATIONS`
+10. [ ] `FR-ORCH-DELIVER_TELEGRAM_NOTIFICATIONS`
+11. [ ] `FR-ORCH-DELIVER_SMS_NOTIFICATIONS`
+12. [ ] `FR-ORCH-SEND_PROJECT_NOTIFICATIONS`
+
+##### 14.6 [ ] `FEAT-ORCH-TRACK_RUN_HISTORY`
+
+1. [ ] `FR-ORCH-RETAIN_PROJECT_HISTORY`
+
+##### 14.7 [ ] `FEAT-ORCH-TRAIN_NETWORKS`
+
+1. [ ] `FR-ORCH-TRAIN_NEURAL_NETWORKS`
+
+---
+
+### Stage 15 — Interfaces (D-IFACE)
+
+**Authority:** [Interfaces README](../../app/services/interfaces/README.md)
+
+**Purpose:** The Interfaces domain exposes the public HTTP, WebSocket, event streaming, CLI, MCP, and operator gateways across research, projects, portfolios, capability administration, and trading.
+
+
+##### 15.1 [ ] `FEAT-IFACE-SERVE_API_EVENTS`
+
+1. [X] `FR-IFACE-SERVE_VERSIONED_API` — evidence: tests/services/interfaces/api_events/test_api_events.py:34
+2. [X] `FR-IFACE-ENFORCE_CONCURRENCY_TOKENS` — evidence: tests/services/interfaces/api_events/test_api_events.py:74
+3. [X] `FR-IFACE-DEDUPLICATE_MUTATIONS` — evidence: tests/services/interfaces/api_events/test_api_events.py:106
+4. [X] `FR-IFACE-REPLAY_INTERFACE_EVENTS` — evidence: tests/services/interfaces/api_events/test_api_events.py:189
+5. [X] `FR-IFACE-TRACK_ASYNC_JOBS` — evidence: tests/services/interfaces/api_events/test_api_events.py:241
+6. [X] `FR-IFACE-VALIDATE_ARTIFACT_DOWNLOADS` — evidence: tests/services/interfaces/api_events/test_api_events.py:307
+7. [X] `FR-IFACE-EVOLVE_API_COMPATIBLY` — evidence: tests/services/interfaces/api_events/test_api_events.py:415
+8. [ ] `FR-IFACE-PAGE_INTERFACE_QUERIES`
+9. [ ] `FR-IFACE-QUERY_DATABANK_RESULTS`
+10. [ ] `FR-IFACE-PIN_BULK_REQUESTS`
+11. [ ] `FR-IFACE-SERVE_PROJECT_API`
+
+##### 15.2 [x] `FEAT-IFACE-AUTOMATE_COMMANDS`
+
+1. [X] `FR-IFACE-DELEGATE_APPLICATION_CALLS` — evidence: tests/services/interfaces/cli_mcp_automation/test_cli_mcp_automation.py:27
+2. [X] `FR-IFACE-TRACK_DURABLE_COMMANDS` — evidence: tests/services/interfaces/cli_mcp_automation/test_cli_mcp_automation.py:127
+3. [ ] `FR-IFACE-PROVIDE_NONVISUAL_CHARTS`
+4. [ ] `FR-IFACE-AUTOMATE_CODE_GENERATION`
+5. [ ] `FR-IFACE-SUPPORT_MCP_OPERATIONS`
+6. [ ] `FR-IFACE-PRESERVE_MCP_NEUTRALITY`
+7. [ ] `FR-IFACE-PUBLISH_AUTOMATION_SCHEMAS`
+
+##### 15.3 [ ] `FEAT-IFACE-OPERATE_RESEARCH`
+
+1. [ ] `FR-IFACE-PREVIEW_RESEARCH_RUNS`
+
+##### 15.4 [ ] `FEAT-IFACE-EDIT_PROJECTS`
+
+1. [ ] `FR-IFACE-VISUALIZE_PROJECT_GRAPHS`
+
+##### 15.5 [ ] `FEAT-IFACE-OPERATE_PORTFOLIOS`
+
+1. [ ] `FR-IFACE-OPERATE_PORTFOLIO_BUILDER`
+
+##### 15.6 [ ] `FEAT-IFACE-ADMINISTER_CAPABILITIES`
+
+1. [ ] `FR-IFACE-ADMINISTER_COMPONENTS`
+
+##### 15.7 [ ] `FEAT-IFACE-OPERATE_TRADING`
+
+1. [ ] `FR-IFACE-MANAGE_TRADING_SESSIONS`
+2. [ ] `FR-IFACE-SHOW_TRADING_READINESS`
+3. [ ] `FR-IFACE-PREVIEW_TRADING_ACTIONS`
+4. [ ] `FR-IFACE-OPERATE_EMERGENCY_CONTROLS`
+5. [ ] `FR-IFACE-STREAM_TRADING_EVENTS`
+6. [ ] `FR-IFACE-DISPLAY_MARKET_DATA`
+7. [ ] `FR-IFACE-DISPLAY_OPERATOR_ANALYTICS`
+8. [ ] `FR-IFACE-ENFORCE_TRANSPORT_PARITY`
+
+---
+
+### Stage 16 — User Interface (D-UI)
+
+**Authority:** [User Interface README](../../app/ui/README.md)
+
+**Purpose:** The User Interface domain delivers the complete React/TypeScript single-page trading workstation, feature-owned widget surfaces, accessibility, layout persistence, and full de-mock capability integration across all business domains.
+
+
+##### 16.1 [ ] `FEAT-UI-START_WORK`
+
+1. [ ] `FR-UI-PRESENT_HOME`
+2. [ ] `FR-UI-SHOW_PRODUCT_NEWS`
+3. [ ] `FR-UI-RESUME_RECENT_WORK`
+4. [ ] `FR-UI-LAUNCH_SHORTCUTS`
+
+##### 16.2 [ ] `FEAT-UI-MANAGE_LAYOUTS`
+
+1. [ ] `FR-UI-PERSIST_LAYOUTS`
+2. [ ] `FR-UI-RESTORE_LAYOUTS`
+3. [ ] `FR-UI-SCALE_VIEWS`
+4. [ ] `FR-UI-COMPOSE_PANELS` (relocated from former 8.22; UI-only dependencies — completable in Increment 1)
+5. [ ] `FR-UI-MANAGE_TABS` (relocated from former 3.10; UI-only dependencies — completable in Increment 1)
+
+##### 16.3 [ ] `FEAT-UI-EDIT_INPUTS`
+
+1. [ ] `FR-UI-PRESERVE_DRAFTS`
+2. [ ] `FR-UI-RENDER_FIELDS`
+3. [ ] `FR-UI-VALIDATE_INPUT`
+4. [ ] `FR-UI-RESOLVE_CONFLICTS`
+5. [ ] `FR-UI-CONFIRM_IMPACT`
+
+##### 16.4 [ ] `FEAT-UI-MONITOR_WORK`
+
+1. [ ] `FR-UI-TRACK_PROGRESS`
+2. [ ] `FR-UI-STREAM_ACTIVITY`
+3. [ ] `FR-UI-PRESENT_FAILURES`
+4. [ ] `FR-UI-CONTROL_JOBS`
+5. [ ] `FR-UI-NOTIFY_OUTCOMES`
+
+##### 16.5 [ ] `FEAT-UI-ADMINISTER_SYSTEM`
+
+1. [ ] `FR-UI-SET_APPEARANCE`
+2. [ ] `FR-UI-CONFIGURE_CLIENT`
+3. [ ] `FR-UI-MANAGE_LICENSE`
+4. [ ] `FR-UI-MANAGE_UPDATES`
+5. [ ] `FR-UI-SET_LANGUAGE`
+6. [ ] `FR-UI-ADMINISTER_CAPABILITIES`
+
+##### 16.6 [ ] `FEAT-UI-ENSURE_ACCESS`
+
+1. [ ] `FR-UI-MANAGE_FOCUS`
+2. [ ] `FR-UI-DISTINGUISH_STATE`
+3. [ ] `FR-UI-PROVIDE_DATA_ALTERNATIVES`
+4. [ ] `FR-UI-PRESERVE_USABILITY`
+5. [ ] `FR-UI-OPERATE_BY_KEYBOARD`
+6. [ ] `FR-UI-LABEL_CONTROLS`
+
+##### 16.7 [ ] `FEAT-UI-MANAGE_DATA`
+
+1. [ ] `FR-UI-BROWSE_DATASETS`
+2. [ ] `FR-UI-IMPORT_DATA`
+3. [ ] `FR-UI-EXPORT_DATA`
+4. [ ] `FR-UI-EDIT_INSTRUMENTS`
+5. [ ] `FR-UI-EDIT_SESSIONS`
+6. [ ] `FR-UI-SYNC_DATA`
+7. [ ] `FR-UI-ADMINISTER_DATA`
+
+##### 16.8 [ ] `FEAT-UI-AUTHOR_STRATEGIES`
+
+1. [ ] `FR-UI-EDIT_STRATEGY_TREE`
+2. [ ] `FR-UI-BROWSE_BLOCKS`
+3. [ ] `FR-UI-CONFIGURE_STRATEGY`
+4. [ ] `FR-UI-VALIDATE_STRATEGY`
+5. [ ] `FR-UI-USE_STRATEGY_EXAMPLES`
+6. [ ] `FR-UI-TEST_STRATEGY`
+
+##### 16.9 [ ] `FEAT-UI-OPERATE_DATABANKS`
+
+1. [ ] `FR-UI-QUERY_DATABANKS`
+2. [ ] `FR-UI-CONFIGURE_COLUMNS`
+3. [ ] `FR-UI-SELECT_DATABANK_ROWS`
+4. [ ] `FR-UI-OPEN_DATABANK_RESULT`
+5. [ ] `FR-UI-FILTER_DATABANKS`
+6. [ ] `FR-UI-RUN_BULK_ACTIONS`
+
+##### 16.10 [ ] `FEAT-UI-EXPLORE_RESULTS`
+
+1. [ ] `FR-UI-SUMMARIZE_RESULTS`
+2. [ ] `FR-UI-PLOT_EQUITY`
+3. [ ] `FR-UI-LIST_TRADES`
+4. [ ] `FR-UI-PLOT_TRADES`
+5. [ ] `FR-UI-ANALYZE_TRADES`
+6. [ ] `FR-UI-EXPORT_RESULTS`
+7. [ ] `FR-UI-INSPECT_SOURCE`
+8. [ ] `FR-UI-INSPECT_ROBUSTNESS`
+
+##### 16.11 [ ] `FEAT-UI-EDIT_CODE`
+
+1. [ ] `FR-UI-NAVIGATE_CODE`
+2. [ ] `FR-UI-SEARCH_CODE`
+3. [ ] `FR-UI-EDIT_CODE_TABS`
+4. [ ] `FR-UI-MANAGE_CODE_FILES`
+5. [ ] `FR-UI-SHOW_CODE_DIAGNOSTICS`
+6. [ ] `FR-UI-TEST_EXTENSIONS`
+
+##### 16.12 [ ] `FEAT-UI-RUN_RESEARCH`
+
+1. [ ] `FR-UI-SELECT_RESEARCH_MODE`
+2. [ ] `FR-UI-CONFIGURE_RESEARCH`
+3. [ ] `FR-UI-PREVIEW_RESEARCH`
+4. [ ] `FR-UI-CONTROL_RESEARCH`
+5. [ ] `FR-UI-COMPARE_RESEARCH`
+6. [ ] `FR-UI-REUSE_RESEARCH_SETTINGS`
+
+##### 16.13 [ ] `FEAT-UI-EDIT_PROJECTS`
+
+1. [ ] `FR-UI-MANAGE_PROJECTS`
+2. [ ] `FR-UI-EDIT_TASKS`
+3. [ ] `FR-UI-EDIT_PROJECT_GRAPH`
+4. [ ] `FR-UI-COMPARE_PROJECTS`
+5. [ ] `FR-UI-CONTROL_PROJECTS`
+6. [ ] `FR-UI-INSPECT_PROJECTS`
+
+##### 16.14 [ ] `FEAT-UI-COMPOSE_PORTFOLIOS`
+
+1. [ ] `FR-UI-SELECT_CONSTITUENTS`
+2. [ ] `FR-UI-EDIT_PORTFOLIO`
+3. [ ] `FR-UI-INSPECT_CORRELATION`
+4. [ ] `FR-UI-RUN_PORTFOLIO`
+5. [ ] `FR-UI-COMPARE_PORTFOLIOS`
+
+##### 16.15 [ ] `FEAT-UI-OPERATE_TRADING`
+
+1. [ ] `FR-UI-MANAGE_TRADING_SESSIONS`
+2. [ ] `FR-UI-SHOW_TRADING_READINESS`
+3. [ ] `FR-UI-PREVIEW_TRADING_ACTION`
+4. [ ] `FR-UI-COMMIT_TRADING_ACTION`
+5. [ ] `FR-UI-OPERATE_KILL_SWITCH`
+6. [ ] `FR-UI-WATCH_TRADING_EVENTS`
+7. [ ] `FR-UI-WATCH_MARKETS`
+8. [ ] `FR-UI-INSPECT_OPERATOR_ANALYTICS`
+
+##### 16.16 [ ] `FEAT-UI-EXTEND_VIEWS`
+
+1. [ ] `FR-UI-DECLARE_VIEW_CONTRIBUTIONS`
+2. [ ] `FR-UI-VALIDATE_VIEW_CONTRIBUTIONS`
+3. [ ] `FR-UI-SCOPE_VIEW_EFFECTS`
+4. [ ] `FR-UI-REPLACE_VIEW_PROVIDERS`
+5. [ ] `FR-UI-REMOVE_VIEW_CONTRIBUTIONS`
+
+##### 16.17 [x] `FEAT-UI-COMPOSE_SHELL`
+
+1. [X] `FR-UI-ASSEMBLE_SHELL` — evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:24
+2. [X] `FR-UI-DISCOVER_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:107, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:48
+3. [X] `FR-UI-SWITCH_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:146, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:102
+4. [X] `FR-UI-SHOW_CAPABILITY_STATE` — evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:149
+5. [X] `FR-UI-RESTORE_ROUTE` — evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:189
+
 
 ---
 
@@ -444,17 +1396,15 @@ A completed implementation may therefore remain intentionally unavailable in a r
 
 ## 26. Final completion gate
 
-HaruQuantAI implementation is complete only when:
+Implementation is complete only when every Stage 0 foundation guarantee remains green, all 142 unique feature completion checkboxes and all 549 unique business-FR checkboxes above are complete with executable `path:line` evidence, all 33 retained shared-foundation guarantees remain passing, and:
 
-1. Stage 0 foundation guarantees remain green;
-2. all 15 authoritative domain READMEs report every planned feature/FR complete with executable evidence;
-3. all public contracts and generated clients are version-consistent;
-4. every domain passed its domain completion/removal gate in waterfall order;
-5. the unified Runtime Risk -> Trading -> execution-authority architecture is proven for SIM/PAPER/DEMO/LIVE without a parallel Simulator business lifecycle;
-6. all twelve system workflows pass;
-7. all applicable system NFR and release gates pass;
-8. every mock provider is absent from production behavior;
-9. local/hosted and interface parity gates pass where applicable;
-10. no unresolved architecture decision, duplicate requirement registry, hidden fallback, or unowned public behavior remains.
-
-The intended end state is not merely “all code written.” It is a chain of completed, independently removable, contract-stable domain baselines whose composition reproduces the complete HaruQuantAI product.
+1. Every one of the 15 domains starts or degrades independently and advertises only compatible public capabilities or UI contributions.
+2. Every shared-module guarantee, domain, feature, responsibility, and FR passes its applicable cold-start, dependency-change, live-removal, reinstall, failed-activation, replacement, leak, and deletion-build checks.
+3. All twelve system workflows and every applicable phase/release gate in `PROJECT.md` pass with pinned manifests and no hidden fallback.
+4. Simulator and generated-target parity, deterministic replay, persistence recovery, and distributed/local equivalence fixtures pass where applicable.
+5. UI workflows remain operable throughout delivery and pass applicable keyboard, focus, semantics, nonvisual-data, loading, stale, unavailable, error, contract-parity, and browser/integration evidence.
+6. Broker, Runtime Risk, and Trading remain disabled by default and pass sandbox/testnet, approval, kill-switch, unknown-outcome, reconciliation, protection, ledger, and audit gates before operational release.
+7. Hosted and local modes preserve the same public contracts and pass cross-workspace isolation and authorization.
+8. No requirement is considered implemented solely because related code, tests, databases, migrations, or UI screens exist; its current owning acceptance contract must pass.
+9. The mock capability provider is fully retired: no production bundle imports `app/ui/src/mocks/`, the folder is deletable without touching production behavior, and every mock-build line that reached its de-mock increment has contract-parity evidence at the increment holding its completion checkbox.
+10. The intended end state is not merely “all code written.” It is a chain of completed, independently removable, contract-stable domain baselines whose composition reproduces the complete HaruQuantAI product.
