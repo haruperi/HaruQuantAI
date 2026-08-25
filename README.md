@@ -20,6 +20,7 @@ The current repository is the clean composability foundation from which register
 - **Graceful Absence and Physical Removability**: A feature package and its local tests can be physically removed without breaking the shared runtime or unrelated features. Missing requirements block only the affected dependency closure.
 - **Profile-Driven Readiness**: Runtime profiles declare required capabilities. Composition reports liveness, readiness, active capabilities, feature states, and missing dependencies independently of any future transport.
 - **Interface Ownership**: Product-facing HTTP, CLI, MCP, and other gateways are registered D-IFACE features owned by `app/services/interfaces/`; they are not part of the shared composability foundation.
+- **Unified Trading Execution**: Simulation, paper, demo, and live execution share one Trading-owned business lifecycle. Simulator and Broker Connectivity provide route-specific execution authority mechanics through versioned capabilities rather than implementing parallel trading lifecycles.
 
 ---
 
@@ -27,7 +28,8 @@ The current repository is the clean composability foundation from which register
 
 - [Project Specification](docs/PROJECT.md) — Product scope, system workflows, requirements, NFRs, and release gates.
 - [Architecture](docs/ARCHITECTURE.md) — Universal structural, lifecycle, persistence, and runtime constraints.
-- [Implementation Order](docs/dev/IMPLEMENTATION_ORDER.md) — Incremental, UI-visible delivery sequence.
+- [Unified Trading Execution Parity](docs/EXECUTION_PARITY.md) — Ratified cross-domain amendment restoring one Trading lifecycle with Simulator/Broker execution authorities and the revised Risk → Trading → Simulator dependency core.
+- [Implementation Order](docs/dev/IMPLEMENTATION_ORDER.md) — Incremental, UI-visible delivery sequence. Its affected Trading/Simulator/Runtime-Risk ordering is pending mechanical reconciliation with the ratified execution-parity decision above.
 - [Domain Specifications](app/services) — Authoritative domain boundaries, feature registries, responsibilities, and acceptance evidence.
 - [Feature Implementation Pipeline](docs/dev/feature_implementation_pipeline.md) — Procedure for designing, implementing, demonstrating, testing, replacing, and removing features.
 - [Builder Guide](AGENTS.md) — Contributor process, approval gates, coding standards, and verification policy.
