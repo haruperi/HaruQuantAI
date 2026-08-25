@@ -1,0 +1,68 @@
+prompt_schema_version = 1
+
+[task_workspace]
+planner_journal = ".agents/task/planner.md"
+executor_journal = ".agents/task/executor.md"
+reviewer_journal = ".agents/task/reviewer.md"
+next_agent = ".agents/task/next-agent.md"
+
+[isolation]
+solo = "soft"
+delegate = "fresh-context"
+multi-delegate = "fresh-process"
+manual = "fresh-chat"
+
+[[transitions]]
+source_role = "PLANNER"
+handoff = "PENDING_APPROVAL"
+target_role = "EXECUTOR"
+gate = "APPROVED: EXECUTE"
+target_template = "docs/templates/prompt/executor.md"
+
+[[transitions]]
+source_role = "PLANNER"
+handoff = "BLOCKED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
+source_role = "EXECUTOR"
+handoff = "READY_FOR_REVIEW"
+target_role = "REVIEWER"
+target_template = "docs/templates/prompt/reviewer.md"
+
+[[transitions]]
+source_role = "EXECUTOR"
+handoff = "BLOCKED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
+source_role = "REVIEWER"
+handoff = "CHANGES_REQUESTED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
+source_role = "REVIEWER"
+handoff = "PENDING_COMMIT"
+target_role = "REVIEWER"
+gate = "APPROVED: COMMIT"
+target_template = "docs/templates/prompt/reviewer-closeout.md"
+
+[[transitions]]
+source_role = "REVIEWER"
+handoff = "ACCEPTED"
+target_role = "NONE"
+
+[[transitions]]
+source_role = "ORCHESTRATOR"
+handoff = "OWNER_REJECTED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
+source_role = "ORCHESTRATOR"
+handoff = "COMMIT_REJECTED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"

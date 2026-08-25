@@ -1,184 +1,257 @@
 # Standards and Principles
 
-**Purpose**: Three-role Planner, Executor, and Reviewer operating guide for HaruQuantAI.
+**Purpose:** Authoritative contributor and three-role development workflow for HaruQuantAI.
 
-## 1. Coding Principles
+## 1. Core engineering principles
 
-- **Memory & Truth**: Permanent truth lives in repository files (`AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and owning package READMEs), **never in chat**. Temporary state for the active development task lives in `docs/dev/task/planner.md`, `docs/dev/task/executor.md`, and `docs/dev/task/reviewer.md`; these journals never override authoritative specifications and are empty between tasks. Read `AGENTS.md`, then use the context routers in `docs/PROJECT.md` and `docs/ARCHITECTURE.md` to load only the sections and owning READMEs applicable to the task. Read either system document in full only for genuinely system-wide or cross-cutting work.
-- **Scoped Authority**: Authority is assigned by subject, not by a linear document override chain. `AGENTS.md` owns contributor process; `docs/PROJECT.md` owns product/system scope, cross-domain workflows, NFRs, and release gates; `docs/ARCHITECTURE.md` owns universal structural/runtime constraints; each topical package README owns its boundary, feature/FR registry, domain semantics, and domain acceptance evidence. When multiple scopes apply, satisfy all of their non-overlapping rules and report any actual conflict before editing.
-- **Feature Registry Authority**: Each owning package README is the sole canonical current-state registry for that package's feature IDs, statuses, module ownership, semantic public contracts, requirements, and usage evidence. The registry may be expressed through the README's `Owns`, package-structure, and composable-feature sections; a redundant heading or second mutable registry is forbidden. `docs/PROJECT.md` indexes domains and owns system-level relationships; it does not duplicate domain feature internals.
-- **Think First Before Coding**: State assumptions explicitly. Surface tradeoffs. If multiple interpretations exist, present them. If unclear, stop and ask.
-- **Simplicity & Surgical Changes**: Write minimum code to solve the problem. No speculative features. Touch _only_ what you must. Match existing style. Every changed line must trace to the request.
-- **Goal-Driven**: Transform tasks into verifiable goals. State a brief plan with verification steps before executing.
-- **Correctness > Speed**: Verify via tools. Never guess. Say "I don't know" rather than hallucinating.
-- **Test Performance Ceiling**: Optimize unit test code, mock database calls, or isolate network/IO operations whenever an individual unit test takes longer than 100ms.
-- **SOLID Class Design**: Enforce SOLID principles when designing classes: Single Responsibility per file/class, Open for extension closed for modification, Liskov Substitution, Interface Segregation, and Dependency Inversion.
-- **Document Assumptions**: Add inline comments explaining non-obvious domain assumptions, numeric thresholds, mathematical models, or boundary conditions.
-- **Research Workflow**: 1. **WebSearch** (landscape) → 2. **Context7** (verify syntax/deprecations) → 3. **DeepWiki** (design intent). Handle disagreements by explicitly calling out tradeoffs.
-- **Focused Domain Architecture (Domain Scoping)**: In `app/services/[DOMAIN]`, everything must be focused:
-  - A **Module folder** inside a domain is dedicated to ONE feature / capability only (e.g., feature `FEAT-DATA-01: Retrieve historical data` has its own module folder inside the data domain focused solely on that feature).
-  - **Feature-group namespace exception**: A domain may define a documented non-feature organizational namespace that contains related feature module folders. The namespace may contain only `README.md`, `__init__.py`, and registered feature folders; it must not own feature behavior, requirements, persistence, or a second feature registry. Each child feature still satisfies one feature = one module folder, and the domain package root remains import-pure. Cross-boundary types live in `app/contracts/`; public HTTP, SSE, CLI, MCP, and automation access is owned by registered features in `app/services/interfaces/`. React UI capabilities are the separate `D-UI` domain under the authority of `app/ui/README.md`; they do not live in a Python service namespace and follow the UI widget exception below.
-  - A **File** inside a module folder is for ONE use case or focused responsibility only.
-  - A **Class / function / method** inside a file addresses ONE functional requirement behavior at a time.
-  - One feature = One module folder = One designated primary domain-logic file containing that service feature's executable usage example. The example is an `if __name__ == "__main__":` harness in the production module, not a pytest file or a second implementation location.
-  - **D-UI Widget and Support Exception**: The UI preserves the `Domain → Feature → Responsibility → FR` identity hierarchy while using a single-page composable workstation. A registered `FEAT-UI-*` is the independently selectable/removable capability and acceptance owner; a widget is a visual contribution owned by exactly one feature; a workspace is a runtime arrangement of widget instances. Visual modules target `app/ui/src/widgets/<widget>/`, and one feature may contribute multiple widgets, but one widget never has multiple feature owners. The sole feature-to-widget mapping lives in `app/ui/README.md`; runtime registries derive from typed manifests and never become a second product registry. Documented non-feature support folders (`runtime/`, `workspaces/`, `clients/`, `context/`, `contracts/generated/`, and dev-only `mocks/`) may own only coherent shared infrastructure, never product policy, authoritative state, or another implementation of widget behavior. Cross-feature coordination uses generated public contracts and typed UI contribution/context boundaries, never private widget imports.
-  - **UI Usage and Verification Exception**: Registered `FEAT-UI-*` capabilities and their owned widgets document one bounded interactive usage workflow in the owning feature/widget README and expose it through the running UI. Focused component tests may be colocated with a widget; cross-widget, workspace, contract, accessibility, removal, and browser evidence lives under `tests/ui/`. Tests verify the workflow but are not themselves usage examples. Every completed UI feature must cite tests covering its public behavior and relevant loading, empty, stale, unavailable, degraded, unauthorized, incompatible, error, interaction, temporal-resynchronization, disposal, and accessibility states. Workspace docking or multi-widget workflows require integration or browser evidence when component tests cannot prove the complete interaction, and typed-client features require request plus backend/frontend contract-parity evidence.
-  - **Reconciliation Exclusions**: For Python/service feature-count reconciliation, count only README-registered production feature directories. For D-UI, count only the owning README's registered `FEAT-UI-*` rows; widget types/instances and support folders never increase the feature count. Exclude cache directories (`__pycache__`), generated artifacts, package metadata (`py.typed`), migration infrastructure (`migrations/`), and explicitly documented non-feature support directories (`contracts/`, `schemas/`, `_shared/`, plus the D-UI support boundaries above). Support directories must have documented ownership and may not become a second implementation location for feature behavior.
-  - **Shared-Infrastructure Exception**: `app/kernel/`, `app/contracts/`, and `app/composition/` are non-domain shared modules. They own no product `FEAT-*` registry. `app/kernel/` defines business-neutral capability, feature, graph, scope, registry, event, state, and lifecycle primitives; `app/contracts/` defines cross-boundary DTOs, protocols, events, errors, and capability keys; and `app/composition/` defines discovery, TOML configuration, readiness, provider selection, reconciliation, replacement, diagnostics, and runtime infrastructure policy. Product-facing transports and gateways are removable D-IFACE features.
-  - **Three-Feature Shared-Support Threshold**: A domain-level support folder or module is permitted only when at least three distinct registered features consume the same coherent capability. Count feature consumers, not import occurrences, composition wiring, package-root re-exports, or tests. Code used by one or two features remains inside one explicit owning feature; consumers depend on that owner rather than creating a horizontal catch-all. Registered standalone capabilities remain valid feature folders regardless of consumer count.
-  - **Domain Persistence Support**: A persistent domain may define one documented non-feature `persistence/` support package containing exactly `__init__.py`, `create.py`, `read.py`, `update.py`, and `delete.py`. The package owns only domain-record CRUD statement construction, execution delegation through a Data-owned public capability resolved from `FeatureContext`, and normalized row handoff; authorization, validation, policy, orchestration, and public behavior remain in the owning feature modules. Classify atomic multi-statement operations by their domain effect and never split one transaction across CRUD files. Unsupported verbs retain an empty module. Immutable schema definitions remain in `migrations/`. `app/services/data/persistence/` is exempt from this five-file layout because it owns shared database connection, transaction, locking, migration-ledger, backup, and recovery infrastructure in addition to Data-owned CRUD.
-    - If fewer than three registered features consume the persistence capability, put the same five-file package inside the owning feature folder instead of at the domain root.
-    - Feature-owned immutable schema definitions live in that feature's `migrations/` package. A shared composition entry point may aggregate feature manifests without owning or altering their migration steps.
-  - **Root-file Rule**: Except for explicitly allowed package infrastructure (`__init__.py`, `_settings.py`, `_limits.py`), production behavior must reside inside its owning feature module folder. A domain may impose a stricter root in its owning README.
-  - **Pure Initializers and Public Boundaries**: Every Python `__init__.py` is empty or contains only a module docstring. It performs no re-export, discovery, registration, I/O, task creation, connection, or logging configuration. Cross-feature and cross-domain consumers import DTOs, protocols, events, errors, and capability keys from `app.contracts.<owner>`, declare exact capability dependencies in `FeatureSpec`, and resolve providers through `FeatureContext`; they never import service implementations. Stable external callers use the capability-aware gateways registered by D-IFACE features where applicable.
+- **Repository truth, not chat memory.** Permanent truth lives in `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and owning package READMEs. Temporary active-task coordination lives only in `.agents/task/`. Chat context is never authoritative.
+- **Scoped authority.** `AGENTS.md` owns contributor process; `docs/PROJECT.md` owns product/system scope and cross-domain relationships; `docs/ARCHITECTURE.md` owns universal structural/runtime constraints; each owning package README is the canonical current-state feature/FR registry for that package. Satisfy all non-overlapping authorities and report real conflicts before editing.
+- **Think first.** State assumptions, boundaries, trade-offs, validation, and rollback before coding. Never silently resolve missing requirements.
+- **Surgical changes.** Implement the minimum complete change. No speculative features, unrelated refactors, or scope expansion.
+- **Correctness over speed.** Verify with tools and repository evidence; never invent behavior, tests, results, or upstream contracts.
+- **SOLID/focused ownership.** One feature owns one coherent capability. One module folder owns one feature/capability; files and classes/functions stay focused on one responsibility. Shared support exists only under documented exceptions and must not become a second feature registry or implementation location.
+- **Pure boundaries.** Python `__init__.py` files are empty or docstring-only. Cross-feature/domain collaboration uses public contracts/capabilities, not private service imports. Import-time registration/I/O/task creation/logging configuration is forbidden.
+- **Managed side effects.** Features use lifecycle-owned resources and `FeatureContext`/scope facilities for managed tasks, subscriptions, capabilities, and cleanup. Service packages do not configure global logging.
+- **Test performance.** Unit tests should avoid real network/database sleeps; mock or isolate I/O when a unit test exceeds roughly 100 ms.
+- **Document non-obvious assumptions.** Numeric thresholds, domain assumptions, boundary conditions, and policy decisions require concise source documentation.
 
-### Three-Agent Development Workflow
+### Focused domain architecture
 
-- **Role Declaration and Single Writer**: Every development chat is explicitly assigned exactly one role with `ROLE: PLANNER`, `ROLE: EXECUTOR`, or `ROLE: REVIEWER`. An agent must stop if its role is absent, conflicts with the active handoff state, or would require performing another role's work. Only one agent may write to the repository at a time; Planner, Executor, and Reviewer chats never make concurrent changes.
-- **Workflow Journals**: Active-task coordination uses three tracked journals:
-  - `docs/dev/task/planner.md` is written only by the Planner.
-  - `docs/dev/task/executor.md` is written only by the Executor.
-  - `docs/dev/task/reviewer.md` is written only by the Reviewer.
-  - Completed entries are append-only for the duration of the active task. A role may update its current entry until it hands off, but it never rewrites or deletes an earlier numbered dry run, report, or review.
-  - The Reviewer may empty all three journals only after an accepted review as the administrative close-out step.
-  - All three journals are empty when no task is active. They are temporary coordination records, not product specifications, feature registries, decision records, or substitutes for authoritative documentation.
-- **Task Branch Isolation**:
-  - Every registered feature is developed on `feature/<feature-id>-<slug>`; every non-feature task uses `task/<task-id>-<slug>`. Names are lowercase and contain only letters, numbers, `/`, `.`, `_`, and `-`. Colons, spaces, and backslashes are forbidden. The Planner validates the complete name with `git check-ref-format --branch` before creating it.
-  - Multiple agents work sequentially on the same branch. Parallel task branches are permitted simultaneously, provided they do not conflict in terms of what is being changed.
-  - The repository `main` branch remains clean and unchanged throughout planning, execution, and review. Product changes, journals, tests, generated artifacts, and task commands belong only to the task branch.
-  - Every numbered dry run, report, and review records the main repository path, main baseline commit, task branch, task ID, iteration number, and expected changed/untracked paths.
-- **Handoff State Machine**:
-  1. Main is clean on `main`, all journals are empty, and no active task branch is checked out: the repository is idle and the Planner may create one task branch.
-  2. Latest dry run has no approval record: execution is `PENDING_APPROVAL`.
-  3. Latest dry run has a valid approval record: the Executor may implement that dry run.
-  4. Latest Executor report is `BLOCKED`: control returns immediately to the Planner.
-  5. Latest Executor report is `READY_FOR_REVIEW`: control passes to the Reviewer.
-  6. Latest review is `CHANGES_REQUESTED`: control returns to the Planner for the next numbered dry run.
-  7. Latest review is `ACCEPTED`: the Reviewer performs final close-out and the one authorized local commit.
-- **Iteration Example**: `clean main → create task branch → Dry Run 1 → Approval 1 → Report 1 → Review 1 (CHANGES_REQUESTED) → Dry Run 2 → Approval 2 → Report 2 → Review 2 (ACCEPTED) → empty all journals → task commit → fast-forward main → delete merged branch`. An Executor blocker replaces the review step for that iteration and returns directly to the next Planner dry run in the same task branch.
+- Production service behavior belongs in `app/services/<domain>/<feature>/` unless an owning README documents an explicit support-package exception.
+- Cross-boundary DTOs, protocols, events, errors, and capability keys live in `app/contracts/`; business-neutral lifecycle/composition primitives live in `app/kernel/` and `app/composition/` according to `docs/ARCHITECTURE.md`.
+- A feature never imports another feature implementation. Consumers declare exact capability dependencies and resolve providers through `FeatureContext`.
+- A domain-level shared support capability is permitted only when at least three registered features genuinely consume the same coherent capability, unless another explicit architecture exception applies.
+- Persistent domains may use the documented persistence/migration conventions in the owning README and architecture guide; persistence support never absorbs authorization, policy, orchestration, or feature semantics.
+- D-UI follows its own owning README: registered `FEAT-UI-*` capabilities own widgets; widgets never have multiple feature owners; shared UI support folders do not become product-policy owners.
 
-#### Planner
+## 2. Three-role development workflow
 
-- **Planner Authority**: The Planner performs repository inspection, research, architecture analysis, gap analysis, and task decomposition. Except for the isolation bootstrap below, it may write only the task branch's `docs/dev/task/planner.md`; all other repository access is read-only.
-- **Planner Isolation Bootstrap**: Before writing `Dry Run 1`, the Planner operates from the `main` branch and:
-  1. verifies the current branch is `main`, `git status --porcelain` is empty, and all three journals exist at zero bytes;
-  2. records the main repository's resolved absolute path and main baseline commit;
-  3. verifies the proposed branch does not already exist;
-  4. validates the deterministic task branch with `git check-ref-format --branch`;
-  5. creates exactly one task branch with `git checkout -b <task-branch> main`;
-  6. verifies the new branch, repository root, and `HEAD`, then performs all remaining planning inside it.
-     The Planner never modifies main files, commits, merges, rebases, pulls, fetches, or pushes.
-- **Numbered Dry Runs**: The Planner appends `Dry Run 1`, `Dry Run 2`, and subsequent complete revisions in the task branch. Each dry run records a stable task ID, iteration number, status, main repository path, main baseline commit, task branch, expected changed/untracked paths, preceding report/review references, assumptions, and the following eight mandatory sections:
-  - **1. TASK TO DO:** Selected feature, requirement, or task; requirements to implement; tests; and usage examples.
-  - **2. Files read:** Authoritative documents, upstream documentation, and related source/test files.
-  - **3. Files to create or edit:** Exact paths, purpose of each change, implementation order, and rationale.
-  - **4. Dependencies:** Upstream libraries, systems, contracts, features, and functional requirements.
-  - **5. Blockers:** Specification conflicts, missing information or dependencies, trade-offs, implementation risks, and compatibility risks.
-  - **6. Scope boundaries:** Explicitly included and excluded work, including whether the final local commit is authorized.
-  - **7. Validation commands:** Formatting, linting, typing, change-scoped tests, validators, usage-example execution, and final review gates.
-  - **8. Rollback:** Files and behavior to restore, exports or registrations to remove, and artifacts to clean.
-- **Dry-Run Completeness**: Every dry run contains all eight sections. Use `None` or `Not Applicable` when necessary; never omit a section. `Dry Run 1` starts from the clean task branch created at the recorded main baseline, with only `docs/dev/task/planner.md` becoming modified. A correction dry run remains in the same branch, explicitly inventories every retained changed and untracked path, and states whether each is retained, changed, or rolled back.
-- **Planning Write Exception**: The Planner must not modify implementation, tests, configuration, dependencies, or authoritative documentation. Its only write authorities are the validated branch creation performed once before `Dry Run 1` and appending the current dry run and approval record to the task branch's `docs/dev/task/planner.md`.
-- **Approval Record**: Execution is authorized only when the trimmed entire content of a standalone owner message equals exactly `APPROVED: EXECUTE`. A message containing additional text, quoting the phrase, or referring to an earlier approval is invalid. After receiving valid approval, the Planner appends an approval record containing the exact phrase, approved dry-run number, task ID, main baseline commit, task branch, and expected working-tree state. The approved dry-run body is then immutable.
-- **Correction Planning**: An Executor blocker or Reviewer change request never authorizes more implementation. The Planner reads the complete active journal history and repository state, appends the next full dry run, and obtains a new standalone approval.
-- **Planner-Only Cancellation**: If the owner cancels before Executor changes exist, the Planner may close the task only after explicit cancellation direction, emptying `planner.md`, and verifying the task branch is clean. Normal deletion of a branch still equal to `main` is then permitted. Any dirty or unmerged abandonment follows the separately approved destructive-abandonment process.
+The workflow is **Planner → Executor → Reviewer**. `.agents/protocol.toml` is the machine-readable transition contract. Canonical role prompts live in `docs/templates/prompt/`; `.agents/task/next-agent.md` is the complete instantiated prompt for the next role.
 
-#### Executor
+### 2.1 Active-task workspace
 
-- **Executor Entry Gate**: Before editing, the Executor reads `AGENTS.md`, all three journals, every authority/source/test path routed by the latest dry run, and the complete Git status and diff from the recorded main baseline. It verifies the latest dry run has a matching approval record; the current repository root is the exact repository root; the active branch is the exact task branch; `HEAD`, main baseline, and expected changed/untracked paths match the handoff; and the `main` branch remains untouched. Any mismatch returns control to the Planner without implementation.
-- **Executor Scope**: The Executor implements exactly the latest approved dry run inside the task branch. It may write only the approved implementation/documentation paths and the task branch's `docs/dev/task/executor.md`; it never edits `docs/dev/task/planner.md` or `docs/dev/task/reviewer.md`, operates from the `main` branch, switches branches, commits, merges, rebases, pulls, fetches, or pushes.
-- **Documentation Implementation**: The Planner identifies documentation impact; the Executor performs approved documentation updates alongside the implementation. Update authoritative documentation first, then contracts/manifests, implementation, tests/usage evidence, and final status/evidence reconciliation. A newly discovered material documentation change is a blocker, not permission to rewrite the specification.
-- **Numbered Reports**: The Executor appends `Report 1`, `Report 2`, and subsequent entries aligned with the approved dry-run iteration. Each report records status, files changed, decisions and implications, affected active documentation, requirements implemented, checklist file-and-line evidence, dependencies/contracts used, deviations, commands and results, tests, usage evidence, known issues, and rollback.
-- **Immediate Blocker Handoff**: When the Executor discovers missing authority, a specification conflict, stale baseline, unapproved path, material scope expansion, unsafe dependency, or other blocker, it stops implementation immediately before making any further change. It preserves partial work, marks the current report `BLOCKED`, records the evidence, affected paths, completed work, safe rollback, and exact Planner/owner decision required, then hands control back to the Planner. It does not guess, implement around the blocker, modify the dry run, or commit.
-- **Ready Handoff**: When all approved work and change-scoped verification are complete, the Executor marks the report `READY_FOR_REVIEW` and stops. The Executor never commits or pushes.
+Tracked files:
 
-#### Reviewer
+```text
+.agents/task/
+├── planner.md
+├── executor.md
+├── reviewer.md
+└── next-agent.md
+```
 
-- **Reviewer Entry Gate**: The Reviewer works inside the exact repository root and reads `AGENTS.md`, the complete Planner and Executor histories, applicable authoritative documents, actual source/test files, the complete branch diff from the recorded main baseline, staged and unstaged diffs, and every untracked path. It verifies the current repository root, task branch, `HEAD`, main baseline, and expected path inventory before testing. It independently verifies results rather than treating the Executor report as proof and never reviews implementation from the `main` branch.
-- **Reviewer Scope**: The Reviewer may write only `docs/dev/task/reviewer.md`. It never silently fixes implementation, tests, configuration, or authoritative documentation and never authors a dry run.
-- **Numbered Reviews**: The Reviewer appends `Review 1`, `Review 2`, and subsequent entries. Each review records the associated dry run/report, base and reviewed diff, plan compliance, requirements, documentation consistency, contract/boundary correctness, tests and quality gates, usage evidence, deviations, omissions, defects, risks, required corrections, and commit decision.
-- **Changes Requested**: If any defect, omission, unapproved change, insufficient evidence, test failure, hook mutation, or unresolved risk exists, the Reviewer marks the review `CHANGES_REQUESTED`, does not commit, and hands control to the Planner. The Planner alone creates the next dry run, and the owner must approve it again.
-- **Acceptance and Task Commit**: The Reviewer marks a review `ACCEPTED` only when the latest approved dry run is completely satisfied and all applicable verification passes. When verification passes, the Reviewer first ends the review awaiting commit authorization and performs no repository mutation until the owner issues a standalone message whose entire trimmed content is exactly `APPROVED: COMMIT`; a rejected commit authorization returns control to the Planner with the owner's feedback as the next dry run's direction. After valid commit authorization the Reviewer appends a commit authorization record, then — inside the task branch — empties `docs/dev/task/planner.md`, `docs/dev/task/executor.md`, and `docs/dev/task/reviewer.md`; verifies those files match their empty state at the main baseline; stages only approved changes; and creates the one authorized local task commit. If the commit gate fails or modifies files, no merge or cleanup occurs, acceptance is withdrawn, and control returns to the Planner through a reconstructed `CHANGES_REQUESTED` review.
-- **Fast-Forward Merge Gate**: After the task commit succeeds, the Reviewer switches back to the `main` branch only for close-out. It verifies main is still on `main`, `git status --porcelain` is empty, all three main journals remain zero bytes, and main `HEAD` exactly equals the recorded baseline. It then runs `git merge --ff-only <task-branch>`. If any precondition fails or fast-forward is impossible, it leaves the branch intact, performs no conflict resolution, rebase, squash, merge commit, or cleanup, and returns the issue to the Planner.
-- **Post-Merge Verification and Cleanup**: The Reviewer verifies `main` `HEAD` equals the reviewed task commit and the main journals remain empty. From the `main` branch, it deletes only the merged branch with `git branch -d <task-branch>`. It never uses `-D` during normal close-out.
-- **Failure and Abandonment**: A blocked, failed, rejected, or damaged task remains isolated in its task branch; `main` is never reset or cleaned to abandon it. Deleting an unmerged branch requires a separate owner-approved cleanup dry run identifying the branch, changed/untracked files, recovery or patch options, and irreversible consequences. Until then, preserve the branch.
+Rules:
 
-- **Scope Control**: `APPROVED: EXECUTE` approves only the latest numbered dry run and, only when explicitly included in that dry run, the Reviewer's final local task commit, fast-forward-only merge to local `main`, and safe branch cleanup after acceptance; the final task commit itself additionally requires the standalone owner message `APPROVED: COMMIT`. It never approves unrelated findings, refactoring, dependency upgrades, architectural redesign, formatting outside scope, changes to other domains, history rewriting, destructive abandonment, remote operations, or pushing.
-  - Implement only the selected feature and approved paths.
-  - Do not invent requirements or perform broad refactors.
-  - Preserve domain ownership boundaries.
-  - Reuse existing conforming behavior where appropriate.
-  - Use only verified upstream contracts and public dependency interfaces.
-  - Every material plan delta returns to the Planner and requires a new approval.
-- **No Guessing**: If information is missing, check active authoritative documentation. If it remains missing, record it as `Pending`, `Assumption`, or `Proposed Decision` in the owning role journal and hand off according to the state machine. Never resolve it silently.
+- `planner.md`, `executor.md`, and `reviewer.md` are append-only during an active task and written only by their owning role, except for the narrow deterministic owner-gate record described below.
+- `next-agent.md` is replace-only. At every non-terminal role transition it contains exactly one complete standalone prompt for the next role.
+- All four files are zero bytes when no task is active and after accepted close-out.
+- They are coordination artifacts, not product specifications, feature registries, or permanent decision history.
+- Every non-terminal journal handoff must agree with a valid `next-agent.md`; missing, stale, contradictory, or partially instantiated prompts fail closed.
 
-## 2. Coding Style
+### 2.2 Role declaration and single writer
 
-- **Strict Adherence**: [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).
-- **Format**: 4 spaces, formatted via `ruff format` (double quotes, magic trailing comma respected). Pre-commit runs repository hygiene, Ruff, secret detection, and the full Pytest coverage gate when application/test/configuration files are included; pre-push runs Mypy.
-- **Typing & Docs**: `mypy` type-checked (see `docs/ARCHITECTURE.md` for current strictness settings).
-  - Explicit type hints on all signatures.
-  - Every module, class, and function should be properly fitted with Google-style docstrings.
-  - Docstrings should always include description, args, return values, exceptions raised, and type hints.
-  - Modules that log use the standard-library pattern `logger = logging.getLogger(__name__)`; there is no shared logger singleton import. Composition owns application logging configuration, handlers, formatters, redaction, correlation context, retention, and cleanup. Log at workflow boundaries, public service entry points, external interactions, state transitions, side-effect boundaries, important decisions, retries, and failures. Pure helpers, DTOs/contracts, trivial accessors, deterministic transformations, and high-frequency numerical functions do not require logging unless specified. Logs must not expose secrets, credentials, personal information, full payloads, or sensitive trading data.
-- **Imports**: Absolute imports, grouped (stdlib, 3rd-party, local).
-- **Versioning**: Always confirm library versions before coding. Default to `pyproject.toml` pinned version.
-- **Quality**: 80% `pytest` coverage minimum, enforced by pre-commit and automated CI/release verification rather than iterative test commands. No bare `except:`. Application and library code uses `logger`, never `print`. Directly executable teaching and usage-example scripts may use `print` to display bounded, secret-safe results. No silent failures.
-- **Usage Evidence**: Every service feature designates one primary domain-logic module. Every core capability module documents its purpose, key capabilities, Python API usage, and executable module command; the primary module ends with a bounded, deterministic, secret-safe `if __name__ == "__main__":` harness that demonstrates the feature and fails nonzero when verification fails. The owning README maps applicable FRs to named harness scenarios. Usage examples never live under `tests/`. `FEAT-UI-*` features document bounded interactive workflows in their README and expose them through the running UI; automated UI tests verify but do not replace that usage documentation.
-- **Test and Example Placement**: Feature-level automated tests live under `tests/services/<domain>/<feature>/`; system-level removability, dependency-graph, lifecycle, composition, API, and other verification suites retain their documented test locations. Tests verify behavior and never own public usage demonstrations. Provider-specific usage demonstrations live only in the provider feature's designated primary domain-logic module and use safe fakes, fixtures, sandbox/demo targets, or explicitly supplied safe inputs. No second example implementation is created.
-- **Clean Resource Lifecycles**: Always close SQLite handles, open sockets, and background sub-processes explicitly in test teardown or context managers to eliminate `ResourceWarning` leaks.
-- **Async Mocking Rigor**: Ensure mocks for asynchronous operations return genuine coroutines/futures (`async def`) to prevent unawaited coroutine warnings (`RuntimeWarning`).
+Every development agent invocation has exactly one role: `PLANNER`, `EXECUTOR`, or `REVIEWER`. Only one role writes at a time. Roles never run concurrently on the same task branch. A role stops if its authority conflicts with the active handoff.
 
-## 3. Security
+The orchestrator is not a fourth reasoning role. It may only perform deterministic routing/validation and deterministic owner-gate bookkeeping. It never authors planning, implementation, or review conclusions.
 
-- **Secrets**: Never commit secrets. Redact sensitive values in logs. Use `.env.example` only.
-- **Fail-Closed**: If policy is uncertain or evidence is missing, block the action.
-- **No Live Action by Default**: Live trading, risk changes, and execution state mutations require explicit, deterministic approval. Real integration operations are permitted only against verified non-production targets (`ENVIRONMENT=dev`, demo/testnet/sandbox accounts), with one exception: MetaTrader 5 may connect to a live environment when the operator has elected `ACCOUNT_MODE=live` **and** supplied live MT5 credentials. A mode/credential mismatch fails closed rather than trading one environment under another's label. Every other provider remains non-production. Any attempt to touch or mutate production infrastructure is a blocking safety violation.
-- **Kill Switch**: Deterministic. No caller can override or bypass a kill switch.
-- **No Invented Data**: The system must never invent backtest results, live performance, or broker fills.
-- **Deterministic Policy**: Python code is the sole policy-enforcement authority.
-- **Credential Hygiene**: Ensure logging, exception payloads, and test outputs never capture plain-text API credentials, secret keys, JWT tokens, or account passwords.
+### 2.3 Task branch isolation
 
-## 4. Documentation
+- Registered features use `feature/<feature-id>-<slug>`; other tasks use `task/<task-id>-<slug>`. Names are lowercase filesystem-safe refs and must pass `git check-ref-format --branch`.
+- Planner creates exactly one task branch from a clean `main` baseline before Dry Run 1.
+- Planner, Executor, and Reviewer work sequentially on that branch until authorized close-out.
+- `main` remains clean and unchanged throughout planning/execution/review.
+- Every dry run/report/review records task ID, iteration, baseline, task branch, and expected changed/untracked paths.
 
-- **Update Rules**: Current domain features, statuses, semantic public contracts, requirements, database schema, prefix ownership, domain indexing policy, and target-vs-live reconciliation → the owning package `README.md`. Architecture, cross-domain models, universal database conventions, and shared storage policy → `docs/ARCHITECTURE.md`. System relationships and domain index → `docs/PROJECT.md`. Builder workflow → `AGENTS.md`. Delivery sequencing → `docs/dev/IMPLEMENTATION_ORDER.md`. Implemented feature procedure → `docs/dev/feature_implementation_pipeline.md`.
-- **Three-Role Documentation Accountability**: The Planner identifies every affected authoritative document and the intended change in the dry run. The Executor applies only those approved documentation changes and reconciles implementation status/evidence after verification. The Reviewer checks the resulting documentation against requirements, runtime truth, tests, and every overlapping authority; it reports discrepancies but never fixes them.
-- **Journal Hygiene**: `docs/dev/task/planner.md`, `docs/dev/task/executor.md`, and `docs/dev/task/reviewer.md` contain temporary active-task coordination only. They must not become specifications, feature registries, implementation history, or decision records. Entries accumulate during the current task and all three files return to empty only after accepted review.
-- **Schema Model Boundary**: Each owning package README's `### Persistence - Database` section is authoritative for that domain's current and target database model and authorises no migration. Executable schema remains in the owning domain's migration definitions. Where the model and an applied migration disagree, the migration is what the database contains and the README states what it should become.
-- **Decision Hygiene**: `Open Decisions` sections in `docs/PROJECT.md` and domain/module READMEs contain unresolved owner choices only. When an owner resolves a choice, write the outcome as an ordinary requirement, contract, workflow, configuration rule, boundary, or explicit exclusion in the authoritative specification, then delete the decision row and any resolved issue entry. Do not retain resolved, superseded, retired, or deferred-from-initial-scope rows as decision history, and do not create ADR or other standalone decision-record documents.
-- **Update Module/Service Documentation**: Add/update a `README.md` for each module/service as it's built.
-- **Feature Specification Authority**: Every Python feature declares one immutable `SPEC: FeatureSpec` in `manifest.py` and registers a zero-argument factory through the `haruquantai.features` entry-point group. `FeatureSpec` is the implemented runtime authority for feature identity, domain, provided/required/optional capabilities, conflicts, state, and accepted configuration keys. The owning domain README remains the target product authority; the mandatory feature-local README and executable validator must match runtime truth. D-UI uses the typed `manifest.ts` variant documented in its owning README and the feature pipeline.
-- **Checklist Evidence**: Every completed implementation-plan checklist item must end with the supporting code file path and line number.
+### 2.4 State machine and owner gates
 
-## 5. Database Schema Rules
+Normal path:
 
-- **Authoritative Schema Manifest**: Database schema migrations are governed by authoritative domain migration manifests (e.g. `run_data_migrations`, `run_domain_migrations`).
-- **Ledger Verification & Locks**: All database schema changes require initial ledger table verification, explicit database write lock acquisition, and checksum validation before applying steps.
-- **Atomic Operations**: Database operations must be transactional (`execute_transaction`), with write lock leases and strict busy-timeout policies (`SQLITE_BUSY_TIMEOUT_SECONDS`).
-- **Immutable Historical Steps**: Applied migration steps in the migration ledger are immutable; step checksum mismatches block database access to enforce schema integrity.
-- **Migration Tombstones and Uninstall Retention**: Provider uninstallation is not data purging. When a provider is uninstalled or removed from runtime configuration, its historical migration entries remain immutable in the migration ledger to preserve database checksum integrity. Tables and records created by uninstalled providers are retained in a dormant state; destructive schema drop or table purge requires explicit, separate administrative authorization.
+```text
+clean main
+  → Planner Dry Run N
+  → PENDING_APPROVAL
+  → owner: APPROVED: EXECUTE
+  → Executor Report N
+  → READY_FOR_REVIEW
+  → Reviewer Review N
+  → PENDING_COMMIT
+  → owner: APPROVED: COMMIT
+  → Reviewer close-out
+  → ACCEPTED
+```
 
-## 6. API Connection
+Correction paths:
 
-- **Verified Upstream Contracts**: Use only verified upstream contracts and public dependency interfaces for external API connections.
-- **Broker Session & Transport Isolation**: Broker connections must use dedicated session adapters (`_LazyBrokerSession`, transport circuit breakers) with deterministic retry and circuit recovery rules.
-- **Credential & Readiness Verification**: Connection attempts must validate credential availability (`CREDENTIALS_MISSING`) and readiness state before opening external sockets.
-- **Rate Limit & Circuit Governance**: API requests must respect declared source policy rate limits (`rate_limit`, `rate_window_seconds`) and circuit breaker state machines.
-- **Circuit Recovery Testing**: Configure transport circuit breakers (`_TransportCircuitBreaker`) with micro-timeouts (e.g., `0.001s`) in tests to verify failover and recovery without thread-sleep pauses.
+- Executor `BLOCKED` → next Planner dry run.
+- Reviewer `CHANGES_REQUESTED` → next Planner dry run.
+- Owner rejection of execution or commit gate → next Planner dry run with the owner direction.
+- Planner `BLOCKED` → owner resolves the documented cause; Planner resumes.
 
-## 7. Integration
+Execution authorization is valid only when the entire trimmed owner message is exactly `APPROVED: EXECUTE`. Commit authorization is valid only when it is exactly `APPROVED: COMMIT`.
 
-- **Role-Separated Verification**:
-  - The Planner uses read-only inspection and may run a narrowly named baseline check only when necessary to produce an evidence-backed dry run. It does not run coverage or the complete repository gate.
-  - The Executor runs only change-scoped tests and applicable focused quality checks while implementing. It never runs coverage, the complete suite, or the complete repository gate.
-  - The Reviewer independently reruns the affected tests and applicable non-mutating quality checks. For applicable changes, the final accepted local commit invokes pre-commit and its complete coverage gate; this is final integration evidence, not iterative feedback.
-- **Environment Boundaries**: Real integration operations are permitted only against verified non-production targets (`ENVIRONMENT=dev`, demo/testnet/sandbox accounts), except for operator-elected live MetaTrader 5 as defined in §3.
-- **Change-Scoped Testing & Verification**: Iterative development must test only the impact set of the current uncommitted changes. Start from `git diff --name-only`, `git diff --cached --name-only`, and untracked paths reported by `git status --short`; map changed production files to their existing owning tests. Include tests for changed tests, the owning feature, and affected public contracts, consumers, architecture, composition, API, integration, or dependency closure. A test file need not itself be modified to be affected by changed production code. Exclude tests for unrelated code.
-  - Run selected tests explicitly with `uv run pytest --no-cov <test_path> [<test_path> ...]`.
-  - `uv run pytest --no-cov --testmon` may assist selection only when its cache is valid; it must not be allowed to fall back to an unfiltered first run. `--lf`, `--ff`, and `-n auto` may be combined only with an already bounded test selection.
-  - Never run bare `uv run pytest`, `pytest` without selected paths, `uv run python scripts/ci_check.py`, or any `--cov` command during implementation or iterative verification.
-  - Coverage and the complete suite run only through the pre-commit hook for applicable code/test/configuration changes and through automated CI/release verification. They are final integration evidence, not per-edit feedback.
-  - Documentation-only changes run no Pytest tests unless they modify executable documentation tooling or another validated runtime surface.
-- **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `git diff --name-only`, `uv run pytest --no-cov <selected_test_path>`, `uv run ruff check .`, `uv run mypy .`.
-- **Git Authority**: The Planner never commits, merges, or pushes; its only Git mutation is the gated creation of one task branch before `Dry Run 1` and safe cleanup of a cancelled, clean Planner-only task. The Executor never creates or switches branches, commits, merges, or pushes. After an `ACCEPTED` review, the Reviewer may create exactly one local task commit, fast-forward local `main`, delete the merged branch only when the latest approved dry run explicitly includes those actions. No workflow state authorizes `git push`, force-push, pull, fetch, rebase, reset, clean, amend, unmerged-branch deletion, or other history mutation; each requires separate applicable owner authorization.
-- **Restricted Commands (Require `APPROVED: EXECUTE`)**: `rm -rf`, `git reset`, `git clean`, `uv add`/`uv remove`, `docker compose`, live broker calls, real email/Telegram sends, destructive SQL.
+**Deterministic owner-gate exception:** after exact `APPROVED: EXECUTE`, the orchestrator may append a factual gate record to `.agents/task/planner.md` containing the task, iteration, baseline, branch, and approved plan SHA-256. It may not alter the dry-run body. Planner is not re-invoked merely to transcribe owner authorization.
+
+### 2.5 `next-agent.md` as the role boundary
+
+Every generated next-role prompt begins with TOML front matter using prompt schema version 1. It records run/task/iteration, source/target role, handoff, branch, baseline, source HEAD, canonical template path, and owner-gate requirement.
+
+The orchestrator validates:
+
+- protocol transition and target role/template;
+- schema/version and required metadata;
+- branch, baseline, and source HEAD;
+- canonical incoming-role authority sentinels;
+- no unfilled `{{placeholders}}`;
+- prompt SHA-256 and canonical template SHA-256;
+- complete working-tree fingerprint for gate-protected transitions.
+
+Outgoing roles populate task-specific context and structured handoff facts. They may **not** weaken or rewrite the incoming role's canonical role, authority, methodology, quality criteria, or handoff contract.
+
+Free-form `NEXT AGENT NOTES` are not part of the protocol.
+
+### 2.6 Structured handoff facts
+
+- **Planner → Executor:** approved scope, exact path authority, implementation order, requirements, validation, rollback, risks.
+- **Executor → Reviewer:** changed paths, requirements claimed complete, commands/tests reported, limitations, deviations, assumptions, risks. These claims are explicitly labeled `UPSTREAM CLAIMS — UNTRUSTED UNTIL INDEPENDENTLY VERIFIED`.
+- **Executor → Planner (`BLOCKED`):** blocker, evidence, partial-work state, affected paths, safe retained work/rollback, and exact decision required.
+- **Reviewer → Planner:** failed requirement/gate, independent evidence, required correction, valid retained work, and scope requiring reconsideration.
+
+### 2.7 Planner authority
+
+Planner performs repository inspection, research, architecture/gap analysis, and detailed task decomposition.
+
+Allowed writes:
+
+- one-time task-branch creation before Dry Run 1;
+- `.agents/task/planner.md`;
+- `.agents/task/next-agent.md`.
+
+Planner never edits implementation/tests/configuration/dependencies/authoritative product docs, commits, merges, rebases, pulls, fetches, or pushes.
+
+Each numbered dry run contains all eight sections:
+
+1. Task to do, requirements, tests, usage evidence.
+2. Files read.
+3. Exact files to create/edit and implementation order.
+4. Dependencies/contracts.
+5. Blockers/risks/trade-offs.
+6. Scope boundaries/inclusions/exclusions.
+7. Exact validation commands.
+8. Rollback.
+
+Dry Run 1 starts from clean `main`, creates the deterministic branch, then plans on that branch. Correction dry runs explicitly inventory retained/changed/rolled-back paths. Planner generates the complete next-role prompt before stopping; it never waits inside a headless invocation for owner approval.
+
+### 2.8 Executor authority
+
+Executor first verifies repository root, branch, baseline, approved dry-run hash/record, expected path inventory, journals, and authoritative files routed by the plan.
+
+Allowed writes:
+
+- only implementation/documentation/test paths explicitly authorized by the approved dry run;
+- `.agents/task/executor.md`;
+- `.agents/task/next-agent.md`.
+
+Executor never edits Planner/Reviewer journals, expands scope, switches branches, commits, merges, rebases, pulls, fetches, or pushes. It runs only approved change-scoped formatting/linting/typing/tests/validators/usage examples during implementation; no coverage or unfiltered suite.
+
+If a material blocker or unapproved path appears, Executor stops before further change, preserves partial work, records evidence/rollback/decision needed, and generates a complete Planner prompt with `BLOCKED`. If all approved work succeeds, it generates the complete Reviewer prompt with `READY_FOR_REVIEW`.
+
+### 2.9 Reviewer authority and anti-anchoring
+
+Reviewer independently verifies and never repairs implementation.
+
+Allowed writes:
+
+- `.agents/task/reviewer.md`;
+- `.agents/task/next-agent.md`;
+- after exact `APPROVED: COMMIT`, only the defined close-out mutations.
+
+Reviewer follows this order:
+
+1. **Independent reconstruction:** before reading Planner/Executor journals, inspect the original task, `AGENTS.md`, applicable authoritative specifications, main baseline, complete branch diff, staged/unstaged changes, untracked paths, and resulting repository. Derive expected behavior/evidence independently.
+2. **Independent verification:** rerun applicable affected tests and non-mutating quality/architecture/usage checks. Upstream reports are not proof.
+3. **Claims reconciliation:** only now read Planner/Executor histories and compare their claims with independently observed evidence.
+
+If any defect, omission, scope violation, evidence gap, failed check, or unresolved original requirement exists, Reviewer writes `CHANGES_REQUESTED` and generates a complete Planner correction prompt. It never fixes the defect itself.
+
+If all verification passes, Reviewer writes `PENDING_COMMIT`, generates the complete gated Reviewer close-out prompt, and performs no commit/merge/cleanup before exact owner authorization.
+
+### 2.10 Authorized close-out
+
+After exact `APPROVED: COMMIT`, Reviewer must re-verify that reviewed HEAD and complete working-tree fingerprint are unchanged. It then:
+
+1. records commit authorization;
+2. empties all four `.agents/task/` files;
+3. stages only approved changes;
+4. creates exactly one local task commit, including applicable pre-commit/final coverage gate;
+5. verifies `main` is still clean and at the recorded baseline;
+6. fast-forward merges only (`git merge --ff-only`);
+7. verifies the merged commit;
+8. deletes only the safely merged branch with `git branch -d`.
+
+Close-out never force-deletes, rebases, resets, cleans, amends, resolves merge conflicts, pushes, or expands scope. Any failed precondition returns to Planner through `CHANGES_REQUESTED`.
+
+### 2.11 Orchestration modes and isolation
+
+- `solo`: same chat sequentially executes exact prompts; **soft isolation only**. At each role boundary, stop the old role, load `next-agent.md` as the new role contract, re-read repository evidence, and treat conclusions from prior roles as non-evidence. Solo review is self-review under a fresh role contract, not independent review.
+- `delegate`: fresh same-brand subagent per role; fresh role context.
+- `multi-delegate`: fresh configured CLI process per role; cross-vendor diversity possible.
+- `manual`: user pastes exact `next-agent.md` into a fresh role chat.
+
+Mode changes transport only; role prompt semantics are identical.
+
+## 3. Coding style and verification
+
+- Follow the Google Python Style Guide and repository Ruff configuration. Use 4-space indentation and `ruff format`.
+- Public/module code uses explicit typing and appropriate Google-style docstrings. Run configured mypy strict checks for applicable code.
+- No bare `except:` and no silent failures.
+- Application/library code uses `logging.getLogger(__name__)`, not `print`; bounded executable teaching/usage harnesses may print secret-safe results.
+- Do not log secrets, credentials, personal information, full sensitive payloads, or trading account data.
+- Every service feature has one designated primary domain-logic module with bounded executable usage evidence. Tests verify behavior but do not become a second usage implementation.
+- Feature-level tests belong under the owning test namespace; system architecture/composition/removability tests remain in their documented locations.
+- Close SQLite handles, sockets, files, and subprocesses explicitly. Async mocks must return genuine awaitables.
+
+### Change-scoped testing
+
+During implementation/review, derive the affected set from `git diff --name-only`, staged diff, and untracked paths. Map changed production code to owning and affected contract/consumer/architecture tests.
+
+Run bounded tests explicitly, e.g. `uv run pytest --no-cov <selected paths>`. Never run bare/unfiltered pytest or coverage iteratively. Coverage and the complete suite are final integration evidence through the configured pre-commit/CI gates.
+
+Safe read/verification commands include `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, bounded pytest, Ruff, and mypy. Destructive commands and live external actions require explicit applicable authorization.
+
+## 4. Security and operational safety
+
+- Never commit secrets; use `.env.example` for examples and redact sensitive outputs.
+- Fail closed when policy, authority, credentials, environment, or evidence is uncertain.
+- No live trading/action by default. External integration operations use verified dev/demo/testnet/sandbox targets unless an owning policy explicitly permits an operator-selected live mode (including the documented MT5 exception).
+- Kill switches and deterministic risk/policy gates cannot be bypassed by callers or agents.
+- Never invent backtest results, live performance, broker fills, or external data.
+- Python/runtime policy enforcement is authoritative; LLM prompts are not a substitute for deterministic controls.
+
+## 5. Documentation and ownership
+
+- Owning package README: domain feature/FR registry, current feature status, semantic contracts, persistence target model, usage/evidence mapping.
+- `docs/ARCHITECTURE.md`: universal structural/runtime/database conventions.
+- `docs/PROJECT.md`: product/system scope, domain index, cross-domain relationships and NFRs.
+- `AGENTS.md`: contributor and three-role workflow.
+- `docs/dev/IMPLEMENTATION_ORDER.md`: delivery sequencing.
+- `docs/dev/feature_implementation_pipeline.md`: feature delivery architecture/checklist.
+- `docs/templates/prompt/`: canonical reusable workflow prompt definitions.
+
+Planner identifies documentation impact; Executor applies only approved documentation changes; Reviewer verifies consistency and reports discrepancies without fixing them.
+
+Resolved decisions become ordinary requirements/boundaries in the owning authority; do not accumulate superseded decision history as a second source of truth.
+
+## 6. Database and external API rules
+
+- Applied migration steps/checksums are immutable. Schema changes follow owning migration manifests, explicit write locks, ledger verification, and transactional execution.
+- Provider uninstall/removal does not imply destructive data purge; retention/purge follows explicit owning policy and separate authorization.
+- External APIs use verified public upstream contracts, credential/readiness checks, bounded rate limits, retries/circuit breakers, and deterministic recovery tests.
+- Broker/provider implementations stay isolated behind public contracts/capabilities; consumers do not import provider internals.
+
+## 7. Git authority summary
+
+- Planner: only validated task-branch creation; no commits/merge/push.
+- Executor: no branch creation/switch, commits/merge/push.
+- Reviewer: one authorized local task commit + ff-only local merge + safe merged-branch deletion only after `APPROVED: COMMIT` and only when the latest approved scope includes close-out.
+- Normal workflow never authorizes push, force-push, pull, fetch, rebase, reset, clean, amend, force deletion, merge-conflict resolution, or destructive abandonment. Such actions require separate explicit applicable owner authorization.
+- `APPROVED: EXECUTE` approves only the latest dry run. It never authorizes unrelated findings/refactors/dependency upgrades/history rewrites/live actions.

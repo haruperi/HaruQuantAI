@@ -1,0 +1,334 @@
+#!/usr/bin/env python3
+"""Process, state, and invocation helpers for the HaruQuantAI agent workflow."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from workflow_protocol import *  # noqa: F403,E402
+
+
+def _stream_reader(
+    stream: IO[str],
+    sink: list[str],
+    prefix: str,
+    enabled: bool,
+    activity: dict[str, float],
+) -> None:
+    try:
+        for raw in stream:
+            line = raw.rstrip("\r\n")
+            sink.append(line)
+            activity["t"] = time.monotonic()
+            if enabled and line.strip():
+                print(f"    {prefix}{line}", flush=True)
+    finally:
+        stream.close()
+
+
+def _run_process(
+    cmd: list[str],
+    cwd: Path,
+    stdin_text: str | None,
+    *,
+    timeout: int,
+    stream: bool,
+    heartbeat: int,
+) -> tuple[int, str, str]:
+    try:
+        proc = subprocess.Popen(  # noqa: S603
+            cmd,
+            cwd=str(cwd),
+            stdin=subprocess.PIPE if stdin_text is not None else subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+    except OSError as exc:
+        raise OrchestratorError(f"Failed to launch {cmd[0]!r}: {exc}") from exc
+    out: list[str] = []
+    err: list[str] = []
+    activity = {"t": time.monotonic()}
+    threads = [
+        threading.Thread(
+            target=_stream_reader,
+            args=(proc.stdout, out, "| ", stream, activity),
+            daemon=True,
+        ),
+        threading.Thread(
+            target=_stream_reader,
+            args=(proc.stderr, err, "! ", stream, activity),
+            daemon=True,
+        ),
+    ]
+    for thread in threads:
+        thread.start()
+    if stdin_text is not None and proc.stdin is not None:
+        proc.stdin.write(stdin_text)
+        proc.stdin.close()
+    started = time.monotonic()
+    last_beat = started
+    try:
+        while proc.poll() is None:
+            if time.monotonic() - started > timeout:
+                proc.kill()
+                raise OrchestratorError(f"Agent invocation timed out after {timeout}s.")
+            now = time.monotonic()
+            if heartbeat > 0 and now - activity["t"] >= heartbeat and now - last_beat >= heartbeat:
+                print(f"    [{int(now - started)}s] agent still running...", flush=True)
+                last_beat = now
+            time.sleep(0.2)
+    finally:
+        for thread in threads:
+            thread.join(timeout=5)
+    return proc.returncode or 0, "\n".join(out), "\n".join(err)
+
+
+def _build_agent_command(
+    role_cfg: dict[str, Any], prompt: str, prompt_file: Path
+) -> tuple[list[str], str | None]:
+    command = list(role_cfg["command"])
+    model_args = list(role_cfg.get("model_args", []))
+    delivery = str(role_cfg.get("prompt_delivery", "file"))
+    stdin_text: str | None = None
+    if delivery == "stdin":
+        stdin_text = prompt
+        cmd = command + model_args
+    elif delivery == "arg":
+        cmd = [prompt if token == "{prompt}" else token for token in command]
+        if "{prompt}" not in command:
+            cmd += model_args + [prompt]
+    else:
+        prompt_file.write_text(prompt, encoding="utf-8")
+        pointer = (
+            f"Read and follow the instructions in {prompt_file} exactly. "
+            "Perform the full task described there now."
+        )
+        cmd = [pointer if token == "{prompt}" else token for token in command]
+        if "{prompt}" not in command:
+            cmd += model_args + [pointer]
+    return cmd, stdin_text
+
+
+def run_agent(
+    cfg: dict[str, Any], role: str, prompt: str, tag: str
+) -> tuple[str, Path]:
+    logs_dir: Path = cfg["logs_dir"]
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    stamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S")
+    prompt_file = logs_dir / f"{stamp}-{tag}-prompt.md"
+    role_cfg = cast("dict[str, Any]", cfg["roles"][role.lower()])
+    cmd, stdin_text = _build_agent_command(role_cfg, prompt, prompt_file)
+    executable = shutil.which(cmd[0])
+    if executable is None:
+        raise OrchestratorError(f"Agent CLI {cmd[0]!r} is not on PATH.")
+    cmd[0] = executable
+    attempts = max(1, int(cfg["retries"]) + 1)
+    last_error = ""
+    for attempt in range(1, attempts + 1):
+        if attempt > 1:
+            print(f"    retry {attempt}/{attempts} after non-zero exit")
+            time.sleep(1)
+        code, stdout, stderr = _run_process(
+            cmd,
+            cfg["repo"],
+            stdin_text,
+            timeout=int(cfg["timeout"]),
+            stream=bool(cfg["stream"]),
+            heartbeat=int(cfg["heartbeat"]),
+        )
+        log = logs_dir / f"{stamp}-{tag}{'-retry'+str(attempt-1) if attempt > 1 else ''}.log"
+        log.write_text(
+            f"command: {cmd!r}\nexit_code: {code}\n"
+            f"{'=' * 20} stdout {'=' * 20}\n{stdout}\n"
+            f"{'=' * 20} stderr {'=' * 20}\n{stderr}\n",
+            encoding="utf-8",
+        )
+        if code == 0:
+            return stdout, log
+        last_error = stderr or stdout
+    raise OrchestratorError(f"{role} agent failed after {attempts} attempt(s): {last_error[-500:]}")
+
+
+def _save_state(cfg: dict[str, Any], state: dict[str, Any]) -> Path:
+    runs_dir: Path = cfg["runs_dir"]
+    runs_dir.mkdir(parents=True, exist_ok=True)
+    path = runs_dir / f"{state['run_id']}.json"
+    path.write_text(json.dumps(state, indent=2, default=str), encoding="utf-8")
+    return path
+
+
+def _load_state(cfg: dict[str, Any], run_id: str | None) -> dict[str, Any]:
+    runs_dir: Path = cfg["runs_dir"]
+    if run_id:
+        path = runs_dir / f"{run_id}.json"
+    else:
+        candidates = sorted(runs_dir.glob("*.json"))
+        if not candidates:
+            raise OrchestratorError("No saved runs found.")
+        path = candidates[-1]
+    if not path.exists():
+        raise OrchestratorError(f"Run state not found: {path}")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise OrchestratorError(f"Invalid run state: {path}")
+    return cast("dict[str, Any]", data)
+
+
+def _record(state: dict[str, Any], phase: str, **extra: Any) -> None:
+    entry = {
+        "time": dt.datetime.now(tz=dt.UTC).isoformat(timespec="seconds"),
+        "phase": phase,
+        "iteration": state["iteration"],
+        **extra,
+    }
+    state.setdefault("history", []).append(entry)
+
+
+def _entry_gate(cfg: dict[str, Any]) -> str:
+    repo: Path = cfg["repo"]
+    if not (repo / ".git").exists():
+        raise OrchestratorError(f"{repo} is not a git repository.")
+    branch = _git_ok(repo, "branch", "--show-current")
+    if branch != cfg["main_branch"]:
+        raise OrchestratorError(
+            f"New task must start on {cfg['main_branch']!r}; current branch is {branch!r}."
+        )
+    dirty = _git_ok(repo, "status", "--porcelain")
+    if dirty:
+        raise OrchestratorError(f"main must be clean before starting:\n{dirty}")
+    active_files = [*cfg["journals"].values(), cfg["next_agent"]]
+    for path in active_files:
+        if not path.exists():
+            raise OrchestratorError(f"Missing active-task file: {path}")
+        if path.stat().st_size != 0:
+            raise OrchestratorError(f"Active-task file is not empty: {path}")
+    return _git_ok(repo, "rev-parse", "HEAD")
+
+
+def _build_fields(state: dict[str, Any], cfg: dict[str, Any]) -> dict[str, Any]:
+    task = cast("dict[str, Any]", state["task"])
+    return {
+        "repo_path": str(cfg["repo"]),
+        "run_id": state["run_id"],
+        "task_kind": task.get("task_kind", "feature"),
+        "task_id": task["task_id"],
+        "task_slug": task["task_slug"],
+        "task_name": task.get("task_name", task["task_id"]),
+        "task_request": task["task_request"],
+        "additional_context": task.get("additional_context", "None"),
+        "exclusions": task.get("exclusions", "None"),
+        "owner_execution_notes": task.get("owner_execution_notes", "None"),
+        "review_focus": task.get("review_focus", "None"),
+        "implementation_file": task.get("implementation_file", "(none)"),
+        "implementation_entry": task.get("implementation_entry", "(none)"),
+        "iteration": state["iteration"],
+        "branch": state.get("branch") or "(created by Planner)",
+        "baseline_commit": state["baseline"],
+        "correction_context": state.get("correction_context", "None"),
+        "owner_feedback": state.get("owner_feedback", "None") or "None",
+        "approved_plan_hash": state.get("approved_plan_hash", "(recorded after owner gate)"),
+        "executor_report_hash": state.get("executor_report_hash", "(not available yet)"),
+        "blocker_ledger": _blocker_ledger(state),
+        "handoff_facts": state.get("handoff_facts", "See active journals and repository evidence."),
+        "reviewed_worktree_hash": state.get("reviewed_worktree_hash", "(recorded by orchestrator)"),
+        "reviewed_head": state.get("reviewed_head", "(recorded by orchestrator)"),
+    }
+
+
+def _blocker_ledger(state: dict[str, Any]) -> str:
+    blockers = cast("list[dict[str, Any]]", state.get("blockers", []))
+    if not blockers:
+        return "None"
+    return "; ".join(
+        f"{item['raised_by']} iteration {item['iteration']} ({item['status']})"
+        for item in blockers
+    )
+
+
+def _append_owner_approval(cfg: dict[str, Any], state: dict[str, Any]) -> None:
+    journal: Path = cfg["journals"]["planner"]
+    plan_hash = state["plan_hash"]
+    block = (
+        f"\n### Owner Gate — Dry Run {state['iteration']}\n\n"
+        "APPROVED: EXECUTE\n"
+        f"Task ID: {state['task']['task_id']}\n"
+        f"Dry Run: {state['iteration']}\n"
+        f"Plan SHA-256: {plan_hash}\n"
+        f"Main baseline: {state['baseline']}\n"
+        f"Task branch: {state['branch']}\n"
+    )
+    with journal.open("a", encoding="utf-8") as handle:
+        handle.write(block)
+    state["approved_plan_hash"] = plan_hash
+
+
+def _write_orchestrator_planner_prompt(
+    cfg: dict[str, Any], state: dict[str, Any], source_handoff: str
+) -> None:
+    fields = _build_fields(state, cfg)
+    body = compose_prompt(cfg["templates"]["planner"], fields)
+    transition = _transition_for(cfg["transitions"], "ORCHESTRATOR", source_handoff)
+    metadata = {
+        "prompt_schema_version": SCHEMA_VERSION,
+        "run_id": state["run_id"],
+        "task_id": state["task"]["task_id"],
+        "iteration": state["iteration"],
+        "source_role": "ORCHESTRATOR",
+        "target_role": "PLANNER",
+        "handoff": source_handoff,
+        "branch": state["branch"],
+        "baseline_commit": state["baseline"],
+        "source_head": _git_ok(cfg["repo"], "rev-parse", "HEAD"),
+        "template_path": transition.target_template or "docs/templates/prompt/planner.md",
+        "requires_owner_gate": False,
+        "owner_gate": "",
+    }
+    cfg["next_agent"].write_text(_render_next_agent(metadata, body), encoding="utf-8")
+    validate_next_agent(
+        cfg, state, expected_source="ORCHESTRATOR", expected_handoff=source_handoff
+    )
+
+
+def _request_gate(exact: str, label: str, scripted: bool, rejection: str | None) -> tuple[bool, str]:
+    if scripted:
+        print(f"[gate] relaying exact owner authorization: {exact}")
+        return True, ""
+    if rejection is not None:
+        return False, rejection
+    print(f"\n{label} required. Enter exactly `{exact}`, `reject`, or `abort`.")
+    while True:
+        try:
+            answer = input("> ").strip()
+        except EOFError:
+            answer = "abort"
+        if answer == exact:
+            return True, ""
+        if answer.lower() == "reject":
+            feedback = input("Feedback: ").strip()
+            return False, feedback
+        if answer.lower() == "abort":
+            raise KeyboardInterrupt
+        print("Unrecognized gate response.")
+
+
+def _invoke_pending(cfg: dict[str, Any], state: dict[str, Any], role: str) -> tuple[str, Path]:
+    _ensure_pending_artifact_unchanged(cfg, state)
+    artifact = parse_next_agent(cfg["next_agent"])
+    if str(artifact.metadata["target_role"]).upper() != role.upper():
+        raise OrchestratorError(
+            f"Pending prompt targets {artifact.metadata['target_role']}, not {role}."
+        )
+    return run_agent(
+        cfg,
+        role,
+        artifact.raw,
+        f"{state['run_id']}-{role.lower()}-{state['iteration']}",
+    )
+
+
+__all__ = [name for name in globals() if not name.startswith("__")]

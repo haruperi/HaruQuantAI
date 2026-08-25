@@ -3,4 +3,4 @@ brand = "codex"
 command = ["codex", "exec", "-s", "danger-full-access"]
 model_args = ["-m", "gpt-5.6-sol", "-c", "model_reasoning_effort=high"]
 prompt_delivery = "file"
-template = ".agents/templates/planner.md"
+template = "docs/templates/prompt/planner.md"

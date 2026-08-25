@@ -1,0 +1,5 @@
+# Runtime-only agent orchestration artifacts.
+logs/
+runs/
+run-config.toml
+task.toml

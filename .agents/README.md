@@ -1,184 +1,124 @@
-# .agents — Multi-Mode Agent Workflow System
+# `.agents` — Artifact-Driven Agent Workflow
 
-**Full operating procedure: [PROCEDURE.md](PROCEDURE.md)** — setup, task
-generation, kick-off prompt, gates, resume, completion, and maintenance.
+HaruQuantAI delivers development tasks through Planner → Executor → Reviewer with four interchangeable execution modes. The workflow is file-driven: chat memory is never the coordination authority.
 
-Automates the `AGENTS.md` three-role workflow (Planner → Executor → Reviewer)
-in four interchangeable modes. Roles never talk to each other directly — the
-task journals in `docs/dev/task/` are the shared memory, and every journal
-entry ends with the three-line handoff block plus NEXT AGENT NOTES.
+## Active task workspace
 
-| Mode | What runs the roles | Typical use |
-| --- | --- | --- |
-| `solo` | The orchestrating chat itself, sequentially wearing each hat | Fast small tasks; one context |
-| `delegate` | Same-brand subagents spawned by the chat (per-role model/effort, e.g. Sol-High plans, Luna-High executes, Terra-High reviews) | Division of reasoning tiers in one brand |
-| `multi-delegate` | Cross-vendor headless CLIs driven by `orchestrator.py` (codex/agy/cline/...) | Best tool per phase |
-| `manual` | Separate chats; the user relays prompts between roles | The original hand workflow |
-
-Modes 1–3 run in one chat with that chat as the orchestrator following
-`.agents/ORCHESTRATOR.md`; mode 4 runs across chats. Choose and configure a
-mode with the picker — menus cascade (vendor → vendor-specific model list →
-effort, per role), and in multi-delegate mode the picker also regenerates the
-three `.agents/<role>.toml` files with correct per-vendor CLI flags:
-
-```bash
-python .agents/configure.py        # writes .agents/run-config.toml
+```text
+.agents/task/
+├── planner.md
+├── executor.md
+├── reviewer.md
+└── next-agent.md
 ```
 
-This tooling lives outside the AGENTS.md workflow by owner decision
-(2026-08-24). It orchestrates that workflow; it is not part of the product.
+The three role journals are append-only during an active task. `next-agent.md` is replace-only and contains the complete standalone prompt for the next role. All four files are zero bytes when no task is active and after successful close-out.
+
+Reusable prompt truth lives only in `docs/templates/prompt/`. Runtime prompts are instantiated into `next-agent.md`; there is no second prompt-template tree under `.agents`.
+
+## Modes
+
+| Mode | Execution | Context isolation |
+| --- | --- | --- |
+| `solo` | This chat performs each role sequentially | Soft — role contract reset, not truly independent review |
+| `delegate` | Fresh same-brand subagent per role | Fresh role context |
+| `multi-delegate` | Fresh configured CLI process per role | Fresh process; cross-vendor diversity available |
+| `manual` | User relays `next-agent.md` to a fresh chat | Fresh chat |
+
+Every mode consumes the same `next-agent.md`. Mode changes transport, not workflow semantics.
+
+## Canonical workflow truth
+
+- `AGENTS.md` — contributor/role authority.
+- `.agents/protocol.toml` — machine-readable transitions, gates, workspace paths, schema version.
+- `docs/templates/prompt/default.md` — prompt-design standard (MAIN/MINIMAL).
+- `docs/templates/prompt/{planner,executor,reviewer,reviewer-closeout}.md` — canonical role prompts.
+- `.agents/task/next-agent.md` — current instantiated next-role prompt.
+- `.agents/runs/*.json` — runtime audit state (gitignored).
+- `.agents/logs/` — immutable invocation prompt/transcript archive (gitignored).
+
+## State machine
+
+```text
+PLANNER Dry Run N
+  └─ PENDING_APPROVAL
+       └─ owner: APPROVED: EXECUTE
+            └─ EXECUTOR Report N
+                 ├─ BLOCKED ────────────────> PLANNER Dry Run N+1
+                 └─ READY_FOR_REVIEW ──────> REVIEWER Review N
+                                                ├─ CHANGES_REQUESTED -> PLANNER N+1
+                                                └─ PENDING_COMMIT
+                                                     └─ owner: APPROVED: COMMIT
+                                                          └─ REVIEWER close-out
+                                                               └─ ACCEPTED
+```
+
+Owner approval is deterministic orchestration, not an LLM task. The orchestrator appends the exact execution gate record to `planner.md`; it does not re-invoke Planner merely to transcribe authorization.
+
+## `next-agent.md` contract
+
+Every non-terminal role handoff writes a complete prompt beginning with TOML front matter:
+
+```toml
++++
+prompt_schema_version = 1
+run_id = "..."
+task_id = "..."
+iteration = 1
+source_role = "PLANNER"
+target_role = "EXECUTOR"
+handoff = "PENDING_APPROVAL"
+branch = "feature/..."
+baseline_commit = "..."
+source_head = "..."
+template_path = "docs/templates/prompt/executor.md"
+requires_owner_gate = true
+owner_gate = "APPROVED: EXECUTE"
++++
+```
+
+The orchestrator validates schema, transition, target template, branch, baseline, HEAD, protected role sentinels, owner-gate semantics, unfilled placeholders, prompt SHA-256, canonical-template SHA-256, and a working-tree fingerprint. Stale or contradictory artifacts fail closed.
+
+Outgoing roles may populate task-specific facts but may not weaken the incoming role's canonical role, authority, methodology, quality criteria, or handoff rules.
+
+## Structured handoff facts
+
+Free-form `NEXT AGENT NOTES` are retired. Each full next-role prompt carries structured facts appropriate to the transition.
+
+- Planner → Executor: approved scope, exact path authority, implementation order, requirements, validation, rollback, risks.
+- Executor → Reviewer: changed paths, claims, commands/tests reported, limitations, deviations, assumptions, risks. These are explicitly labeled **UPSTREAM CLAIMS — UNTRUSTED UNTIL INDEPENDENTLY VERIFIED**.
+- Executor → Planner (`BLOCKED`): blocker, evidence, partial state, affected paths, safe retained work, required decision.
+- Reviewer → Planner: failed requirement/gate, independent evidence, required correction, retained valid work.
+
+## Reviewer anti-anchoring
+
+Reviewer follows three stages:
+
+1. **Independent reconstruction** from original task, authorities, baseline, diff, resulting repository.
+2. **Independent verification** with affected tests and non-mutating quality/architecture/usage checks.
+3. **Claims reconciliation** only afterward by reading Planner/Executor journals.
+
+The Reviewer never repairs implementation. Defects produce `CHANGES_REQUESTED`.
 
 ## Quick start
 
 ```bash
-python .agents/make_task.py --list                    # open entries in the implementation order
-python .agents/make_task.py 1.1                       # generate .agents/task.toml for entry 1.1
-python .agents/orchestrator.py doctor                 # check configs/CLIs/repo
-python .agents/orchestrator.py self-test              # stub end-to-end run
-python .agents/orchestrator.py start --task-file .agents/task.toml
-python .agents/orchestrator.py resume                 # continue after interrupt
+uv run .agents/configure.py
+uv run .agents/make_task.py --list
+uv run .agents/make_task.py 1.1
+uv run .agents/orchestrator.py doctor
+uv run .agents/orchestrator.py self-test
+uv run .agents/orchestrator.py start --task-file .agents/task.toml
 ```
 
-Task specs may reference an implementation tracker (`implementation_file` +
-`implementation_entry`, e.g. `docs/dev/IMPLEMENTATION_ORDER.md` entry `2.8`). The
-Planner then includes marking that entry complete (`[x]` plus `— evidence: path:line`)
-among the approved changed paths, so progress lands in the tracker through the normal
-reviewed merge — never as an out-of-band edit.
+Resume/gate relay examples:
 
-## How it works
-
-```
-start ──▶ PLANNER (dry run N) ─▶ PENDING_APPROVAL ─▶ OWNER GATE ─┬─ approve ─▶ PLANNER (record approval)
-                ▲                                               │                 │
-                │                                               └─ reject ───────┘ (feedback)
-                │                                                                        ▼
-                │                                                   EXECUTOR (report N) ─┬─ READY_FOR_REVIEW ─▶ REVIEWER (review N)
-                │                                                                        │                          ├─ CHANGES_REQUESTED ─┐
-                └────────────────── BLOCKED / CHANGES_REQUESTED / reject ◀──────────────┴──────────────────────────┘
-                                                                                                      └─ ACCEPTED ─▶ done
+```bash
+uv run .agents/orchestrator.py resume
+uv run .agents/orchestrator.py resume --approved
+uv run .agents/orchestrator.py resume --reject-feedback "..."
+uv run .agents/orchestrator.py resume --approved-commit
+uv run .agents/orchestrator.py resume --reject-commit-feedback "..."
 ```
 
-- **Shared memory**: the journals `docs/dev/task/{planner,executor,reviewer}.md`.
-  Each prompt ends with a mandatory contract: the agent must finish its journal
-  entry with a three-line block — `STOPPED : <PLANNER|EXECUTOR|REVIEWER>`,
-  `ACTIVATING : <PLANNER|EXECUTOR|REVIEWER|NONE>`, and
-  `HANDOFF : <PENDING_APPROVAL|APPROVED_EXECUTE|READY_FOR_REVIEW|CHANGES_REQUESTED|ACCEPTED|BLOCKED>`.
-  The orchestrator routes on HANDOFF, cross-checks STOPPED against the role that
-  actually ran, and records ACTIVATING for tracking (a mismatch warns but does
-  not stop the pipeline). A complete block printed in the agent's final answer
-  is accepted as a warned fallback. `ACTIVATING : NONE` marks terminal states
-  (Reviewer ACCEPTED, Planner BLOCKED awaiting an owner decision).
-- **Blocker memory**: every BLOCKED outcome (Planner gate failure or Executor
-  blocker) is recorded as an OPEN blocker in the run state. The description is
-  extracted automatically from the blocking agent's NEXT AGENT NOTES and shown
-  with a journal evidence pointer — the owner is never asked to re-describe
-  what the agent already documented. The next Planner iteration becomes a
-  minimal blocker-resolution dry run (the original scope is explicitly suspended);
-  once that dry run is implemented, the blocker is marked RESOLVED and the
-  following dry runs continue the ORIGINAL task. The blocker ledger is
-  injected into correction contexts and the reviewer prompt, and the reviewer
-  must CHANGES_REQUESTED ("continue the original scope") rather than accept
-  while the original task request is unmet. Planner BLOCKED stops for an
-  owner decision; `resume` afterwards continues with the blocker dry run.
-- **Next-agent notes**: each journal entry carries a `NEXT AGENT NOTES :`
-  section (1-5 lines) just above the handoff block. The orchestrator scrapes
-  it and injects it into the next agent's prompt (`Handoff notes : From X:`),
-  so agents exchange targeted context without ever authoring each other's
-  prompts; notes are cleared on acceptance.
-- **Single writer preserved**: one agent runs at a time; the loop blocks.
-- **Owner gate preserved**: after every dry run the orchestrator pauses in the
-  terminal for the exact message `APPROVED: EXECUTE` (or `reject` with
-  feedback, or `abort`). The approval is relayed to a fresh Planner invocation
-  which appends the approval record itself, per AGENTS.md writer rules.
-  `--auto-approve` exists but bypasses a deliberate safety latch — avoid it.
-- **Owner commit gate preserved**: when the Reviewer's verification passes,
-  the review ends `PENDING_COMMIT` and nothing is committed. The orchestrator
-  pauses for the exact message `APPROVED: COMMIT` (or reject with feedback →
-  back to the Planner), giving a human the chance to inspect the branch diff
-  before the close-out commit, ff-only merge, and branch cleanup. Chat-driven
-  runs relay this gate with `--approved-commit` / `--reject-commit-feedback`.
-- **Live agent output**: every agent invocation streams its stdout/stderr into
-  the terminal as it happens (`| ` = agent stdout, `! ` = agent stderr), and a
-  heartbeat line (`[123s] agent still running...`) appears after
-  `stream_heartbeat_seconds` of quiet, so long invocations are never silent.
-  Disable per-terminal echo with `stream_agent_output = false` in
-  `orchestrator.toml`; the full transcript is always captured in `.agents/logs/`
-  regardless. On timeout the whole process tree is killed (`taskkill /T`).
-  Transient non-zero exits are automatically retried (`agent_retry_attempts`,
-  default 1, 5s apart); timeouts are never auto-retried. Note agy's own
-  `--print-timeout` (default 5m) caps headless runs — the executor command
-  raises it to 110m below the orchestrator's ceiling.
-- **Fail closed**: missing/invalid marker, non-branch repo state, or timeouts
-  stop the run with the invocation log tail; state is saved for `resume`.
-
-## Files
-
-| Path | Purpose |
-| --- | --- |
-| `orchestrator.py` | State-machine router, agent launcher, gates, subcommands |
-| `orchestrator.toml` | Repo path, journals, limits, role wiring |
-| `planner.toml` / `executor.toml` / `reviewer.toml` | Per-role CLI command, model args, delivery mode, template |
-| `templates/*.md` | Role prompts with `{{placeholders}}` + HANDOFF contract |
-| `tests/stub_agent.py` | Scripted agents used by `self-test` |
-| `task.example.toml` | Example task spec for `start` |
-| `logs/`, `runs/` | Invocation prompts/logs and resumable run state (gitignored) |
-
-## Swapping brands
-
-Edit the role TOMLs. Commands are argv lists; `model_args` are appended.
-Prompt delivery modes: `file` (default — prompt written under `logs/`, agent
-gets a short pointer argument; safest with Windows `.cmd` shims), `arg`
-(prompt appended as one argument, or substituted for a `{prompt}` token),
-`stdin`. Examples:
-
-```toml
-# codex (current planner): model + reasoning effort via config overrides.
-# Note: --full-auto was removed in current Codex; use the sandbox flag.
-command = ["codex", "exec", "-s", "workspace-write"]
-model_args = ["-m", "gpt-5.6-sol", "-c", "model_reasoning_effort=high"]
-
-# agy (current executor): reasoning level is part of the slug. NOTE: agy's -p
-# takes the NEXT token as its prompt value, so -p must be the LAST token and
-# the orchestrator-appended prompt pointer becomes its value.
-command = ["agy", "--dangerously-skip-permissions", "--model", "gemini-3.7-flash-high", "-p"]
-
-# cline (current reviewer): Z.ai GLM via the provider id in ~/.cline.
-# WARNING: cline's `-p` flag is PLAN mode (not print mode) — the Reviewer
-# needs act mode for tests and the close-out commit, so never add `-p`.
-command = ["cline", "-P", "zai-coding-plan", "-m", "glm-5.3", "--thinking", "high"]
-
-# claude
-command = ["claude", "-p", "--dangerously-skip-permissions"]
-```
-
-Headless agents cannot answer interactive permission prompts, so each role's
-command must include its CLI's auto-approval flag. Safety rests on the owner
-approval gate plus git branch isolation (`main` is never touched until the
-Reviewer's accepted close-out).
-
-## Keeping prompts in sync
-
-`templates/*.md` mirror `docs/dev/prompt/{planner,executor,reviewer}.md` with
-`{{placeholders}}`, headless adjustments (the Planner does not wait for
-approval in-session), and the HANDOFF contract. If you edit the authoritative
-prompts in `docs/dev/prompt/`, mirror the changes here (or vice versa) — the
-templates in this folder are what agents actually receive.
-
-## Notes and limits
-
-- **Everything is file-based; the terminal is display only.** Run state lives
-  in `.agents/runs/<run-id>.json` (rewritten after every phase transition,
-  blocker, failure, and interrupt), every composed prompt and full invocation
-  transcript lives in `.agents/logs/`, and agent memory lives in the journals.
-  After any crash or terminal kill, `python .agents/orchestrator.py resume`
-  re-enters at the last saved phase. Caveat: a run interrupted while an agent
-  invocation was in flight re-runs that phase; the agent's own journal-based
-  entry gates keep the re-run from double-appending.
-- The entry gate requires clean `main` with zero-byte journals (untracked
-  `.agents/` itself is ignored). If `start` refuses, commit or stash first.
-- `resume` restarts from the saved phase (`approve`, `executor`, ...). The
-  saved state lives in `runs/<run-id>.json` with full phase history.
-- Every invocation's composed prompt and full stdout/stderr land in `logs/`
-  for audit; nothing there is committed (gitignored).
-- The orchestrator never creates/switches branches, commits, or pushes — only
-  agents do, each within its own role's authority.
+Runtime `run-config.toml`, `task.toml`, `logs/`, and `runs/` are intentionally gitignored. `task.example.toml`, `protocol.toml`, canonical prompts, role TOMLs, and the four zero-byte active-task files are tracked workflow source.

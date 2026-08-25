@@ -1,162 +1,62 @@
 # Chat Orchestrator Playbook
 
-**You — this chat — are the orchestrator** of the three-role feature workflow
-(Planner → Executor → Reviewer) defined by `AGENTS.md`. This playbook tells you
-how to run it in any of four modes. The file-based protocol in section 1 is
-identical for all modes; only the execution mechanism differs.
+You — this chat — orchestrate the Planner → Executor → Reviewer workflow defined by `AGENTS.md` and `.agents/protocol.toml`. The same file protocol is used in every mode; only execution transport differs.
 
-If `.agents/run-config.toml` is missing (or the owner asks to change setup),
-run `python .agents/configure.py` first, or present the equivalent choice menu
-yourself. Never guess a mode.
+## 1. Non-negotiable protocol
 
-## 1. Protocol (every mode)
+- Truth is on file, never in chat memory.
+- Exactly one role writes at a time.
+- Active state lives in `.agents/task/{planner,executor,reviewer,next-agent}.md`.
+- Role journals are append-only; `next-agent.md` is replace-only.
+- A non-terminal handoff is invalid unless both the journal handoff block and a valid complete `next-agent.md` agree with `.agents/protocol.toml`.
+- Outgoing role handoff facts cannot alter the incoming role's canonical authority.
+- Owner gates remain exact standalone messages: `APPROVED: EXECUTE` and `APPROVED: COMMIT`.
+- Approval transcription is deterministic orchestration; never spend a Planner invocation merely recording approval.
+- Missing/contradictory markers, stale prompt hash, stale working-tree fingerprint, stale HEAD, wrong target role/template, or invalid gate state fail closed.
 
-**Truth on file.** The journals `docs/dev/task/{planner,executor,reviewer}.md`
-are the only coordination channel between roles and iterations. Entries are
-append-only during a task. Every entry ends with an optional `NEXT AGENT NOTES :`
-section followed by the mandatory three-line block:
+## 2. SOLO
 
-```text
-NEXT AGENT NOTES : <1-5 lines for the next agent, or None>
-STOPPED : <PLANNER|EXECUTOR|REVIEWER>
-ACTIVATING : <PLANNER|EXECUTOR|REVIEWER|NONE>
-HANDOFF : <PENDING_APPROVAL|APPROVED_EXECUTE|READY_FOR_REVIEW|CHANGES_REQUESTED|ACCEPTED|BLOCKED>
-```
+Perform roles sequentially in this chat using the exact current `next-agent.md` at each transition.
 
-**Task intake.** A task spec (`.agents/task.*.toml`) supplies the fields the
-role templates need: task ids, request, exclusions, and optionally
-`implementation_file`/`implementation_entry` — when present, completing the
-feature includes marking that tracker entry `[x]` with `— evidence: path:line`
-as an approved changed path (never in a blocker-resolution dry run). Generate
-a spec from an implementation-order entry with
-`python .agents/make_task.py <entry>` (e.g. `1.1`); `--list` shows open entries.
+Solo has **soft isolation only**. At every role boundary:
 
-**Entry gate (new task).** `main` checked out and clean (untracked `.agents/`
-is ignorable), all three journals zero bytes. Record the baseline commit.
+1. finish and journal the outgoing role;
+2. replace `next-agent.md` with the full incoming-role prompt;
+3. stop the outgoing role;
+4. load only `next-agent.md` as the new role contract;
+5. re-read required repository evidence;
+6. treat conclusions formed in another role as non-evidence.
 
-**State machine.**
+Reviewer must still perform the canonical three-stage anti-anchoring review. Do not describe solo self-review as independent review.
 
-```text
-PLANNER dry run N → PENDING_APPROVAL → owner gate ─┬─ APPROVED: EXECUTE
-               ▲                                   │   → PLANNER approval record
-               │                                   │     → EXECUTOR report N
-               │                                   └─ reject (feedback) → PLANNER N+1
-               │                                     EXECUTOR → READY_FOR_REVIEW → REVIEWER
-               └── BLOCKED / CHANGES_REQUESTED ◀────────────────────┘
-               REVIEWER → PENDING_COMMIT → owner commit gate (APPROVED: COMMIT)
-                        → authorized close-out (commit, ff-merge, cleanup) → done
-```
+## 3. DELEGATE
 
-**Owner gate.** After every dry run, ask the owner. Authorization is ONLY the
-exact standalone message `APPROVED: EXECUTE`. A rejection collects feedback and
-returns to the Planner as the next iteration with the owner direction injected.
+Spawn exactly one fresh same-brand subagent for the target role and give it the exact `next-agent.md`. Never run two role agents concurrently. The orchestrating chat handles owner gates and validates resulting journal/next-agent artifacts.
 
-**Owner commit gate.** When the Reviewer's verification passes, the review
-ends `PENDING_COMMIT` and nothing is committed. Ask the owner to authorize the
-final task commit — the exact standalone message `APPROVED: COMMIT` — giving
-them the chance to inspect the branch (`git diff <baseline>..HEAD`) first.
-Only then re-invoke the Reviewer to perform the close-out. A rejection returns
-the task to the Planner with the owner's feedback.
+## 4. MULTI-DELEGATE
 
-**Blockers.** An Executor `BLOCKED` (missing authority, unapproved path,
-spec conflict...) is recorded with the agent's own NEXT AGENT NOTES as the
-description; the next Planner iteration is a minimal blocker-resolution dry
-run with the original scope explicitly suspended; it resumes after resolution.
-A Planner gate `BLOCKED` needs an owner fix outside the workflow, then the
-same dry-run number is retried. Keep a blocker ledger in the run state.
-
-**Fail closed.** Missing or contradictory markers, wrong role identification,
-or a gate violation stops progression. Surface the journal evidence; never
-guess the next step and never repair another role's work yourself (only the
-Reviewer accepts and closes out).
-
-**Single writer.** Exactly one role works at a time, in order, on the task
-branch. Never run roles concurrently.
-
-**Run state and audit.** Maintain `.agents/runs/<run-id>.json` (iteration,
-phase, branch, baseline, blocker ledger, history) and write every composed
-prompt under `.agents/logs/`. Everything must survive a chat or terminal
-crash; a fresh chat resumes from journals + run state.
-
-**Close-out (authorized Reviewer ACCEPTED).** Only after the owner's
-`APPROVED: COMMIT`: per the reviewer close-out template — append the commit
-authorization record, empty all three journals, create the one task commit
-(pre-commit coverage gate included), verify clean unchanged `main`,
-`git merge --ff-only`, delete the merged branch. Never push.
-
-## 2. Mode: SOLO
-
-You perform **all three roles yourself, sequentially, in this chat**. For each
-phase: load `.agents/templates/<role>.md`, fill the `{{placeholders}}` from the
-task spec and run state, announce the phase, execute that role's instructions
-yourself, then append the journal entry exactly as the role would (including
-the three-line block and notes). The owner gate between dry run and
-implementation still applies. Role discipline is sequential: complete and
-journal the Planner work before any Executor action begins. When
-self-reviewing, genuinely re-verify (re-run tests, inspect the diff) rather
-than trusting your own implementation summary; if you find defects, mark the
-review `CHANGES_REQUESTED` and loop back to re-planning like any other mode.
-
-## 3. Mode: DELEGATE (same-brand subagents)
-
-For each phase, spawn **one subagent** via your harness's subagent mechanism
-with the composed role prompt as its task, working in this repository.
-Configure model/effort from `run-config.toml` `[roles.*]` using your harness's
-per-subagent model setting when it supports one; when it does not, run with
-the chat default and state the configured tier in the prompt header so it is
-on record. The subagent writes its journal; you read the markers and route per
-section 1. Never spawn two role subagents concurrently. Relay the owner gate
-yourself (ask the user in-chat, then act on the exact `APPROVED: EXECUTE`).
-
-## 4. Mode: MULTI-DELEGATE (cross-vendor headless)
-
-**Preferred:** drive the proven script — it already implements this entire
-protocol with streaming, retries, and fail-closed gates:
+Use `.agents/orchestrator.py`. It validates the protocol, launches the per-role CLI from `.agents/<role>.toml`, archives prompts/transcripts, verifies prompt/worktree provenance, and persists run state under `.agents/runs/`.
 
 ```bash
-python .agents/orchestrator.py doctor
-python .agents/orchestrator.py start --task-file <task.toml>   # or: resume
-python .agents/orchestrator.py resume --approved               # relay owner approval
-python .agents/orchestrator.py resume --reject-feedback "..."  # relay rejection
-python .agents/orchestrator.py resume --approved-commit        # relay commit authorization
-python .agents/orchestrator.py resume --reject-commit-feedback "..."  # relay commit rejection
+uv run .agents/orchestrator.py doctor
+uv run .agents/orchestrator.py start --task-file .agents/task.toml
+uv run .agents/orchestrator.py resume
 ```
 
-Run it via your shell tool and watch the streamed output; on failure, read
-`.agents/logs/`. Vendors, models, and effort levels are configured with
-`python .agents/configure.py` (per-role vendor → model → effort menus),
-which regenerates `.agents/<role>.toml` with the correct per-vendor CLI
-flags; hand-edit those files only for exotic flags.
+## 5. MANUAL
 
-**Fallback** (script unusable): run each vendor CLI yourself with the composed
-prompt file per `.agents/<role>.toml`, then parse the journals and route per
-section 1 — you are then effectively a hand-run version of the script.
+The user is the transport. After validating the latest role journal, instruct the user to open `.agents/task/next-agent.md` and paste its complete contents into a fresh chat. Never reconstruct or summarize the prompt manually.
 
-## 5. Mode: MANUAL (separate chats)
+## 6. Routing table
 
-The pre-automation workflow, still fully supported. Each role runs in its own
-chat (same or different vendor); the user relays.
-
-As the orchestrating chat you can still help: compose each role prompt from
-`.agents/templates/<role>.md` (fill placeholders from the task spec and the
-current journals), save it to `.agents/logs/<timestamp>-<role>-prompt.md`, and
-tell the user which chat to open next based on the latest handoff block:
-
-| Latest block | Next chat |
+| Latest handoff | Next action |
 | --- | --- |
-| `PLANNER / PLANNER / PENDING_APPROVAL` | Owner decides; then a PLANNER chat with the approval message |
-| `PLANNER / EXECUTOR / APPROVED_EXECUTE` | EXECUTOR chat |
-| `EXECUTOR / REVIEWER / READY_FOR_REVIEW` | REVIEWER chat |
-| `EXECUTOR / PLANNER / BLOCKED` | PLANNER chat (blocker-resolution dry run) |
-| `REVIEWER / PLANNER / CHANGES_REQUESTED` | PLANNER chat (next dry run) |
-| `REVIEWER / NONE / ACCEPTED` | Task complete |
+| `PLANNER / PENDING_APPROVAL` | Owner gate; on approval execute the already-written Executor prompt |
+| `PLANNER / BLOCKED` | Owner resolves cause, then Planner retry prompt |
+| `EXECUTOR / READY_FOR_REVIEW` | Reviewer prompt |
+| `EXECUTOR / BLOCKED` | Planner blocker-resolution prompt |
+| `REVIEWER / CHANGES_REQUESTED` | Planner correction prompt |
+| `REVIEWER / PENDING_COMMIT` | Owner commit gate; on approval Reviewer close-out prompt |
+| `REVIEWER / ACCEPTED` | Terminal; all four active-task files must be empty |
 
-When a role chat finishes, verify its journal markers before announcing the
-next step; never take the chat's word over the journal.
-
-## 6. Reference
-
-- Templates: `.agents/templates/{planner,planner_approval,executor,reviewer}.md`
-- Task specs: `.agents/task.*.toml` · Vendor flags: `.agents/<role>.toml`
-- Script driver: `.agents/orchestrator.py` · Picker: `.agents/configure.py`
-- Full system docs: `.agents/README.md`
+Gate rejection is the only normal case where no outgoing reasoning role exists to author the next prompt. The orchestrator may therefore instantiate the canonical Planner template deterministically with owner feedback.

@@ -1,1932 +1,65 @@
 #!/usr/bin/env python3
-"""Cross-brand Planner/Executor/Reviewer orchestrator for HaruQuantAI.
-
-Drives the AGENTS.md three-role handoff state machine by launching each
-role's coding agent non-interactively (any CLI brand: claude, codex, agy, ...).
-The task journals in docs/dev/task/ are the shared memory between agents;
-machine coordination uses a mandatory three-line block that each agent
-writes at the end of its journal entry:
-
-    STOPPED : <PLANNER|EXECUTOR|REVIEWER>
-    ACTIVATING : <PLANNER|EXECUTOR|REVIEWER|NONE>
-    HANDOFF : <PENDING_APPROVAL|APPROVED_EXECUTE|READY_FOR_REVIEW|
-               CHANGES_REQUESTED|ACCEPTED|BLOCKED>
-
-Exactly one agent runs at a time.
-
-Subcommands:
-    start      Run a new task through the full state machine.
-    resume     Continue an interrupted run from its saved state.
-    doctor     Validate configs, templates, CLIs, and repository gates.
-    self-test  Exercise the whole state machine with stub agents (no real
-               agent CLI calls, no cost).
-
-Usage examples:
-    python .agents/orchestrator.py doctor
-    python .agents/orchestrator.py start --task-file .agents/task.example.toml
-    python .agents/orchestrator.py resume
-    python .agents/orchestrator.py self-test
-"""
-
-# pylint: disable=too-many-lines,too-many-arguments,too-many-locals
+"""CLI for the HaruQuantAI artifact-driven agent workflow."""
 
 from __future__ import annotations
 
-import argparse
-import contextlib
-import datetime as _dt
-import json
-import re
-import shutil
-import subprocess
 import sys
-import tempfile
-import threading
-import time
-import tomllib
 from pathlib import Path
-from typing import IO, Any, cast
 
-AGENTS_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from workflow_engine import *  # noqa: F403,E402
 
-VALID_HANDOFFS = {
-    "PENDING_APPROVAL",
-    "APPROVED_EXECUTE",
-    "READY_FOR_REVIEW",
-    "PENDING_COMMIT",
-    "CHANGES_REQUESTED",
-    "ACCEPTED",
-    "BLOCKED",
-}
 
-SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
-
-# Whitespace around the colon is optional, and leading/trailing markdown
-# decoration (fences, bold, backticks, headers, quote markers) is tolerated
-# so `**STOPPED** : \`PLANNER\`` parses the same as `STOPPED : PLANNER`.
-BLOCK_LINE_RES = {
-    "stopped": re.compile(r"^[>\s#`*_-]*STOPPED[\s`*_-]*:\s*(.+?)\s*$", re.IGNORECASE),
-    "activating": re.compile(
-        r"^[>\s#`*_-]*ACTIVATING[\s`*_-]*:\s*(.+?)\s*$", re.IGNORECASE
-    ),
-    "handoff": re.compile(r"^[>\s#`*_-]*HANDOFF[\s`*_-]*:\s*(.+?)\s*$", re.IGNORECASE),
-}
-
-NEXT_NOTES_RE = re.compile(r"^\s*NEXT AGENT NOTES\s*:\s?(.*)$", re.IGNORECASE)
-
-MAX_CMD_PREVIEW = 6
-EXPECTED_SELF_TEST_ITERATION = 3
-BLOCK_FIELD_COUNT = 3
-MIN_SELF_TEST_LOG_FILES = 16
-DEFAULT_TAIL_LINES = 30
-MAX_BLOCKER_DESC_LEN = 400
-
-
-class OrchestratorError(RuntimeError):
-    """Fatal orchestration error; run state is saved before raising."""
-
-
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
-
-
-def load_toml(path: Path) -> dict[str, Any]:
-    """Load and parse a TOML file from disk.
-
-    Args:
-        path: File path to the TOML document.
-
-    Returns:
-        Dictionary representing the parsed TOML document.
-    """
-    with path.open("rb") as fh:
-        data: dict[str, Any] = tomllib.load(fh)
-        return data
-
-
-def assemble_config(repo_override: str | None = None) -> dict[str, Any]:
-    """Load orchestrator.toml plus the three role TOMLs into one config map.
-
-    Args:
-        repo_override: Optional path string overriding the repository root.
-
-    Returns:
-        Consolidated orchestration configuration mapping.
-    """
-    orch = load_toml(AGENTS_DIR / "orchestrator.toml")
-    run_cfg: dict[str, Any] = orch.get("run", {})
-    paths: dict[str, Any] = orch.get("paths", {})
-
-    default_repo = str(AGENTS_DIR.parent)
-    repo = Path(repo_override or run_cfg.get("repo_path", default_repo)).resolve()
-    journals = {
-        "planner": repo / paths.get("planner_journal", "docs/dev/task/planner.md"),
-        "executor": repo / paths.get("executor_journal", "docs/dev/task/executor.md"),
-        "reviewer": repo / paths.get("reviewer_journal", "docs/dev/task/reviewer.md"),
-    }
-    templates = {
-        "planner": repo / ".agents/templates/planner.md",
-        "planner_approval": repo / ".agents/templates/planner_approval.md",
-        "executor": repo / ".agents/templates/executor.md",
-        "reviewer": repo / ".agents/templates/reviewer.md",
-        "reviewer_commit": repo / ".agents/templates/reviewer_commit.md",
-    }
-    roles: dict[str, dict[str, Any]] = {}
-    roles_cfg: dict[str, Any] = orch.get("roles", {})
-    for role, filename in roles_cfg.items():
-        role_cfg = load_toml(AGENTS_DIR / str(filename))
-        role_cfg["template_path"] = (repo / str(role_cfg["template"])).resolve()
-        if "approval_command" in role_cfg:
-            role_cfg["approval_command"] = list(role_cfg["approval_command"])
-        roles[role] = role_cfg
-
-    return {
-        "repo": repo,
-        "main_branch": run_cfg.get("main_branch", "main"),
-        "max_iterations": int(run_cfg.get("max_iterations", 5)),
-        "timeout": int(run_cfg.get("invocation_timeout_seconds", 3600)),
-        "stream_agent_output": bool(run_cfg.get("stream_agent_output", True)),
-        "stream_heartbeat_seconds": int(run_cfg.get("stream_heartbeat_seconds", 60)),
-        "agent_retry_attempts": int(run_cfg.get("agent_retry_attempts", 1)),
-        "journals": journals,
-        "templates": templates,
-        "logs_dir": (repo / paths.get("logs_dir", ".agents/logs")).resolve(),
-        "runs_dir": (repo / paths.get("runs_dir", ".agents/runs")).resolve(),
-        "roles": roles,
-    }
-
-
-# ---------------------------------------------------------------------------
-# Prompt composition and agent invocation
-# ---------------------------------------------------------------------------
-
-
-def compose_prompt(template_path: Path, fields: dict[str, Any]) -> str:
-    """Fill {{placeholder}} fields; refuse to run with any placeholder left.
-
-    Args:
-        template_path: Path to the markdown template file.
-        fields: Mapping of placeholder keys to replacement values.
-
-    Returns:
-        Rendered prompt string.
-
-    Raises:
-        OrchestratorError: If unfilled placeholders remain in the prompt.
-    """
-    text = template_path.read_text(encoding="utf-8")
-    for key, value in fields.items():
-        text = text.replace("{{" + key + "}}", str(value))
-    leftover = sorted(set(re.findall(r"\{\{\w+\}\}", text)))
-    if leftover:
-        msg = f"Template {template_path} has unfilled placeholders: {leftover}"
-        raise OrchestratorError(msg)
-    return text
-
-
-def _build_agent_cmd(
-    role_cfg: dict[str, Any],
-    prompt: str,
-    prompt_file: Path,
-    *,
-    approval: bool,
-) -> tuple[list[str], str | None]:
-    """Build the command line and optional stdin string for the agent.
-
-    Args:
-        role_cfg: Configuration dictionary for the agent role.
-        prompt: Composed prompt string.
-        prompt_file: Destination file path for file-based prompt delivery.
-        approval: Whether this is an approval-recording invocation.
-
-    Returns:
-        Tuple of (command_args_list, stdin_text).
-    """
-    command = list(role_cfg.get("approval_command", []) if approval else [])
-    if not command:
-        command = list(role_cfg["command"])
-    delivery = role_cfg.get("prompt_delivery", "file")
-    model_args = list(role_cfg.get("model_args", []))
-
-    stdin_text: str | None = None
-    if delivery == "stdin":
-        stdin_text = prompt
-        cmd = command + model_args
-    elif delivery == "arg":
-        arg = prompt
-        cmd = [arg if tok == "{prompt}" else tok for tok in command]
-        if "{prompt}" not in command:
-            cmd = cmd + model_args + [arg]
-    else:  # "file"
-        prompt_file.write_text(prompt, encoding="utf-8")
-        arg = (
-            f"Read and follow the instructions in {prompt_file} exactly. "
-            "Perform the full task described there now."
-        )
-        cmd = [arg if tok == "{prompt}" else tok for tok in command]
-        if "{prompt}" not in command:
-            cmd = cmd + model_args + [arg]
-    return cmd, stdin_text
-
-
-def _stream_pump(
-    stream: IO[str],
-    sink: list[str],
-    prefix: str,
-    last_activity: dict[str, float],
-    stream_enabled: bool,
-) -> None:
-    """Drain a process pipe line-by-line, echoing lines to the terminal.
-
-    Args:
-        stream: Text pipe (stdout or stderr) of the agent process.
-        sink: List accumulating the captured lines for the log file.
-        prefix: Terminal prefix ('| ' for stdout, '! ' for stderr).
-        last_activity: Shared monotonic timestamp of the latest output line.
-        stream_enabled: Whether to echo lines live to the terminal.
-    """
-    try:
-        for raw in stream:
-            line = raw.rstrip("\r\n")
-            sink.append(line)
-            last_activity["t"] = time.monotonic()
-            if stream_enabled and line.strip():
-                print(f"{prefix}{line}", flush=True)
-    finally:
-        stream.close()
-
-
-def _heartbeat_monitor(
-    proc: subprocess.Popen[str],
-    started: float,
-    last_activity: dict[str, float],
-    stop: threading.Event,
-    interval: int,
-) -> None:
-    """Print a heartbeat line while the agent produces no output.
-
-    Args:
-        proc: Agent process being watched.
-        started: Monotonic timestamp of invocation start.
-        last_activity: Shared timestamp of the latest output line.
-        stop: Event set when the invocation finishes.
-        interval: Minimum quiet seconds before a heartbeat is printed.
-    """
-    last_beat = started
-    while not stop.wait(1.0):
-        now = time.monotonic()
-        if now - last_activity["t"] >= interval and now - last_beat >= interval:
-            state = "running" if proc.poll() is None else "finishing"
-            print(f"    [{int(now - started)}s] agent still {state}...", flush=True)
-            last_beat = now
-
-
-def _kill_process_tree(proc: subprocess.Popen[str]) -> None:
-    """Kill the agent process and, on Windows, its whole child tree.
-
-    Args:
-        proc: Agent process to terminate.
-    """
-    with contextlib.suppress(OSError):
-        proc.kill()
-    if sys.platform == "win32" and proc.pid:
-        taskkill = shutil.which("taskkill")
-        if taskkill:
-            subprocess.run(  # noqa: S603
-                [taskkill, "/PID", str(proc.pid), "/T", "/F"],
-                capture_output=True,
-                check=False,
-            )
-
-
-def _start_agent_process(
-    cmd: list[str],
-    cwd: Path,
-    stdin_text: str | None,
-) -> subprocess.Popen[str]:
-    """Launch the configured agent process and surface launch errors.
-
-    Args:
-        cmd: Command arguments to execute.
-        cwd: Working directory for the agent process.
-        stdin_text: Optional prompt payload sent to stdin instead of DEVNULL.
-
-    Returns:
-        The started subprocess object.
-
-    Raises:
-        OrchestratorError: If the process cannot be launched.
-    """
-    try:
-        return subprocess.Popen(  # noqa: S603
-            cmd,
-            cwd=str(cwd),
-            stdin=subprocess.PIPE if stdin_text is not None else subprocess.DEVNULL,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-        )
-    except OSError as exc:
-        msg = f"Failed to launch agent command {cmd[0]!r}: {exc}"
-        raise OrchestratorError(msg) from exc
-
-
-def _run_attempt(
-    cmd: list[str],
-    cwd: Path,
-    stdin_text: str | None,
-    log_context: tuple[Path, str, str],
-    *,
-    timeout: int,
-    stream: bool,
-    heartbeat: int,
-) -> tuple[int, str, Path]:
-    """Run a single agent attempt with live streaming, capture, and logging.
-
-    Args:
-        cmd: Resolved command line (executable plus arguments).
-        cwd: Working directory for the process.
-        stdin_text: Optional prompt text piped via stdin.
-        log_context: (logs_dir, timestamp_stamp, tag) tuple used for logging.
-        timeout: Maximum seconds before the process tree is killed.
-        stream: Echo agent output lines live to the terminal.
-        heartbeat: Quiet seconds before a heartbeat line (0 = off).
-
-    Returns:
-        Tuple of (exit_code, stdout_content, log_file_path).
-
-    Raises:
-        OrchestratorError: If the process exceeds the timeout.
-    """
-    logs_dir, stamp, tag = log_context
-    proc = _start_agent_process(cmd, cwd, stdin_text)
-
-    out_lines: list[str] = []
-    err_lines: list[str] = []
-    last_activity = {"t": time.monotonic()}
-    started = time.monotonic()
-    stop_heartbeat = threading.Event()
-    pumps = [
-        threading.Thread(
-            target=_stream_pump,
-            args=(proc.stdout, out_lines, "    | ", last_activity, stream),
-            daemon=True,
-        ),
-        threading.Thread(
-            target=_stream_pump,
-            args=(proc.stderr, err_lines, "    ! ", last_activity, stream),
-            daemon=True,
-        ),
-    ]
-    for pump in pumps:
-        pump.start()
-    if heartbeat > 0:
-        threading.Thread(
-            target=_heartbeat_monitor,
-            args=(proc, started, last_activity, stop_heartbeat, heartbeat),
-            daemon=True,
-        ).start()
-
-    try:
-        if stdin_text is not None and proc.stdin is not None:
-            proc.stdin.write(stdin_text)
-            proc.stdin.close()
-        code = proc.wait(timeout=timeout)
-    except subprocess.TimeoutExpired as exc:
-        _kill_process_tree(proc)
-        stop_heartbeat.set()
-        out = "\n".join(out_lines)
-        err = "\n".join(err_lines)
-        _write_log(
-            logs_dir,
-            stamp,
-            tag,
-            cmd,
-            -1,
-            out=out,
-            err=err,
-            note=f"TIMED OUT after {timeout}s",
-        )
-        timeout_msg = f"Agent invocation '{tag}' timed out after {timeout}s"
-        raise OrchestratorError(timeout_msg) from exc
-
-    stop_heartbeat.set()
-    for pump in pumps:
-        pump.join(timeout=5)
-    out = "\n".join(out_lines)
-    err = "\n".join(err_lines)
-
-    log_path = _write_log(logs_dir, stamp, tag, cmd, code, out=out, err=err)
-    return code, out, log_path
-
-
-def run_agent(
-    role_cfg: dict[str, Any],
-    prompt: str,
-    cwd: Path,
-    logs_dir: Path,
-    tag: str,
-    *,
-    timeout: int,
-    approval: bool = False,
-    stream: bool = True,
-    heartbeat: int = 60,
-    retries: int = 1,
-) -> tuple[int, str, Path]:
-    """Run one headless agent invocation; return (exit_code, stdout, log_path).
-
-    Prompt delivery defaults to "file": the composed prompt is written under
-    logs_dir and the agent receives a short pointer argument. This avoids
-    passing megabyte prompts through argv, which is fragile on Windows where
-    npm CLIs are .cmd shims re-parsed by cmd.exe.
-
-    Agent output is streamed live to the terminal ('| ' = agent stdout,
-    '! ' = agent stderr) and a heartbeat line appears whenever the agent is
-    quiet for `heartbeat` seconds, so long invocations are never silent.
-
-    Args:
-        role_cfg: Configuration dictionary for the agent role.
-        prompt: Composed prompt string.
-        cwd: Working directory for the process.
-        logs_dir: Directory for writing run logs and prompt files.
-        tag: Identifier tag used in log file naming.
-        timeout: Maximum seconds before the process tree is killed.
-        approval: Whether this invocation is for approval recording.
-        stream: Echo agent output lines live to the terminal.
-        heartbeat: Quiet seconds before printing a heartbeat line (0 = off).
-        retries: Automatic re-launches (5s apart) when the agent exits
-            non-zero, so transient CLI/network failures do not kill the phase.
-            Timeouts are never retried automatically.
-
-    Returns:
-        Tuple of (exit_code, stdout_content, log_file_path).
-
-    Raises:
-        OrchestratorError: If the CLI executable is missing or times out.
-    """
-    logs_dir.mkdir(parents=True, exist_ok=True)
-    now_utc = _dt.datetime.now(tz=_dt.UTC)
-    stamp = now_utc.strftime("%Y%m%d-%H%M%S")
-    prompt_file = logs_dir / f"{stamp}-{tag}-prompt.md"
-
-    cmd, stdin_text = _build_agent_cmd(role_cfg, prompt, prompt_file, approval=approval)
-
-    exe = shutil.which(cmd[0])
-    if exe is None:
-        cmd_str = role_cfg.get("command")
-        msg = f"Agent CLI '{cmd[0]}' not found on PATH (role command: {cmd_str})"
-        raise OrchestratorError(msg)
-    cmd[0] = exe
-
-    preview_tokens = " ".join(cmd[:MAX_CMD_PREVIEW])
-    ellipsis_suffix = " ..." if len(cmd) > MAX_CMD_PREVIEW else ""
-    print(f"    launching: {preview_tokens}{ellipsis_suffix}")
-    if stream:
-        print("    (live output: '|' = agent stdout, '!' = agent stderr)")
-
-    attempts = max(1, int(retries) + 1)
-    code, out, log_path = 1, "", logs_dir / f"{stamp}-{tag}.log"
-    for attempt in range(1, attempts + 1):
-        attempt_tag = tag if attempt == 1 else f"{tag}-retry{attempt - 1}"
-        if attempt > 1:
-            print(f"    [retry] agent failed; attempt {attempt}/{attempts}", flush=True)
-            time.sleep(5)
-        code, out, log_path = _run_attempt(
-            cmd,
-            cwd,
-            stdin_text,
-            (logs_dir, stamp, attempt_tag),
-            timeout=timeout,
-            stream=stream,
-            heartbeat=heartbeat,
-        )
-        if code == 0:
-            break
-    if code != 0:
-        print(f"[warn] agent exited with code {code}; see {log_path}")
-    return code, out, log_path
-
-
-def _write_log(
-    logs_dir: Path,
-    stamp: str,
-    tag: str,
-    cmd: list[str],
-    code: int,
-    *,
-    out: str,
-    err: str,
-    note: str = "",
-) -> Path:
-    """Write process invocation output to a log file.
-
-    Args:
-        logs_dir: Target directory for log output.
-        stamp: Timestamp string.
-        tag: Identifier tag for the invocation.
-        cmd: Executed command arguments.
-        code: Return code of the process.
-        out: Captured standard output.
-        err: Captured standard error.
-        note: Optional note (e.g. timeout indicator).
-
-    Returns:
-        Path to the created log file.
-    """
-    log_path = logs_dir / f"{stamp}-{tag}.log"
-    body = (
-        f"command: {cmd!r}\nexit_code: {code}\n{note}\n"
-        f"{'=' * 20} stdout {'=' * 20}\n{out}\n"
-        f"{'=' * 20} stderr {'=' * 20}\n{err}\n"
-    )
-    log_path.write_text(body, encoding="utf-8")
-    return log_path
-
-
-def print_log_tail(log_path: Path, lines: int = DEFAULT_TAIL_LINES) -> None:
-    """Print the final lines of a log file to standard output.
-
-    Args:
-        log_path: Path to the log file.
-        lines: Maximum number of trailing lines to print.
-    """
-    try:
-        content = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
-    except OSError:
-        return
-    print(f"--- tail of {log_path} ---")
-    for line in content[-lines:]:
-        print(f"  {line}")
-
-
-# ---------------------------------------------------------------------------
-# Handoff markers and git state
-# ---------------------------------------------------------------------------
-
-
-def parse_handoff_block(lines: list[str]) -> dict[str, str] | None:
-    """Parse the nearest STOPPED/ACTIVATING/HANDOFF triple from a line list.
-
-    Scans backwards so earlier iterations' blocks are ignored.
-
-    Args:
-        lines: Lines of a journal or agent final answer.
-
-    Returns:
-        Mapping with 'stopped', 'activating', and 'handoff' keys converted to
-        uppercase if all three lines are found, otherwise None.
-    """
-    block: dict[str, str] = {}
-    for line in reversed(lines):
-        for key, rx in BLOCK_LINE_RES.items():
-            if key in block:
-                continue
-            match = rx.match(line)
-            if match:
-                value = match.group(1).strip("*`_ .;:\"'").upper()
-                if value:
-                    block[key] = value
-        if len(block) == BLOCK_FIELD_COUNT:
-            return block
-    return None
-
-
-def latest_handoff_block(journal: Path) -> dict[str, str] | None:
-    """Read the most recent handoff block from a journal file.
-
-    Args:
-        journal: Path to the markdown journal file.
-
-    Returns:
-        Handoff block mapping if found, otherwise None.
-    """
-    if not journal.exists():
-        return None
-    lines = journal.read_text(encoding="utf-8", errors="replace").splitlines()
-    return parse_handoff_block(lines)
-
-
-def latest_handoff(journal: Path) -> str | None:
-    """Return the most recent HANDOFF status value in a journal, if any.
-
-    Args:
-        journal: Path to the markdown journal file.
-
-    Returns:
-        The status string if found, otherwise None.
-    """
-    block = latest_handoff_block(journal)
-    return block["handoff"] if block else None
-
-
-def parse_next_notes(lines: list[str]) -> str:
-    """Extract the last NEXT AGENT NOTES section, ending at the STOPPED line.
-
-    Args:
-        lines: Lines of a journal or agent final answer.
-
-    Returns:
-        The notes text (possibly multiline), or an empty string when absent.
-    """
-    start: int | None = None
-    for idx in range(len(lines) - 1, -1, -1):
-        if NEXT_NOTES_RE.match(lines[idx]):
-            start = idx
-            break
-    if start is None:
-        return ""
-    first = NEXT_NOTES_RE.match(lines[start])
-    if first is None:
-        return ""
-    first_value = first.group(1).strip()
-    collected: list[str] = [first_value] if first_value else []
-    for line in lines[start + 1 :]:
-        if BLOCK_LINE_RES["stopped"].match(line):
-            break
-        collected.append(line.rstrip())
-    while collected and not collected[-1].strip():
-        collected.pop()
-    return "\n".join(collected).strip()
-
-
-def capture_notes(state: dict[str, Any], journal: Path, from_role: str) -> None:
-    """Scrape NEXT AGENT NOTES from a journal into the run state.
-
-    The notes are injected into the next agent's prompt; they never carry
-    prompt authority, which stays with the orchestrator templates.
-
-    Args:
-        state: Mutable orchestrator state mapping.
-        journal: Path to the role journal just written.
-        from_role: Role that wrote the notes (e.g. 'EXECUTOR').
-    """
-    if not journal.exists():
-        return
-    lines = journal.read_text(encoding="utf-8", errors="replace").splitlines()
-    notes = parse_next_notes(lines)
-    if notes:
-        state["handoff_notes"] = {"from": from_role, "notes": notes}
-
-
-def stdout_handoff_block(stdout: str) -> dict[str, str] | None:
-    """Fallback handoff block parsed from the agent's final answer.
-
-    Args:
-        stdout: Process standard output string.
-
-    Returns:
-        Handoff block mapping if found, otherwise None.
-    """
-    return parse_handoff_block(stdout.splitlines())
-
-
-def resolve_handoff(
-    journal: Path,
-    stdout: str,
-    allowed: set[str],
-    role_name: str,
-    *,
-    log_path: Path,
-    stopped_expected: str,
-    activating_expected: str | dict[str, str],
-    prefer_stdout: bool = False,
-) -> dict[str, str] | None:
-    """Validate the journal handoff block; accept a stdout block as fallback.
-
-    Routing decisions follow HANDOFF; STOPPED must identify the role that
-    just ran (catches role confusion); ACTIVATING is tracked and only warned
-    about on mismatch so a redundant field cannot hard-block the pipeline.
-
-    Args:
-        journal: Path to the role journal file.
-        stdout: Process standard output string.
-        allowed: Set of permissible HANDOFF status strings.
-        role_name: Role display name for messages.
-        log_path: Path to the invocation log file for diagnostics.
-        stopped_expected: Expected STOPPED value (e.g. 'EXECUTOR').
-        activating_expected: Expected ACTIVATING value, either a single string
-            or a per-HANDOFF mapping (e.g. {'READY_FOR_REVIEW': 'REVIEWER',
-            'BLOCKED': 'PLANNER'}) so correct blocked routings never warn.
-        prefer_stdout: Check the agent's final answer first. Used for the
-            close-out invocation, which legitimately empties the journals as
-            part of the task commit, leaving the block only in stdout.
-
-    Returns:
-        The validated handoff block if valid, otherwise None.
-    """
-    if prefer_stdout:
-        alt = stdout_handoff_block(stdout)
-        if alt and alt["stopped"] == stopped_expected and alt["handoff"] in allowed:
-            _warn_activating_mismatch(alt, activating_expected, role_name)
-            return alt
-    block = latest_handoff_block(journal)
-    if block and block["stopped"] == stopped_expected and block["handoff"] in allowed:
-        _warn_activating_mismatch(block, activating_expected, role_name)
-        return block
-    alt = stdout_handoff_block(stdout)
-    if alt and alt["stopped"] == stopped_expected and alt["handoff"] in allowed:
-        print(
-            f"[warn] {role_name} did not write a valid handoff block to its "
-            "journal; accepted the stdout block. Fix prompt compliance "
-            "before real runs."
-        )
-        _warn_activating_mismatch(alt, activating_expected, role_name)
-        return alt
-    found = block or alt
-    sorted_allowed = sorted(allowed)
-    print(
-        f"[FAIL] expected STOPPED {stopped_expected} with HANDOFF one of "
-        f"{sorted_allowed} from {role_name}; found {found}"
-    )
-    print_log_tail(log_path)
-    return None
-
-
-def _warn_activating_mismatch(
-    block: dict[str, str],
-    activating_expected: str | dict[str, str],
-    role_name: str,
-) -> None:
-    """Warn when the agent's ACTIVATING line disagrees with the router plan.
-
-    Args:
-        block: Validated handoff block mapping.
-        activating_expected: Expected ACTIVATING value, or a per-HANDOFF map.
-        role_name: Role display name for messages.
-    """
-    if isinstance(activating_expected, dict):
-        expected = activating_expected.get(block["handoff"], "?")
-    else:
-        expected = activating_expected
-    if block["activating"] != expected:
-        print(
-            f"[warn] {role_name} wrote ACTIVATING {block['activating']}; "
-            f"expected {expected}. Routing follows HANDOFF."
-        )
-
-
-def git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    """Execute a git command in the repository without raising.
-
-    Args:
-        repo: Root path of the git repository.
-        *args: Command line arguments to git.
-
-    Returns:
-        CompletedProcess instance capturing the result.
-    """
-    git_exe = shutil.which("git") or "git"
-    return subprocess.run(  # noqa: S603
-        [git_exe, *args],
-        cwd=str(repo),
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        check=False,
-    )
-
-
-def porcelain_outside_agents(repo: Path) -> list[str]:
-    """Return porcelain status lines excluding untracked .agents/ entries.
-
-    Args:
-        repo: Root path of the git repository.
-
-    Returns:
-        List of porcelain status line strings.
-    """
-    out = git(repo, "status", "--porcelain").stdout.splitlines()
-    return [line for line in out if not line.startswith("?? .agents/")]
-
-
-def entry_gate(cfg: dict[str, Any]) -> str:
-    """Verify idle repository state; return the main baseline commit.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-
-    Returns:
-        The 40-character baseline commit hash string.
-
-    Raises:
-        OrchestratorError: If the repo is dirty, on the wrong branch, or has
-            non-empty journals.
-    """
-    repo: Path = cfg["repo"]
-    if not (repo / ".git").exists():
-        msg = f"{repo} is not a git repository"
-        raise OrchestratorError(msg)
-    branch = git(repo, "branch", "--show-current").stdout.strip()
-    if branch != cfg["main_branch"]:
-        msg = f"Repository must be on '{cfg['main_branch']}' (currently {branch!r})."
-        raise OrchestratorError(msg)
-    dirty = porcelain_outside_agents(repo)
-    if dirty:
-        dirty_list = "\n  ".join(dirty)
-        msg = (
-            "main must be clean before starting a task "
-            f"(untracked .agents/ is ignored):\n  {dirty_list}"
-        )
-        raise OrchestratorError(msg)
-    for journal in cfg["journals"].values():
-        if not journal.exists():
-            msg = f"Missing journal: {journal}"
-            raise OrchestratorError(msg)
-        if journal.stat().st_size != 0:
-            msg = f"Journal {journal} is not empty; an active task may exist."
-            raise OrchestratorError(msg)
-    baseline = git(repo, "rev-parse", "HEAD").stdout.strip()
-    print(f"[ok] entry gate passed; baseline {baseline[:12]}")
-    return baseline
-
-
-# ---------------------------------------------------------------------------
-# Run state
-# ---------------------------------------------------------------------------
-
-
-def save_state(runs_dir: Path, state: dict[str, Any]) -> Path:
-    """Serialize the orchestrator run state dictionary to JSON on disk.
-
-    Args:
-        runs_dir: Target directory for run state files.
-        state: State dictionary to serialize.
-
-    Returns:
-        Path to the written JSON file.
-    """
-    runs_dir.mkdir(parents=True, exist_ok=True)
-    path = runs_dir / f"{state['run_id']}.json"
-    path.write_text(json.dumps(state, indent=2, default=str), encoding="utf-8")
-    return path
-
-
-def load_run(runs_dir: Path, run_id: str | None) -> dict[str, Any]:
-    """Load a saved run state from disk by ID or most recent file.
-
-    Args:
-        runs_dir: Target directory holding saved run state JSON files.
-        run_id: Optional run ID to load; if None, loads the latest run.
-
-    Returns:
-        State dictionary loaded from disk.
-
-    Raises:
-        OrchestratorError: If no run state exists or file is invalid JSON.
-    """
-    if run_id:
-        path = runs_dir / f"{run_id}.json"
-        if not path.exists():
-            msg = f"No saved run {run_id!r} in {runs_dir}"
-            raise OrchestratorError(msg)
-        raw_data: Any = json.loads(path.read_text(encoding="utf-8"))
-        if not isinstance(raw_data, dict):
-            msg = f"Saved run state in {path} is not a valid object"
-            raise OrchestratorError(msg)
-        data: dict[str, Any] = cast("dict[str, Any]", raw_data)
-        return data
-
-    runs = sorted(p for p in runs_dir.glob("*.json") if p.is_file())
-    if not runs:
-        msg = f"No saved runs in {runs_dir}"
-        raise OrchestratorError(msg)
-    raw_data = json.loads(runs[-1].read_text(encoding="utf-8"))
-    if not isinstance(raw_data, dict):
-        msg = f"Saved run state in {runs[-1]} is not a valid object"
-        raise OrchestratorError(msg)
-    data = cast("dict[str, Any]", raw_data)
-    return data
-
-
-def record(
-    state: dict[str, Any],
-    phase: str,
-    block: dict[str, str] | None,
-    log_path: Path,
-) -> None:
-    """Append a step execution entry to the run state history.
-
-    Args:
-        state: Mutable orchestrator state mapping.
-        phase: Current workflow phase name.
-        block: Resolved handoff block (stopped/activating/handoff), if any.
-        log_path: Path to the log file for this invocation.
-    """
-    now_utc = _dt.datetime.now(tz=_dt.UTC)
-    state["history"].append(
-        {
-            "time": now_utc.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
-            "phase": phase,
-            "iteration": state["iteration"],
-            "stopped": (block or {}).get("stopped"),
-            "activating": (block or {}).get("activating"),
-            "handoff": (block or {}).get("handoff"),
-            "log": str(log_path),
-        }
-    )
-
-
-# ---------------------------------------------------------------------------
-# Prompt fields
-# ---------------------------------------------------------------------------
-
-
-def build_fields(
-    task: dict[str, Any], state: dict[str, Any], cfg: dict[str, Any]
-) -> dict[str, Any]:
-    """Construct the replacement fields dictionary for template rendering.
-
-    Args:
-        task: Task definition dictionary.
-        state: Active run state mapping.
-        cfg: Consolidated orchestration configuration mapping.
-
-    Returns:
-        Mapping of placeholder keys to string values.
-    """
-    branch_val = state.get("branch") or "(created by the Planner)"
-    base_val = state.get("baseline") or "(recorded by the Planner)"
-    notes_val = cast("dict[str, Any]", state.get("handoff_notes") or {})
-    notes_txt = (
-        f"From {notes_val.get('from', 'UNKNOWN')}: {notes_val.get('notes', '')}"
-        if notes_val.get("notes")
-        else "None"
-    )
-    return {
-        "repo_path": str(cfg["repo"]),
-        "task_kind": task.get("task_kind", "feature"),
-        "task_id": task["task_id"],
-        "task_slug": task["task_slug"],
-        "task_name": task.get("task_name", task["task_id"]),
-        "task_request": task["task_request"],
-        "additional_context": task.get("additional_context", "None"),
-        "exclusions": task.get("exclusions", "None"),
-        "owner_execution_notes": task.get("owner_execution_notes", "None"),
-        "review_focus": task.get("review_focus", "None"),
-        "implementation_file": task.get("implementation_file", "(none)"),
-        "implementation_entry": task.get("implementation_entry", "(none)"),
-        "iteration": state["iteration"],
-        "branch": branch_val,
-        "baseline_commit": base_val,
-        "blocker_ledger": blocker_ledger_text(state),
-        "handoff_notes": notes_txt,
-        "correction_context": correction_text(state),
-    }
-
-
-def correction_text(state: dict[str, Any]) -> str:
-    """Generate correction/blocker context instructions for iteration > 1.
-
-    A blocker raised by the previous iteration turns the current dry run into
-    a minimal blocker-resolution plan; the original task scope is explicitly
-    suspended and resumes in the following dry run.
-
-    Args:
-        state: Active run state mapping.
-
-    Returns:
-        Formatted context text, or empty string for iteration 1.
-    """
-    iteration = state["iteration"]
-    if iteration <= 1:
-        return ""
-    blockers: list[dict[str, Any]] = state.get("blockers", [])
-    # Only EXECUTOR-raised blockers turn a dry run into a minimal
-    # blocker-resolution plan; PLANNER gate failures are retried as the
-    # original dry run after the owner resolves the cause.
-    pending = [
-        b
-        for b in blockers
-        if b.get("status") == "OPEN"
-        and b.get("iteration") == iteration - 1
-        and b.get("raised_by") == "EXECUTOR"
-    ]
-    parts: list[str] = []
-    if pending:
-        pending_txt = "; ".join(
-            f"{b['raised_by']} at iteration {b['iteration']}"
-            + (f": {b['description']}" if b.get("description") else "")
-            for b in pending
-        )
-        parts.append(
-            f"This is a BLOCKER-RESOLUTION dry run (Dry Run {iteration}). The "
-            f"previous iteration was blocked — {pending_txt}. Plan ONLY the "
-            "minimal scope needed to resolve the blocker(s). The ORIGINAL task "
-            "scope is suspended and continues in the next dry run after this "
-            "resolution is implemented; do not expand into it here."
-        )
-    else:
-        parts.append(
-            f"This is correction iteration {iteration} of the ORIGINAL task. "
-            f"The previous iteration ended with: "
-            f"{state.get('last_event', 'unknown')}."
-        )
-        last_event = state.get("last_event", "")
-        if last_event.startswith("Reviewer"):
-            parts.append(
-                "Address every required correction recorded in "
-                "`docs/dev/task/reviewer.md` for the latest review before "
-                "re-planning."
-            )
-        elif last_event.startswith("owner rejected"):
-            parts.append(
-                "Incorporate the owner direction below into the revised dry run."
-            )
-    resolved = [b for b in blockers if b.get("status") == "RESOLVED"]
-    if resolved:
-        ledger = "; ".join(
-            f"{b['raised_by']} blocker from iteration {b['iteration']} "
-            f"resolved by Dry Run {b.get('resolved_by')}"
-            for b in resolved
-        )
-        parts.append(f"Blocker ledger (already resolved): {ledger}.")
-    parts.append(
-        "Read the complete journal history in docs/dev/task/, explicitly "
-        "inventory every retained changed and untracked path, state whether "
-        "each is retained, changed, or rolled back, and append the complete "
-        f"`Dry Run {iteration}` per AGENTS.md."
-    )
-    feedback = state.get("owner_feedback", "").strip()
-    if feedback:
-        parts.append(f"Owner direction for this dry run: {feedback}")
-    return "\n".join(parts)
-
-
-# ---------------------------------------------------------------------------
-# Owner approval gate
-# ---------------------------------------------------------------------------
-
-
-def _collect_rejection_feedback() -> str:
-    """Prompt the owner interactively for dry run correction feedback.
-
-    Returns:
-        Multiline feedback string entered by the user.
-    """
-    print("Enter planning feedback (finish with a line containing only '.'):")
-    lines: list[str] = []
-    while True:
-        try:
-            line = input()
-        except EOFError:
-            break
-        if line.strip() == ".":
-            break
-        lines.append(line)
-    return "\n".join(lines).strip()
-
-
-def request_approval(
-    auto_approve: bool,
-    *,
-    approved: bool = False,
-    reject_feedback: str | None = None,
-) -> tuple[bool, str]:
-    """Prompt the owner to approve, reject, or abort a planned dry run.
-
-    Args:
-        auto_approve: If True, bypass the owner gate automatically.
-        approved: Scripted relay of an explicit owner approval (--approved).
-        reject_feedback: Scripted relay of an owner rejection with feedback
-            (--reject-feedback); implies rejection when not None.
-
-    Returns:
-        Tuple of (approved_bool, owner_feedback_for_next_dry_run).
-
-    Raises:
-        KeyboardInterrupt: If the user chooses to abort execution.
-    """
-    if approved:
-        print("[gate] --approved: relaying explicit owner approval.")
-        return True, ""
-    if reject_feedback is not None:
-        print("[gate] --reject-feedback: relaying owner rejection to the Planner.")
-        return False, reject_feedback
-    if auto_approve:
-        print("[warn] --auto-approve: bypassing the owner approval gate.")
-        return True, ""
-    print("\nOwner approval required. Options:")
-    print("  APPROVED: EXECUTE   authorize this dry run")
-    print("  reject              send back to the Planner with feedback")
-    abort_msg = "  abort               stop the orchestrator (state saved, resumable)\n"
-    print(abort_msg)
-    while True:
-        try:
-            answer = input("Approve Dry Run? > ").strip()
-        except EOFError:
-            answer = "abort"
-        if answer == "APPROVED: EXECUTE":
-            return True, ""
-        lowered = answer.lower()
-        if lowered in ("reject", "r"):
-            feedback = _collect_rejection_feedback()
-            return False, feedback
-        if lowered in ("abort", "a"):
-            raise KeyboardInterrupt
-        print("Unrecognized input; type APPROVED: EXECUTE, reject, or abort.")
-
-
-def _request_commit_authorization(
-    auto_approve: bool,
-    *,
-    approved: bool = False,
-    reject_feedback: str | None = None,
-) -> tuple[bool, str]:
-    """Prompt the owner to authorize the final task commit, or reject it.
-
-    Args:
-        auto_approve: If True, bypass the commit gate automatically (tests).
-        approved: Scripted relay of an explicit --approved-commit decision.
-        reject_feedback: Scripted owner rejection (--reject-commit-feedback);
-            implies rejection when not None.
-
-    Returns:
-        Tuple of (authorized_bool, owner_feedback_for_next_dry_run).
-
-    Raises:
-        KeyboardInterrupt: If the user chooses to abort execution.
-    """
-    if approved:
-        print("[gate] --approved-commit: relaying explicit commit authorization.")
-        return True, ""
-    if reject_feedback is not None:
-        print("[gate] --reject-commit-feedback: returning the task to the Planner.")
-        return False, reject_feedback
-    if auto_approve:
-        print("[warn] auto-approving the commit gate (test mode only).")
-        return True, ""
-    print("\nCommit authorization required. All verification passed.")
-    print("  Inspect the branch yourself first if you want a human look, e.g.:")
-    print("    git diff <baseline>..HEAD   /   git show --stat HEAD")
-    print("  APPROVED: COMMIT     authorize the close-out commit and merge")
-    print("  reject               send back to the Planner with feedback")
-    print("  abort                stop (state saved, resumable)\n")
-    while True:
-        try:
-            answer = input("Authorize commit? > ").strip()
-        except EOFError:
-            answer = "abort"
-        if answer == "APPROVED: COMMIT":
-            return True, ""
-        lowered = answer.lower()
-        if lowered in ("reject", "r"):
-            feedback = _collect_rejection_feedback()
-            return False, feedback
-        if lowered in ("abort", "a"):
-            raise KeyboardInterrupt
-        print("Unrecognized input; type APPROVED: COMMIT, reject, or abort.")
-
-
-def _record_blocker(state: dict[str, Any], raised_by: str, *, journal: Path) -> None:
-    """Record an OPEN blocker in the run state and update ``last_event``.
-
-    The description is extracted automatically from the blocking agent's
-    latest NEXT AGENT NOTES (the agent's own targeted summary of the blocker),
-    so the owner is never asked to re-describe what the agent already
-    documented in its journal.
-
-    Args:
-        state: Mutable orchestrator state mapping.
-        raised_by: Role that raised the blocker ('PLANNER' or 'EXECUTOR').
-        journal: Path to the blocking role's journal.
-    """
-    description = ""
-    if journal.exists():
-        lines = journal.read_text(encoding="utf-8", errors="replace").splitlines()
-        description = parse_next_notes(lines)
-    if len(description) > MAX_BLOCKER_DESC_LEN:
-        description = description[:MAX_BLOCKER_DESC_LEN].rstrip() + " ..."
-    now_utc = _dt.datetime.now(tz=_dt.UTC)
-    state.setdefault("blockers", []).append(
-        {
-            "iteration": state["iteration"],
-            "raised_by": raised_by,
-            "description": description,
-            "status": "OPEN",
-            "time": now_utc.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
-        }
-    )
-    state["last_event"] = f"{raised_by.title()} iteration {state['iteration']} BLOCKED"
-    print(f"\n[blocker] {state['last_event']}")
-    print(f"    evidence: {journal}")
-    if description:
-        print(f"    agent notes: {description}")
-
-
-def blocker_ledger_text(state: dict[str, Any]) -> str:
-    """Format the blocker ledger for prompt templates.
-
-    Args:
-        state: Active run state mapping.
-
-    Returns:
-        Human-readable ledger string, or 'None' when no blockers exist.
-    """
-    blockers: list[dict[str, Any]] = state.get("blockers", [])
-    if not blockers:
-        return "None"
-    entries: list[str] = []
-    for b in blockers:
-        entry = f"{b['raised_by']} iteration {b['iteration']} ({b['status']}"
-        if b.get("resolved_by"):
-            entry += f", resolved by Dry Run {b['resolved_by']}"
-        if b.get("description"):
-            entry += f": {b['description']}"
-        entries.append(entry + ")")
-    return "; ".join(entries)
-
-
-# ---------------------------------------------------------------------------
-# State-machine router
-# ---------------------------------------------------------------------------
-
-
-def banner(title: str) -> None:
-    """Print a prominent section header banner to standard output.
-
-    Args:
-        title: Banner title text.
-    """
-    print("\n" + "=" * 70)
-    print(f" {title}")
-    print("=" * 70)
-
-
-def _handle_plan_phase(
-    cfg: dict[str, Any],
-    state: dict[str, Any],
-    *,
-    self_test: bool,
-) -> bool:
-    """Execute the Planner dry-run phase.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-        state: Mutable orchestrator state mapping.
-        self_test: Whether running in self-test sandbox mode.
-
-    Returns:
-        True if the router loop should continue, False to stop.
-
-    Raises:
-        OrchestratorError: If planning fails or branch is unexpected.
-    """
-    it = state["iteration"]
-    banner(f"PLANNER — Dry Run {it}")
-    fields = build_fields(state["task"], state, cfg)
-    prompt = compose_prompt(cfg["templates"]["planner"], fields)
-    tag = f"{state['run_id']}-planner-dry-run-{it}"
-    _, out, log = run_agent(
-        cfg["roles"]["planner"],
-        prompt,
-        cfg["repo"],
-        cfg["logs_dir"],
-        tag,
-        timeout=cfg["timeout"],
-        stream=cfg["stream_agent_output"],
-        heartbeat=cfg["stream_heartbeat_seconds"],
-        retries=cfg["agent_retry_attempts"],
-    )
-    block = resolve_handoff(
-        cfg["journals"]["planner"],
-        out,
-        {"PENDING_APPROVAL", "BLOCKED"},
-        "Planner",
-        log_path=log,
-        stopped_expected="PLANNER",
-        activating_expected="PLANNER",
-    )
-    record(state, "plan", block, log)
-    marker = block["handoff"] if block else None
-    if marker is None:
-        state["status"] = "FAILED"
-        save_state(cfg["runs_dir"], state)
-        msg = "Planner produced no valid handoff block; stopping (fail closed)."
-        raise OrchestratorError(msg)
-    capture_notes(state, cfg["journals"]["planner"], "PLANNER")
-    if marker == "BLOCKED":
-        _record_blocker(state, "PLANNER", journal=cfg["journals"]["planner"])
-        state["status"] = "PLANNER_BLOCKED"
-        state["phase"] = "done"
-        save_state(cfg["runs_dir"], state)
-        banner("Planner BLOCKED — owner decision required")
-        print("See docs/dev/task/planner.md for evidence and required action.")
-        print("Fix the cause, then: python .agents/orchestrator.py resume")
-        return True
-
-    if not self_test:
-        branch = git(cfg["repo"], "branch", "--show-current").stdout.strip()
-        if branch in ("", cfg["main_branch"]):
-            state["status"] = "FAILED"
-            save_state(cfg["runs_dir"], state)
-            msg = (
-                "Planner reported PENDING_APPROVAL but repository is still on "
-                f"{branch!r}; expected the new task branch."
-            )
-            raise OrchestratorError(msg)
-        state["branch"] = branch
-    elif not state.get("branch"):
-        state["branch"] = "feature/feat-demo-demo-task"
-
-    state["phase"] = "approve"
-    save_state(cfg["runs_dir"], state)
-    return True
-
-
-def _handle_approve_phase(
-    cfg: dict[str, Any],
-    state: dict[str, Any],
-    *,
-    auto_approve: bool,
-    approved: bool = False,
-    reject_feedback: str | None = None,
-) -> None:
-    """Execute the Owner approval phase.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-        state: Mutable orchestrator state mapping.
-        auto_approve: Whether to auto-approve without interactive prompt.
-        approved: Scripted owner approval relay (--approved).
-        reject_feedback: Scripted owner rejection feedback (--reject-feedback).
-    """
-    it = state["iteration"]
-    banner(f"OWNER GATE — approve Dry Run {it}")
-    approved_decision, feedback = request_approval(
-        auto_approve, approved=approved, reject_feedback=reject_feedback
-    )
-    if approved_decision:
-        state["phase"] = "approval_record"
-    else:
-        state["last_event"] = f"owner rejected Dry Run {it}"
-        state["owner_feedback"] = feedback
-        state["iteration"] = it + 1
-        state["phase"] = "plan"
-    save_state(cfg["runs_dir"], state)
-
-
-def _handle_approval_record_phase(
-    cfg: dict[str, Any],
-    state: dict[str, Any],
-) -> None:
-    """Execute the Planner approval recording phase.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-        state: Mutable orchestrator state mapping.
-
-    Raises:
-        OrchestratorError: If recording approval fails.
-    """
-    it = state["iteration"]
-    banner(f"PLANNER — record approval for Dry Run {it}")
-    fields = build_fields(state["task"], state, cfg)
-    approval_fields = {
-        "repo_path": fields["repo_path"],
-        "branch": state["branch"],
-        "task_id": fields["task_id"],
-        "iteration": it,
-        "baseline_commit": state.get("baseline") or fields["baseline_commit"],
-        "handoff_notes": fields["handoff_notes"],
-    }
-    prompt = compose_prompt(cfg["templates"]["planner_approval"], approval_fields)
-    tag = f"{state['run_id']}-planner-approval-{it}"
-    _, out, log = run_agent(
-        cfg["roles"]["planner"],
-        prompt,
-        cfg["repo"],
-        cfg["logs_dir"],
-        tag,
-        timeout=cfg["timeout"],
-        stream=cfg["stream_agent_output"],
-        heartbeat=cfg["stream_heartbeat_seconds"],
-        retries=cfg["agent_retry_attempts"],
-        approval=True,
-    )
-    block = resolve_handoff(
-        cfg["journals"]["planner"],
-        out,
-        {"APPROVED_EXECUTE", "BLOCKED"},
-        "Planner (approval)",
-        log_path=log,
-        stopped_expected="PLANNER",
-        activating_expected="EXECUTOR",
-    )
-    record(state, "approval_record", block, log)
-    marker = block["handoff"] if block else None
-    if marker != "APPROVED_EXECUTE":
-        state["status"] = "FAILED"
-        save_state(cfg["runs_dir"], state)
-        msg = "Planner failed to record the approval; stopping (fail closed)."
-        raise OrchestratorError(msg)
-    capture_notes(state, cfg["journals"]["planner"], "PLANNER")
-    state["phase"] = "executor"
-    save_state(cfg["runs_dir"], state)
-
-
-def _handle_executor_phase(
-    cfg: dict[str, Any],
-    state: dict[str, Any],
-) -> None:
-    """Execute the Executor implementation phase.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-        state: Mutable orchestrator state mapping.
-
-    Raises:
-        OrchestratorError: If execution yields no valid marker.
-    """
-    it = state["iteration"]
-    banner(f"EXECUTOR — implement Dry Run {it}")
-    fields = build_fields(state["task"], state, cfg)
-    prompt = compose_prompt(cfg["templates"]["executor"], fields)
-    tag = f"{state['run_id']}-executor-{it}"
-    _, out, log = run_agent(
-        cfg["roles"]["executor"],
-        prompt,
-        cfg["repo"],
-        cfg["logs_dir"],
-        tag,
-        timeout=cfg["timeout"],
-        stream=cfg["stream_agent_output"],
-        heartbeat=cfg["stream_heartbeat_seconds"],
-        retries=cfg["agent_retry_attempts"],
-    )
-    block = resolve_handoff(
-        cfg["journals"]["executor"],
-        out,
-        {"READY_FOR_REVIEW", "BLOCKED"},
-        "Executor",
-        log_path=log,
-        stopped_expected="EXECUTOR",
-        activating_expected={"READY_FOR_REVIEW": "REVIEWER", "BLOCKED": "PLANNER"},
-    )
-    record(state, "executor", block, log)
-    marker = block["handoff"] if block else None
-    if marker is None:
-        state["status"] = "FAILED"
-        save_state(cfg["runs_dir"], state)
-        msg = "Executor produced no valid handoff block; stopping (fail closed)."
-        raise OrchestratorError(msg)
-    capture_notes(state, cfg["journals"]["executor"], "EXECUTOR")
-    if marker == "BLOCKED":
-        _record_blocker(state, "EXECUTOR", journal=cfg["journals"]["executor"])
-        state["owner_feedback"] = ""
-        state["iteration"] = it + 1
-        state["phase"] = "plan"
-    else:
-        for blocker in state.get("blockers", []):
-            if blocker["status"] == "OPEN":
-                blocker["status"] = "RESOLVED"
-                blocker["resolved_by"] = it
-        state["phase"] = "reviewer"
-    save_state(cfg["runs_dir"], state)
-
-
-def _handle_reviewer_phase(
-    cfg: dict[str, Any],
-    state: dict[str, Any],
-    *,
-    self_test: bool,
-) -> bool:
-    """Execute the Reviewer evaluation phase.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-        state: Mutable orchestrator state mapping.
-        self_test: Whether running in self-test sandbox mode.
-
-    Returns:
-        True if routing should continue, False if ACCEPTED or terminal.
-
-    Raises:
-        OrchestratorError: If review yields no valid marker.
-    """
-    it = state["iteration"]
-    banner(f"REVIEWER — review Dry Run {it} / Report {it}")
-    fields = build_fields(state["task"], state, cfg)
-    prompt = compose_prompt(cfg["templates"]["reviewer"], fields)
-    tag = f"{state['run_id']}-reviewer-{it}"
-    _, out, log = run_agent(
-        cfg["roles"]["reviewer"],
-        prompt,
-        cfg["repo"],
-        cfg["logs_dir"],
-        tag,
-        timeout=cfg["timeout"],
-        stream=cfg["stream_agent_output"],
-        heartbeat=cfg["stream_heartbeat_seconds"],
-        retries=cfg["agent_retry_attempts"],
-    )
-    block = resolve_handoff(
-        cfg["journals"]["reviewer"],
-        out,
-        {"ACCEPTED", "CHANGES_REQUESTED", "PENDING_COMMIT"},
-        "Reviewer",
-        log_path=log,
-        stopped_expected="REVIEWER",
-        activating_expected={
-            "ACCEPTED": "NONE",
-            "CHANGES_REQUESTED": "PLANNER",
-            "PENDING_COMMIT": "REVIEWER",
-        },
-    )
-    record(state, "reviewer", block, log)
-    marker = block["handoff"] if block else None
-    if marker is None:
-        state["status"] = "FAILED"
-        save_state(cfg["runs_dir"], state)
-        msg = "Reviewer produced no valid handoff block; stopping (fail closed)."
-        raise OrchestratorError(msg)
-    capture_notes(state, cfg["journals"]["reviewer"], "REVIEWER")
-    if marker == "CHANGES_REQUESTED":
-        state["last_event"] = f"Reviewer Review {it} CHANGES_REQUESTED"
-        state["owner_feedback"] = ""
-        state["iteration"] = it + 1
-        state["phase"] = "plan"
-        save_state(cfg["runs_dir"], state)
-        return True
-    if marker == "PENDING_COMMIT":
-        state["phase"] = "commit_gate"
-        save_state(cfg["runs_dir"], state)
-        return True
-
-    print(
-        "[warn] Reviewer reached ACCEPTED without pausing at PENDING_COMMIT; "
-        "the owner commit gate was bypassed. Prompt compliance issue."
-    )
-    state["status"] = "ACCEPTED"
-    state["handoff_notes"] = None
-    state["phase"] = "done"
-    save_state(cfg["runs_dir"], state)
-    banner("REVIEWER ACCEPTED — verifying close-out")
-    _verify_close_out(cfg, self_test=self_test)
-    return False
-
-
-def _verify_close_out(cfg: dict[str, Any], *, self_test: bool) -> None:
-    """Verify git and journal state after Reviewer acceptance.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-        self_test: Whether running in self-test sandbox mode.
-    """
-    if self_test:
-        print("    (self-test mode: git close-out checks skipped)")
-        return
-    repo = cfg["repo"]
-    journals = cfg["journals"]
-    branch = git(repo, "branch", "--show-current").stdout.strip()
-    dirty = porcelain_outside_agents(repo)
-    empty_journals = all(journals[name].stat().st_size == 0 for name in journals)
-    print(f"    branch: {branch} (expected {cfg['main_branch']})")
-    print(f"    main dirty entries outside .agents/: {len(dirty)}")
-    print(f"    journals emptied: {empty_journals}")
-    if branch == cfg["main_branch"] and not dirty and empty_journals:
-        last = git(repo, "log", "-1", "--format=%h %s").stdout.strip()
-        print(f"[ok] close-out verified; main HEAD: {last}")
-    else:
-        print("[warn] close-out state unexpected; inspect manually.")
-
-
-def _handle_commit_gate_phase(
-    cfg: dict[str, Any],
-    state: dict[str, Any],
-    *,
-    auto_approve: bool,
-    approved: bool = False,
-    reject_feedback: str | None = None,
-) -> None:
-    """Execute the owner commit gate after Reviewer verification passed.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-        state: Mutable orchestrator state mapping.
-        auto_approve: Whether to auto-approve without interactive prompt.
-        approved: Scripted commit authorization relay (--approved-commit).
-        reject_feedback: Scripted rejection (--reject-commit-feedback).
-    """
-    it = state["iteration"]
-    banner(f"OWNER COMMIT GATE — Review {it} passed; authorize the task commit")
-    baseline = state.get("baseline") or "<baseline>"
-    print(f"    human review hint: git diff {baseline}..HEAD  /  git show --stat HEAD")
-    authorized, feedback = _request_commit_authorization(
-        auto_approve, approved=approved, reject_feedback=reject_feedback
-    )
-    if authorized:
-        state["phase"] = "commit_record"
-    else:
-        state["last_event"] = f"owner rejected the commit after Review {it}"
-        state["owner_feedback"] = feedback
-        state["iteration"] = it + 1
-        state["phase"] = "plan"
-    save_state(cfg["runs_dir"], state)
-
-
-def _handle_commit_record_phase(
-    cfg: dict[str, Any],
-    state: dict[str, Any],
-    *,
-    self_test: bool,
-) -> bool:
-    """Execute the authorized Reviewer close-out (commit, merge, cleanup).
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-        state: Mutable orchestrator state mapping.
-        self_test: Whether running in self-test sandbox mode.
-
-    Returns:
-        True if routing should continue, False if the task is complete.
-
-    Raises:
-        OrchestratorError: If the close-out yields no valid marker.
-    """
-    it = state["iteration"]
-    banner(f"REVIEWER — authorized close-out for Review {it}")
-    fields = build_fields(state["task"], state, cfg)
-    commit_fields = {
-        "repo_path": fields["repo_path"],
-        "branch": state["branch"],
-        "task_id": fields["task_id"],
-        "iteration": it,
-        "baseline_commit": state.get("baseline") or fields["baseline_commit"],
-    }
-    prompt = compose_prompt(cfg["templates"]["reviewer_commit"], commit_fields)
-    tag = f"{state['run_id']}-reviewer-commit-{it}"
-    _, out, log = run_agent(
-        cfg["roles"]["reviewer"],
-        prompt,
-        cfg["repo"],
-        cfg["logs_dir"],
-        tag,
-        timeout=cfg["timeout"],
-        stream=cfg["stream_agent_output"],
-        heartbeat=cfg["stream_heartbeat_seconds"],
-        retries=cfg["agent_retry_attempts"],
-        approval=True,
-    )
-    # The close-out empties the journals, so the final-answer block is the
-    # expected source for the ACCEPTED marker here.
-    block = resolve_handoff(
-        cfg["journals"]["reviewer"],
-        out,
-        {"ACCEPTED", "CHANGES_REQUESTED", "BLOCKED"},
-        "Reviewer (close-out)",
-        log_path=log,
-        stopped_expected="REVIEWER",
-        activating_expected={
-            "ACCEPTED": "NONE",
-            "CHANGES_REQUESTED": "PLANNER",
-            "BLOCKED": "NONE",
-        },
-        prefer_stdout=True,
-    )
-    record(state, "commit_record", block, log)
-    marker = block["handoff"] if block else None
-    if marker == "ACCEPTED":
-        state["status"] = "ACCEPTED"
-        state["handoff_notes"] = None
-        state["phase"] = "done"
-        save_state(cfg["runs_dir"], state)
-        banner("REVIEWER ACCEPTED — verifying close-out")
-        _verify_close_out(cfg, self_test=self_test)
-        return False
-    if marker == "CHANGES_REQUESTED":
-        state["last_event"] = f"Reviewer close-out failed after Review {it}"
-        state["owner_feedback"] = ""
-        state["iteration"] = it + 1
-        state["phase"] = "plan"
-        save_state(cfg["runs_dir"], state)
-        return True
-    state["status"] = "FAILED"
-    save_state(cfg["runs_dir"], state)
-    msg = "Reviewer close-out produced no ACCEPTED block; stopping (fail closed)."
-    raise OrchestratorError(msg)
-
-
-def _route_phase(
-    cfg: dict[str, Any],
-    state: dict[str, Any],
-    *,
-    auto_approve: bool,
-    self_test: bool,
-    approved: bool,
-    reject_feedback: str | None,
-    commit_approved: bool,
-    commit_reject_feedback: str | None,
-) -> bool:
-    """Execute a single state-machine phase.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-        state: Mutable orchestrator state mapping.
-        auto_approve: Whether gates may be bypassed (self-test only).
-        self_test: Whether running in self-test sandbox mode.
-        approved: Scripted owner approval for one gate.
-        reject_feedback: Scripted owner rejection for one gate.
-        commit_approved: Scripted commit authorization for one commit gate.
-        commit_reject_feedback: Scripted commit-gate rejection.
-
-    Returns:
-        True while the router loop should continue; False when the run is
-        complete or terminal.
-
-    Raises:
-        OrchestratorError: If the saved phase is unrecognized.
-    """
-    phase = state["phase"]
-    if phase == "plan":
-        _handle_plan_phase(cfg, state, self_test=self_test)
-    elif phase == "approve":
-        _handle_approve_phase(
-            cfg,
-            state,
-            auto_approve=auto_approve,
-            approved=approved,
-            reject_feedback=reject_feedback,
-        )
-    elif phase == "approval_record":
-        _handle_approval_record_phase(cfg, state)
-    elif phase == "executor":
-        _handle_executor_phase(cfg, state)
-    elif phase == "reviewer":
-        return _handle_reviewer_phase(cfg, state, self_test=self_test)
-    elif phase == "commit_gate":
-        _handle_commit_gate_phase(
-            cfg,
-            state,
-            auto_approve=auto_approve,
-            approved=commit_approved,
-            reject_feedback=commit_reject_feedback,
-        )
-    elif phase == "commit_record":
-        return _handle_commit_record_phase(cfg, state, self_test=self_test)
-    elif phase == "done":
-        return False
-    else:
-        msg = f"Unknown phase {phase!r} in saved state."
-        raise OrchestratorError(msg)
-    return True
-
-
-def router(
-    cfg: dict[str, Any],
-    state: dict[str, Any],
-    *,
-    auto_approve: bool = False,
-    self_test: bool = False,
-    approved: bool = False,
-    reject_feedback: str | None = None,
-    commit_approved: bool = False,
-    commit_reject_feedback: str | None = None,
-) -> dict[str, Any]:
-    """Run phases until ACCEPTED, a stop condition, or owner interruption.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-        state: Mutable orchestrator state mapping.
-        auto_approve: If True, bypass the owner gate.
-        self_test: If True, operate in self-test stub mode.
-        approved: Scripted owner approval relayed for one gate (--approved).
-        reject_feedback: Scripted owner rejection for one gate
-            (--reject-feedback); takes precedence over `approved`.
-        commit_approved: Scripted commit authorization for one commit gate
-            (--approved-commit).
-        commit_reject_feedback: Scripted commit-gate rejection
-            (--reject-commit-feedback); takes precedence over
-            `commit_approved`.
-
-    Returns:
-        Final state dictionary upon completion or stop condition.
-
-    Raises:
-        OrchestratorError: If an unrecognized phase or fatal condition occurs.
-    """
-    while True:
-        if state["iteration"] > cfg["max_iterations"]:
-            state["status"] = "MAX_ITERATIONS"
-            save_state(cfg["runs_dir"], state)
-            banner(f"Stopped: exceeded max iterations ({cfg['max_iterations']})")
-            return state
-
-        phase = state["phase"]
-        should_continue = _route_phase(
-            cfg,
-            state,
-            auto_approve=auto_approve,
-            self_test=self_test,
-            approved=approved,
-            reject_feedback=reject_feedback,
-            commit_approved=commit_approved,
-            commit_reject_feedback=commit_reject_feedback,
-        )
-        # Scripted gate decisions are one-shot: never reuse them for a later
-        # gate reached in the same router loop (e.g. after a rejection loops
-        # back through planning to another gate).
-        if phase == "approve":
-            approved = False
-            reject_feedback = None
-        elif phase == "commit_gate":
-            commit_approved = False
-            commit_reject_feedback = None
-        if not should_continue:
-            return state
-
-
-# ---------------------------------------------------------------------------
-# Subcommands
-# ---------------------------------------------------------------------------
-
-
-TASK_REQUIRED = ("task_id", "task_slug", "task_request")
-
-
-def collect_task(args: argparse.Namespace) -> dict[str, str]:
-    """Extract and validate task definition fields from CLI arguments or TOML.
-
-    Args:
-        args: Parsed command line arguments namespace.
-
-    Returns:
-        Dictionary of validated task fields.
-
-    Raises:
-        OrchestratorError: If required fields are missing or slug is invalid.
-    """
+def _collect_task(args: argparse.Namespace) -> dict[str, str]:
     if args.task_file:
-        task: dict[str, str] = load_toml(Path(args.task_file).resolve())
+        task = {key: str(value) for key, value in _load_toml(Path(args.task_file).resolve()).items()}
     else:
-        task = {
-            key: str(getattr(args, key))
-            for key in (
-                "task_kind",
-                "task_id",
-                "task_slug",
-                "task_name",
-                "task_request",
-                "additional_context",
-                "exclusions",
-                "owner_execution_notes",
-                "review_focus",
-                "implementation_file",
-                "implementation_entry",
-            )
-            if getattr(args, key, None) is not None
-        }
+        keys = (
+            "task_kind",
+            "task_id",
+            "task_slug",
+            "task_name",
+            "task_request",
+            "additional_context",
+            "exclusions",
+            "owner_execution_notes",
+            "review_focus",
+            "implementation_file",
+            "implementation_entry",
+        )
+        task = {key: str(getattr(args, key)) for key in keys if getattr(args, key, None) is not None}
     missing = [key for key in TASK_REQUIRED if not task.get(key)]
     if missing:
-        msg = f"Task fields missing: {missing}"
-        raise OrchestratorError(msg)
+        raise OrchestratorError(f"Missing task fields: {missing}")
     if not SLUG_RE.match(task["task_slug"]):
-        msg = (
-            f"task_slug {task['task_slug']!r} must be lowercase "
-            "filesystem-safe (letters, digits, '.', '_', '-')."
-        )
-        raise OrchestratorError(msg)
+        raise OrchestratorError("task_slug must be lowercase filesystem-safe text.")
     return task
 
 
 def cmd_start(args: argparse.Namespace) -> int:
-    """Execute the 'start' subcommand to begin a new task workflow.
-
-    Args:
-        args: Parsed command line arguments namespace.
-
-    Returns:
-        Exit code: 0 on success, 130 on interrupt, 1 on failure.
-    """
     cfg = assemble_config(args.repo)
     if args.max_iterations:
         cfg["max_iterations"] = args.max_iterations
-    task = collect_task(args)
-    baseline = entry_gate(cfg)
-
-    now_utc = _dt.datetime.now(tz=_dt.UTC)
-    stamp = now_utc.strftime("%Y%m%d-%H%M%S")
+    task = _collect_task(args)
+    baseline = _entry_gate(cfg)
+    stamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S")
     state: dict[str, Any] = {
         "run_id": f"{stamp}-{task['task_slug']}",
         "task": task,
-        "iteration": 1,
-        "phase": "plan",
-        "status": "RUNNING",
         "baseline": baseline,
         "branch": None,
-        "last_event": "",
+        "iteration": 1,
+        "phase": "initial_planner",
+        "status": "RUNNING",
         "owner_feedback": "",
+        "correction_context": "None",
         "blockers": [],
-        "handoff_notes": None,
         "history": [],
+        "next_agent": None,
     }
-    path = save_state(cfg["runs_dir"], state)
-    print(f"[ok] run {state['run_id']} started; state: {path}")
+    _save_state(cfg, state)
     try:
-        router(
+        result = router(
             cfg,
             state,
             auto_approve=args.auto_approve,
@@ -1936,55 +69,17 @@ def cmd_start(args: argparse.Namespace) -> int:
             commit_reject_feedback=args.reject_commit_feedback,
         )
     except KeyboardInterrupt:
-        state["status"] = "INTERRUPTED"
-        save_state(cfg["runs_dir"], state)
-        print("\n[interrupted] Run state saved; resume with:")
-        print(f"  python .agents/orchestrator.py resume --run-id {state['run_id']}")
+        _save_state(cfg, state)
+        print("\nStopped by owner; run state saved.")
         return 130
-    return 0 if state.get("status") == "ACCEPTED" else 1
+    return 0 if result.get("status") == "ACCEPTED" else 0
 
 
 def cmd_resume(args: argparse.Namespace) -> int:
-    """Execute the 'resume' subcommand to continue an interrupted task.
-
-    Args:
-        args: Parsed command line arguments namespace.
-
-    Returns:
-        Exit code: 0 on success, 130 on interrupt, 1 on failure.
-    """
     cfg = assemble_config(args.repo)
     if args.max_iterations:
         cfg["max_iterations"] = args.max_iterations
-    run_id_val = getattr(args, "run_id", None)
-    run_id: str | None = str(run_id_val) if run_id_val is not None else None
-    state: dict[str, Any] = load_run(cfg["runs_dir"], run_id)
-    print(
-        f"[ok] resuming run {state['run_id']} at phase {state['phase']!r}, "
-        f"iteration {state['iteration']}, status {state['status']}"
-    )
-    if state["phase"] == "done" and state.get("status") == "PLANNER_BLOCKED":
-        repo_branch = git(cfg["repo"], "branch", "--show-current").stdout.strip()
-        if repo_branch == cfg["main_branch"]:
-            dirty = porcelain_outside_agents(cfg["repo"])
-            if dirty:
-                print(
-                    "[FAIL] main must be clean before retrying the planner "
-                    "(the agent would block again); commit or stash first:"
-                )
-                for line in dirty:
-                    print(f"    {line}")
-                return 2
-        state["status"] = "RUNNING"
-        state["phase"] = "plan"
-        print(
-            "[ok] planner blocker on record and cause resolved; retrying "
-            f"Dry Run {state['iteration']} from a clean gate state."
-        )
-    elif state["phase"] == "done":
-        print("Run already finished; nothing to do.")
-        return 0
-    state["status"] = "RUNNING"
+    state = _load_state(cfg, args.run_id)
     try:
         router(
             cfg,
@@ -1996,419 +91,249 @@ def cmd_resume(args: argparse.Namespace) -> int:
             commit_reject_feedback=args.reject_commit_feedback,
         )
     except KeyboardInterrupt:
-        state["status"] = "INTERRUPTED"
-        save_state(cfg["runs_dir"], state)
-        print("\n[interrupted] Run state saved; resume again with:")
-        print(f"  python .agents/orchestrator.py resume --run-id {state['run_id']}")
+        _save_state(cfg, state)
         return 130
-    return 0 if state.get("status") == "ACCEPTED" else 1
-
-
-def _doctor_check_roles(cfg: dict[str, Any]) -> bool:
-    """Validate configured roles, CLIs, and templates for doctor subcommand.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-
-    Returns:
-        True if all role validations pass, False otherwise.
-    """
-    ok = True
-    for role in ("planner", "executor", "reviewer"):
-        configured = role in cfg["roles"]
-        print(f"[{'ok' if configured else 'FAIL'}] role configured: {role}")
-        if not configured:
-            ok = False
-
-    roles_dict: dict[str, dict[str, Any]] = cfg["roles"]
-    for role, role_cfg in roles_dict.items():
-        for cmd_key in ("command", "approval_command"):
-            command_val: Any = role_cfg.get(cmd_key)
-            if not command_val or not isinstance(command_val, (list, tuple)):
-                continue
-            cmd_token: str = cast("str", command_val[0])
-            exe: str | None = shutil.which(cmd_token)
-            available: bool = exe is not None
-            print(
-                f"[{'ok' if available else 'FAIL'}] "
-                f"{role}.{cmd_key} CLI '{cmd_token}' on PATH"
-            )
-            if not available:
-                ok = False
-        template: Path | None = role_cfg.get("template_path")
-        if template:
-            exists = template.exists()
-            print(f"[{'ok' if exists else 'FAIL'}] {role} template: {template}")
-            if not exists:
-                ok = False
-    return ok
-
-
-def _doctor_check_repo(cfg: dict[str, Any]) -> bool:
-    """Validate git repository and journal state for doctor subcommand.
-
-    Args:
-        cfg: Consolidated orchestration configuration mapping.
-
-    Returns:
-        True if repository checks pass, False otherwise.
-    """
-    git_found = shutil.which("git") is not None
-    print(f"[{'ok' if git_found else 'FAIL'}] git on PATH")
-    if not git_found:
-        return False
-
-    repo: Path = cfg["repo"]
-    if not (repo / ".git").exists():
-        print(f"[FAIL] repo not a git repository: {repo}")
-        return False
-
-    branch = git(repo, "branch", "--show-current").stdout.strip()
-    dirty = porcelain_outside_agents(repo)
-    dirty_count = len(dirty)
-    print(f"[info] repo branch: {branch}; dirty outside .agents/: {dirty_count}")
-    journals_dict: dict[str, Path] = cfg["journals"]
-    for name, journal in journals_dict.items():
-        size = journal.stat().st_size if journal.exists() else -1
-        print(f"[info] journal {name}: {size} bytes ({journal})")
-    return True
-
-
-def cmd_doctor(args: argparse.Namespace) -> int:
-    """Execute the 'doctor' subcommand to validate configurations and tools.
-
-    Args:
-        args: Parsed command line arguments namespace.
-
-    Returns:
-        Exit code: 0 on success, 1 on failure.
-    """
-    py_ver = sys.version.split()[0]
-    print(f"[ok] python {py_ver} at {sys.executable}")
-    try:
-        cfg = assemble_config(args.repo)
-    except (OrchestratorError, tomllib.TOMLDecodeError, OSError) as exc:
-        print(f"[FAIL] config load: {exc}")
-        return 1
-    print(f"[ok] config loaded; repo: {cfg['repo']}")
-
-    ok = True
-    templates_dict: dict[str, Path] = cfg["templates"]
-    for name, path in templates_dict.items():
-        exists = path.exists()
-        print(f"[{'ok' if exists else 'FAIL'}] template {name}: {path}")
-        if not exists:
-            ok = False
-
-    if not _doctor_check_roles(cfg):
-        ok = False
-    if not _doctor_check_repo(cfg):
-        ok = False
-    return 0 if ok else 1
-
-
-def cmd_self_test(_args: argparse.Namespace) -> int:
-    """Drive the real router/templates against stub agents in a temp dir.
-
-    Args:
-        _args: Parsed command line arguments namespace (unused).
-
-    Returns:
-        Exit code: 0 on success, 1 on failure.
-    """
-    agents_dir = AGENTS_DIR
-    cfg = assemble_config()
-    tmp = Path(tempfile.mkdtemp(prefix="hq-orch-self_test-"))
-    journals = {
-        "planner": tmp / "docs/dev/task/planner.md",
-        "executor": tmp / "docs/dev/task/executor.md",
-        "reviewer": tmp / "docs/dev/task/reviewer.md",
-    }
-    for journal in journals.values():
-        journal.parent.mkdir(parents=True, exist_ok=True)
-        journal.write_bytes(b"")
-
-    stub = agents_dir / "tests" / "stub_agent.py"
-
-    def stub_role(role: str, extra: list[str] | None = None) -> dict[str, Any]:
-        command = [
-            sys.executable,
-            str(stub),
-            "--role",
-            role,
-            "--journal",
-            str(journals[role]),
-        ] + (extra or [])
-        return {"command": command, "prompt_delivery": "file"}
-
-    approval_cmd = stub_role("planner", ["--mode", "approval"])["command"]
-    test_cfg: dict[str, Any] = {
-        "repo": tmp,
-        "main_branch": "main",
-        "max_iterations": 3,
-        "timeout": 120,
-        "stream_agent_output": False,
-        "stream_heartbeat_seconds": 0,
-        "agent_retry_attempts": 0,
-        "journals": journals,
-        "templates": cfg["templates"],
-        "logs_dir": tmp / "logs",
-        "runs_dir": tmp / "runs",
-        "roles": {
-            "planner": {
-                **stub_role("planner"),
-                "approval_command": approval_cmd,
-            },
-            "executor": stub_role("executor"),
-            "reviewer": {
-                **stub_role("reviewer"),
-                "approval_command": stub_role("reviewer", ["--mode", "commit"])[
-                    "command"
-                ],
-            },
-        },
-    }
-    state: dict[str, Any] = {
-        "run_id": "self_test-demo",
-        "task": {
-            "task_kind": "feature",
-            "task_id": "FEAT-DEMO",
-            "task_slug": "demo-task",
-            "task_name": "Demo Task",
-            "task_request": "Self-test task.",
-            "additional_context": "None",
-            "exclusions": "None",
-            "owner_execution_notes": "None",
-            "review_focus": "None",
-        },
-        "iteration": 1,
-        "phase": "plan",
-        "status": "RUNNING",
-        "baseline": "0" * 40,
-        "branch": None,
-        "last_event": "",
-        "owner_feedback": "",
-        "blockers": [],
-        "handoff_notes": None,
-        "history": [],
-    }
-
-    print(f"[self-test] sandbox: {tmp}")
-    try:
-        result = router(test_cfg, state, auto_approve=True, self_test=True)
-    finally:
-        pass
-
-    planner_text = journals["planner"].read_text(encoding="utf-8")
-    executor_text = journals["executor"].read_text(encoding="utf-8")
-    reviewer_text = journals["reviewer"].read_text(encoding="utf-8")
-    log_files = list((tmp / "logs").glob("*"))
-    reviewer_block = latest_handoff_block(journals["reviewer"])
-    rev_ok = reviewer_block is not None and reviewer_block["handoff"] == "ACCEPTED"
-    rev_activating_ok = (
-        reviewer_block is not None and reviewer_block["activating"] == "NONE"
-    )
-    rev_pause_ok = "HANDOFF : PENDING_COMMIT" in reviewer_text
-    rev_commit_ok = "APPROVED: COMMIT" in reviewer_text
-    logs_path = tmp / "logs"
-
-    def _prompt_has(path: Path | None, needle: str) -> bool:
-        return path is not None and needle in path.read_text(encoding="utf-8")
-
-    exec1_prompt = next(iter(logs_path.glob("*executor-1-prompt.md")), None)
-    rev2_prompt = next(iter(logs_path.glob("*reviewer-2-prompt.md")), None)
-    plan2_prompt = next(iter(logs_path.glob("*planner-dry-run-2-prompt.md")), None)
-    dry_runs_ok = all(f"Dry Run {n}" in planner_text for n in (1, 2, 3))
-    reports_ok = all(f"Report {n}" in executor_text for n in (1, 2, 3))
-    blockers: list[dict[str, Any]] = result.get("blockers", [])
-    expected_resolved_iteration = 2
-    blocker_ok = (
-        len(blockers) == 1
-        and blockers[0].get("raised_by") == "EXECUTOR"
-        and blockers[0].get("status") == "RESOLVED"
-        and blockers[0].get("resolved_by") == expected_resolved_iteration
-    )
-    assertions: list[tuple[str, bool]] = [
-        ("final status ACCEPTED", result.get("status") == "ACCEPTED"),
-        (
-            "iterations advanced to 3 (blocker + changes-requested loops)",
-            result.get("iteration") == EXPECTED_SELF_TEST_ITERATION,
-        ),
-        ("planner journal has Dry Runs 1-3", dry_runs_ok),
-        (
-            "planner journal has APPROVED: EXECUTE record",
-            "APPROVED: EXECUTE" in planner_text,
-        ),
-        (
-            "planner journal has APPROVED_EXECUTE handoff block",
-            "HANDOFF : APPROVED_EXECUTE" in planner_text,
-        ),
-        (
-            "planner journal routes approval to EXECUTOR",
-            "ACTIVATING : EXECUTOR" in planner_text,
-        ),
-        ("executor journal has Reports 1-3", reports_ok),
-        (
-            "blocker recorded (EXECUTOR it1) and resolved by Dry Run 2",
-            blocker_ok,
-        ),
-        ("reviewer journal ends ACCEPTED", rev_ok),
-        ("reviewer journal activates NONE on acceptance", rev_activating_ok),
-        ("reviewer paused at PENDING_COMMIT before the commit", rev_pause_ok),
-        ("reviewer journal has APPROVED: COMMIT record", rev_commit_ok),
-        (
-            "planner notes reached the executor prompt",
-            _prompt_has(exec1_prompt, "From PLANNER:"),
-        ),
-        (
-            "executor notes reached the reviewer prompt",
-            _prompt_has(rev2_prompt, "From EXECUTOR:"),
-        ),
-        (
-            "blocked-executor notes reached the planner prompt",
-            _prompt_has(plan2_prompt, "From EXECUTOR:"),
-        ),
-        (
-            "handoff notes cleared on acceptance",
-            not result.get("handoff_notes"),
-        ),
-        (
-            "prompt+log files written per invocation",
-            len(log_files) >= MIN_SELF_TEST_LOG_FILES,
-        ),
-    ]
-    failed: list[str] = [name for name, passed in assertions if not passed]
-    for name, passed in assertions:
-        print(f"[{'ok' if passed else 'FAIL'}] {name}")
-    shutil.rmtree(tmp, ignore_errors=True)
-    if failed or result.get("status") != "ACCEPTED":
-        print(f"SELF-TEST FAILED: {failed}")
-        return 1
-    print("SELF-TEST PASSED")
     return 0
 
 
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
+def _doctor_protocol(cfg: dict[str, Any]) -> bool:
+    ok = True
+    print(f"[ok] protocol schema: {cfg['protocol']['prompt_schema_version']}")
+    seen: set[tuple[str, str]] = set()
+    for transition in cfg["transitions"]:
+        key = (transition.source_role, transition.handoff)
+        if key in seen:
+            print(f"[FAIL] duplicate transition: {key}")
+            ok = False
+        seen.add(key)
+        if transition.target_template and not (cfg["repo"] / transition.target_template).exists():
+            print(f"[FAIL] missing transition template: {transition.target_template}")
+            ok = False
+    return ok
 
 
-def _add_common_args(parser: argparse.ArgumentParser) -> None:
-    """Register common CLI flags across subcommands.
+def cmd_doctor(args: argparse.Namespace) -> int:
+    try:
+        cfg = assemble_config(args.repo)
+    except (OSError, KeyError, tomllib.TOMLDecodeError, OrchestratorError) as exc:
+        print(f"[FAIL] configuration: {exc}")
+        return 1
+    ok = _doctor_protocol(cfg)
+    for name, path in cfg["templates"].items():
+        exists = path.exists()
+        print(f"[{'ok' if exists else 'FAIL'}] template {name}: {path}")
+        ok = ok and exists
+    for name, path in {**cfg["journals"], "next-agent": cfg["next_agent"]}.items():
+        exists = path.exists()
+        print(f"[{'ok' if exists else 'FAIL'}] active task file {name}: {path}")
+        ok = ok and exists
+    for obsolete in (
+        cfg["repo"] / ".agents/templates",
+        cfg["repo"] / "docs/dev/prompt",
+        cfg["repo"] / "docs/dev/task",
+    ):
+        if obsolete.exists():
+            print(f"[FAIL] obsolete workflow path still exists: {obsolete}")
+            ok = False
+    for role, role_cfg in cfg["roles"].items():
+        command = cast("list[str]", role_cfg.get("command", []))
+        cli_ok = bool(command) and shutil.which(command[0]) is not None
+        print(f"[{'ok' if cli_ok else 'warn'}] role {role} CLI: {command[:1]}")
+    if cfg["next_agent"].exists() and cfg["next_agent"].stat().st_size:
+        try:
+            artifact = parse_next_agent(cfg["next_agent"])
+            print(
+                f"[ok] current next-agent: {artifact.metadata['source_role']} -> "
+                f"{artifact.metadata['target_role']} / {artifact.metadata['handoff']}"
+            )
+        except OrchestratorError as exc:
+            print(f"[FAIL] current next-agent: {exc}")
+            ok = False
+    return 0 if ok else 1
 
-    Args:
-        parser: Subcommand parser instance.
-    """
-    parser.add_argument("--repo", help="override repository path")
-    parser.add_argument(
-        "--auto-approve",
-        action="store_true",
-        help="DANGEROUS: skip the owner APPROVED: EXECUTE gate",
+
+def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any]:
+    (tmp / ".agents/task").mkdir(parents=True)
+    (tmp / ".agents/tests").mkdir(parents=True)
+    (tmp / "docs/templates/prompt").mkdir(parents=True)
+    for name in ("planner.md", "executor.md", "reviewer.md", "next-agent.md"):
+        (tmp / ".agents/task" / name).write_bytes(b"")
+    for key in ("planner", "executor", "reviewer", "reviewer_closeout", "default"):
+        source = source_cfg["templates"][key]
+        target_name = "reviewer-closeout.md" if key == "reviewer_closeout" else source.name
+        (tmp / "docs/templates/prompt" / target_name).write_text(
+            source.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+    (tmp / ".agents/protocol.toml").write_text(
+        source_cfg["protocol_path"].read_text(encoding="utf-8"), encoding="utf-8"
     )
-    parser.add_argument(
-        "--approved",
-        action="store_true",
-        help="relay an explicit owner approval for the current gate only "
-        "(for chat-driven orchestration)",
-    )
-    parser.add_argument(
-        "--reject-feedback",
-        dest="reject_feedback",
-        default=None,
-        help="relay an owner rejection with feedback for the current gate only",
-    )
-    parser.add_argument(
-        "--approved-commit",
-        dest="approved_commit",
-        action="store_true",
-        help="relay commit authorization for the current commit gate only",
-    )
-    parser.add_argument(
-        "--reject-commit-feedback",
-        dest="reject_commit_feedback",
-        default=None,
-        help="relay a commit-gate rejection with feedback (one-shot)",
-    )
-    parser.add_argument(
-        "--max-iterations",
-        type=int,
-        default=0,
-        help="override max iterations from orchestrator.toml",
-    )
+    (tmp / "AGENTS.md").write_text("# self-test AGENTS\n", encoding="utf-8")
+    (tmp / ".gitignore").write_text(".agents/logs/\n.agents/runs/\n", encoding="utf-8")
+    (tmp / "demo.txt").write_text("baseline\n", encoding="utf-8")
+    _git_ok(tmp, "init", "-b", "main")
+    _git_ok(tmp, "config", "user.email", "self-test@example.invalid")
+    _git_ok(tmp, "config", "user.name", "HaruQuantAI Self Test")
+    _git_ok(tmp, "add", ".")
+    _git_ok(tmp, "commit", "-m", "self-test baseline")
+
+    stub = AGENTS_DIR / "tests" / "stub_agent.py"
+    journals = {
+        "planner": tmp / ".agents/task/planner.md",
+        "executor": tmp / ".agents/task/executor.md",
+        "reviewer": tmp / ".agents/task/reviewer.md",
+    }
+    roles: dict[str, dict[str, Any]] = {}
+    for role in ("planner", "executor", "reviewer"):
+        roles[role] = {
+            "command": [
+                sys.executable,
+                str(stub),
+                "--role",
+                role,
+                "--repo",
+                str(tmp),
+            ],
+            "prompt_delivery": "file",
+        }
+    protocol, transitions = _parse_protocol(tmp / ".agents/protocol.toml")
+    return {
+        "repo": tmp,
+        "main_branch": "main",
+        "max_iterations": 3,
+        "timeout": 60,
+        "stream": False,
+        "heartbeat": 0,
+        "retries": 0,
+        "protocol": protocol,
+        "transitions": transitions,
+        "protocol_path": tmp / ".agents/protocol.toml",
+        "journals": journals,
+        "next_agent": tmp / ".agents/task/next-agent.md",
+        "templates": {
+            "planner": tmp / "docs/templates/prompt/planner.md",
+            "executor": tmp / "docs/templates/prompt/executor.md",
+            "reviewer": tmp / "docs/templates/prompt/reviewer.md",
+            "reviewer_closeout": tmp / "docs/templates/prompt/reviewer-closeout.md",
+            "default": tmp / "docs/templates/prompt/default.md",
+        },
+        "logs_dir": tmp / ".agents/logs",
+        "runs_dir": tmp / ".agents/runs",
+        "roles": roles,
+    }
+
+
+def cmd_self_test(_args: argparse.Namespace) -> int:
+    source_cfg = assemble_config(str(REPO_ROOT))
+    tmp = Path(tempfile.mkdtemp(prefix="hq-agent-workflow-v2-"))
+    print(f"[self-test] {tmp}")
+    try:
+        cfg = _init_self_test_repo(tmp, source_cfg)
+        baseline = _entry_gate(cfg)
+        state: dict[str, Any] = {
+            "run_id": "self-test",
+            "task": {
+                "task_kind": "feature",
+                "task_id": "FEAT-DEMO",
+                "task_slug": "demo",
+                "task_name": "Demo",
+                "task_request": "Exercise workflow v2.",
+                "additional_context": "None",
+                "exclusions": "None",
+                "owner_execution_notes": "None",
+                "review_focus": "Anti-anchoring",
+            },
+            "baseline": baseline,
+            "branch": None,
+            "iteration": 1,
+            "phase": "initial_planner",
+            "status": "RUNNING",
+            "owner_feedback": "",
+            "correction_context": "None",
+            "blockers": [],
+            "history": [],
+            "next_agent": None,
+        }
+        result = router(cfg, state, auto_approve=True)
+        checks = {
+            "status accepted": result.get("status") == "ACCEPTED",
+            "reached iteration 3": result.get("iteration") == 3,
+            "blocker recorded": any(
+                item.get("raised_by") == "EXECUTOR"
+                for item in cast("list[dict[str, Any]]", result.get("blockers", []))
+            ),
+            "owner approval no Planner approval phase": all(
+                item.get("phase") != "approval_record"
+                for item in cast("list[dict[str, Any]]", result.get("history", []))
+            ),
+            "all active files empty": all(
+                path.stat().st_size == 0
+                for path in [*cfg["journals"].values(), cfg["next_agent"]]
+            ),
+            "main clean": _git_ok(tmp, "status", "--porcelain") == "",
+            "returned to main": _git_ok(tmp, "branch", "--show-current") == "main",
+            "prompt hashes recorded": any(
+                item.get("phase") == "owner_approval"
+                for item in cast("list[dict[str, Any]]", result.get("history", []))
+            ),
+        }
+        failed = [name for name, passed in checks.items() if not passed]
+        for name, passed in checks.items():
+            print(f"[{'ok' if passed else 'FAIL'}] {name}")
+        if failed:
+            print(f"SELF-TEST FAILED: {failed}")
+            return 1
+        print("SELF-TEST PASSED")
+        return 0
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def _add_common(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--repo", default=None)
+    parser.add_argument("--auto-approve", action="store_true")
+    parser.add_argument("--approved", action="store_true")
+    parser.add_argument("--reject-feedback", default=None)
+    parser.add_argument("--approved-commit", action="store_true")
+    parser.add_argument("--reject-commit-feedback", default=None)
+    parser.add_argument("--max-iterations", type=int, default=0)
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """Construct the command line arguments parser for the orchestrator.
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    subs = parser.add_subparsers(dest="command", required=True)
+    start = subs.add_parser("start")
+    start.add_argument("--task-file", default=None)
+    start.add_argument("--task-kind", default=None)
+    start.add_argument("--task-id", default=None)
+    start.add_argument("--task-slug", default=None)
+    start.add_argument("--task-name", default=None)
+    start.add_argument("--task-request", default=None)
+    start.add_argument("--additional-context", default=None)
+    start.add_argument("--exclusions", default=None)
+    start.add_argument("--owner-execution-notes", default=None)
+    start.add_argument("--review-focus", default=None)
+    start.add_argument("--implementation-file", default=None)
+    start.add_argument("--implementation-entry", default=None)
+    _add_common(start)
+    start.set_defaults(func=cmd_start)
 
-    Returns:
-        Configured ArgumentParser instance.
-    """
-    doc_summary = __doc__.splitlines()[0] if __doc__ else "Agent orchestrator"
-    parser = argparse.ArgumentParser(description=doc_summary)
-    sub = parser.add_subparsers(dest="command", required=True)
+    resume = subs.add_parser("resume")
+    resume.add_argument("--run-id", default=None)
+    _add_common(resume)
+    resume.set_defaults(func=cmd_resume)
 
-    p_start = sub.add_parser("start", help="run a new task through the state machine")
-    p_start.add_argument(
-        "--task-file",
-        help="TOML file with task fields (see task.example.toml)",
-    )
-    p_start.add_argument("--task-kind", default=None)
-    p_start.add_argument("--task-id", default=None)
-    p_start.add_argument("--task-slug", default=None)
-    p_start.add_argument("--task-name", default=None)
-    p_start.add_argument("--task-request", default=None)
-    p_start.add_argument(
-        "--additional-context", dest="additional_context", default=None
-    )
-    p_start.add_argument("--exclusions", default=None)
-    p_start.add_argument(
-        "--owner-execution-notes", dest="owner_execution_notes", default=None
-    )
-    p_start.add_argument("--review-focus", dest="review_focus", default=None)
-    p_start.add_argument(
-        "--implementation-file",
-        dest="implementation_file",
-        default=None,
-        help="implementation tracker file whose entry this task completes",
-    )
-    p_start.add_argument(
-        "--implementation-entry",
-        dest="implementation_entry",
-        default=None,
-        help="tracker entry id (e.g. '1.1' or 'T.1')",
-    )
-    _add_common_args(p_start)
-    p_start.set_defaults(func=cmd_start)
+    doctor = subs.add_parser("doctor")
+    doctor.add_argument("--repo", default=None)
+    doctor.set_defaults(func=cmd_doctor)
 
-    p_resume = sub.add_parser("resume", help="continue a saved run")
-    p_resume.add_argument("--run-id", default=None, help="run id (default: latest)")
-    _add_common_args(p_resume)
-    p_resume.set_defaults(func=cmd_resume)
-
-    p_doctor = sub.add_parser("doctor", help="validate configuration and environment")
-    p_doctor.add_argument("--repo", help="override repository path")
-    p_doctor.set_defaults(func=cmd_doctor, auto_approve=False, max_iterations=0)
-
-    p_test = sub.add_parser("self-test", help="run stub-agent end-to-end test")
-    p_test.set_defaults(
-        func=cmd_self_test, repo=None, auto_approve=False, max_iterations=0
-    )
-
+    self_test = subs.add_parser("self-test")
+    self_test.set_defaults(func=cmd_self_test)
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI entry point for the orchestrator script.
-
-    Args:
-        argv: Optional list of command line argument strings.
-
-    Returns:
-        Process exit code integer.
-    """
     args = build_parser().parse_args(argv)
     for stream in (sys.stdout, sys.stderr):
-        # Agent output may contain characters outside the console codepage.
         stream_obj = cast("Any", stream)
         with contextlib.suppress(OSError, ValueError):
             if hasattr(stream_obj, "reconfigure"):
@@ -2417,7 +342,6 @@ def main(argv: list[str] | None = None) -> int:
         return int(args.func(args))
     except OrchestratorError as exc:
         print(f"\n[FAIL] {exc}")
-        print("Run state is saved under .agents/runs; fix the cause and 'resume'.")
         return 2
 
 

@@ -1,35 +1,16 @@
-# HaruQuantAI agent orchestrator — global wiring.
-# Docs: .agents/README.md
+# HaruQuantAI artifact-driven agent orchestrator wiring.
 
 [run]
-# Absolute path of the repository the agents work in.
-repo_path = 'C:\Users\rharu\AppDev\HaruquantAI'
+repo_path = 'C:\\Users\\rharu\\AppDev\\HaruquantAI'
 main_branch = "main"
-# manual = pause in the terminal for the owner's APPROVED: EXECUTE message.
-approval_mode = "manual"
 max_iterations = 5
-# Per-invocation ceiling for each headless agent call (seconds). Kept generous
-# because the Reviewer's accepted close-out runs pre-commit with the full
-# coverage gate inside a single invocation.
 invocation_timeout_seconds = 7200
-# Stream live agent output into this terminal while an agent runs ('| ' for
-# agent stdout, '! ' for agent stderr), and print a heartbeat line after this
-# many quiet seconds so long-running agents are never silent. 0 disables the
-# heartbeat; stream_agent_output = false disables live echo (full output is
-# still captured in .agents/logs/).
 stream_agent_output = true
 stream_heartbeat_seconds = 60
-# Automatic re-launches when an agent CLI exits non-zero (transient crashes,
-# network errors). Timeouts are never auto-retried. 0 disables.
 agent_retry_attempts = 1
 
 [paths]
-# Shared-memory journals (relative to repo_path). These are the ONLY
-# coordination channel between agents.
-planner_journal = "docs/dev/task/planner.md"
-executor_journal = "docs/dev/task/executor.md"
-reviewer_journal = "docs/dev/task/reviewer.md"
-# Orchestrator-owned runtime state (gitignored, never committed).
+protocol = ".agents/protocol.toml"
 logs_dir = ".agents/logs"
 runs_dir = ".agents/runs"
 
