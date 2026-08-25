@@ -231,25 +231,25 @@ import boundaries. No product `FEAT-*`/`FR-*` status changed.
     integrity), `tests/contracts/test_contract_boundaries.py`; `app/contracts/README.md` status header reconciled to
     the implemented wire-contract state.
 
-##### 1.01 [ ] Foundation task — D-UI spatiotemporal workstation foundation
+##### 1.01 [x] Foundation task — D-UI spatiotemporal workstation foundation
 
 This ordered non-FR foundation enables the existing 17 D-UI feature slices; it creates no product feature or FR ID and
 cannot mark `FEAT-UI-MANAGE_LAYOUTS`, `FEAT-UI-EXTEND_VIEWS`, or any other feature complete by itself.
 
-1. [ ] Implement the typed widget registry/host so every widget type names exactly one owning `FEAT-UI-*`, validates
+1. [x] Implement the typed widget registry/host so every widget type names exactly one owning `FEAT-UI-*`, validates
     manifest/configuration/state-schema metadata, reverses lifecycle effects exactly once, and derives runtime state
-    without a second product registry.
-2. [ ] Pin and integrate the then-verified `dockview-react` version behind a HaruQuantAI-owned adapter; implement blank
+    without a second product registry — evidence: `app/ui/src/runtime/__tests__/widget_registry.test.ts:7`, `tests/ui/unit/test_spatiotemporal_foundation.py:33`.
+2. [x] Pin and integrate the then-verified `dockview-react` version behind a HaruQuantAI-owned adapter; implement blank
     workspaces, versioned templates, add/remove/dock/tab/split/resize/minimize/maximize, bounded layout persistence,
-    migration, dirty-close resolution, and explicit missing/incompatible-widget restoration.
-3. [ ] Implement explicit selection and temporal presentation contexts for live, delayed, historical, playback,
+    migration, dirty-close resolution, and explicit missing/incompatible-widget restoration — evidence: `app/ui/src/workspaces/__tests__/dockview_adapter.test.tsx:12`, `app/ui/src/workspaces/__tests__/layout_serializer.test.ts:10`.
+3. [x] Implement explicit selection and temporal presentation contexts for live, delayed, historical, playback,
     simulation, and job-event sources with source/clock identity, timestamp, sequence/cursor order, stale/gap/resync,
-    incompatible-domain failure, bounded coalescing, and exact subscription disposal.
-4. [ ] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue,
-    and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts.
-5. [ ] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout
+    incompatible-domain failure, bounded coalescing, and exact subscription disposal — evidence: `app/ui/src/context/__tests__/temporal.test.tsx:13`, `app/ui/src/context/__tests__/selection.test.tsx:11`.
+4. [x] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue,
+    and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts — evidence: `app/ui/src/mocks/__tests__/mock_provider.test.ts:7`, `app/ui/src/accessibility/__tests__/focus_manager.test.tsx:28`.
+5. [x] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout
     round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and
-    listener/timer/subscription leak freedom before dependent widget slices proceed.
+    listener/timer/subscription leak freedom before dependent widget slices proceed — evidence: `app/ui/src/workspaces/__tests__/dockview_adapter.test.tsx:12`, `tests/ui/unit/test_spatiotemporal_foundation.py:171`.
 
 #### `D-WS` — [Workspace](../../app/services/workspace/README.md) (Increment 1)
 

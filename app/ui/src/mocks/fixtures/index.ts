@@ -1,0 +1,288 @@
+/**
+ * Dev-Only Mock Presentation Fixtures for HaruQuantAI D-UI.
+ *
+ * All mock data here implements ratified generated wire contracts from app/contracts/
+ * and is visibly labeled non-authoritative.
+ */
+
+import type {
+  AdministerSystemPresentationSuccess,
+  AuthorStrategiesPresentationSuccess,
+  ComposePortfoliosPresentationSuccess,
+  EditCodePresentationSuccess,
+  EditInputsPresentationSuccess,
+  EditProjectsPresentationSuccess,
+  EnsureAccessPresentationSuccess,
+  ExploreResultsPresentationSuccess,
+  ExtendViewsPresentationSuccess,
+  ManageDataPresentationSuccess,
+  ManageLayoutsPresentationSuccess,
+  MonitorWorkPresentationSuccess,
+  OperateDatabanksPresentationSuccess,
+  OperateTradingPresentationSuccess,
+  RunResearchPresentationSuccess,
+  StartWorkPresentationSuccess,
+} from "../../contracts/generated/ui";
+
+export const MOCK_START_WORK_SUCCESS: StartWorkPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-start-work",
+  result_version: 1,
+  recent_routes: [
+    {
+      path: "/research",
+      workspace_id: "preset-research",
+      title: "Research Workspace (Mock)",
+      schema_version: 1,
+    },
+    {
+      path: "/data",
+      workspace_id: "preset-data",
+      title: "Data Workspace (Mock)",
+      schema_version: 1,
+    },
+  ],
+  shortcuts: [
+    {
+      command_id: "cmd.new-strategy",
+      title: "Create Strategy Draft",
+      category: "Strategy",
+      shortcut: "Ctrl+N",
+      enabled: true,
+      schema_version: 1,
+    },
+  ],
+  news: [
+    {
+      notification_id: "notif-mock-1",
+      title: "Development Mock Mode Active",
+      message: "Mock capability provider active for Increment 1 UI workstation foundation.",
+      severity: "info",
+      timestamp_iso: new Date().toISOString(),
+      schema_version: 1,
+    },
+  ],
+  schema_version: 1,
+};
+
+export const MOCK_MANAGE_LAYOUTS_SUCCESS: ManageLayoutsPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-manage-layouts",
+  result_version: 1,
+  layout: null,
+  migration: null,
+  template: null,
+  schema_version: 1,
+};
+
+export const MOCK_EDIT_INPUTS_SUCCESS: EditInputsPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-edit-inputs",
+  result_version: 1,
+  fields: [
+    {
+      field_name: "symbol",
+      label: "Instrument Symbol",
+      field_type: "string",
+      required: true,
+      default_value: "EURUSD",
+      schema_version: 1,
+    },
+  ],
+  findings: [],
+  draft: null,
+  conflict: null,
+  confirmation: null,
+  schema_version: 1,
+};
+
+export const MOCK_AUTHOR_STRATEGIES_SUCCESS: AuthorStrategiesPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-author-strategies",
+  result_version: 1,
+  projection: {
+    view_id: "view-strategy-tree",
+    title: "Strategy AST (Mock)",
+    data_source: "mock.strategy.tree",
+    parameters: { is_mock: true },
+    schema_version: 1,
+  },
+  findings: [],
+  strategy_version_id: "strat-mock-v1",
+  schema_version: 1,
+};
+
+export const MOCK_RUN_RESEARCH_SUCCESS: RunResearchPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-run-research",
+  result_version: 1,
+  preview: null,
+  run: null,
+  pinned_versions: ["strat-mock-v1"],
+  schema_version: 1,
+};
+
+export const MOCK_EDIT_PROJECTS_SUCCESS: EditProjectsPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-edit-projects",
+  result_version: 1,
+  projection: null,
+  project_version_id: "proj-mock-v1",
+  progress: null,
+  schema_version: 1,
+};
+
+export const MOCK_MANAGE_DATA_SUCCESS: ManageDataPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-manage-data",
+  result_version: 1,
+  projection: {
+    view_id: "view-datasets",
+    title: "Market Datasets (Mock)",
+    data_source: "mock.data.datasets",
+    parameters: { is_mock: true },
+    schema_version: 1,
+  },
+  findings: [],
+  job: null,
+  schema_version: 1,
+};
+
+export const MOCK_OPERATE_DATABANKS_SUCCESS: OperateDatabanksPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-operate-databanks",
+  result_version: 1,
+  page: null,
+  selection: {
+    selection_id: "sel-databank-mock",
+    selected_keys: [],
+    is_all_selected: false,
+    schema_version: 1,
+  },
+  bulk_token: null,
+  confirmation: null,
+  schema_version: 1,
+};
+
+export const MOCK_EXPLORE_RESULTS_SUCCESS: ExploreResultsPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-explore-results",
+  result_version: 1,
+  summary: {
+    view_id: "view-results-summary",
+    title: "Backtest Results (Mock)",
+    data_source: "mock.analytics.results",
+    parameters: { is_mock: true },
+    schema_version: 1,
+  },
+  page_state: null,
+  chart_alternative: {
+    chart_id: "chart-equity-mock",
+    title: "Equity Curve (Mock Data)",
+    summary_text: "Tabular representation of mock equity series.",
+    table_data: [
+      { date: "2026-01-01", balance: "10000.00", equity: "10000.00" },
+      { date: "2026-01-02", balance: "10150.00", equity: "10180.00" },
+    ],
+    schema_version: 1,
+  },
+  context: null,
+  schema_version: 1,
+};
+
+export const MOCK_COMPOSE_PORTFOLIOS_SUCCESS: ComposePortfoliosPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-compose-portfolios",
+  result_version: 1,
+  projection: null,
+  portfolio_version_id: "port-mock-v1",
+  schema_version: 1,
+};
+
+export const MOCK_EDIT_CODE_SUCCESS: EditCodePresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-edit-code",
+  result_version: 1,
+  files: ["indicators/custom_rsi.py", "strategies/sample_trend.py"],
+  diagnostics: [],
+  job: null,
+  schema_version: 1,
+};
+
+export const MOCK_MONITOR_WORK_SUCCESS: MonitorWorkPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-monitor-work",
+  result_version: 1,
+  progress: {
+    task_id: "task-mock-1",
+    stage_name: "Running Mock Simulation",
+    progress_percent: "75.5",
+    is_indeterminate: false,
+    message: "Processing bars...",
+    schema_version: 1,
+  },
+  notification: null,
+  error: null,
+  schema_version: 1,
+};
+
+export const MOCK_ADMINISTER_SYSTEM_SUCCESS: AdministerSystemPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-administer-system",
+  result_version: 1,
+  preferences: {
+    theme: "dark",
+    density: "comfortable",
+    font_scale: "1",
+    locale: "en-US",
+    schema_version: 1,
+  },
+  accessibility: {
+    high_contrast: false,
+    reduced_motion: false,
+    screen_reader_optimized: false,
+    schema_version: 1,
+  },
+  administration: null,
+  schema_version: 1,
+};
+
+export const MOCK_OPERATE_TRADING_SUCCESS: OperateTradingPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-operate-trading",
+  result_version: 1,
+  readiness: null,
+  preview: null,
+  receipt: null,
+  kill_switch: null,
+  market: null,
+  schema_version: 1,
+};
+
+export const MOCK_ENSURE_ACCESS_SUCCESS: EnsureAccessPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-ensure-access",
+  result_version: 1,
+  alternatives: [],
+  bindings: [
+    {
+      key_combination: "Alt+W",
+      command_id: "cmd.open-workspace-switcher",
+      description: "Open workspace switcher",
+      scope: "global",
+      schema_version: 1,
+    },
+  ],
+  focus_target: "shell-workspace-outlet",
+  schema_version: 1,
+};
+
+export const MOCK_EXTEND_VIEWS_SUCCESS: ExtendViewsPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-extend-views",
+  result_version: 1,
+  widget_type: null,
+  removal: null,
+  migration: null,
+  schema_version: 1,
+};
