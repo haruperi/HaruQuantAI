@@ -49,7 +49,7 @@ The product presents one unified workstation canvas rather than isolated full-pa
 | Missing | `FEAT-UI-EXPLORE_RESULTS` | Result details, charts, trades, reports, and robustness views | 8 | Rich result exploration disappears; result artifacts remain. |
 | Missing | `FEAT-UI-COMPOSE_PORTFOLIOS` | Manual/automatic portfolio construction and comparison | 5 | Portfolio views disappear; Portfolio contracts remain available. |
 | Missing | `FEAT-UI-EDIT_CODE` | Extension/source editor, navigation, diagnostics, and testing | 6 | Code editing disappears; codegen/compiler services remain available. |
-| Missing | `FEAT-UI-MONITOR_WORK` | Job progress, logs, notifications, failure, and recovery feedback | 5 | Dedicated monitors disappear; jobs continue server-side. |
+| Partial (3 of 5; 2 mock-build pending 14.10) | `FEAT-UI-MONITOR_WORK` | Job progress, logs, notifications, failure, and recovery feedback | 5 | Dedicated monitors disappear; jobs continue server-side. |
 | Missing | `FEAT-UI-ADMINISTER_SYSTEM` | Preferences, language, theme, updates, and capability administration | 6 | Settings and administration screens disappear. |
 | Missing | `FEAT-UI-OPERATE_TRADING` | Governed operational trading views and controls | 8 | Operational views disappear; governed headless operations remain. |
 | Missing | `FEAT-UI-ENSURE_ACCESS` | Keyboard, nonvisual, focus, scale, and safety accessibility | 6 | The UI becomes non-releasable. |
@@ -441,10 +441,10 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 
 | Status | Requirement ID | Responsibility | Depends | Acceptance / evidence |
 |---|---|---|---|---|
-| Missing | `FR-UI-TRACK_PROGRESS` | Show bounded progress, stage, counts, estimates, resource state, and last event time without fabricating precision. | IFACE, ORCH | Indeterminate work is labeled indeterminate. |
+| Implemented | `FR-UI-TRACK_PROGRESS` | Show bounded progress, stage, counts, estimates, resource state, and last event time without fabricating precision. | IFACE, ORCH | Indeterminate work is labeled indeterminate. `— evidence: tests/ui/unit/test_monitor_work.py:148, app/ui/src/widgets/job_progress/__tests__/job_progress.test.tsx:64` |
 | Missing | `FR-UI-CONTROL_JOBS` | Offer pause/resume/cancel/retry only when supported by the current job state and authority. | ORCH | Stale controls fail safely and refresh. |
-| Missing | `FR-UI-STREAM_ACTIVITY` | Present ordered events/logs with source/clock identity, authoritative timestamp, sequence/cursor, severity, correlation, redaction, reconnect replay, staleness and resync gaps. | IFACE, WS | Event loss, reordering, and incompatible time domains are explicitly marked and never presented as continuous truth. |
-| Missing | `FR-UI-PRESENT_FAILURES` | Present structured failures, validation findings, causal references, retryability, and safe next actions. | IFACE | Unknown errors remain causal and never appear as success. |
+| Implemented | `FR-UI-STREAM_ACTIVITY` | Present ordered events/logs with source/clock identity, authoritative timestamp, sequence/cursor, severity, correlation, redaction, reconnect replay, staleness and resync gaps. | IFACE, WS | Event loss, reordering, and incompatible time domains are explicitly marked and never presented as continuous truth. `— evidence: tests/ui/unit/test_monitor_work.py:233, app/ui/src/widgets/activity_log/__tests__/activity_log.test.tsx:61` |
+| Implemented | `FR-UI-PRESENT_FAILURES` | Present structured failures, validation findings, causal references, retryability, and safe next actions. | IFACE | Unknown errors remain causal and never appear as success. `— evidence: tests/ui/unit/test_monitor_work.py:196, app/ui/src/widgets/job_progress/__tests__/job_progress.test.tsx:111` |
 | Missing | `FR-UI-NOTIFY_OUTCOMES` | Deliver in-client notices for configured milestones/outcomes with deduplication and links to owning work. | ORCH, WS | Notification is not authoritative job state. |
 
 ### 4.14 `administer_system/` — `FEAT-UI-ADMINISTER_SYSTEM`

@@ -23,6 +23,7 @@ import type {
   RunResearchPresentationSuccess,
   StartWorkPresentationSuccess,
 } from "../../contracts/generated/ui";
+import type { ActivitySnapshot } from "../../features/monitor_work/activity_model";
 
 export const MOCK_START_WORK_SUCCESS: StartWorkPresentationSuccess = {
   outcome: "SUCCESS",
@@ -330,6 +331,61 @@ export const MOCK_MONITOR_WORK_SUCCESS: MonitorWorkPresentationSuccess = {
   notification: null,
   error: null,
   schema_version: 1,
+};
+
+export const MOCK_MONITOR_WORK_FAILURE: MonitorWorkPresentationSuccess = {
+  outcome: "SUCCESS",
+  request_id: "mock-req-monitor-work-fail",
+  result_version: 1,
+  progress: null,
+  notification: null,
+  error: {
+    error_code: "ERR_DATA_FETCH_TIMEOUT",
+    title: "Data Fetch Timeout (Mock)",
+    detail: "Historical tick feed connection timed out after 30 seconds.",
+    causal_reference: "req-fetch-mock-998",
+    is_retryable: true,
+    suggested_action: "Check connectivity and retry the data sync job.",
+    schema_version: 1,
+  },
+  schema_version: 1,
+};
+
+export const MOCK_ACTIVITY_SNAPSHOT: ActivitySnapshot = {
+  snapshot_id: "snap-mock-activity-1",
+  cursor: "cursor-seq-105",
+  is_stale: false,
+  generated_at_iso: "2026-08-26T00:00:00.000000Z",
+  is_mock: true,
+  events: [
+    {
+      event_id: "evt-mock-101",
+      sequence: 101,
+      timestamp_iso: "2026-08-26T00:00:01.000000Z",
+      severity: "info",
+      event_type: "JOB_QUEUED",
+      message: "Job queued for execution",
+      correlation_id: "job-mock-99",
+    },
+    {
+      event_id: "evt-mock-102",
+      sequence: 102,
+      timestamp_iso: "2026-08-26T00:00:02.000000Z",
+      severity: "info",
+      event_type: "JOB_STARTED",
+      message: "Job started on worker node-1",
+      correlation_id: "job-mock-99",
+    },
+    {
+      event_id: "evt-mock-105",
+      sequence: 105,
+      timestamp_iso: "2026-08-26T00:00:05.000000Z",
+      severity: "warning",
+      event_type: "STAGE_RETRY",
+      message: "Stage 2 retry attempt 1",
+      correlation_id: "job-mock-99",
+    },
+  ],
 };
 
 export const MOCK_ADMINISTER_SYSTEM_SUCCESS: AdministerSystemPresentationSuccess = {

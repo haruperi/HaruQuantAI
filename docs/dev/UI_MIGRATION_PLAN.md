@@ -74,7 +74,7 @@ Progress legend: `M` mock done · `U` UI migrated · `T` tests ported/passing ·
 |---|---|---|---|---|---|
 | `workspaces` (+`public/templates`) | REPLACE | 1.3 MANAGE_LAYOUTS | (V3 engine exists) presets → `workspace_templates` | `ui.ts`, `workspace.ts` | ☑ ☑ ☑ ☐ | (2026-08-25) donor consumed for templates/persistence algorithms; donor folder retained — family also feeds later rows; deletion at Phase 3 sweep |
 | `components/workflow` (form-heavy pieces) | ADAPT | 1.4 EDIT_INPUTS | `schema_form`, `selection_table`, `confirmation` | `ui.ts` | ☐ ☐ ☑ ☐ | (2026-08-26) completable slice FR-UI-PRESERVE_DRAFTS done (draft store; contract-level tests); donor workflow pieces remain for the 6.15 de-mock |
-| `components/common`, alarm/status patterns | ADAPT | 1.5 MONITOR_WORK | `job_progress`, `activity_log`, `notifications` | `ui.ts`, `orchestration.ts` | ☐ ☐ ☐ ☐ |
+| `components/common`, alarm/status patterns | ADAPT | 1.5 MONITOR_WORK | `job_progress`, `activity_log`, `notifications` | `ui.ts`, `orchestration.ts` | ☑ ☑ ☑ ☐ | (2026-08-26) completable slice FR-UI-TRACK_PROGRESS, FR-UI-STREAM_ACTIVITY, FR-UI-PRESENT_FAILURES done (job_progress, activity_log; snapshot log); notifications widget completes at 14.10 |
 | `system-settings` | ADAPT | 1.6 ADMINISTER_SYSTEM | `settings`, `capability_admin`, `updates` | `ui.ts`, `plugins.ts`, `interfaces.ts`, `orchestration.ts` | ☐ ☐ ☐ ☐ |
 | `human-factors` (a11y/alert semantics) | ADAPT | 1.7 ENSURE_ACCESS | strengthen shell/accessibility surfaces | `ui.ts`, `trading.ts`, `risk.ts` | ☐ ☐ ☐ ☐ |
 | `markets`, `watchlists`, `instrument-panels`, `market-hours`, `session-registry` | ADAPT | 1.8 MANAGE_DATA | `datasets`, `instruments`, `sessions`, `data_quality` | `ui.ts`, `catalogue.ts`, `data.ts` | ☐ ☐ ☐ ☐ |
@@ -134,7 +134,7 @@ Each line is one normal workflow task; donors come from the matrix row. A task's
 
 - [x] 1.3 `FEAT-UI-MANAGE_LAYOUTS` — donors: `widgets/workspaces` presets, `public/templates` (done 2026-08-25; donor folder retained for later rows)
 - [x] 1.4 `FEAT-UI-EDIT_INPUTS` — completable slice done 2026-08-26 (FR-UI-PRESERVE_DRAFTS); donor workflow pieces remain for the 6.15 de-mock
-- [ ] 1.5 `FEAT-UI-MONITOR_WORK` — donors: alarm/status patterns, `emergency-ux` acknowledgment flow
+- [x] 1.5 `FEAT-UI-MONITOR_WORK` — completable slice done 2026-08-26 (FR-UI-TRACK_PROGRESS, FR-UI-STREAM_ACTIVITY, FR-UI-PRESENT_FAILURES; job_progress, activity_log; snapshot log); notifications widget completes at 14.10
 - [ ] 1.6 `FEAT-UI-ADMINISTER_SYSTEM` — donors: `system-settings`
 - [ ] 1.7 `FEAT-UI-ENSURE_ACCESS` — donors: `human-factors` a11y/alert semantics
 - [ ] 1.8 `FEAT-UI-MANAGE_DATA` — donors: `markets`, `watchlists`, `instrument-panels`, `market-hours`, `session-registry`

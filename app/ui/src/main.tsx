@@ -14,12 +14,16 @@ import {
   ScaleControls,
 } from "./features/manage_layouts";
 import { createFeature as createEditInputsFeature } from "./features/edit_inputs";
+import { createFeature as createMonitorWorkFeature } from "./features/monitor_work";
 import { systemStatusWidgetDefinition } from "./widgets/system_status";
 import { widgetCatalogueWidgetDefinition } from "./widgets/widget_catalogue";
 import { homeWidgetDefinition } from "./widgets/home";
 import { productNewsWidgetDefinition } from "./widgets/product_news";
 import { workspaceTemplatesWidgetDefinition } from "./widgets/workspace_templates";
+import { jobProgressWidgetDefinition } from "./widgets/job_progress";
+import { activityLogWidgetDefinition } from "./widgets/activity_log";
 import { MockUiPresentationProvider } from "./mocks/mock_provider";
+import { MOCK_ACTIVITY_SNAPSHOT } from "./mocks/fixtures";
 
 function bootstrapApp() {
   const bridge = new UiCompositionBridge();
@@ -33,6 +37,8 @@ function bootstrapApp() {
   widgetRegistry.registerWidget(homeWidgetDefinition);
   widgetRegistry.registerWidget(productNewsWidgetDefinition);
   widgetRegistry.registerWidget(workspaceTemplatesWidgetDefinition);
+  widgetRegistry.registerWidget(jobProgressWidgetDefinition);
+  widgetRegistry.registerWidget(activityLogWidgetDefinition);
 
   // FEAT-UI-MANAGE_LAYOUTS owns templates, persistence, and view scale.
   const manageLayouts = createManageLayoutsFeature({
@@ -42,6 +48,13 @@ function bootstrapApp() {
 
   // FEAT-UI-EDIT_INPUTS owns local draft preservation (Partial slice).
   bridge.registerFeature(createEditInputsFeature());
+
+  // FEAT-UI-MONITOR_WORK owns job progress tracking and activity log.
+  const monitorWork = createMonitorWorkFeature({
+    presentationClient: new MockUiPresentationProvider(),
+    activitySnapshot: MOCK_ACTIVITY_SNAPSHOT,
+  });
+  bridge.registerFeature(monitorWork);
 
   // FEAT-UI-START_WORK owns the /home landing workspace and product news.
   // Dev runtime uses the gated mock capability provider; production injects
@@ -70,7 +83,9 @@ function bootstrapApp() {
               <SelectionProvider>
                 <TemporalProvider workspaceId="global-workspace">
                   {manageLayouts.renderClientProvider(
-                    composeShell.render(<ScaleControls />)
+                    monitorWork.renderClientProvider(
+                      composeShell.render(<ScaleControls />)
+                    )
                   )}
                 </TemporalProvider>
               </SelectionProvider>

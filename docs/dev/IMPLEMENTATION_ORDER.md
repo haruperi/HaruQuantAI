@@ -268,9 +268,9 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 ##### 1.5 Partial — `FEAT-UI-MONITOR_WORK`
 
-1. [ ] `FR-UI-TRACK_PROGRESS`
-2. [ ] `FR-UI-STREAM_ACTIVITY`
-3. [ ] `FR-UI-PRESENT_FAILURES`
+1. [x] `FR-UI-TRACK_PROGRESS`
+2. [x] `FR-UI-STREAM_ACTIVITY`
+3. [x] `FR-UI-PRESENT_FAILURES`
 4. `FR-UI-CONTROL_JOBS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.10)
 5. `FR-UI-NOTIFY_OUTCOMES` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.10)
 
