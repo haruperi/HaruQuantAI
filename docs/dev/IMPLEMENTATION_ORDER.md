@@ -35,7 +35,7 @@ The waterfall model is chosen for this repository for four reasons:
 3. **Junior-executor safety.** The planner can freeze one complete domain specification and then issue small, concrete feature tasks without repeatedly reopening partially completed features across many increments.
 4. **Execution parity.** Runtime Risk, Trading, and Simulator have a strict dependency relationship: HaruQuantAI uses one Trading-owned business execution lifecycle, while Simulator and Broker Connectivity provide route-specific execution authority mechanics. Completing these domains in dependency order avoids implementing a parallel simulation trading model.
 
-This is not classic “integrate everything at the end” waterfall. **Integration happens after every domain.** The active domain is connected to all earlier real providers and the corresponding UI surfaces are de-mocked as soon as truthful provider evidence exists.
+This is not classic “integrate everything at the end” waterfall. **Integration happens after every domain.** The active domain is connected to all earlier real dependencies and the corresponding UI surfaces are de-mocked as soon as truthful provider evidence exists.
 
 ---
 
@@ -105,7 +105,7 @@ After the domain's real capabilities exist:
 4. run the relevant cross-domain workflow slice and contract-parity tests;
 5. keep mocks only for capabilities whose actual provider is in a later waterfall stage.
 
-A downstream optional integration is not allowed to force a completed upstream domain to remain “Partial.” The upstream domain must expose the required optional capability port and prove its own absent/provider-fixture behavior. The real cross-domain integration is verified when the downstream provider is later completed.
+A later domain is not allowed to force a completed earlier domain to remain “Partial.” If a future domain contributes evidence to an earlier receiver, the earlier domain must be completed against its own receiver-owned contract plus deterministic self-contained evidence fixtures and explicit missing-evidence behavior. The later domain then proves production integration when it can produce that evidence for real.
 
 ### Phase E — Domain completion gate
 
@@ -138,12 +138,12 @@ Only after this gate does the next waterfall domain begin.
 | 5 | `D-BRK` Broker Connectivity | Finish provider profiles, environment/session isolation, reads/events, transport, certification, and safe unavailable behavior. |
 | 6 | `D-DATA` Data | Finish historical/live/external data, quality, versions, connectors, scenarios/news/events, retention, alignment, and run binding. |
 | 7 | `D-STRAT` Strategy | Finish the complete typed strategy language, editors/templates, indicators, ATM, code generation, MQL5, other targets, and plugin extension contracts. |
-| 8 | `D-RISK` Runtime Risk | Finish all Runtime Risk behavior before Trading. Portfolio-aware paths use an optional capability contract and provider fixtures; core Risk never hard-depends on Portfolio. |
+| 8 | `D-RISK` Runtime Risk | Finish the complete Runtime Risk domain before Trading. Portfolio-aware paths use receiver-owned Risk contracts plus self-contained Portfolio evidence/projection fixtures; core Risk never depends on a Portfolio runtime provider. |
 | 9 | `D-TRD` Trading | Finish the single canonical business execution lifecycle and all SIM/PAPER/DEMO/LIVE route semantics before Simulator. |
 | 10 | `D-SIM` Simulator | Finish deterministic simulation as the SIM/PAPER execution authority, using the Trading/Risk lifecycle rather than a parallel business trading model. |
 | 11 | `D-ANA` Analytics | Finish result/databank/trade/operational analytics over canonical committed execution/result evidence. |
 | 12 | `D-RES` Research | Finish robustness, optimization, walk-forward, Builder/evolution, acceptance, AI/neural, drift, and research control. |
-| 13 | `D-PORT` Portfolio | Finish portfolio construction/simulation/search/risk/Markowitz/merge methods, then prove real Portfolio -> optional Runtime Risk integration without reopening core Risk ownership. |
+| 13 | `D-PORT` Portfolio | Finish portfolio construction/simulation/search/risk/Markowitz/merge methods, then prove real Portfolio evidence submission into the already-complete Runtime Risk boundary without reopening Risk ownership. |
 | 14 | `D-ORCH` Orchestration | Finish durable projects/tasks/conditions/domain delegation/utilities/history/training workflows over the completed business domains. |
 | 15 | `D-IFACE` Interfaces | Finish HTTP/events/CLI/MCP/research/project/portfolio/trading/admin gateways against the completed application capability set. |
 | 16 | `D-UI` Finalization and Complete-System Integration | Remove remaining mocks, finish every D-UI feature, run all system workflows, hosted/local parity, and final release gates. |
@@ -284,11 +284,11 @@ Portfolio is **not** a hard prerequisite of Runtime Risk.
 
 Portfolio-aware allocation/budget features must be fully implemented at this stage against:
 
-- versioned optional Portfolio capability contracts;
-- deterministic provider fixtures/conformance doubles;
-- explicit absent-provider behavior.
+- receiver-owned, versioned Runtime Risk requests/results that accept self-contained Portfolio version/allocation projections;
+- deterministic immutable Portfolio evidence fixtures covering valid, stale, incomplete, conflicting, and missing cases;
+- explicit behavior for actions whose requested scope does not require Portfolio evidence versus portfolio-aware operations whose required submitted evidence is absent.
 
-The physical absence of `D-PORT` must leave base Risk and single-strategy/account admission healthy. When Portfolio becomes real at Stage 13, that stage proves the production Portfolio<->Risk integration without redefining Risk ownership or reopening the completed core domain.
+There is no required Runtime Risk -> Portfolio provider edge. The physical absence of `D-PORT` must leave base Risk and single-strategy/account admission healthy. When Portfolio becomes real at Stage 13, it proves production integration by generating the expected immutable evidence and submitting it through the already-completed Risk boundary. That does not redefine Risk ownership or reopen the completed domain.
 
 ---
 
@@ -349,11 +349,11 @@ The Simulator/Analytics substrate is already complete, so StrategyQuantX-inspire
 
 Complete every Portfolio feature in the authoritative [Portfolio README](../../app/services/portfolio/README.md).
 
-After the domain itself passes its completion gate, run the deferred real optional-integration proof against the already-completed Runtime Risk domain:
+After the domain itself passes its completion gate, run the deferred production integration proof against the already-completed Runtime Risk domain:
 
-- Portfolio allocation/exposure/rebalance evidence is accepted only through the ratified optional capability boundary;
-- removing Portfolio withdraws only portfolio-aware Risk capability;
-- single-strategy/account Runtime Risk and Trading remain healthy;
+- Portfolio creates self-contained immutable allocation/exposure/rebalance evidence using the ratified versioned shape expected by Runtime Risk;
+- the evidence is submitted through the receiver-owned Risk request boundary rather than discovered through a Risk -> Portfolio runtime capability dependency;
+- removing Portfolio stops creation of new Portfolio evidence/capabilities but does not prevent base Runtime Risk or single-strategy/account Trading from activating;
 - no reverse implementation import or direct foreign-state write is introduced.
 
 This verification is a cross-domain integration gate, not a second Risk implementation stage.
@@ -397,17 +397,17 @@ D-UI is **DOMAIN COMPLETE — FROZEN BASELINE** only here.
 
 ## 23. Cross-domain integration rule
 
-A completed domain is not casually reopened because a later provider appears.
+A completed domain is not casually reopened because a later domain begins producing compatible evidence.
 
 Instead:
 
-- earlier domains expose exact versioned required/optional capability contracts;
 - required dependencies must exist before domain completion;
-- future optional providers are tested with fixtures and explicit absence behavior;
-- when the real downstream provider is implemented, its stage owns the production integration proof;
-- any discovered incompatibility is treated as an explicit contract change with versioning/migration, not an undocumented backdoor edit.
+- earlier receiver domains define exact versioned request/evidence contracts for future producer data when such interaction is needed;
+- those receiver contracts are tested with deterministic self-contained evidence fixtures and explicit missing-evidence behavior;
+- the later producer domain's stage owns the production integration proof that it emits and submits conforming evidence;
+- any discovered incompatibility is an explicit contract change with versioning/migration, not an undocumented backdoor edit.
 
-This preserves domain waterfall discipline without sacrificing HaruQuantAI's spatiotemporal composability.
+This preserves domain waterfall discipline without sacrificing HaruQuantAI's spatiotemporal composability or creating artificial runtime dependency cycles.
 
 ---
 
