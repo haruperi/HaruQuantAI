@@ -50,7 +50,7 @@ The product presents one unified workstation canvas rather than isolated full-pa
 | Missing | `FEAT-UI-COMPOSE_PORTFOLIOS` | Manual/automatic portfolio construction and comparison | 5 | Portfolio views disappear; Portfolio contracts remain available. |
 | Missing | `FEAT-UI-EDIT_CODE` | Extension/source editor, navigation, diagnostics, and testing | 6 | Code editing disappears; codegen/compiler services remain available. |
 | Partial (3 of 5; 2 mock-build pending 14.10) | `FEAT-UI-MONITOR_WORK` | Job progress, logs, notifications, failure, and recovery feedback | 5 | Dedicated monitors disappear; jobs continue server-side. |
-| Missing | `FEAT-UI-ADMINISTER_SYSTEM` | Preferences, language, theme, updates, and capability administration | 6 | Settings and administration screens disappear. |
+| Partial (3 of 6; 3 mock-build pending 3.10, 14.11, 15.8) | `FEAT-UI-ADMINISTER_SYSTEM` | Preferences, language, theme, updates, and capability administration | 6 | Settings and administration screens disappear. |
 | Missing | `FEAT-UI-OPERATE_TRADING` | Governed operational trading views and controls | 8 | Operational views disappear; governed headless operations remain. |
 | Missing | `FEAT-UI-ENSURE_ACCESS` | Keyboard, nonvisual, focus, scale, and safety accessibility | 6 | The UI becomes non-releasable. |
 | Missing | `FEAT-UI-EXTEND_VIEWS` | Declarative, scoped, deletion-safe UI contributions | 5 | Extension views disappear; built-in fallback views remain. |
@@ -455,11 +455,12 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 | Status | Requirement ID | Responsibility | Depends | Acceptance / evidence |
 |---|---|---|---|---|
 | Missing | `FR-UI-SET_LANGUAGE` | Select supported locale and update all visible UI contributions consistently. | WS, PLUG | Missing translation falls back deterministically and is diagnosable. |
-| Missing | `FR-UI-SET_APPEARANCE` | Select theme, density, zoom, motion, chart palette, and accessible display preferences. | WS | Safety/degradation colors retain non-color alternatives. |
-| Missing | `FR-UI-CONFIGURE_CLIENT` | Edit versioned client/performance/download/notification preferences with validation and reset. | WS | Defaults and scope are explicit. |
-| Missing | `FR-UI-MANAGE_LICENSE` | Inspect edition/entitlements, refresh license state, and show capability effects without embedding authorization policy. | WS | UI refreshes the authoritative entitlement snapshot. |
+| Implemented | `FR-UI-SET_APPEARANCE` | Select theme, density, zoom, motion, chart palette, and accessible display preferences. | WS | Safety/degradation colors retain non-color alternatives. `— evidence: tests/ui/unit/test_administer_system.py:90, app/ui/src/widgets/settings/__tests__/settings.test.tsx:84` |
+| Implemented | `FR-UI-CONFIGURE_CLIENT` | Edit versioned client/performance/download/notification preferences with validation and reset. | WS | Defaults and scope are explicit. `— evidence: tests/ui/unit/test_administer_system.py:108, app/ui/src/widgets/settings/__tests__/settings.test.tsx:119` |
+| Implemented | `FR-UI-MANAGE_LICENSE` | Inspect edition/entitlements, refresh license state, and show capability effects without embedding authorization policy. | WS | UI refreshes the authoritative entitlement snapshot. `— evidence: tests/ui/unit/test_administer_system.py:122, app/ui/src/widgets/settings/__tests__/settings.test.tsx:159` |
 | Missing | `FR-UI-MANAGE_UPDATES` | Inspect available versions, impact, backup/stop warning, and initiate an authorized update workflow. | WS, ORCH | Running-work impact requires explicit confirmation. |
 | Missing | `FR-UI-ADMINISTER_CAPABILITIES` | Inspect and administer plugins, connectors, workers, remote access, MCP/SMTP endpoints, health and diagnostics through public contracts. | FEAT-IFACE-ADMINISTER_CAPABILITIES, PLUG, WS | Secrets stay redacted and incompatible components cannot be invoked. |
+
 
 ### 4.15 `operate_trading/` — `FEAT-UI-OPERATE_TRADING`
 

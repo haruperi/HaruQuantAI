@@ -15,6 +15,7 @@ import {
 } from "./features/manage_layouts";
 import { createFeature as createEditInputsFeature } from "./features/edit_inputs";
 import { createFeature as createMonitorWorkFeature } from "./features/monitor_work";
+import { createFeature as createAdministerSystemFeature } from "./features/administer_system";
 import { systemStatusWidgetDefinition } from "./widgets/system_status";
 import { widgetCatalogueWidgetDefinition } from "./widgets/widget_catalogue";
 import { homeWidgetDefinition } from "./widgets/home";
@@ -22,6 +23,7 @@ import { productNewsWidgetDefinition } from "./widgets/product_news";
 import { workspaceTemplatesWidgetDefinition } from "./widgets/workspace_templates";
 import { jobProgressWidgetDefinition } from "./widgets/job_progress";
 import { activityLogWidgetDefinition } from "./widgets/activity_log";
+import { settingsWidgetDefinition } from "./widgets/settings";
 import { MockUiPresentationProvider } from "./mocks/mock_provider";
 import { MOCK_ACTIVITY_SNAPSHOT } from "./mocks/fixtures";
 
@@ -39,6 +41,7 @@ function bootstrapApp() {
   widgetRegistry.registerWidget(workspaceTemplatesWidgetDefinition);
   widgetRegistry.registerWidget(jobProgressWidgetDefinition);
   widgetRegistry.registerWidget(activityLogWidgetDefinition);
+  widgetRegistry.registerWidget(settingsWidgetDefinition);
 
   // FEAT-UI-MANAGE_LAYOUTS owns templates, persistence, and view scale.
   const manageLayouts = createManageLayoutsFeature({
@@ -55,6 +58,12 @@ function bootstrapApp() {
     activitySnapshot: MOCK_ACTIVITY_SNAPSHOT,
   });
   bridge.registerFeature(monitorWork);
+
+  // FEAT-UI-ADMINISTER_SYSTEM owns settings, preferences, and client administration.
+  const administerSystem = createAdministerSystemFeature({
+    presentationClient: new MockUiPresentationProvider(),
+  });
+  bridge.registerFeature(administerSystem);
 
   // FEAT-UI-START_WORK owns the /home landing workspace and product news.
   // Dev runtime uses the gated mock capability provider; production injects
@@ -84,7 +93,9 @@ function bootstrapApp() {
                 <TemporalProvider workspaceId="global-workspace">
                   {manageLayouts.renderClientProvider(
                     monitorWork.renderClientProvider(
-                      composeShell.render(<ScaleControls />)
+                      administerSystem.renderClientProvider(
+                        composeShell.render(<ScaleControls />)
+                      )
                     )
                   )}
                 </TemporalProvider>

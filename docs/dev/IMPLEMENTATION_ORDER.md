@@ -276,12 +276,13 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 ##### 1.6 Partial — `FEAT-UI-ADMINISTER_SYSTEM`
 
-1. [ ] `FR-UI-SET_APPEARANCE`
-2. [ ] `FR-UI-CONFIGURE_CLIENT`
-3. [ ] `FR-UI-MANAGE_LICENSE`
+1. [x] `FR-UI-SET_APPEARANCE` — evidence: tests/ui/unit/test_administer_system.py:90, app/ui/src/widgets/settings/__tests__/settings.test.tsx:84
+2. [x] `FR-UI-CONFIGURE_CLIENT` — evidence: tests/ui/unit/test_administer_system.py:108, app/ui/src/widgets/settings/__tests__/settings.test.tsx:119
+3. [x] `FR-UI-MANAGE_LICENSE` — evidence: tests/ui/unit/test_administer_system.py:122, app/ui/src/widgets/settings/__tests__/settings.test.tsx:159
 4. `FR-UI-MANAGE_UPDATES` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.11)
 5. `FR-UI-SET_LANGUAGE` (mock build; completes at Stage 3 Plugins de-mock gate — 3.10)
 6. `FR-UI-ADMINISTER_CAPABILITIES` (mock build; completes at Stage 15 Interfaces de-mock gate — 15.8)
+
 
 ##### 1.7 Partial — `FEAT-UI-ENSURE_ACCESS`
 
