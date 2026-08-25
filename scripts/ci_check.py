@@ -49,6 +49,10 @@ def main() -> None:
         (["ruff", "check", "."], "Ruff Lint Check"),
         (["mypy"], "Mypy Type Check"),
         (["lint-imports"], "Import Linter Check"),
+        (
+            ["python", "scripts/generate_contracts.py", "--check"],
+            "Contract Generation Check",
+        ),
         (["python", "scripts/architecture_check.py"], "Architectural AST Check"),
         (
             ["python", "scripts/validate_feature_docs.py"],

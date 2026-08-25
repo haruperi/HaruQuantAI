@@ -7,8 +7,13 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from app.contracts.workspace.errors import WorkspaceFailure
     from app.contracts.workspace.models import (
         DiagnosticBundleRef,
+        DistributeWorkersRequest,
+        DistributeWorkersSuccess,
+        HostWorkspacesRequest,
+        HostWorkspacesSuccess,
         JobKind,
         LocalSession,
         RuntimeSupportProfile,
@@ -365,5 +370,47 @@ class BuildDiagnosticsCapability(Protocol):
 
         Raises:
             DiagnosticBundleError: If bundle construction or packaging fails.
+        """
+        ...
+
+
+@runtime_checkable
+class DistributeWorkersCapability(Protocol):
+    """Capability protocol for distributed worker pool operations."""
+
+    async def distribute_workers(
+        self,
+        request: DistributeWorkersRequest,
+    ) -> DistributeWorkersSuccess | WorkspaceFailure:
+        """Register, authenticate, lease, assign, and transfer worker work.
+
+        Args:
+            request: Operation-discriminated distributed worker pool
+                request.
+
+        Returns:
+            The registration, lease, assignment envelope, or artifact
+            manifest on success, otherwise a structured workspace failure.
+        """
+        ...
+
+
+@runtime_checkable
+class HostWorkspacesCapability(Protocol):
+    """Capability protocol for hosted workspace boundary operations."""
+
+    async def host_workspaces(
+        self,
+        request: HostWorkspacesRequest,
+    ) -> HostWorkspacesSuccess | WorkspaceFailure:
+        """Provision, describe, and authorize isolated hosted workspaces.
+
+        Args:
+            request: Operation-discriminated hosted workspace request.
+
+        Returns:
+            The isolation context or authorization decision (where ``DENY``
+            is a typed success outcome) on success, otherwise a structured
+            workspace failure.
         """
         ...

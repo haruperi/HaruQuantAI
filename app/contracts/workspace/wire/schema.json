@@ -1,0 +1,2246 @@
+{
+  "$defs": {
+    "ArtifactChunk": {
+      "additionalProperties": false,
+      "description": "One content-addressed chunk of an artifact transfer plan.",
+      "properties": {
+        "chunk_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Chunk Hash",
+          "type": "string"
+        },
+        "index": {
+          "minimum": 0,
+          "title": "Index",
+          "type": "integer"
+        },
+        "offset_bytes": {
+          "minimum": 0,
+          "title": "Offset Bytes",
+          "type": "integer"
+        },
+        "size_bytes": {
+          "minimum": 1,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "index",
+        "offset_bytes",
+        "size_bytes",
+        "chunk_hash"
+      ],
+      "title": "ArtifactChunk",
+      "type": "object"
+    },
+    "ArtifactManifest": {
+      "additionalProperties": false,
+      "description": "Wire-native content-addressed artifact manifest and chunk plan.\n\nChunk plans are sorted by ``index`` starting at 0 and contiguous from\n``offset_bytes`` 0; commit additionally requires concatenating the\nchunk bytes to reproduce ``size_bytes`` and ``content_hash``. The\nbyte-level hash reproduction is verified by the process layer;\ncorruption or interruption never yields ``COMMITTED``.",
+      "properties": {
+        "artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "artifact_schema_version": {
+          "minimum": 1,
+          "title": "Artifact Schema Version",
+          "type": "integer"
+        },
+        "chunks": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ArtifactChunk"
+          },
+          "title": "Chunks",
+          "type": "array"
+        },
+        "committed_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Committed At"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "media_type": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/ResultState"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "kind",
+        "content_hash",
+        "size_bytes",
+        "media_type",
+        "artifact_schema_version",
+        "state",
+        "created_at"
+      ],
+      "title": "ArtifactManifest",
+      "type": "object"
+    },
+    "AuthenticationModeValue": {
+      "enum": [
+        "LOCAL_SESSION",
+        "NONLOCAL_TOKEN"
+      ],
+      "type": "string"
+    },
+    "AuthorizationOutcome": {
+      "enum": [
+        "ALLOW",
+        "DENY"
+      ],
+      "type": "string"
+    },
+    "BackupFileRecordWire": {
+      "additionalProperties": false,
+      "description": "Wire form of one checksummed file inside a backup manifest.",
+      "properties": {
+        "relative_path": {
+          "$ref": "#/$defs/RelativePosixPath"
+        },
+        "sha256_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256 Hash",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "relative_path",
+        "sha256_hash",
+        "size_bytes"
+      ],
+      "title": "BackupFileRecordWire",
+      "type": "object"
+    },
+    "Bcp47LanguageTag": {
+      "pattern": "^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$",
+      "type": "string"
+    },
+    "DeploymentMode": {
+      "enum": [
+        "DESKTOP",
+        "HOSTED"
+      ],
+      "type": "string"
+    },
+    "DiagnosticBundleManifest": {
+      "additionalProperties": false,
+      "description": "Wire projection of the redacted diagnostic bundle manifest.\n\nCollision exception: ``schema_version`` stays the inspected workspace's\ndatabase schema number. Defined before ``DiagnosticBundleRefWire``\nbecause the reference embeds it; registry order still follows the\nREADME inventory. Bundles never disclose session tokens, connection\nsecrets, or unredacted secret values.",
+      "properties": {
+        "build_commit": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "build_version": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "bundle_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Bundle Id",
+          "type": "string"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "integrity_findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Integrity Findings",
+          "type": "array"
+        },
+        "job_records_count": {
+          "minimum": 0,
+          "title": "Job Records Count",
+          "type": "integer"
+        },
+        "log_entries_count": {
+          "minimum": 0,
+          "title": "Log Entries Count",
+          "type": "integer"
+        },
+        "redaction_summary": {
+          "additionalProperties": {
+            "$ref": "#/$defs/NonNegativeInt"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Redaction Summary",
+          "type": "object"
+        },
+        "schema_version": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Schema Version"
+        },
+        "workspace_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Workspace Id"
+        }
+      },
+      "required": [
+        "bundle_id",
+        "created_at",
+        "build_version",
+        "build_commit",
+        "schema_version",
+        "workspace_id",
+        "log_entries_count",
+        "job_records_count"
+      ],
+      "title": "DiagnosticBundleManifestWire",
+      "type": "object"
+    },
+    "DiagnosticBundleRef": {
+      "additionalProperties": false,
+      "description": "Wire projection of a generated diagnostic bundle reference.\n\nThe ``archive_path`` is process-local and excluded; the wire form\nreferences the bundle by identity, checksum, size, and manifest.",
+      "properties": {
+        "bundle_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Bundle Id",
+          "type": "string"
+        },
+        "checksum_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Checksum Sha256",
+          "type": "string"
+        },
+        "file_size_bytes": {
+          "minimum": 0,
+          "title": "File Size Bytes",
+          "type": "integer"
+        },
+        "manifest": {
+          "$ref": "#/$defs/DiagnosticBundleManifest"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "bundle_id",
+        "checksum_sha256",
+        "file_size_bytes",
+        "manifest"
+      ],
+      "title": "DiagnosticBundleRefWire",
+      "type": "object"
+    },
+    "DistributeWorkersRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated distributed worker pool request.\n\n``REGISTER`` requires ``descriptor`` and ``endpoint`` and forbids the\nrest; ``AUTHENTICATE`` and ``HEARTBEAT`` require ``worker_id`` only;\n``ACQUIRE_LEASE`` requires ``worker_id``, ``job_id``, and\n``attempt_no``; ``RELEASE_LEASE`` additionally requires\n``fencing_token``; ``ASSIGN_TASK`` requires ``job_id``, ``attempt_no``,\nand ``task_run_id`` with optional scheduler hints; ``PREPARE_TRANSFER``\nrequires a STAGED ``artifact``; ``COMMIT_TRANSFER`` requires\n``artifact_id``, ``job_id``, ``attempt_no``, and ``fencing_token``.",
+      "properties": {
+        "artifact": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArtifactManifest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Id"
+        },
+        "attempt_no": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Attempt No"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "descriptor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WorkerCapabilityDescriptor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "endpoint": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UriStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "fencing_token": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fencing Token"
+        },
+        "job_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Job Id"
+        },
+        "locality_hints": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Locality Hints",
+          "type": "array"
+        },
+        "operation": {
+          "enum": [
+            "REGISTER",
+            "AUTHENTICATE",
+            "HEARTBEAT",
+            "ACQUIRE_LEASE",
+            "RELEASE_LEASE",
+            "ASSIGN_TASK",
+            "PREPARE_TRANSFER",
+            "COMMIT_TRANSFER"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_capabilities": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Required Capabilities",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "task_run_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Run Id"
+        },
+        "worker_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Worker Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "DistributeWorkersRequest",
+      "type": "object"
+    },
+    "DistributeWorkersSuccess": {
+      "additionalProperties": false,
+      "description": "Successful distributed worker pool operation result.\n\n``registration`` is returned for REGISTER, AUTHENTICATE, and HEARTBEAT;\n``lease`` for ACQUIRE_LEASE; ``envelope`` for ASSIGN_TASK; ``artifact``\ncarries the STAGED chunk plan for PREPARE_TRANSFER and the COMMITTED\nmanifest for COMMIT_TRANSFER.",
+      "properties": {
+        "artifact": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArtifactManifest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "envelope": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WorkerTaskEnvelope"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "lease": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WorkerLease"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "registration": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WorkerRegistration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "DistributeWorkersSuccess",
+      "type": "object"
+    },
+    "HealthState": {
+      "enum": [
+        "HEALTHY",
+        "DEGRADED",
+        "UNHEALTHY"
+      ],
+      "type": "string"
+    },
+    "HostWorkspacesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated hosted workspace boundary request.\n\n``PROVISION`` requires ``context``; ``DESCRIBE`` requires\n``workspace_id``; ``AUTHORIZE`` requires ``workspace_id``,\n``principal``, and ``action``.",
+      "properties": {
+        "action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "context": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HostedWorkspaceContext"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "PROVISION",
+            "DESCRIBE",
+            "AUTHORIZE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "principal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PrincipalRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Workspace Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "HostWorkspacesRequest",
+      "type": "object"
+    },
+    "HostWorkspacesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful hosted workspace boundary operation result.\n\n``context`` is returned for PROVISION and DESCRIBE; ``decision`` is\nreturned for AUTHORIZE, where ``DENY`` is a typed success outcome and\nnever a failure.",
+      "properties": {
+        "context": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HostedWorkspaceContext"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WorkspaceAuthorizationDecision"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "HostWorkspacesSuccess",
+      "type": "object"
+    },
+    "HostedWorkspaceContext": {
+      "additionalProperties": false,
+      "description": "Wire-native isolation scope assignment for one hosted workspace.\n\nNo two hosted contexts may share a value of the same scope kind; that\ncross-record uniqueness is enforced by the owning store, while the six\nscopes map one-to-one to the isolated concerns of\nFR-WS-ISOLATE_HOSTED_WORKSPACES.",
+      "properties": {
+        "artifact_scope": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "credential_scope": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "deployment_mode": {
+          "$ref": "#/$defs/DeploymentMode"
+        },
+        "metadata_scope": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "plugin_permission_scope": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "queue_scope": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "quota_scope": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "deployment_mode",
+        "metadata_scope",
+        "artifact_scope",
+        "queue_scope",
+        "credential_scope",
+        "quota_scope",
+        "plugin_permission_scope"
+      ],
+      "title": "HostedWorkspaceContext",
+      "type": "object"
+    },
+    "IanaTimezone": {
+      "pattern": "^[A-Za-z0-9+\\-_]+(?:/[A-Za-z0-9+\\-_]+)*$",
+      "type": "string"
+    },
+    "IpLiteral": {
+      "pattern": "^(?:(?:(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)|[0-9A-Fa-f:]*:[0-9A-Fa-f:.]+)$",
+      "type": "string"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "LocalSession": {
+      "additionalProperties": false,
+      "description": "Wire projection of an ephemeral local launcher session.\n\nThe secret ``token`` is process-local and never appears in wire schemas\nor generated UI types.",
+      "properties": {
+        "client_host": {
+          "$ref": "#/$defs/IpLiteral"
+        },
+        "client_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "is_launcher_connected": {
+          "default": true,
+          "title": "Is Launcher Connected",
+          "type": "boolean"
+        },
+        "is_loopback": {
+          "default": true,
+          "title": "Is Loopback",
+          "type": "boolean"
+        },
+        "issued_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Issued At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "client_id",
+        "client_host",
+        "issued_at",
+        "expires_at"
+      ],
+      "title": "LocalSessionWire",
+      "type": "object"
+    },
+    "LogLevel": {
+      "enum": [
+        "DEBUG",
+        "INFO",
+        "WARNING",
+        "ERROR",
+        "CRITICAL"
+      ],
+      "type": "string"
+    },
+    "Name1To160": {
+      "maxLength": 160,
+      "minLength": 1,
+      "type": "string"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "NonNegativeInt": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "PrincipalRef": {
+      "additionalProperties": false,
+      "description": "Wire-native reference to one authenticated hosted principal.\n\nThe authority discriminator is the provider identity; the principal\nreplaces the local-session token in hosted mode.",
+      "properties": {
+        "auth_provider": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "principal_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Principal Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "principal_id",
+        "auth_provider"
+      ],
+      "title": "PrincipalRef",
+      "type": "object"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "RelativePosixPath": {
+      "pattern": "^[^/\\\\]+(?:/[^/\\\\]+)*$",
+      "type": "string"
+    },
+    "ResultState": {
+      "enum": [
+        "STAGED",
+        "VALIDATING",
+        "COMMITTED",
+        "REJECTED",
+        "CORRUPT"
+      ],
+      "type": "string"
+    },
+    "RuntimeConfiguration": {
+      "additionalProperties": false,
+      "description": "Wire projection of the validated launcher/server runtime state.",
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "settings": {
+          "$ref": "#/$defs/ServerRuntimeSettingsWire"
+        },
+        "validation": {
+          "$ref": "#/$defs/ServerRuntimeValidationWire"
+        }
+      },
+      "required": [
+        "settings",
+        "validation"
+      ],
+      "title": "RuntimeConfigurationWire",
+      "type": "object"
+    },
+    "SecretName": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+      "type": "string"
+    },
+    "SecretRef": {
+      "additionalProperties": false,
+      "description": "Wire-native opaque reference to one stored workspace secret.\n\nSecret values never enter wire schemas, manifests, or logs; names are\nunique per workspace (``secret_refs(workspace_id, name UNIQUE)``).",
+      "properties": {
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/SecretName"
+        },
+        "row_version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Row Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "secret_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Secret Id",
+          "type": "string"
+        },
+        "updated_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "secret_id",
+        "workspace_id",
+        "name",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "SecretRef",
+      "type": "object"
+    },
+    "ServerRuntimeSettingsWire": {
+      "additionalProperties": false,
+      "description": "Wire form of the v1 ``ServerRuntimeSettings`` fields.",
+      "properties": {
+        "allow_non_loopback": {
+          "default": false,
+          "title": "Allow Non Loopback",
+          "type": "boolean"
+        },
+        "authentication_mode": {
+          "$ref": "#/$defs/AuthenticationModeValue",
+          "default": "LOCAL_SESSION"
+        },
+        "bind_address": {
+          "$ref": "#/$defs/IpLiteral",
+          "default": "127.0.0.1"
+        },
+        "global_cpu_percent": {
+          "default": 100,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Global Cpu Percent",
+          "type": "integer"
+        },
+        "global_memory_mb": {
+          "default": 4096,
+          "minimum": 1,
+          "title": "Global Memory Mb",
+          "type": "integer"
+        },
+        "headless": {
+          "default": false,
+          "title": "Headless",
+          "type": "boolean"
+        },
+        "port": {
+          "maximum": 65535,
+          "minimum": 1,
+          "title": "Port",
+          "type": "integer"
+        },
+        "worker_cpu_percent": {
+          "default": 100,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Worker Cpu Percent",
+          "type": "integer"
+        },
+        "worker_memory_mb": {
+          "default": 1024,
+          "minimum": 1,
+          "title": "Worker Memory Mb",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "port"
+      ],
+      "title": "ServerRuntimeSettingsWire",
+      "type": "object"
+    },
+    "ServerRuntimeValidationWire": {
+      "additionalProperties": false,
+      "description": "Wire form of the v1 ``ServerRuntimeValidation`` fields.",
+      "properties": {
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "port_available": {
+          "default": true,
+          "title": "Port Available",
+          "type": "boolean"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "valid"
+      ],
+      "title": "ServerRuntimeValidationWire",
+      "type": "object"
+    },
+    "StorageGuardPolicy": {
+      "additionalProperties": false,
+      "description": "Wire projection of the workspace storage guard thresholds.\n\nThe policy carries limits only; the admission ``StorageGuardDecision``\nremains the distinct frozen v1 port result.",
+      "properties": {
+        "max_artifact_size_mb": {
+          "default": 4096,
+          "minimum": 1,
+          "title": "Max Artifact Size Mb",
+          "type": "integer"
+        },
+        "min_free_space_mb": {
+          "default": 512,
+          "minimum": 1,
+          "title": "Min Free Space Mb",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "title": "StorageGuardPolicyWire",
+      "type": "object"
+    },
+    "SystemHealth": {
+      "additionalProperties": false,
+      "description": "Wire projection of the pre-readiness system health summary.",
+      "properties": {
+        "checked_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Checked At",
+          "type": "string"
+        },
+        "components": {
+          "additionalProperties": {
+            "$ref": "#/$defs/HealthState"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Components",
+          "type": "object"
+        },
+        "healthy": {
+          "default": true,
+          "title": "Healthy",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/HealthState",
+          "default": "HEALTHY"
+        }
+      },
+      "required": [
+        "checked_at"
+      ],
+      "title": "SystemHealthWire",
+      "type": "object"
+    },
+    "SystemReadiness": {
+      "additionalProperties": false,
+      "description": "Wire projection of the secret-free system readiness report.\n\nCollision exception: ``schema_version`` stays the open workspace's\ndatabase schema number, or None when no workspace is open.",
+      "properties": {
+        "active_workers": {
+          "minimum": 0,
+          "title": "Active Workers",
+          "type": "integer"
+        },
+        "build_commit": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "build_version": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "checked_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Checked At",
+          "type": "string"
+        },
+        "healthy": {
+          "title": "Healthy",
+          "type": "boolean"
+        },
+        "migrations_current": {
+          "title": "Migrations Current",
+          "type": "boolean"
+        },
+        "ready": {
+          "title": "Ready",
+          "type": "boolean"
+        },
+        "reasons": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "schema_version": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Schema Version"
+        },
+        "state_recovered": {
+          "title": "State Recovered",
+          "type": "boolean"
+        },
+        "worker_capacity": {
+          "minimum": 0,
+          "title": "Worker Capacity",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ready",
+        "healthy",
+        "build_version",
+        "build_commit",
+        "schema_version",
+        "migrations_current",
+        "state_recovered",
+        "worker_capacity",
+        "active_workers",
+        "checked_at"
+      ],
+      "title": "SystemReadinessWire",
+      "type": "object"
+    },
+    "UppercaseToken": {
+      "pattern": "^[A-Z][A-Z0-9_-]*$",
+      "type": "string"
+    },
+    "UriStr": {
+      "pattern": "^[A-Za-z][A-Za-z0-9+.-]*://\\S+$",
+      "type": "string"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    },
+    "WorkerCapabilityDescriptor": {
+      "additionalProperties": false,
+      "description": "Wire-native registration facts describing one worker build.\n\nRegistration alone confers no trust; ``capabilities`` lists supported\ntask/profile/plugin capability versions and ``artifact_locality`` lists\nartifact content hashes present locally.",
+      "properties": {
+        "architecture": {
+          "$ref": "#/$defs/UppercaseToken"
+        },
+        "artifact_locality": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Artifact Locality",
+          "type": "array"
+        },
+        "build_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Build Hash",
+          "type": "string"
+        },
+        "capabilities": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "cpu_cores": {
+          "minimum": 1,
+          "title": "Cpu Cores",
+          "type": "integer"
+        },
+        "heartbeat_interval_seconds": {
+          "minimum": 1,
+          "title": "Heartbeat Interval Seconds",
+          "type": "integer"
+        },
+        "memory_mb": {
+          "minimum": 1,
+          "title": "Memory Mb",
+          "type": "integer"
+        },
+        "os_family": {
+          "$ref": "#/$defs/UppercaseToken"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "capabilities",
+        "build_hash",
+        "os_family",
+        "architecture",
+        "cpu_cores",
+        "memory_mb",
+        "heartbeat_interval_seconds"
+      ],
+      "title": "WorkerCapabilityDescriptor",
+      "type": "object"
+    },
+    "WorkerLease": {
+      "additionalProperties": false,
+      "description": "Wire-native fenced job execution lease held by one worker.\n\n``(job_id, attempt_no, fencing_token)`` is unique and a commit is\naccepted only for the current token before expiry; scoped job\ncredentials are ``SecretRef`` identities, never values.",
+      "properties": {
+        "acquired_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Acquired At",
+          "type": "string"
+        },
+        "attempt_no": {
+          "minimum": 1,
+          "title": "Attempt No",
+          "type": "integer"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "fencing_token": {
+          "minimum": 1,
+          "title": "Fencing Token",
+          "type": "integer"
+        },
+        "heartbeat_interval_seconds": {
+          "minimum": 1,
+          "title": "Heartbeat Interval Seconds",
+          "type": "integer"
+        },
+        "job_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Job Id",
+          "type": "string"
+        },
+        "last_heartbeat_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Last Heartbeat At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/WorkerLeaseState"
+        },
+        "worker_build_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Worker Build Hash",
+          "type": "string"
+        },
+        "worker_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Worker Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id",
+        "attempt_no",
+        "worker_id",
+        "worker_build_hash",
+        "fencing_token",
+        "acquired_at",
+        "last_heartbeat_at",
+        "expires_at",
+        "heartbeat_interval_seconds",
+        "state"
+      ],
+      "title": "WorkerLease",
+      "type": "object"
+    },
+    "WorkerLeaseState": {
+      "enum": [
+        "ACTIVE",
+        "RELEASED",
+        "EXPIRED",
+        "SUPERSEDED"
+      ],
+      "type": "string"
+    },
+    "WorkerRegistration": {
+      "additionalProperties": false,
+      "description": "Wire-native registered remote worker identity and liveness.\n\nTrust requires channel authentication, not registration; stale workers\n(past ``heartbeat_expires_at``) and untrusted workers receive no\nassignments.",
+      "properties": {
+        "descriptor": {
+          "$ref": "#/$defs/WorkerCapabilityDescriptor"
+        },
+        "endpoint": {
+          "$ref": "#/$defs/UriStr"
+        },
+        "heartbeat_expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Heartbeat Expires At",
+          "type": "string"
+        },
+        "last_heartbeat_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Last Heartbeat At",
+          "type": "string"
+        },
+        "registered_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Registered At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "trusted": {
+          "default": false,
+          "title": "Trusted",
+          "type": "boolean"
+        },
+        "worker_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Worker Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "worker_id",
+        "descriptor",
+        "endpoint",
+        "registered_at",
+        "last_heartbeat_at",
+        "heartbeat_expires_at"
+      ],
+      "title": "WorkerRegistration",
+      "type": "object"
+    },
+    "WorkerTaskEnvelope": {
+      "additionalProperties": false,
+      "description": "Wire-native assignment envelope dispatching one task attempt.\n\nReassignment to another compatible worker changes only ``envelope_id``,\n``assigned_worker_id``, and ``assigned_at``; the input hashes stay\ninvariant so seeds and canonical output are unchanged.",
+      "properties": {
+        "assigned_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Assigned At",
+          "type": "string"
+        },
+        "assigned_worker_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Assigned Worker Id",
+          "type": "string"
+        },
+        "attempt_no": {
+          "minimum": 1,
+          "title": "Attempt No",
+          "type": "integer"
+        },
+        "envelope_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Envelope Id",
+          "type": "string"
+        },
+        "fencing_token": {
+          "minimum": 1,
+          "title": "Fencing Token",
+          "type": "integer"
+        },
+        "input_hashes": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Input Hashes",
+          "type": "array"
+        },
+        "job_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Job Id",
+          "type": "string"
+        },
+        "locality_hints": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Locality Hints",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "task_run_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Task Run Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "envelope_id",
+        "task_run_id",
+        "job_id",
+        "attempt_no",
+        "fencing_token",
+        "assigned_worker_id",
+        "assigned_at"
+      ],
+      "title": "WorkerTaskEnvelope",
+      "type": "object"
+    },
+    "WorkspaceAuthorizationDecision": {
+      "additionalProperties": false,
+      "description": "Wire-native fail-closed authorization decision for hosted access.\n\nMissing evidence or policy uncertainty yields ``DENY``; a ``DENY``\noutcome is a typed success result of ``HostWorkspacesCapability``,\nnot a transport failure.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "decided_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Decided At",
+          "type": "string"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "outcome": {
+          "$ref": "#/$defs/AuthorizationOutcome"
+        },
+        "principal": {
+          "$ref": "#/$defs/PrincipalRef"
+        },
+        "reason": {
+          "default": "",
+          "title": "Reason",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_id",
+        "principal",
+        "workspace_id",
+        "action",
+        "outcome",
+        "decided_at"
+      ],
+      "title": "WorkspaceAuthorizationDecision",
+      "type": "object"
+    },
+    "WorkspaceBackupManifest": {
+      "additionalProperties": false,
+      "description": "Wire projection of a consistent workspace backup snapshot.\n\nCollision exception: ``schema_version`` stays the workspace database\nschema number captured at backup time. The v1 empty-string\n``manifest_checksum`` default is a process-local construction\nconvenience; the wire form requires the canonical hash.",
+      "properties": {
+        "backup_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Backup Id",
+          "type": "string"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "file_count": {
+          "minimum": 0,
+          "title": "File Count",
+          "type": "integer"
+        },
+        "files": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/BackupFileRecordWire"
+          },
+          "title": "Files",
+          "type": "array"
+        },
+        "manifest_checksum": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Manifest Checksum",
+          "type": "string"
+        },
+        "schema_version": {
+          "minimum": 0,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "total_bytes": {
+          "minimum": 0,
+          "title": "Total Bytes",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "backup_id",
+        "workspace_id",
+        "schema_version",
+        "created_at",
+        "file_count",
+        "total_bytes",
+        "manifest_checksum"
+      ],
+      "title": "WorkspaceBackupManifestWire",
+      "type": "object"
+    },
+    "WorkspaceConfiguration": {
+      "additionalProperties": false,
+      "description": "Wire projection of one immutable versioned workspace configuration.",
+      "properties": {
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "settings": {
+          "$ref": "#/$defs/WorkspaceSettingsWire"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "version",
+        "settings",
+        "created_at"
+      ],
+      "title": "WorkspaceConfigurationWire",
+      "type": "object"
+    },
+    "WorkspaceFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope shared by the new Workspace capabilities.\n\n``WORKER_UNTRUSTED`` covers assignments or leases by untrusted workers,\n``LEASE_TOKEN_STALE`` covers commits under a superseded token,\n``TRANSFER_INVALID`` covers hash/size/schema mismatches,\n``TRANSFER_INCOMPLETE`` covers missing chunks, ``ISOLATION_CONFLICT``\ncovers hosted scope collisions at PROVISION, and\n``CAPABILITY_UNAVAILABLE`` performs no mutation.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/WorkspaceFailureCode"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "WorkspaceFailure",
+      "type": "object"
+    },
+    "WorkspaceFailureCode": {
+      "enum": [
+        "WORKSPACE_VALIDATION_FAILED",
+        "WORKSPACE_NOT_FOUND",
+        "WORKSPACE_ALREADY_OPEN",
+        "WORKER_UNKNOWN",
+        "WORKER_UNTRUSTED",
+        "WORKER_EXPIRED",
+        "LEASE_UNAVAILABLE",
+        "LEASE_TOKEN_STALE",
+        "TRANSFER_INVALID",
+        "TRANSFER_INCOMPLETE",
+        "ISOLATION_CONFLICT",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "WorkspaceRef": {
+      "additionalProperties": false,
+      "description": "Wire projection of the immutable workspace identity description.\n\nThe v1 ``root_path`` field is process-local and excluded; ``status``\nmirrors the v1 ``WorkspaceStatus`` states.",
+      "properties": {
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/Name1To160"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/WorkspaceStatusValue",
+          "default": "READY"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "name",
+        "created_at"
+      ],
+      "title": "WorkspaceRefWire",
+      "type": "object"
+    },
+    "WorkspaceRestorePlan": {
+      "additionalProperties": false,
+      "description": "Wire projection of a backup restore plan.\n\nThe plan references the backup by identity; the v1 ``Path``-based plan\nremains the process contract and restore always targets empty staging.",
+      "properties": {
+        "backup_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Backup Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "verify_checksums": {
+          "default": true,
+          "title": "Verify Checksums",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "backup_id"
+      ],
+      "title": "WorkspaceRestorePlanWire",
+      "type": "object"
+    },
+    "WorkspaceSettingsWire": {
+      "additionalProperties": false,
+      "description": "Wire form of the v1 ``WorkspaceSettings`` fields.\n\nDirectories are workspace-relative, contain no ``..`` segments or\nabsolute anchors, and are mutually distinct.",
+      "properties": {
+        "artifacts_dir": {
+          "default": "artifacts",
+          "title": "Artifacts Dir",
+          "type": "string"
+        },
+        "cache_dir": {
+          "default": "cache",
+          "title": "Cache Dir",
+          "type": "string"
+        },
+        "exports_dir": {
+          "default": "exports",
+          "title": "Exports Dir",
+          "type": "string"
+        },
+        "locale": {
+          "$ref": "#/$defs/Bcp47LanguageTag"
+        },
+        "log_level": {
+          "$ref": "#/$defs/LogLevel",
+          "default": "INFO"
+        },
+        "log_retention_days": {
+          "default": 30,
+          "minimum": 1,
+          "title": "Log Retention Days",
+          "type": "integer"
+        },
+        "logs_dir": {
+          "default": "logs",
+          "title": "Logs Dir",
+          "type": "string"
+        },
+        "max_artifact_size_mb": {
+          "minimum": 1,
+          "title": "Max Artifact Size Mb",
+          "type": "integer"
+        },
+        "max_total_artifact_gb": {
+          "minimum": 1,
+          "title": "Max Total Artifact Gb",
+          "type": "integer"
+        },
+        "retention_days": {
+          "default": 365,
+          "minimum": 1,
+          "title": "Retention Days",
+          "type": "integer"
+        },
+        "timezone": {
+          "$ref": "#/$defs/IanaTimezone"
+        },
+        "worker_count": {
+          "minimum": 1,
+          "title": "Worker Count",
+          "type": "integer"
+        },
+        "worker_memory_mb": {
+          "minimum": 1,
+          "title": "Worker Memory Mb",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "timezone",
+        "locale",
+        "worker_count",
+        "worker_memory_mb",
+        "max_artifact_size_mb",
+        "max_total_artifact_gb"
+      ],
+      "title": "WorkspaceSettingsWire",
+      "type": "object"
+    },
+    "WorkspaceStatusValue": {
+      "enum": [
+        "UNINITIALIZED",
+        "READY",
+        "MIGRATING",
+        "LOCKED",
+        "RECOVERING",
+        "CORRUPTED"
+      ],
+      "type": "string"
+    },
+    "WorkspaceVersion": {
+      "additionalProperties": false,
+      "description": "Wire projection of applied workspace schema migration metadata.\n\nCollision exception: ``schema_version`` stays the workspace database\nschema number, so this record carries no record-level ``Literal[1]``\nfield; its wire-schema identity is the workspace namespace v1.",
+      "properties": {
+        "app_version": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "applied_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Applied At",
+          "type": "string"
+        },
+        "database_engine": {
+          "$ref": "#/$defs/NonEmptyStr",
+          "default": "sqlite3"
+        },
+        "schema_version": {
+          "minimum": 0,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "app_version",
+        "applied_at"
+      ],
+      "title": "WorkspaceVersionWire",
+      "type": "object"
+    },
+    "WorkspaceWriterFence": {
+      "additionalProperties": false,
+      "description": "Wire projection of an acquired workspace writer fence.\n\nThe secret ``lock_token`` is process-local; a second writer receives\n``WORKSPACE_ALREADY_OPEN`` from the frozen v1 port.",
+      "properties": {
+        "acquired_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Acquired At",
+          "type": "string"
+        },
+        "holder_pid": {
+          "minimum": 1,
+          "title": "Holder Pid",
+          "type": "integer"
+        },
+        "is_read_only": {
+          "default": false,
+          "title": "Is Read Only",
+          "type": "boolean"
+        },
+        "is_write_locked": {
+          "default": true,
+          "title": "Is Write Locked",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "holder_pid",
+        "acquired_at"
+      ],
+      "title": "WorkspaceWriterFenceWire",
+      "type": "object"
+    },
+    "WorkspaceWriterLease": {
+      "additionalProperties": false,
+      "description": "Wire-native writer lease fencing one workspace writer.\n\nAt most one active lease may exist per workspace and expired leases are\nreclaimed at startup; the paired fence's secret ``lock_token`` stays\nprocess-local.",
+      "properties": {
+        "acquired_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Acquired At",
+          "type": "string"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "holder_pid": {
+          "minimum": 1,
+          "title": "Holder Pid",
+          "type": "integer"
+        },
+        "is_read_only": {
+          "default": false,
+          "title": "Is Read Only",
+          "type": "boolean"
+        },
+        "lease_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Lease Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "lease_id",
+        "workspace_id",
+        "holder_pid",
+        "acquired_at",
+        "expires_at"
+      ],
+      "title": "WorkspaceWriterLease",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {},
+  "failures": {
+    "WorkspaceFailure": {
+      "$ref": "#/$defs/WorkspaceFailure"
+    }
+  },
+  "models": {
+    "ArtifactManifest": {
+      "$ref": "#/$defs/ArtifactManifest"
+    },
+    "DiagnosticBundleManifest": {
+      "$ref": "#/$defs/DiagnosticBundleManifest"
+    },
+    "DiagnosticBundleRef": {
+      "$ref": "#/$defs/DiagnosticBundleRef"
+    },
+    "DistributeWorkersRequest": {
+      "$ref": "#/$defs/DistributeWorkersRequest"
+    },
+    "DistributeWorkersSuccess": {
+      "$ref": "#/$defs/DistributeWorkersSuccess"
+    },
+    "HostWorkspacesRequest": {
+      "$ref": "#/$defs/HostWorkspacesRequest"
+    },
+    "HostWorkspacesSuccess": {
+      "$ref": "#/$defs/HostWorkspacesSuccess"
+    },
+    "HostedWorkspaceContext": {
+      "$ref": "#/$defs/HostedWorkspaceContext"
+    },
+    "LocalSession": {
+      "$ref": "#/$defs/LocalSession"
+    },
+    "PrincipalRef": {
+      "$ref": "#/$defs/PrincipalRef"
+    },
+    "RuntimeConfiguration": {
+      "$ref": "#/$defs/RuntimeConfiguration"
+    },
+    "SecretRef": {
+      "$ref": "#/$defs/SecretRef"
+    },
+    "StorageGuardPolicy": {
+      "$ref": "#/$defs/StorageGuardPolicy"
+    },
+    "SystemHealth": {
+      "$ref": "#/$defs/SystemHealth"
+    },
+    "SystemReadiness": {
+      "$ref": "#/$defs/SystemReadiness"
+    },
+    "WorkerCapabilityDescriptor": {
+      "$ref": "#/$defs/WorkerCapabilityDescriptor"
+    },
+    "WorkerLease": {
+      "$ref": "#/$defs/WorkerLease"
+    },
+    "WorkerRegistration": {
+      "$ref": "#/$defs/WorkerRegistration"
+    },
+    "WorkerTaskEnvelope": {
+      "$ref": "#/$defs/WorkerTaskEnvelope"
+    },
+    "WorkspaceAuthorizationDecision": {
+      "$ref": "#/$defs/WorkspaceAuthorizationDecision"
+    },
+    "WorkspaceBackupManifest": {
+      "$ref": "#/$defs/WorkspaceBackupManifest"
+    },
+    "WorkspaceConfiguration": {
+      "$ref": "#/$defs/WorkspaceConfiguration"
+    },
+    "WorkspaceRef": {
+      "$ref": "#/$defs/WorkspaceRef"
+    },
+    "WorkspaceRestorePlan": {
+      "$ref": "#/$defs/WorkspaceRestorePlan"
+    },
+    "WorkspaceVersion": {
+      "$ref": "#/$defs/WorkspaceVersion"
+    },
+    "WorkspaceWriterFence": {
+      "$ref": "#/$defs/WorkspaceWriterFence"
+    },
+    "WorkspaceWriterLease": {
+      "$ref": "#/$defs/WorkspaceWriterLease"
+    }
+  },
+  "namespace": "workspace",
+  "schema_version": 1,
+  "title": "workspace wire contracts v1"
+}

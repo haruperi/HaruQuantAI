@@ -374,3 +374,12 @@ def test_fr_trace_function(
     res_pkg = fr_plug_declare_plugin_manifests(pkg_path)
     assert isinstance(res_pkg, PluginPackageValidation)
     assert res_pkg.manifest.id == valid_manifest_dict["id"]
+
+
+def test_plugin_manifests_usage_example() -> None:
+    """Verify the __main__ usage scenarios run successfully."""
+    from app.services.plugins.manifests.plugin_manifests import (
+        _run_usage_example,
+    )
+
+    _run_usage_example()

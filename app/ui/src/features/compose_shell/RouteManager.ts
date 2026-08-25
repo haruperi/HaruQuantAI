@@ -1,4 +1,4 @@
-import type { WorkspaceRoute } from "../../contracts/generated/ui_contracts";
+import type { WorkspaceRoute } from "../../runtime/composition_bridge";
 
 export class RouteManager {
   /**
@@ -7,22 +7,22 @@ export class RouteManager {
    */
   public static resolveRoute(
     requestedRoute: string,
-    availableWorkspaces: readonly WorkspaceRoute[],
+    available_workspaces: readonly WorkspaceRoute[],
     defaultFallback: string = "/home"
   ): { targetRoute: string; activeWorkspace: WorkspaceRoute | null } {
-    const matched = availableWorkspaces.find(
-      (ws) => ws.routePath === requestedRoute && ws.isAuthorized !== false
+    const matched = available_workspaces.find(
+      (ws) => ws.route_path === requestedRoute && ws.is_authorized !== false
     );
 
     if (matched) {
       return {
-        targetRoute: matched.routePath,
+        targetRoute: matched.route_path,
         activeWorkspace: matched,
       };
     }
 
-    const fallbackMatched = availableWorkspaces.find(
-      (ws) => ws.routePath === defaultFallback && ws.isAuthorized !== false
+    const fallbackMatched = available_workspaces.find(
+      (ws) => ws.route_path === defaultFallback && ws.is_authorized !== false
     );
 
     return {

@@ -204,14 +204,36 @@ boundary before any mock-backed UI slice is built, so mocks implement ratified c
 Contracts are authored from the owning domain READMEs (the semantic authorities) and may be revised by later real
 feature slices through their documented change processes.
 
-1. [ ] Enumerate every cross-boundary contract requirement from the 15 business-domain READMEs plus the existing
+**Completion evidence (task 1.0):** all 15 owner READMEs now carry their ratified `Ratified v1 public records and
+capabilities` catalogues; the 16 namespaces under `app/contracts/` implement the inventoried records and capability
+bundles as strict frozen Pydantic v2 wire models (compatibility-frozen v1 process classes unchanged; additive
+`<Record>Wire` projections); `scripts/generate_contracts.py` deterministically emits the 16 `wire/schema.json`
+documents and 17 TypeScript modules (byte-reproducible, `--check` wired into `scripts/ci_check.py` and
+`app/ui/package.json`); the handwritten `ui_contracts.ts` mirror is deleted with all nine consumers migrated; and
+`tests/contracts/` (213 focused tests) proves inventory parity, round-trips, versions, generation determinism, and
+import boundaries. No product `FEAT-*`/`FR-*` status changed.
+
+1. [x] Enumerate every cross-boundary contract requirement from the 15 business-domain READMEs plus the existing
    `app/contracts/ui/` package, and record the owner, consumers, and version for each.
-2. [ ] Author the Python/Pydantic definitions and wire schemas into `app/contracts/<owner>/` packages for all listed
+   — evidence: `app/contracts/README.md` §§4.1–4.15 inventory reconciled 1:1 by
+   `tests/contracts/test_contract_inventory.py::test_readme_record_counts_match_registries` (486 items, zero removals).
+2. [x] Author the Python/Pydantic definitions and wire schemas into `app/contracts/<owner>/` packages for all listed
    contracts, including the 17 versioned UI feature capability ports and their request/result/failure/event unions.
-3. [ ] Regenerate the TypeScript clients and types under `app/ui/src/contracts/generated/` from the new contracts and
+   — evidence: `app/contracts/{workspace,catalogue,data,strategy,simulator,analytics,research,portfolio,orchestration,`
+   `interfaces,ui,plugins,broker,risk,trading}/` plus `app/contracts/common/`; 17-UI-port surface verified by
+   `tests/contracts/test_ui_contracts.py`; strictness/frozen verified by
+   `tests/contracts/test_contract_inventory.py::test_registered_models_are_frozen_and_strict`.
+3. [x] Regenerate the TypeScript clients and types under `app/ui/src/contracts/generated/` from the new contracts and
    verify the existing generation flow stays the sole source (no hand-written public wire contracts under `app/ui/`).
-4. [ ] Prove contract-roundtrip parity (schema validation, versioning, and generated-type equality) and update
+   — evidence: `scripts/generate_contracts.py` (write/`--check`); 33 artifacts byte-identical across consecutive
+   checks per `tests/contracts/test_contract_generation.py`; `ui_contracts.ts` deleted (zero references repo-wide);
+   `npm --prefix app/ui run typecheck`, `test`, and `build` pass against the generated barrel.
+4. [x] Prove contract-roundtrip parity (schema validation, versioning, and generated-type equality) and update
    `app/contracts/README.md` to reflect the complete public contract inventory.
+   — evidence: `tests/contracts/test_contract_roundtrip.py` (33 fixtures across every owner: JSON round-trip, extra
+   field rejection, frozen mutation), `tests/contracts/test_contract_versions.py` (schema-version and key/major
+   integrity), `tests/contracts/test_contract_boundaries.py`; `app/contracts/README.md` status header reconciled to
+   the implemented wire-contract state.
 
 #### Foundation task 1.A — D-UI spatiotemporal workstation foundation
 

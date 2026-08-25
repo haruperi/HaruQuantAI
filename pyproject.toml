@@ -10,6 +10,7 @@ requires-python = ">=3.14"
 dependencies = [
     "httpx>=0.28.1",
     "openai>=3.3.1",
+    "pydantic>=2.13.4,<3",
 ]
 
 [project.scripts]

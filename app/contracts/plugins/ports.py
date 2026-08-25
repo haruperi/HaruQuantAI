@@ -7,13 +7,24 @@ from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from app.contracts.plugins.errors import PluginFailure
     from app.contracts.plugins.models import (
         ContributionRegistrationResult,
         ContributionTestResult,
+        IsolateAnalysisRequest,
+        IsolateAnalysisSuccess,
+        MaintainCompatibilityRequest,
+        MaintainCompatibilitySuccess,
+        ManageLifecycleRequest,
+        ManageLifecycleSuccess,
         PluginContributionDescriptor,
         PluginManifest,
         PluginPackageValidation,
         PluginType,
+        RenderResultPanelsRequest,
+        RenderResultPanelsSuccess,
+        SandboxPermissionsRequest,
+        SandboxPermissionsSuccess,
     )
 
 
@@ -153,5 +164,107 @@ class RegisterContributionsCapability(Protocol):
 
         Returns:
             ContributionTestResult indicating whether contract rules were satisfied.
+        """
+        ...
+
+
+@runtime_checkable
+class ManageLifecycleCapability(Protocol):
+    """Capability protocol for transactional plugin lifecycle operations."""
+
+    async def manage_lifecycle(
+        self,
+        request: ManageLifecycleRequest,
+    ) -> ManageLifecycleSuccess | PluginFailure:
+        """Install, enable, disable, upgrade, or remove plugins transactionally.
+
+        Args:
+            request: Operation-discriminated plugin lifecycle request.
+
+        Returns:
+            The resulting activation and lifecycle state on success,
+            otherwise a structured plugins failure.
+        """
+        ...
+
+
+@runtime_checkable
+class SandboxPermissionsCapability(Protocol):
+    """Capability protocol for plugin sandbox permission grants and inspection."""
+
+    async def sandbox_permissions(
+        self,
+        request: SandboxPermissionsRequest,
+    ) -> SandboxPermissionsSuccess | PluginFailure:
+        """Grant or inspect narrowed plugin sandbox permissions.
+
+        Args:
+            request: Operation-discriminated plugin sandbox permission
+                request.
+
+        Returns:
+            The effective permission set on success, otherwise a structured
+            plugins failure.
+        """
+        ...
+
+
+@runtime_checkable
+class IsolateAnalysisCapability(Protocol):
+    """Capability protocol for isolated plugin analysis boundary execution."""
+
+    async def isolate_analysis(
+        self,
+        request: IsolateAnalysisRequest,
+    ) -> IsolateAnalysisSuccess | PluginFailure:
+        """Run one plugin analysis with immutable handles and staged output.
+
+        Args:
+            request: Operation-discriminated plugin analysis boundary
+                request.
+
+        Returns:
+            The staged analysis result on success, otherwise a structured
+            plugins failure.
+        """
+        ...
+
+
+@runtime_checkable
+class RenderResultPanelsCapability(Protocol):
+    """Capability protocol for sandboxed plugin result panel description."""
+
+    async def render_result_panels(
+        self,
+        request: RenderResultPanelsRequest,
+    ) -> RenderResultPanelsSuccess | PluginFailure:
+        """Describe or resolve sandboxed plugin result panels.
+
+        Args:
+            request: Operation-discriminated plugin result panel request.
+
+        Returns:
+            The matching panel descriptors on success, otherwise a
+            structured plugins failure.
+        """
+        ...
+
+
+@runtime_checkable
+class MaintainCompatibilityCapability(Protocol):
+    """Capability protocol for plugin API compatibility publication and checks."""
+
+    async def maintain_compatibility(
+        self,
+        request: MaintainCompatibilityRequest,
+    ) -> MaintainCompatibilitySuccess | PluginFailure:
+        """Publish plugin API compatibility or check one plugin version.
+
+        Args:
+            request: Operation-discriminated plugin compatibility request.
+
+        Returns:
+            The published compatibility declaration or the check verdict on
+            success, otherwise a structured plugins failure.
         """
         ...

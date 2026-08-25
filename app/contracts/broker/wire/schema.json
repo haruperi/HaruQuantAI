@@ -1,0 +1,2687 @@
+{
+  "$defs": {
+    "BrokerAccountSnapshot": {
+      "additionalProperties": false,
+      "description": "Provider-truth account and balance projection.",
+      "properties": {
+        "account_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "balances": {
+          "patternProperties": {
+            "^[A-Z]{3}$": {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            }
+          },
+          "title": "Balances",
+          "type": "object"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        },
+        "equity": {
+          "$ref": "#/$defs/Money"
+        },
+        "free_margin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "margin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "permissions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "provider_time": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Time"
+        },
+        "retrieved_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation",
+        "account_ref",
+        "currency",
+        "equity",
+        "retrieved_at"
+      ],
+      "title": "BrokerAccountSnapshot",
+      "type": "object"
+    },
+    "BrokerAdapterCertification": {
+      "additionalProperties": false,
+      "description": "One versioned adapter conformance and release certification.",
+      "properties": {
+        "adapter_build_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Adapter Build Hash",
+          "type": "string"
+        },
+        "api_version_range": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "approval_principal_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Approval Principal Id",
+          "type": "string"
+        },
+        "capability_id": {
+          "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+          "title": "Capability Id",
+          "type": "string"
+        },
+        "certification_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Certification Id",
+          "type": "string"
+        },
+        "certification_version": {
+          "minimum": 1,
+          "title": "Certification Version",
+          "type": "integer"
+        },
+        "disconnect_unknown_fixtures": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Disconnect Unknown Fixtures",
+          "type": "array"
+        },
+        "duplicate_idempotency_fixtures": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Duplicate Idempotency Fixtures",
+          "type": "array"
+        },
+        "expiry_rule": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "fixture_hashes": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Fixture Hashes",
+          "type": "array"
+        },
+        "issued_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Issued At",
+          "type": "string"
+        },
+        "profile_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Version Id",
+          "type": "string"
+        },
+        "rejection_fixtures": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Rejection Fixtures",
+          "type": "array"
+        },
+        "sandbox_execution_evidence": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "certification_id",
+        "profile_version_id",
+        "capability_id",
+        "certification_version",
+        "api_version_range",
+        "adapter_build_hash",
+        "approval_principal_id",
+        "issued_at",
+        "expiry_rule"
+      ],
+      "title": "BrokerAdapterCertification",
+      "type": "object"
+    },
+    "BrokerCapabilityDeclaration": {
+      "additionalProperties": false,
+      "description": "One capability dimension row of a broker capability matrix.\n\nContradictory dimensions are rejected: a capability cannot be available\nwithout being implemented.",
+      "properties": {
+        "capability_id": {
+          "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+          "title": "Capability Id",
+          "type": "string"
+        },
+        "execution_model": {
+          "$ref": "#/$defs/ExecutionModel"
+        },
+        "is_available": {
+          "title": "Is Available",
+          "type": "boolean"
+        },
+        "is_implemented": {
+          "title": "Is Implemented",
+          "type": "boolean"
+        },
+        "is_permitted": {
+          "title": "Is Permitted",
+          "type": "boolean"
+        },
+        "is_release_approved": {
+          "title": "Is Release Approved",
+          "type": "boolean"
+        },
+        "is_verified": {
+          "title": "Is Verified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "capability_id",
+        "is_implemented",
+        "is_available",
+        "is_permitted",
+        "is_verified",
+        "is_release_approved",
+        "execution_model"
+      ],
+      "title": "BrokerCapabilityDeclaration",
+      "type": "object"
+    },
+    "BrokerCapabilityMatrix": {
+      "additionalProperties": false,
+      "description": "One source of truth for a profile version's declared capabilities.",
+      "properties": {
+        "capabilities": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/BrokerCapabilityDeclaration"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "matrix_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Matrix Id",
+          "type": "string"
+        },
+        "profile_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Version Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "matrix_id",
+        "profile_version_id"
+      ],
+      "title": "BrokerCapabilityMatrix",
+      "type": "object"
+    },
+    "BrokerConnectionState": {
+      "enum": [
+        "DISCONNECTED",
+        "CONNECTING",
+        "READY",
+        "DEGRADED",
+        "CLOSING",
+        "FAILED"
+      ],
+      "type": "string"
+    },
+    "BrokerEnvironment": {
+      "additionalProperties": false,
+      "description": "One declared broker execution boundary with isolation identity.",
+      "properties": {
+        "environment": {
+          "$ref": "#/$defs/BrokerEnvironmentKind"
+        },
+        "idempotency_namespace": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "isolation_realm": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "environment",
+        "idempotency_namespace",
+        "isolation_realm"
+      ],
+      "title": "BrokerEnvironment",
+      "type": "object"
+    },
+    "BrokerEnvironmentKind": {
+      "enum": [
+        "LIVE",
+        "DEMO",
+        "TESTNET",
+        "SANDBOX",
+        "SIMULATION"
+      ],
+      "type": "string"
+    },
+    "BrokerFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope shared by every broker capability.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/BrokerFailureCode"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "BrokerFailure",
+      "type": "object"
+    },
+    "BrokerFailureCode": {
+      "enum": [
+        "BROKER_VALIDATION_FAILED",
+        "BROKER_PROFILE_UNSUPPORTED",
+        "BROKER_ENVIRONMENT_MISMATCH",
+        "BROKER_SESSION_NOT_READY",
+        "BROKER_CAPABILITY_NOT_DECLARED",
+        "BROKER_OPERATION_REJECTED",
+        "BROKER_OUTCOME_UNKNOWN",
+        "BROKER_PAGINATION_INVALID",
+        "BROKER_CERTIFICATION_REQUIRED",
+        "CREDENTIALS_MISSING",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "BrokerHistoryPage": {
+      "additionalProperties": false,
+      "description": "One bounded page of provider-native history records.",
+      "properties": {
+        "is_truncated": {
+          "title": "Is Truncated",
+          "type": "boolean"
+        },
+        "page_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Page Id",
+          "type": "string"
+        },
+        "provider_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Provider Cursor"
+        },
+        "records": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProviderRecord"
+          },
+          "title": "Records",
+          "type": "array"
+        },
+        "requested_count": {
+          "minimum": 1,
+          "title": "Requested Count",
+          "type": "integer"
+        },
+        "retrieved_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "returned_count": {
+          "minimum": 0,
+          "title": "Returned Count",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "page_id",
+        "requested_count",
+        "returned_count",
+        "is_truncated",
+        "retrieved_at",
+        "provider_cursor"
+      ],
+      "title": "BrokerHistoryPage",
+      "type": "object"
+    },
+    "BrokerMarketState": {
+      "additionalProperties": false,
+      "description": "Provider-truth quote, tick, and market-status projection.",
+      "properties": {
+        "ask": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Ask"
+        },
+        "bid": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Bid"
+        },
+        "event_time": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Time"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "last": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last"
+        },
+        "market_status": {
+          "$ref": "#/$defs/MarketStatus"
+        },
+        "provider_sequence": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Sequence"
+        },
+        "provider_symbol": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "receipt_time": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Receipt Time",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation",
+        "instrument",
+        "provider_symbol",
+        "market_status",
+        "receipt_time",
+        "bid",
+        "ask",
+        "last"
+      ],
+      "title": "BrokerMarketState",
+      "type": "object"
+    },
+    "BrokerOperationKind": {
+      "enum": [
+        "SUBMIT_ORDER",
+        "CANCEL_ORDER",
+        "MODIFY_ORDER"
+      ],
+      "type": "string"
+    },
+    "BrokerOperationOutcome": {
+      "additionalProperties": false,
+      "description": "Correlated logical result of one transport operation attempt.",
+      "properties": {
+        "is_reconciled": {
+          "default": false,
+          "title": "Is Reconciled",
+          "type": "boolean"
+        },
+        "last_known_transport_state": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/TransportOutcome"
+        },
+        "receipt": {
+          "$ref": "#/$defs/BrokerOperationReceipt"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "operation_id",
+        "outcome",
+        "receipt"
+      ],
+      "title": "BrokerOperationOutcome",
+      "type": "object"
+    },
+    "BrokerOperationReceipt": {
+      "additionalProperties": false,
+      "description": "Append-only provider transport outcome evidence for one attempt.",
+      "properties": {
+        "attempt_no": {
+          "minimum": 1,
+          "title": "Attempt No",
+          "type": "integer"
+        },
+        "completed_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completed At"
+        },
+        "dispatched_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dispatched At"
+        },
+        "duration_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "environment": {
+          "$ref": "#/$defs/BrokerEnvironmentKind"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProblemDetails"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/TransportOutcome"
+        },
+        "profile_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Version Id",
+          "type": "string"
+        },
+        "provider_client_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provider_deal_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provider_evidence": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "provider_order_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provider_request_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "receipt_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Receipt Id",
+          "type": "string"
+        },
+        "reconciliation_keys": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "request_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Request Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_generation": {
+          "minimum": 1,
+          "title": "Session Generation",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "receipt_id",
+        "operation_id",
+        "attempt_no",
+        "profile_version_id",
+        "environment",
+        "session_generation",
+        "request_hash",
+        "outcome"
+      ],
+      "title": "BrokerOperationReceipt",
+      "type": "object"
+    },
+    "BrokerOperationRequest": {
+      "additionalProperties": false,
+      "description": "Trading-owned transport request admitted after Risk authorization.",
+      "properties": {
+        "attempt_no": {
+          "minimum": 1,
+          "title": "Attempt No",
+          "type": "integer"
+        },
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "normalized_price": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Normalized Price"
+        },
+        "normalized_quantity": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Normalized Quantity",
+          "type": "string"
+        },
+        "operation": {
+          "$ref": "#/$defs/BrokerOperationKind"
+        },
+        "operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "provider_symbol": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "request_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Request Hash",
+          "type": "string"
+        },
+        "risk_authorization_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Risk Authorization Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "$ref": "#/$defs/BrokerSessionRef"
+        },
+        "trading_operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Trading Operation Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "operation_id",
+        "trading_operation_id",
+        "session",
+        "operation",
+        "provider_symbol",
+        "normalized_quantity",
+        "policy",
+        "risk_authorization_id",
+        "idempotency_key",
+        "attempt_no",
+        "request_hash"
+      ],
+      "title": "BrokerOperationRequest",
+      "type": "object"
+    },
+    "BrokerProviderKind": {
+      "enum": [
+        "MT5",
+        "CTRADER",
+        "BINANCE_SPOT",
+        "BINANCE_USD_M",
+        "BINANCE_COIN_M",
+        "DUKASCOPY",
+        "YAHOO"
+      ],
+      "type": "string"
+    },
+    "BrokerProviderProfile": {
+      "additionalProperties": false,
+      "description": "One immutable broker provider profile version.",
+      "properties": {
+        "account_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "api_version_range": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "credential_ref_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Credential Ref Ids",
+          "type": "array"
+        },
+        "environment": {
+          "$ref": "#/$defs/BrokerEnvironmentKind"
+        },
+        "kind": {
+          "$ref": "#/$defs/BrokerProviderKind"
+        },
+        "profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "provider": {
+          "$ref": "#/$defs/ProviderRef"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profile_id",
+        "version",
+        "provider",
+        "kind",
+        "account_ref",
+        "environment",
+        "api_version_range",
+        "content_hash"
+      ],
+      "title": "BrokerProviderProfile",
+      "type": "object"
+    },
+    "BrokerSessionReadiness": {
+      "additionalProperties": false,
+      "description": "Multi-dimensional readiness assessment of a session generation.",
+      "properties": {
+        "account_authorization": {
+          "$ref": "#/$defs/ReadinessState"
+        },
+        "assessed_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Assessed At",
+          "type": "string"
+        },
+        "authentication": {
+          "$ref": "#/$defs/ReadinessState"
+        },
+        "environment_verified": {
+          "title": "Environment Verified",
+          "type": "boolean"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "resynchronized": {
+          "title": "Resynchronized",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "subscriptions": {
+          "$ref": "#/$defs/ReadinessState"
+        },
+        "trading_permission": {
+          "$ref": "#/$defs/ReadinessState"
+        },
+        "transport": {
+          "$ref": "#/$defs/ReadinessState"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation",
+        "transport",
+        "authentication",
+        "account_authorization",
+        "trading_permission",
+        "subscriptions",
+        "environment_verified",
+        "resynchronized",
+        "assessed_at"
+      ],
+      "title": "BrokerSessionReadiness",
+      "type": "object"
+    },
+    "BrokerSessionRef": {
+      "additionalProperties": false,
+      "description": "Stable environment/account/session-generation binding.",
+      "properties": {
+        "account_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "environment": {
+          "$ref": "#/$defs/BrokerEnvironmentKind"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "profile_version": {
+          "minimum": 1,
+          "title": "Profile Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "profile_id",
+        "profile_version",
+        "account_ref",
+        "environment",
+        "generation"
+      ],
+      "title": "BrokerSessionRef",
+      "type": "object"
+    },
+    "BrokerSessionState": {
+      "additionalProperties": false,
+      "description": "One recorded connection-state transition of a session generation.",
+      "properties": {
+        "connection_state": {
+          "$ref": "#/$defs/BrokerConnectionState"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "previous_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerConnectionState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason": {
+          "default": "",
+          "title": "Reason",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "transitioned_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Transitioned At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation",
+        "connection_state",
+        "transitioned_at"
+      ],
+      "title": "BrokerSessionState",
+      "type": "object"
+    },
+    "BrokerTradingState": {
+      "additionalProperties": false,
+      "description": "Provider-native positions, orders, and deals of a session generation.",
+      "properties": {
+        "deals": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProviderRecord"
+          },
+          "title": "Deals",
+          "type": "array"
+        },
+        "duplicate_or_contradictory": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Duplicate Or Contradictory",
+          "type": "array"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "orders": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProviderRecord"
+          },
+          "title": "Orders",
+          "type": "array"
+        },
+        "positions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProviderRecord"
+          },
+          "title": "Positions",
+          "type": "array"
+        },
+        "retrieved_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation",
+        "retrieved_at"
+      ],
+      "title": "BrokerTradingState",
+      "type": "object"
+    },
+    "BrokerWriteCertification": {
+      "additionalProperties": false,
+      "description": "Explicit owner-approved production write release record.",
+      "properties": {
+        "approved_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Approved At",
+          "type": "string"
+        },
+        "authenticated_execution_evidence": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "capability_id": {
+          "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+          "title": "Capability Id",
+          "type": "string"
+        },
+        "certification_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Certification Id",
+          "type": "string"
+        },
+        "is_write_released": {
+          "const": true,
+          "title": "Is Write Released",
+          "type": "boolean"
+        },
+        "owner_approval_principal_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Owner Approval Principal Id",
+          "type": "string"
+        },
+        "permission_verification": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "profile_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Version Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "certification_id",
+        "profile_version_id",
+        "capability_id",
+        "is_write_released",
+        "authenticated_execution_evidence",
+        "permission_verification",
+        "owner_approval_principal_id",
+        "approved_at"
+      ],
+      "title": "BrokerWriteCertification",
+      "type": "object"
+    },
+    "CertifyAdaptersRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated adapter certification request.\n\nRUN_CONFORMANCE requires only ``profile_version_id``; CERTIFY_VERSION\nrequires only ``certification``; CERTIFY_WRITE requires only\n``write_certification``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "certification": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerAdapterCertification"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "RUN_CONFORMANCE",
+            "CERTIFY_VERSION",
+            "CERTIFY_WRITE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "profile_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile Version Id"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "write_certification": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerWriteCertification"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "CertifyAdaptersRequest",
+      "type": "object"
+    },
+    "CertifyAdaptersSuccess": {
+      "additionalProperties": false,
+      "description": "Successful adapter certification operation result.",
+      "properties": {
+        "certification": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerAdapterCertification"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "write_certification": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerWriteCertification"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "CertifyAdaptersSuccess",
+      "type": "object"
+    },
+    "ConfigureProvidersRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated provider configuration request.\n\nCONFIGURE requires only ``profile``; VALIDATE_CREDENTIALS requires\nonly ``profile_id``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "CONFIGURE",
+            "VALIDATE_CREDENTIALS"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerProviderProfile"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "profile_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile Id"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ConfigureProvidersRequest",
+      "type": "object"
+    },
+    "ConfigureProvidersSuccess": {
+      "additionalProperties": false,
+      "description": "Successful provider configuration operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerProviderProfile"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ConfigureProvidersSuccess",
+      "type": "object"
+    },
+    "DeclareCapabilitiesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated capability declaration request.\n\nDECLARE_PROFILE requires only ``profile``; DECLARE_MATRIX requires\nonly ``matrix``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "matrix": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerCapabilityMatrix"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "DECLARE_PROFILE",
+            "DECLARE_MATRIX"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerProviderProfile"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "DeclareCapabilitiesRequest",
+      "type": "object"
+    },
+    "DeclareCapabilitiesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful capability declaration operation result.",
+      "properties": {
+        "matrix": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerCapabilityMatrix"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerProviderProfile"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "DeclareCapabilitiesSuccess",
+      "type": "object"
+    },
+    "ExecutionModel": {
+      "enum": [
+        "READ_ONLY",
+        "WRITE",
+        "EVENT_STREAM"
+      ],
+      "type": "string"
+    },
+    "InstrumentRef": {
+      "additionalProperties": false,
+      "description": "Reference to one canonical instrument identity.",
+      "properties": {
+        "instrument_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Instrument Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "instrument_id"
+      ],
+      "title": "InstrumentRef",
+      "type": "object"
+    },
+    "IsolateEnvironmentsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated environment isolation request.\n\nDECLARE_ENVIRONMENT, VERIFY_ISOLATION, and RESOLVE_AUTHORITY each\nrequire ``environment``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "environment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerEnvironment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "DECLARE_ENVIRONMENT",
+            "VERIFY_ISOLATION",
+            "RESOLVE_AUTHORITY"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "IsolateEnvironmentsRequest",
+      "type": "object"
+    },
+    "IsolateEnvironmentsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful environment isolation operation result.",
+      "properties": {
+        "environment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerEnvironment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "IsolateEnvironmentsSuccess",
+      "type": "object"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ManageSessionsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated session lifecycle request.\n\nEvery operation requires ``session``; TRANSITION additionally\nrequires ``state`` and every other operation forbids it.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "OPEN",
+            "TRANSITION",
+            "RECONNECT",
+            "ASSESS_READINESS",
+            "CLOSE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerSessionState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ManageSessionsRequest",
+      "type": "object"
+    },
+    "ManageSessionsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful session lifecycle operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "readiness": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerSessionReadiness"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerSessionState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ManageSessionsSuccess",
+      "type": "object"
+    },
+    "MarketStatus": {
+      "enum": [
+        "OPEN",
+        "CLOSED",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "Currency-qualified canonical decimal amount.",
+      "properties": {
+        "amount": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "ProviderCorrelation": {
+      "additionalProperties": false,
+      "description": "Stable idempotent correlation identity of a provider operation.",
+      "properties": {
+        "correlation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "provider_client_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provider_deal_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provider_order_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provider_request_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "correlation_id",
+        "operation_id",
+        "idempotency_key"
+      ],
+      "title": "ProviderCorrelation",
+      "type": "object"
+    },
+    "ProviderEventKind": {
+      "enum": [
+        "QUOTE",
+        "TICK",
+        "DEAL",
+        "ORDER_UPDATE",
+        "POSITION_UPDATE",
+        "MARKET_STATUS",
+        "HEARTBEAT"
+      ],
+      "type": "string"
+    },
+    "ProviderEventPayload": {
+      "additionalProperties": false,
+      "description": "Payload for broker.provider-event DomainEvent envelopes.\n\nThe normalized observational event retains the raw provider identity\nhash and the fenced session generation; ``findings`` records sequence\ngaps, duplicates, late events, and decode failures as classified\nevidence. There are no subscriptions; consumers receive these events\nthrough the Interfaces trading stream.",
+      "properties": {
+        "event_time": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Event Time"
+        },
+        "findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/ProviderEventKind"
+        },
+        "provider_sequence": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Provider Sequence"
+        },
+        "raw_provider_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Raw Provider Hash",
+          "type": "string"
+        },
+        "receipt_time": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Receipt Time",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "values": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation",
+        "kind",
+        "raw_provider_hash",
+        "provider_sequence",
+        "event_time",
+        "receipt_time",
+        "values"
+      ],
+      "title": "ProviderEventPayload",
+      "type": "object"
+    },
+    "ProviderRecord": {
+      "additionalProperties": false,
+      "description": "One provider-native record preserved for Trading reconciliation.",
+      "properties": {
+        "provider_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "record": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "provider_id",
+        "record"
+      ],
+      "title": "ProviderRecord",
+      "type": "object"
+    },
+    "ProviderRef": {
+      "additionalProperties": false,
+      "description": "Reference to one external data provider identity.",
+      "properties": {
+        "provider_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Provider Id",
+          "type": "string"
+        },
+        "provider_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "provider_id",
+        "provider_name"
+      ],
+      "title": "ProviderRef",
+      "type": "object"
+    },
+    "ReadProviderStateRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated provider-truth read request.\n\nREAD_ACCOUNT and READ_TRADING_STATE require only ``session``;\nREAD_MARKET additionally requires ``instrument``; PAGE_HISTORY\npermits only paging fields; NORMALIZE_EVENT additionally requires\n``raw_event``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "instrument": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InstrumentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "READ_ACCOUNT",
+            "READ_TRADING_STATE",
+            "READ_MARKET",
+            "PAGE_HISTORY",
+            "NORMALIZE_EVENT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "page_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Cursor"
+        },
+        "page_size": {
+          "anyOf": [
+            {
+              "maximum": 1000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Size"
+        },
+        "raw_event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ReadProviderStateRequest",
+      "type": "object"
+    },
+    "ReadProviderStateSuccess": {
+      "additionalProperties": false,
+      "description": "Successful provider-truth read operation result.",
+      "properties": {
+        "account": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerAccountSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "market": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerMarketState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerHistoryPage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "trading_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerTradingState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ReadProviderStateSuccess",
+      "type": "object"
+    },
+    "ReadinessState": {
+      "enum": [
+        "NOT_READY",
+        "READY"
+      ],
+      "type": "string"
+    },
+    "TransportOrdersRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated execution transport request.\n\nVALIDATE_REQUEST, SUBMIT, CANCEL, and MODIFY require only\n``operation_request``; JOURNAL requires only ``operation_id``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "VALIDATE_REQUEST",
+            "SUBMIT",
+            "CANCEL",
+            "MODIFY",
+            "JOURNAL"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operation Id"
+        },
+        "operation_request": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerOperationRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "TransportOrdersRequest",
+      "type": "object"
+    },
+    "TransportOrdersSuccess": {
+      "additionalProperties": false,
+      "description": "Successful execution transport operation result.\n\nThe ratified field ``outcome`` carries the transport operation\noutcome, so the conventional ``Literal[\"SUCCESS\"]`` discriminator of\nother success records is represented here by ``result_version`` and\nthe enclosing success type alone.",
+      "properties": {
+        "correlation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProviderCorrelation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerOperationOutcome"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "receipt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerOperationReceipt"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "TransportOrdersSuccess",
+      "type": "object"
+    },
+    "TransportOutcome": {
+      "enum": [
+        "ACCEPTED",
+        "REJECTED",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {
+    "ProviderEventPayload": {
+      "$ref": "#/$defs/ProviderEventPayload"
+    }
+  },
+  "failures": {
+    "BrokerFailure": {
+      "$ref": "#/$defs/BrokerFailure"
+    }
+  },
+  "models": {
+    "BrokerAccountSnapshot": {
+      "$ref": "#/$defs/BrokerAccountSnapshot"
+    },
+    "BrokerAdapterCertification": {
+      "$ref": "#/$defs/BrokerAdapterCertification"
+    },
+    "BrokerCapabilityDeclaration": {
+      "$ref": "#/$defs/BrokerCapabilityDeclaration"
+    },
+    "BrokerCapabilityMatrix": {
+      "$ref": "#/$defs/BrokerCapabilityMatrix"
+    },
+    "BrokerEnvironment": {
+      "$ref": "#/$defs/BrokerEnvironment"
+    },
+    "BrokerHistoryPage": {
+      "$ref": "#/$defs/BrokerHistoryPage"
+    },
+    "BrokerMarketState": {
+      "$ref": "#/$defs/BrokerMarketState"
+    },
+    "BrokerOperationOutcome": {
+      "$ref": "#/$defs/BrokerOperationOutcome"
+    },
+    "BrokerOperationReceipt": {
+      "$ref": "#/$defs/BrokerOperationReceipt"
+    },
+    "BrokerOperationRequest": {
+      "$ref": "#/$defs/BrokerOperationRequest"
+    },
+    "BrokerProviderProfile": {
+      "$ref": "#/$defs/BrokerProviderProfile"
+    },
+    "BrokerSessionReadiness": {
+      "$ref": "#/$defs/BrokerSessionReadiness"
+    },
+    "BrokerSessionRef": {
+      "$ref": "#/$defs/BrokerSessionRef"
+    },
+    "BrokerSessionState": {
+      "$ref": "#/$defs/BrokerSessionState"
+    },
+    "BrokerTradingState": {
+      "$ref": "#/$defs/BrokerTradingState"
+    },
+    "BrokerWriteCertification": {
+      "$ref": "#/$defs/BrokerWriteCertification"
+    },
+    "CertifyAdaptersRequest": {
+      "$ref": "#/$defs/CertifyAdaptersRequest"
+    },
+    "CertifyAdaptersSuccess": {
+      "$ref": "#/$defs/CertifyAdaptersSuccess"
+    },
+    "ConfigureProvidersRequest": {
+      "$ref": "#/$defs/ConfigureProvidersRequest"
+    },
+    "ConfigureProvidersSuccess": {
+      "$ref": "#/$defs/ConfigureProvidersSuccess"
+    },
+    "DeclareCapabilitiesRequest": {
+      "$ref": "#/$defs/DeclareCapabilitiesRequest"
+    },
+    "DeclareCapabilitiesSuccess": {
+      "$ref": "#/$defs/DeclareCapabilitiesSuccess"
+    },
+    "IsolateEnvironmentsRequest": {
+      "$ref": "#/$defs/IsolateEnvironmentsRequest"
+    },
+    "IsolateEnvironmentsSuccess": {
+      "$ref": "#/$defs/IsolateEnvironmentsSuccess"
+    },
+    "ManageSessionsRequest": {
+      "$ref": "#/$defs/ManageSessionsRequest"
+    },
+    "ManageSessionsSuccess": {
+      "$ref": "#/$defs/ManageSessionsSuccess"
+    },
+    "ProviderCorrelation": {
+      "$ref": "#/$defs/ProviderCorrelation"
+    },
+    "ProviderRecord": {
+      "$ref": "#/$defs/ProviderRecord"
+    },
+    "ReadProviderStateRequest": {
+      "$ref": "#/$defs/ReadProviderStateRequest"
+    },
+    "ReadProviderStateSuccess": {
+      "$ref": "#/$defs/ReadProviderStateSuccess"
+    },
+    "TransportOrdersRequest": {
+      "$ref": "#/$defs/TransportOrdersRequest"
+    },
+    "TransportOrdersSuccess": {
+      "$ref": "#/$defs/TransportOrdersSuccess"
+    }
+  },
+  "namespace": "broker",
+  "schema_version": 1,
+  "title": "broker wire contracts v1"
+}

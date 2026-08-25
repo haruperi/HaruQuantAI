@@ -1,0 +1,4125 @@
+{
+  "$defs": {
+    "AstType": {
+      "enum": [
+        "BOOLEAN",
+        "INTEGER",
+        "DECIMAL",
+        "PRICE",
+        "QUANTITY",
+        "PERCENTAGE",
+        "DURATION",
+        "TIMEFRAME",
+        "INSTRUMENT",
+        "ENUM",
+        "SCALAR_SERIES",
+        "EVENT",
+        "ACTION"
+      ],
+      "type": "string"
+    },
+    "AtmExitDefinition": {
+      "additionalProperties": false,
+      "description": "One ATM exit definition with ordered partial-exit stages.",
+      "properties": {
+        "atm_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Atm Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "stages": {
+          "items": {
+            "$ref": "#/$defs/AtmStage"
+          },
+          "minItems": 1,
+          "title": "Stages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "atm_id",
+        "stages",
+        "content_hash"
+      ],
+      "title": "AtmExitDefinition",
+      "type": "object"
+    },
+    "AtmStage": {
+      "additionalProperties": false,
+      "description": "One partial-exit stage of an ATM exit definition.\n\nSizing, protection, residual-position, collision, and state semantics\nare owned by the ATM feature per Project sections 18.6-18.7.",
+      "properties": {
+        "parameters": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "size_percent": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Size Percent",
+          "type": "string"
+        },
+        "stage_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "stage_name",
+        "size_percent",
+        "parameters"
+      ],
+      "title": "AtmStage",
+      "type": "object"
+    },
+    "BlockDefinition": {
+      "additionalProperties": false,
+      "description": "One versioned block catalogue record.\n\nUniqueness ``(stable_id, version)`` and referenced-version diagnosability\nare enforced by the owning store because they span records.",
+      "properties": {
+        "block_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "category": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "data_capabilities": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Data Capabilities",
+          "type": "array"
+        },
+        "input_types": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AstType"
+          },
+          "title": "Input Types",
+          "type": "array"
+        },
+        "output_types": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AstType"
+          },
+          "title": "Output Types",
+          "type": "array"
+        },
+        "parameter_schema": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "ACTIVE",
+            "DEPRECATED",
+            "RETIRED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "supported_events": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Supported Events",
+          "type": "array"
+        },
+        "target_capabilities": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Target Capabilities",
+          "type": "array"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "block_id",
+        "version",
+        "category",
+        "parameter_schema",
+        "status",
+        "content_hash"
+      ],
+      "title": "BlockDefinition",
+      "type": "object"
+    },
+    "BrokerRef": {
+      "additionalProperties": false,
+      "description": "Reference to one broker identity.",
+      "properties": {
+        "broker_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Broker Id",
+          "type": "string"
+        },
+        "broker_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "broker_id",
+        "broker_name"
+      ],
+      "title": "BrokerRef",
+      "type": "object"
+    },
+    "CatalogBlocksRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated block catalogue request.\n\nCATALOG requires no selector; DESCRIBE requires only ``block_id`` with\nan optional ``block_version`` (latest when absent); FILTER_COMPATIBLE\nrequires the schema-aware insertion point given by ``ast``,\n``parent_node_id``, and ``port_name``.",
+      "properties": {
+        "ast": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyAst"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "block_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "block_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Block Version"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "CATALOG",
+            "DESCRIBE",
+            "FILTER_COMPATIBLE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "parent_node_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Node Id"
+        },
+        "port_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "CatalogBlocksRequest",
+      "type": "object"
+    },
+    "CatalogBlocksSuccess": {
+      "additionalProperties": false,
+      "description": "Successful block catalogue operation result.",
+      "properties": {
+        "blocks": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/BlockDefinition"
+          },
+          "title": "Blocks",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "parameters": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ParameterDefinition"
+          },
+          "title": "Parameters",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "CatalogBlocksSuccess",
+      "type": "object"
+    },
+    "ChartDefinition": {
+      "additionalProperties": false,
+      "description": "One primary or additional chart binding of a strategy.\n\nExactly one chart of a strategy carries the PRIMARY role; that\ncollection-level rule is validated wherever charts are collected.",
+      "properties": {
+        "broker": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "role": {
+          "enum": [
+            "PRIMARY",
+            "ADDITIONAL"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "timeframe": {
+          "$ref": "#/$defs/Timeframe"
+        },
+        "warmup_bars": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Warmup Bars",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ordinal",
+        "instrument",
+        "timeframe",
+        "role"
+      ],
+      "title": "ChartDefinition",
+      "type": "object"
+    },
+    "CodeManifest": {
+      "additionalProperties": false,
+      "description": "One embedded manifest tracing generated code to its source version.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "engine_profile_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Engine Profile Id"
+        },
+        "generator_version": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "manifest_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Manifest Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "settings_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Settings Hash",
+          "type": "string"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "manifest_id",
+        "strategy_version_id",
+        "generator_version",
+        "settings_hash",
+        "content_hash"
+      ],
+      "title": "CodeManifest",
+      "type": "object"
+    },
+    "CodeTargetDescriptor": {
+      "additionalProperties": false,
+      "description": "One versioned code-generation target advertisement.\n\nA target is advertised only from a versioned compatibility record backed\nby compiler/runtime versions, capability tests, and section 23.13 parity\nfixtures; PSEUDOCODE is a deterministic human-readable built-in target\n(FR-STRAT-REGISTER_CODE_TARGETS, FR-STRAT-DESCRIBE_EMITTER_CAPABILITIES).",
+      "properties": {
+        "compatibility_record_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Compatibility Record Id"
+        },
+        "compiler_adapter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "emitter_version": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "engine_profile_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Engine Profile Id"
+        },
+        "formatter": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "packaging_rules": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "supported_ast_capabilities": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Supported Ast Capabilities",
+          "type": "array"
+        },
+        "target_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "unsupported_semantics": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Unsupported Semantics",
+          "type": "array"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "target_id",
+        "version",
+        "emitter_version",
+        "formatter",
+        "packaging_rules"
+      ],
+      "title": "CodeTargetDescriptor",
+      "type": "object"
+    },
+    "CodegenRequest": {
+      "additionalProperties": false,
+      "description": "One deterministic code-generation job request for one target.",
+      "properties": {
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "settings_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Settings Hash",
+          "type": "string"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        },
+        "target_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "target_version": {
+          "minimum": 1,
+          "title": "Target Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "strategy_version_id",
+        "target_id",
+        "target_version",
+        "settings_hash"
+      ],
+      "title": "CodegenRequest",
+      "type": "object"
+    },
+    "CodegenResult": {
+      "additionalProperties": false,
+      "description": "One code-generation run result with compile status and diagnostics.\n\nPASSED is reported only with real compiler success and an existing\noutput artifact; repeated emission has an identical normalized source\nhash (FR-STRAT-GENERATE_CODE_DETERMINISTICALLY,\nFR-STRAT-VERIFY_MQL5_COMPILE).",
+      "properties": {
+        "compile_status": {
+          "default": "PENDING",
+          "enum": [
+            "PENDING",
+            "PASSED",
+            "FAILED",
+            "SKIPPED"
+          ],
+          "title": "Compile Status",
+          "type": "string"
+        },
+        "diagnostics": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CompilerDiagnostic"
+          },
+          "title": "Diagnostics",
+          "type": "array"
+        },
+        "manifest_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Manifest Id",
+          "type": "string"
+        },
+        "parity_report_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parity Report Id"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Source Artifact Id",
+          "type": "string"
+        },
+        "source_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result_id",
+        "request_id",
+        "source_artifact_id",
+        "source_hash",
+        "manifest_id"
+      ],
+      "title": "CodegenResult",
+      "type": "object"
+    },
+    "CompilerDiagnostic": {
+      "additionalProperties": false,
+      "description": "One parsed compiler diagnostic anchored to generated code.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "column": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Column"
+        },
+        "file": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "line": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Line"
+        },
+        "message": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "node_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Node Id"
+        },
+        "severity": {
+          "enum": [
+            "ERROR",
+            "WARNING",
+            "INFO"
+          ],
+          "title": "Severity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "severity",
+        "code",
+        "file",
+        "message"
+      ],
+      "title": "CompilerDiagnostic",
+      "type": "object"
+    },
+    "ConfigureChartsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated charts, direction, and visibility request.\n\nCONFIGURE_CHARTS requires a nonempty replacement chart set with exactly\none PRIMARY chart; CONFIGURE_DIRECTION requires only ``direction``;\nDECLARE_SHIFT requires only ``visibility``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "charts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ChartDefinition"
+          },
+          "title": "Charts",
+          "type": "array"
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DirectionPolicy"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "CONFIGURE_CHARTS",
+            "CONFIGURE_DIRECTION",
+            "DECLARE_SHIFT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "visibility": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VisibilityPolicy"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ConfigureChartsRequest",
+      "type": "object"
+    },
+    "ConfigureChartsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful charts, direction, and visibility operation result.",
+      "properties": {
+        "charts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ChartDefinition"
+          },
+          "title": "Charts",
+          "type": "array"
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DirectionPolicy"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "visibility": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VisibilityPolicy"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ConfigureChartsSuccess",
+      "type": "object"
+    },
+    "DefineArchitecturesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated architecture and mapping request.\n\nDEFINE_ARCHITECTURE requires only ``architecture``; DEFINE_RANDOM_GROUP\nrequires only ``random_group``; MAP_OPPOSITE requires only\n``opposite_map``.",
+      "properties": {
+        "architecture": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyArchitecture"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "DEFINE_ARCHITECTURE",
+            "DEFINE_RANDOM_GROUP",
+            "MAP_OPPOSITE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "opposite_map": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OppositeMapVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "random_group": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RandomGroupVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "DefineArchitecturesRequest",
+      "type": "object"
+    },
+    "DefineArchitecturesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful architecture and mapping operation result.",
+      "properties": {
+        "architecture": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyArchitecture"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "opposite_map": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OppositeMapVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "random_group": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RandomGroupVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "DefineArchitecturesSuccess",
+      "type": "object"
+    },
+    "DefineAstRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated canonical AST request.\n\nNORMALIZE requires only ``ast``; VALIDATE requires only\n``strategy_version_id`` because the validation report is anchored to a\nstored version. Domain assumption: the operation split follows the\nrecord shapes; the ratified envelope lists only the operations.",
+      "properties": {
+        "ast": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyAst"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "NORMALIZE",
+            "VALIDATE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Strategy Version Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "DefineAstRequest",
+      "type": "object"
+    },
+    "DefineAstSuccess": {
+      "additionalProperties": false,
+      "description": "Successful canonical AST operation result.",
+      "properties": {
+        "ast": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyAst"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "report": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyValidationReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "DefineAstSuccess",
+      "type": "object"
+    },
+    "DefineIndicatorsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated indicator request.\n\nDEFINE_INDICATOR requires only ``indicator``; DEFINE_EXTERNAL requires\nonly ``external_definition``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "external_definition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExternalIndicatorDefinitionVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "indicator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IndicatorDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "DEFINE_INDICATOR",
+            "DEFINE_EXTERNAL"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "DefineIndicatorsRequest",
+      "type": "object"
+    },
+    "DefineIndicatorsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful indicator operation result.",
+      "properties": {
+        "external_definition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExternalIndicatorDefinitionVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "indicator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IndicatorDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "DefineIndicatorsSuccess",
+      "type": "object"
+    },
+    "DeploymentPackage": {
+      "additionalProperties": false,
+      "description": "One immutable deployable package of a code-generation run.\n\nUniqueness ``(codegen_run_id, package_hash)`` is enforced by the owning\nstore because it spans records (FR-STRAT-PACKAGE_TARGET_CODE).",
+      "properties": {
+        "checksums": {
+          "additionalProperties": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Checksums",
+          "type": "object"
+        },
+        "codegen_result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Codegen Result Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "dependency_artifact_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Dependency Artifact Ids",
+          "type": "array"
+        },
+        "engine_profile_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Engine Profile Id"
+        },
+        "installation_manifest": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "package_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Package Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_binary_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Strategy Binary Artifact Id"
+        },
+        "strategy_source_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Source Artifact Id",
+          "type": "string"
+        },
+        "target_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "target_version": {
+          "minimum": 1,
+          "title": "Target Version",
+          "type": "integer"
+        },
+        "validation_result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Validation Result Id"
+        }
+      },
+      "required": [
+        "package_id",
+        "codegen_result_id",
+        "target_id",
+        "target_version",
+        "strategy_source_artifact_id",
+        "installation_manifest",
+        "checksums",
+        "content_hash"
+      ],
+      "title": "DeploymentPackage",
+      "type": "object"
+    },
+    "Direction": {
+      "enum": [
+        "LONG",
+        "SHORT",
+        "BOTH"
+      ],
+      "type": "string"
+    },
+    "DirectionPolicy": {
+      "additionalProperties": false,
+      "description": "Trade-direction and opposite-symmetry policy of a strategy.\n\nDerived short logic is stored visibly and detachable without mutating\nlong logic (FR-STRAT-CONFIGURE_TRADE_DIRECTIONS).",
+      "properties": {
+        "direction": {
+          "$ref": "#/$defs/Direction"
+        },
+        "opposite_map_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Opposite Map Version Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "symmetry": {
+          "enum": [
+            "INDEPENDENT",
+            "DERIVED"
+          ],
+          "title": "Symmetry",
+          "type": "string"
+        }
+      },
+      "required": [
+        "direction",
+        "symmetry"
+      ],
+      "title": "DirectionPolicy",
+      "type": "object"
+    },
+    "EditTemplatesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated template request.\n\nDEFINE_TEMPLATE requires only ``template``; INSTANTIATE requires only\n``template_id`` with ``placeholder_values``. Visual-edit operations are\nclient-side; commands flow through version-strategies.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "DEFINE_TEMPLATE",
+            "INSTANTIATE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "placeholder_values": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "template": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyTemplate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "template_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Template Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "EditTemplatesRequest",
+      "type": "object"
+    },
+    "EditTemplatesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful template operation result.",
+      "properties": {
+        "instantiated_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instantiated Version Id"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "template": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyTemplate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "EditTemplatesSuccess",
+      "type": "object"
+    },
+    "ExchangeStrategiesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated strategy interchange request.\n\nEXPORT requires only ``strategy_version_id``; IMPORT requires only\n``package``; IMPORT_LEGACY requires only ``legacy_artifact_id`` holding\nthe Workspace artifact-store reference of a legacy `.sqx` file that is\nimported only through the isolated importer plugin.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "legacy_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Legacy Artifact Id"
+        },
+        "operation": {
+          "enum": [
+            "EXPORT",
+            "IMPORT",
+            "IMPORT_LEGACY"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "package": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyExchangePackage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Strategy Version Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ExchangeStrategiesRequest",
+      "type": "object"
+    },
+    "ExchangeStrategiesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful strategy interchange operation result.",
+      "properties": {
+        "imported_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Imported Version Id"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "package": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyExchangePackage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ExchangeStrategiesSuccess",
+      "type": "object"
+    },
+    "ExpressionNode": {
+      "additionalProperties": false,
+      "description": "One typed operator application over referenced operand nodes.\n\nDomain assumption: invalid operand connections such as series-to-boolean\nor price-to-duration require the operand types from the block catalogue,\nso they are rejected by AST validation (FR-STRAT-DEFINE_AST_TYPES) rather\nthan by this wire shape.",
+      "properties": {
+        "node_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "operands": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Operands",
+          "type": "array"
+        },
+        "operator": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "result_type": {
+          "$ref": "#/$defs/AstType"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "node_id",
+        "operator",
+        "operands",
+        "result_type"
+      ],
+      "title": "ExpressionNode",
+      "type": "object"
+    },
+    "ExtendPluginNodesRequest": {
+      "additionalProperties": false,
+      "description": "Plugin node registration request.\n\nREGISTER_PLUGIN_NODE requires only ``plugin_node``; Volume-Profile/TPO\nnodes are Experimental and gated per Project section 2.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "const": "REGISTER_PLUGIN_NODE",
+          "title": "Operation",
+          "type": "string"
+        },
+        "plugin_node": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginNodeRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ExtendPluginNodesRequest",
+      "type": "object"
+    },
+    "ExtendPluginNodesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful plugin node registration result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "plugin_node": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginNodeRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ExtendPluginNodesSuccess",
+      "type": "object"
+    },
+    "ExternalIndicatorDefinitionVersion": {
+      "additionalProperties": false,
+      "description": "One immutable versioned external indicator definition.\n\nTarget fragments stay isolated from canonical semantics; shift-0 and\nlook-ahead sentinels follow Project section 15.4\n(FR-STRAT-ISOLATE_INDICATOR_FRAGMENTS).",
+      "properties": {
+        "chart_binding_defaults": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "definition_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Definition Id",
+          "type": "string"
+        },
+        "output_lines": {
+          "items": {
+            "$ref": "#/$defs/IndicatorOutputLine"
+          },
+          "minItems": 1,
+          "title": "Output Lines",
+          "type": "array"
+        },
+        "parameter_schema": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "shift_semantics": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "source_platform": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "source_version": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "target_fragments": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TargetFragment"
+          },
+          "title": "Target Fragments",
+          "type": "array"
+        },
+        "value_kind": {
+          "enum": [
+            "NUMBER",
+            "PRICE",
+            "PRICE_RANGE",
+            "SIGNAL"
+          ],
+          "title": "Value Kind",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "warmup_bars": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Warmup Bars",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "definition_id",
+        "version",
+        "value_kind",
+        "output_lines",
+        "parameter_schema",
+        "source_platform",
+        "source_version",
+        "shift_semantics",
+        "content_hash"
+      ],
+      "title": "ExternalIndicatorDefinitionVersion",
+      "type": "object"
+    },
+    "GenerateCodeRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated codegen core request.\n\nREGISTER_TARGET requires only ``target``; GENERATE requires only the\ncode-generation job record ``codegen_request``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "codegen_request": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodegenRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "REGISTER_TARGET",
+            "GENERATE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodeTargetDescriptor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "GenerateCodeRequest",
+      "type": "object"
+    },
+    "GenerateCodeSuccess": {
+      "additionalProperties": false,
+      "description": "Successful codegen core operation result.\n\nThe field named ``request`` carries the accepted\n``CodegenRequest`` record per the ratified success envelope.",
+      "properties": {
+        "manifest": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodeManifest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodegenRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodegenResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodeTargetDescriptor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "GenerateCodeSuccess",
+      "type": "object"
+    },
+    "GenerateMql5Request": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated MQL5 toolchain request.\n\nGENERATE requires only ``codegen_request``; COMPILE, VERIFY, and\nPACKAGE require only ``result_id``; COMPARE requires only\n``baseline_result_id`` with ``comparison_result_id``. MetaEditor is\ninvoked in an isolated worker with timeout and captured output.",
+      "properties": {
+        "baseline_result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseline Result Id"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "codegen_request": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodegenRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "comparison_result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Comparison Result Id"
+        },
+        "operation": {
+          "enum": [
+            "GENERATE",
+            "COMPILE",
+            "VERIFY",
+            "COMPARE",
+            "PACKAGE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "GenerateMql5Request",
+      "type": "object"
+    },
+    "GenerateMql5Success": {
+      "additionalProperties": false,
+      "description": "Successful MQL5 toolchain operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "package": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DeploymentPackage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodegenResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "GenerateMql5Success",
+      "type": "object"
+    },
+    "GenerateTargetsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated additional-target request.\n\nIMPLEMENT_TARGET requires only ``target``; VALIDATE_TARGET requires\nonly ``target_id`` with an optional ``target_version``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "IMPLEMENT_TARGET",
+            "VALIDATE_TARGET"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodeTargetDescriptor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "target_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "target_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Version"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "GenerateTargetsRequest",
+      "type": "object"
+    },
+    "GenerateTargetsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful additional-target operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodegenResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodeTargetDescriptor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "GenerateTargetsSuccess",
+      "type": "object"
+    },
+    "IndicatorDefinition": {
+      "additionalProperties": false,
+      "description": "One versioned indicator definition with typed output lines.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "indicator_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "output_lines": {
+          "items": {
+            "$ref": "#/$defs/IndicatorOutputLine"
+          },
+          "minItems": 1,
+          "title": "Output Lines",
+          "type": "array"
+        },
+        "parameters": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ParameterDefinition"
+          },
+          "title": "Parameters",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source": {
+          "enum": [
+            "BUILTIN",
+            "EXTERNAL"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "indicator_id",
+        "version",
+        "source",
+        "output_lines",
+        "content_hash"
+      ],
+      "title": "IndicatorDefinition",
+      "type": "object"
+    },
+    "IndicatorOutputLine": {
+      "additionalProperties": false,
+      "description": "One named typed output line of an indicator definition.",
+      "properties": {
+        "line_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "value_type": {
+          "$ref": "#/$defs/AstType"
+        }
+      },
+      "required": [
+        "line_name",
+        "value_type"
+      ],
+      "title": "IndicatorOutputLine",
+      "type": "object"
+    },
+    "InstrumentRef": {
+      "additionalProperties": false,
+      "description": "Reference to one canonical instrument identity.",
+      "properties": {
+        "instrument_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Instrument Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "instrument_id"
+      ],
+      "title": "InstrumentRef",
+      "type": "object"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ModelAtmExitsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated ATM and partial-exit request.\n\nDEFINE_ATM requires only ``atm``; DEFINE_PARTIAL_EXIT requires only\n``partial_exit``.",
+      "properties": {
+        "atm": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AtmExitDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "DEFINE_ATM",
+            "DEFINE_PARTIAL_EXIT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "partial_exit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialExitDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ModelAtmExitsRequest",
+      "type": "object"
+    },
+    "ModelAtmExitsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful ATM and partial-exit operation result.",
+      "properties": {
+        "atm": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AtmExitDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "partial_exit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialExitDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ModelAtmExitsSuccess",
+      "type": "object"
+    },
+    "NodeBinding": {
+      "additionalProperties": false,
+      "description": "One typed input binding of an AST node.\n\nDomain assumption: exactly one of ``source_node_id`` and a ``constant``\nvalue supplies a port; the mutual-exclusion rule is enforced by AST\nnormalization (FR-STRAT-DEFINE_AST_NODES), not by the wire shape, because\na ``None`` constant is itself a legal JSON value.",
+      "properties": {
+        "constant": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "port_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "source_node_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Node Id"
+        }
+      },
+      "required": [
+        "port_name"
+      ],
+      "title": "NodeBinding",
+      "type": "object"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "OppositeMapVersion": {
+      "additionalProperties": false,
+      "description": "One immutable versioned opposite-direction block mapping.",
+      "properties": {
+        "action": {
+          "enum": [
+            "MAP",
+            "PRESERVE",
+            "REJECT"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "map_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Map Id",
+          "type": "string"
+        },
+        "parameter_transform": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_block_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "source_relation": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "target_block_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "target_relation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "map_id",
+        "version",
+        "source_block_id",
+        "source_relation",
+        "action",
+        "content_hash"
+      ],
+      "title": "OppositeMapVersion",
+      "type": "object"
+    },
+    "PackageDependency": {
+      "additionalProperties": false,
+      "description": "One packaged interchange dependency entry with content proof.",
+      "properties": {
+        "media_type": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "relative_path": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "role": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "role",
+        "relative_path",
+        "media_type",
+        "size_bytes",
+        "sha256"
+      ],
+      "title": "PackageDependency",
+      "type": "object"
+    },
+    "ParameterDefinition": {
+      "additionalProperties": false,
+      "description": "One typed parameter with its declared value domain.\n\nInteger 5-15 step 5 enumerates exactly 5, 10, 15; invalid or empty\ndeclared domains fail before search queueing\n(FR-STRAT-DEFINE_PARAMETER_DOMAINS, FR-STRAT-DEFINE_SEARCH_PARAMETERS).",
+      "properties": {
+        "default_value": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "discrete_values": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Discrete Values",
+          "type": "array"
+        },
+        "domain": {
+          "enum": [
+            "FIXED",
+            "DISCRETE",
+            "RANGE_STEP"
+          ],
+          "title": "Domain",
+          "type": "string"
+        },
+        "fixed_value": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "is_search_eligible": {
+          "default": false,
+          "title": "Is Search Eligible",
+          "type": "boolean"
+        },
+        "mutation_behavior": {
+          "default": "",
+          "title": "Mutation Behavior",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "optimization_visible": {
+          "default": true,
+          "title": "Optimization Visible",
+          "type": "boolean"
+        },
+        "range_max": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Range Max"
+        },
+        "range_min": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Range Min"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "step": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Step"
+        },
+        "value_type": {
+          "$ref": "#/$defs/AstType"
+        }
+      },
+      "required": [
+        "name",
+        "value_type",
+        "domain"
+      ],
+      "title": "ParameterDefinition",
+      "type": "object"
+    },
+    "PartialExitDefinition": {
+      "additionalProperties": false,
+      "description": "One partial-exit rule of a strategy.\n\nSection 23 exit fixtures pass before enablement\n(FR-STRAT-MODEL_ATM_EXITS).",
+      "properties": {
+        "exit_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Exit Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "TARGET",
+            "STOP",
+            "TRAILING",
+            "BREAKEVEN",
+            "BARS",
+            "RULE",
+            "EOD",
+            "FRIDAY"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "parameters": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "residual_policy": {
+          "enum": [
+            "KEEP_RESIDUAL",
+            "CLOSE_ALL"
+          ],
+          "title": "Residual Policy",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "exit_id",
+        "kind",
+        "parameters",
+        "residual_policy"
+      ],
+      "title": "PartialExitDefinition",
+      "type": "object"
+    },
+    "PluginNodeRef": {
+      "additionalProperties": false,
+      "description": "Reference to one plugin-provided AST node type.\n\nA missing plugin or migration hook yields a diagnosable unavailable\nstrategy, never silent node loss (FR-STRAT-IDENTIFY_PLUGIN_NODES).",
+      "properties": {
+        "api_version": {
+          "$ref": "#/$defs/SemverString"
+        },
+        "capabilities": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "migration_hook": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "plugin_id",
+        "api_version",
+        "schema_ref"
+      ],
+      "title": "PluginNodeRef",
+      "type": "object"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "RandomBlockTemplate": {
+      "additionalProperties": false,
+      "description": "One weighted block candidate of a random group version.",
+      "properties": {
+        "block_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "block_version": {
+          "minimum": 1,
+          "title": "Block Version",
+          "type": "integer"
+        },
+        "weight": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Weight",
+          "type": "string"
+        }
+      },
+      "required": [
+        "block_id",
+        "block_version",
+        "weight"
+      ],
+      "title": "RandomBlockTemplate",
+      "type": "object"
+    },
+    "RandomGroupVersion": {
+      "additionalProperties": false,
+      "description": "One immutable versioned random group of block templates.",
+      "properties": {
+        "applicability": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Applicability",
+          "type": "array"
+        },
+        "block_templates": {
+          "items": {
+            "$ref": "#/$defs/RandomBlockTemplate"
+          },
+          "minItems": 1,
+          "title": "Block Templates",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "fixed_parameters": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Fixed Parameters",
+          "type": "array"
+        },
+        "group_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Group Id",
+          "type": "string"
+        },
+        "group_type": {
+          "enum": [
+            "CONDITION",
+            "VALUE",
+            "ACTION"
+          ],
+          "title": "Group Type",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "group_id",
+        "version",
+        "group_type",
+        "block_templates",
+        "content_hash"
+      ],
+      "title": "RandomGroupVersion",
+      "type": "object"
+    },
+    "SemverString": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+      "type": "string"
+    },
+    "StrategyArchitecture": {
+      "additionalProperties": false,
+      "description": "One architecture style selection of a strategy.\n\nSignal-gated evaluation prevents conflicting entry and exit signals\n(FR-STRAT-DEFINE_STRATEGY_ARCHITECTURES).",
+      "properties": {
+        "architecture_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Architecture Id",
+          "type": "string"
+        },
+        "custom_template_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Custom Template Version Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "style": {
+          "enum": [
+            "CLASSIC_RULES",
+            "SIGNAL_GATED",
+            "FUZZY_VOTING",
+            "CUSTOM"
+          ],
+          "title": "Style",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "architecture_id",
+        "version",
+        "style"
+      ],
+      "title": "StrategyArchitecture",
+      "type": "object"
+    },
+    "StrategyAst": {
+      "additionalProperties": false,
+      "description": "Canonical typed abstract syntax tree of one strategy.\n\nCommutatively reordered AND operands hash equally; ordered action\nsequences do not (FR-STRAT-NORMALIZE_STRATEGY_AST).",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "expression_nodes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ExpressionNode"
+          },
+          "title": "Expression Nodes",
+          "type": "array"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/StrategyNode"
+          },
+          "minItems": 1,
+          "title": "Nodes",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "nodes",
+        "content_hash"
+      ],
+      "title": "StrategyAst",
+      "type": "object"
+    },
+    "StrategyExchangePackage": {
+      "additionalProperties": false,
+      "description": "One native `.sqxs` interchange package of a strategy version.\n\nExport-then-import reproduces the AST and content hash; unknown required\nroles reject import while unknown optional entries are preserved as\nnamespaced attachments (FR-STRAT-EXCHANGE_NATIVE_STRATEGIES). The\ndeterministic ZIP64 rules are owned by the interchange feature per\nProject section 22.3.",
+      "properties": {
+        "ast_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Ast Hash",
+          "type": "string"
+        },
+        "container_schema_version": {
+          "const": 1,
+          "title": "Container Schema Version",
+          "type": "integer"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "dependencies": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PackageDependency"
+          },
+          "title": "Dependencies",
+          "type": "array"
+        },
+        "package_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Package Id",
+          "type": "string"
+        },
+        "results_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Results Hash"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "settings_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Settings Hash"
+        },
+        "strategy_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Id",
+          "type": "string"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "package_id",
+        "container_schema_version",
+        "strategy_id",
+        "strategy_version_id",
+        "ast_hash",
+        "created_at",
+        "content_hash"
+      ],
+      "title": "StrategyExchangePackage",
+      "type": "object"
+    },
+    "StrategyFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope for every strategy capability.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/StrategyFailureCode"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "StrategyFailure",
+      "type": "object"
+    },
+    "StrategyFailureCode": {
+      "enum": [
+        "STRATEGY_VALIDATION_FAILED",
+        "STRATEGY_AST_INVALID",
+        "STRATEGY_BLOCK_UNAVAILABLE",
+        "STRATEGY_TEMPLATE_INVALID",
+        "STRATEGY_IMPORT_INVALID",
+        "STRATEGY_PLUGIN_UNAVAILABLE",
+        "STRATEGY_TARGET_UNSUPPORTED",
+        "CODEGEN_FAILED",
+        "COMPILE_FAILED",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "StrategyNode": {
+      "additionalProperties": false,
+      "description": "One AST node carrying identity, block reference, and typed bindings.",
+      "properties": {
+        "bindings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NodeBinding"
+          },
+          "title": "Bindings",
+          "type": "array"
+        },
+        "block_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "block_version": {
+          "minimum": 1,
+          "title": "Block Version",
+          "type": "integer"
+        },
+        "children": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Children",
+          "type": "array"
+        },
+        "kind": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "node_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "parameters": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "node_id",
+        "kind",
+        "block_id",
+        "block_version"
+      ],
+      "title": "StrategyNode",
+      "type": "object"
+    },
+    "StrategyRef": {
+      "additionalProperties": false,
+      "description": "Reference to one strategy identity.",
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "strategy_id"
+      ],
+      "title": "StrategyRef",
+      "type": "object"
+    },
+    "StrategyTemplate": {
+      "additionalProperties": false,
+      "description": "One versioned strategy template with placeholders and constraints.\n\nInstantiation with missing required or out-of-domain values fails\nwithout creating a version; materialization is type-valid or a\nstructured rejection (FR-STRAT-DEFINE_STRATEGY_TEMPLATES,\nFR-STRAT-CONSTRAIN_TEMPLATE_GRAMMAR).",
+      "properties": {
+        "base_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Base Version Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "placeholders": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TemplatePlaceholder"
+          },
+          "title": "Placeholders",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "subtree_constraints": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TemplateSubtreeConstraint"
+          },
+          "title": "Subtree Constraints",
+          "type": "array"
+        },
+        "template_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Template Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "template_id",
+        "name",
+        "base_version_id",
+        "content_hash"
+      ],
+      "title": "StrategyTemplate",
+      "type": "object"
+    },
+    "StrategyValidationReport": {
+      "additionalProperties": false,
+      "description": "Complete validation findings for one strategy version.\n\nThe response contains all findings covering structure, types, block\nversions, parameter domains, charts, instruments, sessions, data\nprecision, order lifecycle, sizing, exits, and the selected code target\n(FR-STRAT-VALIDATE_STRATEGIES).",
+      "properties": {
+        "findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "is_valid": {
+          "title": "Is Valid",
+          "type": "boolean"
+        },
+        "report_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Report Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "report_id",
+        "strategy_version_id",
+        "is_valid"
+      ],
+      "title": "StrategyValidationReport",
+      "type": "object"
+    },
+    "StrategyVersion": {
+      "additionalProperties": false,
+      "description": "One versioned strategy snapshot.\n\nUniqueness ``(strategy_id, version)`` is enforced by the owning store\nbecause it spans records; committing a draft creates the immutable\nversion and results from the parent stay linked\n(FR-STRAT-VERSION_STRATEGY_DRAFTS).",
+      "properties": {
+        "architecture": {
+          "$ref": "#/$defs/StrategyArchitecture"
+        },
+        "ast": {
+          "$ref": "#/$defs/StrategyAst"
+        },
+        "ast_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Ast Hash",
+          "type": "string"
+        },
+        "charts": {
+          "items": {
+            "$ref": "#/$defs/ChartDefinition"
+          },
+          "minItems": 1,
+          "title": "Charts",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "creation_method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "dependency_artifact_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Dependency Artifact Ids",
+          "type": "array"
+        },
+        "direction": {
+          "$ref": "#/$defs/DirectionPolicy"
+        },
+        "parent_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Version Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Id",
+          "type": "string"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "strategy_version_id",
+        "strategy_id",
+        "version",
+        "architecture",
+        "ast",
+        "ast_hash",
+        "charts",
+        "direction",
+        "creation_method",
+        "created_at",
+        "content_hash"
+      ],
+      "title": "StrategyVersion",
+      "type": "object"
+    },
+    "TargetFragment": {
+      "additionalProperties": false,
+      "description": "One isolated target-specific code fragment of an external indicator.\n\nCross-owner reference: Workspace artifact store artifact ID.",
+      "properties": {
+        "artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "target_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "target_id",
+        "artifact_id"
+      ],
+      "title": "TargetFragment",
+      "type": "object"
+    },
+    "TemplatePlaceholder": {
+      "additionalProperties": false,
+      "description": "One named substitution slot of a strategy template.",
+      "properties": {
+        "allowed_domains": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Allowed Domains",
+          "type": "array"
+        },
+        "is_required": {
+          "title": "Is Required",
+          "type": "boolean"
+        },
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "name",
+        "is_required"
+      ],
+      "title": "TemplatePlaceholder",
+      "type": "object"
+    },
+    "TemplateSubtreeConstraint": {
+      "additionalProperties": false,
+      "description": "One subtree grammar constraint applied to a template placeholder.",
+      "properties": {
+        "cardinality_max": {
+          "minimum": 0,
+          "title": "Cardinality Max",
+          "type": "integer"
+        },
+        "cardinality_min": {
+          "minimum": 0,
+          "title": "Cardinality Min",
+          "type": "integer"
+        },
+        "compatible_block_ids": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Compatible Block Ids",
+          "type": "array"
+        },
+        "complexity_limit": {
+          "minimum": 1,
+          "title": "Complexity Limit",
+          "type": "integer"
+        },
+        "placeholder": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "placeholder",
+        "cardinality_min",
+        "cardinality_max",
+        "complexity_limit"
+      ],
+      "title": "TemplateSubtreeConstraint",
+      "type": "object"
+    },
+    "Timeframe": {
+      "additionalProperties": false,
+      "description": "Positive multiple of a supported market-time unit.",
+      "properties": {
+        "multiple": {
+          "minimum": 1,
+          "title": "Multiple",
+          "type": "integer"
+        },
+        "unit": {
+          "enum": [
+            "MINUTE",
+            "DAY",
+            "WEEK",
+            "MONTH"
+          ],
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit",
+        "multiple"
+      ],
+      "title": "Timeframe",
+      "type": "object"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    },
+    "VersionStrategiesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated strategy versioning request.\n\nCREATE_DRAFT requires only the draft record ``strategy_version``;\nCOMMIT_VERSION and SNAPSHOT_DRAFT require only the stored\n``strategy_version_id``; a backtest binding commits the exact draft.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "CREATE_DRAFT",
+            "COMMIT_VERSION",
+            "SNAPSHOT_DRAFT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "strategy_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Strategy Version Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "VersionStrategiesRequest",
+      "type": "object"
+    },
+    "VersionStrategiesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful strategy versioning operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "strategy_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Strategy Version Id"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "VersionStrategiesSuccess",
+      "type": "object"
+    },
+    "VisibilityPolicy": {
+      "additionalProperties": false,
+      "description": "Observable series shift declaration for one chart.\n\nShift 0 exposes only the value observable at the current event;\nhigher-timeframe future closes cannot influence lower timeframes\n(FR-STRAT-DEFINE_SERIES_SHIFTS).",
+      "properties": {
+        "chart_ordinal": {
+          "minimum": 0,
+          "title": "Chart Ordinal",
+          "type": "integer"
+        },
+        "look_ahead": {
+          "const": "PROHIBITED",
+          "default": "PROHIBITED",
+          "title": "Look Ahead",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "shift": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Shift",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "chart_ordinal"
+      ],
+      "title": "VisibilityPolicy",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {},
+  "failures": {
+    "StrategyFailure": {
+      "$ref": "#/$defs/StrategyFailure"
+    }
+  },
+  "models": {
+    "AtmExitDefinition": {
+      "$ref": "#/$defs/AtmExitDefinition"
+    },
+    "AtmStage": {
+      "$ref": "#/$defs/AtmStage"
+    },
+    "BlockDefinition": {
+      "$ref": "#/$defs/BlockDefinition"
+    },
+    "CatalogBlocksRequest": {
+      "$ref": "#/$defs/CatalogBlocksRequest"
+    },
+    "CatalogBlocksSuccess": {
+      "$ref": "#/$defs/CatalogBlocksSuccess"
+    },
+    "ChartDefinition": {
+      "$ref": "#/$defs/ChartDefinition"
+    },
+    "CodeManifest": {
+      "$ref": "#/$defs/CodeManifest"
+    },
+    "CodeTargetDescriptor": {
+      "$ref": "#/$defs/CodeTargetDescriptor"
+    },
+    "CodegenRequest": {
+      "$ref": "#/$defs/CodegenRequest"
+    },
+    "CodegenResult": {
+      "$ref": "#/$defs/CodegenResult"
+    },
+    "CompilerDiagnostic": {
+      "$ref": "#/$defs/CompilerDiagnostic"
+    },
+    "ConfigureChartsRequest": {
+      "$ref": "#/$defs/ConfigureChartsRequest"
+    },
+    "ConfigureChartsSuccess": {
+      "$ref": "#/$defs/ConfigureChartsSuccess"
+    },
+    "DefineArchitecturesRequest": {
+      "$ref": "#/$defs/DefineArchitecturesRequest"
+    },
+    "DefineArchitecturesSuccess": {
+      "$ref": "#/$defs/DefineArchitecturesSuccess"
+    },
+    "DefineAstRequest": {
+      "$ref": "#/$defs/DefineAstRequest"
+    },
+    "DefineAstSuccess": {
+      "$ref": "#/$defs/DefineAstSuccess"
+    },
+    "DefineIndicatorsRequest": {
+      "$ref": "#/$defs/DefineIndicatorsRequest"
+    },
+    "DefineIndicatorsSuccess": {
+      "$ref": "#/$defs/DefineIndicatorsSuccess"
+    },
+    "DeploymentPackage": {
+      "$ref": "#/$defs/DeploymentPackage"
+    },
+    "DirectionPolicy": {
+      "$ref": "#/$defs/DirectionPolicy"
+    },
+    "EditTemplatesRequest": {
+      "$ref": "#/$defs/EditTemplatesRequest"
+    },
+    "EditTemplatesSuccess": {
+      "$ref": "#/$defs/EditTemplatesSuccess"
+    },
+    "ExchangeStrategiesRequest": {
+      "$ref": "#/$defs/ExchangeStrategiesRequest"
+    },
+    "ExchangeStrategiesSuccess": {
+      "$ref": "#/$defs/ExchangeStrategiesSuccess"
+    },
+    "ExpressionNode": {
+      "$ref": "#/$defs/ExpressionNode"
+    },
+    "ExtendPluginNodesRequest": {
+      "$ref": "#/$defs/ExtendPluginNodesRequest"
+    },
+    "ExtendPluginNodesSuccess": {
+      "$ref": "#/$defs/ExtendPluginNodesSuccess"
+    },
+    "ExternalIndicatorDefinitionVersion": {
+      "$ref": "#/$defs/ExternalIndicatorDefinitionVersion"
+    },
+    "GenerateCodeRequest": {
+      "$ref": "#/$defs/GenerateCodeRequest"
+    },
+    "GenerateCodeSuccess": {
+      "$ref": "#/$defs/GenerateCodeSuccess"
+    },
+    "GenerateMql5Request": {
+      "$ref": "#/$defs/GenerateMql5Request"
+    },
+    "GenerateMql5Success": {
+      "$ref": "#/$defs/GenerateMql5Success"
+    },
+    "GenerateTargetsRequest": {
+      "$ref": "#/$defs/GenerateTargetsRequest"
+    },
+    "GenerateTargetsSuccess": {
+      "$ref": "#/$defs/GenerateTargetsSuccess"
+    },
+    "IndicatorDefinition": {
+      "$ref": "#/$defs/IndicatorDefinition"
+    },
+    "IndicatorOutputLine": {
+      "$ref": "#/$defs/IndicatorOutputLine"
+    },
+    "ModelAtmExitsRequest": {
+      "$ref": "#/$defs/ModelAtmExitsRequest"
+    },
+    "ModelAtmExitsSuccess": {
+      "$ref": "#/$defs/ModelAtmExitsSuccess"
+    },
+    "NodeBinding": {
+      "$ref": "#/$defs/NodeBinding"
+    },
+    "OppositeMapVersion": {
+      "$ref": "#/$defs/OppositeMapVersion"
+    },
+    "PackageDependency": {
+      "$ref": "#/$defs/PackageDependency"
+    },
+    "ParameterDefinition": {
+      "$ref": "#/$defs/ParameterDefinition"
+    },
+    "PartialExitDefinition": {
+      "$ref": "#/$defs/PartialExitDefinition"
+    },
+    "PluginNodeRef": {
+      "$ref": "#/$defs/PluginNodeRef"
+    },
+    "RandomBlockTemplate": {
+      "$ref": "#/$defs/RandomBlockTemplate"
+    },
+    "RandomGroupVersion": {
+      "$ref": "#/$defs/RandomGroupVersion"
+    },
+    "StrategyArchitecture": {
+      "$ref": "#/$defs/StrategyArchitecture"
+    },
+    "StrategyAst": {
+      "$ref": "#/$defs/StrategyAst"
+    },
+    "StrategyExchangePackage": {
+      "$ref": "#/$defs/StrategyExchangePackage"
+    },
+    "StrategyNode": {
+      "$ref": "#/$defs/StrategyNode"
+    },
+    "StrategyRef": {
+      "$ref": "#/$defs/StrategyRef"
+    },
+    "StrategyTemplate": {
+      "$ref": "#/$defs/StrategyTemplate"
+    },
+    "StrategyValidationReport": {
+      "$ref": "#/$defs/StrategyValidationReport"
+    },
+    "StrategyVersion": {
+      "$ref": "#/$defs/StrategyVersion"
+    },
+    "TargetFragment": {
+      "$ref": "#/$defs/TargetFragment"
+    },
+    "TemplatePlaceholder": {
+      "$ref": "#/$defs/TemplatePlaceholder"
+    },
+    "TemplateSubtreeConstraint": {
+      "$ref": "#/$defs/TemplateSubtreeConstraint"
+    },
+    "VersionStrategiesRequest": {
+      "$ref": "#/$defs/VersionStrategiesRequest"
+    },
+    "VersionStrategiesSuccess": {
+      "$ref": "#/$defs/VersionStrategiesSuccess"
+    },
+    "VisibilityPolicy": {
+      "$ref": "#/$defs/VisibilityPolicy"
+    }
+  },
+  "namespace": "strategy",
+  "schema_version": 1,
+  "title": "strategy wire contracts v1"
+}

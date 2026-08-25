@@ -1,0 +1,4440 @@
+{
+  "$defs": {
+    "AcceptResearchRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated acceptance pipeline request.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "DEFINE_PIPELINE",
+            "EVALUATE",
+            "PROMOTE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "AcceptResearchRequest",
+      "type": "object"
+    },
+    "AcceptResearchSuccess": {
+      "additionalProperties": false,
+      "description": "Successful acceptance pipeline operation result.",
+      "properties": {
+        "decision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AcceptanceDecision"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "pipeline": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AcceptancePipeline"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "promotion": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PromotionDecision"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "AcceptResearchSuccess",
+      "type": "object"
+    },
+    "AcceptanceDecision": {
+      "additionalProperties": false,
+      "description": "One stage outcome of one candidate against one pipeline (R17).\n\nRejection totals reconcile exactly with candidate counts in the owning\nstore.",
+      "properties": {
+        "candidate_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "diagnostic_context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "direction": {
+          "$ref": "#/$defs/Direction"
+        },
+        "observed_value": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Observed Value"
+        },
+        "outcome": {
+          "enum": [
+            "PASSED",
+            "REJECTED"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "pipeline_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Pipeline Id",
+          "type": "string"
+        },
+        "rule": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "rule_version": {
+          "minimum": 1,
+          "title": "Rule Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "segment": {
+          "$ref": "#/$defs/Segment"
+        },
+        "stage": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Threshold"
+        }
+      },
+      "required": [
+        "decision_id",
+        "candidate_id",
+        "pipeline_id",
+        "stage",
+        "rule",
+        "rule_version",
+        "observed_value",
+        "threshold",
+        "segment",
+        "direction",
+        "outcome"
+      ],
+      "title": "AcceptanceDecision",
+      "type": "object"
+    },
+    "AcceptancePipeline": {
+      "additionalProperties": false,
+      "description": "Ordered acceptance pipeline definition (R16).\n\nHigher-cost stages receive only candidates allowed by earlier stages.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "pipeline_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Pipeline Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "stages": {
+          "items": {
+            "$ref": "#/$defs/AcceptanceStage"
+          },
+          "minItems": 1,
+          "title": "Stages",
+          "type": "array"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "pipeline_id",
+        "version",
+        "stages",
+        "content_hash"
+      ],
+      "title": "AcceptancePipeline",
+      "type": "object"
+    },
+    "AcceptanceStage": {
+      "additionalProperties": false,
+      "description": "One ordered stage of a research acceptance pipeline.",
+      "properties": {
+        "budget": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "concurrency": {
+          "minimum": 1,
+          "title": "Concurrency",
+          "type": "integer"
+        },
+        "rule": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "rule_version": {
+          "minimum": 1,
+          "title": "Rule Version",
+          "type": "integer"
+        },
+        "stage": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "stop_on_failure": {
+          "title": "Stop On Failure",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "stage",
+        "rule",
+        "rule_version",
+        "budget",
+        "concurrency",
+        "stop_on_failure"
+      ],
+      "title": "AcceptanceStage",
+      "type": "object"
+    },
+    "AiImprovementProposal": {
+      "additionalProperties": false,
+      "description": "Governed AI improvement proposal over one parent strategy (R22).\n\nExperimental: proposals may not run, promote, overwrite, or delete\nstrategies without an explicit approved research action.",
+      "properties": {
+        "draft_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Draft Id",
+          "type": "string"
+        },
+        "edit_operations": {
+          "items": {
+            "$ref": "#/$defs/JsonObject"
+          },
+          "minItems": 1,
+          "title": "Edit Operations",
+          "type": "array"
+        },
+        "parent_strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Parent Strategy Version Id",
+          "type": "string"
+        },
+        "proposal_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Proposal Id",
+          "type": "string"
+        },
+        "proposal_state": {
+          "enum": [
+            "PROPOSED",
+            "REJECTED",
+            "APPROVED"
+          ],
+          "title": "Proposal State",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "proposal_id",
+        "draft_id",
+        "parent_strategy_version_id",
+        "edit_operations",
+        "proposal_state"
+      ],
+      "title": "AiImprovementProposal",
+      "type": "object"
+    },
+    "AiResearchDraft": {
+      "additionalProperties": false,
+      "description": "Redacted AI-drafted strategy proposal (R21, experimental).\n\nProposed ASTs pass the same registry/schema validation as the editor and\nare never executable by themselves; AI inputs are minimized and redacted,\nand disabling the adapter leaves all stable workflows functional.",
+      "properties": {
+        "adapter": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "draft_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Draft Id",
+          "type": "string"
+        },
+        "input_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Input Hash",
+          "type": "string"
+        },
+        "model": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "proposal_state": {
+          "enum": [
+            "PROPOSED",
+            "VALIDATED",
+            "REJECTED",
+            "APPROVED"
+          ],
+          "title": "Proposal State",
+          "type": "string"
+        },
+        "proposed_ast": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyAst"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provider_request_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "redacted_input": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "validation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrategyValidationReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "draft_id",
+        "input_hash",
+        "provider_request_id",
+        "adapter",
+        "model",
+        "redacted_input",
+        "proposal_state"
+      ],
+      "title": "AiResearchDraft",
+      "type": "object"
+    },
+    "AssistResearchAiRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated AI-assisted research request.\n\nExperimental gating: an external AI failure never impairs non-AI\nworkflows.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "DRAFT",
+            "VALIDATE_DRAFT",
+            "PROPOSE_IMPROVEMENT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "AssistResearchAiRequest",
+      "type": "object"
+    },
+    "AssistResearchAiSuccess": {
+      "additionalProperties": false,
+      "description": "Successful AI-assisted research operation result.",
+      "properties": {
+        "draft": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AiResearchDraft"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "proposal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AiImprovementProposal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "AssistResearchAiSuccess",
+      "type": "object"
+    },
+    "AstType": {
+      "enum": [
+        "BOOLEAN",
+        "INTEGER",
+        "DECIMAL",
+        "PRICE",
+        "QUANTITY",
+        "PERCENTAGE",
+        "DURATION",
+        "TIMEFRAME",
+        "INSTRUMENT",
+        "ENUM",
+        "SCALAR_SERIES",
+        "EVENT",
+        "ACTION"
+      ],
+      "type": "string"
+    },
+    "BrokerRef": {
+      "additionalProperties": false,
+      "description": "Reference to one broker identity.",
+      "properties": {
+        "broker_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Broker Id",
+          "type": "string"
+        },
+        "broker_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "broker_id",
+        "broker_name"
+      ],
+      "title": "BrokerRef",
+      "type": "object"
+    },
+    "BuilderPlan": {
+      "additionalProperties": false,
+      "description": "Reproducible Builder strategy-generation search manifest (R13).\n\nThe complete search is reproducible from this one manifest; only\ntype-valid strategies satisfying grammar, resource, complexity, and\nrequired-block constraints are emitted, and semantic duplicates are\ndetected by normalized fingerprints with a declared collision policy.",
+      "properties": {
+        "block_registry_version": {
+          "minimum": 1,
+          "title": "Block Registry Version",
+          "type": "integer"
+        },
+        "block_weights": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "direction": {
+          "$ref": "#/$defs/Direction"
+        },
+        "engine_profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Engine Profile Id",
+          "type": "string"
+        },
+        "evolution_policy": {
+          "anyOf": [
+            {
+              "enum": [
+                "STRICT_GROUPS",
+                "REFERENCE_RELAXED"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evolution Policy"
+        },
+        "filters": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "markets": {
+          "items": {
+            "$ref": "#/$defs/MarketMatrixCell"
+          },
+          "title": "Markets",
+          "type": "array"
+        },
+        "parameter_domains": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Parameter Domains",
+          "type": "array"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "random_group_version_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Random Group Version Ids",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "seeds": {
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Seeds",
+          "type": "array"
+        },
+        "template_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Template Id"
+        }
+      },
+      "required": [
+        "plan_id",
+        "block_registry_version",
+        "block_weights",
+        "parameter_domains",
+        "template_id",
+        "direction",
+        "markets",
+        "engine_profile_id",
+        "filters",
+        "seeds",
+        "content_hash"
+      ],
+      "title": "BuilderPlan",
+      "type": "object"
+    },
+    "Direction": {
+      "enum": [
+        "LONG",
+        "SHORT",
+        "BOTH"
+      ],
+      "type": "string"
+    },
+    "DriftReport": {
+      "additionalProperties": false,
+      "description": "Pinned expectancy versus later evidence drift report (R27).",
+      "properties": {
+        "baseline": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Baseline"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "lineage": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "metric": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "missing_data_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "observed": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Observed"
+        },
+        "reference_profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Reference Profile Id",
+          "type": "string"
+        },
+        "report_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Report Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/DriftState"
+        },
+        "subject": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Subject",
+          "type": "string"
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Threshold"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Uncertainty"
+        },
+        "window": {
+          "$ref": "#/$defs/SeriesInterval"
+        }
+      },
+      "required": [
+        "report_id",
+        "subject",
+        "reference_profile_id",
+        "metric",
+        "window",
+        "baseline",
+        "observed",
+        "threshold",
+        "uncertainty",
+        "missing_data_policy",
+        "state",
+        "lineage",
+        "content_hash"
+      ],
+      "title": "DriftReport",
+      "type": "object"
+    },
+    "DriftState": {
+      "additionalProperties": false,
+      "description": "Advisory drift classification of one subject at one instant (R26).\n\nAdvisory until a separate acceptance or Risk policy consumes it.",
+      "properties": {
+        "as_of": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "As Of",
+          "type": "string"
+        },
+        "evaluation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Evaluation Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "state": {
+          "enum": [
+            "STABLE",
+            "WATCH",
+            "DEGRADED",
+            "BREACHED",
+            "INSUFFICIENT_EVIDENCE",
+            "INVALID_COMPARISON"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "subject": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Subject",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evaluation_id",
+        "subject",
+        "state",
+        "as_of"
+      ],
+      "title": "DriftState",
+      "type": "object"
+    },
+    "EvolutionPlan": {
+      "additionalProperties": false,
+      "description": "Genetic-evolution configuration with checkpointable RNG streams (R15).\n\nCheckpoints contain generation/island populations, fitness, the duplicate\nindex, counters, and every named RNG stream state; resuming after each\ncheckpoint reproduces identical evolution.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "crossover": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "decimation": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "elitism": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "fitness": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "fitness_version": {
+          "minimum": 1,
+          "title": "Fitness Version",
+          "type": "integer"
+        },
+        "fresh_blood": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "initialization": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "islands": {
+          "minimum": 1,
+          "title": "Islands",
+          "type": "integer"
+        },
+        "migration": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "mutation": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "population_size": {
+          "minimum": 1,
+          "title": "Population Size",
+          "type": "integer"
+        },
+        "restart": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "selection": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "termination": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "plan_id",
+        "population_size",
+        "islands",
+        "initialization",
+        "fitness",
+        "fitness_version",
+        "selection",
+        "crossover",
+        "mutation",
+        "elitism",
+        "migration",
+        "restart",
+        "decimation",
+        "fresh_blood",
+        "termination",
+        "content_hash"
+      ],
+      "title": "EvolutionPlan",
+      "type": "object"
+    },
+    "EvolveStrategiesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated Improver and genetic evolution request.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PLAN",
+            "EVOLVE",
+            "CHECKPOINT",
+            "RESUME",
+            "IMPROVE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "EvolveStrategiesRequest",
+      "type": "object"
+    },
+    "EvolveStrategiesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful Improver and genetic evolution operation result.",
+      "properties": {
+        "candidates": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/StrategyCandidate"
+          },
+          "title": "Candidates",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvolutionPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "EvolveStrategiesSuccess",
+      "type": "object"
+    },
+    "ExpressionNode": {
+      "additionalProperties": false,
+      "description": "One typed operator application over referenced operand nodes.\n\nDomain assumption: invalid operand connections such as series-to-boolean\nor price-to-duration require the operand types from the block catalogue,\nso they are rejected by AST validation (FR-STRAT-DEFINE_AST_TYPES) rather\nthan by this wire shape.",
+      "properties": {
+        "node_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "operands": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Operands",
+          "type": "array"
+        },
+        "operator": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "result_type": {
+          "$ref": "#/$defs/AstType"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "node_id",
+        "operator",
+        "operands",
+        "result_type"
+      ],
+      "title": "ExpressionNode",
+      "type": "object"
+    },
+    "GenerateStrategiesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated Builder generation request.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PLAN",
+            "GENERATE",
+            "CALIBRATE",
+            "DETECT_DUPLICATES"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "GenerateStrategiesRequest",
+      "type": "object"
+    },
+    "GenerateStrategiesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful Builder generation operation result.",
+      "properties": {
+        "candidates": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/StrategyCandidate"
+          },
+          "title": "Candidates",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BuilderPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "GenerateStrategiesSuccess",
+      "type": "object"
+    },
+    "GovernResearchBudgetsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated research budget governance request.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "DEFINE",
+            "CHECK",
+            "ENFORCE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "GovernResearchBudgetsRequest",
+      "type": "object"
+    },
+    "GovernResearchBudgetsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful research budget governance operation result.",
+      "properties": {
+        "budget": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResearchBudget"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "GovernResearchBudgetsSuccess",
+      "type": "object"
+    },
+    "InstrumentRef": {
+      "additionalProperties": false,
+      "description": "Reference to one canonical instrument identity.",
+      "properties": {
+        "instrument_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Instrument Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "instrument_id"
+      ],
+      "title": "InstrumentRef",
+      "type": "object"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "MarketIntelligenceObservation": {
+      "additionalProperties": false,
+      "description": "Immutable point-in-time market intelligence study output (R25).\n\nConsumes only Data-owned point-in-time evidence; descriptive evidence is\ndistinguished from executable rules through versioned definitions.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "definitions": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "entity_instrument_mapping": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "language_model_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language Model Version"
+        },
+        "missingness_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "multiple_comparison_correction": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Multiple Comparison Correction"
+        },
+        "observation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "outputs_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Outputs Artifact Id",
+          "type": "string"
+        },
+        "revision_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "study_kind": {
+          "enum": [
+            "FUNDAMENTAL",
+            "SENTIMENT",
+            "SEASONALITY",
+            "MARKET_STRUCTURE"
+          ],
+          "title": "Study Kind",
+          "type": "string"
+        },
+        "visibility_time": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Visibility Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "observation_id",
+        "study_kind",
+        "source_refs",
+        "visibility_time",
+        "revision_policy",
+        "entity_instrument_mapping",
+        "missingness_policy",
+        "outputs_artifact_id",
+        "content_hash"
+      ],
+      "title": "MarketIntelligenceObservation",
+      "type": "object"
+    },
+    "MarketMatrixCell": {
+      "additionalProperties": false,
+      "description": "One pinned market/broker/data-version cell of a retest market matrix.",
+      "properties": {
+        "broker": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "data_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Data Version Id",
+          "type": "string"
+        },
+        "market": {
+          "$ref": "#/$defs/InstrumentRef"
+        }
+      },
+      "required": [
+        "market",
+        "broker",
+        "data_version_id"
+      ],
+      "title": "MarketMatrixCell",
+      "type": "object"
+    },
+    "MonitorMarketDriftRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated market intelligence and drift request.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "OBSERVE",
+            "EVALUATE_DRIFT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "MonitorMarketDriftRequest",
+      "type": "object"
+    },
+    "MonitorMarketDriftSuccess": {
+      "additionalProperties": false,
+      "description": "Successful market intelligence and drift operation result.",
+      "properties": {
+        "observation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MarketIntelligenceObservation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "report": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DriftReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "MonitorMarketDriftSuccess",
+      "type": "object"
+    },
+    "MonteCarloMethod": {
+      "enum": [
+        "REORDER",
+        "SKIP",
+        "PL_PERTURB",
+        "TRADE_COST_PERTURB",
+        "PARAMETER",
+        "DATA",
+        "SPREAD",
+        "SLIPPAGE",
+        "EXECUTION_DELAY"
+      ],
+      "type": "string"
+    },
+    "MonteCarloSpec": {
+      "additionalProperties": false,
+      "description": "Seeded Monte Carlo perturbation specification of a robustness plan.",
+      "properties": {
+        "acceptance_rule": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "confidence": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Confidence",
+          "type": "string"
+        },
+        "distributions": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "failure_handling": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "methods": {
+          "items": {
+            "$ref": "#/$defs/MonteCarloMethod"
+          },
+          "title": "Methods",
+          "type": "array"
+        },
+        "percentile_method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "sample_count": {
+          "minimum": 1,
+          "title": "Sample Count",
+          "type": "integer"
+        },
+        "seeds": {
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Seeds",
+          "type": "array"
+        }
+      },
+      "required": [
+        "methods",
+        "distributions",
+        "seeds",
+        "sample_count",
+        "percentile_method",
+        "confidence",
+        "failure_handling",
+        "acceptance_rule"
+      ],
+      "title": "MonteCarloSpec",
+      "type": "object"
+    },
+    "NeuralResearchPlan": {
+      "additionalProperties": false,
+      "description": "Neural research training/inference artifact plan (R23, experimental).",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "feature_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Feature Refs",
+          "type": "array"
+        },
+        "hyperparameters": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "inference_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Inference Artifact Id"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "seeds": {
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Seeds",
+          "type": "array"
+        },
+        "trainer_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Trainer Artifact Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "plan_id",
+        "trainer_artifact_id",
+        "hyperparameters",
+        "seeds",
+        "content_hash"
+      ],
+      "title": "NeuralResearchPlan",
+      "type": "object"
+    },
+    "NodeBinding": {
+      "additionalProperties": false,
+      "description": "One typed input binding of an AST node.\n\nDomain assumption: exactly one of ``source_node_id`` and a ``constant``\nvalue supplies a port; the mutual-exclusion rule is enforced by AST\nnormalization (FR-STRAT-DEFINE_AST_NODES), not by the wire shape, because\na ``None`` constant is itself a legal JSON value.",
+      "properties": {
+        "constant": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "port_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "source_node_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Node Id"
+        }
+      },
+      "required": [
+        "port_name"
+      ],
+      "title": "NodeBinding",
+      "type": "object"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "OptimizationPlan": {
+      "additionalProperties": false,
+      "description": "Admitted parameter-optimization plan (R7).\n\nAdmission reports the projected evaluation count and storage; over-policy\ndomains reject unless budget-limited, duplicate vectors execute at most\nonce per compatible manifest, and replay selects the same final vector.",
+      "properties": {
+        "budget_limit": {
+          "default": false,
+          "title": "Budget Limit",
+          "type": "boolean"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "estimated_storage_mb": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Estimated Storage Mb",
+          "type": "integer"
+        },
+        "mode": {
+          "enum": [
+            "SIMPLE",
+            "GRID",
+            "SEQUENTIAL"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "objective": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "objective_version": {
+          "minimum": 1,
+          "title": "Objective Version",
+          "type": "integer"
+        },
+        "parameter_space": {
+          "$ref": "#/$defs/ParameterSpace"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "projected_evaluations": {
+          "minimum": 1,
+          "title": "Projected Evaluations",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "stages": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SequentialStage"
+          },
+          "title": "Stages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "plan_id",
+        "mode",
+        "parameter_space",
+        "objective",
+        "objective_version",
+        "projected_evaluations",
+        "content_hash"
+      ],
+      "title": "OptimizationPlan",
+      "type": "object"
+    },
+    "OptimizationResult": {
+      "additionalProperties": false,
+      "description": "Ranked variants and selection of one optimization run (R9).",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "domain_cardinality": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Domain Cardinality"
+        },
+        "evaluated_count": {
+          "minimum": 0,
+          "title": "Evaluated Count",
+          "type": "integer"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "selected_variant_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Selected Variant Id"
+        },
+        "variants": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/OptimizationVariant"
+          },
+          "title": "Variants",
+          "type": "array"
+        }
+      },
+      "required": [
+        "result_id",
+        "plan_id",
+        "run_id",
+        "evaluated_count",
+        "content_hash"
+      ],
+      "title": "OptimizationResult",
+      "type": "object"
+    },
+    "OptimizationVariant": {
+      "additionalProperties": false,
+      "description": "One evaluated parameter vector of an optimization run (R8).",
+      "properties": {
+        "combination_index": {
+          "minimum": 1,
+          "title": "Combination Index",
+          "type": "integer"
+        },
+        "is_feasible": {
+          "default": true,
+          "title": "Is Feasible",
+          "type": "boolean"
+        },
+        "objective_values": {
+          "additionalProperties": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Objective Values",
+          "type": "object"
+        },
+        "parameter_vector": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "pareto_status": {
+          "default": "UNRANKED",
+          "enum": [
+            "DOMINATED",
+            "NON_DOMINATED",
+            "UNRANKED"
+          ],
+          "title": "Pareto Status",
+          "type": "string"
+        },
+        "rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rank"
+        },
+        "result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result Id"
+        },
+        "run_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "variant_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Variant Id",
+          "type": "string"
+        },
+        "vector_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Vector Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "variant_id",
+        "run_id",
+        "combination_index",
+        "parameter_vector",
+        "vector_hash"
+      ],
+      "title": "OptimizationVariant",
+      "type": "object"
+    },
+    "OptimizeParametersRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated parameter optimization request.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PLAN",
+            "EXECUTE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "OptimizeParametersRequest",
+      "type": "object"
+    },
+    "OptimizeParametersSuccess": {
+      "additionalProperties": false,
+      "description": "Successful parameter optimization operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OptimizationPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OptimizationResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "OptimizeParametersSuccess",
+      "type": "object"
+    },
+    "ParameterSpace": {
+      "additionalProperties": false,
+      "description": "Named multi-dimensional optimization parameter space (R6).",
+      "properties": {
+        "cardinality": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cardinality"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "parameters": {
+          "items": {
+            "$ref": "#/$defs/SpaceDimension"
+          },
+          "minItems": 1,
+          "title": "Parameters",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "space_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Space Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "space_id",
+        "parameters",
+        "content_hash"
+      ],
+      "title": "ParameterSpace",
+      "type": "object"
+    },
+    "PortfolioFitnessScore": {
+      "additionalProperties": false,
+      "description": "Portfolio-aware Builder fitness score of one candidate (R24).\n\nPhase 3 Builder option; only a caller-supplied immutable pinned portfolio\nversion is accepted, so Research never depends on Portfolio runtime.",
+      "properties": {
+        "candidate_strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Candidate Strategy Version Id",
+          "type": "string"
+        },
+        "combined_result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Combined Result Id",
+          "type": "string"
+        },
+        "existing_portfolio_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Existing Portfolio Version Id",
+          "type": "string"
+        },
+        "fitness": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Fitness",
+          "type": "string"
+        },
+        "fitness_version": {
+          "minimum": 1,
+          "title": "Fitness Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "score_components": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "score_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Score Id",
+          "type": "string"
+        },
+        "snapshot_mode": {
+          "enum": [
+            "SNAPSHOT",
+            "REFERENCE"
+          ],
+          "title": "Snapshot Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score_id",
+        "candidate_strategy_version_id",
+        "existing_portfolio_version_id",
+        "snapshot_mode",
+        "combined_result_id",
+        "fitness",
+        "fitness_version",
+        "score_components"
+      ],
+      "title": "PortfolioFitnessScore",
+      "type": "object"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "PromotionDecision": {
+      "additionalProperties": false,
+      "description": "Immutable promotion of one candidate into a new strategy version (R19).\n\nPromotion creates a new immutable strategy version linked to its source\ncandidate and result; it never overwrites parents, so lineage stays\ntraversable afterwards.",
+      "properties": {
+        "candidate_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "new_strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "New Strategy Version Id",
+          "type": "string"
+        },
+        "promoted_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Promoted At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "selected_result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Selected Result Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_id",
+        "candidate_id",
+        "selected_result_id",
+        "new_strategy_version_id",
+        "promoted_at"
+      ],
+      "title": "PromotionDecision",
+      "type": "object"
+    },
+    "ResearchBudget": {
+      "additionalProperties": false,
+      "description": "Bound set enforced by research budget governance.\n\nPublic record R18, defined ahead of the table order because\n``ResearchManifest`` (R2) embeds it; every bound left ``None`` is\nunbounded, and bound exhaustion is a runtime policy, not a record rule.",
+      "properties": {
+        "budget_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Budget Id",
+          "type": "string"
+        },
+        "max_artifact_storage_mb": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Artifact Storage Mb"
+        },
+        "max_candidates": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Candidates"
+        },
+        "max_cpu_seconds": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Cpu Seconds"
+        },
+        "max_elapsed_seconds": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Elapsed Seconds"
+        },
+        "max_evaluations": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Evaluations"
+        },
+        "max_memory_mb": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Memory Mb"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "budget_id"
+      ],
+      "title": "ResearchBudget",
+      "type": "object"
+    },
+    "ResearchFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope shared by every research capability.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ResearchFailureCode"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "ResearchFailure",
+      "type": "object"
+    },
+    "ResearchFailureCode": {
+      "enum": [
+        "RESEARCH_VALIDATION_FAILED",
+        "RESEARCH_NOT_FOUND",
+        "RESEARCH_STATE_CONFLICT",
+        "RESEARCH_BUDGET_EXCEEDED",
+        "RESEARCH_METHOD_INCOMPATIBLE",
+        "RESEARCH_PREVIEW_MISMATCH",
+        "PARAMETER_DOMAIN_INVALID",
+        "AI_PROPOSAL_INVALID",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "ResearchManifest": {
+      "additionalProperties": false,
+      "description": "Immutable pinned inputs of one research execution request (R2).\n\nEquivalent requests from every entry point produce one manifest\n``content_hash``; the approved preview hash must match at admission.",
+      "properties": {
+        "budgets": {
+          "$ref": "#/$defs/ResearchBudget"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "estimated_resource_use": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "inputs": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "manifest_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Manifest Id",
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "method_version": {
+          "minimum": 1,
+          "title": "Method Version",
+          "type": "integer"
+        },
+        "run_manifest_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Run Manifest Ids",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "seed_set": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Seed Set",
+          "type": "array"
+        }
+      },
+      "required": [
+        "manifest_id",
+        "method",
+        "method_version",
+        "capability_snapshot_id",
+        "inputs",
+        "budgets",
+        "content_hash"
+      ],
+      "title": "ResearchManifest",
+      "type": "object"
+    },
+    "ResearchNeuralModelsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated neural research request (experimental).",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PLAN",
+            "TRAIN"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ResearchNeuralModelsRequest",
+      "type": "object"
+    },
+    "ResearchNeuralModelsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful neural research operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NeuralResearchPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ResearchNeuralModelsSuccess",
+      "type": "object"
+    },
+    "ResearchRunRef": {
+      "additionalProperties": false,
+      "description": "Reference to one controllable research run execution (R1).\n\nStart/pause/resume/stop/cancel/status commands are idempotent; repeated\ncommands create one effective transition. That runtime contract is\nenforced by the owning feature, not by this record.",
+      "properties": {
+        "derived_from_run_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Derived From Run Id"
+        },
+        "job_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Job Id",
+          "type": "string"
+        },
+        "manifest_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Manifest Id",
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "run_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/ResearchRunState"
+        }
+      },
+      "required": [
+        "run_id",
+        "job_id",
+        "manifest_id",
+        "method",
+        "state"
+      ],
+      "title": "ResearchRunRef",
+      "type": "object"
+    },
+    "ResearchRunState": {
+      "enum": [
+        "QUEUED",
+        "RUNNING",
+        "PAUSED",
+        "STOPPING",
+        "STOPPED",
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED"
+      ],
+      "type": "string"
+    },
+    "ResearchStatus": {
+      "additionalProperties": false,
+      "description": "Bounded observational progress snapshot of one research run (R3).\n\nFailed runs retain the classified error, checkpoint sequence, committed\npartial artifacts, and retry eligibility so failure pages never require\nlog parsing.",
+      "properties": {
+        "accepted_artifact_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Accepted Artifact Ids",
+          "type": "array"
+        },
+        "checkpoint_sequence": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Checkpoint Sequence",
+          "type": "integer"
+        },
+        "classified_error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "committed_partial_artifact_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Committed Partial Artifact Ids",
+          "type": "array"
+        },
+        "elapsed_seconds": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Elapsed Seconds",
+          "type": "integer"
+        },
+        "estimated_remaining_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Estimated Remaining Seconds"
+        },
+        "memory_mb": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Memory Mb"
+        },
+        "processed_units": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Processed Units",
+          "type": "integer"
+        },
+        "retry_eligible": {
+          "default": false,
+          "title": "Retry Eligible",
+          "type": "boolean"
+        },
+        "run_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "simulation_time": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Simulation Time"
+        },
+        "speed_units_per_second": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Speed Units Per Second"
+        },
+        "state": {
+          "$ref": "#/$defs/ResearchRunState"
+        },
+        "total_units": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Units"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "run_id",
+        "state"
+      ],
+      "title": "ResearchStatus",
+      "type": "object"
+    },
+    "ResearchStockpickersRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated stockpicker research request.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PLAN",
+            "EXECUTE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ResearchStockpickersRequest",
+      "type": "object"
+    },
+    "ResearchStockpickersSuccess": {
+      "additionalProperties": false,
+      "description": "Successful stockpicker research operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StockpickerResearchPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result Id"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ResearchStockpickersSuccess",
+      "type": "object"
+    },
+    "RobustnessPlan": {
+      "additionalProperties": false,
+      "description": "Pinned retest and robustness execution plan (R4).\n\nInput membership cannot change mid-run, every candidate yields an\naccepted result or a structured rejection, and simulation ordinal 0\nreproduces the baseline; those are runtime contracts of the owning\nfeature.",
+      "properties": {
+        "aggregation_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "market_matrix": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MarketMatrixCell"
+          },
+          "title": "Market Matrix",
+          "type": "array"
+        },
+        "monte_carlo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MonteCarloSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "permutation_domains": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Permutation Domains",
+          "type": "array"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "precision_upgrade": {
+          "default": "NONE",
+          "enum": [
+            "NONE",
+            "DECLARED"
+          ],
+          "title": "Precision Upgrade",
+          "type": "string"
+        },
+        "retest_profile_version": {
+          "minimum": 1,
+          "title": "Retest Profile Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version_ids": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Strategy Version Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "plan_id",
+        "strategy_version_ids",
+        "retest_profile_version",
+        "aggregation_policy",
+        "content_hash"
+      ],
+      "title": "RobustnessPlan",
+      "type": "object"
+    },
+    "RobustnessResult": {
+      "additionalProperties": false,
+      "description": "Aggregated robustness simulation outcomes for one plan (R5).",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "divergence_first_event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "percentiles": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "permutation_coverage": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "scenario_variants": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Scenario Variants",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "simulations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RobustnessSimulation"
+          },
+          "title": "Simulations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "result_id",
+        "plan_id",
+        "percentiles",
+        "content_hash"
+      ],
+      "title": "RobustnessResult",
+      "type": "object"
+    },
+    "RobustnessSimulation": {
+      "additionalProperties": false,
+      "description": "One ordinal robustness simulation sample or its structured failure.",
+      "properties": {
+        "failure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "ordinal": {
+          "minimum": 1,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Result Id"
+        },
+        "sampled_values": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "source_stream": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "ordinal",
+        "method",
+        "sampled_values",
+        "source_stream",
+        "result_id"
+      ],
+      "title": "RobustnessSimulation",
+      "type": "object"
+    },
+    "RunResearchRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated manual research run request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PREVIEW",
+            "START",
+            "PAUSE",
+            "RESUME",
+            "STOP",
+            "CANCEL",
+            "STATUS",
+            "COMMIT",
+            "DUPLICATE",
+            "SUBMIT_BATCH"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "RunResearchRequest",
+      "type": "object"
+    },
+    "RunResearchSuccess": {
+      "additionalProperties": false,
+      "description": "Successful manual research run operation result.",
+      "properties": {
+        "committed_result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Committed Result Id"
+        },
+        "manifest": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResearchManifest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "run": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResearchRunRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResearchStatus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "RunResearchSuccess",
+      "type": "object"
+    },
+    "ScorePortfolioFitnessRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated portfolio-aware fitness request.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "const": "SCORE",
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ScorePortfolioFitnessRequest",
+      "type": "object"
+    },
+    "ScorePortfolioFitnessSuccess": {
+      "additionalProperties": false,
+      "description": "Successful portfolio-aware fitness operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioFitnessScore"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ScorePortfolioFitnessSuccess",
+      "type": "object"
+    },
+    "Segment": {
+      "enum": [
+        "FULL",
+        "IS",
+        "VALIDATION",
+        "OOS",
+        "NO_TRADE"
+      ],
+      "type": "string"
+    },
+    "SequentialStage": {
+      "additionalProperties": false,
+      "description": "One sequential optimization stage over one parameter.",
+      "properties": {
+        "objective": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "parameter_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "retained_values": {
+          "minimum": 1,
+          "title": "Retained Values",
+          "type": "integer"
+        },
+        "stopping_rule": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "tie_breaker": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "parameter_name",
+        "objective",
+        "retained_values",
+        "stopping_rule",
+        "tie_breaker"
+      ],
+      "title": "SequentialStage",
+      "type": "object"
+    },
+    "SeriesInterval": {
+      "additionalProperties": false,
+      "description": "Half-open UTC interval `[from_at, to_at)`.\n\nThe interval must be positive; half-open interval semantics follow\nProject §15.4 and apply to every data interval record.",
+      "properties": {
+        "from_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "From At",
+          "type": "string"
+        },
+        "to_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "To At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_at",
+        "to_at"
+      ],
+      "title": "SeriesInterval",
+      "type": "object"
+    },
+    "SpaceDimension": {
+      "additionalProperties": false,
+      "description": "One named dimension of a parameter space.",
+      "properties": {
+        "domain": {
+          "enum": [
+            "FIXED",
+            "DISCRETE",
+            "RANGE_STEP",
+            "GRID",
+            "WEIGHTED"
+          ],
+          "title": "Domain",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "range_max": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Range Max"
+        },
+        "range_min": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Range Min"
+        },
+        "step": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Step"
+        },
+        "values": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "domain",
+        "range_min",
+        "range_max",
+        "step"
+      ],
+      "title": "SpaceDimension",
+      "type": "object"
+    },
+    "StockpickerResearchPlan": {
+      "additionalProperties": false,
+      "description": "Point-in-time stockpicker research plan (R20).\n\nRepeated runs select identical historical constituents.",
+      "properties": {
+        "allocation_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "cost_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "ranking_expression": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "rebalance_schedule": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "selection_count": {
+          "minimum": 1,
+          "title": "Selection Count",
+          "type": "integer"
+        },
+        "universe": {
+          "$ref": "#/$defs/UniverseRef"
+        },
+        "universe_version": {
+          "minimum": 1,
+          "title": "Universe Version",
+          "type": "integer"
+        },
+        "validation_partitions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SeriesInterval"
+          },
+          "title": "Validation Partitions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "plan_id",
+        "universe",
+        "universe_version",
+        "ranking_expression",
+        "rebalance_schedule",
+        "selection_count",
+        "allocation_policy",
+        "cost_policy",
+        "content_hash"
+      ],
+      "title": "StockpickerResearchPlan",
+      "type": "object"
+    },
+    "StrategyAst": {
+      "additionalProperties": false,
+      "description": "Canonical typed abstract syntax tree of one strategy.\n\nCommutatively reordered AND operands hash equally; ordered action\nsequences do not (FR-STRAT-NORMALIZE_STRATEGY_AST).",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "expression_nodes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ExpressionNode"
+          },
+          "title": "Expression Nodes",
+          "type": "array"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/StrategyNode"
+          },
+          "minItems": 1,
+          "title": "Nodes",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "nodes",
+        "content_hash"
+      ],
+      "title": "StrategyAst",
+      "type": "object"
+    },
+    "StrategyCandidate": {
+      "additionalProperties": false,
+      "description": "One generated or evolved strategy candidate with exact lineage (R14).",
+      "properties": {
+        "atm_only_mutation": {
+          "default": false,
+          "title": "Atm Only Mutation",
+          "type": "boolean"
+        },
+        "candidate_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "edit_operations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/JsonObject"
+          },
+          "title": "Edit Operations",
+          "type": "array"
+        },
+        "fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Fingerprint",
+          "type": "string"
+        },
+        "parent_strategy_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Strategy Version Id"
+        },
+        "result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result Id"
+        },
+        "run_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "run_id",
+        "strategy_version_id",
+        "fingerprint"
+      ],
+      "title": "StrategyCandidate",
+      "type": "object"
+    },
+    "StrategyNode": {
+      "additionalProperties": false,
+      "description": "One AST node carrying identity, block reference, and typed bindings.",
+      "properties": {
+        "bindings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NodeBinding"
+          },
+          "title": "Bindings",
+          "type": "array"
+        },
+        "block_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "block_version": {
+          "minimum": 1,
+          "title": "Block Version",
+          "type": "integer"
+        },
+        "children": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Children",
+          "type": "array"
+        },
+        "kind": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "node_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "parameters": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "node_id",
+        "kind",
+        "block_id",
+        "block_version"
+      ],
+      "title": "StrategyNode",
+      "type": "object"
+    },
+    "StrategyValidationReport": {
+      "additionalProperties": false,
+      "description": "Complete validation findings for one strategy version.\n\nThe response contains all findings covering structure, types, block\nversions, parameter domains, charts, instruments, sessions, data\nprecision, order lifecycle, sizing, exits, and the selected code target\n(FR-STRAT-VALIDATE_STRATEGIES).",
+      "properties": {
+        "findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "is_valid": {
+          "title": "Is Valid",
+          "type": "boolean"
+        },
+        "report_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Report Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "report_id",
+        "strategy_version_id",
+        "is_valid"
+      ],
+      "title": "StrategyValidationReport",
+      "type": "object"
+    },
+    "TestRobustnessRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated retest and robustness request.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PLAN",
+            "EXECUTE",
+            "SUMMARIZE",
+            "RUN_SCENARIO",
+            "PERMUTE_SYSTEM"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "TestRobustnessRequest",
+      "type": "object"
+    },
+    "TestRobustnessSuccess": {
+      "additionalProperties": false,
+      "description": "Successful retest and robustness operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RobustnessPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RobustnessResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "TestRobustnessSuccess",
+      "type": "object"
+    },
+    "UniverseRef": {
+      "additionalProperties": false,
+      "description": "Reference to one universe identity.",
+      "properties": {
+        "universe_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Universe Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "universe_id"
+      ],
+      "title": "UniverseRef",
+      "type": "object"
+    },
+    "ValidateWalkForwardRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated walk-forward research request.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PLAN",
+            "EXECUTE",
+            "EVALUATE_MATRIX"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ValidateWalkForwardRequest",
+      "type": "object"
+    },
+    "ValidateWalkForwardSuccess": {
+      "additionalProperties": false,
+      "description": "Successful walk-forward research operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WalkForwardPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WalkForwardResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ValidateWalkForwardSuccess",
+      "type": "object"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    },
+    "WalkForwardPlan": {
+      "additionalProperties": false,
+      "description": "Walk-forward window scheme and evaluation policy (R10).\n\nNo timestamp overlap violating the scheme and selection-only data\nvisibility are runtime contracts enforced while windows execute.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "matrix": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/JsonObject"
+          },
+          "title": "Matrix",
+          "type": "array"
+        },
+        "oos_interval": {
+          "$ref": "#/$defs/SeriesInterval"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scheme": {
+          "enum": [
+            "ANCHORED",
+            "ROLLING"
+          ],
+          "title": "Scheme",
+          "type": "string"
+        },
+        "score": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "score_version": {
+          "minimum": 1,
+          "title": "Score Version",
+          "type": "integer"
+        },
+        "selection_interval": {
+          "$ref": "#/$defs/SeriesInterval"
+        },
+        "stitch_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "tie_breaker": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "train_interval": {
+          "$ref": "#/$defs/SeriesInterval"
+        },
+        "window_config": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "plan_id",
+        "scheme",
+        "window_config",
+        "train_interval",
+        "selection_interval",
+        "oos_interval",
+        "stitch_policy",
+        "score",
+        "score_version",
+        "tie_breaker",
+        "content_hash"
+      ],
+      "title": "WalkForwardPlan",
+      "type": "object"
+    },
+    "WalkForwardResult": {
+      "additionalProperties": false,
+      "description": "Stitched walk-forward windows and aggregate metrics (R12).",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "matrix_ranking": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "stitched_equity_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stitched Equity Artifact Id"
+        },
+        "wf_metrics": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Wf Metrics",
+          "type": "object"
+        },
+        "windows": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/WalkForwardWindow"
+          },
+          "title": "Windows",
+          "type": "array"
+        }
+      },
+      "required": [
+        "result_id",
+        "plan_id",
+        "run_id",
+        "content_hash"
+      ],
+      "title": "WalkForwardResult",
+      "type": "object"
+    },
+    "WalkForwardWindow": {
+      "additionalProperties": false,
+      "description": "One train/selection/out-of-sample window of a walk-forward run (R11).\n\nEvery OOS segment links to exactly one selection decision and its inputs;\nfailed cells remain visible through ``failed_cell_reason``.",
+      "properties": {
+        "eligible_days": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "failed_cell_reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "is_metrics": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "oos_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Oos From",
+          "type": "string"
+        },
+        "oos_result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Oos Result Id"
+        },
+        "oos_to": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Oos To",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 1,
+          "title": "Ordinal",
+          "type": "integer"
+        },
+        "run_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "selected_variant_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Selected Variant Id",
+          "type": "string"
+        },
+        "selection_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Selection From",
+          "type": "string"
+        },
+        "selection_to": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Selection To",
+          "type": "string"
+        },
+        "train_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Train From",
+          "type": "string"
+        },
+        "train_to": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Train To",
+          "type": "string"
+        },
+        "window_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Window Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "window_id",
+        "run_id",
+        "ordinal",
+        "train_from",
+        "train_to",
+        "selection_from",
+        "selection_to",
+        "oos_from",
+        "oos_to",
+        "is_metrics",
+        "selected_variant_id",
+        "eligible_days"
+      ],
+      "title": "WalkForwardWindow",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {},
+  "failures": {
+    "ResearchFailure": {
+      "$ref": "#/$defs/ResearchFailure"
+    }
+  },
+  "models": {
+    "AcceptResearchRequest": {
+      "$ref": "#/$defs/AcceptResearchRequest"
+    },
+    "AcceptResearchSuccess": {
+      "$ref": "#/$defs/AcceptResearchSuccess"
+    },
+    "AcceptanceDecision": {
+      "$ref": "#/$defs/AcceptanceDecision"
+    },
+    "AcceptancePipeline": {
+      "$ref": "#/$defs/AcceptancePipeline"
+    },
+    "AiImprovementProposal": {
+      "$ref": "#/$defs/AiImprovementProposal"
+    },
+    "AiResearchDraft": {
+      "$ref": "#/$defs/AiResearchDraft"
+    },
+    "AssistResearchAiRequest": {
+      "$ref": "#/$defs/AssistResearchAiRequest"
+    },
+    "AssistResearchAiSuccess": {
+      "$ref": "#/$defs/AssistResearchAiSuccess"
+    },
+    "BuilderPlan": {
+      "$ref": "#/$defs/BuilderPlan"
+    },
+    "DriftReport": {
+      "$ref": "#/$defs/DriftReport"
+    },
+    "DriftState": {
+      "$ref": "#/$defs/DriftState"
+    },
+    "EvolutionPlan": {
+      "$ref": "#/$defs/EvolutionPlan"
+    },
+    "EvolveStrategiesRequest": {
+      "$ref": "#/$defs/EvolveStrategiesRequest"
+    },
+    "EvolveStrategiesSuccess": {
+      "$ref": "#/$defs/EvolveStrategiesSuccess"
+    },
+    "GenerateStrategiesRequest": {
+      "$ref": "#/$defs/GenerateStrategiesRequest"
+    },
+    "GenerateStrategiesSuccess": {
+      "$ref": "#/$defs/GenerateStrategiesSuccess"
+    },
+    "GovernResearchBudgetsRequest": {
+      "$ref": "#/$defs/GovernResearchBudgetsRequest"
+    },
+    "GovernResearchBudgetsSuccess": {
+      "$ref": "#/$defs/GovernResearchBudgetsSuccess"
+    },
+    "MarketIntelligenceObservation": {
+      "$ref": "#/$defs/MarketIntelligenceObservation"
+    },
+    "MonitorMarketDriftRequest": {
+      "$ref": "#/$defs/MonitorMarketDriftRequest"
+    },
+    "MonitorMarketDriftSuccess": {
+      "$ref": "#/$defs/MonitorMarketDriftSuccess"
+    },
+    "NeuralResearchPlan": {
+      "$ref": "#/$defs/NeuralResearchPlan"
+    },
+    "OptimizationPlan": {
+      "$ref": "#/$defs/OptimizationPlan"
+    },
+    "OptimizationResult": {
+      "$ref": "#/$defs/OptimizationResult"
+    },
+    "OptimizationVariant": {
+      "$ref": "#/$defs/OptimizationVariant"
+    },
+    "OptimizeParametersRequest": {
+      "$ref": "#/$defs/OptimizeParametersRequest"
+    },
+    "OptimizeParametersSuccess": {
+      "$ref": "#/$defs/OptimizeParametersSuccess"
+    },
+    "ParameterSpace": {
+      "$ref": "#/$defs/ParameterSpace"
+    },
+    "PortfolioFitnessScore": {
+      "$ref": "#/$defs/PortfolioFitnessScore"
+    },
+    "PromotionDecision": {
+      "$ref": "#/$defs/PromotionDecision"
+    },
+    "ResearchBudget": {
+      "$ref": "#/$defs/ResearchBudget"
+    },
+    "ResearchManifest": {
+      "$ref": "#/$defs/ResearchManifest"
+    },
+    "ResearchNeuralModelsRequest": {
+      "$ref": "#/$defs/ResearchNeuralModelsRequest"
+    },
+    "ResearchNeuralModelsSuccess": {
+      "$ref": "#/$defs/ResearchNeuralModelsSuccess"
+    },
+    "ResearchRunRef": {
+      "$ref": "#/$defs/ResearchRunRef"
+    },
+    "ResearchStatus": {
+      "$ref": "#/$defs/ResearchStatus"
+    },
+    "ResearchStockpickersRequest": {
+      "$ref": "#/$defs/ResearchStockpickersRequest"
+    },
+    "ResearchStockpickersSuccess": {
+      "$ref": "#/$defs/ResearchStockpickersSuccess"
+    },
+    "RobustnessPlan": {
+      "$ref": "#/$defs/RobustnessPlan"
+    },
+    "RobustnessResult": {
+      "$ref": "#/$defs/RobustnessResult"
+    },
+    "RunResearchRequest": {
+      "$ref": "#/$defs/RunResearchRequest"
+    },
+    "RunResearchSuccess": {
+      "$ref": "#/$defs/RunResearchSuccess"
+    },
+    "ScorePortfolioFitnessRequest": {
+      "$ref": "#/$defs/ScorePortfolioFitnessRequest"
+    },
+    "ScorePortfolioFitnessSuccess": {
+      "$ref": "#/$defs/ScorePortfolioFitnessSuccess"
+    },
+    "StockpickerResearchPlan": {
+      "$ref": "#/$defs/StockpickerResearchPlan"
+    },
+    "StrategyCandidate": {
+      "$ref": "#/$defs/StrategyCandidate"
+    },
+    "TestRobustnessRequest": {
+      "$ref": "#/$defs/TestRobustnessRequest"
+    },
+    "TestRobustnessSuccess": {
+      "$ref": "#/$defs/TestRobustnessSuccess"
+    },
+    "ValidateWalkForwardRequest": {
+      "$ref": "#/$defs/ValidateWalkForwardRequest"
+    },
+    "ValidateWalkForwardSuccess": {
+      "$ref": "#/$defs/ValidateWalkForwardSuccess"
+    },
+    "WalkForwardPlan": {
+      "$ref": "#/$defs/WalkForwardPlan"
+    },
+    "WalkForwardResult": {
+      "$ref": "#/$defs/WalkForwardResult"
+    },
+    "WalkForwardWindow": {
+      "$ref": "#/$defs/WalkForwardWindow"
+    }
+  },
+  "namespace": "research",
+  "schema_version": 1,
+  "title": "research wire contracts v1"
+}

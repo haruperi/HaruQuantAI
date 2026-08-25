@@ -444,3 +444,10 @@ def test_configuration_rollback_on_partial_attachment_failure() -> None:
     assert target.level == logging.ERROR
     target.removeHandler(foreign_handler)
     target.setLevel(previous_level)
+
+
+def test_logging_usage_scenarios() -> None:
+    """Verify the __main__ usage demonstration scenarios run cleanly."""
+    from app.composition.logging import _harness_main
+
+    assert _harness_main() == 0

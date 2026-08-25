@@ -39,10 +39,10 @@ export const Shell: React.FC<ShellProps> = ({
       >
         <div className="system-status-message" role="status">
           <span className="status-label">Status:</span>{" "}
-          <span className="status-text">{snapshot.statusMessage}</span>
+          <span className="status-text">{snapshot.status_message}</span>
         </div>
         <div className="capability-badges-list">
-          {Object.entries(snapshot.capabilityStates).map(([capId, state]) => (
+          {Object.entries(snapshot.capability_states).map(([capId, state]) => (
             <CapabilityStateView key={capId} capabilityId={capId} state={state} />
           ))}
         </div>
@@ -54,12 +54,12 @@ export const Shell: React.FC<ShellProps> = ({
         role="main"
         id={
           activeWorkspace
-            ? `workspace-panel-${activeWorkspace.workspaceId}`
+            ? `workspace-panel-${activeWorkspace.workspace_id}`
             : "workspace-panel-empty"
         }
         aria-labelledby={
           activeWorkspace
-            ? `workspace-tab-${activeWorkspace.workspaceId}`
+            ? `workspace-tab-${activeWorkspace.workspace_id}`
             : undefined
         }
         tabIndex={-1}
@@ -70,8 +70,8 @@ export const Shell: React.FC<ShellProps> = ({
               activeWorkspace.renderWorkspace()
             ) : (
               <div className="workspace-placeholder" role="region">
-                <h2>{activeWorkspace.displayName}</h2>
-                <p>Route: {activeWorkspace.routePath}</p>
+                <h2>{activeWorkspace.display_name}</h2>
+                <p>Route: {activeWorkspace.route_path}</p>
               </div>
             )}
           </div>
@@ -91,7 +91,7 @@ export const Shell: React.FC<ShellProps> = ({
           ) : (
             <div className="default-footer-content">
               <span>HaruQuantAI Composability Shell</span>
-              <span>Route: {snapshot.currentRoute}</span>
+              <span>Route: {snapshot.current_route}</span>
             </div>
           )}
         </footer>

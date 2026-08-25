@@ -8,6 +8,8 @@ if TYPE_CHECKING:
     from app.contracts.workspace.ports import (
         BuildDiagnosticsCapability,
         ConfigureRuntimeCapability,
+        DistributeWorkersCapability,
+        HostWorkspacesCapability,
         ManageWorkspacesCapability,
         SecureLocalAccessCapability,
     )
@@ -31,5 +33,17 @@ SECURE_LOCAL_ACCESS_CAPABILITY: CapabilityKey[SecureLocalAccessCapability] = (
 
 BUILD_DIAGNOSTICS_CAPABILITY: CapabilityKey[BuildDiagnosticsCapability] = CapabilityKey(
     name="workspace.build-diagnostics",
+    major=1,
+)
+
+DISTRIBUTE_WORKERS_CAPABILITY: CapabilityKey[DistributeWorkersCapability] = (
+    CapabilityKey(
+        name="workspace.distribute-workers",
+        major=1,
+    )
+)
+
+HOST_WORKSPACES_CAPABILITY: CapabilityKey[HostWorkspacesCapability] = CapabilityKey(
+    name="workspace.host-workspaces",
     major=1,
 )

@@ -3,11 +3,46 @@
  * Bridges backend capabilities to typed React presentation components without static service coupling.
  */
 
-import type {
-  CapabilityPresentationState,
-  ShellSnapshot,
-  WorkspaceRoute,
-} from "../contracts/generated/ui_contracts";
+import type { ReactNode } from "react";
+
+/**
+ * Client-side compose-shell process types (D-UI client state), not wire contracts.
+ * These describe runtime shell state assembled by the composition bridge; wire
+ * records come exclusively from `contracts/generated/`. Field names follow the
+ * snake_case contracts convention.
+ */
+export type CapabilityPresentationState =
+  | "loading"
+  | "unavailable"
+  | "incompatible"
+  | "disabled"
+  | "degraded"
+  | "unauthorized"
+  | "ready";
+
+/** Client-side workspace route contribution, not a wire contract. */
+export interface WorkspaceRoute {
+  readonly workspace_id: string;
+  readonly route_path: string;
+  readonly display_name: string;
+  readonly icon_name?: string;
+  readonly required_capabilities?: readonly string[];
+  readonly is_authorized?: boolean;
+  /** Client-only render callback; never serialized as contract data. */
+  readonly renderWorkspace?: () => ReactNode;
+}
+
+/** Client-side compose-shell snapshot, not a wire contract. */
+export interface ShellSnapshot {
+  readonly active_workspace_id: string | null;
+  readonly current_route: string;
+  readonly available_workspaces: readonly WorkspaceRoute[];
+  readonly capability_states: Readonly<
+    Record<string, CapabilityPresentationState>
+  >;
+  readonly is_ready: boolean;
+  readonly status_message: string;
+}
 
 export interface UiFeatureManifest {
   readonly featureId: string;
@@ -154,9 +189,9 @@ export class UiCompositionBridge {
     for (const feature of this.registeredFeatures.values()) {
       if (feature.manifest.contributedWorkspaces) {
         for (const ws of feature.manifest.contributedWorkspaces) {
-          if (ws.isAuthorized === false) continue;
+          if (ws.is_authorized === false) continue;
 
-          const required = ws.requiredCapabilities ?? [];
+          const required = ws.required_capabilities ?? [];
           const isCompatible = required.every((cap) =>
             this.activeCapabilities.has(cap)
           );
@@ -172,7 +207,7 @@ export class UiCompositionBridge {
 
   public switchWorkspace(targetWorkspaceId: string, updateHistory: boolean = true): void {
     const available = this.discoverWorkspaces();
-    const target = available.find((ws) => ws.workspaceId === targetWorkspaceId);
+    const target = available.find((ws) => ws.workspace_id === targetWorkspaceId);
 
     if (!target) {
       throw new Error(
@@ -181,12 +216,12 @@ export class UiCompositionBridge {
     }
 
     this.activeWorkspaceId = targetWorkspaceId;
-    this.currentRoute = target.routePath;
-    this.statusMessage = `Active workspace: ${target.displayName}`;
+    this.currentRoute = target.route_path;
+    this.statusMessage = `Active workspace: ${target.display_name}`;
 
     if (updateHistory && this.syncBrowserUrl && typeof window !== "undefined" && typeof window.history?.pushState === "function") {
-      if (window.location.pathname !== target.routePath) {
-        window.history.pushState({ workspaceId: targetWorkspaceId }, "", target.routePath);
+      if (window.location.pathname !== target.route_path) {
+        window.history.pushState({ workspace_id: targetWorkspaceId }, "", target.route_path);
       }
     }
 
@@ -199,21 +234,21 @@ export class UiCompositionBridge {
     updateHistory: boolean = true
   ): string {
     const available = this.discoverWorkspaces();
-    const match = available.find((ws) => ws.routePath === requestedRoute);
+    const match = available.find((ws) => ws.route_path === requestedRoute);
 
     if (match) {
-      this.activeWorkspaceId = match.workspaceId;
-      this.currentRoute = match.routePath;
-      this.statusMessage = `Active workspace: ${match.displayName}`;
+      this.activeWorkspaceId = match.workspace_id;
+      this.currentRoute = match.route_path;
+      this.statusMessage = `Active workspace: ${match.display_name}`;
 
       if (updateHistory && this.syncBrowserUrl && typeof window !== "undefined" && typeof window.history?.replaceState === "function") {
-        if (window.location.pathname !== match.routePath) {
-          window.history.replaceState({ workspaceId: match.workspaceId }, "", match.routePath);
+        if (window.location.pathname !== match.route_path) {
+          window.history.replaceState({ workspace_id: match.workspace_id }, "", match.route_path);
         }
       }
 
       this.notify();
-      return match.routePath;
+      return match.route_path;
     }
 
     this.activeWorkspaceId = null;
@@ -232,14 +267,14 @@ export class UiCompositionBridge {
 
   public getSnapshot(): ShellSnapshot {
     const available = this.discoverWorkspaces();
-    const capabilityStates: Record<string, CapabilityPresentationState> = {};
+    const capability_states: Record<string, CapabilityPresentationState> = {};
 
     for (const feature of this.registeredFeatures.values()) {
       const required = feature.manifest.requiredCapabilities ?? [];
       const optional = feature.manifest.optionalCapabilities ?? [];
       const all = [...required, ...optional];
       for (const cap of all) {
-        capabilityStates[cap] = this.getCapabilityPresentationState(cap);
+        capability_states[cap] = this.getCapabilityPresentationState(cap);
       }
     }
 
@@ -248,12 +283,12 @@ export class UiCompositionBridge {
       (this.activeWorkspaceId !== null || available.length > 0);
 
     return {
-      activeWorkspaceId: this.activeWorkspaceId,
-      currentRoute: this.currentRoute,
-      availableWorkspaces: available,
-      capabilityStates,
-      isReady,
-      statusMessage: this.statusMessage,
+      active_workspace_id: this.activeWorkspaceId,
+      current_route: this.currentRoute,
+      available_workspaces: available,
+      capability_states,
+      is_ready: isReady,
+      status_message: this.statusMessage,
     };
   }
 

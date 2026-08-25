@@ -203,3 +203,12 @@ def test_redaction_helpers() -> None:
     assert red_data["auth_token"] == "[REDACTED_SECRET]"
     assert isinstance(red_data["nested"], dict)
     assert red_data["nested"]["password"] == "[REDACTED_SECRET]"
+
+
+def test_diagnostic_bundle_usage_example() -> None:
+    """Verify the __main__ usage scenarios run successfully."""
+    from app.services.workspace.diagnostic_bundle.diagnostic_bundle import (
+        _run_usage_example,
+    )
+
+    _run_usage_example()

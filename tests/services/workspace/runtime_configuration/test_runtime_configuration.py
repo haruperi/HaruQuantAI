@@ -275,3 +275,12 @@ def test_settings_table_persisted(
     finally:
         conn.close()
     assert versions == [1]
+
+
+def test_runtime_configuration_usage_scenarios() -> None:
+    """Verify the __main__ usage scenarios run successfully."""
+    from app.services.workspace.runtime_configuration.runtime_configuration import (
+        _run_usage_scenarios,
+    )
+
+    _run_usage_scenarios()

@@ -5,9 +5,9 @@ export const WorkspaceSwitcher: React.FC = () => {
   const snapshot = useShellSnapshot();
   const bridge = useUiRuntime();
 
-  const handleSelectWorkspace = (workspaceId: string) => {
+  const handleSelectWorkspace = (workspace_id: string) => {
     try {
-      bridge.switchWorkspace(workspaceId);
+      bridge.switchWorkspace(workspace_id);
     } catch (err) {
       console.error("Failed to switch workspace:", err);
     }
@@ -17,7 +17,7 @@ export const WorkspaceSwitcher: React.FC = () => {
     event: React.KeyboardEvent<HTMLButtonElement>,
     currentIndex: number
   ) => {
-    const workspaces = snapshot.availableWorkspaces;
+    const workspaces = snapshot.available_workspaces;
     if (!workspaces.length) return;
 
     let targetIndex: number | null = null;
@@ -26,7 +26,7 @@ export const WorkspaceSwitcher: React.FC = () => {
       case "Enter":
       case " ":
         event.preventDefault();
-        handleSelectWorkspace(workspaces[currentIndex].workspaceId);
+        handleSelectWorkspace(workspaces[currentIndex].workspace_id);
         break;
       case "ArrowRight":
       case "ArrowDown":
@@ -52,15 +52,15 @@ export const WorkspaceSwitcher: React.FC = () => {
 
     if (targetIndex !== null) {
       const targetWorkspace = workspaces[targetIndex];
-      handleSelectWorkspace(targetWorkspace.workspaceId);
+      handleSelectWorkspace(targetWorkspace.workspace_id);
       const tabElement = document.getElementById(
-        `workspace-tab-${targetWorkspace.workspaceId}`
+        `workspace-tab-${targetWorkspace.workspace_id}`
       );
       tabElement?.focus();
     }
   };
 
-  if (!snapshot.availableWorkspaces.length) {
+  if (!snapshot.available_workspaces.length) {
     return (
       <nav aria-label="Workspaces" className="workspace-switcher-empty">
         <span role="status">No authorized workspaces available</span>
@@ -75,28 +75,28 @@ export const WorkspaceSwitcher: React.FC = () => {
       data-testid="workspace-switcher"
     >
       <ul role="tablist" className="workspace-nav-list">
-        {snapshot.availableWorkspaces.map((ws, index) => {
-          const isActive = ws.workspaceId === snapshot.activeWorkspaceId;
+        {snapshot.available_workspaces.map((ws, index) => {
+          const isActive = ws.workspace_id === snapshot.active_workspace_id;
           return (
-            <li key={ws.workspaceId} role="presentation">
+            <li key={ws.workspace_id} role="presentation">
               <button
                 type="button"
                 role="tab"
                 aria-selected={isActive}
-                aria-controls={`workspace-panel-${ws.workspaceId}`}
-                id={`workspace-tab-${ws.workspaceId}`}
+                aria-controls={`workspace-panel-${ws.workspace_id}`}
+                id={`workspace-tab-${ws.workspace_id}`}
                 className={`workspace-tab-btn ${isActive ? "active" : ""}`}
-                onClick={() => handleSelectWorkspace(ws.workspaceId)}
+                onClick={() => handleSelectWorkspace(ws.workspace_id)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
                 tabIndex={isActive ? 0 : -1}
-                data-testid={`workspace-tab-${ws.workspaceId}`}
+                data-testid={`workspace-tab-${ws.workspace_id}`}
               >
-                {ws.iconName && (
+                {ws.icon_name && (
                   <span className="ws-icon" aria-hidden="true">
-                    {ws.iconName}
+                    {ws.icon_name}
                   </span>
                 )}
-                <span className="ws-name">{ws.displayName}</span>
+                <span className="ws-name">{ws.display_name}</span>
               </button>
             </li>
           );

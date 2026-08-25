@@ -206,3 +206,12 @@ def test_ws_report_system_readiness(
     # Ensure raw user paths are not leaked in the database error reason
     corrupt_reasons_dump = " ".join(corrupt_status.reasons)
     assert corrupt_ws.as_posix() not in corrupt_reasons_dump
+
+
+def test_local_access_health_usage_example() -> None:
+    """Verify the __main__ usage scenarios run successfully."""
+    from app.services.workspace.local_access_health.local_access_health import (
+        _run_usage_example,
+    )
+
+    _run_usage_example()

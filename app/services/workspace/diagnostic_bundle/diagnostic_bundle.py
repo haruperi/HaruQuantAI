@@ -271,7 +271,8 @@ def _inspect_workspace_db(
     job_states: list[dict[str, object]] = []
 
     try:
-        with sqlite3.connect(str(db_path), timeout=5.0) as conn:
+        conn = sqlite3.connect(str(db_path), timeout=5.0)
+        try:
             findings.extend(_check_db_integrity(conn))
             s_ver, s_findings = _read_db_schema_version(conn)
             schema_version = s_ver
@@ -287,6 +288,8 @@ def _inspect_workspace_db(
                 pass
 
             job_states = _read_recent_jobs(conn)
+        finally:
+            conn.close()
     except (sqlite3.Error, OSError) as exc:
         sanitized_err, _ = _redact_text(str(exc))
         findings.append(f"DATABASE_READ_ERROR: {sanitized_err}")

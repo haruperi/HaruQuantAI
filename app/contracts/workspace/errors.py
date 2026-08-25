@@ -2,6 +2,17 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
+# These wire aliases and base classes are annotation-only for readers but
+# Pydantic resolves them at class-creation time, so they must remain runtime
+# imports.
+from app.contracts.common.models import (
+    ProblemDetails,
+    Uuid7,
+    WireModel,
+)
+
 
 class WorkspaceError(RuntimeError):
     """Base exception for all workspace-related errors."""
@@ -253,3 +264,43 @@ class DiagnosticBundleError(WorkspaceError):
             error_code: Stable machine-readable error token.
         """
         super().__init__(message, error_code=error_code)
+
+
+# Closed workspace failure-code union from the ratified v1 operation rules.
+type WorkspaceFailureCode = Literal[
+    "WORKSPACE_VALIDATION_FAILED",
+    "WORKSPACE_NOT_FOUND",
+    "WORKSPACE_ALREADY_OPEN",
+    "WORKER_UNKNOWN",
+    "WORKER_UNTRUSTED",
+    "WORKER_EXPIRED",
+    "LEASE_UNAVAILABLE",
+    "LEASE_TOKEN_STALE",
+    "TRANSFER_INVALID",
+    "TRANSFER_INCOMPLETE",
+    "ISOLATION_CONFLICT",
+    "CAPABILITY_UNAVAILABLE",
+]
+
+
+class WorkspaceFailure(WireModel):
+    """Structured failure envelope shared by the new Workspace capabilities.
+
+    ``WORKER_UNTRUSTED`` covers assignments or leases by untrusted workers,
+    ``LEASE_TOKEN_STALE`` covers commits under a superseded token,
+    ``TRANSFER_INVALID`` covers hash/size/schema mismatches,
+    ``TRANSFER_INCOMPLETE`` covers missing chunks, ``ISOLATION_CONFLICT``
+    covers hosted scope collisions at PROVISION, and
+    ``CAPABILITY_UNAVAILABLE`` performs no mutation.
+    """
+
+    outcome: Literal["FAILURE"] = "FAILURE"
+    request_id: Uuid7
+    code: WorkspaceFailureCode
+    problem: ProblemDetails
+    schema_version: Literal[1] = 1
+
+
+WIRE_FAILURES: dict[str, type[WireModel]] = {
+    "WorkspaceFailure": WorkspaceFailure,
+}

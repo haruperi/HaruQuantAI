@@ -1,0 +1,553 @@
+{
+  "$defs": {
+    "CapabilityFailure": {
+      "additionalProperties": false,
+      "description": "Explicit failed capability outcome.",
+      "properties": {
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "problem"
+      ],
+      "title": "CapabilityFailure",
+      "type": "object"
+    },
+    "CapabilityProviderSnapshot": {
+      "additionalProperties": false,
+      "description": "Pinned provider identity and configuration evidence.",
+      "properties": {
+        "capability_key": {
+          "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+          "title": "Capability Key",
+          "type": "string"
+        },
+        "configuration_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Configuration Hash",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "implementation_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Implementation Hash",
+          "type": "string"
+        },
+        "provider_feature_id": {
+          "pattern": "^FEAT-[A-Z0-9_-]+$",
+          "title": "Provider Feature Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capability_key",
+        "provider_feature_id",
+        "generation",
+        "implementation_hash",
+        "configuration_hash"
+      ],
+      "title": "CapabilityProviderSnapshot",
+      "type": "object"
+    },
+    "CapabilitySnapshot": {
+      "additionalProperties": false,
+      "description": "Immutable ordered provider snapshot.",
+      "properties": {
+        "causal_request_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Causal Request Id"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "providers": {
+          "items": {
+            "$ref": "#/$defs/CapabilityProviderSnapshot"
+          },
+          "minItems": 1,
+          "title": "Providers",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "snapshot_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Snapshot Hash",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Snapshot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "created_at",
+        "providers",
+        "snapshot_hash"
+      ],
+      "title": "CapabilitySnapshot",
+      "type": "object"
+    },
+    "DomainEvent": {
+      "additionalProperties": false,
+      "description": "Causally linked, ordered cross-boundary event envelope.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "component_instance_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Component Instance Id"
+        },
+        "event_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "title": "Event Type",
+          "type": "string"
+        },
+        "job_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Job Id"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "project_run_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Project Run Id"
+        },
+        "reconciliation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reconciliation Id"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "task_run_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Run Id"
+        }
+      },
+      "required": [
+        "event_id",
+        "sequence",
+        "event_type",
+        "occurred_at",
+        "request_id",
+        "capability_snapshot_id",
+        "payload"
+      ],
+      "title": "DomainEvent",
+      "type": "object"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "Currency-qualified canonical decimal amount.",
+      "properties": {
+        "amount": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "SeriesPointKey": {
+      "additionalProperties": false,
+      "description": "Stable ordering key for one time-series observation.",
+      "properties": {
+        "sequence": {
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "timestamp": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "timestamp",
+        "sequence"
+      ],
+      "title": "SeriesPointKey",
+      "type": "object"
+    },
+    "Timeframe": {
+      "additionalProperties": false,
+      "description": "Positive multiple of a supported market-time unit.",
+      "properties": {
+        "multiple": {
+          "minimum": 1,
+          "title": "Multiple",
+          "type": "integer"
+        },
+        "unit": {
+          "enum": [
+            "MINUTE",
+            "DAY",
+            "WEEK",
+            "MONTH"
+          ],
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit",
+        "multiple"
+      ],
+      "title": "Timeframe",
+      "type": "object"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {
+    "DomainEvent": {
+      "$ref": "#/$defs/DomainEvent"
+    }
+  },
+  "failures": {
+    "CapabilityFailure": {
+      "$ref": "#/$defs/CapabilityFailure"
+    }
+  },
+  "models": {
+    "CapabilityProviderSnapshot": {
+      "$ref": "#/$defs/CapabilityProviderSnapshot"
+    },
+    "CapabilitySnapshot": {
+      "$ref": "#/$defs/CapabilitySnapshot"
+    },
+    "Money": {
+      "$ref": "#/$defs/Money"
+    },
+    "ProblemDetails": {
+      "$ref": "#/$defs/ProblemDetails"
+    },
+    "SeriesPointKey": {
+      "$ref": "#/$defs/SeriesPointKey"
+    },
+    "Timeframe": {
+      "$ref": "#/$defs/Timeframe"
+    },
+    "ValidationIssue": {
+      "$ref": "#/$defs/ValidationIssue"
+    }
+  },
+  "namespace": "common",
+  "schema_version": 1,
+  "title": "common wire contracts v1"
+}

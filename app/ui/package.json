@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "contracts:generate": "uv run python ../../scripts/generate_contracts.py",
+    "contracts:check": "uv run python ../../scripts/generate_contracts.py --check"
   },
   "dependencies": {
     "react": "^19.0.0",

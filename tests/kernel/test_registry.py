@@ -194,3 +194,77 @@ def test_registry_active_capabilities_and_clear() -> None:
     registry.clear()
     assert len(registry.active_capabilities()) == 0
     assert not registry.is_available(CONSUMER_CAPABILITY)
+
+
+def test_registry_validation_empty_owner_and_duplicate_bundle_keys() -> None:
+    """Test validation rejects empty owner_id and duplicate bundle keys."""
+    registry = ServiceRegistry()
+
+    with pytest.raises(ValueError, match="owner_id must not be empty"):
+        registry.register(
+            capability=CONSUMER_CAPABILITY,
+            provider=object(),
+            owner_id="   ",
+        )
+
+    with pytest.raises(
+        CapabilityAlreadyBoundError,
+        match="duplicate identifiers",
+    ):
+        registry.register_many(
+            [
+                (CONSUMER_CAPABILITY, object(), "FEAT-A"),
+                (CONSUMER_CAPABILITY, object(), "FEAT-B"),
+            ]
+        )
+
+
+def test_registry_register_many_attach_disposers_failure_rollback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test register_many rolls back bindings and generations if attach_disposers fails."""
+    registry = ServiceRegistry()
+
+    def failing_attach(tokens: object, scope: object) -> None:
+        raise RuntimeError("Scope attachment failed")
+
+    monkeypatch.setattr(registry, "_attach_disposers", failing_attach)
+
+    with pytest.raises(RuntimeError, match="Scope attachment failed"):
+        registry.register_many(
+            [(CONSUMER_CAPABILITY, object(), "FEAT-TEST-CONSUME_SERVICE")]
+        )
+
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+    assert registry.get_binding(CONSUMER_CAPABILITY.identifier) is None
+
+
+def test_registry_replace_many_attach_disposers_failure_rollback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test replace_many rolls back previous bindings and generations on failure."""
+    registry = ServiceRegistry()
+    initial_service = object()
+    token1 = registry.register(
+        capability=CONSUMER_CAPABILITY,
+        provider=initial_service,
+        owner_id="FEAT-INITIAL",
+    )
+    assert token1.generation == 1
+
+    def failing_attach(tokens: object, scope: object) -> None:
+        raise RuntimeError("Replacement attach failed")
+
+    monkeypatch.setattr(registry, "_attach_disposers", failing_attach)
+
+    with pytest.raises(RuntimeError, match="Replacement attach failed"):
+        registry.replace_binding(
+            capability=CONSUMER_CAPABILITY,
+            provider=object(),
+            owner_id="FEAT-REPLACEMENT",
+        )
+
+    binding = registry.get_binding(CONSUMER_CAPABILITY.identifier)
+    assert binding is not None
+    assert binding.provider is initial_service
+    assert binding.token == token1

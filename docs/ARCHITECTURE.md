@@ -197,10 +197,14 @@ Replacement requires an unchanged provided-capability set, exact shadow provider
 
 - Receivers semantically own commands/requests; producers own events/results; common envelopes belong to Contracts; composability primitives remain in Kernel.
 - Contract definitions live under `app/contracts/<owner>/`; semantic ownership remains with the domain README.
+- Public wire DTOs target strict, frozen Pydantic v2 `BaseModel` definitions with unknown fields forbidden. Private implementation-only records may use standard dataclasses; an existing public dataclass migrates only with constructor, equality, validation, serialization, and failure compatibility evidence.
 - Consumers receive immutable DTOs, handles, and ports—not ORM entities, SDK objects, provider internals, or mutable foreign state.
 - Additive compatible changes retain a major version. Breaking semantics/schemas require a new major, migration plan, and compatibility window.
 - Capability major, schema/behavior version, provider identity, hashes, permissions, and tolerances are pinned separately where required.
 - Wire schemas/clients are generated or compatibility-tested from the same contract source.
+- Pydantic is the target validation/schema authority for public Python wire records; generated JSON Schema and client types remain artifacts, never parallel semantic authorities.
+- Every new capability port exposes one capability-named asynchronous request/response method over discriminated request and success/failure unions. A separate typed async event iterator exists only for an owner-declared streaming/replay contract; event publication alone does not imply one. Synchronous helpers remain private implementation details.
+- Implemented v1 port signatures are compatibility-frozen. Changing their method granularity or sync/async semantics is breaking and requires a new major, compatibility adapter/window, and explicit consumer migration.
 - Every request/event carries the applicable correlation, causation, workspace, actor, idempotency, schema, and timestamp metadata defined in Contracts.
 
 The exact shared models, lifecycle state machines, serialization rules, constants, fixtures, and failure mappings are authoritative in [Contracts README](../app/contracts/README.md). Route semantics are authoritative in [Interfaces README](../app/services/interfaces/README.md).

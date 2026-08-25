@@ -1,0 +1,2731 @@
+{
+  "$defs": {
+    "AlignmentPolicy": {
+      "additionalProperties": false,
+      "description": "One point-in-time alignment policy for external series.\n\nNo value timestamped after a decision event can affect that event;\n``look_ahead_prohibited`` is therefore pinned true.",
+      "properties": {
+        "direction": {
+          "enum": [
+            "EXACT",
+            "LAST_KNOWN",
+            "AGGREGATE"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "look_ahead_prohibited": {
+          "const": true,
+          "default": true,
+          "title": "Look Ahead Prohibited",
+          "type": "boolean"
+        },
+        "max_age_seconds": {
+          "minimum": 1,
+          "title": "Max Age Seconds",
+          "type": "integer"
+        },
+        "missing_policy": {
+          "enum": [
+            "NULL",
+            "CARRY_FORWARD",
+            "FAIL"
+          ],
+          "title": "Missing Policy",
+          "type": "string"
+        },
+        "timezone": {
+          "$ref": "#/$defs/IanaTimezone"
+        }
+      },
+      "required": [
+        "direction",
+        "max_age_seconds",
+        "missing_policy",
+        "timezone"
+      ],
+      "title": "AlignmentPolicy",
+      "type": "object"
+    },
+    "Allocation": {
+      "additionalProperties": false,
+      "description": "One capital allocation policy, incomplete during composition (R4).\n\nAn incomplete allocation is completed before the portfolio version is\nadmitted; allocation fixtures reconcile requested and allocated capital\nexactly. A ``custom_policy`` carries the §21.4 plugin method identity\nwhen ``method`` is ``CUSTOM``.",
+      "properties": {
+        "allocation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Allocation Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "custom_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "exposure_limits": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ExposureLimit"
+          },
+          "title": "Exposure Limits",
+          "type": "array"
+        },
+        "method": {
+          "$ref": "#/$defs/AllocationMethod"
+        },
+        "normalization": {
+          "$ref": "#/$defs/AllocationNormalization"
+        },
+        "rebalance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RebalancePolicy"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "rounding": {
+          "$ref": "#/$defs/Rounding"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "shared_instrument_policy": {
+          "$ref": "#/$defs/SharedInstrumentPolicy",
+          "default": "REJECT"
+        }
+      },
+      "required": [
+        "allocation_id",
+        "method",
+        "normalization",
+        "rounding",
+        "content_hash"
+      ],
+      "title": "Allocation",
+      "type": "object"
+    },
+    "AllocationMethod": {
+      "enum": [
+        "FIXED_WEIGHT",
+        "FIXED_NOTIONAL",
+        "VOLATILITY_SCALED",
+        "CUSTOM"
+      ],
+      "type": "string"
+    },
+    "AllocationNormalization": {
+      "enum": [
+        "NONE",
+        "L1_BUDGET",
+        "CAPITAL"
+      ],
+      "type": "string"
+    },
+    "AnalyzeCorrelationRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated correlation analysis request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "REQUEST",
+            "COMPUTE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "AnalyzeCorrelationRequest",
+      "type": "object"
+    },
+    "AnalyzeCorrelationSuccess": {
+      "additionalProperties": false,
+      "description": "Successful correlation analysis operation result.",
+      "properties": {
+        "matrix": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CorrelationMatrix"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "AnalyzeCorrelationSuccess",
+      "type": "object"
+    },
+    "AnalyzePortfolioRiskRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated portfolio risk request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "REPORT",
+            "DEFINE_METRIC"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "AnalyzePortfolioRiskRequest",
+      "type": "object"
+    },
+    "AnalyzePortfolioRiskSuccess": {
+      "additionalProperties": false,
+      "description": "Successful portfolio risk operation result.",
+      "properties": {
+        "metric": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioMetricDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "report": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioRiskReport"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "AnalyzePortfolioRiskSuccess",
+      "type": "object"
+    },
+    "ComposePortfoliosRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated portfolio composition request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "ADD_MEMBER",
+            "REMOVE_MEMBER",
+            "EDIT_ALLOCATION",
+            "EDIT_CONSTRAINTS",
+            "VALIDATE",
+            "VERSION",
+            "PROMOTE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ComposePortfoliosRequest",
+      "type": "object"
+    },
+    "ComposePortfoliosSuccess": {
+      "additionalProperties": false,
+      "description": "Successful portfolio composition operation result.",
+      "properties": {
+        "findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ComposePortfoliosSuccess",
+      "type": "object"
+    },
+    "CorrelationMatrix": {
+      "additionalProperties": false,
+      "description": "One immutable correlation matrix artifact (R7).\n\nChanging any constituent or policy produces a different identity; the\nmatrix values live in the referenced artifact, not on this record.",
+      "properties": {
+        "candidate_set_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Set Hash",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "matrix_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Matrix Artifact Id",
+          "type": "string"
+        },
+        "matrix_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Matrix Id",
+          "type": "string"
+        },
+        "observation_counts": {
+          "additionalProperties": {
+            "$ref": "#/$defs/NonNegativeInt"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Observation Counts",
+          "type": "object"
+        },
+        "request": {
+          "$ref": "#/$defs/CorrelationRequest"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "settings_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Settings Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "matrix_id",
+        "request",
+        "candidate_set_hash",
+        "settings_hash",
+        "observation_counts",
+        "matrix_artifact_id",
+        "content_hash"
+      ],
+      "title": "CorrelationMatrix",
+      "type": "object"
+    },
+    "CorrelationRequest": {
+      "additionalProperties": false,
+      "description": "One versioned correlation input policy for a candidate set (R6).",
+      "properties": {
+        "alignment_policy": {
+          "$ref": "#/$defs/AlignmentPolicy"
+        },
+        "candidate_set_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Set Hash",
+          "type": "string"
+        },
+        "frequency": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "member_ids": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Member Ids",
+          "type": "array"
+        },
+        "method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "method_version": {
+          "minimum": 1,
+          "title": "Method Version",
+          "type": "integer"
+        },
+        "minimum_observations": {
+          "minimum": 1,
+          "title": "Minimum Observations",
+          "type": "integer"
+        },
+        "overlap_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "return_definition": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "candidate_set_hash",
+        "member_ids",
+        "return_definition",
+        "frequency",
+        "alignment_policy",
+        "overlap_policy",
+        "minimum_observations",
+        "method",
+        "method_version"
+      ],
+      "title": "CorrelationRequest",
+      "type": "object"
+    },
+    "EfficientFrontier": {
+      "additionalProperties": false,
+      "description": "One immutable portfolio optimization artifact (R15).",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "frontier_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Frontier Id",
+          "type": "string"
+        },
+        "maximum_sharpe_weights": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+                "type": "string"
+              },
+              "propertyNames": {
+                "$ref": "#/$defs/NonEmptyStr"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum Sharpe Weights"
+        },
+        "minimum_risk_weights": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+                "type": "string"
+              },
+              "propertyNames": {
+                "$ref": "#/$defs/NonEmptyStr"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum Risk Weights"
+        },
+        "points": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/FrontierPoint"
+          },
+          "title": "Points",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "frontier_id",
+        "request_id",
+        "content_hash"
+      ],
+      "title": "EfficientFrontier",
+      "type": "object"
+    },
+    "ExposureLimit": {
+      "additionalProperties": false,
+      "description": "One declared exposure limit kind with its bound and optional scope.\n\nNested record of ``Allocation`` (R4) and ``PortfolioConstraintSet`` (R5).",
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "instrument": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InstrumentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "kind": {
+          "$ref": "#/$defs/ExposureLimitKind"
+        },
+        "limit": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Limit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "limit"
+      ],
+      "title": "ExposureLimit",
+      "type": "object"
+    },
+    "ExposureLimitKind": {
+      "enum": [
+        "GROSS",
+        "NET",
+        "PER_INSTRUMENT",
+        "PER_CURRENCY",
+        "PER_MARKET",
+        "PER_STRATEGY",
+        "CONCURRENT_POSITIONS"
+      ],
+      "type": "string"
+    },
+    "ExtendPortfolioMethodsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated portfolio method extension request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record. ``REGISTER_METHOD``\nis Experimental gated.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "const": "REGISTER_METHOD",
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ExtendPortfolioMethodsRequest",
+      "type": "object"
+    },
+    "ExtendPortfolioMethodsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful portfolio method extension operation result.",
+      "properties": {
+        "method": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioMethodDescriptor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ExtendPortfolioMethodsSuccess",
+      "type": "object"
+    },
+    "FrontierPoint": {
+      "additionalProperties": false,
+      "description": "One point of an efficient frontier.\n\nNested record of ``EfficientFrontier`` (R15).",
+      "properties": {
+        "expected_return": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Expected Return",
+          "type": "string"
+        },
+        "volatility": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Volatility",
+          "type": "string"
+        },
+        "weights": {
+          "additionalProperties": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Weights",
+          "type": "object"
+        }
+      },
+      "required": [
+        "expected_return",
+        "volatility",
+        "weights"
+      ],
+      "title": "FrontierPoint",
+      "type": "object"
+    },
+    "IanaTimezone": {
+      "pattern": "^[A-Za-z0-9+\\-_]+(?:/[A-Za-z0-9+\\-_]+)*$",
+      "type": "string"
+    },
+    "InstrumentRef": {
+      "additionalProperties": false,
+      "description": "Reference to one canonical instrument identity.",
+      "properties": {
+        "instrument_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Instrument Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "instrument_id"
+      ],
+      "title": "InstrumentRef",
+      "type": "object"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "MarkowitzOptimizationRequest": {
+      "additionalProperties": false,
+      "description": "One Markowitz optimization request over aligned daily returns (R14).",
+      "properties": {
+        "aligned_daily_returns_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Aligned Daily Returns Artifact Id",
+          "type": "string"
+        },
+        "expected_return_vector": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "frontier_points": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frontier Points"
+        },
+        "method_version": {
+          "minimum": 1,
+          "title": "Method Version",
+          "type": "integer"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "sample_covariance_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Sample Covariance Artifact Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "simulation_count": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Simulation Count"
+        },
+        "weight_constraints": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "request_id",
+        "aligned_daily_returns_artifact_id",
+        "expected_return_vector",
+        "sample_covariance_artifact_id",
+        "weight_constraints",
+        "method_version"
+      ],
+      "title": "MarkowitzOptimizationRequest",
+      "type": "object"
+    },
+    "MergePortfoliosRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated portfolio merge and split request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PLAN_MERGE",
+            "PLAN_SPLIT",
+            "EXECUTE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "MergePortfoliosRequest",
+      "type": "object"
+    },
+    "MergePortfoliosSuccess": {
+      "additionalProperties": false,
+      "description": "Successful portfolio merge and split operation result.",
+      "properties": {
+        "merge_plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioMergePlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "split_plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioSplitPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "MergePortfoliosSuccess",
+      "type": "object"
+    },
+    "MetricBasis": {
+      "enum": [
+        "AGGREGATE_EQUITY",
+        "CONSTITUENT_RETURNS",
+        "ALLOCATED_CAPITAL",
+        "EXPOSURE_ADJUSTED_CAPITAL"
+      ],
+      "type": "string"
+    },
+    "MetricUnit": {
+      "enum": [
+        "MONEY",
+        "PERCENT",
+        "PIPS",
+        "RATIO",
+        "COUNT"
+      ],
+      "type": "string"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "Currency-qualified canonical decimal amount.",
+      "properties": {
+        "amount": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "NonNegativeInt": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "ObjectiveDirection": {
+      "enum": [
+        "MINIMIZE",
+        "MAXIMIZE"
+      ],
+      "type": "string"
+    },
+    "ObjectiveSpec": {
+      "additionalProperties": false,
+      "description": "One declared objective of a portfolio search objective vector.\n\nNested record of ``PortfolioSearchPlan`` (R10). Multi-objective search\nstays Pareto and never silently scalarizes objectives.",
+      "properties": {
+        "direction": {
+          "$ref": "#/$defs/ObjectiveDirection"
+        },
+        "metric": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weight"
+        }
+      },
+      "required": [
+        "metric",
+        "direction"
+      ],
+      "title": "ObjectiveSpec",
+      "type": "object"
+    },
+    "OptimizeMarkowitzRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated Markowitz optimization request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "const": "OPTIMIZE",
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "OptimizeMarkowitzRequest",
+      "type": "object"
+    },
+    "OptimizeMarkowitzSuccess": {
+      "additionalProperties": false,
+      "description": "Successful Markowitz optimization operation result.",
+      "properties": {
+        "frontier": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EfficientFrontier"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "OptimizeMarkowitzSuccess",
+      "type": "object"
+    },
+    "ParetoStatus": {
+      "enum": [
+        "DOMINATED",
+        "NON_DOMINATED",
+        "UNRANKED"
+      ],
+      "type": "string"
+    },
+    "PluginStableId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "PortfolioCandidate": {
+      "additionalProperties": false,
+      "description": "One evaluated candidate of a portfolio search run (R11).\n\nCheckpoints persist the frontier, population, evaluated candidates,\ncache keys, budget counters, and RNG state; resume equals uninterrupted\nexecution.",
+      "properties": {
+        "candidate_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "is_feasible": {
+          "default": true,
+          "title": "Is Feasible",
+          "type": "boolean"
+        },
+        "objective_values": {
+          "additionalProperties": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Objective Values",
+          "type": "object"
+        },
+        "pareto_status": {
+          "$ref": "#/$defs/ParetoStatus",
+          "default": "UNRANKED"
+        },
+        "rank": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rank"
+        },
+        "result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result Id"
+        },
+        "run_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "weights": {
+          "additionalProperties": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Weights",
+          "type": "object"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "run_id",
+        "weights"
+      ],
+      "title": "PortfolioCandidate",
+      "type": "object"
+    },
+    "PortfolioConstraintSet": {
+      "additionalProperties": false,
+      "description": "One declared portfolio constraint set (R5).\n\nBreaches are prevented or resolved deterministically by the owning\nfeature; the record only freezes the declared limits.",
+      "properties": {
+        "constraint_set_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Constraint Set Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "custom_constraints": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "exposure_limits": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ExposureLimit"
+          },
+          "title": "Exposure Limits",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "constraint_set_id",
+        "content_hash"
+      ],
+      "title": "PortfolioConstraintSet",
+      "type": "object"
+    },
+    "PortfolioFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope shared by every portfolio capability.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/PortfolioFailureCode"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "PortfolioFailure",
+      "type": "object"
+    },
+    "PortfolioFailureCode": {
+      "enum": [
+        "PORTFOLIO_VALIDATION_FAILED",
+        "PORTFOLIO_ADMISSION_REJECTED",
+        "PORTFOLIO_VERSION_CONFLICT",
+        "CORRELATION_POLICY_INVALID",
+        "CURRENCY_RATE_MISSING",
+        "EXPOSURE_LIMIT_BREACHED",
+        "SEARCH_INFEASIBLE",
+        "PORTFOLIO_NOT_FOUND",
+        "PORTFOLIO_METHOD_UNSUPPORTED",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "PortfolioMember": {
+      "additionalProperties": false,
+      "description": "One constituent strategy version of a portfolio version (R3).\n\nAdmission validates date overlap, result compatibility, required\ncurrencies, duplicate exposure, and constituent availability.",
+      "properties": {
+        "data_manifest_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Manifest Id"
+        },
+        "member_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Member Id",
+          "type": "string"
+        },
+        "result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sizing_rule": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weight"
+        }
+      },
+      "required": [
+        "member_id",
+        "strategy_version_id"
+      ],
+      "title": "PortfolioMember",
+      "type": "object"
+    },
+    "PortfolioMergeMode": {
+      "enum": [
+        "SIMULATED_PORTFOLIO",
+        "PARALLEL_COMPOUND",
+        "FUZZY_ENSEMBLE"
+      ],
+      "type": "string"
+    },
+    "PortfolioMergePlan": {
+      "additionalProperties": false,
+      "description": "One portfolio merge plan (R16).\n\n``PARALLEL_COMPOUND`` and ``FUZZY_ENSEMBLE`` implement the Experimental\n§21.9 rules; gating is enforced by the owning feature.",
+      "properties": {
+        "capital_sharing": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "conflict_resolution": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/PortfolioMergeMode"
+        },
+        "order_identity_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "signal_aggregation": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "source_strategy_version_ids": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Strategy Version Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "plan_id",
+        "mode",
+        "source_strategy_version_ids",
+        "signal_aggregation",
+        "conflict_resolution",
+        "capital_sharing",
+        "order_identity_policy",
+        "content_hash"
+      ],
+      "title": "PortfolioMergePlan",
+      "type": "object"
+    },
+    "PortfolioMethodDescriptor": {
+      "additionalProperties": false,
+      "description": "One §21.4 research-method portfolio plugin descriptor (R18).\n\nExperimental plugin algorithms only; complete schemas, determinism, and\nconformance vectors are required before stable enablement.",
+      "properties": {
+        "conformance_vectors": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Conformance Vectors",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "input_schema": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "method_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "output_schema": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "resource_bounds": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "seed_streams": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Seed Streams",
+          "type": "array"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "method_id",
+        "version",
+        "plugin_id",
+        "input_schema",
+        "output_schema",
+        "resource_bounds",
+        "content_hash"
+      ],
+      "title": "PortfolioMethodDescriptor",
+      "type": "object"
+    },
+    "PortfolioMetricDefinition": {
+      "additionalProperties": false,
+      "description": "One versioned portfolio metric definition (R13).\n\nMetric metadata removes basis ambiguity between aggregate equity,\nconstituent returns, and allocated capital views.",
+      "properties": {
+        "basis": {
+          "$ref": "#/$defs/MetricBasis"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "formula_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "metric_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "unit": {
+          "$ref": "#/$defs/MetricUnit"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "metric_id",
+        "version",
+        "basis",
+        "formula_ref",
+        "unit",
+        "content_hash"
+      ],
+      "title": "PortfolioMetricDefinition",
+      "type": "object"
+    },
+    "PortfolioRef": {
+      "additionalProperties": false,
+      "description": "Reference to one portfolio identity (R1).",
+      "properties": {
+        "portfolio_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Portfolio Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "portfolio_id"
+      ],
+      "title": "PortfolioRef",
+      "type": "object"
+    },
+    "PortfolioResult": {
+      "additionalProperties": false,
+      "description": "One aggregate portfolio simulation result (R9).\n\nAggregate totals reconcile to constituents; ``.sqxpf`` export preserves\nidentities, policies, metrics, and artifacts and reproduces the\ncanonical portfolio hash on round-trip.",
+      "properties": {
+        "aggregate_trades_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Aggregate Trades Artifact Id",
+          "type": "string"
+        },
+        "cashflow_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Cashflow Artifact Id",
+          "type": "string"
+        },
+        "constituent_attribution_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Constituent Attribution Artifact Id",
+          "type": "string"
+        },
+        "constraint_events_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Constraint Events Artifact Id"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "correlation_matrix_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Correlation Matrix Id"
+        },
+        "daily_returns_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Daily Returns Artifact Id",
+          "type": "string"
+        },
+        "equity_drawdown_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Equity Drawdown Artifact Id",
+          "type": "string"
+        },
+        "exposure_timeline_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Exposure Timeline Artifact Id",
+          "type": "string"
+        },
+        "manifest_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Manifest Id",
+          "type": "string"
+        },
+        "portfolio_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Portfolio Version Id",
+          "type": "string"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "turnover": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "result_id",
+        "portfolio_version_id",
+        "manifest_id",
+        "aggregate_trades_artifact_id",
+        "cashflow_artifact_id",
+        "equity_drawdown_artifact_id",
+        "exposure_timeline_artifact_id",
+        "constituent_attribution_artifact_id",
+        "turnover",
+        "daily_returns_artifact_id",
+        "content_hash"
+      ],
+      "title": "PortfolioResult",
+      "type": "object"
+    },
+    "PortfolioRiskReport": {
+      "additionalProperties": false,
+      "description": "One calculated portfolio risk report (R12).",
+      "properties": {
+        "cvar_method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "daily_expected_return": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Daily Expected Return",
+          "type": "string"
+        },
+        "daily_volatility": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Daily Volatility",
+          "type": "string"
+        },
+        "expected_shortfall": {
+          "$ref": "#/$defs/Money"
+        },
+        "parametric_var": {
+          "$ref": "#/$defs/Money"
+        },
+        "portfolio_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Portfolio Version Id",
+          "type": "string"
+        },
+        "report_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Report Id",
+          "type": "string"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "risk_free_rate": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Risk Free Rate",
+          "type": "string"
+        },
+        "risk_free_version": {
+          "minimum": 1,
+          "title": "Risk Free Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sharpe": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Sharpe",
+          "type": "string"
+        },
+        "var_confidence": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Var Confidence",
+          "type": "string"
+        },
+        "var_horizon_days": {
+          "minimum": 1,
+          "title": "Var Horizon Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "report_id",
+        "portfolio_version_id",
+        "result_id",
+        "daily_expected_return",
+        "daily_volatility",
+        "var_confidence",
+        "var_horizon_days",
+        "parametric_var",
+        "expected_shortfall",
+        "cvar_method",
+        "sharpe",
+        "risk_free_rate",
+        "risk_free_version"
+      ],
+      "title": "PortfolioRiskReport",
+      "type": "object"
+    },
+    "PortfolioSearchPlan": {
+      "additionalProperties": false,
+      "description": "One deterministic automatic portfolio search plan (R10).\n\nIdentical inputs select the same portfolio or the same Pareto set\nordering; the tie-breaker resolves ties deterministically.",
+      "properties": {
+        "budget": {
+          "$ref": "#/$defs/ResearchBudget"
+        },
+        "candidate_set": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Candidate Set",
+          "type": "array"
+        },
+        "constraints": {
+          "$ref": "#/$defs/PortfolioConstraintSet"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "method_version": {
+          "minimum": 1,
+          "title": "Method Version",
+          "type": "integer"
+        },
+        "objective_vector": {
+          "items": {
+            "$ref": "#/$defs/ObjectiveSpec"
+          },
+          "minItems": 1,
+          "title": "Objective Vector",
+          "type": "array"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "search_method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "seeds": {
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Seeds",
+          "type": "array"
+        },
+        "tie_breaker": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "plan_id",
+        "candidate_set",
+        "objective_vector",
+        "constraints",
+        "search_method",
+        "method_version",
+        "budget",
+        "seeds",
+        "tie_breaker",
+        "content_hash"
+      ],
+      "title": "PortfolioSearchPlan",
+      "type": "object"
+    },
+    "PortfolioSimulationRequest": {
+      "additionalProperties": false,
+      "description": "One aggregate simulation request for a portfolio version (R8).\n\nAggregate simulation merges constituent cash flows and exposures on a\ncanonical event timeline without future information; the conversion\npolicy declares fail, carry, or explicit fallback per missing rate and\nconversion uses only rates visible at each event timestamp.",
+      "properties": {
+        "conversion_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "from_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "From At"
+        },
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "portfolio_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Portfolio Version Id",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "to_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "To At"
+        }
+      },
+      "required": [
+        "request_id",
+        "portfolio_version_id",
+        "conversion_policy",
+        "idempotency_key"
+      ],
+      "title": "PortfolioSimulationRequest",
+      "type": "object"
+    },
+    "PortfolioSplitPlan": {
+      "additionalProperties": false,
+      "description": "One portfolio split plan (R17).\n\nSplit creates independently versioned constituents preserving the\nallocation snapshot and lineage.",
+      "properties": {
+        "allocation_snapshot": {
+          "$ref": "#/$defs/Allocation"
+        },
+        "compound_strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Compound Strategy Version Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "lineage": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "output_strategy_ids": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Output Strategy Ids",
+          "type": "array"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "plan_id",
+        "compound_strategy_version_id",
+        "output_strategy_ids",
+        "allocation_snapshot",
+        "lineage",
+        "content_hash"
+      ],
+      "title": "PortfolioSplitPlan",
+      "type": "object"
+    },
+    "PortfolioVersion": {
+      "additionalProperties": false,
+      "description": "One immutable version of a portfolio and its policies (R2).\n\nSaving a portfolio creates an immutable version with a canonical hash;\ninvalid portfolios are rejected before simulation and promotion of\nautomatic-search results preserves ``search_lineage``.",
+      "properties": {
+        "allocation": {
+          "$ref": "#/$defs/Allocation"
+        },
+        "capital": {
+          "$ref": "#/$defs/Money"
+        },
+        "constraints": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioConstraintSet"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "currency_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "members": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PortfolioMember"
+          },
+          "title": "Members",
+          "type": "array"
+        },
+        "name": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "portfolio_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Portfolio Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "search_lineage": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "valid_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Valid From",
+          "type": "string"
+        },
+        "valid_to": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid To"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "portfolio_id",
+        "version",
+        "name",
+        "allocation",
+        "currency_policy",
+        "capital",
+        "valid_from",
+        "content_hash"
+      ],
+      "title": "PortfolioVersion",
+      "type": "object"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "RebalancePolicy": {
+      "additionalProperties": false,
+      "description": "Declared rebalance schedule, trigger, bands, costs, and timing.\n\nNested record of ``Allocation`` (R4).",
+      "properties": {
+        "execution_timing": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schedule": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "tolerance_bands": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tolerance Bands"
+        },
+        "trigger": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "turnover_cost_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "unresolved_order_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "schedule",
+        "trigger",
+        "turnover_cost_policy",
+        "execution_timing",
+        "unresolved_order_policy"
+      ],
+      "title": "RebalancePolicy",
+      "type": "object"
+    },
+    "ResearchBudget": {
+      "additionalProperties": false,
+      "description": "Bound set enforced by research budget governance.\n\nPublic record R18, defined ahead of the table order because\n``ResearchManifest`` (R2) embeds it; every bound left ``None`` is\nunbounded, and bound exhaustion is a runtime policy, not a record rule.",
+      "properties": {
+        "budget_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Budget Id",
+          "type": "string"
+        },
+        "max_artifact_storage_mb": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Artifact Storage Mb"
+        },
+        "max_candidates": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Candidates"
+        },
+        "max_cpu_seconds": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Cpu Seconds"
+        },
+        "max_elapsed_seconds": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Elapsed Seconds"
+        },
+        "max_evaluations": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Evaluations"
+        },
+        "max_memory_mb": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Memory Mb"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "budget_id"
+      ],
+      "title": "ResearchBudget",
+      "type": "object"
+    },
+    "Rounding": {
+      "enum": [
+        "DOWN",
+        "UP",
+        "HALF_UP",
+        "HALF_EVEN",
+        "TOWARD_ZERO"
+      ],
+      "type": "string"
+    },
+    "SearchPortfoliosRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated portfolio search request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PLAN",
+            "SEARCH",
+            "CHECKPOINT",
+            "RESUME"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "SearchPortfoliosRequest",
+      "type": "object"
+    },
+    "SearchPortfoliosSuccess": {
+      "additionalProperties": false,
+      "description": "Successful portfolio search operation result.",
+      "properties": {
+        "candidates": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PortfolioCandidate"
+          },
+          "title": "Candidates",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioSearchPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "SearchPortfoliosSuccess",
+      "type": "object"
+    },
+    "SharedInstrumentPolicy": {
+      "enum": [
+        "NET",
+        "INDEPENDENT",
+        "REJECT"
+      ],
+      "type": "string"
+    },
+    "SimulatePortfoliosRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated aggregate simulation request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "SIMULATE",
+            "CONVERT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "SimulatePortfoliosRequest",
+      "type": "object"
+    },
+    "SimulatePortfoliosSuccess": {
+      "additionalProperties": false,
+      "description": "Successful aggregate simulation operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "SimulatePortfoliosSuccess",
+      "type": "object"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {},
+  "failures": {
+    "PortfolioFailure": {
+      "$ref": "#/$defs/PortfolioFailure"
+    }
+  },
+  "models": {
+    "Allocation": {
+      "$ref": "#/$defs/Allocation"
+    },
+    "AnalyzeCorrelationRequest": {
+      "$ref": "#/$defs/AnalyzeCorrelationRequest"
+    },
+    "AnalyzeCorrelationSuccess": {
+      "$ref": "#/$defs/AnalyzeCorrelationSuccess"
+    },
+    "AnalyzePortfolioRiskRequest": {
+      "$ref": "#/$defs/AnalyzePortfolioRiskRequest"
+    },
+    "AnalyzePortfolioRiskSuccess": {
+      "$ref": "#/$defs/AnalyzePortfolioRiskSuccess"
+    },
+    "ComposePortfoliosRequest": {
+      "$ref": "#/$defs/ComposePortfoliosRequest"
+    },
+    "ComposePortfoliosSuccess": {
+      "$ref": "#/$defs/ComposePortfoliosSuccess"
+    },
+    "CorrelationMatrix": {
+      "$ref": "#/$defs/CorrelationMatrix"
+    },
+    "CorrelationRequest": {
+      "$ref": "#/$defs/CorrelationRequest"
+    },
+    "EfficientFrontier": {
+      "$ref": "#/$defs/EfficientFrontier"
+    },
+    "ExposureLimit": {
+      "$ref": "#/$defs/ExposureLimit"
+    },
+    "ExtendPortfolioMethodsRequest": {
+      "$ref": "#/$defs/ExtendPortfolioMethodsRequest"
+    },
+    "ExtendPortfolioMethodsSuccess": {
+      "$ref": "#/$defs/ExtendPortfolioMethodsSuccess"
+    },
+    "FrontierPoint": {
+      "$ref": "#/$defs/FrontierPoint"
+    },
+    "MarkowitzOptimizationRequest": {
+      "$ref": "#/$defs/MarkowitzOptimizationRequest"
+    },
+    "MergePortfoliosRequest": {
+      "$ref": "#/$defs/MergePortfoliosRequest"
+    },
+    "MergePortfoliosSuccess": {
+      "$ref": "#/$defs/MergePortfoliosSuccess"
+    },
+    "ObjectiveSpec": {
+      "$ref": "#/$defs/ObjectiveSpec"
+    },
+    "OptimizeMarkowitzRequest": {
+      "$ref": "#/$defs/OptimizeMarkowitzRequest"
+    },
+    "OptimizeMarkowitzSuccess": {
+      "$ref": "#/$defs/OptimizeMarkowitzSuccess"
+    },
+    "PortfolioCandidate": {
+      "$ref": "#/$defs/PortfolioCandidate"
+    },
+    "PortfolioConstraintSet": {
+      "$ref": "#/$defs/PortfolioConstraintSet"
+    },
+    "PortfolioMember": {
+      "$ref": "#/$defs/PortfolioMember"
+    },
+    "PortfolioMergePlan": {
+      "$ref": "#/$defs/PortfolioMergePlan"
+    },
+    "PortfolioMethodDescriptor": {
+      "$ref": "#/$defs/PortfolioMethodDescriptor"
+    },
+    "PortfolioMetricDefinition": {
+      "$ref": "#/$defs/PortfolioMetricDefinition"
+    },
+    "PortfolioRef": {
+      "$ref": "#/$defs/PortfolioRef"
+    },
+    "PortfolioResult": {
+      "$ref": "#/$defs/PortfolioResult"
+    },
+    "PortfolioRiskReport": {
+      "$ref": "#/$defs/PortfolioRiskReport"
+    },
+    "PortfolioSearchPlan": {
+      "$ref": "#/$defs/PortfolioSearchPlan"
+    },
+    "PortfolioSimulationRequest": {
+      "$ref": "#/$defs/PortfolioSimulationRequest"
+    },
+    "PortfolioSplitPlan": {
+      "$ref": "#/$defs/PortfolioSplitPlan"
+    },
+    "PortfolioVersion": {
+      "$ref": "#/$defs/PortfolioVersion"
+    },
+    "RebalancePolicy": {
+      "$ref": "#/$defs/RebalancePolicy"
+    },
+    "SearchPortfoliosRequest": {
+      "$ref": "#/$defs/SearchPortfoliosRequest"
+    },
+    "SearchPortfoliosSuccess": {
+      "$ref": "#/$defs/SearchPortfoliosSuccess"
+    },
+    "SimulatePortfoliosRequest": {
+      "$ref": "#/$defs/SimulatePortfoliosRequest"
+    },
+    "SimulatePortfoliosSuccess": {
+      "$ref": "#/$defs/SimulatePortfoliosSuccess"
+    }
+  },
+  "namespace": "portfolio",
+  "schema_version": 1,
+  "title": "portfolio wire contracts v1"
+}

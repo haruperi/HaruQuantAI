@@ -57,20 +57,20 @@ describe("FEAT-UI-COMPOSE_SHELL", () => {
         description: "Feature one",
         contributedWorkspaces: [
           {
-            workspaceId: "ws-1",
-            routePath: "/workspaces/ws1",
-            displayName: "Workspace One",
-            iconName: "1️⃣",
-            requiredCapabilities: [],
-            isAuthorized: true,
+            workspace_id: "ws-1",
+            route_path: "/workspaces/ws1",
+            display_name: "Workspace One",
+            icon_name: "1️⃣",
+            required_capabilities: [],
+            is_authorized: true,
             renderWorkspace: () => <div>Workspace One Content</div>,
           },
           {
-            workspaceId: "ws-unauthorized",
-            routePath: "/workspaces/unauth",
-            displayName: "Unauthorized WS",
-            requiredCapabilities: [],
-            isAuthorized: false,
+            workspace_id: "ws-unauthorized",
+            route_path: "/workspaces/unauth",
+            display_name: "Unauthorized WS",
+            required_capabilities: [],
+            is_authorized: false,
           },
         ],
       },
@@ -83,11 +83,11 @@ describe("FEAT-UI-COMPOSE_SHELL", () => {
         description: "Feature two",
         contributedWorkspaces: [
           {
-            workspaceId: "ws-2",
-            routePath: "/workspaces/ws2",
-            displayName: "Workspace Two",
-            requiredCapabilities: ["custom.cap@1"],
-            isAuthorized: true,
+            workspace_id: "ws-2",
+            route_path: "/workspaces/ws2",
+            display_name: "Workspace Two",
+            required_capabilities: ["custom.cap@1"],
+            is_authorized: true,
             renderWorkspace: () => <div>Workspace Two Content</div>,
           },
         ],
@@ -96,12 +96,12 @@ describe("FEAT-UI-COMPOSE_SHELL", () => {
 
     // Before custom.cap@1 is ready, only ws-1 is discovered
     let discovered = bridge.discoverWorkspaces();
-    expect(discovered.map((w) => w.workspaceId)).toEqual(["ws-1"]);
+    expect(discovered.map((w) => w.workspace_id)).toEqual(["ws-1"]);
 
     // Make custom.cap@1 ready
     bridge.setCapabilityState("custom.cap@1", "ready");
     discovered = bridge.discoverWorkspaces();
-    expect(discovered.map((w) => w.workspaceId)).toEqual(["ws-1", "ws-2"]);
+    expect(discovered.map((w) => w.workspace_id)).toEqual(["ws-1", "ws-2"]);
   });
 
   it("FR-UI-SWITCH_WORKSPACES: Switches active workspace and isolates interaction target", () => {
@@ -112,17 +112,17 @@ describe("FEAT-UI-COMPOSE_SHELL", () => {
         description: "Test",
         contributedWorkspaces: [
           {
-            workspaceId: "ws-a",
-            routePath: "/a",
-            displayName: "Workspace A",
-            isAuthorized: true,
+            workspace_id: "ws-a",
+            route_path: "/a",
+            display_name: "Workspace A",
+            is_authorized: true,
             renderWorkspace: () => <div data-testid="content-a">Panel A</div>,
           },
           {
-            workspaceId: "ws-b",
-            routePath: "/b",
-            displayName: "Workspace B",
-            isAuthorized: true,
+            workspace_id: "ws-b",
+            route_path: "/b",
+            display_name: "Workspace B",
+            is_authorized: true,
             renderWorkspace: () => <div data-testid="content-b">Panel B</div>,
           },
         ],
@@ -161,24 +161,24 @@ describe("FEAT-UI-COMPOSE_SHELL", () => {
         description: "Test keyboard navigation",
         contributedWorkspaces: [
           {
-            workspaceId: "ws-1",
-            routePath: "/ws1",
-            displayName: "Workspace 1",
-            isAuthorized: true,
+            workspace_id: "ws-1",
+            route_path: "/ws1",
+            display_name: "Workspace 1",
+            is_authorized: true,
             renderWorkspace: () => <div data-testid="content-1">Content 1</div>,
           },
           {
-            workspaceId: "ws-2",
-            routePath: "/ws2",
-            displayName: "Workspace 2",
-            isAuthorized: true,
+            workspace_id: "ws-2",
+            route_path: "/ws2",
+            display_name: "Workspace 2",
+            is_authorized: true,
             renderWorkspace: () => <div data-testid="content-2">Content 2</div>,
           },
           {
-            workspaceId: "ws-3",
-            routePath: "/ws3",
-            displayName: "Workspace 3",
-            isAuthorized: true,
+            workspace_id: "ws-3",
+            route_path: "/ws3",
+            display_name: "Workspace 3",
+            is_authorized: true,
             renderWorkspace: () => <div data-testid="content-3">Content 3</div>,
           },
         ],
@@ -260,23 +260,23 @@ describe("FEAT-UI-COMPOSE_SHELL", () => {
   it("FR-UI-RESTORE_ROUTE: Restores valid authorized route and falls back on invalid route", () => {
     const available = [
       {
-        workspaceId: "ws-valid",
-        routePath: "/valid-path",
-        displayName: "Valid Route",
-        isAuthorized: true,
+        workspace_id: "ws-valid",
+        route_path: "/valid-path",
+        display_name: "Valid Route",
+        is_authorized: true,
       },
       {
-        workspaceId: "ws-unauth",
-        routePath: "/secret-path",
-        displayName: "Secret Route",
-        isAuthorized: false,
+        workspace_id: "ws-unauth",
+        route_path: "/secret-path",
+        display_name: "Secret Route",
+        is_authorized: false,
       },
     ];
 
     // Valid route
     const res1 = RouteManager.resolveRoute("/valid-path", available, "/home");
     expect(res1.targetRoute).toBe("/valid-path");
-    expect(res1.activeWorkspace?.workspaceId).toBe("ws-valid");
+    expect(res1.activeWorkspace?.workspace_id).toBe("ws-valid");
 
     // Unauthorized route -> fallback
     const res2 = RouteManager.resolveRoute("/secret-path", available, "/home");
@@ -298,29 +298,29 @@ describe("FEAT-UI-COMPOSE_SHELL", () => {
         description: "Test History",
         contributedWorkspaces: [
           {
-            workspaceId: "home",
-            routePath: "/home",
-            displayName: "Home",
-            isAuthorized: true,
+            workspace_id: "home",
+            route_path: "/home",
+            display_name: "Home",
+            is_authorized: true,
           },
           {
-            workspaceId: "research",
-            routePath: "/research",
-            displayName: "Research",
-            isAuthorized: true,
+            workspace_id: "research",
+            route_path: "/research",
+            display_name: "Research",
+            is_authorized: true,
           },
         ],
       },
     });
 
-    // Direct restoration of /research restores activeWorkspaceId to 'research'
+    // Direct restoration of /research restores active_workspace_id to 'research'
     const restored = historyBridge.restoreRoute("/research", "/home");
     expect(restored).toBe("/research");
-    expect(historyBridge.getSnapshot().activeWorkspaceId).toBe("research");
+    expect(historyBridge.getSnapshot().active_workspace_id).toBe("research");
 
     // Switching workspace updates current route
     historyBridge.switchWorkspace("home");
-    expect(historyBridge.getSnapshot().currentRoute).toBe("/home");
+    expect(historyBridge.getSnapshot().current_route).toBe("/home");
 
     // Clean up history bridge
     historyBridge.destroy();

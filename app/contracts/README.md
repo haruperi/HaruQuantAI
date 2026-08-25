@@ -2,8 +2,8 @@
 
 > **Package:** `app/contracts/`
 > **Category:** Non-domain shared substrate
-> **Status:** Contract inventory specified; production contract slices `Missing`
-> **Planned inventory:** Maintained in this README
+> **Status:** Wire contracts implemented for all 16 namespaces (strict frozen Pydantic v2 models, generated wire schemas and TypeScript types); runtime capability providers remain the owning features' `Missing` status
+> **Inventory:** Maintained in this README
 
 ## Purpose
 
@@ -41,9 +41,48 @@ Runtime capability identifiers use `<lowercase-name>@<major>`, normally `<domain
 
 Creating a contract does not complete its business FR. Completion requires the owning feature implementation and acceptance evidence.
 
+## Public wire-model boundary
+
+Public cross-boundary wire records target strict, frozen Pydantic v2 `BaseModel` types with unknown fields forbidden. Private implementation-only records may remain standard dataclasses. Existing public dataclasses migrate only with compatibility evidence; documenting a target model does not make it implemented.
+
+Wire properties use `snake_case`. Every top-level persisted record, event, request, and result carries `schema_version: Literal[1] = 1` for its initial schema. The common scalar aliases are:
+
+| Alias | Exact wire rule |
+| --- | --- |
+| `Uuid7` | Lowercase canonical UUIDv7 string. |
+| `UtcTimestamp` | RFC 3339 UTC with exactly six fractional digits and suffix `Z`. |
+| `DecimalValue` | Canonical non-exponent decimal string. |
+| `CurrencyCode` | Uppercase ISO 4217 code. |
+| `ContentHash` | 64 lowercase SHA-256 hexadecimal characters. |
+
+`JsonValue` is the recursive union of JSON null, boolean, number, string, array of `JsonValue`, or string-keyed object of `JsonValue`; `JsonObject` is its string-keyed object branch. These aliases carry no domain semantics.
+
+### Common v1 records
+
+| Record | Exact fields and constraints |
+| --- | --- |
+| `Money` | `amount: DecimalValue`; `currency: CurrencyCode`. |
+| `Timeframe` | `unit: MINUTE\|DAY\|WEEK\|MONTH`; `multiple: int >= 1`. |
+| `SeriesPointKey` | `timestamp: UtcTimestamp`; `sequence: int >= 0`. |
+| `ValidationIssue` | `path: tuple[str, ...]`; nonempty uppercase `code`; nonempty `message`; `context: dict[str, JsonValue] = {}`. |
+| `ProblemDetails` | `type` absolute URN/URI; nonempty `title`; HTTP `status` 400–599; nonempty uppercase `code`; nonempty `detail`; `request_id: Uuid7`; `errors: tuple[ValidationIssue, ...] = ()`; optional `capability_key`, positive `required_version`, `feature_state`, `affected_object_id: Uuid7`; `missing_dependencies` and `available_alternatives` default to empty tuples; `schema_version = 1`. Capability extension fields are valid only for capability-related codes. |
+| `DomainEvent` | `event_id: Uuid7`; `sequence >= 0`; lowercase dotted `event_type`; `occurred_at`; `request_id`; `capability_snapshot_id`; `payload: JsonObject`; optional project-run, task-run, job, component-instance, and reconciliation UUIDv7 fields; `schema_version = 1`. |
+| `CapabilityProviderSnapshot` | Versioned `capability_key` in `<name>@<major>` form; `provider_feature_id` in `FEAT-*` form; `generation >= 1`; `implementation_hash`; `configuration_hash`. |
+| `CapabilitySnapshot` | `snapshot_id`; `created_at`; nonempty providers sorted by capability key; `snapshot_hash`; optional `causal_request_id`; `schema_version = 1`. Duplicate capability keys are invalid. |
+
+Common domain failures embed `ProblemDetails`; they do not inherit from it. Closed request/result/event unions use a literal discriminator. Common envelopes define representation and correlation only and never become a second owner for domain payload semantics.
+
+### Capability-port invocation and event delivery
+
+Every newly authored business-domain or UI capability port is a runtime-checkable protocol with exactly one primary asynchronous request/response method. Its lower-snake-case name derives from the capability action—such as `catalog_instruments`, `run_research`, or `manage_layouts`—and is never generic `execute`. The method accepts one strict operation-discriminated request union and returns one success/failure discriminated union. FRs remain traceability identities and do not become separate public methods.
+
+A port adds one `subscribe_<action>_events(request) -> AsyncIterator[EventUnion]` method only when its semantic owner explicitly requires live, streaming, or replay delivery. The subscription request identifies source/scope, optional resume cursor, bounded replay, and schema version. The iterator preserves event order/cursor semantics and requires explicit cancellation/disposal; it never returns command results. Publishing an observational event through Kernel does not by itself create a subscription method.
+
+Implemented v1 ports are compatibility-frozen at their current method set and sync/async behavior. Breaking adoption of this convention requires a new capability major, compatibility adapter/window, and consumer migration. Additive methods require producer-consumer compatibility proof in the same change.
+
 ## Planned contract inventory
 
-This is the planned product contract inventory, not a prerequisite that must be implemented in one wave. Each feature adds its minimal contract slice before implementation. An undelivered entry remains `Missing` and does not imply runtime availability.
+This is the product contract inventory. Every listed record and capability bundle now has an implemented strict wire definition under `app/contracts/<owner>/` plus per-owner `wire/schema.json` and generated TypeScript under `app/ui/src/contracts/generated/`, all emitted deterministically by `scripts/generate_contracts.py` (write and `--check` modes; freshness enforced by CI and the UI package scripts). An entry being defined does not implement its owning feature: runtime capability providers and acceptance evidence remain the owning features' responsibility and stay `Missing` until their feature slices land.
 
 ### 4.1 `app/contracts/workspace/`
 
@@ -54,6 +93,8 @@ This is the planned product contract inventory, not a prerequisite that must be 
 **Capability bundles (6):** `ManageWorkspacesCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability` (implemented), `DistributeWorkersCapability`, and `HostWorkspacesCapability`.
 
 ### 4.2 `app/contracts/catalogue/`
+
+**Status:** wire definitions, schemas, and generated types implemented; runtime providers and acceptance evidence remain `Missing`. Exact record fields, operations, failures, events, producers, consumers, and FR links are authoritative in the [Catalogue Shared Contracts section](../services/catalogue/README.md#shared-contracts).
 
 **Public records:** `InstrumentRef`, `InstrumentVersion`, `AssetClass`, `ProviderRef`, `BrokerRef`, `ProviderSymbolMapping`, `TradingSessionDefinition`, `MarketCalendarVersion`, `TradingInterval`, `TradingRuleSet`, `OrderConstraints`, `CostModelRef`, `UniverseRef`, `UniverseVersion`, `UniverseMembership`, `FxRateObservation`, `CurrencyConversionPath`, and `CatalogueExchangePackage`.
 

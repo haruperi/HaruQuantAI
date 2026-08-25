@@ -1,0 +1,1946 @@
+{
+  "$defs": {
+    "ApiRangeStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "CompatibilityVerdict": {
+      "enum": [
+        "SUPPORTED",
+        "DEPRECATED",
+        "UNSUPPORTED"
+      ],
+      "type": "string"
+    },
+    "ContributionTestResultWire": {
+      "additionalProperties": false,
+      "description": "Wire form of the v1 contribution contract-fixture test result.",
+      "properties": {
+        "contribution_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "details": {
+          "default": "",
+          "title": "Details",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "plugin_type": {
+          "$ref": "#/$defs/PluginTypeValue"
+        }
+      },
+      "required": [
+        "contribution_id",
+        "plugin_type",
+        "passed"
+      ],
+      "title": "ContributionTestResultWire",
+      "type": "object"
+    },
+    "IsolateAnalysisRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated plugin analysis boundary request.\n\n``ANALYZE`` requires the ``analysis`` request record; the event union is\nempty.",
+      "properties": {
+        "analysis": {
+          "$ref": "#/$defs/PluginAnalysisRequest"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "const": "ANALYZE",
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation",
+        "analysis"
+      ],
+      "title": "IsolateAnalysisRequest",
+      "type": "object"
+    },
+    "IsolateAnalysisSuccess": {
+      "additionalProperties": false,
+      "description": "Successful plugin analysis boundary operation result.\n\nThe event union is empty.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginAnalysisResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "IsolateAnalysisSuccess",
+      "type": "object"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "MaintainCompatibilityRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated plugin compatibility request.\n\n``PUBLISH`` requires ``compatibility`` and forbids ``plugin_id`` and\n``version``; ``CHECK`` requires ``plugin_id`` and ``version`` and\nforbids ``compatibility``. Publication is observational Kernel\n``PUBLISH`` with no subscription; the event union is empty.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "compatibility": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginCompatibility"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "PUBLISH",
+            "CHECK"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "plugin_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginStableId"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SemverString"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "MaintainCompatibilityRequest",
+      "type": "object"
+    },
+    "MaintainCompatibilitySuccess": {
+      "additionalProperties": false,
+      "description": "Successful plugin compatibility operation result.\n\n``compatibility`` is returned when the operation yields a published\ndeclaration; ``verdict`` classifies the checked plugin version for\n``CHECK``.",
+      "properties": {
+        "compatibility": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginCompatibility"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "verdict": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CompatibilityVerdict"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "MaintainCompatibilitySuccess",
+      "type": "object"
+    },
+    "ManageLifecycleRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated plugin lifecycle request.\n\n``INSTALL`` and ``UPGRADE`` require ``receipt`` (plugin identity and\nversion arrive on the receipt; ``plugin_id`` and ``workspace_id`` stay\noptional addressors); ``ENABLE``, ``DISABLE``, and ``REMOVE`` require\n``plugin_id`` and ``workspace_id`` and forbid the receipt; ``UPGRADE``\nadditionally accepts an optional target ``version`` and every other\noperation forbids it.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "INSTALL",
+            "ENABLE",
+            "DISABLE",
+            "UPGRADE",
+            "REMOVE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "plugin_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginStableId"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "receipt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginPackageReceipt"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SemverString"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "workspace_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Workspace Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ManageLifecycleRequest",
+      "type": "object"
+    },
+    "ManageLifecycleSuccess": {
+      "additionalProperties": false,
+      "description": "Successful plugin lifecycle operation result.\n\n``activation`` and ``lifecycle`` are returned when the operation\nproduces them; the event union is empty.",
+      "properties": {
+        "activation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginActivation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "lifecycle": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginLifecycleState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ManageLifecycleSuccess",
+      "type": "object"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "NonNegativeInt": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "PanelBridgeOperation": {
+      "enum": [
+        "READ_RESULTS",
+        "QUERY_DATA",
+        "RECEIVE_MESSAGES"
+      ],
+      "type": "string"
+    },
+    "PluginActivation": {
+      "additionalProperties": false,
+      "description": "Wire-native transactional plugin activation state in a workspace.\n\n``(plugin_id, workspace_id)`` is unique (``plugin_activations``); a\nfailed upgrade preserves the previous usable version and dependent\nobjects remain diagnosable.",
+      "properties": {
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "disabled_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Disabled At"
+        },
+        "enabled_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Enabled At"
+        },
+        "installed_version": {
+          "$ref": "#/$defs/SemverString"
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "previous_version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SemverString"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "row_version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Row Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/PluginActivationState"
+        },
+        "updated_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "plugin_id",
+        "workspace_id",
+        "installed_version",
+        "state",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "PluginActivation",
+      "type": "object"
+    },
+    "PluginActivationState": {
+      "enum": [
+        "INSTALLED",
+        "ENABLED",
+        "DISABLED"
+      ],
+      "type": "string"
+    },
+    "PluginAnalysisOutcome": {
+      "enum": [
+        "SUCCEEDED",
+        "FAILED"
+      ],
+      "type": "string"
+    },
+    "PluginAnalysisRequest": {
+      "additionalProperties": false,
+      "description": "Wire-native isolated plugin analysis request.\n\nHandles are immutable; the request reaches the plugin through the\nanalysis boundary only.",
+      "properties": {
+        "contribution_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "input_handles": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PluginInputHandle"
+          },
+          "title": "Input Handles",
+          "type": "array"
+        },
+        "parameters": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "plugin_id",
+        "contribution_id"
+      ],
+      "title": "PluginAnalysisRequest",
+      "type": "object"
+    },
+    "PluginAnalysisResult": {
+      "additionalProperties": false,
+      "description": "Wire-native isolated plugin analysis outcome.\n\nOutput is staged only (``STAGED``, schema-validated) and never committed\nby the plugin boundary.",
+      "properties": {
+        "contribution_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "staged_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Staged Artifact Id"
+        },
+        "status": {
+          "$ref": "#/$defs/PluginAnalysisOutcome"
+        }
+      },
+      "required": [
+        "request_id",
+        "contribution_id",
+        "status"
+      ],
+      "title": "PluginAnalysisResult",
+      "type": "object"
+    },
+    "PluginCompatibility": {
+      "additionalProperties": false,
+      "description": "Wire-native published plugin API compatibility declaration.\n\nA supported older plugin runs unchanged or is rejected before activation\nwith a precise reason.",
+      "properties": {
+        "conformance_suite": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "deprecation_diagnostic": {
+          "default": "",
+          "title": "Deprecation Diagnostic",
+          "type": "string"
+        },
+        "is_deprecated": {
+          "default": false,
+          "title": "Is Deprecated",
+          "type": "boolean"
+        },
+        "migration_guide_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Migration Guide Ref"
+        },
+        "plugin_api_version": {
+          "$ref": "#/$defs/SemverString"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "supported_range": {
+          "$ref": "#/$defs/ApiRangeStr"
+        }
+      },
+      "required": [
+        "plugin_api_version",
+        "supported_range",
+        "conformance_suite"
+      ],
+      "title": "PluginCompatibility",
+      "type": "object"
+    },
+    "PluginContribution": {
+      "additionalProperties": false,
+      "description": "Wire-native registered typed plugin contribution.\n\nThe v1 ``PluginContributionDescriptor`` remains the process type; each\ntype passes its contract-test kit before stable enablement.",
+      "properties": {
+        "contribution_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "is_enabled": {
+          "default": true,
+          "title": "Is Enabled",
+          "type": "boolean"
+        },
+        "metadata": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "plugin_type": {
+          "$ref": "#/$defs/PluginTypeValue"
+        },
+        "registered_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Registered At",
+          "type": "string"
+        },
+        "schema_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contribution_id",
+        "plugin_id",
+        "plugin_type",
+        "name",
+        "registered_at"
+      ],
+      "title": "PluginContribution",
+      "type": "object"
+    },
+    "PluginExecutionState": {
+      "enum": [
+        "LOADED",
+        "STARTED",
+        "RUNNING",
+        "TIMED_OUT",
+        "CRASHED",
+        "STOPPED"
+      ],
+      "type": "string"
+    },
+    "PluginFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope shared by the new Plugins capabilities.\n\n``PLUGIN_VALIDATION_FAILED`` covers harness validation failures,\n``PLUGIN_MANIFEST_INVALID`` and ``PLUGIN_PACKAGE_INVALID`` cover\nmalformed or altered manifests and packages, ``PLUGIN_SIGNATURE_INVALID``\ncovers unverifiable signatures, ``PLUGIN_CONTRIBUTION_INVALID`` and\n``PLUGIN_CONTRACT_TEST_FAILED`` cover registration and contract-test\nfailures, ``PLUGIN_PERMISSION_DENIED`` covers sandbox denials,\n``PLUGIN_SECRET_FORBIDDEN`` covers undeclared secret access,\n``PLUGIN_INCOMPATIBLE`` covers unsupported API ranges,\n``PLUGIN_LIFECYCLE_CONFLICT`` covers transactional lifecycle conflicts,\nand ``CAPABILITY_UNAVAILABLE`` performs no mutation.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/PluginFailureCode"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "PluginFailure",
+      "type": "object"
+    },
+    "PluginFailureCode": {
+      "enum": [
+        "PLUGIN_VALIDATION_FAILED",
+        "PLUGIN_MANIFEST_INVALID",
+        "PLUGIN_PACKAGE_INVALID",
+        "PLUGIN_SIGNATURE_INVALID",
+        "PLUGIN_CONTRIBUTION_INVALID",
+        "PLUGIN_CONTRACT_TEST_FAILED",
+        "PLUGIN_PERMISSION_DENIED",
+        "PLUGIN_SECRET_FORBIDDEN",
+        "PLUGIN_INCOMPATIBLE",
+        "PLUGIN_LIFECYCLE_CONFLICT",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "PluginFileEntryWire": {
+      "additionalProperties": false,
+      "description": "Wire form of the v1 plugin package file entry metadata.",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/RelativePackagePath"
+        },
+        "sha256_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256 Hash",
+          "type": "string"
+        },
+        "size_bytes": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "sha256_hash"
+      ],
+      "title": "PluginFileEntryWire",
+      "type": "object"
+    },
+    "PluginInputHandle": {
+      "additionalProperties": false,
+      "description": "Wire-native immutable read-only artifact input handle.\n\nDirect database or artifact mutation is impossible through the plugin\ncontract.",
+      "properties": {
+        "artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "media_type": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "read_only": {
+          "const": true,
+          "default": true,
+          "title": "Read Only",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "content_hash",
+        "media_type"
+      ],
+      "title": "PluginInputHandle",
+      "type": "object"
+    },
+    "PluginLifecycleState": {
+      "additionalProperties": false,
+      "description": "Wire-native observational plugin execution lifecycle record.\n\nAppend-only observational state; kill, timeout, or crash leaves the API\nand committed inputs intact.",
+      "properties": {
+        "entered_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Entered At",
+          "type": "string"
+        },
+        "execution_state": {
+          "$ref": "#/$defs/PluginExecutionState"
+        },
+        "exit_reason": {
+          "default": "",
+          "title": "Exit Reason",
+          "type": "string"
+        },
+        "last_heartbeat_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Heartbeat At"
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "plugin_id",
+        "workspace_id",
+        "execution_state",
+        "entered_at"
+      ],
+      "title": "PluginLifecycleState",
+      "type": "object"
+    },
+    "PluginManifest": {
+      "additionalProperties": false,
+      "description": "Wire projection of the v1 ``PluginManifest`` (record R3).\n\nThe v1 field names are kept; ``schemas`` takes ``JsonObject`` in place\nof the v1 ``Any``. Package paths are normalized relative paths with no\n``..``, drive, or absolute anchors.",
+      "properties": {
+        "api_range": {
+          "$ref": "#/$defs/ApiRangeStr"
+        },
+        "capabilities": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "entry_point": {
+          "$ref": "#/$defs/RelativePackagePath",
+          "default": "main.py"
+        },
+        "id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "permissions": {
+          "$ref": "#/$defs/PluginPermissionWire"
+        },
+        "resources": {
+          "$ref": "#/$defs/PluginResourceLimitsWire"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "schemas": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonObject"
+          },
+          "title": "Schemas",
+          "type": "object"
+        },
+        "sha256_by_file": {
+          "additionalProperties": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/RelativePackagePath"
+          },
+          "title": "Sha256 By File",
+          "type": "object"
+        },
+        "signature": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Signature"
+        },
+        "types": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PluginTypeValue"
+          },
+          "title": "Types",
+          "type": "array"
+        },
+        "version": {
+          "$ref": "#/$defs/SemverString"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "api_range"
+      ],
+      "title": "PluginManifestWire",
+      "type": "object"
+    },
+    "PluginPackageReceipt": {
+      "additionalProperties": false,
+      "description": "Wire-native retained plugin package installation receipt.\n\nThe v1 ``PluginPackageValidation``/``PluginPackageRef`` wire facts are\ncarried here; ``signature_verified`` stays false when the package\ncarried no verifiable detached signature.",
+      "properties": {
+        "files": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PluginFileEntryWire"
+          },
+          "title": "Files",
+          "type": "array"
+        },
+        "installed_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Installed At",
+          "type": "string"
+        },
+        "manifest_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Manifest Hash",
+          "type": "string"
+        },
+        "package_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Package Hash",
+          "type": "string"
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "receipt_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Receipt Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "signature_verified": {
+          "default": false,
+          "title": "Signature Verified",
+          "type": "boolean"
+        },
+        "version": {
+          "$ref": "#/$defs/SemverString"
+        }
+      },
+      "required": [
+        "receipt_id",
+        "plugin_id",
+        "version",
+        "package_hash",
+        "manifest_hash",
+        "installed_at"
+      ],
+      "title": "PluginPackageReceipt",
+      "type": "object"
+    },
+    "PluginPermissionSet": {
+      "additionalProperties": false,
+      "description": "Wire-native effective sandbox grants for one plugin in a workspace.\n\nEffective grants narrow the declared manifest permissions only; the\nprovider rejects any grant exceeding the declared manifest, grants no\nnetwork the manifest did not declare, and supplies only declared\nendpoints and credentials. ``secrets`` carries Workspace ``SecretRef``\nnames only.",
+      "properties": {
+        "cpu_limit_cores": {
+          "default": "1",
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Cpu Limit Cores",
+          "type": "string"
+        },
+        "filesystem_read": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Filesystem Read",
+          "type": "array"
+        },
+        "filesystem_write": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Filesystem Write",
+          "type": "array"
+        },
+        "max_output_mb": {
+          "default": 64,
+          "minimum": 1,
+          "title": "Max Output Mb",
+          "type": "integer"
+        },
+        "memory_limit_mb": {
+          "default": 1024,
+          "minimum": 1,
+          "title": "Memory Limit Mb",
+          "type": "integer"
+        },
+        "network_endpoints": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Network Endpoints",
+          "type": "array"
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "secrets": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Secrets",
+          "type": "array"
+        },
+        "subprocess_allow": {
+          "default": false,
+          "title": "Subprocess Allow",
+          "type": "boolean"
+        },
+        "timeout_seconds": {
+          "default": "60",
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Timeout Seconds",
+          "type": "string"
+        },
+        "version": {
+          "$ref": "#/$defs/SemverString"
+        },
+        "workspace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "plugin_id",
+        "workspace_id",
+        "version"
+      ],
+      "title": "PluginPermissionSet",
+      "type": "object"
+    },
+    "PluginPermissionWire": {
+      "additionalProperties": false,
+      "description": "Wire form of the v1 declared plugin execution permissions.\n\n``secrets`` carries Workspace ``SecretRef`` names only; secret values\nnever cross the wire.",
+      "properties": {
+        "filesystem_read": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Filesystem Read",
+          "type": "array"
+        },
+        "filesystem_write": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Filesystem Write",
+          "type": "array"
+        },
+        "network_endpoints": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Network Endpoints",
+          "type": "array"
+        },
+        "secrets": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Secrets",
+          "type": "array"
+        },
+        "subprocess_allow": {
+          "default": false,
+          "title": "Subprocess Allow",
+          "type": "boolean"
+        }
+      },
+      "title": "PluginPermissionWire",
+      "type": "object"
+    },
+    "PluginRef": {
+      "additionalProperties": false,
+      "description": "Wire-native stable reference to one declared plugin.",
+      "properties": {
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "plugin_id"
+      ],
+      "title": "PluginRef",
+      "type": "object"
+    },
+    "PluginResourceLimitsWire": {
+      "additionalProperties": false,
+      "description": "Wire form of the v1 declared plugin resource limits.\n\nThe v1 float limits take ``DecimalValue``; CPU cores and the elapsed-time\nlimit must exceed zero.",
+      "properties": {
+        "cpu_limit_cores": {
+          "default": "1",
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Cpu Limit Cores",
+          "type": "string"
+        },
+        "memory_limit_mb": {
+          "default": 512,
+          "minimum": 1,
+          "title": "Memory Limit Mb",
+          "type": "integer"
+        },
+        "timeout_seconds": {
+          "default": "30",
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Timeout Seconds",
+          "type": "string"
+        }
+      },
+      "title": "PluginResourceLimitsWire",
+      "type": "object"
+    },
+    "PluginStableId": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$",
+      "type": "string"
+    },
+    "PluginTypeValue": {
+      "enum": [
+        "BLOCK",
+        "INDICATOR",
+        "METRIC",
+        "FILTER",
+        "FITNESS",
+        "RESEARCH_METHOD",
+        "DATA_CONNECTOR",
+        "PROJECT_TASK",
+        "SOURCE_EMITTER",
+        "RESULT_PANEL"
+      ],
+      "type": "string"
+    },
+    "PluginValidationReport": {
+      "additionalProperties": false,
+      "description": "Wire-native plugin package validation report.\n\nA reference plugin passes identically in CI and the local harness.",
+      "properties": {
+        "captured_log_counts": {
+          "additionalProperties": {
+            "$ref": "#/$defs/NonNegativeInt"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Captured Log Counts",
+          "type": "object"
+        },
+        "contract_fixture_results": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ContributionTestResultWire"
+          },
+          "title": "Contract Fixture Results",
+          "type": "array"
+        },
+        "is_valid": {
+          "title": "Is Valid",
+          "type": "boolean"
+        },
+        "manifest_checks": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Manifest Checks",
+          "type": "array"
+        },
+        "package_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Package Hash",
+          "type": "string"
+        },
+        "permission_simulation_findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Permission Simulation Findings",
+          "type": "array"
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "report_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Report Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "$ref": "#/$defs/SemverString"
+        }
+      },
+      "required": [
+        "report_id",
+        "plugin_id",
+        "version",
+        "package_hash",
+        "is_valid"
+      ],
+      "title": "PluginValidationReport",
+      "type": "object"
+    },
+    "PluginVersion": {
+      "additionalProperties": false,
+      "description": "Wire-native immutable version record of one declared plugin.\n\n``(plugin_id, version)`` is unique and the record is immutable once\npersisted.",
+      "properties": {
+        "api_range": {
+          "$ref": "#/$defs/ApiRangeStr"
+        },
+        "capabilities": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "manifest_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Manifest Hash",
+          "type": "string"
+        },
+        "package_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Package Hash",
+          "type": "string"
+        },
+        "permissions": {
+          "$ref": "#/$defs/PluginPermissionWire"
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "resources": {
+          "$ref": "#/$defs/PluginResourceLimitsWire"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "types": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PluginTypeValue"
+          },
+          "title": "Types",
+          "type": "array"
+        },
+        "version": {
+          "$ref": "#/$defs/SemverString"
+        }
+      },
+      "required": [
+        "plugin_id",
+        "version",
+        "api_range",
+        "manifest_hash",
+        "package_hash",
+        "permissions",
+        "resources",
+        "content_hash"
+      ],
+      "title": "PluginVersion",
+      "type": "object"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "RelativePackagePath": {
+      "pattern": "^[^/\\\\]+(?:/[^/\\\\]+)*$",
+      "type": "string"
+    },
+    "RenderResultPanelsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated plugin result panel request.\n\n``DESCRIBE_PANELS`` accepts an optional ``contribution_id`` filter and\nforbids ``panel_id``; ``RESOLVE_PANEL`` requires ``panel_id`` and\nforbids ``contribution_id``. The event union is empty.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "contribution_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "DESCRIBE_PANELS",
+            "RESOLVE_PANEL"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "panel_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "RenderResultPanelsRequest",
+      "type": "object"
+    },
+    "RenderResultPanelsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful plugin result panel operation result.\n\nThe event union is empty.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "panels": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ResultPanelDescriptor"
+          },
+          "title": "Panels",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "RenderResultPanelsSuccess",
+      "type": "object"
+    },
+    "ResultPanelDescriptor": {
+      "additionalProperties": false,
+      "description": "Wire-native sandboxed result-panel descriptor.\n\nSandboxed browser boundary with a narrow read/query/message bridge; no\ncontrol-plane credentials; undeclared navigation and commands are\nblocked.",
+      "properties": {
+        "bridge_operations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PanelBridgeOperation"
+          },
+          "title": "Bridge Operations",
+          "type": "array"
+        },
+        "content_source": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "contribution_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "panel_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "plugin_id": {
+          "$ref": "#/$defs/PluginStableId"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "title": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "panel_id",
+        "contribution_id",
+        "plugin_id",
+        "title",
+        "content_source"
+      ],
+      "title": "ResultPanelDescriptor",
+      "type": "object"
+    },
+    "SandboxPermissionsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated plugin sandbox permission request.\n\n``GRANT`` requires ``plugin_id``, ``workspace_id``, and ``version``;\n``INSPECT`` requires ``plugin_id`` and ``workspace_id`` and forbids\n``version``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "GRANT",
+            "INSPECT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "plugin_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginStableId"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SemverString"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "workspace_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Workspace Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "SandboxPermissionsRequest",
+      "type": "object"
+    },
+    "SandboxPermissionsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful plugin sandbox permission operation result.\n\nThe event union is empty.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "permission_set": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PluginPermissionSet"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "SandboxPermissionsSuccess",
+      "type": "object"
+    },
+    "SemverString": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+      "type": "string"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {},
+  "failures": {
+    "PluginFailure": {
+      "$ref": "#/$defs/PluginFailure"
+    }
+  },
+  "models": {
+    "IsolateAnalysisRequest": {
+      "$ref": "#/$defs/IsolateAnalysisRequest"
+    },
+    "IsolateAnalysisSuccess": {
+      "$ref": "#/$defs/IsolateAnalysisSuccess"
+    },
+    "MaintainCompatibilityRequest": {
+      "$ref": "#/$defs/MaintainCompatibilityRequest"
+    },
+    "MaintainCompatibilitySuccess": {
+      "$ref": "#/$defs/MaintainCompatibilitySuccess"
+    },
+    "ManageLifecycleRequest": {
+      "$ref": "#/$defs/ManageLifecycleRequest"
+    },
+    "ManageLifecycleSuccess": {
+      "$ref": "#/$defs/ManageLifecycleSuccess"
+    },
+    "PluginActivation": {
+      "$ref": "#/$defs/PluginActivation"
+    },
+    "PluginAnalysisRequest": {
+      "$ref": "#/$defs/PluginAnalysisRequest"
+    },
+    "PluginAnalysisResult": {
+      "$ref": "#/$defs/PluginAnalysisResult"
+    },
+    "PluginCompatibility": {
+      "$ref": "#/$defs/PluginCompatibility"
+    },
+    "PluginContribution": {
+      "$ref": "#/$defs/PluginContribution"
+    },
+    "PluginLifecycleState": {
+      "$ref": "#/$defs/PluginLifecycleState"
+    },
+    "PluginManifest": {
+      "$ref": "#/$defs/PluginManifest"
+    },
+    "PluginPackageReceipt": {
+      "$ref": "#/$defs/PluginPackageReceipt"
+    },
+    "PluginPermissionSet": {
+      "$ref": "#/$defs/PluginPermissionSet"
+    },
+    "PluginRef": {
+      "$ref": "#/$defs/PluginRef"
+    },
+    "PluginValidationReport": {
+      "$ref": "#/$defs/PluginValidationReport"
+    },
+    "PluginVersion": {
+      "$ref": "#/$defs/PluginVersion"
+    },
+    "RenderResultPanelsRequest": {
+      "$ref": "#/$defs/RenderResultPanelsRequest"
+    },
+    "RenderResultPanelsSuccess": {
+      "$ref": "#/$defs/RenderResultPanelsSuccess"
+    },
+    "ResultPanelDescriptor": {
+      "$ref": "#/$defs/ResultPanelDescriptor"
+    },
+    "SandboxPermissionsRequest": {
+      "$ref": "#/$defs/SandboxPermissionsRequest"
+    },
+    "SandboxPermissionsSuccess": {
+      "$ref": "#/$defs/SandboxPermissionsSuccess"
+    }
+  },
+  "namespace": "plugins",
+  "schema_version": 1,
+  "title": "plugins wire contracts v1"
+}

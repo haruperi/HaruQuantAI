@@ -437,3 +437,12 @@ def test_iface_evolve_api_compatibly() -> None:
 
     deprecations = service.get_deprecations()
     assert len(deprecations) == 1
+
+
+def test_api_events_usage_example() -> None:
+    """Verify the __main__ usage scenarios run successfully."""
+    from app.services.interfaces.api_events.api_events import (
+        _run_usage_example,
+    )
+
+    _run_usage_example()

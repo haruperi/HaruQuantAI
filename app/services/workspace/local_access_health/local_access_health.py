@@ -294,7 +294,8 @@ def fr_ws_report_system_readiness(
         else:
             try:
                 # Check schema version from metadata database
-                with sqlite3.connect(str(db_path), timeout=5.0) as conn:
+                conn = sqlite3.connect(str(db_path), timeout=5.0)
+                try:
                     cursor = conn.cursor()
                     cursor.execute("SELECT MAX(version) FROM schema_migrations")
                     row = cursor.fetchone()
@@ -314,6 +315,8 @@ def fr_ws_report_system_readiness(
                     )
                     _ = cursor.fetchone()
                     state_recovered = True
+                finally:
+                    conn.close()
             except (sqlite3.Error, OSError) as exc:
                 sanitized_exc = _redact_paths_and_secrets(str(exc))
                 reasons.append(f"DATABASE_ACCESS_ERROR: {sanitized_exc}")

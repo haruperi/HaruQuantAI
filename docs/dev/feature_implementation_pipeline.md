@@ -90,26 +90,73 @@ The manifest's `domain` is the lowercase semantic domain such as `broker`, `data
 
 Create or update `app/contracts/<domain>/<capability>.py`. The established contract form uses:
 
-- frozen, slotted dataclasses for request/result records;
+- strict, frozen Pydantic v2 `BaseModel` types with unknown fields forbidden for public cross-boundary request/result/event records;
+- standard dataclasses only for private implementation records that never cross a feature, process, persistence, or client boundary;
 - `Protocol` plus `@runtime_checkable` for provider behavior;
 - one `CapabilityKey[Protocol]` with a lowercase dotted or hyphenated name and positive major version;
 - domain-specific exceptions only when they add meaning beyond `CapabilityUnavailableError`.
 
 ```python
-from dataclasses import dataclass
-from typing import Protocol, runtime_checkable
+from typing import Annotated, Literal, Protocol, runtime_checkable
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.kernel.capability import CapabilityKey
 
 
-@dataclass(frozen=True, slots=True)
-class CustomRequest:
+class RunCustomRequest(BaseModel):
+    """Validated request to run the illustrative capability."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    operation: Literal["RUN"] = "RUN"
     symbol: str
+    schema_version: Literal[1] = 1
+
+
+class InspectCustomRequest(BaseModel):
+    """Validated request to inspect the illustrative capability."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    operation: Literal["INSPECT"] = "INSPECT"
+    request_id: str
+    schema_version: Literal[1] = 1
+
+
+CustomRequest = Annotated[
+    RunCustomRequest | InspectCustomRequest,
+    Field(discriminator="operation"),
+]
+
+
+class CustomSuccess(BaseModel):
+    """Typed successful capability outcome."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    value: str
+    schema_version: Literal[1] = 1
+
+
+class CustomFailure(BaseModel):
+    """Typed failed capability outcome."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    outcome: Literal["FAILURE"] = "FAILURE"
+    code: str
+    detail: str
+    schema_version: Literal[1] = 1
 
 
 @runtime_checkable
 class CustomService(Protocol):
-    async def execute(self, request: CustomRequest) -> object: ...
+    async def run_custom_service(
+        self,
+        request: CustomRequest,
+    ) -> CustomSuccess | CustomFailure: ...
 
 
 CUSTOM_SERVICE = CapabilityKey[CustomService](
@@ -119,6 +166,12 @@ CUSTOM_SERVICE = CapabilityKey[CustomService](
 ```
 
 The runtime identifier is `<name>@<major>`, for example `data.custom-service@1`. A breaking contract change receives a new major key; consumers and providers migrate explicitly.
+
+Existing public dataclasses are not converted mechanically. Their migration requires compatibility tests for construction, equality, immutability, validation errors, serialization, and every producer/consumer before the old representation is removed.
+
+Every newly authored capability protocol has exactly one primary asynchronous request/response method named from its capability action, never generic `execute` and never one method per FR. One strict request union uses an operation discriminator; the return type is one explicit success/failure union.
+
+Add `subscribe_<action>_events(request) -> AsyncIterator[EventUnion]` only when the semantic owner explicitly requires live, streaming, or replay delivery. Its request pins source/scope, optional resume cursor, bounded replay, and schema version; consumers explicitly cancel/dispose it. Ordinary event publication does not add a subscription method. Existing v1 ports retain their current method set and sync/async behavior unless a separately approved new major, compatibility adapter/window, and consumer migration are delivered.
 
 ### 3.3 Define typed events when needed
 

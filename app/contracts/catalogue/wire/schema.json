@@ -1,0 +1,2832 @@
+{
+  "$defs": {
+    "AssetClass": {
+      "enum": [
+        "FOREX",
+        "EQUITY",
+        "ETF",
+        "INDEX",
+        "FUTURE",
+        "OPTION",
+        "BOND",
+        "COMMODITY",
+        "CRYPTO"
+      ],
+      "type": "string"
+    },
+    "BrokerRef": {
+      "additionalProperties": false,
+      "description": "Reference to one broker identity.",
+      "properties": {
+        "broker_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Broker Id",
+          "type": "string"
+        },
+        "broker_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "broker_id",
+        "broker_name"
+      ],
+      "title": "BrokerRef",
+      "type": "object"
+    },
+    "CalendarEarlyClose": {
+      "additionalProperties": false,
+      "description": "One calendar date on which trading closes earlier than usual.",
+      "properties": {
+        "close_local": {
+          "$ref": "#/$defs/LocalTime"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "close_local"
+      ],
+      "title": "CalendarEarlyClose",
+      "type": "object"
+    },
+    "CatalogInstrumentsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated instrument catalogue request.\n\nGET requires only ``instrument_ref``; LIST permits only paging; UPSERT\nrequires only ``instrument_version`` plus an optional ``expected_version``;\nDELETE requires ``instrument_ref`` and ``expected_version``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "expected_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Version"
+        },
+        "instrument_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InstrumentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "instrument_version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InstrumentVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "GET",
+            "LIST",
+            "UPSERT_VERSION",
+            "DELETE_VERSION"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "page_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Cursor"
+        },
+        "page_size": {
+          "default": 100,
+          "maximum": 500,
+          "minimum": 1,
+          "title": "Page Size",
+          "type": "integer"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "CatalogInstrumentsRequest",
+      "type": "object"
+    },
+    "CatalogInstrumentsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful instrument catalogue operation result.",
+      "properties": {
+        "deleted": {
+          "default": false,
+          "title": "Deleted",
+          "type": "boolean"
+        },
+        "instruments": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/InstrumentVersion"
+          },
+          "title": "Instruments",
+          "type": "array"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Next Cursor"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "CatalogInstrumentsSuccess",
+      "type": "object"
+    },
+    "CatalogueExchangePackage": {
+      "additionalProperties": false,
+      "description": "One versioned interchange package of catalogue definitions.\n\nEvery reference carried by the packaged records must either resolve to a\nrecord inside the package (instruments, sessions, calendars) or appear\nin ``external_refs``; providers, brokers, and cost models are never\npackaged, so their identifiers must always be declared external.",
+      "properties": {
+        "calendars": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MarketCalendarVersion"
+          },
+          "title": "Calendars",
+          "type": "array"
+        },
+        "catalogue_schema_version": {
+          "const": 1,
+          "title": "Catalogue Schema Version",
+          "type": "integer"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "exported_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Exported At",
+          "type": "string"
+        },
+        "external_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "External Refs",
+          "type": "array"
+        },
+        "instrument_versions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/InstrumentVersion"
+          },
+          "title": "Instrument Versions",
+          "type": "array"
+        },
+        "package_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Package Id",
+          "type": "string"
+        },
+        "provider_mappings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProviderSymbolMapping"
+          },
+          "title": "Provider Mappings",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sessions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TradingSessionDefinition"
+          },
+          "title": "Sessions",
+          "type": "array"
+        },
+        "trading_rules": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TradingRuleSet"
+          },
+          "title": "Trading Rules",
+          "type": "array"
+        },
+        "universes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/UniverseVersion"
+          },
+          "title": "Universes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "package_id",
+        "exported_at",
+        "catalogue_schema_version",
+        "content_hash"
+      ],
+      "title": "CatalogueExchangePackage",
+      "type": "object"
+    },
+    "CatalogueFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope for every catalogue capability.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/CatalogueFailureCode"
+        },
+        "conflicting_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Conflicting Refs",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "CatalogueFailure",
+      "type": "object"
+    },
+    "CatalogueFailureCode": {
+      "enum": [
+        "CATALOGUE_VALIDATION_FAILED",
+        "CATALOGUE_NOT_FOUND",
+        "CATALOGUE_VERSION_CONFLICT",
+        "CATALOGUE_REFERENCE_PROTECTED",
+        "CATALOGUE_MAPPING_OVERLAP",
+        "CATALOGUE_SESSION_INVALID",
+        "CATALOGUE_RULE_UNSUPPORTED",
+        "CATALOGUE_UNIVERSE_INVALID",
+        "CATALOGUE_FX_PATH_UNAVAILABLE",
+        "CATALOGUE_EXCHANGE_INCOMPATIBLE",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "CataloguePackageImported": {
+      "additionalProperties": false,
+      "description": "Payload for catalogue.package-imported events.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "imported_refs": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Imported Refs",
+          "type": "array"
+        },
+        "package_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Package Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "package_id",
+        "content_hash",
+        "imported_refs"
+      ],
+      "title": "CataloguePackageImported",
+      "type": "object"
+    },
+    "ConvertCurrenciesRequest": {
+      "additionalProperties": false,
+      "description": "Pure currency conversion query request.",
+      "properties": {
+        "amount": {
+          "$ref": "#/$defs/Money"
+        },
+        "as_of": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "As Of",
+          "type": "string"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "freshness_limit_seconds": {
+          "minimum": 1,
+          "title": "Freshness Limit Seconds",
+          "type": "integer"
+        },
+        "max_hops": {
+          "default": 3,
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Max Hops",
+          "type": "integer"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "to_currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "To Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "amount",
+        "to_currency",
+        "as_of",
+        "freshness_limit_seconds"
+      ],
+      "title": "ConvertCurrenciesRequest",
+      "type": "object"
+    },
+    "ConvertCurrenciesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful currency conversion query result.",
+      "properties": {
+        "converted": {
+          "$ref": "#/$defs/Money"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "path": {
+          "$ref": "#/$defs/CurrencyConversionPath"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "converted",
+        "path"
+      ],
+      "title": "ConvertCurrenciesSuccess",
+      "type": "object"
+    },
+    "CostModelRef": {
+      "additionalProperties": false,
+      "description": "Reference to one versioned trading cost model.",
+      "properties": {
+        "cost_model_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Cost Model Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "cost_model_id",
+        "version"
+      ],
+      "title": "CostModelRef",
+      "type": "object"
+    },
+    "CurrencyConversionPath": {
+      "additionalProperties": false,
+      "description": "One directed, continuous FX conversion path with its product rate.",
+      "properties": {
+        "as_of": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "As Of",
+          "type": "string"
+        },
+        "converted_rate": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Converted Rate",
+          "type": "string"
+        },
+        "from_currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "From Currency",
+          "type": "string"
+        },
+        "hop_count": {
+          "minimum": 1,
+          "title": "Hop Count",
+          "type": "integer"
+        },
+        "observations": {
+          "items": {
+            "$ref": "#/$defs/FxRateObservation"
+          },
+          "minItems": 1,
+          "title": "Observations",
+          "type": "array"
+        },
+        "path_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Path Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "to_currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "To Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_currency",
+        "to_currency",
+        "as_of",
+        "observations",
+        "converted_rate",
+        "hop_count",
+        "path_hash"
+      ],
+      "title": "CurrencyConversionPath",
+      "type": "object"
+    },
+    "DefineSessionsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated session and calendar request.\n\nGET requires only ``session_id``; each UPSERT requires only its record;\nPREVIEW requires ``session_id`` with ``to_at`` after ``from_at``.",
+      "properties": {
+        "calendar": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MarketCalendarVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "from_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "From At"
+        },
+        "operation": {
+          "enum": [
+            "GET",
+            "UPSERT_SESSION",
+            "UPSERT_CALENDAR",
+            "PREVIEW"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSessionDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "session_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Session Id"
+        },
+        "to_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "To At"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "DefineSessionsRequest",
+      "type": "object"
+    },
+    "DefineSessionsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful session and calendar operation result.",
+      "properties": {
+        "calendar": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MarketCalendarVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "effective_intervals": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EffectiveInterval"
+          },
+          "title": "Effective Intervals",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSessionDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "DefineSessionsSuccess",
+      "type": "object"
+    },
+    "DefineTradingRulesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated trading rules and costs request.\n\nUPSERT requires only ``rule_set``; GET requires identity and time;\nNORMALIZE requires identity and time plus at least ``price`` or\n``quantity``.",
+      "properties": {
+        "as_of": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "As Of"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "instrument": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InstrumentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "instrument_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instrument Version"
+        },
+        "operation": {
+          "enum": [
+            "GET",
+            "UPSERT",
+            "NORMALIZE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "price": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Price"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantity"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "rule_set": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingRuleSet"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "DefineTradingRulesRequest",
+      "type": "object"
+    },
+    "DefineTradingRulesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful trading rules and costs operation result.",
+      "properties": {
+        "cost_model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CostModelRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "normalized_price": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Normalized Price"
+        },
+        "normalized_quantity": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Normalized Quantity"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "rule_set": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingRuleSet"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "DefineTradingRulesSuccess",
+      "type": "object"
+    },
+    "EffectiveInterval": {
+      "additionalProperties": false,
+      "description": "Half-open effective UTC interval returned by session previews.\n\nThis is the inline ``{from_at, to_at}`` record of\n``DefineSessionsSuccess.effective_intervals``; it is not one of the 18\nregistered public records.",
+      "properties": {
+        "from_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "From At",
+          "type": "string"
+        },
+        "to_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "To At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_at",
+        "to_at"
+      ],
+      "title": "EffectiveInterval",
+      "type": "object"
+    },
+    "ExchangeCatalogueRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated catalogue interchange request.\n\nEXPORT forbids ``package``; VALIDATE_IMPORT and IMPORT require it.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "conflict_policy": {
+          "default": "REJECT",
+          "enum": [
+            "REJECT",
+            "KEEP_EXISTING",
+            "CREATE_NEW_VERSION"
+          ],
+          "title": "Conflict Policy",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "EXPORT",
+            "VALIDATE_IMPORT",
+            "IMPORT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "package": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CatalogueExchangePackage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "selected_instrument_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Selected Instrument Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ExchangeCatalogueRequest",
+      "type": "object"
+    },
+    "ExchangeCatalogueSuccess": {
+      "additionalProperties": false,
+      "description": "Successful catalogue interchange operation result.",
+      "properties": {
+        "imported_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Imported Refs",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "package": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CatalogueExchangePackage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ExchangeCatalogueSuccess",
+      "type": "object"
+    },
+    "FxRateObservation": {
+      "additionalProperties": false,
+      "description": "One observed FX quote edge with a freshness deadline.",
+      "properties": {
+        "base_currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Base Currency",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "freshness_expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Freshness Expires At",
+          "type": "string"
+        },
+        "observation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "observed_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "quote_currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Quote Currency",
+          "type": "string"
+        },
+        "rate": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Rate",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_instrument": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InstrumentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source_provider": {
+          "$ref": "#/$defs/ProviderRef"
+        }
+      },
+      "required": [
+        "observation_id",
+        "base_currency",
+        "quote_currency",
+        "rate",
+        "observed_at",
+        "source_provider",
+        "freshness_expires_at",
+        "content_hash"
+      ],
+      "title": "FxRateObservation",
+      "type": "object"
+    },
+    "IanaTimezone": {
+      "pattern": "^[A-Za-z0-9+\\-_]+(?:/[A-Za-z0-9+\\-_]+)*$",
+      "type": "string"
+    },
+    "InstrumentRef": {
+      "additionalProperties": false,
+      "description": "Reference to one canonical instrument identity.",
+      "properties": {
+        "instrument_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Instrument Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "instrument_id"
+      ],
+      "title": "InstrumentRef",
+      "type": "object"
+    },
+    "InstrumentVersion": {
+      "additionalProperties": false,
+      "description": "One immutable canonical instrument version.\n\nEffective validity is half-open; ``effective_to`` must be strictly after\n``effective_from`` when present.",
+      "properties": {
+        "asset_class": {
+          "$ref": "#/$defs/AssetClass"
+        },
+        "base_currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Base Currency",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "default_commission": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "default_spread": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Default Spread",
+          "type": "string"
+        },
+        "default_swap_long": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "default_swap_short": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "display_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "effective_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "effective_to": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective To"
+        },
+        "exchange": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "instrument_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Instrument Id",
+          "type": "string"
+        },
+        "order_constraints": {
+          "$ref": "#/$defs/OrderConstraints"
+        },
+        "point_value": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Point Value",
+          "type": "string"
+        },
+        "price_decimals": {
+          "maximum": 18,
+          "minimum": 0,
+          "title": "Price Decimals",
+          "type": "integer"
+        },
+        "quantity_multiplier": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Quantity Multiplier",
+          "type": "string"
+        },
+        "quote_currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Quote Currency",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "settlement_currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Settlement Currency",
+          "type": "string"
+        },
+        "symbol": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "tick_size": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Tick Size",
+          "type": "string"
+        },
+        "timezone": {
+          "$ref": "#/$defs/IanaTimezone"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "instrument_id",
+        "version",
+        "symbol",
+        "display_name",
+        "asset_class",
+        "base_currency",
+        "quote_currency",
+        "settlement_currency",
+        "point_value",
+        "tick_size",
+        "price_decimals",
+        "quantity_multiplier",
+        "order_constraints",
+        "default_spread",
+        "exchange",
+        "timezone",
+        "session_id",
+        "effective_from",
+        "content_hash"
+      ],
+      "title": "InstrumentVersion",
+      "type": "object"
+    },
+    "InstrumentVersionCreated": {
+      "additionalProperties": false,
+      "description": "Payload for catalogue.instrument-version-created events.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "instrument_version": {
+          "minimum": 1,
+          "title": "Instrument Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "instrument",
+        "instrument_version",
+        "content_hash"
+      ],
+      "title": "InstrumentVersionCreated",
+      "type": "object"
+    },
+    "InstrumentVersionDeleted": {
+      "additionalProperties": false,
+      "description": "Payload for catalogue.instrument-version-deleted events.",
+      "properties": {
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "instrument_version": {
+          "minimum": 1,
+          "title": "Instrument Version",
+          "type": "integer"
+        },
+        "prior_content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Prior Content Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "instrument",
+        "instrument_version",
+        "prior_content_hash"
+      ],
+      "title": "InstrumentVersionDeleted",
+      "type": "object"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "LocalTime": {
+      "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$",
+      "type": "string"
+    },
+    "ManageUniversesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated universe management request.\n\nUPSERT requires only ``universe_version``; GET requires only\n``universe_ref``; RESOLVE_MEMBERS requires ``universe_ref`` and time.",
+      "properties": {
+        "as_of": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "As Of"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "GET",
+            "UPSERT_VERSION",
+            "RESOLVE_MEMBERS"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "universe_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UniverseRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "universe_version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UniverseVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ManageUniversesRequest",
+      "type": "object"
+    },
+    "ManageUniversesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful universe management operation result.",
+      "properties": {
+        "members": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/UniverseMembership"
+          },
+          "title": "Members",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "universe": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UniverseVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ManageUniversesSuccess",
+      "type": "object"
+    },
+    "MapProvidersRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated provider and broker mapping request.\n\nUPSERT/DELETE require ``mapping`` and forbid resolution fields; RESOLVE\nrequires ``provider``, ``provider_symbol``, and ``as_of`` and forbids\n``mapping``.",
+      "properties": {
+        "as_of": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "As Of"
+        },
+        "broker": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "mapping": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProviderSymbolMapping"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "RESOLVE",
+            "UPSERT",
+            "DELETE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "provider": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProviderRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provider_symbol": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Symbol"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "MapProvidersRequest",
+      "type": "object"
+    },
+    "MapProvidersSuccess": {
+      "additionalProperties": false,
+      "description": "Successful provider and broker mapping operation result.",
+      "properties": {
+        "deleted": {
+          "default": false,
+          "title": "Deleted",
+          "type": "boolean"
+        },
+        "mappings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProviderSymbolMapping"
+          },
+          "title": "Mappings",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "MapProvidersSuccess",
+      "type": "object"
+    },
+    "MarketCalendarChanged": {
+      "additionalProperties": false,
+      "description": "Payload for catalogue.market-calendar-changed events.",
+      "properties": {
+        "calendar_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Calendar Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "calendar_id",
+        "version",
+        "content_hash"
+      ],
+      "title": "MarketCalendarChanged",
+      "type": "object"
+    },
+    "MarketCalendarVersion": {
+      "additionalProperties": false,
+      "description": "One immutable version of a market calendar.\n\n``holiday_dates`` and ``early_closes`` must each be sorted and unique by\ndate.",
+      "properties": {
+        "calendar_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Calendar Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "early_closes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CalendarEarlyClose"
+          },
+          "title": "Early Closes",
+          "type": "array"
+        },
+        "holiday_dates": {
+          "default": [],
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Holiday Dates",
+          "type": "array"
+        },
+        "timezone": {
+          "$ref": "#/$defs/IanaTimezone"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "calendar_id",
+        "version",
+        "timezone",
+        "content_hash"
+      ],
+      "title": "MarketCalendarVersion",
+      "type": "object"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "Currency-qualified canonical decimal amount.",
+      "properties": {
+        "amount": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "OrderConstraints": {
+      "additionalProperties": false,
+      "description": "Executable quantity bounds and supported order mechanics.",
+      "properties": {
+        "max_quantity": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Max Quantity",
+          "type": "string"
+        },
+        "min_order_distance": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Min Order Distance",
+          "type": "string"
+        },
+        "min_quantity": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Min Quantity",
+          "type": "string"
+        },
+        "quantity_step": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Quantity Step",
+          "type": "string"
+        },
+        "supported_order_types": {
+          "items": {
+            "$ref": "#/$defs/OrderType"
+          },
+          "minItems": 1,
+          "title": "Supported Order Types",
+          "type": "array"
+        },
+        "supported_time_in_force": {
+          "items": {
+            "$ref": "#/$defs/TimeInForce"
+          },
+          "minItems": 1,
+          "title": "Supported Time In Force",
+          "type": "array"
+        }
+      },
+      "required": [
+        "min_quantity",
+        "max_quantity",
+        "quantity_step",
+        "min_order_distance",
+        "supported_order_types",
+        "supported_time_in_force"
+      ],
+      "title": "OrderConstraints",
+      "type": "object"
+    },
+    "OrderType": {
+      "enum": [
+        "MARKET",
+        "STOP",
+        "LIMIT",
+        "STOP_LIMIT"
+      ],
+      "type": "string"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "ProviderRef": {
+      "additionalProperties": false,
+      "description": "Reference to one external data provider identity.",
+      "properties": {
+        "provider_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Provider Id",
+          "type": "string"
+        },
+        "provider_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "provider_id",
+        "provider_name"
+      ],
+      "title": "ProviderRef",
+      "type": "object"
+    },
+    "ProviderSymbolMapping": {
+      "additionalProperties": false,
+      "description": "One versioned provider/broker symbol mapping for an instrument.\n\nThe provider/broker/symbol plus effective interval is unique and mappings\nmay not overlap; that cross-record invariant is enforced by the owning\nstore because it spans multiple mapping records.",
+      "properties": {
+        "broker": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "effective_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "effective_to": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective To"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "instrument_version": {
+          "minimum": 1,
+          "title": "Instrument Version",
+          "type": "integer"
+        },
+        "mapping_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Mapping Id",
+          "type": "string"
+        },
+        "provider": {
+          "$ref": "#/$defs/ProviderRef"
+        },
+        "provider_symbol": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mapping_id",
+        "instrument",
+        "instrument_version",
+        "provider",
+        "provider_symbol",
+        "broker",
+        "effective_from",
+        "content_hash"
+      ],
+      "title": "ProviderSymbolMapping",
+      "type": "object"
+    },
+    "ProviderSymbolMappingChanged": {
+      "additionalProperties": false,
+      "description": "Payload for catalogue.provider-symbol-mapping-changed events.",
+      "properties": {
+        "broker": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "instrument_version": {
+          "minimum": 1,
+          "title": "Instrument Version",
+          "type": "integer"
+        },
+        "mapping_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Mapping Id",
+          "type": "string"
+        },
+        "provider": {
+          "$ref": "#/$defs/ProviderRef"
+        },
+        "provider_symbol": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mapping_id",
+        "instrument",
+        "instrument_version",
+        "provider",
+        "broker",
+        "provider_symbol",
+        "content_hash"
+      ],
+      "title": "ProviderSymbolMappingChanged",
+      "type": "object"
+    },
+    "ProviderSymbolMappingDeleted": {
+      "additionalProperties": false,
+      "description": "Payload for catalogue.provider-symbol-mapping-deleted events.",
+      "properties": {
+        "broker": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "instrument_version": {
+          "minimum": 1,
+          "title": "Instrument Version",
+          "type": "integer"
+        },
+        "mapping_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Mapping Id",
+          "type": "string"
+        },
+        "prior_content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Prior Content Hash",
+          "type": "string"
+        },
+        "provider": {
+          "$ref": "#/$defs/ProviderRef"
+        },
+        "provider_symbol": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mapping_id",
+        "instrument",
+        "instrument_version",
+        "provider",
+        "broker",
+        "provider_symbol",
+        "prior_content_hash"
+      ],
+      "title": "ProviderSymbolMappingDeleted",
+      "type": "object"
+    },
+    "Rounding": {
+      "enum": [
+        "DOWN",
+        "UP",
+        "HALF_UP",
+        "HALF_EVEN",
+        "TOWARD_ZERO"
+      ],
+      "type": "string"
+    },
+    "TimeInForce": {
+      "enum": [
+        "GTC",
+        "DAY",
+        "IOC",
+        "FOK"
+      ],
+      "type": "string"
+    },
+    "TradingInterval": {
+      "additionalProperties": false,
+      "description": "One weekday-localized trading interval inside a session template.\n\nAn interval whose close time is before its open time spans into the next\nlocal day; equal open and close times are invalid.",
+      "properties": {
+        "close_local": {
+          "$ref": "#/$defs/LocalTime"
+        },
+        "day_of_week": {
+          "maximum": 7,
+          "minimum": 1,
+          "title": "Day Of Week",
+          "type": "integer"
+        },
+        "open_local": {
+          "$ref": "#/$defs/LocalTime"
+        },
+        "spans_next_day": {
+          "default": false,
+          "title": "Spans Next Day",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "day_of_week",
+        "open_local",
+        "close_local"
+      ],
+      "title": "TradingInterval",
+      "type": "object"
+    },
+    "TradingRuleSet": {
+      "additionalProperties": false,
+      "description": "One versioned set of rounding and cost rules for an instrument.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "cost_model": {
+          "$ref": "#/$defs/CostModelRef"
+        },
+        "effective_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "effective_to": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective To"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "instrument_version": {
+          "minimum": 1,
+          "title": "Instrument Version",
+          "type": "integer"
+        },
+        "order_constraints": {
+          "$ref": "#/$defs/OrderConstraints"
+        },
+        "price_rounding": {
+          "$ref": "#/$defs/Rounding"
+        },
+        "quantity_rounding": {
+          "const": "TOWARD_ZERO",
+          "title": "Quantity Rounding",
+          "type": "string"
+        },
+        "rule_set_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Rule Set Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "rule_set_id",
+        "instrument",
+        "instrument_version",
+        "order_constraints",
+        "price_rounding",
+        "quantity_rounding",
+        "cost_model",
+        "effective_from",
+        "content_hash"
+      ],
+      "title": "TradingRuleSet",
+      "type": "object"
+    },
+    "TradingRuleSetChanged": {
+      "additionalProperties": false,
+      "description": "Payload for catalogue.trading-rule-set-changed events.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "instrument_version": {
+          "minimum": 1,
+          "title": "Instrument Version",
+          "type": "integer"
+        },
+        "rule_set_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Rule Set Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "rule_set_id",
+        "instrument",
+        "instrument_version",
+        "content_hash"
+      ],
+      "title": "TradingRuleSetChanged",
+      "type": "object"
+    },
+    "TradingSessionChanged": {
+      "additionalProperties": false,
+      "description": "Payload for catalogue.trading-session-changed events.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "session_id",
+        "version",
+        "content_hash"
+      ],
+      "title": "TradingSessionChanged",
+      "type": "object"
+    },
+    "TradingSessionDefinition": {
+      "additionalProperties": false,
+      "description": "One versioned, timezone-aware reusable trading session.\n\nIntervals may not overlap after normalizing overnight spans into the\nlocal week (a Sunday-night interval wraps into Monday).",
+      "properties": {
+        "calendar": {
+          "$ref": "#/$defs/MarketCalendarVersion"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "end_of_day_policy": {
+          "enum": [
+            "SESSION_CLOSE",
+            "UTC_MIDNIGHT"
+          ],
+          "title": "End Of Day Policy",
+          "type": "string"
+        },
+        "intervals": {
+          "items": {
+            "$ref": "#/$defs/TradingInterval"
+          },
+          "minItems": 1,
+          "title": "Intervals",
+          "type": "array"
+        },
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "timezone": {
+          "$ref": "#/$defs/IanaTimezone"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "session_id",
+        "version",
+        "name",
+        "timezone",
+        "intervals",
+        "calendar",
+        "end_of_day_policy",
+        "content_hash"
+      ],
+      "title": "TradingSessionDefinition",
+      "type": "object"
+    },
+    "UniverseMembership": {
+      "additionalProperties": false,
+      "description": "One timebound membership row of an instrument in a universe.",
+      "properties": {
+        "effective_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "effective_to": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective To"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "instrument_version": {
+          "minimum": 1,
+          "title": "Instrument Version",
+          "type": "integer"
+        },
+        "tags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "weight_hint": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weight Hint"
+        }
+      },
+      "required": [
+        "instrument",
+        "instrument_version",
+        "effective_from"
+      ],
+      "title": "UniverseMembership",
+      "type": "object"
+    },
+    "UniverseRef": {
+      "additionalProperties": false,
+      "description": "Reference to one universe identity.",
+      "properties": {
+        "universe_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Universe Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "universe_id"
+      ],
+      "title": "UniverseRef",
+      "type": "object"
+    },
+    "UniverseVersion": {
+      "additionalProperties": false,
+      "description": "One immutable version of a named universe and its memberships.\n\nMember intervals must intersect the universe interval, and memberships\nof one instrument version may not carry overlapping intervals.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "effective_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "effective_to": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective To"
+        },
+        "memberships": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/UniverseMembership"
+          },
+          "title": "Memberships",
+          "type": "array"
+        },
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "universe_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Universe Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "universe_id",
+        "version",
+        "name",
+        "effective_from",
+        "content_hash"
+      ],
+      "title": "UniverseVersion",
+      "type": "object"
+    },
+    "UniverseVersionCreated": {
+      "additionalProperties": false,
+      "description": "Payload for catalogue.universe-version-created events.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "universe": {
+          "$ref": "#/$defs/UniverseRef"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "universe",
+        "version",
+        "content_hash"
+      ],
+      "title": "UniverseVersionCreated",
+      "type": "object"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {
+    "CataloguePackageImported": {
+      "$ref": "#/$defs/CataloguePackageImported"
+    },
+    "InstrumentVersionCreated": {
+      "$ref": "#/$defs/InstrumentVersionCreated"
+    },
+    "InstrumentVersionDeleted": {
+      "$ref": "#/$defs/InstrumentVersionDeleted"
+    },
+    "MarketCalendarChanged": {
+      "$ref": "#/$defs/MarketCalendarChanged"
+    },
+    "ProviderSymbolMappingChanged": {
+      "$ref": "#/$defs/ProviderSymbolMappingChanged"
+    },
+    "ProviderSymbolMappingDeleted": {
+      "$ref": "#/$defs/ProviderSymbolMappingDeleted"
+    },
+    "TradingRuleSetChanged": {
+      "$ref": "#/$defs/TradingRuleSetChanged"
+    },
+    "TradingSessionChanged": {
+      "$ref": "#/$defs/TradingSessionChanged"
+    },
+    "UniverseVersionCreated": {
+      "$ref": "#/$defs/UniverseVersionCreated"
+    }
+  },
+  "failures": {
+    "CatalogueFailure": {
+      "$ref": "#/$defs/CatalogueFailure"
+    }
+  },
+  "models": {
+    "BrokerRef": {
+      "$ref": "#/$defs/BrokerRef"
+    },
+    "CatalogInstrumentsRequest": {
+      "$ref": "#/$defs/CatalogInstrumentsRequest"
+    },
+    "CatalogInstrumentsSuccess": {
+      "$ref": "#/$defs/CatalogInstrumentsSuccess"
+    },
+    "CatalogueExchangePackage": {
+      "$ref": "#/$defs/CatalogueExchangePackage"
+    },
+    "ConvertCurrenciesRequest": {
+      "$ref": "#/$defs/ConvertCurrenciesRequest"
+    },
+    "ConvertCurrenciesSuccess": {
+      "$ref": "#/$defs/ConvertCurrenciesSuccess"
+    },
+    "CostModelRef": {
+      "$ref": "#/$defs/CostModelRef"
+    },
+    "CurrencyConversionPath": {
+      "$ref": "#/$defs/CurrencyConversionPath"
+    },
+    "DefineSessionsRequest": {
+      "$ref": "#/$defs/DefineSessionsRequest"
+    },
+    "DefineSessionsSuccess": {
+      "$ref": "#/$defs/DefineSessionsSuccess"
+    },
+    "DefineTradingRulesRequest": {
+      "$ref": "#/$defs/DefineTradingRulesRequest"
+    },
+    "DefineTradingRulesSuccess": {
+      "$ref": "#/$defs/DefineTradingRulesSuccess"
+    },
+    "ExchangeCatalogueRequest": {
+      "$ref": "#/$defs/ExchangeCatalogueRequest"
+    },
+    "ExchangeCatalogueSuccess": {
+      "$ref": "#/$defs/ExchangeCatalogueSuccess"
+    },
+    "FxRateObservation": {
+      "$ref": "#/$defs/FxRateObservation"
+    },
+    "InstrumentRef": {
+      "$ref": "#/$defs/InstrumentRef"
+    },
+    "InstrumentVersion": {
+      "$ref": "#/$defs/InstrumentVersion"
+    },
+    "ManageUniversesRequest": {
+      "$ref": "#/$defs/ManageUniversesRequest"
+    },
+    "ManageUniversesSuccess": {
+      "$ref": "#/$defs/ManageUniversesSuccess"
+    },
+    "MapProvidersRequest": {
+      "$ref": "#/$defs/MapProvidersRequest"
+    },
+    "MapProvidersSuccess": {
+      "$ref": "#/$defs/MapProvidersSuccess"
+    },
+    "MarketCalendarVersion": {
+      "$ref": "#/$defs/MarketCalendarVersion"
+    },
+    "OrderConstraints": {
+      "$ref": "#/$defs/OrderConstraints"
+    },
+    "ProviderRef": {
+      "$ref": "#/$defs/ProviderRef"
+    },
+    "ProviderSymbolMapping": {
+      "$ref": "#/$defs/ProviderSymbolMapping"
+    },
+    "TradingInterval": {
+      "$ref": "#/$defs/TradingInterval"
+    },
+    "TradingRuleSet": {
+      "$ref": "#/$defs/TradingRuleSet"
+    },
+    "TradingSessionDefinition": {
+      "$ref": "#/$defs/TradingSessionDefinition"
+    },
+    "UniverseMembership": {
+      "$ref": "#/$defs/UniverseMembership"
+    },
+    "UniverseRef": {
+      "$ref": "#/$defs/UniverseRef"
+    },
+    "UniverseVersion": {
+      "$ref": "#/$defs/UniverseVersion"
+    }
+  },
+  "namespace": "catalogue",
+  "schema_version": 1,
+  "title": "catalogue wire contracts v1"
+}

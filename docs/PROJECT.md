@@ -230,6 +230,8 @@ Each `SYS-WF-*` row is complete only when the participating domain READMEs ident
 
 Every application/domain contract in this section is physically defined in `app/contracts/`. The generic `CapabilityKey` and composability protocols are kernel primitives, not application contracts. The Owner column identifies semantic ownership and change authority, not a domain-local file location. No public cross-boundary contract definition may live under `app/services/`; domain packages contain implementations and adapters only. The planned contract inventory is maintained in `app/contracts/README.md`.
 
+Common v1 wire foundations are semantically authoritative in the Contracts README. Catalogue v1 record fields, operations, failures, and events are semantically authoritative in the Catalogue README; this system table retains only cross-domain ownership and producer/consumer relationships. Ratified target documentation does not change a `Missing` runtime status without source and executable evidence.
+
 | Status | Contract / Event | Version | Owner | Producer / Submitter | Consumer | Purpose | Schema / Type | Failure behavior |
 |---|---|---|---|---|---|---|---|---|
 | Missing | `CapabilitySnapshot` | `v1` | Shared substrate | Composition engine | Every domain | Pin active features/providers/configuration for reproducible work | `app/contracts/` system models plus kernel `CapabilityKey`; Contracts README §§8, 15 | Missing/incompatible providers reject admission. |

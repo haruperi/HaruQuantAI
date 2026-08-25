@@ -10,7 +10,7 @@ import { UiCompositionBridge } from "./composition_bridge";
 import type {
   CapabilityPresentationState,
   ShellSnapshot,
-} from "../contracts/generated/ui_contracts";
+} from "./composition_bridge";
 
 const UiRuntimeContext = createContext<UiCompositionBridge | null>(null);
 
@@ -78,11 +78,11 @@ export function useActiveWorkspace() {
   const snapshot = useShellSnapshot();
   const activeWorkspace = useMemo(() => {
     return (
-      snapshot.availableWorkspaces.find(
-        (ws) => ws.workspaceId === snapshot.activeWorkspaceId
+      snapshot.available_workspaces.find(
+        (ws) => ws.workspace_id === snapshot.active_workspace_id
       ) ?? null
     );
-  }, [snapshot.availableWorkspaces, snapshot.activeWorkspaceId]);
+  }, [snapshot.available_workspaces, snapshot.active_workspace_id]);
 
   return activeWorkspace;
 }

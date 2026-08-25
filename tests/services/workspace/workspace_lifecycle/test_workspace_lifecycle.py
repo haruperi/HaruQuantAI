@@ -284,3 +284,12 @@ async def test_workspace_feature_mount_and_spec() -> None:
     assert isinstance(resolved, WorkspaceLifecycleService)
 
     await scope.close()
+
+
+def test_workspace_lifecycle_usage_scenarios() -> None:
+    """Verify the __main__ usage scenarios run successfully."""
+    from app.services.workspace.workspace_lifecycle.workspace_lifecycle import (
+        _run_usage_scenarios,
+    )
+
+    _run_usage_scenarios()

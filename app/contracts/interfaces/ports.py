@@ -6,9 +6,14 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
     from pathlib import Path
 
+    from app.contracts.common.events import DomainEvent
+    from app.contracts.interfaces.errors import InterfaceFailure
     from app.contracts.interfaces.models import (
+        AdministerCapabilitiesRequest,
+        AdministerCapabilitiesSuccess,
         ApiCompatibilityReport,
         ApiDeprecationNotice,
         ApplicationCommandRequest,
@@ -19,9 +24,18 @@ if TYPE_CHECKING:
         AsyncJobState,
         DurableCommandRef,
         DurableJobStatus,
+        EditProjectsRequest,
+        EditProjectsSuccess,
         EventReplayBatch,
         InterfaceEventEnvelope,
         OpenApiManifest,
+        OperatePortfoliosRequest,
+        OperatePortfoliosSuccess,
+        OperateResearchRequest,
+        OperateResearchSuccess,
+        OperateTradingEventSubscription,
+        OperateTradingRequest,
+        OperateTradingSuccess,
     )
 
 
@@ -343,5 +357,131 @@ class AutomateCommandsCapability(Protocol):
 
         Raises:
             DurableJobNotFoundError: If durable job is not registered.
+        """
+        ...
+
+
+@runtime_checkable
+class OperateResearchCapability(Protocol):
+    """Protocol for the research preview gateway."""
+
+    async def operate_research(
+        self,
+        request: OperateResearchRequest,
+    ) -> OperateResearchSuccess | InterfaceFailure:
+        """Resolve and expose research preview and admission projections.
+
+        Args:
+            request: Operation-discriminated research preview request.
+
+        Returns:
+            The research preview on success, otherwise a structured
+            interface failure.
+        """
+        ...
+
+
+@runtime_checkable
+class EditProjectsCapability(Protocol):
+    """Protocol for the project graph gateway."""
+
+    async def edit_projects(
+        self,
+        request: EditProjectsRequest,
+    ) -> EditProjectsSuccess | InterfaceFailure:
+        """Resolve and expose project graph validation and command contracts.
+
+        Edge and condition commands delegate to Orchestration public
+        contracts; this gateway adds none.
+
+        Args:
+            request: Operation-discriminated project graph request.
+
+        Returns:
+            The project graph projection on success, otherwise a
+            structured interface failure.
+        """
+        ...
+
+
+@runtime_checkable
+class OperatePortfoliosCapability(Protocol):
+    """Protocol for the portfolio operations gateway."""
+
+    async def operate_portfolios(
+        self,
+        request: OperatePortfoliosRequest,
+    ) -> OperatePortfoliosSuccess | InterfaceFailure:
+        """Resolve and expose portfolio projections and commands.
+
+        Simulation, search, and attribution commands delegate to Portfolio
+        public contracts.
+
+        Args:
+            request: Operation-discriminated portfolio operations request.
+
+        Returns:
+            The portfolio builder projection and issues on success,
+            otherwise a structured interface failure.
+        """
+        ...
+
+
+@runtime_checkable
+class AdministerCapabilitiesCapability(Protocol):
+    """Protocol for the capability administration gateway."""
+
+    async def administer_capabilities(
+        self,
+        request: AdministerCapabilitiesRequest,
+    ) -> AdministerCapabilitiesSuccess | InterfaceFailure:
+        """Resolve and expose capability-administration projections.
+
+        Args:
+            request: Operation-discriminated capability administration
+                request.
+
+        Returns:
+            The capability administration projection on success, otherwise
+            a structured interface failure.
+        """
+        ...
+
+
+@runtime_checkable
+class OperateTradingCapability(Protocol):
+    """Protocol for the governed trading operations gateway."""
+
+    async def operate_trading(
+        self,
+        request: OperateTradingRequest,
+    ) -> OperateTradingSuccess | InterfaceFailure:
+        """Resolve and expose governed operational projections and commands.
+
+        Args:
+            request: Operation-discriminated trading operations request.
+
+        Returns:
+            The session, readiness, preview, kill switch, market state, or
+            operator analytics projection on success, otherwise a
+            structured interface failure.
+        """
+        ...
+
+    def subscribe_operate_trading_events(
+        self,
+        request: OperateTradingEventSubscription,
+    ) -> AsyncIterator[DomainEvent]:
+        """Deliver governed trading operations events as domain events.
+
+        Args:
+            request: Owner-required subscription selector carrying the
+                scope filter, session binding, resume position, and
+                bounded replay limit.
+
+        Returns:
+            An asynchronous iterator of trading operations events wrapped
+            in the common domain event envelope with ordered replay and
+            resync semantics.
         """
         ...

@@ -1,0 +1,3749 @@
+{
+  "$defs": {
+    "AccountOperationsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated operational account request.\n\nPROJECT_ACCOUNT requires only ``session``; VALUE requires only\n``account_id``; POST_ADJUSTMENT requires only ``ledger_entry``.",
+      "properties": {
+        "account_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Account Id"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "ledger_entry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperationalLedgerEntry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "PROJECT_ACCOUNT",
+            "VALUE",
+            "POST_ADJUSTMENT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "AccountOperationsRequest",
+      "type": "object"
+    },
+    "AccountOperationsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful operational account operation result.",
+      "properties": {
+        "account": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperationalAccount"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ledger_entry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperationalLedgerEntry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "valuation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperationalValuation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "AccountOperationsSuccess",
+      "type": "object"
+    },
+    "DispatchEvidence": {
+      "additionalProperties": false,
+      "description": "Staged pre-dispatch evidence with an immutable request hash (R12).\n\nThe staged record and request hash commit before any external or paper\nside effect; staging failure causes no dispatch.",
+      "properties": {
+        "authority_generation": {
+          "minimum": 1,
+          "title": "Authority Generation",
+          "type": "integer"
+        },
+        "evidence_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "recheck_passed": {
+          "const": true,
+          "title": "Recheck Passed",
+          "type": "boolean"
+        },
+        "request_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Request Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "staged_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Staged At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "operation_id",
+        "request_hash",
+        "staged_at",
+        "authority_generation",
+        "recheck_passed"
+      ],
+      "title": "DispatchEvidence",
+      "type": "object"
+    },
+    "DispatchOrdersRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated authority dispatch request.\n\nOBTAIN_AUTHORITY requires only ``session``; RECHECK and DISPATCH\nrequire only ``evidence``; STAGE_EVIDENCE requires only\n``trading_operation``; CLASSIFY_RECEIPT requires only ``receipt``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DispatchEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "OBTAIN_AUTHORITY",
+            "RECHECK",
+            "STAGE_EVIDENCE",
+            "DISPATCH",
+            "CLASSIFY_RECEIPT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "receipt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DispatchReceipt"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "trading_operation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingOperation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "DispatchOrdersRequest",
+      "type": "object"
+    },
+    "DispatchOrdersSuccess": {
+      "additionalProperties": false,
+      "description": "Successful authority dispatch operation result.",
+      "properties": {
+        "authority": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExecutionAuthorityRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DispatchEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingOperation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "receipt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DispatchReceipt"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "DispatchOrdersSuccess",
+      "type": "object"
+    },
+    "DispatchReceipt": {
+      "additionalProperties": false,
+      "description": "Classified dispatch receipt from the authority (record R13).\n\nConcurrent or repeated requests never create a duplicate logical\norder; blind retry stays disabled on ``UNKNOWN`` until reconciliation\nproves no authority operation or a new separately authorized action\nexists.",
+      "properties": {
+        "authority_receipt_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "authority_request_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "ACCEPTED",
+            "REJECTED",
+            "UNKNOWN"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "provider_evidence": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "receipt_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Receipt Id",
+          "type": "string"
+        },
+        "received_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Received At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "receipt_id",
+        "operation_id",
+        "outcome",
+        "authority_request_id",
+        "authority_receipt_id",
+        "provider_evidence",
+        "received_at"
+      ],
+      "title": "DispatchReceipt",
+      "type": "object"
+    },
+    "ExecutePublicActionsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated public action request.\n\nROUTE_ACTION and GOVERN_BULK require only ``action``; QUERY_STATE\nrequires only ``query``.",
+      "properties": {
+        "action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PublicTradingAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "ROUTE_ACTION",
+            "GOVERN_BULK",
+            "QUERY_STATE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingStateQuery"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ExecutePublicActionsRequest",
+      "type": "object"
+    },
+    "ExecutePublicActionsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful public action operation result.\n\n``rows`` are bounded ``ResultPage``-style ``JsonObject`` tuples\nreferencing owner records; they are not a copy of any owner record.",
+      "properties": {
+        "action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PublicTradingAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingStateQuery"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "rows": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/JsonObject"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ExecutePublicActionsSuccess",
+      "type": "object"
+    },
+    "ExecutionAuthorityRef": {
+      "additionalProperties": false,
+      "description": "Reference to the selected paper or broker authority (record R11).\n\nCross-authority and cross-environment dispatch is structurally\nimpossible: a paper authority carries only the registered\npaper-execution capability, and a demo/live authority carries only the\nexact Broker session environment.",
+      "properties": {
+        "authority_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Authority Id",
+          "type": "string"
+        },
+        "broker_session_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Broker Session Id"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/TradingModeValue"
+        },
+        "paper_capability": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Paper Capability"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "authority_id",
+        "kind",
+        "paper_capability",
+        "broker_session_id",
+        "generation"
+      ],
+      "title": "ExecutionAuthorityRef",
+      "type": "object"
+    },
+    "ExecutionProvenance": {
+      "additionalProperties": false,
+      "description": "Bounded verifiable export provenance pin (record R22).\n\nThe export reproduces record hashes without credentials or\nunrestricted provider payloads.",
+      "properties": {
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "export_bounds": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "journal_record_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Journal Record Id",
+          "type": "string"
+        },
+        "profile_versions": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "provenance_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Provenance Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "provenance_id",
+        "journal_record_id",
+        "profile_versions",
+        "export_bounds"
+      ],
+      "title": "ExecutionProvenance",
+      "type": "object"
+    },
+    "FilterSpec": {
+      "additionalProperties": false,
+      "description": "One typed column-filter predicate of a result query.",
+      "properties": {
+        "column": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "operator": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "value": {
+          "$ref": "#/$defs/JsonValue"
+        }
+      },
+      "required": [
+        "column",
+        "operator",
+        "value"
+      ],
+      "title": "FilterSpec",
+      "type": "object"
+    },
+    "InstrumentRef": {
+      "additionalProperties": false,
+      "description": "Reference to one canonical instrument identity.",
+      "properties": {
+        "instrument_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Instrument Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "instrument_id"
+      ],
+      "title": "InstrumentRef",
+      "type": "object"
+    },
+    "JournalExecutionRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated execution journal request.\n\nAPPEND requires only ``record``; EXPORT requires only\n``journal_record_id``; BALANCE_LEDGER requires only ``ledger_entry``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "journal_record_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Journal Record Id"
+        },
+        "ledger_entry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperationalLedgerEntry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "APPEND",
+            "EXPORT",
+            "BALANCE_LEDGER"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingJournalRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "JournalExecutionRequest",
+      "type": "object"
+    },
+    "JournalExecutionSuccess": {
+      "additionalProperties": false,
+      "description": "Successful execution journal operation result.",
+      "properties": {
+        "ledger_entry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperationalLedgerEntry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExecutionProvenance"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingJournalRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "JournalExecutionSuccess",
+      "type": "object"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ManageProtectionsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated protection management request.\n\nINSTALL, MODIFY, CANCEL, and RECOVER all operate on one\n``protection_set`` bound to its exact owner identity.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "INSTALL",
+            "MODIFY",
+            "CANCEL",
+            "RECOVER"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "protection_set": {
+          "$ref": "#/$defs/ProtectionSet"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation",
+        "protection_set"
+      ],
+      "title": "ManageProtectionsRequest",
+      "type": "object"
+    },
+    "ManageProtectionsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful protection management operation result.",
+      "properties": {
+        "change": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProtectionChange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "protection_set": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProtectionSet"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ManageProtectionsSuccess",
+      "type": "object"
+    },
+    "ManageTradingSessionsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated trading session request.\n\nCREATE requires only ``session``; START, STOP, ARCHIVE, and RECOVER\nrequire only ``session_ref``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "CREATE",
+            "START",
+            "STOP",
+            "ARCHIVE",
+            "RECOVER"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSession"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "session_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ManageTradingSessionsRequest",
+      "type": "object"
+    },
+    "ManageTradingSessionsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful trading session operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSession"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSessionState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ManageTradingSessionsSuccess",
+      "type": "object"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "Currency-qualified canonical decimal amount.",
+      "properties": {
+        "amount": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "OperationalAccount": {
+      "additionalProperties": false,
+      "description": "One operational account projection (record R23).\n\nProjected from reconciled deals and events only; projection totals\nreconcile to the ledger plus explicit provider differences.",
+      "properties": {
+        "account_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Account Id",
+          "type": "string"
+        },
+        "account_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "as_of": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "As Of",
+          "type": "string"
+        },
+        "balances": {
+          "patternProperties": {
+            "^[A-Z]{3}$": {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            }
+          },
+          "title": "Balances",
+          "type": "object"
+        },
+        "buying_power": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cash": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        },
+        "equity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fees": {
+          "$ref": "#/$defs/Money"
+        },
+        "financing": {
+          "$ref": "#/$defs/Money"
+        },
+        "free_margin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "margin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "open_positions": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Open Positions",
+          "type": "array"
+        },
+        "pending_obligations": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "realized_pl": {
+          "$ref": "#/$defs/Money"
+        },
+        "risk_health_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Risk Health At"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "unrealized_pl": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "account_id",
+        "session_id",
+        "account_ref",
+        "currency",
+        "cash",
+        "realized_pl",
+        "unrealized_pl",
+        "fees",
+        "financing",
+        "equity",
+        "margin",
+        "free_margin",
+        "buying_power",
+        "risk_health_at",
+        "as_of"
+      ],
+      "title": "OperationalAccount",
+      "type": "object"
+    },
+    "OperationalLedgerEntry": {
+      "additionalProperties": false,
+      "description": "One signed balanced operational ledger entry (record R24).\n\nEvery journalized transaction balances; direct edit or delete of\nhistory is prohibited, and adjustments append evidence-linked balanced\nentries with reversal lineage.",
+      "properties": {
+        "account_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Account Id",
+          "type": "string"
+        },
+        "credit": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Credit",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        },
+        "debit": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Debit",
+          "type": "string"
+        },
+        "effective_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Effective At",
+          "type": "string"
+        },
+        "entry_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Entry Id",
+          "type": "string"
+        },
+        "entry_kind": {
+          "enum": [
+            "CASH",
+            "ASSET_POSITION",
+            "FEE",
+            "FINANCING_SWAP",
+            "REALIZED_PL",
+            "ADJUSTMENT"
+          ],
+          "title": "Entry Kind",
+          "type": "string"
+        },
+        "posted_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Posted At",
+          "type": "string"
+        },
+        "record_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Record Hash",
+          "type": "string"
+        },
+        "recorded_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "reversal_of": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reversal Of"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "source_deal_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Deal Id"
+        },
+        "source_event_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Event Id"
+        }
+      },
+      "required": [
+        "entry_id",
+        "account_id",
+        "sequence",
+        "record_hash",
+        "entry_kind",
+        "debit",
+        "credit",
+        "currency",
+        "source_deal_id",
+        "source_event_id",
+        "effective_at",
+        "recorded_at",
+        "posted_at",
+        "reversal_of"
+      ],
+      "title": "OperationalLedgerEntry",
+      "type": "object"
+    },
+    "OperationalValuation": {
+      "additionalProperties": false,
+      "description": "One point-in-time operational valuation (record R25).\n\nNo value, P/L, margin, or buying power is derived from a stale or\nmissing mandatory mark.",
+      "properties": {
+        "account_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Account Id",
+          "type": "string"
+        },
+        "as_of": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "As Of",
+          "type": "string"
+        },
+        "contract_sizes": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "currencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Z]{3}$",
+            "type": "string"
+          },
+          "title": "Currencies",
+          "type": "array"
+        },
+        "fx_graph_version": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "mark_source": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "mark_time": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Mark Time",
+          "type": "string"
+        },
+        "missing_price_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "rounding": {
+          "$ref": "#/$defs/Rounding"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "stale_mandatory_marks": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Stale Mandatory Marks",
+          "type": "array"
+        },
+        "valuation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Valuation Id",
+          "type": "string"
+        },
+        "valuation_version": {
+          "minimum": 1,
+          "title": "Valuation Version",
+          "type": "integer"
+        },
+        "values": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "valuation_id",
+        "account_id",
+        "as_of",
+        "valuation_version",
+        "mark_source",
+        "mark_time",
+        "fx_graph_version",
+        "contract_sizes",
+        "rounding",
+        "missing_price_policy",
+        "values"
+      ],
+      "title": "OperationalValuation",
+      "type": "object"
+    },
+    "OrderState": {
+      "enum": [
+        "CREATED",
+        "ACCEPTED",
+        "REJECTED",
+        "PENDING",
+        "PARTIALLY_FILLED",
+        "FILLED",
+        "CANCELLED",
+        "EXPIRED"
+      ],
+      "type": "string"
+    },
+    "OrderType": {
+      "enum": [
+        "MARKET",
+        "STOP",
+        "LIMIT",
+        "STOP_LIMIT"
+      ],
+      "type": "string"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "ProtectionChange": {
+      "additionalProperties": false,
+      "description": "One risk-validated protection lifecycle change (record R20).\n\nRisk-worsening changes block unless an explicit exception authorizes\nthem.",
+      "properties": {
+        "authority_rules_applied": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "change": {
+          "enum": [
+            "INSTALL",
+            "MODIFY",
+            "CANCEL"
+          ],
+          "title": "Change",
+          "type": "string"
+        },
+        "change_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Change Id",
+          "type": "string"
+        },
+        "changed_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Changed At",
+          "type": "string"
+        },
+        "explicit_exception_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Explicit Exception Id"
+        },
+        "is_risk_worsening": {
+          "title": "Is Risk Worsening",
+          "type": "boolean"
+        },
+        "protection_set": {
+          "$ref": "#/$defs/ProtectionSet"
+        },
+        "risk_validation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Risk Validation Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "change_id",
+        "protection_set",
+        "change",
+        "risk_validation_id",
+        "authority_rules_applied",
+        "is_risk_worsening",
+        "changed_at"
+      ],
+      "title": "ProtectionChange",
+      "type": "object"
+    },
+    "ProtectionSet": {
+      "additionalProperties": false,
+      "description": "One versioned set of owned protective orders (record R19).\n\nProtections bind an exact entry/order/position identity and never\nattach to another strategy or manual action; protected quantity never\nexceeds live residual quantity. Uniqueness\n``(owner_identity, version)`` spans records and is store-enforced.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "owner_identity": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "owner_kind": {
+          "enum": [
+            "STRATEGY",
+            "MANUAL",
+            "ATM"
+          ],
+          "title": "Owner Kind",
+          "type": "string"
+        },
+        "plan_version": {
+          "minimum": 1,
+          "title": "Plan Version",
+          "type": "integer"
+        },
+        "protections": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProtectionSpec"
+          },
+          "title": "Protections",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "owner_identity",
+        "version",
+        "owner_kind",
+        "plan_version",
+        "content_hash"
+      ],
+      "title": "ProtectionSet",
+      "type": "object"
+    },
+    "ProtectionSpec": {
+      "additionalProperties": false,
+      "description": "One protective-order specification inside a protection set (R19).\n\nInline nested record of ``ProtectionSet.protections``; not a numbered\npublic record itself.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "STOP",
+            "TARGET",
+            "TRAILING",
+            "BREAKEVEN",
+            "PARTIAL_EXIT"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "parameters": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "quantity_scope": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Quantity Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "quantity_scope",
+        "parameters"
+      ],
+      "title": "ProtectionSpec",
+      "type": "object"
+    },
+    "PublicTradingAction": {
+      "additionalProperties": false,
+      "description": "One versioned mode-neutral public action (record R26).\n\nOne delegated contract reaches the exact session owner; no caller\nselects a private adapter, and scope cannot broaden between preview\nand commit.",
+      "properties": {
+        "action": {
+          "enum": [
+            "CREATE",
+            "SUBMIT",
+            "CANCEL",
+            "MODIFY",
+            "CLOSE",
+            "FLATTEN",
+            "HOLD",
+            "PROTECTION"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "action_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Action Id",
+          "type": "string"
+        },
+        "approval_token_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approval Token Id"
+        },
+        "conflict_policy": {
+          "anyOf": [
+            {
+              "enum": [
+                "REJECT",
+                "KEEP_EXISTING",
+                "CREATE_NEW_VERSION"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Conflict Policy"
+        },
+        "contract_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Contract Version",
+          "type": "integer"
+        },
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "impact_preview_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Impact Preview Id"
+        },
+        "payload": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "per_target_outcomes": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Per Target Outcomes",
+          "type": "array"
+        },
+        "pinned_selection_token_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pinned Selection Token Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "$ref": "#/$defs/TradingSessionRef"
+        }
+      },
+      "required": [
+        "action_id",
+        "action",
+        "session",
+        "payload",
+        "idempotency_key"
+      ],
+      "title": "PublicTradingAction",
+      "type": "object"
+    },
+    "ReconcileTradingRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated reconciliation request.\n\nREQUEST_RUN and EXECUTE require only ``reconciliation``;\nRESOLVE_FINDING requires only ``finding``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "finding": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReconciliationFinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "REQUEST_RUN",
+            "EXECUTE",
+            "RESOLVE_FINDING"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "reconciliation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReconciliationRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ReconcileTradingRequest",
+      "type": "object"
+    },
+    "ReconcileTradingSuccess": {
+      "additionalProperties": false,
+      "description": "Successful reconciliation operation result.",
+      "properties": {
+        "findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ReconciliationFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReconciliationRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ReconcileTradingSuccess",
+      "type": "object"
+    },
+    "ReconciliationFinding": {
+      "additionalProperties": false,
+      "description": "One typed reconciliation finding (record R18).\n\nDestructive repair requires explicit authorization; the transition\nhistory is append-only.",
+      "properties": {
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "finding_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "finding_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "kind": {
+          "enum": [
+            "MISSING_ORDER",
+            "MISSING_DEAL",
+            "MISSING_POSITION",
+            "QUANTITY_MISMATCH",
+            "PRICE_MISMATCH",
+            "STATE_MISMATCH",
+            "EVENT_GAP",
+            "PAGE_MISSING",
+            "DUPLICATE",
+            "CORPORATE_ACTION_UNMATCHED",
+            "PROTECTION_MISSING",
+            "PROTECTION_ORPHANED",
+            "PROTECTION_STALE",
+            "PROTECTION_DUPLICATED"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "resolution_policy": {
+          "enum": [
+            "AUTO",
+            "MANUAL"
+          ],
+          "title": "Resolution Policy",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "severity": {
+          "enum": [
+            "INFO",
+            "WARNING",
+            "CRITICAL"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "transition_history": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/JsonObject"
+          },
+          "title": "Transition History",
+          "type": "array"
+        }
+      },
+      "required": [
+        "finding_id",
+        "run_id",
+        "finding_key",
+        "kind",
+        "severity",
+        "resolution_policy"
+      ],
+      "title": "ReconciliationFinding",
+      "type": "object"
+    },
+    "ReconciliationRequest": {
+      "additionalProperties": false,
+      "description": "One bounded reconciliation run request (record R17).\n\nCompares local operations and projections with bounded authority\nstate; missing pages or event gaps block clean completion.\n``SeriesInterval`` is Data-owned and imported per the cross-namespace\nowner-type rule.",
+      "properties": {
+        "event_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Event Cursor"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "default": "ALL",
+          "enum": [
+            "ORDERS",
+            "DEALS",
+            "POSITIONS",
+            "ACCOUNT",
+            "EVENTS",
+            "ALL"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "time_window": {
+          "$ref": "#/$defs/SeriesInterval"
+        }
+      },
+      "required": [
+        "request_id",
+        "session_id",
+        "time_window",
+        "event_cursor"
+      ],
+      "title": "ReconciliationRequest",
+      "type": "object"
+    },
+    "Rounding": {
+      "enum": [
+        "DOWN",
+        "UP",
+        "HALF_UP",
+        "HALF_EVEN",
+        "TOWARD_ZERO"
+      ],
+      "type": "string"
+    },
+    "SeriesInterval": {
+      "additionalProperties": false,
+      "description": "Half-open UTC interval `[from_at, to_at)`.\n\nThe interval must be positive; half-open interval semantics follow\nProject §15.4 and apply to every data interval record.",
+      "properties": {
+        "from_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "From At",
+          "type": "string"
+        },
+        "to_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "To At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_at",
+        "to_at"
+      ],
+      "title": "SeriesInterval",
+      "type": "object"
+    },
+    "Side": {
+      "enum": [
+        "BUY",
+        "SELL"
+      ],
+      "type": "string"
+    },
+    "TimeInForce": {
+      "enum": [
+        "GTC",
+        "DAY",
+        "IOC",
+        "FOK"
+      ],
+      "type": "string"
+    },
+    "TradeIntentRef": {
+      "additionalProperties": false,
+      "description": "Reference to one exact Strategy intent or manual order (record R8).\n\nManual actions carry authenticated principal, reason, source interface,\nrequest/correlation IDs, and explicit discretionary identity; they\ncannot masquerade as Strategy signals.",
+      "properties": {
+        "intent_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Intent Hash",
+          "type": "string"
+        },
+        "intent_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Intent Id",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "STRATEGY_INTENT",
+            "MANUAL_ORDER"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Strategy Version Id"
+        }
+      },
+      "required": [
+        "intent_id",
+        "origin",
+        "strategy_version_id",
+        "intent_hash"
+      ],
+      "title": "TradeIntentRef",
+      "type": "object"
+    },
+    "TradePlan": {
+      "additionalProperties": false,
+      "description": "One validated immutable trade plan (record R9).\n\nAmbiguous or mutable inputs reject before Risk review; the plan hash\npins the exact normalized content.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "entry": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "evidence_version_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Evidence Version Ids",
+          "type": "array"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "intent": {
+          "$ref": "#/$defs/TradeIntentRef"
+        },
+        "order_type": {
+          "$ref": "#/$defs/OrderType"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "protection": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProtectionSet"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quantity_method": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "route": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "side": {
+          "$ref": "#/$defs/Side"
+        },
+        "time_in_force": {
+          "$ref": "#/$defs/TimeInForce"
+        }
+      },
+      "required": [
+        "plan_id",
+        "intent",
+        "instrument",
+        "side",
+        "order_type",
+        "quantity_method",
+        "entry",
+        "protection",
+        "time_in_force",
+        "route",
+        "session_id",
+        "content_hash"
+      ],
+      "title": "TradePlan",
+      "type": "object"
+    },
+    "TradingDeal": {
+      "additionalProperties": false,
+      "description": "One authority execution deal (record R15).\n\nDeals are the authority for executed quantity and realized state;\nuniqueness ``(session_id, authority_deal_id)`` spans records and is\nstore-enforced.",
+      "properties": {
+        "authority_deal_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "deal_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Deal Id",
+          "type": "string"
+        },
+        "fee": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "financing": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "order_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Order Id",
+          "type": "string"
+        },
+        "price": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Price",
+          "type": "string"
+        },
+        "quantity": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Quantity",
+          "type": "string"
+        },
+        "realized_pl": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "side": {
+          "$ref": "#/$defs/Side"
+        },
+        "timestamp": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "deal_id",
+        "session_id",
+        "order_id",
+        "authority_deal_id",
+        "timestamp",
+        "side",
+        "quantity",
+        "price",
+        "fee",
+        "financing",
+        "realized_pl"
+      ],
+      "title": "TradingDeal",
+      "type": "object"
+    },
+    "TradingEventKind": {
+      "enum": [
+        "PLAN",
+        "VALIDATION",
+        "RISK_CHECK",
+        "RESERVATION",
+        "DISPATCH",
+        "RECEIPT",
+        "ORDER_CHANGE",
+        "DEAL",
+        "POSITION_CHANGE",
+        "RECONCILIATION",
+        "PROTECTION",
+        "RETRY",
+        "CLOSURE"
+      ],
+      "type": "string"
+    },
+    "TradingEventPayload": {
+      "additionalProperties": false,
+      "description": "Payload for ``trading.event`` DomainEvent envelopes (record R28).\n\nEvents are ordered with replay/resync and keep stable links among\nplan/decision/reservation/operation/order/deal/position/protection/\nledger/reconciliation records; ``sequence`` is the monotonic session\nsequence.",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/TradingEventKind"
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operation Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "values": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "session_id",
+        "sequence",
+        "kind",
+        "values"
+      ],
+      "title": "TradingEventPayload",
+      "type": "object"
+    },
+    "TradingFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope for every trading capability.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/TradingFailureCode"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "TradingFailure",
+      "type": "object"
+    },
+    "TradingFailureCode": {
+      "enum": [
+        "TRADING_VALIDATION_FAILED",
+        "TRADING_MODE_MISMATCH",
+        "TRADING_SESSION_NOT_ACTIVE",
+        "TRADING_STATE_CONFLICT",
+        "TRADING_AUTHORITY_MISMATCH",
+        "TRADING_RISK_AUTHORITY_INVALID",
+        "TRADING_IDEMPOTENCY_CONFLICT",
+        "TRADING_PROTECTION_INVALID",
+        "TRADING_QUERY_INVALID",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "TradingJournalRecord": {
+      "additionalProperties": false,
+      "description": "One immutable append-only journal record (record R21).\n\nFirst-divergence causal reconstruction requires no free-text log\nparsing; secrets never appear in redacted failure details.",
+      "properties": {
+        "authority_generation": {
+          "minimum": 1,
+          "title": "Authority Generation",
+          "type": "integer"
+        },
+        "contract_versions": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "event_kind": {
+          "$ref": "#/$defs/TradingEventKind"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "failure_detail_redacted": {
+          "default": "",
+          "title": "Failure Detail Redacted",
+          "type": "string"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "operator_or_strategy_identity": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "record_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Record Hash",
+          "type": "string"
+        },
+        "record_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "request_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Request Hash"
+        },
+        "response_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Response Hash"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "session_id",
+        "sequence",
+        "record_hash",
+        "event_kind",
+        "contract_versions",
+        "request_hash",
+        "response_hash",
+        "authority_generation",
+        "operator_or_strategy_identity",
+        "occurred_at"
+      ],
+      "title": "TradingJournalRecord",
+      "type": "object"
+    },
+    "TradingMode": {
+      "additionalProperties": false,
+      "description": "Explicit per-session trading-mode declaration (record R1).\n\nThere is no live default and no implicit promotion; a missing or\nmismatched mode blocks session start and dispatch.",
+      "properties": {
+        "mode": {
+          "$ref": "#/$defs/TradingModeValue"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mode"
+      ],
+      "title": "TradingMode",
+      "type": "object"
+    },
+    "TradingModeValue": {
+      "enum": [
+        "PAPER",
+        "DEMO",
+        "LIVE"
+      ],
+      "type": "string"
+    },
+    "TradingOperation": {
+      "additionalProperties": false,
+      "description": "One logical idempotent trading mutation (record R6).\n\nNo operation changes session, action, or plan identity after dispatch,\nso the embedded identity fields are immutable while in flight.",
+      "properties": {
+        "action": {
+          "enum": [
+            "CREATE",
+            "SUBMIT",
+            "CANCEL",
+            "MODIFY",
+            "CLOSE",
+            "FLATTEN",
+            "HOLD",
+            "PROTECTION"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "authority_route": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "event_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Event Ids",
+          "type": "array"
+        },
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "idempotency_scope": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "paper_correlation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Paper Correlation Id"
+        },
+        "plan_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Plan Hash",
+          "type": "string"
+        },
+        "provider_correlation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Provider Correlation Id"
+        },
+        "risk_decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Risk Decision Id"
+        },
+        "risk_reservation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Risk Reservation Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/TradingOperationStateValue"
+        }
+      },
+      "required": [
+        "operation_id",
+        "session_id",
+        "idempotency_scope",
+        "idempotency_key",
+        "action",
+        "plan_hash",
+        "risk_decision_id",
+        "risk_reservation_id",
+        "authority_route",
+        "state",
+        "provider_correlation_id",
+        "paper_correlation_id"
+      ],
+      "title": "TradingOperation",
+      "type": "object"
+    },
+    "TradingOperationRef": {
+      "additionalProperties": false,
+      "description": "Reference to one logical idempotent trading mutation.\n\nDispatch occurs at most once per logical identity\n``(idempotency_scope, idempotency_key)``.",
+      "properties": {
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "idempotency_scope": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "operation_id",
+        "session_id",
+        "idempotency_scope",
+        "idempotency_key"
+      ],
+      "title": "TradingOperationRef",
+      "type": "object"
+    },
+    "TradingOperationState": {
+      "additionalProperties": false,
+      "description": "One recorded state snapshot of a logical operation (record R7).\n\nUnknown transport outcomes enter ``UNKNOWN`` then ``RECONCILING``; only\nreconciled authority evidence establishes fills or a final state.",
+      "properties": {
+        "changed_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Changed At",
+          "type": "string"
+        },
+        "operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/TradingOperationStateValue"
+        }
+      },
+      "required": [
+        "operation_id",
+        "state",
+        "changed_at"
+      ],
+      "title": "TradingOperationState",
+      "type": "object"
+    },
+    "TradingOperationStateValue": {
+      "enum": [
+        "PLANNED",
+        "ADMITTED",
+        "DISPATCHING",
+        "ACCEPTED",
+        "REJECTED",
+        "UNKNOWN",
+        "RECONCILING",
+        "PARTIALLY_FILLED",
+        "FILLED",
+        "CANCELLED",
+        "CLOSED",
+        "FAILED"
+      ],
+      "type": "string"
+    },
+    "TradingOrder": {
+      "additionalProperties": false,
+      "description": "One canonical operational order (record R14).\n\nOnly reconciled authority evidence establishes the state; uniqueness\n``(session_id, authority_order_id)`` spans records and is\nstore-enforced.",
+      "properties": {
+        "authority_order_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "filled_quantity": {
+          "default": "0",
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Filled Quantity",
+          "type": "string"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "operation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "order_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Order Id",
+          "type": "string"
+        },
+        "order_type": {
+          "$ref": "#/$defs/OrderType"
+        },
+        "requested_quantity": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Requested Quantity",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "side": {
+          "$ref": "#/$defs/Side"
+        },
+        "state": {
+          "$ref": "#/$defs/OrderState"
+        }
+      },
+      "required": [
+        "order_id",
+        "session_id",
+        "operation_id",
+        "authority_order_id",
+        "instrument",
+        "side",
+        "order_type",
+        "requested_quantity",
+        "state"
+      ],
+      "title": "TradingOrder",
+      "type": "object"
+    },
+    "TradingPositionProjection": {
+      "additionalProperties": false,
+      "description": "One canonical operational position projection (record R16).\n\nSnapshots are current-state evidence, never a replacement for\ntransaction history; disagreements remain explicit until reconciled.",
+      "properties": {
+        "as_of": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "As Of",
+          "type": "string"
+        },
+        "authority_source": {
+          "enum": [
+            "DEAL_DERIVED",
+            "SNAPSHOT"
+          ],
+          "title": "Authority Source",
+          "type": "string"
+        },
+        "avg_price": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Avg Price"
+        },
+        "direction": {
+          "enum": [
+            "LONG",
+            "SHORT"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "position_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Position Id",
+          "type": "string"
+        },
+        "position_identity": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "quantity": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Quantity",
+          "type": "string"
+        },
+        "realized_pl": {
+          "$ref": "#/$defs/Money"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "unrealized_pl": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "position_id",
+        "session_id",
+        "position_identity",
+        "instrument",
+        "direction",
+        "quantity",
+        "avg_price",
+        "realized_pl",
+        "unrealized_pl",
+        "as_of",
+        "authority_source"
+      ],
+      "title": "TradingPositionProjection",
+      "type": "object"
+    },
+    "TradingReadiness": {
+      "additionalProperties": false,
+      "description": "Point-in-time preflight readiness assessment (record R10).\n\nAny mandatory unknown state blocks a new mutation by appearing in\n``blocking_reasons``.",
+      "properties": {
+        "account_permission_granted": {
+          "title": "Account Permission Granted",
+          "type": "boolean"
+        },
+        "assessed_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Assessed At",
+          "type": "string"
+        },
+        "authority_capability_ready": {
+          "title": "Authority Capability Ready",
+          "type": "boolean"
+        },
+        "blocking_reasons": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Blocking Reasons",
+          "type": "array"
+        },
+        "evidence_fresh": {
+          "title": "Evidence Fresh",
+          "type": "boolean"
+        },
+        "instrument_mapping_valid": {
+          "title": "Instrument Mapping Valid",
+          "type": "boolean"
+        },
+        "is_session_active": {
+          "title": "Is Session Active",
+          "type": "boolean"
+        },
+        "market_session_state": {
+          "enum": [
+            "OPEN",
+            "CLOSED",
+            "UNKNOWN"
+          ],
+          "title": "Market Session State",
+          "type": "string"
+        },
+        "risk_admissible": {
+          "title": "Risk Admissible",
+          "type": "boolean"
+        },
+        "route_profile_compatible": {
+          "title": "Route Profile Compatible",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "selected_authority": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExecutionAuthorityRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "session": {
+          "$ref": "#/$defs/TradingSessionRef"
+        }
+      },
+      "required": [
+        "session",
+        "is_session_active",
+        "selected_authority",
+        "authority_capability_ready",
+        "instrument_mapping_valid",
+        "market_session_state",
+        "evidence_fresh",
+        "route_profile_compatible",
+        "account_permission_granted",
+        "risk_admissible",
+        "assessed_at"
+      ],
+      "title": "TradingReadiness",
+      "type": "object"
+    },
+    "TradingSession": {
+      "additionalProperties": false,
+      "description": "One durable trading session binding (record R3).\n\nBindings are immutable while active; changes create a new session\nversion. Uniqueness ``(session_id, generation)`` is enforced by the\nowning store because it spans multiple session records.",
+      "properties": {
+        "account_authority_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "archived_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Archived At"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "mode": {
+          "$ref": "#/$defs/TradingModeValue"
+        },
+        "opening_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "risk_profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Risk Profile Id",
+          "type": "string"
+        },
+        "route_profile_version": {
+          "minimum": 1,
+          "title": "Route Profile Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "started_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Started At"
+        },
+        "stopped_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stopped At"
+        }
+      },
+      "required": [
+        "session_id",
+        "mode",
+        "account_authority_ref",
+        "route_profile_version",
+        "capability_snapshot_id",
+        "risk_profile_id",
+        "created_at",
+        "generation"
+      ],
+      "title": "TradingSession",
+      "type": "object"
+    },
+    "TradingSessionRef": {
+      "additionalProperties": false,
+      "description": "Reference to one durable trading session and its explicit mode.",
+      "properties": {
+        "mode": {
+          "$ref": "#/$defs/TradingModeValue"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "mode"
+      ],
+      "title": "TradingSessionRef",
+      "type": "object"
+    },
+    "TradingSessionState": {
+      "additionalProperties": false,
+      "description": "One recorded lifecycle-state transition of a session generation.\n\nIllegal transitions have no side effect; recovery fences old\ngenerations and reconciles before ``ACTIVE``; unresolved drift stays\n``DEGRADED``.",
+      "properties": {
+        "causal_event_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Causal Event Id"
+        },
+        "changed_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Changed At",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/TradingSessionStateValue"
+        }
+      },
+      "required": [
+        "session_id",
+        "state",
+        "generation",
+        "changed_at"
+      ],
+      "title": "TradingSessionState",
+      "type": "object"
+    },
+    "TradingSessionStateValue": {
+      "enum": [
+        "CREATED",
+        "STARTING",
+        "ACTIVE",
+        "DEGRADED",
+        "STOPPING",
+        "STOPPED",
+        "ARCHIVED"
+      ],
+      "type": "string"
+    },
+    "TradingStateQuery": {
+      "additionalProperties": false,
+      "description": "One bounded trading-state projection query (record R27).\n\nBounded projections carry authority and freshness state; stale or\nunresolved projections are visibly marked and never presented as live\nauthority.",
+      "properties": {
+        "cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Cursor"
+        },
+        "filters": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/FilterSpec"
+          },
+          "title": "Filters",
+          "type": "array"
+        },
+        "page_size": {
+          "default": 100,
+          "maximum": 500,
+          "minimum": 1,
+          "title": "Page Size",
+          "type": "integer"
+        },
+        "projection": {
+          "enum": [
+            "SESSIONS",
+            "OPERATIONS",
+            "ORDERS",
+            "DEALS",
+            "POSITIONS",
+            "PROTECTIONS",
+            "ACCOUNTS",
+            "LEDGER",
+            "RECONCILIATION"
+          ],
+          "title": "Projection",
+          "type": "string"
+        },
+        "query_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Query Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Session Id"
+        }
+      },
+      "required": [
+        "query_id",
+        "session_id",
+        "projection",
+        "cursor"
+      ],
+      "title": "TradingStateQuery",
+      "type": "object"
+    },
+    "ValidateTradePlansRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated plan validation request.\n\nBIND_INTENT requires only ``intent``; BIND_PLAN and NORMALIZE require\nonly ``plan``; VALIDATE_READINESS requires only ``session``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "intent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradeIntentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "BIND_INTENT",
+            "BIND_PLAN",
+            "VALIDATE_READINESS",
+            "NORMALIZE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradePlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ValidateTradePlansRequest",
+      "type": "object"
+    },
+    "ValidateTradePlansSuccess": {
+      "additionalProperties": false,
+      "description": "Successful plan validation operation result.",
+      "properties": {
+        "intent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradeIntentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradePlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "readiness": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingReadiness"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ValidateTradePlansSuccess",
+      "type": "object"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {
+    "TradingEventPayload": {
+      "$ref": "#/$defs/TradingEventPayload"
+    }
+  },
+  "failures": {
+    "TradingFailure": {
+      "$ref": "#/$defs/TradingFailure"
+    }
+  },
+  "models": {
+    "AccountOperationsRequest": {
+      "$ref": "#/$defs/AccountOperationsRequest"
+    },
+    "AccountOperationsSuccess": {
+      "$ref": "#/$defs/AccountOperationsSuccess"
+    },
+    "DispatchEvidence": {
+      "$ref": "#/$defs/DispatchEvidence"
+    },
+    "DispatchOrdersRequest": {
+      "$ref": "#/$defs/DispatchOrdersRequest"
+    },
+    "DispatchOrdersSuccess": {
+      "$ref": "#/$defs/DispatchOrdersSuccess"
+    },
+    "DispatchReceipt": {
+      "$ref": "#/$defs/DispatchReceipt"
+    },
+    "ExecutePublicActionsRequest": {
+      "$ref": "#/$defs/ExecutePublicActionsRequest"
+    },
+    "ExecutePublicActionsSuccess": {
+      "$ref": "#/$defs/ExecutePublicActionsSuccess"
+    },
+    "ExecutionAuthorityRef": {
+      "$ref": "#/$defs/ExecutionAuthorityRef"
+    },
+    "ExecutionProvenance": {
+      "$ref": "#/$defs/ExecutionProvenance"
+    },
+    "JournalExecutionRequest": {
+      "$ref": "#/$defs/JournalExecutionRequest"
+    },
+    "JournalExecutionSuccess": {
+      "$ref": "#/$defs/JournalExecutionSuccess"
+    },
+    "ManageProtectionsRequest": {
+      "$ref": "#/$defs/ManageProtectionsRequest"
+    },
+    "ManageProtectionsSuccess": {
+      "$ref": "#/$defs/ManageProtectionsSuccess"
+    },
+    "ManageTradingSessionsRequest": {
+      "$ref": "#/$defs/ManageTradingSessionsRequest"
+    },
+    "ManageTradingSessionsSuccess": {
+      "$ref": "#/$defs/ManageTradingSessionsSuccess"
+    },
+    "OperationalAccount": {
+      "$ref": "#/$defs/OperationalAccount"
+    },
+    "OperationalLedgerEntry": {
+      "$ref": "#/$defs/OperationalLedgerEntry"
+    },
+    "OperationalValuation": {
+      "$ref": "#/$defs/OperationalValuation"
+    },
+    "ProtectionChange": {
+      "$ref": "#/$defs/ProtectionChange"
+    },
+    "ProtectionSet": {
+      "$ref": "#/$defs/ProtectionSet"
+    },
+    "PublicTradingAction": {
+      "$ref": "#/$defs/PublicTradingAction"
+    },
+    "ReconcileTradingRequest": {
+      "$ref": "#/$defs/ReconcileTradingRequest"
+    },
+    "ReconcileTradingSuccess": {
+      "$ref": "#/$defs/ReconcileTradingSuccess"
+    },
+    "ReconciliationFinding": {
+      "$ref": "#/$defs/ReconciliationFinding"
+    },
+    "ReconciliationRequest": {
+      "$ref": "#/$defs/ReconciliationRequest"
+    },
+    "TradeIntentRef": {
+      "$ref": "#/$defs/TradeIntentRef"
+    },
+    "TradePlan": {
+      "$ref": "#/$defs/TradePlan"
+    },
+    "TradingDeal": {
+      "$ref": "#/$defs/TradingDeal"
+    },
+    "TradingJournalRecord": {
+      "$ref": "#/$defs/TradingJournalRecord"
+    },
+    "TradingMode": {
+      "$ref": "#/$defs/TradingMode"
+    },
+    "TradingOperation": {
+      "$ref": "#/$defs/TradingOperation"
+    },
+    "TradingOperationRef": {
+      "$ref": "#/$defs/TradingOperationRef"
+    },
+    "TradingOperationState": {
+      "$ref": "#/$defs/TradingOperationState"
+    },
+    "TradingOrder": {
+      "$ref": "#/$defs/TradingOrder"
+    },
+    "TradingPositionProjection": {
+      "$ref": "#/$defs/TradingPositionProjection"
+    },
+    "TradingReadiness": {
+      "$ref": "#/$defs/TradingReadiness"
+    },
+    "TradingSession": {
+      "$ref": "#/$defs/TradingSession"
+    },
+    "TradingSessionRef": {
+      "$ref": "#/$defs/TradingSessionRef"
+    },
+    "TradingSessionState": {
+      "$ref": "#/$defs/TradingSessionState"
+    },
+    "TradingStateQuery": {
+      "$ref": "#/$defs/TradingStateQuery"
+    },
+    "ValidateTradePlansRequest": {
+      "$ref": "#/$defs/ValidateTradePlansRequest"
+    },
+    "ValidateTradePlansSuccess": {
+      "$ref": "#/$defs/ValidateTradePlansSuccess"
+    }
+  },
+  "namespace": "trading",
+  "schema_version": 1,
+  "title": "trading wire contracts v1"
+}

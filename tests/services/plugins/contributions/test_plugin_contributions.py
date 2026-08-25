@@ -311,3 +311,12 @@ def test_fr_trace_function(
     assert result.is_successful is True
     assert len(result.contributions) == 1
     assert result.contributions[0].contribution_id == c1.contribution_id
+
+
+def test_plugin_contributions_usage_example() -> None:
+    """Verify the __main__ usage scenarios run successfully."""
+    from app.services.plugins.contributions.plugin_contributions import (
+        _run_usage_example,
+    )
+
+    _run_usage_example()

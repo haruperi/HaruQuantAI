@@ -2,6 +2,17 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
+# These wire aliases and base classes are annotation-only for readers but
+# Pydantic resolves them at class-creation time, so they must remain runtime
+# imports.
+from app.contracts.common.models import (
+    ProblemDetails,
+    Uuid7,
+    WireModel,
+)
+
 
 class InterfaceError(RuntimeError):
     """Base exception for all interface-related errors."""
@@ -209,3 +220,39 @@ class DurableJobNotFoundError(InterfaceError):
             f"Durable job '{durable_job_id}' was not found",
             error_code="DURABLE_JOB_NOT_FOUND",
         )
+
+
+# Closed interfaces failure-code union from the ratified v1 operation rules.
+type InterfaceFailureCode = Literal[
+    "INTERFACE_VALIDATION_FAILED",
+    "VERSION_CONFLICT",
+    "IDEMPOTENCY_CONFLICT",
+    "EVENT_CURSOR_EXPIRED",
+    "JOB_NOT_FOUND",
+    "DURABLE_JOB_NOT_FOUND",
+    "ARTIFACT_ACCESS_DENIED",
+    "API_INCOMPATIBLE",
+    "UPGRADE_REQUIRED",
+    "CAPABILITY_UNAVAILABLE",
+]
+
+
+class InterfaceFailure(WireModel):
+    """Structured failure envelope shared by the five new Interfaces gateways.
+
+    ``CAPABILITY_UNAVAILABLE`` performs no mutation. All five gateways
+    enforce identical authentication, authorization, mode/environment
+    gating, validation, idempotency, conflict, event, and audit semantics
+    across HTTP, CLI, MCP, and automation adapters (transport parity).
+    """
+
+    outcome: Literal["FAILURE"] = "FAILURE"
+    request_id: Uuid7
+    code: InterfaceFailureCode
+    problem: ProblemDetails
+    schema_version: Literal[1] = 1
+
+
+WIRE_FAILURES: dict[str, type[WireModel]] = {
+    "InterfaceFailure": InterfaceFailure,
+}

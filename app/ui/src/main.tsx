@@ -17,11 +17,11 @@ function bootstrapApp() {
       description: "Home workspace",
       contributedWorkspaces: [
         {
-          workspaceId: "home",
-          routePath: "/home",
-          displayName: "Home",
-          iconName: "🏠",
-          isAuthorized: true,
+          workspace_id: "home",
+          route_path: "/home",
+          display_name: "Home",
+          icon_name: "🏠",
+          is_authorized: true,
           renderWorkspace: () => (
             <div className="home-workspace-view">
               <h2>Welcome to HaruQuantAI</h2>

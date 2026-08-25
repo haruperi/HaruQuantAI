@@ -1,0 +1,3334 @@
+{
+  "$defs": {
+    "AllocationBudget": {
+      "additionalProperties": false,
+      "description": "Authoritative capped allocation budget returned to Trading.\n\nTrading receives the authoritative capped values and validates them;\nit never recalculates budget consumption.",
+      "properties": {
+        "budget_decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Budget Decision Id",
+          "type": "string"
+        },
+        "capped_weights": {
+          "items": {
+            "$ref": "#/$defs/JsonObject"
+          },
+          "title": "Capped Weights",
+          "type": "array"
+        },
+        "conditions": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "effective_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Effective At"
+        },
+        "evidence_lineage": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "policy_lineage": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "predecessor_binding": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Predecessor Binding"
+        },
+        "review_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Review Id",
+          "type": "string"
+        },
+        "risk_budget_projection": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "budget_decision_id",
+        "review_id",
+        "capped_weights",
+        "risk_budget_projection",
+        "conditions",
+        "evidence_lineage",
+        "policy_lineage",
+        "expires_at",
+        "predecessor_binding",
+        "effective_at"
+      ],
+      "title": "AllocationBudget",
+      "type": "object"
+    },
+    "AuditRiskDecisionsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated audit-chain request.\n\nAPPEND requires only ``record``; VERIFY_CHAIN and EXPORT forbid it.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "APPEND",
+            "VERIFY_CHAIN",
+            "EXPORT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskAuditRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "AuditRiskDecisionsRequest",
+      "type": "object"
+    },
+    "AuditRiskDecisionsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful audit-chain operation result.",
+      "properties": {
+        "chain_valid": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chain Valid"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskAuditRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "AuditRiskDecisionsSuccess",
+      "type": "object"
+    },
+    "CalculateRiskRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated snapshot, sizing, stop, and report request.\n\nSNAPSHOT, SIZE_POSITION, VALIDATE_STOP, and REPORT require only\n``decision_id``; RUN_SCENARIO requires only ``scenario``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Id"
+        },
+        "operation": {
+          "enum": [
+            "SNAPSHOT",
+            "SIZE_POSITION",
+            "VALIDATE_STOP",
+            "RUN_SCENARIO",
+            "REPORT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "scenario": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskScenarioRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "CalculateRiskRequest",
+      "type": "object"
+    },
+    "CalculateRiskSuccess": {
+      "additionalProperties": false,
+      "description": "Successful snapshot, sizing, stop, and report operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "report_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Report Artifact Id"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "scenario": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskScenarioResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sizing": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PositionSizeRecommendation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "stop": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StopLossAssessment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "CalculateRiskSuccess",
+      "type": "object"
+    },
+    "ControlKillSwitchRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated kill-switch command and check request.\n\nCHECK requires only ``scope``; ACTIVATE additionally requires\n``principal`` and ``reason``; CLEAR and RECOVER additionally require\n``clearance_approval_token_id`` and ``remediation_evidence``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "clearance_approval_token_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Clearance Approval Token Id"
+        },
+        "operation": {
+          "enum": [
+            "CHECK",
+            "ACTIVATE",
+            "CLEAR",
+            "RECOVER"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "principal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PrincipalRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "remediation_evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/KillSwitchScope"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ControlKillSwitchRequest",
+      "type": "object"
+    },
+    "ControlKillSwitchSuccess": {
+      "additionalProperties": false,
+      "description": "Successful kill-switch command and check operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/KillSwitchState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "transition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/KillSwitchTransition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ControlKillSwitchSuccess",
+      "type": "object"
+    },
+    "DefineRiskContractsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated profile, mandate, and evidence request.\n\nDEFINE_PROFILE requires only ``profile``; DEFINE_MANDATE requires only\n``mandate``; VALIDATE_EVIDENCE requires only ``evidence``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskEvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "mandate": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FirmMandateVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "DEFINE_PROFILE",
+            "DEFINE_MANDATE",
+            "VALIDATE_EVIDENCE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskProfileVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "DefineRiskContractsRequest",
+      "type": "object"
+    },
+    "DefineRiskContractsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful profile, mandate, and evidence operation result.",
+      "properties": {
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskEvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "mandate": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FirmMandateVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskProfileVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "DefineRiskContractsSuccess",
+      "type": "object"
+    },
+    "FirmMandateVersion": {
+      "additionalProperties": false,
+      "description": "One immutable, effective-dated firm mandate version.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "effective_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "effective_to": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective To"
+        },
+        "mandate_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Mandate Id",
+          "type": "string"
+        },
+        "rules": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "mandate_id",
+        "version",
+        "rules",
+        "effective_from",
+        "content_hash"
+      ],
+      "title": "FirmMandateVersion",
+      "type": "object"
+    },
+    "GovernAdmissionRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated admission and governor request.\n\nBIND_ACTION and EVALUATE require only ``action``; NO_TRADE and\nREVALIDATE require only ``decision_id``.",
+      "properties": {
+        "action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProposedAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Id"
+        },
+        "operation": {
+          "enum": [
+            "BIND_ACTION",
+            "EVALUATE",
+            "NO_TRADE",
+            "REVALIDATE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "GovernAdmissionRequest",
+      "type": "object"
+    },
+    "GovernAdmissionSuccess": {
+      "additionalProperties": false,
+      "description": "Successful admission and governor operation result.",
+      "properties": {
+        "action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProposedAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskDecision"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "no_trade": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NoTradeDecision"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "GovernAdmissionSuccess",
+      "type": "object"
+    },
+    "GovernAllocationsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated capacity and allocation governance request.\n\nRESERVE requires only ``reservation``; COMMIT and RELEASE require only\n``reservation_id``; REVIEW_ALLOCATION requires only ``review``;\nAUTHORIZE_BUDGET requires only ``review_id``; VALIDATE_BUDGET requires\nonly ``budget_decision_id``.",
+      "properties": {
+        "budget_decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Budget Decision Id"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "RESERVE",
+            "COMMIT",
+            "RELEASE",
+            "REVIEW_ALLOCATION",
+            "AUTHORIZE_BUDGET",
+            "VALIDATE_BUDGET"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "reservation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskCapacityReservation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reservation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reservation Id"
+        },
+        "review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioAllocationReview"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "review_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Review Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "GovernAllocationsRequest",
+      "type": "object"
+    },
+    "GovernAllocationsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful capacity and allocation governance operation result.",
+      "properties": {
+        "budget": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllocationBudget"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "reservation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskCapacityReservation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioAllocationReview"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "GovernAllocationsSuccess",
+      "type": "object"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "KillSwitchScope": {
+      "additionalProperties": false,
+      "description": "One hierarchical kill-switch scope identity.\n\nAn active broader scope dominates narrower clear states; the scope\nhash pins the exact scope identity used by state lookups.",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/KillSwitchScopeKind"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scope Hash",
+          "type": "string"
+        },
+        "scope_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Scope Id",
+          "type": "string"
+        },
+        "scope_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scope Value"
+        }
+      },
+      "required": [
+        "scope_id",
+        "kind",
+        "scope_hash"
+      ],
+      "title": "KillSwitchScope",
+      "type": "object"
+    },
+    "KillSwitchScopeKind": {
+      "enum": [
+        "GLOBAL",
+        "ENVIRONMENT",
+        "BROKER_ACCOUNT",
+        "PORTFOLIO",
+        "STRATEGY",
+        "SYMBOL"
+      ],
+      "type": "string"
+    },
+    "KillSwitchSignalState": {
+      "enum": [
+        "ACTIVE",
+        "CLEARED",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "KillSwitchState": {
+      "additionalProperties": false,
+      "description": "Current kill-switch state for one exact scope.\n\nPreflight and pre-dispatch checks read a known current version for the\nexact scope; active, unknown, stale, unavailable, or version-mismatched\nstate blocks (fail-closed).",
+      "properties": {
+        "last_transition_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Last Transition At",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "$ref": "#/$defs/KillSwitchScope"
+        },
+        "state": {
+          "$ref": "#/$defs/KillSwitchSignalState"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "scope",
+        "version",
+        "state",
+        "reason",
+        "last_transition_at"
+      ],
+      "title": "KillSwitchState",
+      "type": "object"
+    },
+    "KillSwitchTransition": {
+      "additionalProperties": false,
+      "description": "One atomic, append-only, audited kill-switch state transition.\n\n``(scope_hash, version)`` uniqueness is enforced by the owning store\nbecause it spans multiple transition records; the critical causal event\nis published to Trading and Interfaces by the owning feature.",
+      "properties": {
+        "authorized_principal": {
+          "$ref": "#/$defs/PrincipalRef"
+        },
+        "clearance_approval_token_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Clearance Approval Token Id"
+        },
+        "from_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/KillSwitchSignalState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "remediation_evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "$ref": "#/$defs/KillSwitchScope"
+        },
+        "to_state": {
+          "$ref": "#/$defs/KillSwitchSignalState"
+        },
+        "transition_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Transition Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "transition_id",
+        "scope",
+        "from_state",
+        "to_state",
+        "version",
+        "authorized_principal",
+        "reason",
+        "occurred_at"
+      ],
+      "title": "KillSwitchTransition",
+      "type": "object"
+    },
+    "ManageApprovalsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated approval and token lifecycle request.\n\nREQUEST_APPROVAL requires only ``approval_request``; ISSUE_TOKEN\nrequires only ``approval_request_id``; CONSUME_TOKEN and REVOKE_TOKEN\nrequire only ``token_id``.",
+      "properties": {
+        "approval_request": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskApprovalRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "approval_request_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approval Request Id"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "REQUEST_APPROVAL",
+            "ISSUE_TOKEN",
+            "CONSUME_TOKEN",
+            "REVOKE_TOKEN"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "token_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Token Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ManageApprovalsRequest",
+      "type": "object"
+    },
+    "ManageApprovalsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful approval and token lifecycle operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskApprovalRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "token": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskApprovalToken"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ManageApprovalsSuccess",
+      "type": "object"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "Currency-qualified canonical decimal amount.",
+      "properties": {
+        "amount": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NoTradeDecision": {
+      "additionalProperties": false,
+      "description": "Successful ``NO_TRADE`` outcome of a mandatory-gate rejection.\n\nA mandatory-gate rejection with a valid system and evidence state is a\nsuccessful business stand-down, distinct from transport, calculation,\nor storage failure.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ProposedAction"
+        },
+        "business_outcome": {
+          "const": "NO_TRADE",
+          "default": "NO_TRADE",
+          "title": "Business Outcome",
+          "type": "string"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "is_valid_system_state": {
+          "const": true,
+          "title": "Is Valid System State",
+          "type": "boolean"
+        },
+        "provenance": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "verdict": {
+          "enum": [
+            "REJECT",
+            "BLOCK"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_id",
+        "action",
+        "verdict",
+        "is_valid_system_state",
+        "provenance"
+      ],
+      "title": "NoTradeDecision",
+      "type": "object"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "OrderedCheck": {
+      "additionalProperties": false,
+      "description": "One governor check at its fixed precedence position.\n\nThis is the inline ``OrderedCheck`` record of\n``RiskDecision.ordered_checks``.",
+      "properties": {
+        "check": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "precedence": {
+          "minimum": 0,
+          "title": "Precedence",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/RiskLimitState"
+        }
+      },
+      "required": [
+        "check",
+        "state",
+        "precedence"
+      ],
+      "title": "OrderedCheck",
+      "type": "object"
+    },
+    "PortfolioAllocationReview": {
+      "additionalProperties": false,
+      "description": "Risk review of a self-contained portfolio allocation projection.\n\nConsumes exact portfolio/allocation version identities, ordered\nweights, eligibility decisions, and account/market/FX evidence without\nimporting Portfolio behavior.",
+      "properties": {
+        "account_market_fx_evidence": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RiskEvidenceRef"
+          },
+          "title": "Account Market Fx Evidence",
+          "type": "array"
+        },
+        "allocation_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Allocation Version Id",
+          "type": "string"
+        },
+        "eligibility": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/StrategyEligibilityDecision"
+          },
+          "title": "Eligibility",
+          "type": "array"
+        },
+        "ordered_weights": {
+          "items": {
+            "$ref": "#/$defs/JsonObject"
+          },
+          "title": "Ordered Weights",
+          "type": "array"
+        },
+        "portfolio_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Portfolio Version Id",
+          "type": "string"
+        },
+        "review_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Review Id",
+          "type": "string"
+        },
+        "runtime_scope": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "self_contained_projection": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "review_id",
+        "portfolio_version_id",
+        "allocation_version_id",
+        "ordered_weights",
+        "runtime_scope",
+        "self_contained_projection"
+      ],
+      "title": "PortfolioAllocationReview",
+      "type": "object"
+    },
+    "PositionSizeRecommendation": {
+      "additionalProperties": false,
+      "description": "Bounded position-sizing recommendation that never implies approval.",
+      "properties": {
+        "calculation_trace": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "constraints_applied": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "evidence_gaps": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Evidence Gaps",
+          "type": "array"
+        },
+        "fallback_disclosure": {
+          "default": "",
+          "title": "Fallback Disclosure",
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "method_version": {
+          "minimum": 1,
+          "title": "Method Version",
+          "type": "integer"
+        },
+        "normalized_size": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Normalized Size"
+        },
+        "recommendation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Recommendation Id",
+          "type": "string"
+        },
+        "requested_size": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Requested Size",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "recommendation_id",
+        "decision_id",
+        "method",
+        "method_version",
+        "requested_size",
+        "constraints_applied",
+        "calculation_trace"
+      ],
+      "title": "PositionSizeRecommendation",
+      "type": "object"
+    },
+    "PrincipalRef": {
+      "additionalProperties": false,
+      "description": "Wire-native reference to one authenticated hosted principal.\n\nThe authority discriminator is the provider identity; the principal\nreplaces the local-session token in hosted mode.",
+      "properties": {
+        "auth_provider": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "principal_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Principal Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "principal_id",
+        "auth_provider"
+      ],
+      "title": "PrincipalRef",
+      "type": "object"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "ProposedAction": {
+      "additionalProperties": false,
+      "description": "One complete immutable proposed action bound for admission.\n\n``intent`` embeds the complete Strategy intent or Trading manual plan\nunchanged; Risk adds scope, valuation, stop, route, evidence, and the\nrequested risk profile without altering it.",
+      "properties": {
+        "account_scope": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Account Scope",
+          "type": "array"
+        },
+        "action_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Action Id",
+          "type": "string"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RiskEvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "intent": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "portfolio_scope": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Portfolio Scope",
+          "type": "array"
+        },
+        "requested_profile": {
+          "$ref": "#/$defs/RiskProfileRef"
+        },
+        "route_profile": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "stop": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valuation": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "action_id",
+        "intent",
+        "account_scope",
+        "portfolio_scope",
+        "valuation",
+        "stop",
+        "route_profile",
+        "requested_profile"
+      ],
+      "title": "ProposedAction",
+      "type": "object"
+    },
+    "RiskApprovalRequest": {
+      "additionalProperties": false,
+      "description": "Human-approval evidence binding one authenticated principal.\n\nBinds principal, exact action/scope/policy, hashes, times, and trace\nIDs; it carries no secret and grants no authority by itself.",
+      "properties": {
+        "action_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Action Hash",
+          "type": "string"
+        },
+        "approval_request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Approval Request Id",
+          "type": "string"
+        },
+        "config_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Config Hash",
+          "type": "string"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "issued_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Issued At",
+          "type": "string"
+        },
+        "policy_version": {
+          "minimum": 1,
+          "title": "Policy Version",
+          "type": "integer"
+        },
+        "principal": {
+          "$ref": "#/$defs/PrincipalRef"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "trace_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Trace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "approval_request_id",
+        "decision_id",
+        "principal",
+        "action_hash",
+        "scope",
+        "policy_version",
+        "config_hash",
+        "trace_id",
+        "issued_at",
+        "expires_at"
+      ],
+      "title": "RiskApprovalRequest",
+      "type": "object"
+    },
+    "RiskApprovalToken": {
+      "additionalProperties": false,
+      "description": "Signed, scoped, expiring, single-use approval token.\n\nInvalid, expired, revoked, consumed, or mismatched tokens grant no\nverdict; validation and consumption are atomic, so concurrent double\nspend yields at most one success.",
+      "properties": {
+        "action_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Action Hash",
+          "type": "string"
+        },
+        "approval_request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Approval Request Id",
+          "type": "string"
+        },
+        "approver": {
+          "$ref": "#/$defs/PrincipalRef"
+        },
+        "config_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Config Hash",
+          "type": "string"
+        },
+        "decision_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Decision Hash",
+          "type": "string"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "issued_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Issued At",
+          "type": "string"
+        },
+        "nonce": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "signature": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "state": {
+          "$ref": "#/$defs/RiskTokenState"
+        },
+        "token_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Token Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "token_id",
+        "approval_request_id",
+        "signature",
+        "scope",
+        "nonce",
+        "decision_hash",
+        "config_hash",
+        "action_hash",
+        "approver",
+        "issued_at",
+        "expires_at",
+        "state"
+      ],
+      "title": "RiskApprovalToken",
+      "type": "object"
+    },
+    "RiskAuditEventKind": {
+      "enum": [
+        "PROFILE",
+        "EVIDENCE_VALIDATION",
+        "DECISION",
+        "TOKEN",
+        "RESERVATION",
+        "KILL_SWITCH",
+        "ELIGIBILITY",
+        "ALLOCATION",
+        "REUSE",
+        "SCENARIO"
+      ],
+      "type": "string"
+    },
+    "RiskAuditRecord": {
+      "additionalProperties": false,
+      "description": "One redacted, canonical, hash-chained append-only audit record.\n\n``record_hash`` covers the canonical redacted record and\n``previous_hash`` links to the prior record's ``record_hash``; chain\nverification detects insertion, deletion, reordering, or mutation and\nis enforced by the owning feature because it spans records.",
+      "properties": {
+        "detail": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "event_kind": {
+          "$ref": "#/$defs/RiskAuditEventKind"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "previous_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Previous Hash",
+          "type": "string"
+        },
+        "principal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PrincipalRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "record_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Record Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sequence",
+        "record_hash",
+        "previous_hash",
+        "event_kind",
+        "principal",
+        "detail",
+        "occurred_at"
+      ],
+      "title": "RiskAuditRecord",
+      "type": "object"
+    },
+    "RiskCapacityReservation": {
+      "additionalProperties": false,
+      "description": "Durable risk-capacity reservation with fenced lifecycle transitions.\n\nAtomically reserved before dispatch against account, strategy,\nportfolio, symbol, and global budgets; Trading cannot substitute\nanother action or amount, and concurrent admissions cannot exceed any\nhard budget.",
+      "properties": {
+        "action_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Action Hash",
+          "type": "string"
+        },
+        "amount": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "fencing_token": {
+          "minimum": 1,
+          "title": "Fencing Token",
+          "type": "integer"
+        },
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "issued_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Issued At",
+          "type": "string"
+        },
+        "plan_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Plan Hash",
+          "type": "string"
+        },
+        "predecessor_state_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Predecessor State Hash"
+        },
+        "reservation_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Reservation Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "state": {
+          "$ref": "#/$defs/RiskReservationState"
+        },
+        "unit": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "reservation_id",
+        "decision_id",
+        "action_hash",
+        "plan_hash",
+        "amount",
+        "unit",
+        "scope",
+        "predecessor_state_hash",
+        "idempotency_key",
+        "issued_at",
+        "expires_at",
+        "state",
+        "fencing_token"
+      ],
+      "title": "RiskCapacityReservation",
+      "type": "object"
+    },
+    "RiskDecision": {
+      "additionalProperties": false,
+      "description": "Canonical governor decision package for one proposed action.\n\nThe governor evaluates kill switch, evidence/profile validity,\neligibility, session/news/regime constraints, stop, size,\nportfolio/market limits, allocation budget, approval policy, and\ncapability availability in a fixed documented precedence; earlier\nblocking reasons cannot be masked by later approvals.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ProposedAction"
+        },
+        "allowed_action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "as_of": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "As Of",
+          "type": "string"
+        },
+        "authorization_requirement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "composite_reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Composite Reasons",
+          "type": "array"
+        },
+        "concurrency_disclosure": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "configuration_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Configuration Hash",
+          "type": "string"
+        },
+        "correlation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Correlation Id"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "mandate_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Mandate Version Id"
+        },
+        "maximum_size": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum Size"
+        },
+        "ordered_checks": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/OrderedCheck"
+          },
+          "title": "Ordered Checks",
+          "type": "array"
+        },
+        "primary_reason": {
+          "title": "Primary Reason",
+          "type": "string"
+        },
+        "profile_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Version Id",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "verdict": {
+          "$ref": "#/$defs/RuntimeRiskDecision"
+        },
+        "workflow_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Workflow Id"
+        }
+      },
+      "required": [
+        "decision_id",
+        "action",
+        "verdict",
+        "primary_reason",
+        "expires_at",
+        "profile_version_id",
+        "mandate_version_id",
+        "configuration_hash",
+        "as_of",
+        "request_id",
+        "workflow_id",
+        "correlation_id"
+      ],
+      "title": "RiskDecision",
+      "type": "object"
+    },
+    "RiskDecisionState": {
+      "additionalProperties": false,
+      "description": "Named runtime decision-state entry for one decision identity.",
+      "properties": {
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "entered_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Entered At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "verdict": {
+          "$ref": "#/$defs/RuntimeRiskDecision"
+        }
+      },
+      "required": [
+        "decision_id",
+        "verdict",
+        "entered_at"
+      ],
+      "title": "RiskDecisionState",
+      "type": "object"
+    },
+    "RiskEvidenceFreshness": {
+      "enum": [
+        "FRESH",
+        "STALE",
+        "MISSING"
+      ],
+      "type": "string"
+    },
+    "RiskEvidenceRef": {
+      "additionalProperties": false,
+      "description": "Reference to one consumed cross-owner source-evidence record.\n\nOwner schema, identity, UTC time, freshness, coverage, provenance,\nexplicit missingness, and exact units are validated without redefining\nthe source record itself.",
+      "properties": {
+        "evidence_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "freshness": {
+          "$ref": "#/$defs/RiskEvidenceFreshness"
+        },
+        "missingness": {
+          "default": "",
+          "title": "Missingness",
+          "type": "string"
+        },
+        "observed_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Hash",
+          "type": "string"
+        },
+        "source_owner": {
+          "$ref": "#/$defs/RiskEvidenceSourceOwner"
+        },
+        "source_record_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Source Record Id",
+          "type": "string"
+        },
+        "units": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "source_owner",
+        "source_record_id",
+        "source_hash",
+        "observed_at",
+        "freshness",
+        "units"
+      ],
+      "title": "RiskEvidenceRef",
+      "type": "object"
+    },
+    "RiskEvidenceSourceOwner": {
+      "enum": [
+        "ACCOUNT",
+        "FX",
+        "MARKET",
+        "NEWS",
+        "SESSION",
+        "STRATEGY",
+        "BROKER",
+        "PORTFOLIO"
+      ],
+      "type": "string"
+    },
+    "RiskFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope shared by every risk capability.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/RiskFailureCode"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "RiskFailure",
+      "type": "object"
+    },
+    "RiskFailureCode": {
+      "enum": [
+        "RISK_VALIDATION_FAILED",
+        "RISK_PROFILE_INVALID",
+        "RISK_EVIDENCE_STALE",
+        "RISK_EVIDENCE_MISSING",
+        "RISK_APPROVAL_REQUIRED",
+        "RISK_TOKEN_INVALID",
+        "RISK_RESERVATION_CONFLICT",
+        "KILL_SWITCH_ACTIVE",
+        "RISK_SCOPE_UNKNOWN",
+        "RISK_NOT_FOUND",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "RiskLimitResult": {
+      "additionalProperties": false,
+      "description": "One evaluated limit with its precedence-ordered state.\n\n``(decision_id, precedence)`` uniqueness is enforced by the owning\nstore because it spans multiple result rows.",
+      "properties": {
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "limit_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "observed": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Observed"
+        },
+        "precedence": {
+          "minimum": 0,
+          "title": "Precedence",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/RiskLimitState"
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Threshold"
+        },
+        "unit": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "decision_id",
+        "limit_key",
+        "state",
+        "precedence",
+        "observed",
+        "threshold",
+        "unit"
+      ],
+      "title": "RiskLimitResult",
+      "type": "object"
+    },
+    "RiskLimitState": {
+      "enum": [
+        "PASS",
+        "WARN",
+        "MISSING",
+        "FAIL",
+        "BLOCKED"
+      ],
+      "type": "string"
+    },
+    "RiskProfileRef": {
+      "additionalProperties": false,
+      "description": "Reference to one risk profile identity.",
+      "properties": {
+        "profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profile_id"
+      ],
+      "title": "RiskProfileRef",
+      "type": "object"
+    },
+    "RiskProfileVersion": {
+      "additionalProperties": false,
+      "description": "One immutable, effective-dated risk profile version.\n\nThresholds, units, modes, and every policy object are strictly validated\nby the owning feature; the wire record pins their canonical hash and\nhalf-open effective interval without implicit defaults.",
+      "properties": {
+        "approval_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "audit_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "concurrency_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "effective_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "effective_to": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective To"
+        },
+        "failure_precedence": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "freshness_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "modes": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "rounding_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "thresholds": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "units": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profile_id",
+        "version",
+        "effective_from",
+        "thresholds",
+        "units",
+        "modes",
+        "freshness_policy",
+        "rounding_policy",
+        "concurrency_policy",
+        "approval_policy",
+        "audit_policy",
+        "failure_precedence",
+        "content_hash"
+      ],
+      "title": "RiskProfileVersion",
+      "type": "object"
+    },
+    "RiskReservationState": {
+      "enum": [
+        "RESERVED",
+        "COMMITTED",
+        "RELEASED",
+        "EXPIRED"
+      ],
+      "type": "string"
+    },
+    "RiskScenarioRequest": {
+      "additionalProperties": false,
+      "description": "Advisory what-if scenario request against one immutable snapshot.\n\nAdvisory only; a scenario result never produces approval.",
+      "properties": {
+        "baseline_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Baseline Snapshot Id",
+          "type": "string"
+        },
+        "is_stochastic": {
+          "title": "Is Stochastic",
+          "type": "boolean"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "shocks": {
+          "items": {
+            "$ref": "#/$defs/ScenarioShock"
+          },
+          "title": "Shocks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "request_id",
+        "baseline_snapshot_id",
+        "shocks",
+        "is_stochastic"
+      ],
+      "title": "RiskScenarioRequest",
+      "type": "object"
+    },
+    "RiskScenarioResult": {
+      "additionalProperties": false,
+      "description": "Advisory projected-risk result of one scenario request.",
+      "properties": {
+        "assumptions": {
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "baseline_comparison": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "limitations": {
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "projected_snapshot": {
+          "$ref": "#/$defs/RiskSnapshot"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "result_id",
+        "request_id",
+        "projected_snapshot",
+        "baseline_comparison",
+        "assumptions",
+        "limitations"
+      ],
+      "title": "RiskScenarioResult",
+      "type": "object"
+    },
+    "RiskSnapshot": {
+      "additionalProperties": false,
+      "description": "Immutable portfolio/account risk snapshot for one decision.\n\nPending, open, and reserved exposure are always carried explicitly and\nnever silently excluded; ``duplicate_treatment`` discloses the\ndeterministic duplicate and in-flight treatment used.",
+      "properties": {
+        "as_of": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "As Of",
+          "type": "string"
+        },
+        "base_currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Base Currency",
+          "type": "string"
+        },
+        "correlation_contribution": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "daily_loss": {
+          "$ref": "#/$defs/Money"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "dimensional_exposure": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "drawdown": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Drawdown",
+          "type": "string"
+        },
+        "duplicate_treatment": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "equity": {
+          "$ref": "#/$defs/Money"
+        },
+        "gross_exposure": {
+          "$ref": "#/$defs/Money"
+        },
+        "historical_tail_risk": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "leverage": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Leverage"
+        },
+        "limit_results": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RiskLimitResult"
+          },
+          "title": "Limit Results",
+          "type": "array"
+        },
+        "margin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "net_exposure": {
+          "$ref": "#/$defs/Money"
+        },
+        "open_position_exposure": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "pending_order_exposure": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "reserved_exposure": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "total_loss": {
+          "$ref": "#/$defs/Money"
+        },
+        "volatility_contribution": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "decision_id",
+        "as_of",
+        "base_currency",
+        "equity",
+        "daily_loss",
+        "total_loss",
+        "drawdown",
+        "gross_exposure",
+        "net_exposure",
+        "dimensional_exposure",
+        "margin",
+        "leverage",
+        "historical_tail_risk",
+        "volatility_contribution",
+        "correlation_contribution",
+        "pending_order_exposure",
+        "open_position_exposure",
+        "reserved_exposure",
+        "duplicate_treatment"
+      ],
+      "title": "RiskSnapshot",
+      "type": "object"
+    },
+    "RiskTokenState": {
+      "enum": [
+        "ISSUED",
+        "CONSUMED",
+        "REVOKED",
+        "EXPIRED"
+      ],
+      "type": "string"
+    },
+    "RuntimeRiskDecision": {
+      "enum": [
+        "APPROVE",
+        "WARN",
+        "NEEDS_APPROVAL",
+        "NEEDS_MORE_EVIDENCE",
+        "REJECT",
+        "BLOCK",
+        "ERROR"
+      ],
+      "type": "string"
+    },
+    "ScenarioShock": {
+      "additionalProperties": false,
+      "description": "One bounded deterministic shock along a named risk dimension.\n\nThis is the inline ``ScenarioShock`` record of\n``RiskScenarioRequest.shocks``.",
+      "properties": {
+        "dimension": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "magnitude": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Magnitude",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dimension",
+        "magnitude"
+      ],
+      "title": "ScenarioShock",
+      "type": "object"
+    },
+    "Side": {
+      "enum": [
+        "BUY",
+        "SELL"
+      ],
+      "type": "string"
+    },
+    "StopLossAssessment": {
+      "additionalProperties": false,
+      "description": "Validity assessment of one proposed protective stop.\n\nA missing or invalid stop, or missing required volatility evidence,\nrejects sizing and admission downstream.",
+      "properties": {
+        "assessment_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Assessment Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "invalidation_distance": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Invalidation Distance",
+          "type": "string"
+        },
+        "is_valid": {
+          "title": "Is Valid",
+          "type": "boolean"
+        },
+        "noise_minimum": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Noise Minimum"
+        },
+        "projected_loss": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "side": {
+          "$ref": "#/$defs/Side"
+        },
+        "stop_price": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Stop Price",
+          "type": "string"
+        },
+        "tick_aligned": {
+          "title": "Tick Aligned",
+          "type": "boolean"
+        },
+        "venue_minimum": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Venue Minimum"
+        },
+        "widening_permitted": {
+          "title": "Widening Permitted",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "assessment_id",
+        "decision_id",
+        "side",
+        "stop_price",
+        "tick_aligned",
+        "invalidation_distance",
+        "venue_minimum",
+        "noise_minimum",
+        "projected_loss",
+        "widening_permitted",
+        "is_valid"
+      ],
+      "title": "StopLossAssessment",
+      "type": "object"
+    },
+    "StrategyEligibilityDecision": {
+      "additionalProperties": false,
+      "description": "Operational eligibility decision for one exact strategy version.\n\nThe decision binds strategy/version, runtime profile, route, policy,\nevidence, approval context, conditions, validity interval, and\ndecision lineage without altering Strategy registration.",
+      "properties": {
+        "approval_context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "conditions": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "decision_lineage_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Decision Lineage Id"
+        },
+        "eligibility_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Eligibility Id",
+          "type": "string"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RiskEvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "outcome": {
+          "$ref": "#/$defs/StrategyEligibilityOutcome"
+        },
+        "policy_version": {
+          "minimum": 1,
+          "title": "Policy Version",
+          "type": "integer"
+        },
+        "route": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "runtime_profile": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        },
+        "valid_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Valid From",
+          "type": "string"
+        },
+        "valid_to": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid To"
+        }
+      },
+      "required": [
+        "eligibility_id",
+        "strategy_version_id",
+        "runtime_profile",
+        "route",
+        "policy_version",
+        "approval_context",
+        "conditions",
+        "valid_from",
+        "decision_lineage_id",
+        "outcome"
+      ],
+      "title": "StrategyEligibilityDecision",
+      "type": "object"
+    },
+    "StrategyEligibilityOutcome": {
+      "enum": [
+        "ELIGIBLE",
+        "CONDITIONAL",
+        "INELIGIBLE"
+      ],
+      "type": "string"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {},
+  "failures": {
+    "RiskFailure": {
+      "$ref": "#/$defs/RiskFailure"
+    }
+  },
+  "models": {
+    "AllocationBudget": {
+      "$ref": "#/$defs/AllocationBudget"
+    },
+    "AuditRiskDecisionsRequest": {
+      "$ref": "#/$defs/AuditRiskDecisionsRequest"
+    },
+    "AuditRiskDecisionsSuccess": {
+      "$ref": "#/$defs/AuditRiskDecisionsSuccess"
+    },
+    "CalculateRiskRequest": {
+      "$ref": "#/$defs/CalculateRiskRequest"
+    },
+    "CalculateRiskSuccess": {
+      "$ref": "#/$defs/CalculateRiskSuccess"
+    },
+    "ControlKillSwitchRequest": {
+      "$ref": "#/$defs/ControlKillSwitchRequest"
+    },
+    "ControlKillSwitchSuccess": {
+      "$ref": "#/$defs/ControlKillSwitchSuccess"
+    },
+    "DefineRiskContractsRequest": {
+      "$ref": "#/$defs/DefineRiskContractsRequest"
+    },
+    "DefineRiskContractsSuccess": {
+      "$ref": "#/$defs/DefineRiskContractsSuccess"
+    },
+    "FirmMandateVersion": {
+      "$ref": "#/$defs/FirmMandateVersion"
+    },
+    "GovernAdmissionRequest": {
+      "$ref": "#/$defs/GovernAdmissionRequest"
+    },
+    "GovernAdmissionSuccess": {
+      "$ref": "#/$defs/GovernAdmissionSuccess"
+    },
+    "GovernAllocationsRequest": {
+      "$ref": "#/$defs/GovernAllocationsRequest"
+    },
+    "GovernAllocationsSuccess": {
+      "$ref": "#/$defs/GovernAllocationsSuccess"
+    },
+    "KillSwitchScope": {
+      "$ref": "#/$defs/KillSwitchScope"
+    },
+    "KillSwitchState": {
+      "$ref": "#/$defs/KillSwitchState"
+    },
+    "KillSwitchTransition": {
+      "$ref": "#/$defs/KillSwitchTransition"
+    },
+    "ManageApprovalsRequest": {
+      "$ref": "#/$defs/ManageApprovalsRequest"
+    },
+    "ManageApprovalsSuccess": {
+      "$ref": "#/$defs/ManageApprovalsSuccess"
+    },
+    "NoTradeDecision": {
+      "$ref": "#/$defs/NoTradeDecision"
+    },
+    "OrderedCheck": {
+      "$ref": "#/$defs/OrderedCheck"
+    },
+    "PortfolioAllocationReview": {
+      "$ref": "#/$defs/PortfolioAllocationReview"
+    },
+    "PositionSizeRecommendation": {
+      "$ref": "#/$defs/PositionSizeRecommendation"
+    },
+    "ProposedAction": {
+      "$ref": "#/$defs/ProposedAction"
+    },
+    "RiskApprovalRequest": {
+      "$ref": "#/$defs/RiskApprovalRequest"
+    },
+    "RiskApprovalToken": {
+      "$ref": "#/$defs/RiskApprovalToken"
+    },
+    "RiskAuditRecord": {
+      "$ref": "#/$defs/RiskAuditRecord"
+    },
+    "RiskCapacityReservation": {
+      "$ref": "#/$defs/RiskCapacityReservation"
+    },
+    "RiskDecision": {
+      "$ref": "#/$defs/RiskDecision"
+    },
+    "RiskDecisionState": {
+      "$ref": "#/$defs/RiskDecisionState"
+    },
+    "RiskEvidenceRef": {
+      "$ref": "#/$defs/RiskEvidenceRef"
+    },
+    "RiskLimitResult": {
+      "$ref": "#/$defs/RiskLimitResult"
+    },
+    "RiskProfileRef": {
+      "$ref": "#/$defs/RiskProfileRef"
+    },
+    "RiskProfileVersion": {
+      "$ref": "#/$defs/RiskProfileVersion"
+    },
+    "RiskScenarioRequest": {
+      "$ref": "#/$defs/RiskScenarioRequest"
+    },
+    "RiskScenarioResult": {
+      "$ref": "#/$defs/RiskScenarioResult"
+    },
+    "RiskSnapshot": {
+      "$ref": "#/$defs/RiskSnapshot"
+    },
+    "ScenarioShock": {
+      "$ref": "#/$defs/ScenarioShock"
+    },
+    "StopLossAssessment": {
+      "$ref": "#/$defs/StopLossAssessment"
+    },
+    "StrategyEligibilityDecision": {
+      "$ref": "#/$defs/StrategyEligibilityDecision"
+    }
+  },
+  "namespace": "risk",
+  "schema_version": 1,
+  "title": "risk wire contracts v1"
+}

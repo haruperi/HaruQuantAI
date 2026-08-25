@@ -1,5 +1,5 @@
 import React from "react";
-import type { CapabilityPresentationState } from "../../contracts/generated/ui_contracts";
+import type { CapabilityPresentationState } from "../../runtime/composition_bridge";
 
 export interface CapabilityStateViewProps {
   capabilityId: string;

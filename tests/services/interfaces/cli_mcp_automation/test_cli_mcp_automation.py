@@ -233,3 +233,12 @@ def test_iface_track_durable_commands_capacity_eviction() -> None:
     assert (
         service.get_durable_command_status(job3.durable_job_id).command_name == "cmd3"
     )
+
+
+def test_cli_mcp_automation_usage_example() -> None:
+    """Verify the __main__ usage scenarios run successfully."""
+    from app.services.interfaces.cli_mcp_automation.cli_mcp_automation import (
+        _run_usage_example,
+    )
+
+    _run_usage_example()
