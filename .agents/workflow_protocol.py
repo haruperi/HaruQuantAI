@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Artifact-driven Planner -> Executor -> Reviewer orchestrator for HaruQuantAI.
 
-The active task workspace is ``.agents/task``.  The three role journals are
+The active task workspace is ``.agents/task``. The three role journals are
 append-only while a task is active; ``next-agent.md`` is replace-only and is
-the complete executable prompt for the next role.  Runtime routing validates
+the complete executable prompt for the next role. Runtime routing validates
 that artifact against ``.agents/protocol.toml`` before any role is launched.
 
-This script is primarily the multi-delegate transport.  Solo, delegate, and
+This script is primarily the multi-delegate transport. Solo, delegate, and
 manual modes consume the same ``next-agent.md`` contract through the chat
 orchestrator described in ``.agents/ORCHESTRATOR.md``.
 """
@@ -60,23 +60,25 @@ REQUIRED_NEXT_META = {
 }
 PROTECTED_SENTINELS = {
     "PLANNER": (
-        "Act as the HaruQuantAI **Planner** defined by `AGENTS.md`.",
-        "## 5. Authority and Boundaries",
+        "Act as the **HaruQuantAI Principal Software Architect and Implementation Planner**",
+        "This prompt defines your complete **Planner-specific role contract**.",
         "HANDOFF : PENDING_APPROVAL",
     ),
     "EXECUTOR": (
-        "Act as the HaruQuantAI **Executor** defined by `AGENTS.md`.",
-        "## 5. Authority and Boundaries",
+        "Act as the **HaruQuantAI Senior Software Implementation Engineer**",
+        "This prompt defines your complete **Executor-specific role contract**.",
         "HANDOFF : READY_FOR_REVIEW",
     ),
     "REVIEWER": (
-        "Act as the HaruQuantAI **Reviewer** defined by `AGENTS.md`.",
+        "Act as the **HaruQuantAI Principal Software Verification and Code Review Engineer**",
+        "This prompt defines your complete **Reviewer-specific role contract**.",
         "Stage A — Independent reconstruction",
         "Stage B — Independent verification",
         "Stage C — Dry-run, report, and code reconciliation",
     ),
     "REVIEWER_CLOSEOUT": (
-        "Act as the HaruQuantAI **Reviewer performing authorized close-out**.",
+        "Act as the **HaruQuantAI Release Integrity and Change-Control Engineer**",
+        "This prompt defines your complete **close-out-specific role contract**.",
         "HANDOFF : ACCEPTED",
         "ff-only merge",
     ),
@@ -242,6 +244,7 @@ def assemble_config(repo_override: str | None = None) -> dict[str, Any]:
         "retries": int(run_cfg.get("agent_retry_attempts", 1)),
         "mode": str(runtime_cfg.get("mode", "UNCONFIGURED")),
         "protocol": protocol,
+        "session_continuity": cast("dict[str, Any]", protocol.get("session_continuity", {})),
         "transitions": transitions,
         "protocol_path": protocol_path,
         "journals": journals,
@@ -450,14 +453,12 @@ def _ensure_pending_artifact_unchanged(
         raise OrchestratorError("next-agent.md changed after it was validated.")
     if str(pending.get("baseline_commit")) != str(state["baseline"]):
         raise OrchestratorError("Pending artifact baseline contradicts active run.")
-    # Verify branch hasn't changed
     current_branch = _git_ok(cfg["repo"], "branch", "--show-current")
     expected_branch = state.get("branch")
     if expected_branch and current_branch != expected_branch:
         raise OrchestratorError(
             f"Branch changed after validation: {current_branch!r} != {expected_branch!r}"
         )
-    # Verify HEAD hasn't moved (no stealth commits)
     current_head = _git_ok(cfg["repo"], "rev-parse", "HEAD")
     expected_head = pending.get("source_head")
     if expected_head and current_head != expected_head:
@@ -465,7 +466,6 @@ def _ensure_pending_artifact_unchanged(
             f"HEAD changed after validation (possible commit): "
             f"{current_head[:12]} != {expected_head[:12]}"
         )
-    # Verify template hasn't been mutated
     template_path = pending.get("template_path")
     if template_path:
         full_path = cfg["repo"] / template_path
@@ -477,7 +477,6 @@ def _ensure_pending_artifact_unchanged(
                 )
     if _worktree_fingerprint(cfg["repo"]) != pending.get("worktree_sha256"):
         raise OrchestratorError("Working tree changed after next-agent validation.")
-    # Verify target role hasn't changed
     artifact = parse_next_agent(cfg["next_agent"])
     expected_role = pending.get("target_role")
     if (
@@ -552,11 +551,6 @@ def _validate_activating(block: dict[str, str], transition: Transition) -> None:
         )
 
 
-# ---------------------------------------------------------------------------
-# Approval-chain integrity primitives
-# ---------------------------------------------------------------------------
-
-
 def _extract_pre_gate_content(journal_content: str, iteration: int) -> str | None:
     """Extract journal content before the owner gate for a specific iteration."""
     gate_marker = f"### Owner Gate — Dry Run {iteration}"
@@ -576,11 +570,7 @@ def _verify_approval_chain(
     branch: str,
     approved_plan_hash: str,
 ) -> None:
-    """Verify the approval chain for a given iteration.
-
-    Extracts the pre-gate journal content, recomputes SHA-256, and compares
-    against the stored approved_plan_hash.
-    """
+    """Verify the approval chain for a given iteration."""
     content_bytes = journal.read_bytes()
     gate_marker = f"### Owner Gate — Dry Run {iteration}"
     marker_bytes = gate_marker.encode("utf-8")
@@ -613,11 +603,6 @@ def _verify_approval_chain(
         raise OrchestratorError("Owner gate branch mismatch.")
 
 
-# ---------------------------------------------------------------------------
-# Repository snapshot and mutation-delta primitives
-# ---------------------------------------------------------------------------
-
-# Patterns to exclude from snapshots (runtime scratch)
 _SNAPSHOT_IGNORE_PREFIXES = (
     ".agents/logs/",
     ".agents/runs/",
@@ -626,10 +611,7 @@ _SNAPSHOT_IGNORE_PREFIXES = (
 
 
 def capture_repository_snapshot(repo: Path) -> dict[str, str]:
-    """Capture a snapshot of all tracked and relevant untracked files.
-
-    Returns a dict mapping repo-relative paths to their SHA-256 content hashes.
-    """
+    """Capture a snapshot of all tracked and relevant untracked files."""
     snapshot: dict[str, str] = {}
     result = subprocess.run(
         ["git", "ls-files"],
@@ -661,7 +643,7 @@ def capture_repository_snapshot(repo: Path) -> dict[str, str]:
         path = line.strip()
         if not path:
             continue
-        if any(path.startswith(pfx) for pfx in _SNAPSHOT_IGNORE_PREFIXES):
+        if any(path.startswith(prefix) for prefix in _SNAPSHOT_IGNORE_PREFIXES):
             continue
         full_path = repo / path
         if full_path.is_file():
@@ -680,33 +662,20 @@ def compute_snapshot_delta(
     created = set(after.keys()) - set(before.keys())
     deleted = set(before.keys()) - set(after.keys())
     modified = {
-        p for p in set(before.keys()) & set(after.keys()) if before[p] != after[p]
+        path for path in set(before.keys()) & set(after.keys()) if before[path] != after[path]
     }
     return {"created": created, "modified": modified, "deleted": deleted}
 
 
-# ---------------------------------------------------------------------------
-# Role authority primitives
-# ---------------------------------------------------------------------------
-
 ROLE_INTRINSIC_PATHS: dict[str, frozenset[str]] = {
     "PLANNER": frozenset(
-        {
-            ".agents/task/planner.md",
-            ".agents/task/next-agent.md",
-        }
+        {".agents/task/planner.md", ".agents/task/next-agent.md"}
     ),
     "EXECUTOR": frozenset(
-        {
-            ".agents/task/executor.md",
-            ".agents/task/next-agent.md",
-        }
+        {".agents/task/executor.md", ".agents/task/next-agent.md"}
     ),
     "REVIEWER": frozenset(
-        {
-            ".agents/task/reviewer.md",
-            ".agents/task/next-agent.md",
-        }
+        {".agents/task/reviewer.md", ".agents/task/next-agent.md"}
     ),
 }
 

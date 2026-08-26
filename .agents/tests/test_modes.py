@@ -23,8 +23,24 @@ def test_procedure_transport_language_is_current(orc: ModuleType) -> None:
         "already-validated artifact",
         "Proceed with Reviewer",
         "stepped mode",
+        "fresh Planner chat",
+        "fresh Executor chat",
+        "fresh Reviewer close-out chat",
     ):
         assert obsolete not in procedure
     assert "CONTINUE: REVIEWER" in procedure
     assert "transport/resume" in procedure
     assert "not approving the implementation" in procedure
+    assert "existing Planner chat" in procedure
+    assert "existing Executor chat" in procedure
+    assert "existing Reviewer chat" in procedure
+
+
+def test_protocol_declares_same_role_continuity(orc: ModuleType) -> None:
+    cfg = orc.assemble_config(str(orc.REPO_ROOT))
+    policy = cfg["session_continuity"]
+    assert policy["scope"] == "workflow-run"
+    assert policy["same_role_resume"] is True
+    assert policy["new_run_new_sessions"] is True
+    assert policy["reviewer_closeout_reuses_reviewer"] is True
+    assert policy["session_context_is_authority"] is False

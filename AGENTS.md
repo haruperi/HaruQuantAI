@@ -1,11 +1,11 @@
 # Standards and Principles
 
-**Purpose:** Authoritative contributor and three-role development workflow for HaruQuantAI.
+**Purpose:** Authoritative shared contributor and workflow constitution for HaruQuantAI.
 
 ## 1. Core engineering principles
 
-- **Repository truth, not chat memory.** Permanent truth lives in `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and owning package READMEs. Temporary active-task coordination lives only in `.agents/task/`. Chat context is never authoritative.
-- **Scoped authority.** `AGENTS.md` owns contributor process; `docs/PROJECT.md` owns product/system scope and cross-domain relationships; `docs/ARCHITECTURE.md` owns universal structural/runtime constraints; each owning package README is the canonical current-state feature/FR registry for that package. Satisfy all non-overlapping authorities and report real conflicts before editing.
+- **Repository truth, not chat memory.** Permanent truth lives in `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and owning package READMEs. Temporary active-task coordination lives only in `.agents/task/`. Conversation history is useful context but is never authoritative.
+- **Scoped authority.** `AGENTS.md` owns shared contributor and workflow rules; `docs/PROJECT.md` owns product/system scope and cross-domain relationships; `docs/ARCHITECTURE.md` owns universal structural/runtime constraints; each owning package README is the canonical current-state feature/FR registry for that package. Satisfy all non-overlapping authorities and report real conflicts before editing.
 - **Think first.** State assumptions, boundaries, trade-offs, validation, and rollback before coding. Never silently resolve missing requirements.
 - **Surgical changes.** Implement the minimum complete change. No speculative features, unrelated refactors, or scope expansion.
 - **Correctness over speed.** Verify with tools and repository evidence; never invent behavior, tests, results, or upstream contracts.
@@ -28,7 +28,7 @@
 
 The workflow is **Planner → Executor → Reviewer**. `.agents/protocol.toml` is the machine-readable transition contract. Canonical role prompts live in `docs/templates/prompt/`; `.agents/task/next-agent.md` is the complete instantiated prompt for the next reasoning role.
 
-**Role-invocation invariant:** no Planner, Executor, or Reviewer invocation may occur unless its complete prompt already exists in `.agents/task/next-agent.md` and has passed protocol validation. This includes the initial Planner invocation after task activation.
+**Role-invocation invariant:** no Planner, Executor, or Reviewer invocation may occur unless its complete prompt already exists in `.agents/task/next-agent.md` and has passed protocol validation. This includes the initial Planner invocation after task activation and every same-role resumed iteration.
 
 ### 2.1 Active-task workspace
 
@@ -47,14 +47,15 @@ Rules:
 - `planner.md`, `executor.md`, and `reviewer.md` are append-only during an active task and written only by their owning role, except for the narrow deterministic owner-gate record described below.
 - `next-agent.md` is replace-only. Before every reasoning-role invocation it contains exactly one complete standalone prompt for that role.
 - All four files are zero bytes when no task is active and after accepted close-out.
-- They are coordination artifacts, not product specifications, feature registries, or permanent decision history.
+- They are coordination artifacts, not product specifications, feature registries, permanent decision history, or session storage.
 - Every non-terminal journal handoff must agree with a valid `next-agent.md`; missing, stale, contradictory, or partially instantiated prompts fail closed.
+- Native CLI session IDs are runtime-only transport state and must never appear in `next-agent.md`.
 
 ### 2.2 Role declaration and single writer
 
 Every development agent invocation has exactly one role: `PLANNER`, `EXECUTOR`, or `REVIEWER`. Only one role writes at a time. Roles never run concurrently on the same task branch. A role stops if its authority conflicts with the active handoff.
 
-The orchestrator is not a fourth reasoning role. It may only perform deterministic lifecycle actions, routing/validation, and deterministic owner-gate bookkeeping. It never authors planning, implementation, or review conclusions.
+The orchestrator is not a fourth reasoning role. It may only perform deterministic lifecycle actions, routing/validation, transport/session bookkeeping, and deterministic owner-gate bookkeeping. It never authors planning, implementation, or review conclusions.
 
 ### 2.3 Task activation and branch isolation
 
@@ -93,12 +94,12 @@ ORCHESTRATOR READY / TASK NONE
 
 Correction paths:
 
-- Executor `BLOCKED` → next Planner dry run.
-- Reviewer `CHANGES_REQUESTED` → next Planner dry run.
+- Executor `BLOCKED` → next Planner dry run in the same Planner role conversation for this run.
+- Reviewer `CHANGES_REQUESTED` → next Planner dry run in the same Planner role conversation for this run.
 - Owner rejection of execution or commit gate → next Planner dry run with the owner direction.
-- Planner `BLOCKED` → owner resolves the documented cause; Planner resumes.
+- Planner `BLOCKED` → owner resolves the documented cause; Planner resumes its same role conversation with a fresh canonical prompt.
 - Planner blocker resolution replaces the stale retry artifact with a fresh canonical `ORCHESTRATOR / BLOCKER_RESOLVED → PLANNER` prompt fingerprinted against the resolved repository state.
-- Owner cancellation records terminal `CANCELLED` state and preserves the task branch, worktree, journals, and evidence for deliberate recovery.
+- Owner cancellation records terminal `CANCELLED` state and preserves the task branch, worktree, journals, run evidence, and role-session evidence for deliberate recovery.
 
 Execution authorization is valid only when the entire trimmed owner message is exactly `APPROVED: EXECUTE`. Commit authorization is valid only when it is exactly `APPROVED: COMMIT`.
 
@@ -133,91 +134,41 @@ Free-form `NEXT AGENT NOTES` are not part of the protocol.
 - **Executor → Planner (`BLOCKED`):** blocker, evidence, partial-work state, affected paths, safe retained work/rollback, and exact decision required.
 - **Reviewer → Planner:** failed requirement/gate, independent evidence, required correction, valid retained work, and scope requiring reconsideration.
 
-### 2.7 Planner authority
+### 2.7 Canonical professional role contracts
 
-Planner performs repository inspection, research, architecture/gap analysis, and detailed task decomposition.
+`AGENTS.md` defines shared repository-wide law; it does **not** duplicate individual job descriptions. Each canonical template is the complete role-specific contract that is instantiated into `next-agent.md`:
 
-Allowed writes:
+| Protocol role | Professional role contract | Canonical template |
+| --- | --- | --- |
+| `PLANNER` | Principal Software Architect and Implementation Planner | `docs/templates/prompt/planner.md` |
+| `EXECUTOR` | Senior Software Implementation Engineer | `docs/templates/prompt/executor.md` |
+| `REVIEWER` | Principal Software Verification and Code Review Engineer | `docs/templates/prompt/reviewer.md` |
+| `REVIEWER` close-out | Release Integrity and Change-Control Engineer | `docs/templates/prompt/reviewer-closeout.md` |
 
-- `.agents/task/planner.md`;
-- `.agents/task/next-agent.md`.
+The templates own role-specific perspective, responsibilities, allowed writes, forbidden behavior, methodology, quality criteria, and handoff behavior. `AGENTS.md` remains binding for shared repository authority, architecture, safety, quality, contribution, Git, state-machine, and transport rules.
 
-Allowed repository actions are non-mutating inspection and verification of the already-created task branch and recorded baseline.
+### 2.8 Role Session Continuity
 
-Planner never creates or switches branches and never edits implementation/tests/configuration/dependencies/authoritative product docs, commits, merges, rebases, pulls, fetches, or pushes.
+**Cross-role isolation and same-role continuity are independent properties.** Every workflow run owns one logical conversation for Planner, one for Executor, and one for Reviewer. Repeated iterations resume that exact same-role conversation; Reviewer close-out continues the same Reviewer conversation. A new workflow run starts new role conversations.
 
-Each numbered dry run contains all eight sections:
+```text
+Planner 1 → Planner 2 → Planner 3
+Executor 1 → Executor 2 → Executor 3
+Reviewer 1 → Reviewer 2 → Reviewer 3 → Reviewer close-out
 
-1. Task to do, requirements, tests, usage evidence.
-2. Files read.
-3. Exact files to create/edit and implementation order.
-4. Dependencies/contracts.
-5. Blockers/risks/trade-offs.
-6. Scope boundaries/inclusions/exclusions.
-7. Exact validation commands.
-8. Rollback.
+Planner session ≠ Executor session ≠ Reviewer session
+```
 
-Dry Run 1 begins only after the orchestrator has completed `TASK_ACTIVATED`, created the deterministic branch, and materialized/validated the initial Planner prompt. Planner verifies the branch/baseline before planning. Correction dry runs explicitly inventory retained/changed/rolled-back paths. Planner generates the complete next-role prompt before stopping; it never waits inside a headless invocation for owner approval.
+Session history is context only. Authority order remains: repository evidence and deterministic Python workflow state, then the current validated `next-agent.md` role/task contract. Remembered conversation context never overrides them.
 
-### 2.8 Executor authority
+Mode semantics:
 
-Executor first verifies repository root, branch, baseline, approved dry-run hash/record, expected path inventory, journals, and authoritative files routed by the plan.
+- `solo`: one physical chat; same-role continuity is inherent and cross-role isolation is soft only. Every role boundary reloads the complete current `next-agent.md`.
+- `delegate`: one persistent same-brand delegate handle per role per workflow run. Later iterations resume the same role delegate when the host exposes resumable handles; lack of required resume capability must be reported rather than silently pretending a fresh delegate is continuous.
+- `multi-delegate`: each turn may launch a fresh OS process, but the process resumes the exact stored native conversation ID for that role. IDs live under `.agents/runs/<run-id>/role-sessions.json`, never in task prompts. Never use implicit "last session" selection when an exact ID exists. Returned resume identity must match the stored ID or execution fails closed.
+- `manual`: the operator keeps four chats for the run — Orchestrator, Planner, Executor, Reviewer — and returns to the same role chat on later iterations. Reviewer close-out returns to the existing Reviewer chat.
 
-Allowed writes:
-
-- only implementation/documentation/test paths explicitly authorized by the approved dry run;
-- `.agents/task/executor.md`;
-- `.agents/task/next-agent.md`.
-
-Executor never edits Planner/Reviewer journals, expands scope, switches branches, commits, merges, rebases, pulls, fetches, or pushes. It runs only approved change-scoped formatting/linting/typing/tests/validators/usage examples during implementation; no coverage or unfiltered suite.
-
-If a material blocker or unapproved path appears, Executor stops before further change, preserves partial work, records evidence/rollback/decision needed, and generates a complete Planner prompt with `BLOCKED`. If all approved work succeeds, it generates the complete Reviewer prompt with `READY_FOR_REVIEW`.
-
-### 2.9 Reviewer authority and anti-anchoring
-
-Reviewer independently verifies and never repairs implementation.
-
-Allowed writes:
-
-- `.agents/task/reviewer.md`;
-- `.agents/task/next-agent.md`;
-- after exact `APPROVED: COMMIT`, only the defined close-out mutations.
-
-Reviewer follows this order:
-
-1. **Independent reconstruction:** before reading Planner/Executor journals, inspect the original task, `AGENTS.md`, applicable authoritative specifications, main baseline, complete branch diff, staged/unstaged changes, untracked paths, and resulting repository. Derive expected behavior/evidence independently.
-2. **Independent verification:** rerun applicable affected tests and non-mutating quality/architecture/usage checks. Upstream reports are not proof.
-3. **Claims reconciliation:** only now read Planner/Executor histories and compare their claims with independently observed evidence.
-
-If any defect, omission, scope violation, evidence gap, failed check, or unresolved original requirement exists, Reviewer writes `CHANGES_REQUESTED` and generates a complete Planner correction prompt. It never fixes the defect itself.
-
-If all verification passes, Reviewer writes `PENDING_COMMIT`, generates the complete gated Reviewer close-out prompt, and performs no commit/merge/cleanup before exact owner authorization.
-
-### 2.10 Authorized close-out
-
-After exact `APPROVED: COMMIT`, Reviewer must re-verify that reviewed HEAD and complete working-tree fingerprint are unchanged. It then:
-
-1. records commit authorization;
-2. confirms immutable close-out evidence has been archived;
-3. runs the applicable final gates and stages only approved implementation paths;
-4. creates exactly one local task commit;
-5. only after the commit succeeds, empties all four `.agents/task/` files and verifies the task branch is clean;
-6. verifies `main` is still clean and at the recorded baseline;
-7. fast-forward merges only (`git merge --ff-only`);
-8. verifies the exact one-commit lineage and approved committed-path set;
-9. deletes only the safely merged branch with `git branch -d` and verifies the zero-byte task workspace;
-10. marks the run `ACCEPTED`.
-
-Close-out never force-deletes, rebases, resets, cleans, amends, resolves merge conflicts, pushes, or expands scope. Any failed precondition returns to Planner through `CHANGES_REQUESTED`.
-
-### 2.11 Orchestration modes and isolation
-
-- `solo`: same chat sequentially executes exact prompts; **soft isolation only**. Initial Planner and every later role are invoked from exact validated `next-agent.md`. At each role boundary, stop the old role, load `next-agent.md` as the new role contract, re-read repository evidence, and treat conclusions from prior roles as non-evidence. Solo review is self-review under a fresh role contract, not independent review.
-- `delegate`: fresh same-brand subagent per role; fresh role context. Initial Planner is also delegated from the `TASK_ACTIVATED` artifact.
-- `multi-delegate`: fresh configured CLI process per role; cross-vendor diversity possible. Initial Planner is launched from the same validated artifact.
-- `manual`: user pastes exact `next-agent.md` into a fresh role chat, including the initial Planner artifact created by deterministic task activation.
-
-Mode changes transport only; role prompt semantics and activation artifacts are identical.
+Mode changes transport and transport automation only. Role identity, role continuity, current prompt contract, authority, state transitions, iteration semantics, and handoff semantics remain consistent.
 
 ## 3. Coding style and verification
 
@@ -245,17 +196,17 @@ Safe read/verification commands include `pwd`, `ls`, `cat`, `grep`, `git status`
 - No live trading/action by default. External integration operations use verified dev/demo/testnet/sandbox targets unless an owning policy explicitly permits an operator-selected live mode (including the documented MT5 exception).
 - Kill switches and deterministic risk/policy gates cannot be bypassed by callers or agents.
 - Never invent backtest results, live performance, broker fills, or external data.
-- Python/runtime policy enforcement is authoritative; LLM prompts are not a substitute for deterministic controls.
+- Python/runtime policy enforcement is authoritative; LLM prompts and remembered session context are not substitutes for deterministic controls.
 
 ## 5. Documentation and ownership
 
 - Owning package README: domain feature/FR registry, current feature status, semantic contracts, persistence target model, usage/evidence mapping.
 - `docs/ARCHITECTURE.md`: universal structural/runtime/database conventions.
 - `docs/PROJECT.md`: product/system scope, domain index, cross-domain relationships and NFRs.
-- `AGENTS.md`: contributor and three-role workflow.
+- `AGENTS.md`: shared contributor/workflow constitution.
 - `docs/dev/IMPLEMENTATION_ORDER.md`: delivery sequencing.
 - `docs/dev/feature_implementation_pipeline.md`: feature delivery architecture/checklist.
-- `docs/templates/prompt/`: canonical reusable workflow prompt definitions.
+- `docs/templates/prompt/`: complete canonical role-specific workflow contracts.
 
 Planner identifies documentation impact; Executor applies only approved documentation changes; Reviewer verifies consistency and reports discrepancies without fixing them.
 

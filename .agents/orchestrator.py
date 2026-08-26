@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from session_runner import probe_adapter
 from workflow_engine import *
 
 AGENTS_DIR = Path(__file__).resolve().parent
@@ -74,7 +75,6 @@ def cmd_start(args: argparse.Namespace) -> int:
     _require_cli_mode(cfg)
     if args.max_iterations:
         cfg["max_iterations"] = args.max_iterations
-    # Phase 9: Acquire workflow lock to prevent concurrent runs
     lock = WorkflowLock(cfg["repo"])
     lock.acquire()
     try:
@@ -121,14 +121,12 @@ def cmd_resume(args: argparse.Namespace) -> int:
     _require_cli_mode(cfg)
     if args.max_iterations:
         cfg["max_iterations"] = args.max_iterations
-    # Phase 9: Acquire workflow lock to prevent concurrent runs
     lock = WorkflowLock(cfg["repo"])
     lock.acquire()
     try:
         state = _load_state(cfg, args.run_id)
         if state.get("status") == "CANCELLED":
             raise OrchestratorError("A CANCELLED run cannot be resumed.")
-        # Phase 7: Handle planner blocker resolution
         resolve_blocker = getattr(args, "resolve_planner_blocker", None)
         if resolve_blocker and state.get("phase") == "planner_blocked":
             state["blocker_resolution"] = {
@@ -186,6 +184,20 @@ def cmd_cancel(args: argparse.Namespace) -> int:
 def _doctor_protocol(cfg: dict[str, Any]) -> bool:
     ok = True
     print(f"[ok] protocol schema: {cfg['protocol']['prompt_schema_version']}")
+    continuity = cast("dict[str, Any]", cfg.get("session_continuity", {}))
+    required_policy = {
+        "scope": "workflow-run",
+        "same_role_resume": True,
+        "new_run_new_sessions": True,
+        "reviewer_closeout_reuses_reviewer": True,
+        "session_context_is_authority": False,
+    }
+    for key, expected in required_policy.items():
+        if continuity.get(key) != expected:
+            print(f"[FAIL] session continuity {key}: {continuity.get(key)!r}")
+            ok = False
+    if ok:
+        print("[ok] role session continuity policy")
     seen: set[tuple[str, str]] = set()
     for transition in cfg["transitions"]:
         key = (transition.source_role, transition.handoff)
@@ -238,10 +250,17 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         print(f"[ok] workflow mode: {mode}")
     for role, role_cfg in cfg["roles"].items():
         command = cast("list[str]", role_cfg.get("command", []))
-        cli_ok = bool(command) and shutil.which(command[0]) is not None
+        runner_ok = bool(command) and shutil.which(command[0]) is not None
         if mode == "multi-delegate":
-            print(f"[{'ok' if cli_ok else 'FAIL'}] role {role} CLI: {command[:1]}")
-            ok = ok and cli_ok
+            adapter = str(role_cfg.get("session_adapter", ""))
+            continuity_required = role_cfg.get("session_continuity") == "required"
+            adapter_ok, detail = probe_adapter(adapter) if adapter else (False, "missing adapter")
+            print(
+                f"[{'ok' if runner_ok else 'FAIL'}] role {role} session runner: "
+                f"{command[:1]}"
+            )
+            print(f"[{'ok' if adapter_ok else 'FAIL'}] role {role} session adapter: {detail}")
+            ok = ok and runner_ok and continuity_required and adapter_ok
         else:
             print(f"[N/A] role {role} CLI is unused in {mode} mode")
     if cfg["next_agent"].exists() and cfg["next_agent"].stat().st_size:
@@ -266,9 +285,7 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
         (tmp / ".agents/task" / name).write_bytes(b"")
     for key in ("planner", "executor", "reviewer", "reviewer_closeout", "default"):
         source = source_cfg["templates"][key]
-        target_name = (
-            "reviewer-closeout.md" if key == "reviewer_closeout" else source.name
-        )
+        target_name = "reviewer-closeout.md" if key == "reviewer_closeout" else source.name
         (tmp / "docs/templates/prompt" / target_name).write_text(
             source.read_text(encoding="utf-8"), encoding="utf-8"
         )
@@ -293,14 +310,7 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
     roles: dict[str, dict[str, Any]] = {}
     for role in ("planner", "executor", "reviewer"):
         roles[role] = {
-            "command": [
-                sys.executable,
-                str(stub),
-                "--role",
-                role,
-                "--repo",
-                str(tmp),
-            ],
+            "command": [sys.executable, str(stub), "--role", role, "--repo", str(tmp)],
             "prompt_delivery": "file",
         }
     protocol, transitions = _parse_protocol(tmp / ".agents/protocol.toml")
@@ -313,6 +323,7 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
         "heartbeat": 0,
         "retries": 0,
         "protocol": protocol,
+        "session_continuity": cast("dict[str, Any]", protocol.get("session_continuity", {})),
         "transitions": transitions,
         "protocol_path": tmp / ".agents/protocol.toml",
         "journals": journals,
@@ -447,11 +458,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     cancel = subs.add_parser("cancel")
     cancel.add_argument("--run-id", default=None)
-    cancel.add_argument(
-        "--reason",
-        default=None,
-        help="Reason for cancellation (preserved in run state).",
-    )
+    cancel.add_argument("--reason", default=None, help="Reason preserved in run state.")
     cancel.add_argument("--repo", default=None)
     cancel.set_defaults(func=cmd_cancel)
 
