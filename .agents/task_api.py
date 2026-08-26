@@ -4,11 +4,34 @@
 from __future__ import annotations
 
 import datetime as dt
+import re
 from typing import Any
 
 from workflow_engine import TASK_REQUIRED, router
 from workflow_protocol import SLUG_RE, OrchestratorError
 from workflow_runtime import _entry_gate, _save_state
+
+RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+def _validate_run_id(run_id: str) -> str:
+    """Return a filesystem-safe Task run id or fail closed.
+
+    Args:
+        run_id: Candidate Task workflow run identifier.
+
+    Returns:
+        The validated identifier unchanged.
+
+    Raises:
+        OrchestratorError: If the identifier could escape the runtime state directory.
+    """
+    if not RUN_ID_RE.fullmatch(run_id):
+        raise OrchestratorError(
+            "run_id must start with an alphanumeric character and contain only "
+            "letters, digits, '.', '_', or '-'."
+        )
+    return run_id
 
 
 def create_task_state(
@@ -27,6 +50,7 @@ def create_task_state(
     if run_id is None:
         stamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S")
         run_id = f"{stamp}-{task_slug}"
+    run_id = _validate_run_id(run_id)
     return {
         "run_id": run_id,
         "task": task,
