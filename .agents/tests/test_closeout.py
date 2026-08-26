@@ -76,6 +76,7 @@ def test_closeout_accepts_exact_lineage(
     orc._verify_closeout_lineage(cfg, _closeout_state(repo, baseline))
 
 
+
 def test_failed_closeout_before_commit_preserves_journals(
     orc: ModuleType,
     cfg: dict[str, Any],
