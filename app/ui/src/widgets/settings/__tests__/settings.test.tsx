@@ -1,6 +1,6 @@
 /**
  * Unit tests for SettingsWidget (FR-UI-SET_APPEARANCE, FR-UI-CONFIGURE_CLIENT,
- * FR-UI-MANAGE_LICENSE) and settingsWidgetDefinition.
+ * FR-UI-MANAGE_LICENSE, FR-UI-DISTINGUISH_STATE) and settingsWidgetDefinition.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -125,6 +125,54 @@ describe("SettingsWidget & Definition", () => {
     const resetBtn = screen.getByTestId("reset-appearance-btn");
     fireEvent.click(resetBtn);
     expect(screen.getByTestId("settings-status-message").textContent).toContain("Appearance reset to defaults");
+  });
+
+  it("renders tab selection structurally and with visible active state (FR-UI-DISTINGUISH_STATE)", async () => {
+    renderWithProvider();
+
+    await waitFor(() => {
+      expect(screen.getByRole("tab", { name: /Appearance/i })).toBeTruthy();
+    });
+
+    const tabAppearance = screen.getByRole("tab", { name: /Appearance/i });
+    const tabClient = screen.getByRole("tab", { name: /Client Configuration/i });
+
+    // Verify stable IDs and attributes on appearance tab
+    expect(tabAppearance.id).toBe("tab-appearance");
+    expect(tabAppearance).toHaveAttribute("aria-selected", "true");
+    expect(tabAppearance.textContent).toContain("(Active)");
+
+    // Dereference aria-controls to tabpanel and aria-labelledby back to tab
+    const appearanceControlsId = tabAppearance.getAttribute("aria-controls");
+    expect(appearanceControlsId).toBe("section-appearance");
+    const appearancePanel = document.getElementById(appearanceControlsId!);
+    expect(appearancePanel).toBeTruthy();
+    expect(appearancePanel).toHaveAttribute("role", "tabpanel");
+    expect(appearancePanel).toHaveAttribute("aria-labelledby", "tab-appearance");
+
+    // Client tab is unselected
+    expect(tabClient.id).toBe("tab-client");
+    expect(tabClient).toHaveAttribute("aria-selected", "false");
+    expect(tabClient.textContent).not.toContain("(Active)");
+
+    // Switch to client tab
+    fireEvent.click(tabClient);
+
+    // Client tab is now selected
+    expect(tabClient).toHaveAttribute("aria-selected", "true");
+    expect(tabClient.textContent).toContain("(Active)");
+
+    // Dereference aria-controls to client tabpanel and aria-labelledby back to client tab
+    const clientControlsId = tabClient.getAttribute("aria-controls");
+    expect(clientControlsId).toBe("section-client");
+    const clientPanel = document.getElementById(clientControlsId!);
+    expect(clientPanel).toBeTruthy();
+    expect(clientPanel).toHaveAttribute("role", "tabpanel");
+    expect(clientPanel).toHaveAttribute("aria-labelledby", "tab-client");
+
+    // Appearance tab is now unselected
+    expect(tabAppearance).toHaveAttribute("aria-selected", "false");
+    expect(tabAppearance.textContent).not.toContain("(Active)");
   });
 
   it("renders client configuration and write-only credentials (FR-UI-CONFIGURE_CLIENT)", async () => {

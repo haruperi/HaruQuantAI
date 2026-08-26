@@ -52,7 +52,7 @@ The product presents one unified workstation canvas rather than isolated full-pa
 | Partial (3 of 5; 2 mock-build pending 14.10) | `FEAT-UI-MONITOR_WORK` | Job progress, logs, notifications, failure, and recovery feedback | 5 | Dedicated monitors disappear; jobs continue server-side. |
 | Partial (3 of 6; 3 mock-build pending 3.10, 14.11, 15.8) | `FEAT-UI-ADMINISTER_SYSTEM` | Preferences, language, theme, updates, and capability administration | 6 | Settings and administration screens disappear. |
 | Missing | `FEAT-UI-OPERATE_TRADING` | Governed operational trading views and controls | 8 | Operational views disappear; governed headless operations remain. |
-| Missing | `FEAT-UI-ENSURE_ACCESS` | Keyboard, nonvisual, focus, scale, and safety accessibility | 6 | The UI becomes non-releasable. |
+| Partial (2 of 6; 4 mock-build pending 3.11, 9.10, 10.15) | `FEAT-UI-ENSURE_ACCESS` | Keyboard, nonvisual, focus, scale, and safety accessibility | 6 | The UI becomes non-releasable. |
 | Missing | `FEAT-UI-EXTEND_VIEWS` | Declarative, scoped, deletion-safe UI contributions | 5 | Extension views disappear; built-in fallback views remain. |
 
 **Domain inventory:** 17 Features and 99 Functional Requirements.
@@ -485,10 +485,10 @@ All requirements remain `Missing` until implementation and acceptance evidence p
 | Status | Requirement ID | Responsibility | Depends | Acceptance / evidence |
 |---|---|---|---|---|
 | Missing | `FR-UI-OPERATE_BY_KEYBOARD` | Provide complete keyboard operation for navigation, forms, trees, grids, tabs, dialogs, editors, charts, graphs, run controls and trading safety controls. | All UI features | Manual and automated keyboard journeys complete each workflow. |
-| Missing | `FR-UI-MANAGE_FOCUS` | Preserve logical focus across routes/dialogs/updates and restore it after close, failure, or contribution replacement. | FEAT-UI-COMPOSE_SHELL | Focus never falls into removed/hidden content. |
+| Implemented | `FR-UI-MANAGE_FOCUS` | Preserve logical focus across routes/dialogs/updates and restore it after close, failure, or contribution replacement. | FEAT-UI-COMPOSE_SHELL | Focus never falls into removed/hidden content. `— evidence: tests/ui/unit/test_ensure_access.py:89, app/ui/src/accessibility/__tests__/focus_manager.test.tsx:123, app/ui/src/features/ensure_access/__tests__/ensure_access.test.tsx:53` |
 | Missing | `FR-UI-LABEL_CONTROLS` | Expose stable names, roles, states, relationships, errors, live regions and instructions to assistive technology. | All UI features | Automated semantics plus screen-reader journeys pass. |
 | Missing | `FR-UI-PROVIDE_DATA_ALTERNATIVES` | Provide equivalent tables/summaries/downloads for charts, matrices, graphs, timelines and progress visuals. | ANA, IFACE | Alternative values and units match the visual source. |
-| Missing | `FR-UI-DISTINGUISH_STATE` | Communicate status/severity/selection/readiness through text/icon/structure as well as color and motion. | All UI features | Forced-colors/reduced-motion tests preserve meaning. |
+| Implemented | `FR-UI-DISTINGUISH_STATE` | Communicate status/severity/selection/readiness through text/icon/structure as well as color and motion. | All UI features | Forced-colors/reduced-motion tests preserve meaning. `— evidence: tests/ui/unit/test_ensure_access.py:104, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:219, app/ui/src/widgets/activity_log/__tests__/activity_log.test.tsx:159, app/ui/src/widgets/product_news/__tests__/product_news.test.tsx:96, app/ui/src/widgets/settings/__tests__/settings.test.tsx:130, app/ui/src/widgets/workspace_templates/__tests__/workspace_templates.test.tsx:102` |
 | Missing | `FR-UI-PRESERVE_USABILITY` | Maintain usable reflow, target size, contrast, text scaling, locale expansion and bounded dense-data navigation. | FEAT-UI-MANAGE_LAYOUTS | Supported zoom and viewport matrix passes without hiding critical actions/state. |
 
 ### 4.17 `extend_views/` — `FEAT-UI-EXTEND_VIEWS`

@@ -216,7 +216,7 @@ describe("FEAT-UI-COMPOSE_SHELL", () => {
     expect(tab1.getAttribute("aria-selected")).toBe("true");
   });
 
-  it("FR-UI-SHOW_CAPABILITY_STATE: Distinguishes all capability states without blank screens", () => {
+  it("FR-UI-SHOW_CAPABILITY_STATE & FR-UI-DISTINGUISH_STATE: Distinguishes all capability states with visible symbols and ARIA semantics independent of color/motion", () => {
     bridge.registerFeature({
       manifest: {
         featureId: "FEAT-TEST-CAPS",
@@ -242,19 +242,66 @@ describe("FEAT-UI-COMPOSE_SHELL", () => {
     bridge.setCapabilityState("cap.unauthorized@1", "unauthorized");
     bridge.setCapabilityState("cap.incompatible@1", "incompatible");
 
-    render(
-      <UiRuntimeProvider bridge={bridge}>
-        <Shell />
-      </UiRuntimeProvider>
-    );
+    // Simulate forced-colors and reduced-motion media conditions
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = (query: string) => ({
+      matches:
+        query.includes("forced-colors: active") ||
+        query.includes("prefers-reduced-motion: reduce"),
+      media: query,
+      onchange: null,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      dispatchEvent: () => false,
+    });
 
-    expect(screen.getByTestId("capability-badge-cap.ready@1").textContent).toContain("Ready");
-    expect(screen.getByTestId("capability-badge-cap.loading@1").textContent).toContain("Loading");
-    expect(screen.getByTestId("capability-badge-cap.degraded@1").textContent).toContain("Degraded");
-    expect(screen.getByTestId("capability-badge-cap.unavailable@1").textContent).toContain("Unavailable");
-    expect(screen.getByTestId("capability-badge-cap.disabled@1").textContent).toContain("Disabled");
-    expect(screen.getByTestId("capability-badge-cap.unauthorized@1").textContent).toContain("Unauthorized");
-    expect(screen.getByTestId("capability-badge-cap.incompatible@1").textContent).toContain("Incompatible");
+    try {
+      render(
+        <UiRuntimeProvider bridge={bridge}>
+          <Shell />
+        </UiRuntimeProvider>
+      );
+
+      // Verify each state has distinct visible symbol, label, and role="status" / aria-label
+      const readyBadge = screen.getByTestId("capability-badge-cap.ready@1");
+      expect(readyBadge.textContent).toContain("[✓]");
+      expect(readyBadge.textContent).toContain("Ready");
+      expect(readyBadge.getAttribute("aria-label")).toBe("Capability cap.ready@1 is Ready");
+
+      const loadingBadge = screen.getByTestId("capability-badge-cap.loading@1");
+      expect(loadingBadge.textContent).toContain("[...]");
+      expect(loadingBadge.textContent).toContain("Loading...");
+      expect(loadingBadge.getAttribute("aria-label")).toBe("Capability cap.loading@1 is Loading...");
+
+      const degradedBadge = screen.getByTestId("capability-badge-cap.degraded@1");
+      expect(degradedBadge.textContent).toContain("[!]");
+      expect(degradedBadge.textContent).toContain("Degraded");
+      expect(degradedBadge.getAttribute("aria-label")).toBe("Capability cap.degraded@1 is Degraded");
+
+      const unavailableBadge = screen.getByTestId("capability-badge-cap.unavailable@1");
+      expect(unavailableBadge.textContent).toContain("[x]");
+      expect(unavailableBadge.textContent).toContain("Unavailable");
+      expect(unavailableBadge.getAttribute("aria-label")).toBe("Capability cap.unavailable@1 is Unavailable");
+
+      const disabledBadge = screen.getByTestId("capability-badge-cap.disabled@1");
+      expect(disabledBadge.textContent).toContain("[-]");
+      expect(disabledBadge.textContent).toContain("Disabled");
+      expect(disabledBadge.getAttribute("aria-label")).toBe("Capability cap.disabled@1 is Disabled");
+
+      const unauthorizedBadge = screen.getByTestId("capability-badge-cap.unauthorized@1");
+      expect(unauthorizedBadge.textContent).toContain("[🔒]");
+      expect(unauthorizedBadge.textContent).toContain("Unauthorized");
+      expect(unauthorizedBadge.getAttribute("aria-label")).toBe("Capability cap.unauthorized@1 is Unauthorized");
+
+      const incompatibleBadge = screen.getByTestId("capability-badge-cap.incompatible@1");
+      expect(incompatibleBadge.textContent).toContain("[⊘]");
+      expect(incompatibleBadge.textContent).toContain("Incompatible");
+      expect(incompatibleBadge.getAttribute("aria-label")).toBe("Capability cap.incompatible@1 is Incompatible");
+    } finally {
+      window.matchMedia = originalMatchMedia;
+    }
   });
 
   it("FR-UI-RESTORE_ROUTE: Restores valid authorized route and falls back on invalid route", () => {

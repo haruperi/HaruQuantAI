@@ -5,8 +5,8 @@ import { UiRuntimeProvider } from "./runtime/context";
 import { WidgetRegistry } from "./runtime/widget_registry";
 import { SelectionProvider } from "./context/selection";
 import { TemporalProvider } from "./context/temporal";
-import { FocusManagerProvider } from "./context/focus";
 import { createFeature as createComposeShellFeature } from "./features/compose_shell";
+import { createFeature as createEnsureAccessFeature } from "./features/ensure_access";
 import { createFeature as createStartWorkFeature } from "./features/start_work";
 import {
   createFeature as createManageLayoutsFeature,
@@ -31,6 +31,10 @@ function bootstrapApp() {
   const bridge = new UiCompositionBridge();
   const composeShell = createComposeShellFeature();
   bridge.registerFeature(composeShell);
+
+  // FEAT-UI-ENSURE_ACCESS owns focus coordination, accessibility, and state distinction.
+  const ensureAccess = createEnsureAccessFeature();
+  bridge.registerFeature(ensureAccess);
 
   // Initialize global typed widget registry
   const widgetRegistry = new WidgetRegistry();
@@ -88,7 +92,7 @@ function bootstrapApp() {
       <React.StrictMode>
         <UiRuntimeProvider bridge={bridge}>
           <ViewScaleProvider>
-            <FocusManagerProvider>
+            {ensureAccess.renderProvider(
               <SelectionProvider>
                 <TemporalProvider workspaceId="global-workspace">
                   {manageLayouts.renderClientProvider(
@@ -100,7 +104,7 @@ function bootstrapApp() {
                   )}
                 </TemporalProvider>
               </SelectionProvider>
-            </FocusManagerProvider>
+            )}
           </ViewScaleProvider>
         </UiRuntimeProvider>
       </React.StrictMode>

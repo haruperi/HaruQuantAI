@@ -5,6 +5,9 @@
  * strictly separate from authoritative workspace state. Offline or failed
  * news never blocks work: every failure renders an explicit unavailable
  * state confined to this widget.
+ *
+ * Distinguishes notification severity with explicit visible text, symbols,
+ * and ARIA labels in addition to color (FR-UI-DISTINGUISH_STATE).
  */
 
 import React, { useEffect, useState } from "react";
@@ -22,6 +25,13 @@ const SEVERITY_COLORS: Record<string, string> = {
   warning: "#facc15",
   error: "#f87171",
   success: "#4ade80",
+};
+
+const SEVERITY_SYMBOLS: Record<string, string> = {
+  info: "[i]",
+  warning: "[!]",
+  error: "[x]",
+  success: "[✓]",
 };
 
 function newRequestId(prefix: string): string {
@@ -110,28 +120,52 @@ export const ProductNewsWidget: React.FC<WidgetProps> = () => {
           data-testid="product-news-items"
           style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "8px" }}
         >
-          {newsState.items.map((item) => (
-            <li
-              key={item.notification_id}
-              style={{
-                padding: "8px 10px",
-                backgroundColor: "#1e293b",
-                borderRadius: "4px",
-                fontSize: "12px",
-              }}
-            >
-              <div
+          {newsState.items.map((item) => {
+            const sev = item.severity ?? "info";
+            const sevColor = SEVERITY_COLORS[sev] ?? "#38bdf8";
+            const sevSymbol = SEVERITY_SYMBOLS[sev] ?? "[i]";
+
+            return (
+              <li
+                key={item.notification_id}
+                data-testid={`product-news-item-${item.notification_id}`}
                 style={{
-                  fontWeight: "bold",
-                  color: SEVERITY_COLORS[item.severity ?? "info"] ?? "#38bdf8",
+                  padding: "8px 10px",
+                  backgroundColor: "#1e293b",
+                  borderRadius: "4px",
+                  fontSize: "12px",
                 }}
               >
-                {item.title}
-              </div>
-              <div style={{ color: "#cbd5e1", marginTop: "4px" }}>{item.message}</div>
-              <div style={{ color: "#64748b", marginTop: "4px" }}>{item.timestamp_iso}</div>
-            </li>
-          ))}
+                <div
+                  style={{
+                    fontWeight: "bold",
+                    color: sevColor,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <span
+                    data-testid={`product-news-severity-${item.notification_id}`}
+                    aria-label={`Severity: ${sev}`}
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      padding: "1px 5px",
+                      borderRadius: "3px",
+                      border: `1px solid ${sevColor}`,
+                    }}
+                  >
+                    {sevSymbol} {sev.toUpperCase()}
+                  </span>
+                  <span>{item.title}</span>
+                </div>
+                <div style={{ color: "#cbd5e1", marginTop: "4px" }}>{item.message}</div>
+                <div style={{ color: "#64748b", marginTop: "4px" }}>{item.timestamp_iso}</div>
+              </li>
+            );
+          })}
         </ul>
       )}
 

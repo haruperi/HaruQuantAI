@@ -76,7 +76,7 @@ Progress legend: `M` mock done · `U` UI migrated · `T` tests ported/passing ·
 | `components/workflow` (form-heavy pieces) | ADAPT | 1.4 EDIT_INPUTS | `schema_form`, `selection_table`, `confirmation` | `ui.ts` | ☐ ☐ ☑ ☐ |
 | `components/common`, alarm/status patterns | ADAPT | 1.5 MONITOR_WORK | `job_progress`, `activity_log`, `notifications` | `ui.ts`, `orchestration.ts` | ☑ ☑ ☑ ☐ |
 | `system-settings` | ADAPT | 1.6 ADMINISTER_SYSTEM | `settings`, `capability_admin`, `updates` | `ui.ts`, `plugins.ts`, `interfaces.ts`, `orchestration.ts` | ☑ ☑ ☑ ☑ |
-| `human-factors` (a11y/alert semantics) | ADAPT | 1.7 ENSURE_ACCESS | strengthen shell/accessibility surfaces | `ui.ts`, `trading.ts`, `risk.ts` | ☐ ☐ ☐ ☐ |
+| `human-factors` (a11y/alert semantics) | ADAPT | 1.7 ENSURE_ACCESS | strengthen shell/accessibility surfaces | `ui.ts`, `trading.ts`, `risk.ts` | ☑ ☑ ☑ ☑ |
 | `markets`, `watchlists`, `instrument-panels`, `market-hours`, `session-registry` | ADAPT | 1.8 MANAGE_DATA | `datasets`, `instruments`, `sessions`, `data_quality` | `ui.ts`, `catalogue.ts`, `data.ts` | ☐ ☐ ☐ ☐ |
 | (mostly V3-native; harvest where useful) | ADAPT | 1.9 AUTHOR_STRATEGIES | `strategy_tree`, `block_catalogue`, `strategy_inspector` | `ui.ts`, `strategy.ts` | ☐ ☐ ☐ ☐ |
 | `analytics` (library/table/query) | ADAPT | 1.10 OPERATE_DATABANKS | `databank_browser`, `databank_bulk_actions` | `ui.ts`, `analytics.ts` | ☐ ☐ ☐ ☐ |
@@ -99,6 +99,7 @@ Recent matrix updates:
 - `components/workflow`: (2026-08-26) completable slice FR-UI-PRESERVE_DRAFTS done (draft store; contract-level tests); donor workflow pieces remain for the 6.15 de-mock.
 - `components/common`: (2026-08-26) completable slice FR-UI-TRACK_PROGRESS, FR-UI-STREAM_ACTIVITY, FR-UI-PRESENT_FAILURES done (job_progress, activity_log; snapshot log); notifications widget completes at 14.10.
 - `system-settings`: (2026-08-26) completable slice FR-UI-SET_APPEARANCE, FR-UI-CONFIGURE_CLIENT, FR-UI-MANAGE_LICENSE done (settings widget); donor deleted; mock builds language/updates/capabilities complete at 3.10/14.11/15.8.
+- `human-factors`: (2026-08-26) completable slice FR-UI-MANAGE_FOCUS, FR-UI-DISTINGUISH_STATE done (focus manager hardening, route focus coordinator, non-color state distinction across shell/news/settings/templates); donor deleted; mock builds data alternatives/usability/keyboard/labels complete at 3.11/9.10/10.15.
 
 Special classifications:
 
@@ -143,7 +144,7 @@ Each line is one normal workflow task; donors come from the matrix row. A task's
 - [x] 1.4 `FEAT-UI-EDIT_INPUTS` — completable slice done 2026-08-26 (FR-UI-PRESERVE_DRAFTS); donor workflow pieces remain for the 6.15 de-mock
 - [x] 1.5 `FEAT-UI-MONITOR_WORK` — completable slice done 2026-08-26 (FR-UI-TRACK_PROGRESS, FR-UI-STREAM_ACTIVITY, FR-UI-PRESENT_FAILURES; job_progress, activity_log; snapshot log); notifications widget completes at 14.10
 - [x] 1.6 `FEAT-UI-ADMINISTER_SYSTEM` — completable slice done 2026-08-26 (FR-UI-SET_APPEARANCE, FR-UI-CONFIGURE_CLIENT, FR-UI-MANAGE_LICENSE; settings widget); donor deleted; language/updates/capabilities complete at 3.10/14.11/15.8
-- [ ] 1.7 `FEAT-UI-ENSURE_ACCESS` — donors: `human-factors` a11y/alert semantics
+- [x] 1.7 `FEAT-UI-ENSURE_ACCESS` — completable slice done 2026-08-26 (FR-UI-MANAGE_FOCUS, FR-UI-DISTINGUISH_STATE; focus manager, route focus coordinator, non-color state distinction); donor deleted; data alternatives/usability/keyboard/labels complete at 3.11/9.10/10.15
 - [ ] 1.8 `FEAT-UI-MANAGE_DATA` — donors: `markets`, `watchlists`, `instrument-panels`, `market-hours`, `session-registry`
 - [ ] 1.9 `FEAT-UI-AUTHOR_STRATEGIES` — donors: minimal; build V3-native
 - [ ] 1.10 `FEAT-UI-OPERATE_DATABANKS` — donors: `analytics` library/table/query

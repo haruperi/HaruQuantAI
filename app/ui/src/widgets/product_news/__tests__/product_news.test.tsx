@@ -56,7 +56,7 @@ function renderNews(client: IUiPresentationClient) {
   );
 }
 
-describe("FEAT-UI-START_WORK product news widget (FR-UI-SHOW_PRODUCT_NEWS)", () => {
+describe("FEAT-UI-START_WORK product news widget (FR-UI-SHOW_PRODUCT_NEWS, FR-UI-DISTINGUISH_STATE)", () => {
   afterEach(() => {
     cleanup();
   });
@@ -91,6 +91,54 @@ describe("FEAT-UI-START_WORK product news widget (FR-UI-SHOW_PRODUCT_NEWS)", () 
     // News lives in its own dedicated widget region, not in workspace state.
     expect(screen.getByTestId("product-news-widget")).toBeDefined();
     expect(screen.getByTestId("product-news-mock-label").textContent).toContain("MOCK DATA");
+  });
+
+  it("renders explicit visible severity text, symbols, and accessible labels (FR-UI-DISTINGUISH_STATE)", async () => {
+    const client = createFakeClient(async () => ({
+      outcome: "SUCCESS" as const,
+      request_id: "req-news-multi",
+      result_version: 1,
+      news: [
+        {
+          notification_id: "notif-info",
+          title: "Maintenance Notice",
+          message: "Scheduled maintenance tonight.",
+          severity: "info" as const,
+          timestamp_iso: "2026-08-26T00:00:00.000Z",
+          schema_version: 1,
+        },
+        {
+          notification_id: "notif-warn",
+          title: "High Volatility",
+          message: "CPI data release at 13:30 UTC.",
+          severity: "warning" as const,
+          timestamp_iso: "2026-08-26T01:00:00.000Z",
+          schema_version: 1,
+        },
+        {
+          notification_id: "notif-err",
+          title: "Connector Interruption",
+          message: "Primary feed disconnected.",
+          severity: "error" as const,
+          timestamp_iso: "2026-08-26T02:00:00.000Z",
+          schema_version: 1,
+        },
+      ],
+      schema_version: 1,
+    }));
+    renderNews(client);
+
+    const infoBadge = await screen.findByTestId("product-news-severity-notif-info");
+    expect(infoBadge).toHaveTextContent("[i] INFO");
+    expect(infoBadge).toHaveAttribute("aria-label", "Severity: info");
+
+    const warnBadge = screen.getByTestId("product-news-severity-notif-warn");
+    expect(warnBadge).toHaveTextContent("[!] WARNING");
+    expect(warnBadge).toHaveAttribute("aria-label", "Severity: warning");
+
+    const errBadge = screen.getByTestId("product-news-severity-notif-err");
+    expect(errBadge).toHaveTextContent("[x] ERROR");
+    expect(errBadge).toHaveAttribute("aria-label", "Severity: error");
   });
 
   it("renders a non-blocking unavailable state when news fetch fails", async () => {

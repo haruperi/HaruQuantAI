@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { ManageLayoutsClientProvider } from "../../../features/manage_layouts";
 import type { IUiPresentationClient } from "../../../clients/ui_client";
 import { WorkspaceTemplatesWidget } from "../Component";
@@ -56,7 +56,7 @@ function renderWidget(client: IUiPresentationClient) {
   );
 }
 
-describe("FEAT-UI-MANAGE_LAYOUTS workspace_templates widget (FR-UI-COMPOSE_PANELS)", () => {
+describe("FEAT-UI-MANAGE_LAYOUTS workspace_templates widget (FR-UI-COMPOSE_PANELS, FR-UI-DISTINGUISH_STATE)", () => {
   afterEach(() => {
     cleanup();
   });
@@ -97,6 +97,36 @@ describe("FEAT-UI-MANAGE_LAYOUTS workspace_templates widget (FR-UI-COMPOSE_PANEL
     expect(await screen.findByTestId("workspace-template-template-haruquant-v1", {}, { timeout: 2000 })).toBeDefined();
     expect(screen.getByTestId("workspace-template-template-chart-ladder-v1")).toBeDefined();
     expect(screen.getByTestId("workspace-templates-mock-label").textContent).toContain("MOCK DATA");
+  });
+
+  it("renders applied template state structurally and with visible badge (FR-UI-DISTINGUISH_STATE)", async () => {
+    const client = createFakeClient(async () => ({
+      outcome: "SUCCESS" as const,
+      request_id: "req-templates-apply",
+      result_version: 1,
+      schema_version: 1,
+    }));
+    renderWidget(client);
+
+    const list = await screen.findByRole("list", { name: "Workspace templates" });
+    expect(list).toBeInTheDocument();
+
+    const tplBtn = screen.getByRole("button", { name: /HaruQuant/i });
+    expect(tplBtn).toBeInTheDocument();
+    expect(tplBtn.tagName).toBe("BUTTON");
+    expect(tplBtn.closest("li")).not.toBeNull();
+    expect(list.contains(tplBtn)).toBe(true);
+
+    expect(tplBtn).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByTestId("template-applied-badge-template-haruquant-v1")).toBeNull();
+
+    // Click to apply template
+    fireEvent.click(tplBtn);
+
+    expect(tplBtn).toHaveAttribute("aria-pressed", "true");
+    const badge = screen.getByTestId("template-applied-badge-template-haruquant-v1");
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveTextContent("[Applied]");
   });
 
   it("renders a non-blocking unavailable state when the templates provider fails", async () => {

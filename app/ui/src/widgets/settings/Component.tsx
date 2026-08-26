@@ -300,9 +300,13 @@ export const SettingsWidget: React.FC<WidgetProps> = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div style={{ display: "flex", gap: "6px" }}>
+        <div style={{ display: "flex", gap: "6px" }} role="tablist" aria-label="Settings sections">
           <button
+            id="tab-appearance"
             type="button"
+            role="tab"
+            aria-selected={activeTab === "appearance"}
+            aria-controls="section-appearance"
             data-testid="tab-appearance"
             onClick={() => setActiveTab("appearance")}
             style={{
@@ -317,10 +321,14 @@ export const SettingsWidget: React.FC<WidgetProps> = () => {
               fontWeight: 500,
             }}
           >
-            Appearance
+            Appearance {activeTab === "appearance" ? "(Active)" : ""}
           </button>
           <button
+            id="tab-client"
             type="button"
+            role="tab"
+            aria-selected={activeTab === "client"}
+            aria-controls="section-client"
             data-testid="tab-client"
             onClick={() => setActiveTab("client")}
             style={{
@@ -335,10 +343,14 @@ export const SettingsWidget: React.FC<WidgetProps> = () => {
               fontWeight: 500,
             }}
           >
-            Client Configuration
+            Client Configuration {activeTab === "client" ? "(Active)" : ""}
           </button>
           <button
+            id="tab-license"
             type="button"
+            role="tab"
+            aria-selected={activeTab === "license"}
+            aria-controls="section-license"
             data-testid="tab-license"
             onClick={() => setActiveTab("license")}
             style={{
@@ -353,10 +365,14 @@ export const SettingsWidget: React.FC<WidgetProps> = () => {
               fontWeight: 500,
             }}
           >
-            License & Entitlements
+            License & Entitlements {activeTab === "license" ? "(Active)" : ""}
           </button>
           <button
+            id="tab-demock"
             type="button"
+            role="tab"
+            aria-selected={activeTab === "de-mock"}
+            aria-controls="section-demock"
             data-testid="tab-demock"
             onClick={() => setActiveTab("de-mock")}
             style={{
@@ -371,7 +387,7 @@ export const SettingsWidget: React.FC<WidgetProps> = () => {
               fontWeight: 500,
             }}
           >
-            De-Mock Stages
+            De-Mock Stages {activeTab === "de-mock" ? "(Active)" : ""}
           </button>
         </div>
       </div>
@@ -396,7 +412,13 @@ export const SettingsWidget: React.FC<WidgetProps> = () => {
       <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
         {/* Appearance Tab (FR-UI-SET_APPEARANCE) */}
         {activeTab === "appearance" && (
-          <section data-testid="section-appearance" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <section
+            id="section-appearance"
+            role="tabpanel"
+            aria-labelledby="tab-appearance"
+            data-testid="section-appearance"
+            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+          >
             <h3 style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#93c5fd" }}>
               Workstation Appearance & Accessibility (FR-UI-SET_APPEARANCE)
             </h3>
@@ -563,7 +585,13 @@ export const SettingsWidget: React.FC<WidgetProps> = () => {
 
         {/* Client Config Tab (FR-UI-CONFIGURE_CLIENT) */}
         {activeTab === "client" && (
-          <section data-testid="section-client" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <section
+            id="section-client"
+            role="tabpanel"
+            aria-labelledby="tab-client"
+            data-testid="section-client"
+            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+          >
             <h3 style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#93c5fd" }}>
               Client Configuration & Secrets (FR-UI-CONFIGURE_CLIENT)
             </h3>
@@ -817,7 +845,13 @@ export const SettingsWidget: React.FC<WidgetProps> = () => {
 
         {/* License Tab (FR-UI-MANAGE_LICENSE) */}
         {activeTab === "license" && (
-          <section data-testid="section-license" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <section
+            id="section-license"
+            role="tabpanel"
+            aria-labelledby="tab-license"
+            data-testid="section-license"
+            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+          >
             <h3 style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#93c5fd" }}>
               License & Entitlements (FR-UI-MANAGE_LICENSE)
             </h3>
@@ -891,7 +925,13 @@ export const SettingsWidget: React.FC<WidgetProps> = () => {
 
         {/* De-Mock Stages Tab */}
         {activeTab === "de-mock" && (
-          <section data-testid="section-demock" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <section
+            id="section-demock"
+            role="tabpanel"
+            aria-labelledby="tab-demock"
+            data-testid="section-demock"
+            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+          >
             <h3 style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#93c5fd" }}>
               Future De-Mock Stage Integrations
             </h3>

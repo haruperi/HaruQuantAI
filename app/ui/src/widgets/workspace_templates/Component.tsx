@@ -99,33 +99,64 @@ export const WorkspaceTemplatesWidget: React.FC<WidgetProps> = () => {
         </div>
       )}
       {loadState.status === "ready" && (
-        <div role="list" aria-label="Workspace templates" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          {MANAGE_LAYOUTS_TEMPLATES.map((template) => (
-            <button
-              key={template.template_id}
-              type="button"
-              role="listitem"
-              data-testid={`workspace-template-${template.template_id}`}
-              onClick={() => handleApply(template.template_id)}
-              style={{
-                textAlign: "left",
-                padding: "8px 10px",
-                backgroundColor: applied === template.template_id ? "#0369a1" : "#1e293b",
-                color: "#e2e8f0",
-                border: "1px solid #475569",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "12px",
-              }}
-            >
-              <strong>{template.name}</strong>
-              <span style={{ color: "#94a3b8" }}>
-                {" "}
-                — {template.layout.widget_instances?.length ?? 0} widgets
-              </span>
-            </button>
-          ))}
-        </div>
+        <ul
+          aria-label="Workspace templates"
+          style={{
+            listStyle: "none",
+            margin: 0,
+            padding: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: "6px",
+          }}
+        >
+          {MANAGE_LAYOUTS_TEMPLATES.map((template) => {
+            const isApplied = applied === template.template_id;
+            return (
+              <li key={template.template_id} style={{ margin: 0, padding: 0 }}>
+                <button
+                  type="button"
+                  data-testid={`workspace-template-${template.template_id}`}
+                  aria-pressed={isApplied}
+                  onClick={() => handleApply(template.template_id)}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    padding: "8px 10px",
+                    backgroundColor: isApplied ? "#0369a1" : "#1e293b",
+                    color: "#e2e8f0",
+                    border: "1px solid #475569",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontSize: "12px",
+                  }}
+                >
+                  <strong>{template.name}</strong>
+                  {isApplied && (
+                    <span
+                      data-testid={`template-applied-badge-${template.template_id}`}
+                      style={{
+                        marginLeft: "8px",
+                        fontSize: "11px",
+                        padding: "1px 6px",
+                        borderRadius: "3px",
+                        backgroundColor: "#0284c7",
+                        color: "#ffffff",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      [Applied]
+                    </span>
+                  )}
+                  <span style={{ color: "#94a3b8" }}>
+                    {" "}
+                    — {template.layout.widget_instances?.length ?? 0} widgets
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       )}
 
       {isMockClient && (

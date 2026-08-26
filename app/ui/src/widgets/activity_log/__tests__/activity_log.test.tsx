@@ -155,4 +155,28 @@ describe("FEAT-UI-MONITOR_WORK activity_log widget (FR-UI-STREAM_ACTIVITY)", () 
       "No activity events recorded."
     );
   });
+
+  it("renders explicit visible severity text independent of color (FR-UI-DISTINGUISH_STATE)", () => {
+    const client = createFakeClient();
+    render(
+      <MonitorWorkClientProvider
+        client={client}
+        activitySnapshot={MOCK_ACTIVITY_SNAPSHOT}
+      >
+        <ActivityLogWidget {...dummyProps} />
+      </MonitorWorkClientProvider>
+    );
+
+    const sev101 = screen.getByTestId("event-severity-101");
+    expect(sev101).toBeInTheDocument();
+    expect(sev101.textContent?.toLowerCase()).toBe("info");
+
+    const sev102 = screen.getByTestId("event-severity-102");
+    expect(sev102).toBeInTheDocument();
+    expect(sev102.textContent?.toLowerCase()).toBe("info");
+
+    const sev105 = screen.getByTestId("event-severity-105");
+    expect(sev105).toBeInTheDocument();
+    expect(sev105.textContent?.toLowerCase()).toBe("warning");
+  });
 });

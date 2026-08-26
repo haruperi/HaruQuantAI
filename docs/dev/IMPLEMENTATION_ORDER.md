@@ -285,8 +285,8 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 ##### 1.7 Partial — `FEAT-UI-ENSURE_ACCESS`
 
-1. [ ] `FR-UI-MANAGE_FOCUS`
-2. [ ] `FR-UI-DISTINGUISH_STATE`
+1. [x] `FR-UI-MANAGE_FOCUS` — evidence: tests/ui/unit/test_ensure_access.py:89, app/ui/src/accessibility/__tests__/focus_manager.test.tsx:123, app/ui/src/features/ensure_access/__tests__/ensure_access.test.tsx:53
+2. [x] `FR-UI-DISTINGUISH_STATE` — evidence: tests/ui/unit/test_ensure_access.py:104, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:219, app/ui/src/widgets/activity_log/__tests__/activity_log.test.tsx:159, app/ui/src/widgets/product_news/__tests__/product_news.test.tsx:96, app/ui/src/widgets/settings/__tests__/settings.test.tsx:130, app/ui/src/widgets/workspace_templates/__tests__/workspace_templates.test.tsx:102
 3. `FR-UI-PROVIDE_DATA_ALTERNATIVES` (mock build; completes at Stage 10 Simulator de-mock gate — 10.15)
 4. `FR-UI-PRESERVE_USABILITY` (mock build; completes at Stage 3 Plugins de-mock gate — 3.11; locale-expansion acceptance requires `FR-UI-SET_LANGUAGE`)
 5. `FR-UI-OPERATE_BY_KEYBOARD` (mock build; completes at Stage 9 Trading de-mock gate — 9.10)
