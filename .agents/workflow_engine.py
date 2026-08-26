@@ -280,8 +280,7 @@ def _verify_closeout_lineage(
         )
     # Verify task branch is gone
     task_branch = state.get("branch", "")
-    branch_check = _git_ok(repo, "rev-parse", "--verify", task_branch)
-    if branch_check:
+    if task_branch and _git_ok(repo, "branch", "--list", task_branch):
         raise OrchestratorError(
             f"Task branch {task_branch!r} still exists after close-out."
         )
@@ -311,47 +310,7 @@ def _handle_closeout(cfg: dict[str, Any], state: dict[str, Any]) -> bool:
         return True
     if block["handoff"] != "ACCEPTED" or block["activating"] != "NONE":
         raise OrchestratorError(f"Unexpected close-out handoff: {block}")
-    for path in [*cfg["journals"].values(), cfg["next_agent"]]:
-        if not path.exists() or path.stat().st_size != 0:
-            raise OrchestratorError(f"Close-out did not empty active-task file: {path}")
-    branch = _git_ok(cfg["repo"], "branch", "--show-current")
-    if branch != cfg["main_branch"]:
-        raise OrchestratorError("Close-out did not return to main.")
-    if _git_ok(cfg["repo"], "status", "--porcelain"):
-        raise OrchestratorError("Close-out left main dirty.")
-    # Verify Git lineage: exactly one commit added, parent is baseline
-    log_output = _git_ok(
-        cfg["repo"],
-        "log",
-        "--oneline",
-        f"{state['baseline']}..HEAD",
-    )
-    commit_lines = [ln for ln in log_output.splitlines() if ln.strip()]
-    if len(commit_lines) != 1:
-        raise OrchestratorError(
-            f"Expected exactly one task commit, found {len(commit_lines)}."
-        )
-    # Verify committed paths are within approved write paths
-    diff_output = _git_ok(
-        cfg["repo"],
-        "diff",
-        "--name-only",
-        f"{state['baseline']}..HEAD",
-    )
-    committed_paths = [p for p in diff_output.splitlines() if p.strip()]
-    approved = set(state.get("approved_write_paths", []))
-    approved |= ALL_COORDINATION_PATHS
-    unexpected = [p for p in committed_paths if p not in approved]
-    if unexpected:
-        raise OrchestratorError(f"Close-out committed unexpected paths: {unexpected}")
-    # Verify task branch is gone
-    task_branch = state.get("branch", "")
-    if task_branch:
-        branch_check = _git_ok(cfg["repo"], "branch", "--list", task_branch)
-        if branch_check.strip():
-            raise OrchestratorError(
-                f"Task branch {task_branch!r} still exists after close-out."
-            )
+    _verify_closeout_lineage(cfg, state)
     state["status"] = "ACCEPTED"
     state["phase"] = "done"
     state["next_agent"] = None

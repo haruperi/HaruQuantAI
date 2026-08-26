@@ -33,6 +33,8 @@ This includes the very first Planner invocation. Task activation is an explicit 
 
 Every mode consumes the same validated `next-agent.md`, including initial Planner. Mode changes transport, not workflow semantics.
 
+`READY_FOR_REVIEW` is already a protocol-authorized transition, not an owner gate. Multi-delegate launches Reviewer automatically; Delegate launches a fresh Reviewer delegate; Manual requires the operator to copy the exact prompt into a fresh Reviewer chat. Solo chat may require the transport/resume input `CONTINUE: REVIEWER` solely to start another assistant turn. That input grants no authority; the only authorization gates remain `APPROVED: EXECUTE` and `APPROVED: COMMIT`.
+
 Run `.agents/configure.py` before using the CLI. `start` and `resume` consume `.agents/run-config.toml` and run role processes only in `multi-delegate` mode; `solo`, `delegate`, and `manual` use their documented chat transports. Repository location defaults to the checked-out repository, with `--repo` available for explicit overrides and tests.
 
 ## Canonical workflow truth

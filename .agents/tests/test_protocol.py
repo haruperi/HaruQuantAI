@@ -43,3 +43,6 @@ def test_protocol_contains_owner_gates() -> None:
     commit = orchestrator._transition_for(transitions, "REVIEWER", "PENDING_COMMIT")
     assert execute.gate == "APPROVED: EXECUTE"
     assert commit.gate == "APPROVED: COMMIT"
+    gates = [item.gate for item in transitions if item.gate]
+    assert gates == ["APPROVED: EXECUTE", "APPROVED: COMMIT"]
+    assert "CONTINUE: REVIEWER" not in protocol_path.read_text(encoding="utf-8")

@@ -70,7 +70,7 @@ def scaffold_repo(tmp_path: Path) -> Path:
     git(tmp_path, "config", "user.email", "test@example.invalid")
     git(tmp_path, "config", "user.name", "Test")
     git(tmp_path, "add", ".")
-    git(tmp_path, "commit", "-m", "baseline")
+    git(tmp_path, "commit", "--no-verify", "-m", "baseline")
     return tmp_path
 
 

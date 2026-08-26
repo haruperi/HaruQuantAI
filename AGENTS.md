@@ -198,13 +198,15 @@ If all verification passes, Reviewer writes `PENDING_COMMIT`, generates the comp
 After exact `APPROVED: COMMIT`, Reviewer must re-verify that reviewed HEAD and complete working-tree fingerprint are unchanged. It then:
 
 1. records commit authorization;
-2. empties all four `.agents/task/` files;
-3. stages only approved changes;
-4. creates exactly one local task commit, including applicable pre-commit/final coverage gate;
-5. verifies `main` is still clean and at the recorded baseline;
-6. fast-forward merges only (`git merge --ff-only`);
-7. verifies the merged commit;
-8. deletes only the safely merged branch with `git branch -d`.
+2. confirms immutable close-out evidence has been archived;
+3. runs the applicable final gates and stages only approved implementation paths;
+4. creates exactly one local task commit;
+5. only after the commit succeeds, empties all four `.agents/task/` files and verifies the task branch is clean;
+6. verifies `main` is still clean and at the recorded baseline;
+7. fast-forward merges only (`git merge --ff-only`);
+8. verifies the exact one-commit lineage and approved committed-path set;
+9. deletes only the safely merged branch with `git branch -d` and verifies the zero-byte task workspace;
+10. marks the run `ACCEPTED`.
 
 Close-out never force-deletes, rebases, resets, cleans, amends, resolves merge conflicts, pushes, or expands scope. Any failed precondition returns to Planner through `CHANGES_REQUESTED`.
 

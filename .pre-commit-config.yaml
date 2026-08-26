@@ -71,7 +71,7 @@ repos:
         entry: uv run --locked mypy
         language: system
         pass_filenames: false
-        files: ^(app/|tests/|pyproject\.toml$|uv\.lock$)
+        files: ^(app/|tests/|\.agents/|pyproject\.toml$|uv\.lock$)
         stages: [pre-push]
 
       - id: pytest

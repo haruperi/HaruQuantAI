@@ -308,10 +308,12 @@ def _closeout(repo: Path, iteration: int) -> None:
         reviewer, f"\n### Commit Authorization — Review {iteration}\nAPPROVED: COMMIT\n"
     )
     branch = _git(repo, "branch", "--show-current")
+    _git(repo, "add", "demo.txt")
+    _git(repo, "commit", "--no-verify", "-m", "self-test task")
     for name in ("planner.md", "executor.md", "reviewer.md", "next-agent.md"):
         (repo / ".agents/task" / name).write_bytes(b"")
-    _git(repo, "add", ".")
-    _git(repo, "commit", "-m", "self-test task")
+    if _git(repo, "status", "--porcelain"):
+        raise RuntimeError("Self-test task branch is dirty after coordination cleanup.")
     _git(repo, "checkout", "main")
     _git(repo, "merge", "--ff-only", branch)
     _git(repo, "branch", "-d", branch)

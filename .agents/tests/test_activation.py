@@ -48,7 +48,7 @@ def _activation_fixture(tmp_path: Path) -> tuple[dict[str, Any], dict[str, Any]]
     _git(tmp_path, "config", "user.email", "test@example.invalid")
     _git(tmp_path, "config", "user.name", "Test")
     _git(tmp_path, "add", ".")
-    _git(tmp_path, "commit", "-m", "baseline")
+    _git(tmp_path, "commit", "--no-verify", "-m", "baseline")
 
     protocol_path = source_root / ".agents/protocol.toml"
     protocol, transitions = orchestrator._parse_protocol(protocol_path)

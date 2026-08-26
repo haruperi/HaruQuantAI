@@ -263,7 +263,7 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
     _git_ok(tmp, "config", "user.email", "self-test@example.invalid")
     _git_ok(tmp, "config", "user.name", "HaruQuantAI Self Test")
     _git_ok(tmp, "add", ".")
-    _git_ok(tmp, "commit", "-m", "self-test baseline")
+    _git_ok(tmp, "commit", "--no-verify", "-m", "self-test baseline")
 
     stub = AGENTS_DIR / "tests" / "stub_agent.py"
     journals = {
@@ -368,6 +368,10 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
                 item.get("phase") == "owner_approval"
                 for item in cast("list[dict[str, Any]]", result.get("history", []))
             ),
+            "commit contains only approved path": _git_ok(
+                tmp, "diff", "--name-only", f"{baseline}..HEAD"
+            )
+            == "demo.txt",
         }
         failed = [name for name, passed in checks.items() if not passed]
         for name, passed in checks.items():

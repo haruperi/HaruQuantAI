@@ -211,7 +211,7 @@ Resolution evidence:
 <what changed and where the Planner can verify it>
 ```
 
-The orchestrator verifies the resolution and resumes Planner from the already-validated artifact.
+The orchestrator records the resolution evidence and treats the previous pending Planner artifact as stale because the repository or specification may have changed. It verifies the active task branch and run state, materializes a fresh canonical Planner prompt, validates `ORCHESTRATOR / BLOCKER_RESOLVED → PLANNER` against the current task state, and only then resumes Planner. Resolving the blocker does not approve execution; a later `PENDING_APPROVAL` still requires `APPROVED: EXECUTE`.
 
 > [!NOTE]
 > Executor `BLOCKED` does not require immediate owner intervention; it automatically routes to Planner for blocker-resolution planning. Owner action is needed only if Planner subsequently reports `BLOCKED` or reaches `PENDING_APPROVAL`.
@@ -230,17 +230,21 @@ HANDOFF : READY_FOR_REVIEW
 
 At this role boundary, the active contract transitions to **`ROLE: REVIEWER`** using the prompt in `.agents/task/next-agent.md`.
 
-#### Option 1C: Proceed to Reviewer Role
+#### Option 1C — Continue the Workflow Into Reviewer
 
-When Executor yields and the orchestrator stops at `HANDOFF : READY_FOR_REVIEW`, instruct the orchestrator to proceed by pasting:
+`READY_FOR_REVIEW` already makes `EXECUTOR / READY_FOR_REVIEW → REVIEWER` a valid protocol transition. The owner is not approving the implementation and no workflow decision is being made. If Solo chat ends the current assistant turn before Reviewer can begin, send this transport/resume input:
 
 ```text
-Proceed with Reviewer
+CONTINUE: REVIEWER
 ```
 
-*(or paste: `Execute Reviewer using .agents/task/next-agent.md`)*
+This input exists only because a chat assistant cannot send itself a new user turn. It grants no authority and changes no scope. On receipt, the chat orchestrator verifies the active state and exact Executor handoff, loads and validates the already-materialized `.agents/task/next-agent.md` as an `EXECUTOR / READY_FOR_REVIEW → REVIEWER` transition, switches the active role contract, and begins Reviewer Stage A without another approval. If the active state does not match `READY_FOR_REVIEW`, `CONTINUE: REVIEWER` fails closed and never force-routes Reviewer.
 
-The orchestrator loads the complete prompt from `.agents/task/next-agent.md`, switches context to **ROLE: REVIEWER**, and begins independent verification.
+Input classes are deliberately distinct:
+
+- authorization: `APPROVED: EXECUTE` and `APPROVED: COMMIT`;
+- decision/routing: rejection messages and `RESOLVED: PLANNER BLOCKER` evidence;
+- transport/resume only: `CONTINUE: REVIEWER`.
 
 #### Option 1D: Intervene or Re-plan Before Review
 
@@ -307,11 +311,14 @@ After exact `APPROVED: COMMIT`, Reviewer performs administrative close-out:
 
 1. Re-verifies unchanged reviewed state;
 2. Records commit authorization;
-3. Empties all four `.agents/task/` workspace files (reset to 0 bytes);
-4. Stages only approved changes and creates one local task commit;
-5. Verifies clean `main` at the baseline;
-6. Fast-forward merges the task branch to `main` (`git merge --ff-only`);
-7. Safely deletes the merged task branch (`git branch -d`).
+3. Confirms the immutable close-out archive exists and runs the final gates;
+4. Stages only approved implementation paths and creates exactly one local task commit;
+5. Only after the commit succeeds, empties all four `.agents/task/` workspace files and verifies the task branch is clean;
+6. Verifies clean `main` at the baseline;
+7. Fast-forward merges the task branch to `main` (`git merge --ff-only`);
+8. Verifies the exact one-commit lineage and approved committed-path set;
+9. Safely deletes the merged task branch (`git branch -d`) and verifies the zero-byte task workspace;
+10. Marks the run `ACCEPTED`.
 
 **Final terminal state:**
 
@@ -341,7 +348,7 @@ Doctor Check & Orchestration Flow
   → Step 1: Verify Environment and Installation (`doctor`)
   → Step 2: Activate Task and Run Planner (`start`)
   → Step 3: Owner Execution Decision (`resume --approved` / `--reject-feedback`)
-  → Step 4: (Optional) Resolve Blockers (`resume`)
+  → Step 4: (Optional) Resolve Planner Blockers (`resume --resolve-planner-blocker "<resolution evidence>"`)
   → Step 5: Run Executor and Transition to Reviewer
   → Step 6: Reviewer Verification and Findings
   → Step 7: Owner Commit Decision (`resume --approved-commit` / `--reject-commit-feedback`)
@@ -410,10 +417,10 @@ The CLI instantiates a fresh Planner correction prompt with your feedback and re
 
 ### CLI Step 4 — Handle Blockers and Corrections via CLI
 
-- **Planner Blocked**: If Planner reports `BLOCKED`, resolve the external blocker in repository files or requirements, then resume:
+- **Planner Blocked**: If Planner reports `BLOCKED`, resolve the external blocker, then provide explicit resolution evidence so the controller replaces the stale prompt with a fresh `BLOCKER_RESOLVED` Planner artifact:
 
   ```bash
-  uv run .agents/orchestrator.py resume
+  uv run .agents/orchestrator.py resume --resolve-planner-blocker "<resolution evidence>"
   ```
 
 - **Executor Blocked / Reviewer Changes Requested**: The CLI handles these transitions automatically, routing work back to Planner. If the run paused or halted due to an external interruption, continue with:
@@ -434,9 +441,7 @@ ACTIVATING : REVIEWER
 HANDOFF : READY_FOR_REVIEW
 ```
 
-In standard multi-delegate mode, the CLI automatically transitions to invoke Reviewer.
-
-*(If the CLI was run in stepped mode or paused at `READY_FOR_REVIEW`, proceed to Reviewer with `uv run .agents/orchestrator.py resume`, or reject/replan with `uv run .agents/orchestrator.py resume --reject-feedback "<notes>"`).*
+In multi-delegate mode, the controller automatically launches Reviewer. No user transport input or approval is involved.
 
 ---
 
@@ -504,7 +509,8 @@ Verify that:
 | `uv run .agents/orchestrator.py doctor` | Health-check protocol, templates, CLIs, and task workspace |
 | `uv run .agents/orchestrator.py self-test` | Run end-to-end protocol test in an isolated repository |
 | `uv run .agents/orchestrator.py start --task-file .agents/task.toml` | Activate a task and run Planner |
-| `uv run .agents/orchestrator.py resume` | Resume execution from current state / proceed to Reviewer / after resolving blocker |
+| `uv run .agents/orchestrator.py resume` | Continue a paused non-gated run; Executor-to-Reviewer routing is automatic and Planner blocker resolution requires the dedicated option below |
+| `uv run .agents/orchestrator.py resume --resolve-planner-blocker "<resolution evidence>"` | Replace a stale blocked-Planner artifact with a fresh canonical `BLOCKER_RESOLVED` Planner prompt |
 | `uv run .agents/orchestrator.py resume --approved` | Approve execution gate (`APPROVED: EXECUTE`) |
 | `uv run .agents/orchestrator.py resume --reject-feedback "<notes>"` | Reject execution gate and route feedback to Planner |
 | `uv run .agents/orchestrator.py resume --approved-commit` | Approve commit gate (`APPROVED: COMMIT`) |
@@ -665,7 +671,7 @@ Resolution evidence:
 <what changed and where the Planner can verify it>
 ```
 
-The orchestrator validates the resolution and instructs transport to resume Planner in a fresh chat.
+The orchestrator validates the resolution, replaces the stale pending artifact with a fresh canonical `ORCHESTRATOR / BLOCKER_RESOLVED → PLANNER` prompt fingerprinted against the resolved repository state, and instructs transport to resume Planner in a fresh chat.
 
 ---
 
@@ -761,7 +767,7 @@ The orchestrator invalidates the close-out authorization and instantiates a fres
 
 1. Open a **new, separate Reviewer close-out chat**.
 2. Paste the **entire exact contents** of `.agents/task/next-agent.md`.
-3. Let Reviewer perform administrative close-out (emptying task files, staging, committing, merging to `main`, deleting task branch).
+3. Let Reviewer perform the safe close-out transaction: re-verify authorization and reviewed state; confirm the immutable archive; run final gates; stage only approved implementation paths; create exactly one task commit; only after commit success clear all four coordination files; verify the task branch is clean and `main` still equals baseline; switch to `main`; fast-forward merge; verify one-commit lineage and committed-path authority; safely delete the task branch; verify the zero-byte task workspace; and mark `ACCEPTED`.
 4. After close-out finishes, return to the **orchestrator chat** and paste:
 
 ```text

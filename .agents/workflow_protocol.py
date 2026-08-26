@@ -448,8 +448,6 @@ def _ensure_pending_artifact_unchanged(
     current = cfg["next_agent"].read_text(encoding="utf-8")
     if _sha_text(current) != pending.get("prompt_sha256"):
         raise OrchestratorError("next-agent.md changed after it was validated.")
-    if _worktree_fingerprint(cfg["repo"]) != pending.get("worktree_sha256"):
-        raise OrchestratorError("Working tree changed after next-agent validation.")
     if str(pending.get("baseline_commit")) != str(state["baseline"]):
         raise OrchestratorError("Pending artifact baseline contradicts active run.")
     # Verify branch hasn't changed
@@ -477,6 +475,8 @@ def _ensure_pending_artifact_unchanged(
                 raise OrchestratorError(
                     f"Canonical template changed after validation: {template_path}"
                 )
+    if _worktree_fingerprint(cfg["repo"]) != pending.get("worktree_sha256"):
+        raise OrchestratorError("Working tree changed after next-agent validation.")
     # Verify target role hasn't changed
     artifact = parse_next_agent(cfg["next_agent"])
     expected_role = pending.get("target_role")

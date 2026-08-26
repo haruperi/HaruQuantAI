@@ -102,6 +102,8 @@ Manual mode uses the identical initial Planner artifact produced by `TASK_ACTIVA
 
 Gate rejection is the only normal case where no outgoing reasoning role exists to author the next prompt. The orchestrator may therefore instantiate the canonical Planner template deterministically with owner feedback.
 
+In chat transports, `CONTINUE: REVIEWER` is transport/resume input only. It may continue an already-valid `EXECUTOR / READY_FOR_REVIEW → REVIEWER` artifact after verifying active state; it is never an owner gate or a force-routing instruction.
+
 ## 8. Owner-action messages
 
 Protocol authorization tokens are exact standalone messages:
