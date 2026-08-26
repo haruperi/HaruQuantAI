@@ -15,8 +15,6 @@ from pathlib import Path
 from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from session_runner import probe_adapter
-from task_api import *
 from goal_engine import (
     advance_goal,
     cancel_goal,
@@ -25,6 +23,9 @@ from goal_engine import (
     load_goal_state,
     start_goal,
 )
+from session_runner import probe_adapter
+from task_api import *
+from workflow_engine import *
 
 AGENTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = AGENTS_DIR.parent
@@ -269,11 +270,11 @@ def _doctor_protocol(cfg: dict[str, Any]) -> bool:
         print("[ok] role session continuity policy")
     seen: set[tuple[str, str]] = set()
     for transition in cfg["transitions"]:
-        key = (transition.source_role, transition.handoff)
-        if key in seen:
-            print(f"[FAIL] duplicate transition: {key}")
+        trans_key = (transition.source_role, transition.handoff)
+        if trans_key in seen:
+            print(f"[FAIL] duplicate transition: {trans_key}")
             ok = False
-        seen.add(key)
+        seen.add(trans_key)
         if (
             transition.target_template
             and not (cfg["repo"] / transition.target_template).exists()
@@ -333,12 +334,16 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         if mode == "multi-delegate":
             adapter = str(role_cfg.get("session_adapter", ""))
             continuity_required = role_cfg.get("session_continuity") == "required"
-            adapter_ok, detail = probe_adapter(adapter) if adapter else (False, "missing adapter")
+            adapter_ok, detail = (
+                probe_adapter(adapter) if adapter else (False, "missing adapter")
+            )
             print(
                 f"[{'ok' if runner_ok else 'FAIL'}] role {role} session runner: "
                 f"{command[:1]}"
             )
-            print(f"[{'ok' if adapter_ok else 'FAIL'}] role {role} session adapter: {detail}")
+            print(
+                f"[{'ok' if adapter_ok else 'FAIL'}] role {role} session adapter: {detail}"
+            )
             ok = ok and runner_ok and continuity_required and adapter_ok
         else:
             print(f"[N/A] role {role} CLI is unused in {mode} mode")
@@ -364,7 +369,9 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
         (tmp / ".agents/task" / name).write_bytes(b"")
     for key in ("planner", "executor", "reviewer", "reviewer_closeout", "default"):
         source = source_cfg["templates"][key]
-        target_name = "reviewer-closeout.md" if key == "reviewer_closeout" else source.name
+        target_name = (
+            "reviewer-closeout.md" if key == "reviewer_closeout" else source.name
+        )
         (tmp / "docs/templates/prompt" / target_name).write_text(
             source.read_text(encoding="utf-8"), encoding="utf-8"
         )
@@ -401,7 +408,9 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
         "heartbeat": 0,
         "retries": 0,
         "protocol": protocol,
-        "session_continuity": cast("dict[str, Any]", protocol.get("session_continuity", {})),
+        "session_continuity": cast(
+            "dict[str, Any]", protocol.get("session_continuity", {})
+        ),
         "transitions": transitions,
         "protocol_path": tmp / ".agents/protocol.toml",
         "journals": journals,

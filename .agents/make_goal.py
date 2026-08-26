@@ -14,8 +14,8 @@ AGENTS_DIR = Path(__file__).resolve().parent
 REPO = AGENTS_DIR.parent
 sys.path.insert(0, str(AGENTS_DIR))
 
-from goal_engine import resolve_goal_entries
-from make_task import parse_entries
+from goal_engine import resolve_goal_entries  # noqa: E402
+from make_task import parse_entries  # noqa: E402
 
 
 def _q(value: str) -> str:
@@ -53,7 +53,9 @@ def _build_spec(args: argparse.Namespace) -> dict[str, Any]:
         or f"Execute {name} through independent HaruQuantAI child Task workflows.",
         "implementation_file": args.file,
         "selection_type": selection_type,
-        "execution_order": "listed" if args.entries and args.listed_order else "tracker",
+        "execution_order": "listed"
+        if args.entries and args.listed_order
+        else "tracker",
         "skip_completed": True,
         "stop_on_blocked": True,
     }

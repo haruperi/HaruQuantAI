@@ -14,14 +14,12 @@ from typing import Any, cast
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from make_task import build_task_spec, is_entry_complete, parse_entries
 from task_api import (
-    OrchestratorError,
-    _entry_gate,
-    _git_ok,
-    _load_state,
     apply_planner_blocker_resolution,
     prepare_task_run,
     resume_task_run,
 )
+from workflow_protocol import OrchestratorError, _git_ok
+from workflow_runtime import _entry_gate, _load_state
 
 GOAL_REQUIRED = (
     "goal_id",
@@ -42,7 +40,9 @@ def load_goal_spec(path: Path) -> dict[str, Any]:
         with path.open("rb") as handle:
             raw = tomllib.load(handle)
     except OSError as exc:
-        raise OrchestratorError(f"Cannot read Goal specification {path}: {exc}") from exc
+        raise OrchestratorError(
+            f"Cannot read Goal specification {path}: {exc}"
+        ) from exc
     except tomllib.TOMLDecodeError as exc:
         raise OrchestratorError(f"Invalid Goal TOML {path}: {exc}") from exc
     missing = [key for key in GOAL_REQUIRED if not raw.get(key)]
@@ -64,7 +64,9 @@ def load_goal_spec(path: Path) -> dict[str, Any]:
     if selection_type == "entries":
         values = raw.get("entries")
         if not isinstance(values, list) or not values:
-            raise OrchestratorError("entries selection requires a non-empty entries array.")
+            raise OrchestratorError(
+                "entries selection requires a non-empty entries array."
+            )
         normalized = [str(value) for value in values]
         if len(set(normalized)) != len(normalized):
             raise OrchestratorError("Goal entries must not contain duplicates.")
@@ -78,7 +80,9 @@ def load_goal_spec(path: Path) -> dict[str, Any]:
     if execution_order not in {"tracker", "listed"}:
         raise OrchestratorError("execution_order must be 'tracker' or 'listed'.")
     if execution_order == "listed" and selection_type != "entries":
-        raise OrchestratorError("execution_order='listed' is valid only for entries selection.")
+        raise OrchestratorError(
+            "execution_order='listed' is valid only for entries selection."
+        )
     if not bool(raw.get("skip_completed", True)):
         raise OrchestratorError(
             "Goal v1 requires skip_completed=true; rerunning completed entries is unsupported."
@@ -87,7 +91,7 @@ def load_goal_spec(path: Path) -> dict[str, Any]:
         raise OrchestratorError(
             "Goal v1 requires stop_on_blocked=true; automatic child skipping is unsupported."
         )
-    return cast("dict[str, Any]", raw)
+    return raw
 
 
 def _tracker_path(repo: Path, spec_or_state: dict[str, Any]) -> Path:
@@ -95,7 +99,9 @@ def _tracker_path(repo: Path, spec_or_state: dict[str, Any]) -> Path:
     try:
         path.relative_to(repo.resolve())
     except ValueError as exc:
-        raise OrchestratorError("Goal tracker resolves outside the repository.") from exc
+        raise OrchestratorError(
+            "Goal tracker resolves outside the repository."
+        ) from exc
     if not path.exists():
         raise OrchestratorError(f"Goal implementation tracker not found: {path}")
     return path
@@ -115,7 +121,9 @@ def resolve_goal_entries(
             raise OrchestratorError("Goal entries must not contain duplicates.")
         unknown = [entry for entry in requested if entry not in tracker_entries]
         if unknown:
-            raise OrchestratorError(f"Goal references unknown tracker entries: {unknown}")
+            raise OrchestratorError(
+                f"Goal references unknown tracker entries: {unknown}"
+            )
         if execution_order == "listed":
             selected = requested
         else:
@@ -129,7 +137,9 @@ def resolve_goal_entries(
             if entry == prefix or entry.startswith(prefix + ".")
         ]
         if not selected:
-            raise OrchestratorError(f"Goal phase {prefix!r} contains no tracker entries.")
+            raise OrchestratorError(
+                f"Goal phase {prefix!r} contains no tracker entries."
+            )
     elif selection_type == "all_open":
         selected = list(tracker_entries)
     else:
@@ -194,7 +204,9 @@ def _ensure_no_running_goal(cfg: dict[str, Any]) -> None:
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
-            raise OrchestratorError(f"Cannot validate existing Goal state {path}: {exc}") from exc
+            raise OrchestratorError(
+                f"Cannot validate existing Goal state {path}: {exc}"
+            ) from exc
         if isinstance(payload, dict) and payload.get("status") == "RUNNING":
             raise OrchestratorError(
                 f"Another Goal is still RUNNING: {payload.get('goal_run_id', path.parent.name)}"
@@ -243,12 +255,7 @@ def _child_spec_paths(
     cfg: dict[str, Any], state: dict[str, Any], entry_id: str
 ) -> tuple[Path, Path]:
     safe = re.sub(r"[^A-Za-z0-9._-]+", "-", entry_id).strip("-") or "entry"
-    archive = (
-        _goals_dir(cfg)
-        / str(state["goal_run_id"])
-        / "children"
-        / f"{safe}.toml"
-    )
+    archive = _goals_dir(cfg) / str(state["goal_run_id"]) / "children" / f"{safe}.toml"
     current = cast("Path", cfg["repo"]) / ".agents" / "task.toml"
     return archive, current
 
@@ -308,10 +315,14 @@ def _verify_active_child_identity(
     run_id = str(active["run_id"])
     recorded = cast("dict[str, str]", state.get("child_runs", {})).get(entry_id)
     if recorded != run_id or str(child.get("run_id")) != run_id:
-        raise OrchestratorError("Goal active child run identity does not match its ledger.")
+        raise OrchestratorError(
+            "Goal active child run identity does not match its ledger."
+        )
     task = cast("dict[str, Any]", child.get("task") or {})
     if str(task.get("implementation_entry", "")) != entry_id:
-        raise OrchestratorError("Goal active child Task targets a different tracker entry.")
+        raise OrchestratorError(
+            "Goal active child Task targets a different tracker entry."
+        )
 
 
 def _verify_child_acceptance(
@@ -406,7 +417,7 @@ def _finalize_goal(cfg: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]
     return state
 
 
-def advance_goal(
+def advance_goal(  # noqa: PLR0911
     cfg: dict[str, Any],
     state: dict[str, Any],
     *,

@@ -54,7 +54,9 @@ def _resolve_prompt_path(pointer: str) -> Path:
         return direct.resolve()
     match = POINTER_RE.match(pointer)
     if not match:
-        raise SessionContinuityError("Session runner received an invalid prompt pointer.")
+        raise SessionContinuityError(
+            "Session runner received an invalid prompt pointer."
+        )
     path = Path(match.group("path"))
     if not path.is_absolute():
         path = REPO_ROOT / path
@@ -88,7 +90,9 @@ def _parse_prompt_identity(pointer: str) -> PromptIdentity:
         raise SessionContinuityError(f"Unsupported target role: {role!r}")
     if iteration < 1:
         raise SessionContinuityError("Prompt iteration must be positive.")
-    return PromptIdentity(run_id=run_id, role=role, iteration=iteration, prompt_path=path)
+    return PromptIdentity(
+        run_id=run_id, role=role, iteration=iteration, prompt_path=path
+    )
 
 
 def _session_state_path(run_id: str) -> Path:
@@ -118,7 +122,9 @@ def _load_ledger(path: Path) -> dict[str, Any]:
 def _save_ledger(path: Path, ledger: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(".tmp")
-    temporary.write_text(json.dumps(ledger, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary.write_text(
+        json.dumps(ledger, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     temporary.replace(path)
 
 
@@ -290,7 +296,9 @@ def build_vendor_command(
         return _build_agy_command(pointer, model, effort, print_timeout, session_id)
     if brand == "cline":
         if not provider:
-            raise SessionContinuityError("Cline session adapter requires a provider id.")
+            raise SessionContinuityError(
+                "Cline session adapter requires a provider id."
+            )
         return _build_cline_command(pointer, model, effort, provider, session_id)
     raise SessionContinuityError(
         f"Native role-session continuity is not implemented for {brand!r}."
@@ -404,14 +412,22 @@ def probe_adapter(brand: str) -> tuple[bool, str]:
     )
     output = f"{completed.stdout}\n{completed.stderr}"
     if completed.returncode != 0 or expected not in output:
-        return False, f"{brand} CLI does not expose expected resume capability {expected}"
-    return True, f"{brand} exact-id resume capability declared; runtime verifies returned id"
+        return (
+            False,
+            f"{brand} CLI does not expose expected resume capability {expected}",
+        )
+    return (
+        True,
+        f"{brand} exact-id resume capability declared; runtime verifies returned id",
+    )
 
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--brand", required=True, choices=("codex", "agy", "cline"))
-    parser.add_argument("--role", required=True, choices=("planner", "executor", "reviewer"))
+    parser.add_argument(
+        "--role", required=True, choices=("planner", "executor", "reviewer")
+    )
     parser.add_argument("--model", required=True)
     parser.add_argument("--effort", required=True)
     parser.add_argument("--provider", default="")
@@ -423,7 +439,9 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     if not args.prompt:
-        raise SessionContinuityError("Session runner requires the current prompt pointer.")
+        raise SessionContinuityError(
+            "Session runner requires the current prompt pointer."
+        )
     identity = _parse_prompt_identity(str(args.prompt))
     requested_role = str(args.role).upper()
     if identity.role != requested_role:

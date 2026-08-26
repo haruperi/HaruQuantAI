@@ -152,9 +152,9 @@ def test_transport_identity_change_mid_run_fails() -> None:
 
 
 def test_new_run_has_separate_session_ledger() -> None:
-    assert session_runner._session_state_path("run-a") != session_runner._session_state_path(
-        "run-b"
-    )
+    assert session_runner._session_state_path(
+        "run-a"
+    ) != session_runner._session_state_path("run-b")
 
 
 def test_session_ids_are_not_role_prompt_metadata(orc: ModuleType) -> None:

@@ -23,7 +23,7 @@ def _load_goal_engine(orc: ModuleType) -> ModuleType:
 def _mark_complete(path: Path, entry_id: str) -> None:
     text = path.read_text(encoding="utf-8")
     pattern = rf"(####\s+{re.escape(entry_id)}\s+)\[ \]"
-    text, count = re.subn(pattern, rf"\1[X]", text, count=1)
+    text, count = re.subn(pattern, r"\1[X]", text, count=1)
     assert count == 1
     path.write_text(text, encoding="utf-8")
 
@@ -122,9 +122,7 @@ def test_goal_advances_sequential_children_with_fresh_task_runs(
     assert result["completed_entries"] == ["4.1", "4.2", "4.3"]
     assert result["remaining_entries"] == []
     assert result["active_child"] is None
-    assert result["child_runs"] == {
-        entry: run_id for entry, run_id in prepared
-    }
+    assert result["child_runs"] == dict(prepared)
     assert len({child["task_run_id"] for child in result["children"]}) == 3
     serialized = goal.json.dumps(result)
     assert "session_id" not in serialized

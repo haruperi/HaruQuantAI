@@ -244,7 +244,9 @@ def assemble_config(repo_override: str | None = None) -> dict[str, Any]:
         "retries": int(run_cfg.get("agent_retry_attempts", 1)),
         "mode": str(runtime_cfg.get("mode", "UNCONFIGURED")),
         "protocol": protocol,
-        "session_continuity": cast("dict[str, Any]", protocol.get("session_continuity", {})),
+        "session_continuity": cast(
+            "dict[str, Any]", protocol.get("session_continuity", {})
+        ),
         "transitions": transitions,
         "protocol_path": protocol_path,
         "journals": journals,
@@ -662,21 +664,17 @@ def compute_snapshot_delta(
     created = set(after.keys()) - set(before.keys())
     deleted = set(before.keys()) - set(after.keys())
     modified = {
-        path for path in set(before.keys()) & set(after.keys()) if before[path] != after[path]
+        path
+        for path in set(before.keys()) & set(after.keys())
+        if before[path] != after[path]
     }
     return {"created": created, "modified": modified, "deleted": deleted}
 
 
 ROLE_INTRINSIC_PATHS: dict[str, frozenset[str]] = {
-    "PLANNER": frozenset(
-        {".agents/task/planner.md", ".agents/task/next-agent.md"}
-    ),
-    "EXECUTOR": frozenset(
-        {".agents/task/executor.md", ".agents/task/next-agent.md"}
-    ),
-    "REVIEWER": frozenset(
-        {".agents/task/reviewer.md", ".agents/task/next-agent.md"}
-    ),
+    "PLANNER": frozenset({".agents/task/planner.md", ".agents/task/next-agent.md"}),
+    "EXECUTOR": frozenset({".agents/task/executor.md", ".agents/task/next-agent.md"}),
+    "REVIEWER": frozenset({".agents/task/reviewer.md", ".agents/task/next-agent.md"}),
 }
 
 ALL_COORDINATION_PATHS = frozenset(

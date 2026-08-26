@@ -91,9 +91,11 @@ def test_all_open_selects_every_incomplete_entry(
 ) -> None:
     goal = _load_goal_engine(orc)
     entries = goal.parse_entries(_tracker(tmp_path / "tracker.md"))
-    assert goal.resolve_goal_entries(
-        _spec(selection_type="all_open"), entries
-    ) == ["4.1", "4.3", "5.1"]
+    assert goal.resolve_goal_entries(_spec(selection_type="all_open"), entries) == [
+        "4.1",
+        "4.3",
+        "5.1",
+    ]
 
 
 def test_unknown_explicit_entry_fails_closed(orc: ModuleType, tmp_path: Path) -> None:
@@ -153,7 +155,7 @@ def test_duplicate_entries_in_goal_toml_are_rejected(
         'implementation_file = "tracker.md"\n'
         'selection_type = "entries"\n'
         'entries = ["4.1", "4.1"]\n'
-        'stop_on_blocked = true\n',
+        "stop_on_blocked = true\n",
         encoding="utf-8",
     )
     with pytest.raises(goal.OrchestratorError):
@@ -172,7 +174,7 @@ def test_goal_v1_rejects_automatic_child_skipping(
         'goal_request = "G"\n'
         'implementation_file = "tracker.md"\n'
         'selection_type = "all_open"\n'
-        'stop_on_blocked = false\n',
+        "stop_on_blocked = false\n",
         encoding="utf-8",
     )
     with pytest.raises(goal.OrchestratorError):
