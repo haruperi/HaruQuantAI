@@ -97,7 +97,8 @@ def _planner_body(iteration: int) -> str:
     return f"""# PROMPT
 
 ## 1. Role
-Act as the HaruQuantAI **Planner** defined by `AGENTS.md`.
+Act as the **HaruQuantAI Principal Software Architect and Implementation Planner**.
+This prompt defines your complete **Planner-specific role contract**.
 
 ## 2. Context
 Iteration: `{iteration}`
@@ -116,7 +117,8 @@ def _executor_body(iteration: int) -> str:
     return f"""# PROMPT
 
 ## 1. Role
-Act as the HaruQuantAI **Executor** defined by `AGENTS.md`.
+Act as the **HaruQuantAI Senior Software Implementation Engineer**.
+This prompt defines your complete **Executor-specific role contract**.
 
 ## 2. Context
 Approved dry-run number: `{iteration}`
@@ -135,7 +137,8 @@ def _reviewer_body(iteration: int) -> str:
     return f"""# PROMPT
 
 ## 1. Role
-Act as the HaruQuantAI **Reviewer** defined by `AGENTS.md`.
+Act as the **HaruQuantAI Principal Software Verification and Code Review Engineer**.
+This prompt defines your complete **Reviewer-specific role contract**.
 
 ## 2. Context
 Dry-run/report number: `{iteration}`
@@ -154,7 +157,8 @@ def _closeout_body(iteration: int) -> str:
     return f"""# PROMPT
 
 ## 1. Role
-Act as the HaruQuantAI **Reviewer performing authorized close-out**.
+Act as the **HaruQuantAI Release Integrity and Change-Control Engineer**.
+This prompt defines your complete **close-out-specific role contract**.
 
 ## 2. Context
 Review number: `{iteration}`

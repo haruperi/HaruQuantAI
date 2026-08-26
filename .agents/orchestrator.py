@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # pyright: reportPrivateUsage=false
-"""CLI for the HaruQuantAI artifact-driven agent workflow."""
+"""CLI for the HaruQuantAI artifact-driven Task and Goal workflows."""
 
 from __future__ import annotations
 
@@ -15,6 +15,16 @@ from pathlib import Path
 from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from goal_engine import (
+    advance_goal,
+    cancel_goal,
+    format_goal_status,
+    load_goal_spec,
+    load_goal_state,
+    start_goal,
+)
+from session_runner import probe_adapter
+from task_api import *
 from workflow_engine import *
 
 AGENTS_DIR = Path(__file__).resolve().parent
@@ -30,17 +40,17 @@ def _require_cli_mode(cfg: dict[str, Any]) -> None:
                 "Workflow mode is UNCONFIGURED; run .agents/configure.py first."
             )
         raise OrchestratorError(
-            f"CLI start/resume is only available in multi-delegate mode; "
+            f"CLI Task/Goal execution is only available in multi-delegate mode; "
             f"configured mode is {mode!r}. Use its documented chat/manual transport."
         )
 
 
 def _collect_task(args: argparse.Namespace) -> dict[str, str]:
     if args.task_file:
-        task = {
-            key: str(value)
-            for key, value in _load_toml(Path(args.task_file).resolve()).items()
-        }
+        path = Path(args.task_file).resolve()
+        if not path.exists():
+            raise OrchestratorError(f"Task specification not found: {path}")
+        task = {key: str(value) for key, value in _load_toml(path).items()}
     else:
         keys = (
             "task_kind",
@@ -63,7 +73,7 @@ def _collect_task(args: argparse.Namespace) -> dict[str, str]:
     missing = [key for key in TASK_REQUIRED if not task.get(key)]
     if missing:
         raise OrchestratorError(f"Missing task fields: {missing}")
-    if not SLUG_RE.match(task["task_slug"]):
+    if not SLUG_RE.fullmatch(task["task_slug"]):
         raise OrchestratorError("task_slug must be lowercase filesystem-safe text.")
     return task
 
@@ -74,30 +84,12 @@ def cmd_start(args: argparse.Namespace) -> int:
     _require_cli_mode(cfg)
     if args.max_iterations:
         cfg["max_iterations"] = args.max_iterations
-    # Phase 9: Acquire workflow lock to prevent concurrent runs
     lock = WorkflowLock(cfg["repo"])
     lock.acquire()
     try:
-        task = _collect_task(args)
-        baseline = _entry_gate(cfg)
-        stamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S")
-        state: dict[str, Any] = {
-            "run_id": f"{stamp}-{task['task_slug']}",
-            "task": task,
-            "baseline": baseline,
-            "branch": None,
-            "iteration": 1,
-            "phase": "task_activation",
-            "status": "RUNNING",
-            "owner_feedback": "",
-            "correction_context": "None",
-            "blockers": [],
-            "history": [],
-            "next_agent": None,
-        }
-        _save_state(cfg, state)
+        state = prepare_task_run(cfg, _collect_task(args))
         try:
-            result = router(
+            result = resume_task_run(
                 cfg,
                 state,
                 auto_approve=args.auto_approve,
@@ -108,7 +100,7 @@ def cmd_start(args: argparse.Namespace) -> int:
             )
         except KeyboardInterrupt:
             _save_state(cfg, state)
-            print("\nStopped by owner; run state saved.")
+            print("\nStopped by owner; Task run state saved.")
             return 130
         return 0 if result.get("status") == "ACCEPTED" else 0
     finally:
@@ -121,24 +113,18 @@ def cmd_resume(args: argparse.Namespace) -> int:
     _require_cli_mode(cfg)
     if args.max_iterations:
         cfg["max_iterations"] = args.max_iterations
-    # Phase 9: Acquire workflow lock to prevent concurrent runs
     lock = WorkflowLock(cfg["repo"])
     lock.acquire()
     try:
         state = _load_state(cfg, args.run_id)
         if state.get("status") == "CANCELLED":
-            raise OrchestratorError("A CANCELLED run cannot be resumed.")
-        # Phase 7: Handle planner blocker resolution
+            raise OrchestratorError("A CANCELLED Task run cannot be resumed.")
         resolve_blocker = getattr(args, "resolve_planner_blocker", None)
-        if resolve_blocker and state.get("phase") == "planner_blocked":
-            state["blocker_resolution"] = {
-                "evidence": resolve_blocker,
-                "resolved_at": dt.datetime.now(tz=dt.UTC).isoformat(),
-            }
-            _save_state(cfg, state)
+        if resolve_blocker:
+            apply_planner_blocker_resolution(cfg, state, resolve_blocker)
             print(f"[ok] Planner blocker resolved: {resolve_blocker}")
         try:
-            router(
+            resume_task_run(
                 cfg,
                 state,
                 auto_approve=args.auto_approve,
@@ -156,7 +142,7 @@ def cmd_resume(args: argparse.Namespace) -> int:
 
 
 def cmd_cancel(args: argparse.Namespace) -> int:
-    """Cancel an active run without destroying evidence."""
+    """Cancel an active Task run without destroying evidence."""
     cfg = assemble_config(args.repo)
     lock = WorkflowLock(cfg["repo"])
     lock.acquire()
@@ -175,9 +161,91 @@ def cmd_cancel(args: argparse.Namespace) -> int:
             "cancelled_at": dt.datetime.now(tz=dt.UTC).isoformat(),
         }
         _save_state(cfg, state)
-        print(f"[ok] Run {state['run_id']} CANCELLED.")
+        print(f"[ok] Task run {state['run_id']} CANCELLED.")
         print(f"     Reason: {reason}")
-        print("     Journals and task branch preserved for inspection.")
+        print("     Journals, task branch, and role-session evidence preserved.")
+        return 0
+    finally:
+        lock.release()
+
+
+def cmd_goal_start(args: argparse.Namespace) -> int:
+    """Freeze one Goal and begin its first ordinary child Task."""
+    cfg = assemble_config(args.repo)
+    _require_cli_mode(cfg)
+    if args.max_iterations:
+        cfg["max_iterations"] = args.max_iterations
+    path = Path(args.goal_file).resolve()
+    if not path.exists():
+        raise OrchestratorError(f"Goal specification not found: {path}")
+    lock = WorkflowLock(cfg["repo"])
+    lock.acquire()
+    try:
+        try:
+            state = start_goal(
+                cfg,
+                load_goal_spec(path),
+                auto_approve=args.auto_approve,
+                approved=args.approved,
+                reject_feedback=args.reject_feedback,
+                commit_approved=args.approved_commit,
+                commit_reject_feedback=args.reject_commit_feedback,
+            )
+        except KeyboardInterrupt:
+            print("\nStopped by owner; Goal and child Task checkpoints were preserved.")
+            return 130
+        print(format_goal_status(state))
+        return 0
+    finally:
+        lock.release()
+
+
+def cmd_goal_resume(args: argparse.Namespace) -> int:
+    """Resume the active child of a previously frozen Goal."""
+    cfg = assemble_config(args.repo)
+    _require_cli_mode(cfg)
+    if args.max_iterations:
+        cfg["max_iterations"] = args.max_iterations
+    lock = WorkflowLock(cfg["repo"])
+    lock.acquire()
+    try:
+        state = load_goal_state(cfg, args.goal_run_id)
+        try:
+            state = advance_goal(
+                cfg,
+                state,
+                auto_approve=args.auto_approve,
+                approved=args.approved,
+                reject_feedback=args.reject_feedback,
+                commit_approved=args.approved_commit,
+                commit_reject_feedback=args.reject_commit_feedback,
+                resolve_planner_blocker=args.resolve_planner_blocker,
+            )
+        except KeyboardInterrupt:
+            print("\nStopped by owner; Goal and child Task checkpoints were preserved.")
+            return 130
+        print(format_goal_status(state))
+        return 0
+    finally:
+        lock.release()
+
+
+def cmd_goal_status(args: argparse.Namespace) -> int:
+    cfg = assemble_config(args.repo)
+    print(format_goal_status(load_goal_state(cfg, args.goal_run_id)))
+    return 0
+
+
+def cmd_goal_cancel(args: argparse.Namespace) -> int:
+    cfg = assemble_config(args.repo)
+    lock = WorkflowLock(cfg["repo"])
+    lock.acquire()
+    try:
+        state = load_goal_state(cfg, args.goal_run_id)
+        reason = args.reason or "Owner-initiated Goal cancellation"
+        state = cancel_goal(cfg, state, reason)
+        print(format_goal_status(state))
+        print("Active child Task evidence, if any, was deliberately preserved.")
         return 0
     finally:
         lock.release()
@@ -186,13 +254,27 @@ def cmd_cancel(args: argparse.Namespace) -> int:
 def _doctor_protocol(cfg: dict[str, Any]) -> bool:
     ok = True
     print(f"[ok] protocol schema: {cfg['protocol']['prompt_schema_version']}")
+    continuity = cast("dict[str, Any]", cfg.get("session_continuity", {}))
+    required_policy = {
+        "scope": "workflow-run",
+        "same_role_resume": True,
+        "new_run_new_sessions": True,
+        "reviewer_closeout_reuses_reviewer": True,
+        "session_context_is_authority": False,
+    }
+    for key, expected in required_policy.items():
+        if continuity.get(key) != expected:
+            print(f"[FAIL] session continuity {key}: {continuity.get(key)!r}")
+            ok = False
+    if all(continuity.get(key) == value for key, value in required_policy.items()):
+        print("[ok] role session continuity policy")
     seen: set[tuple[str, str]] = set()
     for transition in cfg["transitions"]:
-        key = (transition.source_role, transition.handoff)
-        if key in seen:
-            print(f"[FAIL] duplicate transition: {key}")
+        trans_key = (transition.source_role, transition.handoff)
+        if trans_key in seen:
+            print(f"[FAIL] duplicate transition: {trans_key}")
             ok = False
-        seen.add(key)
+        seen.add(trans_key)
         if (
             transition.target_template
             and not (cfg["repo"] / transition.target_template).exists()
@@ -222,6 +304,16 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         exists = path.exists()
         print(f"[{'ok' if exists else 'FAIL'}] active task file {name}: {path}")
         ok = ok and exists
+    for relative in (
+        ".agents/goal_engine.py",
+        ".agents/task_api.py",
+        ".agents/make_goal.py",
+        ".agents/goal.example.toml",
+    ):
+        path = cfg["repo"] / relative
+        exists = path.exists()
+        print(f"[{'ok' if exists else 'FAIL'}] Goal workflow source: {relative}")
+        ok = ok and exists
     for obsolete in (
         cfg["repo"] / ".agents/templates",
         cfg["repo"] / "docs/dev/prompt",
@@ -238,10 +330,21 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         print(f"[ok] workflow mode: {mode}")
     for role, role_cfg in cfg["roles"].items():
         command = cast("list[str]", role_cfg.get("command", []))
-        cli_ok = bool(command) and shutil.which(command[0]) is not None
+        runner_ok = bool(command) and shutil.which(command[0]) is not None
         if mode == "multi-delegate":
-            print(f"[{'ok' if cli_ok else 'FAIL'}] role {role} CLI: {command[:1]}")
-            ok = ok and cli_ok
+            adapter = str(role_cfg.get("session_adapter", ""))
+            continuity_required = role_cfg.get("session_continuity") == "required"
+            adapter_ok, detail = (
+                probe_adapter(adapter) if adapter else (False, "missing adapter")
+            )
+            print(
+                f"[{'ok' if runner_ok else 'FAIL'}] role {role} session runner: "
+                f"{command[:1]}"
+            )
+            print(
+                f"[{'ok' if adapter_ok else 'FAIL'}] role {role} session adapter: {detail}"
+            )
+            ok = ok and runner_ok and continuity_required and adapter_ok
         else:
             print(f"[N/A] role {role} CLI is unused in {mode} mode")
     if cfg["next_agent"].exists() and cfg["next_agent"].stat().st_size:
@@ -283,7 +386,6 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
     _git_ok(tmp, "config", "user.name", "HaruQuantAI Self Test")
     _git_ok(tmp, "add", ".")
     _git_ok(tmp, "commit", "--no-verify", "-m", "self-test baseline")
-
     stub = AGENTS_DIR / "tests" / "stub_agent.py"
     journals = {
         "planner": tmp / ".agents/task/planner.md",
@@ -293,14 +395,7 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
     roles: dict[str, dict[str, Any]] = {}
     for role in ("planner", "executor", "reviewer"):
         roles[role] = {
-            "command": [
-                sys.executable,
-                str(stub),
-                "--role",
-                role,
-                "--repo",
-                str(tmp),
-            ],
+            "command": [sys.executable, str(stub), "--role", role, "--repo", str(tmp)],
             "prompt_delivery": "file",
         }
     protocol, transitions = _parse_protocol(tmp / ".agents/protocol.toml")
@@ -313,6 +408,9 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
         "heartbeat": 0,
         "retries": 0,
         "protocol": protocol,
+        "session_continuity": cast(
+            "dict[str, Any]", protocol.get("session_continuity", {})
+        ),
         "transitions": transitions,
         "protocol_path": tmp / ".agents/protocol.toml",
         "journals": journals,
@@ -338,9 +436,8 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
     try:
         cfg = _init_self_test_repo(tmp, source_cfg)
         baseline = _entry_gate(cfg)
-        state: dict[str, Any] = {
-            "run_id": "self-test",
-            "task": {
+        state = create_task_state(
+            {
                 "task_kind": "feature",
                 "task_id": "FEAT-DEMO",
                 "task_slug": "demo",
@@ -351,18 +448,10 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
                 "owner_execution_notes": "None",
                 "review_focus": "Anti-anchoring",
             },
-            "baseline": baseline,
-            "branch": None,
-            "iteration": 1,
-            "phase": "task_activation",
-            "status": "RUNNING",
-            "owner_feedback": "",
-            "correction_context": "None",
-            "blockers": [],
-            "history": [],
-            "next_agent": None,
-        }
-        result = router(cfg, state, auto_approve=True)
+            baseline,
+            run_id="self-test",
+        )
+        result = resume_task_run(cfg, state, auto_approve=True)
         checks: dict[str, bool] = {
             "status accepted": result.get("status") == "ACCEPTED",
             "reached iteration 3": result.get("iteration") == 3,
@@ -419,6 +508,7 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the command-line parser for workflow lifecycle commands."""
     parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     subs = parser.add_subparsers(dest="command", required=True)
+
     start = subs.add_parser("start")
     start.add_argument("--task-file", default=None)
     start.add_argument("--task-kind", default=None)
@@ -437,23 +527,37 @@ def build_parser() -> argparse.ArgumentParser:
 
     resume = subs.add_parser("resume")
     resume.add_argument("--run-id", default=None)
-    resume.add_argument(
-        "--resolve-planner-blocker",
-        default=None,
-        help="Evidence that the planner blocker has been resolved externally.",
-    )
+    resume.add_argument("--resolve-planner-blocker", default=None)
     _add_common(resume)
     resume.set_defaults(func=cmd_resume)
 
     cancel = subs.add_parser("cancel")
     cancel.add_argument("--run-id", default=None)
-    cancel.add_argument(
-        "--reason",
-        default=None,
-        help="Reason for cancellation (preserved in run state).",
-    )
+    cancel.add_argument("--reason", default=None)
     cancel.add_argument("--repo", default=None)
     cancel.set_defaults(func=cmd_cancel)
+
+    goal_start = subs.add_parser("goal-start")
+    goal_start.add_argument("--goal-file", default=".agents/goal.toml")
+    _add_common(goal_start)
+    goal_start.set_defaults(func=cmd_goal_start)
+
+    goal_resume = subs.add_parser("goal-resume")
+    goal_resume.add_argument("--goal-run-id", default=None)
+    goal_resume.add_argument("--resolve-planner-blocker", default=None)
+    _add_common(goal_resume)
+    goal_resume.set_defaults(func=cmd_goal_resume)
+
+    goal_status = subs.add_parser("goal-status")
+    goal_status.add_argument("--goal-run-id", default=None)
+    goal_status.add_argument("--repo", default=None)
+    goal_status.set_defaults(func=cmd_goal_status)
+
+    goal_cancel = subs.add_parser("goal-cancel")
+    goal_cancel.add_argument("--goal-run-id", default=None)
+    goal_cancel.add_argument("--reason", default=None)
+    goal_cancel.add_argument("--repo", default=None)
+    goal_cancel.set_defaults(func=cmd_goal_cancel)
 
     doctor = subs.add_parser("doctor")
     doctor.add_argument("--repo", default=None)

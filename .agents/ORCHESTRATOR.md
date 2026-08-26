@@ -1,119 +1,113 @@
 # Chat Orchestrator Playbook
 
-You — this chat — orchestrate the Planner → Executor → Reviewer workflow defined by `AGENTS.md` and `.agents/protocol.toml`. The same file protocol is used in every mode; only execution transport differs.
+You — this chat — orchestrate HaruQuantAI Task and Goal workflows defined by shared rules in `AGENTS.md`, the Task machine contract in `.agents/protocol.toml`, complete role contracts in `docs/templates/prompt/`, and Goal supervision in `.agents/GOALS.md`. Modes change transport only.
 
 ## 1. Non-negotiable protocol
 
-- Truth is on file, never in chat memory.
-- The orchestrator is deterministic routing/validation, not a fourth reasoning role.
-- Exactly one reasoning role writes at a time.
-- Active state lives in `.agents/task/{planner,executor,reviewer,next-agent}.md`.
+- Repository evidence and deterministic controller state are authoritative; conversation memory is context only.
+- The orchestrator is deterministic routing/validation/transport, not a reasoning role.
+- Goal Controller and Task Orchestrator are two deterministic state-machine layers inside one orchestration system, not two AI agents.
+- Exactly one child Task and exactly one reasoning role within that Task may write at a time.
+- Active Task coordination lives in `.agents/task/{planner,executor,reviewer,next-agent}.md`.
 - Role journals are append-only; `next-agent.md` is replace-only.
-- **No reasoning role may be invoked unless its complete prompt already exists in `next-agent.md` and has passed protocol validation.**
-- A non-terminal handoff is invalid unless both the journal handoff block and a valid complete `next-agent.md` agree with `.agents/protocol.toml`.
-- Outgoing role handoff facts cannot alter the incoming role's canonical authority.
-- Owner gates remain exact standalone messages: `APPROVED: EXECUTE` and `APPROVED: COMMIT`.
-- Approval transcription is deterministic orchestration; never spend a Planner invocation merely recording approval.
-- Missing/contradictory markers, stale prompt hash, stale working-tree fingerprint, stale HEAD, wrong target role/template, or invalid gate state fail closed.
+- No reasoning role may run without a complete validated current `next-agent.md`.
+- Owner authorization tokens remain exactly `APPROVED: EXECUTE` and `APPROVED: COMMIT`.
+- Missing/stale prompt, template, worktree, HEAD, gate, Goal-child identity or role-session identity fails closed.
+- Same-role session continuity is bounded to one Task run. A new Goal child starts a new Planner/Executor/Reviewer conversation set.
 
-## 2. Orchestrator lifecycle
-
-An orchestrating chat has a session lifecycle around the per-task role state machine:
+## 2. Atomic Task lifecycle
 
 ```text
 ORCHESTRATOR READY / TASK NONE
-  -> task specification prepared
-  -> TASK_ACTIVATED
-  -> deterministic task branch creation
-  -> canonical Planner prompt materialized in next-agent.md
-  -> Planner
-  -> ... normal workflow ...
-  -> ACCEPTED
-  -> ORCHESTRATOR READY / TASK NONE
+  → TASK_ACTIVATED
+  → task branch + validated Planner contract
+  → Planner P
+  → Executor E
+  → Reviewer R
+  → correction loops reuse P/E/R
+  → Reviewer R close-out
+  → ACCEPTED
+  → ORCHESTRATOR READY / TASK NONE
 ```
 
-Initialization never infers or activates a task from prior chat history.
+`TASK_ACTIVATED` passes clean `main`, records baseline, creates the deterministic task branch, instantiates the Planner contract and validates it. Planner never creates or switches the branch.
 
-### Task activation
+## 3. Goal lifecycle
 
-`TASK_ACTIVATED` is an explicit machine transition from `ORCHESTRATOR` to `PLANNER`. Activation must:
+A Goal wraps the Task lifecycle; it does not duplicate it:
 
-1. pass the clean-`main` entry gate;
-2. record the baseline HEAD;
-3. derive and validate the deterministic task branch;
-4. create/switch to that branch from the baseline;
-5. instantiate `docs/templates/prompt/planner.md` into `.agents/task/next-agent.md`;
-6. validate the full artifact against `ORCHESTRATOR / TASK_ACTIVATED`;
-7. only then invoke or transport Planner.
+```text
+GOAL ACTIVATED
+  → resolve + freeze child entries
+  → generate child task.toml
+  → ordinary Task workflow
+  → child ACCEPTED
+  → reconcile child/main/tracker
+  → next child task.toml
+  → ordinary Task workflow
+  → ...
+  → GOAL ACCEPTED
+```
 
-Branch creation is deterministic orchestration. Planner verifies the already-created branch but never creates or switches it.
+The Goal supervisor stores child Task run IDs and progress only. It never stores role-session IDs, creates a Goal branch, creates a Goal commit, or adds owner gates. Only one child may be active. Accepted children remain committed if a later child blocks.
 
-## 3. SOLO
+## 4. SOLO
 
-Perform roles sequentially in this chat using the exact current `next-agent.md` at every invocation, including the initial Planner invocation after `TASK_ACTIVATED`.
+Perform roles sequentially in this chat from exact current `next-agent.md`. Same-role continuity is inherent; cross-role isolation is soft. For Goals, every accepted child creates a fresh logical Task run and the next child begins from a new complete Planner contract. `CONTINUE: REVIEWER` and `CONTINUE: GOAL` are transport/resume phrases only.
 
-Solo has **soft isolation only**. At every role boundary:
+## 5. DELEGATE
 
-1. finish and journal the outgoing role;
-2. replace `next-agent.md` with the full incoming-role prompt;
-3. stop the outgoing role;
-4. load only `next-agent.md` as the new role contract;
-5. re-read required repository evidence;
-6. treat conclusions formed in another role as non-evidence.
+For one Task run, maintain one dedicated same-brand delegate handle per role and resume that handle on later same-role iterations. For a Goal, each child receives a **new** P/E/R delegate set. Never share a role handle across Goal children.
 
-Reviewer must still perform the canonical three-stage anti-anchoring review. Do not describe solo self-review as independent review.
+## 6. MULTI-DELEGATE
 
-## 4. DELEGATE
-
-Spawn exactly one fresh same-brand subagent for the target role and give it the exact validated `next-agent.md`. This includes initial Planner after `TASK_ACTIVATED`. Never run two role agents concurrently. The orchestrating chat handles deterministic activation, owner gates, and validation of resulting journal/next-agent artifacts.
-
-## 5. MULTI-DELEGATE
-
-Use `.agents/orchestrator.py`. It validates the protocol, performs deterministic activation, launches the per-role CLI from `.agents/<role>.toml`, archives prompts/transcripts, verifies prompt/worktree provenance, and persists run state under `.agents/runs/`.
+Use `.agents/orchestrator.py`. Role turns go through `.agents/session_runner.py` and resume exact native IDs stored under `.agents/runs/<task-run-id>/role-sessions.json`.
 
 ```bash
 uv run .agents/orchestrator.py doctor
 uv run .agents/orchestrator.py start --task-file .agents/task.toml
-uv run .agents/orchestrator.py resume
+uv run .agents/orchestrator.py goal-start --goal-file .agents/goal.toml
 ```
 
-`start` performs `TASK_ACTIVATED`, creates the task branch, materializes the initial Planner artifact, validates it, then invokes Planner from that artifact.
+Each Goal child gets a new Task run ID, so session ledgers are naturally isolated by child. The Goal Engine never calls `session_runner.py` directly; it calls the reusable Task API, which invokes the unchanged Task engine.
 
-## 6. MANUAL
+## 7. MANUAL
 
-The user is the transport. The orchestrator still performs deterministic lifecycle actions, including task activation and task-branch creation, but never performs reasoning-role work.
+For one standalone Task keep four chats: Orchestrator, Planner, Executor, Reviewer. Reuse the P/E/R chats only inside that Task.
 
-After activation or any validated role handoff, instruct the user to open a fresh chat for the target role and paste the **complete exact contents** of `.agents/task/next-agent.md`. Never reconstruct or summarize the role prompt manually.
+For a Goal, keep the Goal Orchestrator chat for the whole Goal, but create a **new** dedicated Planner/Executor/Reviewer chat set for every child. Within each child, later iterations return to that child's existing role chat. Reviewer close-out uses that child's existing Reviewer chat.
 
-Manual mode uses the identical initial Planner artifact produced by `TASK_ACTIVATED`; it has no special first-role prompt path.
-
-## 7. Routing table
+## 8. Task routing table
 
 | Latest source/handoff | Next action |
 | --- | --- |
-| `ORCHESTRATOR / TASK_ACTIVATED` | Planner prompt |
-| `PLANNER / PENDING_APPROVAL` | Owner gate; on approval execute the already-written Executor prompt |
-| `PLANNER / BLOCKED` | Owner resolves cause; orchestrator materializes a fresh `BLOCKER_RESOLVED` Planner prompt |
-| `EXECUTOR / READY_FOR_REVIEW` | Reviewer prompt |
-| `EXECUTOR / BLOCKED` | Planner blocker-resolution prompt |
-| `REVIEWER / CHANGES_REQUESTED` | Planner correction prompt |
-| `REVIEWER / PENDING_COMMIT` | Owner commit gate; on approval Reviewer close-out prompt |
-| `REVIEWER / ACCEPTED` | Terminal task; all four active-task files empty, orchestrator returns READY |
+| `ORCHESTRATOR / TASK_ACTIVATED` | Planner contract |
+| `PLANNER / PENDING_APPROVAL` | owner execution gate |
+| `PLANNER / BLOCKED` | resolve external cause; resume same Planner conversation |
+| `EXECUTOR / READY_FOR_REVIEW` | Reviewer contract |
+| `EXECUTOR / BLOCKED` | Planner correction contract |
+| `REVIEWER / CHANGES_REQUESTED` | Planner correction contract |
+| `REVIEWER / PENDING_COMMIT` | owner commit gate |
+| `REVIEWER / ACCEPTED` | Task terminal; Goal may reconcile/advance |
 
-Gate rejection is the only normal case where no outgoing reasoning role exists to author the next prompt. The orchestrator may therefore instantiate the canonical Planner template deterministically with owner feedback.
+## 9. Goal routing table
 
-In chat transports, `CONTINUE: REVIEWER` is transport/resume input only. It may continue an already-valid `EXECUTOR / READY_FOR_REVIEW → REVIEWER` artifact after verifying active state; it is never an owner gate or a force-routing instruction.
+| Goal/child state | Next action |
+| --- | --- |
+| no active child + remaining entries | generate and prepare next ordinary Task |
+| child Task in normal correction loop | leave Goal progress unchanged |
+| child Planner `BLOCKED` | pause Goal until same child is resolved/resumed |
+| child `ACCEPTED` | verify clean main, zero-byte task workspace and tracker completion; then advance |
+| child cancelled/max-iterations/reconciliation failure | mark Goal `BLOCKED` |
+| no remaining entries + every frozen entry complete | mark Goal `ACCEPTED` |
 
-## 8. Owner-action messages
+## 10. Owner-action messages
 
-Protocol authorization tokens are exact standalone messages:
+Authorization tokens are exactly:
 
 ```text
 APPROVED: EXECUTE
-```
-
-```text
 APPROVED: COMMIT
 ```
 
-Recommended user-facing rejection/blocker conventions are documented in `.agents/PROCEDURE.md`; they are not additional protocol authorization tokens.
+`CONTINUE: REVIEWER` and `CONTINUE: GOAL` grant no authority. Rejection/blocker-resolution conventions and complete manual/CLI procedures are in `.agents/PROCEDURE.md` and `.agents/GOALS.md`.

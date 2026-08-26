@@ -7,10 +7,17 @@ reviewer_journal = ".agents/task/reviewer.md"
 next_agent = ".agents/task/next-agent.md"
 
 [isolation]
-solo = "soft"
-delegate = "fresh-context"
-multi-delegate = "fresh-process"
-manual = "fresh-chat"
+solo = "soft-cross-role"
+delegate = "dedicated-role-session"
+multi-delegate = "dedicated-role-session"
+manual = "dedicated-role-chat"
+
+[session_continuity]
+scope = "workflow-run"
+same_role_resume = true
+new_run_new_sessions = true
+reviewer_closeout_reuses_reviewer = true
+session_context_is_authority = false
 
 [[transitions]]
 source_role = "ORCHESTRATOR"

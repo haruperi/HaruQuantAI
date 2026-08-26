@@ -6,20 +6,37 @@ import importlib.util
 import tomllib
 from types import ModuleType
 
+import pytest
 
-def test_supported_adapters_emit_valid_toml(orc: ModuleType) -> None:
-    configure = importlib.util.spec_from_file_location(
+
+def _load_configure(orc: ModuleType) -> ModuleType:
+    spec = importlib.util.spec_from_file_location(
         "workflow_configure", orc.AGENTS_DIR / "configure.py"
     )
-    assert configure
-    assert configure.loader
-    module = importlib.util.module_from_spec(configure)
-    configure.loader.exec_module(module)
-    for vendor in module.VENDORS:
+    assert spec
+    assert spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_session_capable_adapters_emit_valid_toml(orc: ModuleType) -> None:
+    module = _load_configure(orc)
+    for vendor in module.SESSION_CLI_VENDORS:
         text = module._role_toml(
             "planner", vendor, 'model "quoted"', "high", "provider\\id"
         )
-        tomllib.loads(text)
+        parsed = tomllib.loads(text)
+        assert parsed["session_continuity"] == "required"
+        assert parsed["command"][-1] == "{prompt}"
+
+
+def test_multi_delegate_rejects_unverified_native_session_adapter(
+    orc: ModuleType,
+) -> None:
+    module = _load_configure(orc)
+    with pytest.raises(ValueError, match="no verified native session adapter"):
+        module._role_toml("planner", "claude", "sonnet", "high", "")
 
 
 def test_repo_configuration_is_portable(orc: ModuleType) -> None:

@@ -1,8 +1,8 @@
-# `.agents` — Artifact-Driven Agent Workflow
+# `.agents` — Artifact-Driven Task and Goal Workflow
 
-HaruQuantAI delivers development tasks through Planner → Executor → Reviewer with four interchangeable execution modes. The workflow is file-driven: chat memory is never the coordination authority.
+HaruQuantAI implements one atomic Planner → Executor → Reviewer **Task workflow** and a deterministic **Goal supervisor** that can execute many such Tasks sequentially. Repository state and deterministic controller state are authoritative; conversation history is context only.
 
-## Active task workspace
+## Atomic Task workspace
 
 ```text
 .agents/task/
@@ -12,143 +12,135 @@ HaruQuantAI delivers development tasks through Planner → Executor → Reviewer
 └── next-agent.md
 ```
 
-The three role journals are append-only during an active task. `next-agent.md` is replace-only and contains the complete standalone prompt for the next reasoning role. All four files are zero bytes when no task is active and after successful close-out.
+The role journals are append-only during an active Task. `next-agent.md` is replace-only and contains the complete current role contract. All four files are zero bytes when no Task is active and after successful close-out.
 
-Reusable prompt truth lives only in `docs/templates/prompt/`. Runtime prompts are instantiated into `next-agent.md`; there is no second prompt-template tree under `.agents`.
+Reusable prompt truth lives in `docs/templates/prompt/`. `AGENTS.md` contains shared repository/workflow law. `.agents/protocol.toml` remains the Task transition/gate contract.
 
-## Core invariant
+## Two orchestration levels, one system
 
-**No reasoning role may be invoked unless its complete prompt already exists in `.agents/task/next-agent.md` and has passed protocol validation.**
+```text
+                         ORCHESTRATOR
+                              │
+                  ┌───────────┴───────────┐
+                  │                       │
+             GOAL ENGINE             TASK ENGINE
+           supervisory state            existing
+                  │                       │
+                  │              Planner / Executor / Reviewer
+                  │                       │
+                  └──── child ACCEPTED ◄─┘
+                         │
+                         ▼
+                     next child
+```
 
-This includes the very first Planner invocation. Task activation is an explicit `ORCHESTRATOR / TASK_ACTIVATED -> PLANNER` transition: the orchestrator passes the clean-main gate, records the baseline, creates the deterministic task branch, materializes the canonical Planner prompt, validates it, and only then invokes or transports Planner.
+The Goal Engine is not an LLM agent. It freezes selected implementation entries, generates ordinary child `task.toml` files, records child Task run IDs and advances only after a child reaches verified `ACCEPTED`. It does not duplicate Task routing, branch logic, owner gates, role sessions, review or commit logic.
+
+See `.agents/GOALS.md` for the complete Goal contract.
+
+## Core invariants
+
+- No reasoning role may run unless its complete current prompt exists in `.agents/task/next-agent.md` and passes protocol validation.
+- Cross-role isolation and same-role continuity coexist inside one Task run.
+- One Task run owns one logical Planner conversation, one Executor conversation and one Reviewer conversation; later iterations resume the same role conversation.
+- **A new Goal child is a new Task run and therefore gets a new P/E/R conversation set.** Goal state stores no role-session IDs.
+- A Goal has no Goal branch, no Goal commit and no additional owner authorization gate.
+- Only one Goal child may be active at a time.
+- Every child starts from the latest clean accepted `main` and contributes its own focused commit.
 
 ## Modes
 
-| Mode | Execution | Context isolation |
+| Mode | Task same-role continuity | Goal child boundary |
 | --- | --- | --- |
-| `solo` | This chat performs each role sequentially | Soft — role contract reset, not truly independent review |
-| `delegate` | Fresh same-brand subagent per role | Fresh role context |
-| `multi-delegate` | Fresh configured CLI process per role | Fresh process; cross-vendor diversity available |
-| `manual` | User relays `next-agent.md` to a fresh chat | Fresh chat |
+| `solo` | inherent in one chat; cross-role isolation soft | new logical Task contract/context boundary |
+| `delegate` | resume one dedicated handle per role | new P/E/R delegate set per child |
+| `multi-delegate` | exact native session ID per role/run | new Task run ID and session ledger per child |
+| `manual` | return to same P/E/R chat within Task | new P/E/R chat set per child; same Goal Orchestrator chat |
 
-Every mode consumes the same validated `next-agent.md`, including initial Planner. Mode changes transport, not workflow semantics.
+Mode changes transport and transport automation only.
 
-`READY_FOR_REVIEW` is already a protocol-authorized transition, not an owner gate. Multi-delegate launches Reviewer automatically; Delegate launches a fresh Reviewer delegate; Manual requires the operator to copy the exact prompt into a fresh Reviewer chat. Solo chat may require the transport/resume input `CONTINUE: REVIEWER` solely to start another assistant turn. That input grants no authority; the only authorization gates remain `APPROVED: EXECUTE` and `APPROVED: COMMIT`.
+## Professional role contracts
 
-Run `.agents/configure.py` before using the CLI. `start` and `resume` consume `.agents/run-config.toml` and run role processes only in `multi-delegate` mode; `solo`, `delegate`, and `manual` use their documented chat transports. Repository location defaults to the checked-out repository, with `--repo` available for explicit overrides and tests.
+- Planner — **Principal Software Architect and Implementation Planner**: `docs/templates/prompt/planner.md`
+- Executor — **Senior Software Implementation Engineer**: `docs/templates/prompt/executor.md`
+- Reviewer — **Principal Software Verification and Code Review Engineer**: `docs/templates/prompt/reviewer.md`
+- Reviewer close-out — **Release Integrity and Change-Control Engineer**: `docs/templates/prompt/reviewer-closeout.md`
+
+## Task role-session persistence
+
+Multi-delegate role configs route turns through `.agents/session_runner.py`. Native IDs live at:
+
+```text
+.agents/runs/<task-run-id>/role-sessions.json
+```
+
+They are runtime-only and never enter `next-agent.md`. Codex, AGY and supported Cline native exact-ID resume paths fail closed on identity mismatch. Implicit latest-session heuristics are not used.
+
+## Goal state
+
+Goal input and runtime state are separate from Task coordination:
+
+```text
+.agents/goal.toml                         # runtime input, gitignored
+.agents/goals/<goal-run-id>/state.json   # supervisory checkpoint
+.agents/goals/<goal-run-id>/children/    # exact frozen child task specs
+```
+
+Supported v1 selection types are explicit `entries`, numbered `phase`, and `all_open`. Selection freezes at Goal activation so later tracker edits cannot silently enlarge scope.
 
 ## Canonical workflow truth
 
-- `AGENTS.md` — contributor/role authority.
-- `.agents/protocol.toml` — machine-readable transitions, gates, workspace paths, schema version.
-- `.agents/PROCEDURE.md` — operator procedure and exact copy/paste chat text.
-- `docs/templates/prompt/default.md` — prompt-design standard (MAIN/MINIMAL).
-- `docs/templates/prompt/{planner,executor,reviewer,reviewer-closeout}.md` — canonical role prompts.
-- `.agents/task/next-agent.md` — current instantiated next-role prompt.
-- `.agents/runs/*.json` — runtime audit state (gitignored).
-- `.agents/logs/` — immutable invocation prompt/transcript archive (gitignored).
+- `AGENTS.md` — shared contributor/workflow constitution.
+- `.agents/protocol.toml` — machine-readable atomic Task transitions/gates/session policy.
+- `.agents/GOALS.md` — Goal supervision contract.
+- `.agents/PROCEDURE.md` — operator procedures and chat/manual transport text.
+- `.agents/task_api.py` — reusable entry point into the unchanged Task engine.
+- `.agents/goal_engine.py` — deterministic multi-Task supervisor.
+- `.agents/make_task.py` — canonical one-entry Task spec builder.
+- `.agents/make_goal.py` — Goal spec generator.
+- `.agents/task/next-agent.md` — current instantiated role/Task contract.
+- `.agents/runs/` — Task audit/session runtime state.
+- `.agents/goals/` — Goal checkpoints.
 
-## Session lifecycle
-
-```text
-ORCHESTRATOR READY
-  └─ TASK NONE
-       └─ task spec prepared
-            └─ TASK_ACTIVATED
-                 └─ create task branch
-                      └─ materialize + validate Planner next-agent.md
-                           └─ PLANNER Dry Run N
-                                └─ PENDING_APPROVAL
-                                     └─ owner: APPROVED: EXECUTE
-                                          └─ EXECUTOR Report N
-                                               ├─ BLOCKED ────────────────> PLANNER Dry Run N+1
-                                               └─ READY_FOR_REVIEW ──────> REVIEWER Review N
-                                                                              ├─ CHANGES_REQUESTED -> PLANNER N+1
-                                                                              └─ PENDING_COMMIT
-                                                                                   └─ owner: APPROVED: COMMIT
-                                                                                        └─ REVIEWER close-out
-                                                                                             └─ ACCEPTED
-                                                                                                  └─ ORCHESTRATOR READY / TASK NONE
-```
-
-Owner approval is deterministic orchestration, not an LLM task. The orchestrator appends the exact execution gate record to `planner.md`; it does not re-invoke Planner merely to transcribe authorization.
-
-## `next-agent.md` contract
-
-Every reasoning-role invocation uses a complete prompt beginning with TOML front matter:
-
-```toml
-+++
-prompt_schema_version = 1
-run_id = "..."
-task_id = "..."
-iteration = 1
-source_role = "ORCHESTRATOR"
-target_role = "PLANNER"
-handoff = "TASK_ACTIVATED"
-branch = "feature/..."
-baseline_commit = "..."
-source_head = "..."
-template_path = "docs/templates/prompt/planner.md"
-requires_owner_gate = false
-owner_gate = ""
-+++
-```
-
-Later transitions use the same metadata contract. The orchestrator validates schema, transition, target template, branch, baseline, HEAD, protected role sentinels, owner-gate semantics, unfilled placeholders, prompt SHA-256, canonical-template SHA-256, and a working-tree fingerprint. Stale or contradictory artifacts fail closed.
-
-Executor handoffs additionally carry exact normalized `allowed_write_paths`. Python snapshots tracked and relevant untracked content around each invocation, rejects role writes outside intrinsic/path authority, rejects ordinary role commits or branch switches, and suppresses retries after any failed mutating attempt.
-
-State-mutating CLI commands hold the OS-backed `.agents/workflow.lock`. `cancel --reason "..."` records terminal `CANCELLED` state while preserving the branch, worktree, journals, and run evidence; ordinary resume is then refused.
-
-Outgoing roles may populate task-specific facts but may not weaken the incoming role's canonical role, authority, methodology, quality criteria, or handoff rules.
-
-## Structured handoff facts
-
-Free-form `NEXT AGENT NOTES` are retired. Each full next-role prompt carries structured facts appropriate to the transition.
-
-- Planner → Executor: approved scope, exact path authority, implementation order, requirements, validation, rollback, risks.
-- Executor → Reviewer: changed paths, claims, commands/tests reported, limitations, deviations, assumptions, risks. These are explicitly labeled **UPSTREAM CLAIMS — UNTRUSTED UNTIL INDEPENDENTLY VERIFIED**.
-- Executor → Planner (`BLOCKED`): blocker, evidence, partial state, affected paths, safe retained work, required decision.
-- Reviewer → Planner: failed requirement/gate, independent evidence, required correction, retained valid work.
-
-## Reviewer anti-anchoring
-
-Reviewer follows three stages:
-
-1. **Independent reconstruction** from original task, authorities, baseline, diff, resulting repository.
-2. **Independent verification** with affected tests and non-mutating quality/architecture/usage checks.
-3. **Claims reconciliation** only afterward by reading Planner/Executor journals.
-
-The Reviewer never repairs implementation. Defects produce `CHANGES_REQUESTED`.
-
-## Quick start
-
-Configure transport when needed:
+## Task quick start
 
 ```bash
 uv run .agents/configure.py
-```
-
-Then initialize/check the orchestrator before preparing and activating each task:
-
-```bash
 uv run .agents/orchestrator.py doctor
 uv run .agents/make_task.py --list
 uv run .agents/make_task.py 1.1
 uv run .agents/orchestrator.py start --task-file .agents/task.toml
 ```
 
-For chat-driven or manual orchestration, use the exact initialization, activation, owner-action, and manual-transport text in `.agents/PROCEDURE.md`.
-
-Resume/gate relay examples:
+Task resume/gates:
 
 ```bash
 uv run .agents/orchestrator.py resume
 uv run .agents/orchestrator.py resume --approved
 uv run .agents/orchestrator.py resume --reject-feedback "..."
+uv run .agents/orchestrator.py resume --resolve-planner-blocker "..."
 uv run .agents/orchestrator.py resume --approved-commit
 uv run .agents/orchestrator.py resume --reject-commit-feedback "..."
 ```
 
-Runtime `run-config.toml`, `task.toml`, `logs/`, and `runs/` are intentionally gitignored. `task.example.toml`, `protocol.toml`, canonical prompts, role TOMLs, and the four zero-byte active-task files are tracked workflow source.
+## Goal quick start
+
+Generate one Goal:
+
+```bash
+uv run .agents/make_goal.py --entries 7.1 7.2 7.3
+uv run .agents/make_goal.py --phase 7
+uv run .agents/make_goal.py --all-open
+```
+
+Run/check/resume it:
+
+```bash
+uv run .agents/orchestrator.py goal-start --goal-file .agents/goal.toml
+uv run .agents/orchestrator.py goal-status
+uv run .agents/orchestrator.py goal-resume
+```
+
+The same child owner gates are relayed through `goal-resume --approved` and `goal-resume --approved-commit` when needed. Goals add no authorization token.
+
+For chat-driven and manual operation, follow `.agents/PROCEDURE.md` and `.agents/GOALS.md`. Runtime `run-config.toml`, `task.toml`, `goal.toml`, logs, runs and goals are gitignored.
