@@ -34,9 +34,7 @@ def _task() -> dict[str, Any]:
         "-leading-dash",
     ],
 )
-def test_create_task_state_rejects_unsafe_run_ids(
-    orc: ModuleType, run_id: str
-) -> None:
+def test_create_task_state_rejects_unsafe_run_ids(orc: ModuleType, run_id: str) -> None:
     with pytest.raises(orc.OrchestratorError, match="run_id"):
         orc.create_task_state(_task(), "baseline", run_id=run_id)
 
