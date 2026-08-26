@@ -92,6 +92,14 @@ def parse_entries(path: Path) -> dict[str, dict[str, Any]]:
     return entries
 
 
+def is_entry_complete(entry: dict[str, Any]) -> bool:
+    """Return whether the tracker entry or its complete requirement slice is done."""
+    if bool(entry.get("done")):
+        return True
+    items = entry.get("items", [])
+    return bool(items) and all(bool(item.get("done")) for item in items)
+
+
 def _entry_sort_key(eid: str) -> list[int | str]:
     parts: list[int | str] = []
     for p in eid.split("."):
@@ -180,6 +188,10 @@ implementation_entry = {_toml_string(entry_id)}
 """
     previews = [it["fr_id"] or it["text"][:50] for it in entry["items"][:5]]
     return body, f"[{task_kind}] {label}", previews
+
+
+# Public reusable alias; retain the established private API for compatibility.
+build_task_spec = _build_task_spec
 
 
 def main() -> int:
