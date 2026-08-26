@@ -157,4 +157,6 @@ async def test_fr_ui_preserve_drafts_non_secret_only() -> None:
     service = EditInputsPresentationService()
     assert service.preserve(_draft({"api_key": "x"})) == "secret_rejected"
     assert service.preserve(_draft({"nested": {"Password": "x"}})) == "secret_rejected"
-    assert service.preserve(_draft({"safe": {"symbol": "EURUSD"}})) is not None
+    assert isinstance(
+        service.preserve(_draft({"safe": {"symbol": "EURUSD"}})), DraftEnvelopeWire
+    )
