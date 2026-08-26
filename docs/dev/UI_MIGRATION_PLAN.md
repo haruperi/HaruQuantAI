@@ -29,7 +29,7 @@ V2 (`HaruquantAI-V2/app/ui`: Next.js 15 + zustand + zod, ~313 files, ~59k LOC, 8
 ## 2. Classification rules
 
 | Classification | Meaning |
-|---|---|
+| --- | --- |
 | **KEEP** | V2 visual/product implementation is preserved substantially as-is; V3 contract/runtime wiring replaces V2 backend wiring. |
 | **ADAPT** | UX/design/component logic is preserved but restructured into V3 feature/widget ownership and generated contracts. |
 | **REPLACE** | V3 already solves this differently; harvest ideas/visuals only, use the V3 implementation. |
@@ -71,11 +71,11 @@ Rationale for placement: `.migration/v2-ui/` lives at the **repository root, out
 Progress legend: `M` mock done · `U` UI migrated · `T` tests ported/passing · `D` donor folder deleted. Tracker entries refer to `docs/dev/IMPLEMENTATION_ORDER.md`.
 
 | V2 widget | Class | Tracker / FEAT | V3 widget slugs | Generated contracts | M U T D |
-|---|---|---|---|---|---|
-| `workspaces` (+`public/templates`) | REPLACE | 1.3 MANAGE_LAYOUTS | (V3 engine exists) presets → `workspace_templates` | `ui.ts`, `workspace.ts` | ☑ ☑ ☑ ☐ | (2026-08-25) donor consumed for templates/persistence algorithms; donor folder retained — family also feeds later rows; deletion at Phase 3 sweep |
-| `components/workflow` (form-heavy pieces) | ADAPT | 1.4 EDIT_INPUTS | `schema_form`, `selection_table`, `confirmation` | `ui.ts` | ☐ ☐ ☑ ☐ | (2026-08-26) completable slice FR-UI-PRESERVE_DRAFTS done (draft store; contract-level tests); donor workflow pieces remain for the 6.15 de-mock |
-| `components/common`, alarm/status patterns | ADAPT | 1.5 MONITOR_WORK | `job_progress`, `activity_log`, `notifications` | `ui.ts`, `orchestration.ts` | ☑ ☑ ☑ ☐ | (2026-08-26) completable slice FR-UI-TRACK_PROGRESS, FR-UI-STREAM_ACTIVITY, FR-UI-PRESENT_FAILURES done (job_progress, activity_log; snapshot log); notifications widget completes at 14.10 |
-| `system-settings` | ADAPT | 1.6 ADMINISTER_SYSTEM | `settings`, `capability_admin`, `updates` | `ui.ts`, `plugins.ts`, `interfaces.ts`, `orchestration.ts` | ☑ ☑ ☑ ☑ | (2026-08-26) completable slice FR-UI-SET_APPEARANCE, FR-UI-CONFIGURE_CLIENT, FR-UI-MANAGE_LICENSE done (settings widget); donor deleted; mock builds language/updates/capabilities complete at 3.10/14.11/15.8 |
+| --- | --- | --- | --- | --- | --- |
+| `workspaces` (+`public/templates`) | REPLACE | 1.3 MANAGE_LAYOUTS | (V3 engine exists) presets → `workspace_templates` | `ui.ts`, `workspace.ts` | ☑ ☑ ☑ ☐ |
+| `components/workflow` (form-heavy pieces) | ADAPT | 1.4 EDIT_INPUTS | `schema_form`, `selection_table`, `confirmation` | `ui.ts` | ☐ ☐ ☑ ☐ |
+| `components/common`, alarm/status patterns | ADAPT | 1.5 MONITOR_WORK | `job_progress`, `activity_log`, `notifications` | `ui.ts`, `orchestration.ts` | ☑ ☑ ☑ ☐ |
+| `system-settings` | ADAPT | 1.6 ADMINISTER_SYSTEM | `settings`, `capability_admin`, `updates` | `ui.ts`, `plugins.ts`, `interfaces.ts`, `orchestration.ts` | ☑ ☑ ☑ ☑ |
 | `human-factors` (a11y/alert semantics) | ADAPT | 1.7 ENSURE_ACCESS | strengthen shell/accessibility surfaces | `ui.ts`, `trading.ts`, `risk.ts` | ☐ ☐ ☐ ☐ |
 | `markets`, `watchlists`, `instrument-panels`, `market-hours`, `session-registry` | ADAPT | 1.8 MANAGE_DATA | `datasets`, `instruments`, `sessions`, `data_quality` | `ui.ts`, `catalogue.ts`, `data.ts` | ☐ ☐ ☐ ☐ |
 | (mostly V3-native; harvest where useful) | ADAPT | 1.9 AUTHOR_STRATEGIES | `strategy_tree`, `block_catalogue`, `strategy_inspector` | `ui.ts`, `strategy.ts` | ☐ ☐ ☐ ☐ |
@@ -92,6 +92,13 @@ Progress legend: `M` mock done · `U` UI migrated · `T` tests ported/passing ·
 | `simulator` (run surfaces) | ADAPT | 1.11 + 1.13 monitors | result/run-state surfaces | `ui.ts`, `simulator.ts` | ☐ ☐ ☐ ☐ |
 | `training-ux` (+content, `docs/education`) | DROP | — | none (no V3 feature; see §11) | — | ☐ ☐ ☐ ☐ |
 | `workflow-pages`, `App.tsx`, `app/`, `clients/`, `context/`, `store/`, `types/` | REPLACE | — | harvest visuals only; V3 engine/contracts win | — | n/a |
+
+Recent matrix updates:
+
+- `workspaces`: (2026-08-25) donor consumed for templates/persistence algorithms; donor folder retained — family also feeds later rows; deletion at Phase 3 sweep.
+- `components/workflow`: (2026-08-26) completable slice FR-UI-PRESERVE_DRAFTS done (draft store; contract-level tests); donor workflow pieces remain for the 6.15 de-mock.
+- `components/common`: (2026-08-26) completable slice FR-UI-TRACK_PROGRESS, FR-UI-STREAM_ACTIVITY, FR-UI-PRESENT_FAILURES done (job_progress, activity_log; snapshot log); notifications widget completes at 14.10.
+- `system-settings`: (2026-08-26) completable slice FR-UI-SET_APPEARANCE, FR-UI-CONFIGURE_CLIENT, FR-UI-MANAGE_LICENSE done (settings widget); donor deleted; mock builds language/updates/capabilities complete at 3.10/14.11/15.8.
 
 Special classifications:
 
@@ -160,7 +167,7 @@ Each line is one normal workflow task; donors come from the matrix row. A task's
 ## 11. Deferred-items registry (revisit at owning stages)
 
 | Item | Reason | Revisit |
-|---|---|---|
+| --- | --- | --- |
 | SSE/streaming layer (`clients/stream.ts`, `context/streams.ts`) | No V3 event surface yet beyond two ratified subscriptions | Interfaces/events domain stage |
 | Governed-action preflight (`context/governed.ts`) | No V3 governed-request surface yet | Trading/risk stages |
 | Auth/session + login UI | No V3 identity surface yet | Access/identity stage |
@@ -171,7 +178,7 @@ Each line is one normal workflow task; donors come from the matrix row. A task's
 ## 12. Expected reuse tiers
 
 | Reuse value | Donor areas |
-|---|---|
+| --- | --- |
 | Very high | `price-ladder`, `trading`, `research`, `analytics`, major CSS/design work |
 | High | `markets`, `watchlists`, `market-hours`, `session-registry`, `system-settings`, `planning` |
 | Moderate/conceptual | `simulator`, `instrument-panels`, `emergency-ux`, `human-factors` |

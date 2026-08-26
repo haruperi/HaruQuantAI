@@ -225,42 +225,42 @@ This is non-domain runtime infrastructure, not a product `FEAT-*` or business `F
 
 **De-mock gate:** Initial mock construction baseline — establishes all 17 feature-owned widget surfaces against `app/ui/src/mocks/`.
 
-##### 1.01 [x] Foundation task — D-UI spatiotemporal workstation foundation
+#### 1.01 [x] Foundation task — D-UI spatiotemporal workstation foundation
 
 This ordered non-FR foundation enables the existing 17 D-UI feature slices; it creates no product feature or FR ID and cannot mark `FEAT-UI-MANAGE_LAYOUTS`, `FEAT-UI-EXTEND_VIEWS`, or any other feature complete by itself.
 
-1. [x] Implement the typed widget registry/host so every widget type names exactly one owning `FEAT-UI-*`, validates manifest/configuration/state-schema metadata, reverses lifecycle effects exactly once, and derives runtime state without a second product registry. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:28, app/ui/src/runtime/__tests__/widget_registry.test.ts:6
-2. [x] Pin and integrate the then-verified `dockview-react` version behind a HaruQuantAI-owned adapter; implement blank workspaces, versioned templates, add/remove/dock/tab/split/resize/minimize/maximize, bounded layout persistence, migration, dirty-close resolution, and explicit missing/incompatible-widget restoration. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:44, tests/ui/unit/test_spatiotemporal_foundation.py:84, app/ui/src/workspaces/__tests__/dockview_adapter.test.tsx:11, app/ui/src/workspaces/__tests__/layout_serializer.test.ts:11
-3. [x] Implement explicit selection and temporal presentation contexts for live, delayed, historical, playback, simulation, and job-event sources with source/clock identity, timestamp, sequence/cursor order, stale/gap/resync, incompatible-domain failure, bounded coalescing, and exact subscription disposal. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:106, app/ui/src/context/__tests__/temporal.test.tsx:13, app/ui/src/context/__tests__/selection.test.tsx:9
-4. [x] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue, and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts. — evidence: app/ui/src/accessibility/__tests__/focus_manager.test.tsx:9, app/ui/src/mocks/__tests__/mock_provider.test.ts:7
-5. [x] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and listener/timer/subscription leak freedom before dependent widget slices proceed. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:165, app/ui/src/runtime/__tests__/widget_registry.test.ts:75, app/ui/src/runtime/__tests__/widget_registry.test.ts:99
+1. [x] Implement the typed widget registry/host so every widget type names exactly one owning `FEAT-UI-*`, validates manifest/configuration/state-schema metadata, reverses lifecycle effects exactly once, and derives runtime state without a second product registry. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:28, app/ui/src/runtime/**tests**/widget_registry.test.ts:6
+2. [x] Pin and integrate the then-verified `dockview-react` version behind a HaruQuantAI-owned adapter; implement blank workspaces, versioned templates, add/remove/dock/tab/split/resize/minimize/maximize, bounded layout persistence, migration, dirty-close resolution, and explicit missing/incompatible-widget restoration. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:44, tests/ui/unit/test_spatiotemporal_foundation.py:84, app/ui/src/workspaces/**tests**/dockview_adapter.test.tsx:11, app/ui/src/workspaces/**tests**/layout_serializer.test.ts:11
+3. [x] Implement explicit selection and temporal presentation contexts for live, delayed, historical, playback, simulation, and job-event sources with source/clock identity, timestamp, sequence/cursor order, stale/gap/resync, incompatible-domain failure, bounded coalescing, and exact subscription disposal. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:106, app/ui/src/context/**tests**/temporal.test.tsx:13, app/ui/src/context/**tests**/selection.test.tsx:9
+4. [x] Establish the generated-client boundary, dev-only mock provider, accessibility/focus foundation, widget catalogue, and target `app/ui/src/widgets/<widget>/` convention without copying HaruQuantAI-V2 source or handwritten contracts. — evidence: app/ui/src/accessibility/**tests**/focus_manager.test.tsx:9, app/ui/src/mocks/**tests**/mock_provider.test.ts:7
+5. [x] Prove focused component behavior plus cross-widget/workspace integration, browser Dockview interaction, layout round-trip/migration, temporal synchronization, accessibility, cold/live removal, failed replacement rollback, and listener/timer/subscription leak freedom before dependent widget slices proceed. — evidence: tests/ui/unit/test_spatiotemporal_foundation.py:165, app/ui/src/runtime/**tests**/widget_registry.test.ts:75, app/ui/src/runtime/**tests**/widget_registry.test.ts:99
 
-##### 1.1 [x] `FEAT-UI-COMPOSE_SHELL`
+#### 1.1 [x] `FEAT-UI-COMPOSE_SHELL`
 
-1. [X] `FR-UI-ASSEMBLE_SHELL` — evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:24
-2. [X] `FR-UI-DISCOVER_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:107, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:48
-3. [X] `FR-UI-SWITCH_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:146, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:102
-4. [X] `FR-UI-SHOW_CAPABILITY_STATE` — evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:149
-5. [X] `FR-UI-RESTORE_ROUTE` — evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/__tests__/compose_shell.test.tsx:189
+1. [X] `FR-UI-ASSEMBLE_SHELL` — evidence: tests/ui/unit/test_compose_shell.py:84, app/ui/src/features/compose_shell/**tests**/compose_shell.test.tsx:24
+2. [X] `FR-UI-DISCOVER_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:107, app/ui/src/features/compose_shell/**tests**/compose_shell.test.tsx:48
+3. [X] `FR-UI-SWITCH_WORKSPACES` — evidence: tests/ui/unit/test_compose_shell.py:146, app/ui/src/features/compose_shell/**tests**/compose_shell.test.tsx:102
+4. [X] `FR-UI-SHOW_CAPABILITY_STATE` — evidence: tests/ui/unit/test_compose_shell.py:163, app/ui/src/features/compose_shell/**tests**/compose_shell.test.tsx:149
+5. [X] `FR-UI-RESTORE_ROUTE` — evidence: tests/ui/unit/test_compose_shell.py:246, app/ui/src/features/compose_shell/**tests**/compose_shell.test.tsx:189
 
 ##### 1.2 Partial — `FEAT-UI-START_WORK`
 
-1. [X] `FR-UI-PRESENT_HOME` — evidence: tests/ui/unit/test_start_work.py:102, app/ui/src/widgets/home/__tests__/home.test.tsx:80
-2. [X] `FR-UI-SHOW_PRODUCT_NEWS` — evidence: tests/ui/unit/test_start_work.py:138, app/ui/src/widgets/product_news/__tests__/product_news.test.tsx:70
+1. [X] `FR-UI-PRESENT_HOME` — evidence: tests/ui/unit/test_start_work.py:102, app/ui/src/widgets/home/**tests**/home.test.tsx:80
+2. [X] `FR-UI-SHOW_PRODUCT_NEWS` — evidence: tests/ui/unit/test_start_work.py:138, app/ui/src/widgets/product_news/**tests**/product_news.test.tsx:70
 3. `FR-UI-RESUME_RECENT_WORK` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.8)
 4. `FR-UI-LAUNCH_SHORTCUTS` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.8)
 
 ##### 1.3 [X] `FEAT-UI-MANAGE_LAYOUTS`
 
-1. [X] `FR-UI-PERSIST_LAYOUTS` — evidence: tests/ui/unit/test_manage_layouts.py:181, app/ui/src/features/manage_layouts/__tests__/manage_layouts.test.tsx:104
-2. [X] `FR-UI-RESTORE_LAYOUTS` — evidence: tests/ui/unit/test_manage_layouts.py:192, app/ui/src/workspaces/__tests__/dockview_adapter.test.tsx:35
-3. [X] `FR-UI-SCALE_VIEWS` — evidence: tests/ui/unit/test_manage_layouts.py:217, app/ui/src/features/manage_layouts/__tests__/manage_layouts.test.tsx:155
-4. [X] `FR-UI-COMPOSE_PANELS` — evidence: tests/ui/unit/test_manage_layouts.py:170, app/ui/src/workspaces/__tests__/dockview_adapter.test.tsx:99
-5. [X] `FR-UI-MANAGE_TABS` — evidence: tests/ui/unit/test_manage_layouts.py:207, app/ui/src/features/manage_layouts/__tests__/manage_layouts.test.tsx:138
+1. [X] `FR-UI-PERSIST_LAYOUTS` — evidence: tests/ui/unit/test_manage_layouts.py:181, app/ui/src/features/manage_layouts/**tests**/manage_layouts.test.tsx:104
+2. [X] `FR-UI-RESTORE_LAYOUTS` — evidence: tests/ui/unit/test_manage_layouts.py:192, app/ui/src/workspaces/**tests**/dockview_adapter.test.tsx:35
+3. [X] `FR-UI-SCALE_VIEWS` — evidence: tests/ui/unit/test_manage_layouts.py:217, app/ui/src/features/manage_layouts/**tests**/manage_layouts.test.tsx:155
+4. [X] `FR-UI-COMPOSE_PANELS` — evidence: tests/ui/unit/test_manage_layouts.py:170, app/ui/src/workspaces/**tests**/dockview_adapter.test.tsx:99
+5. [X] `FR-UI-MANAGE_TABS` — evidence: tests/ui/unit/test_manage_layouts.py:207, app/ui/src/features/manage_layouts/**tests**/manage_layouts.test.tsx:138
 
 ##### 1.4 Partial — `FEAT-UI-EDIT_INPUTS`
 
-1. [X] `FR-UI-PRESERVE_DRAFTS` — evidence: tests/ui/unit/test_edit_inputs.py:127, app/ui/src/features/edit_inputs/__tests__/edit_inputs.test.tsx:59
+1. [X] `FR-UI-PRESERVE_DRAFTS` — evidence: tests/ui/unit/test_edit_inputs.py:127, app/ui/src/features/edit_inputs/**tests**/edit_inputs.test.tsx:59
 2. `FR-UI-RENDER_FIELDS` (mock build; completes at Stage 6 Data de-mock gate — 6.15)
 3. `FR-UI-VALIDATE_INPUT` (mock build; completes at Stage 6 Data de-mock gate — 6.15)
 4. `FR-UI-RESOLVE_CONFLICTS` (mock build; completes at Stage 6 Data de-mock gate — 6.15)
@@ -276,13 +276,12 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 ##### 1.6 Partial — `FEAT-UI-ADMINISTER_SYSTEM`
 
-1. [x] `FR-UI-SET_APPEARANCE` — evidence: tests/ui/unit/test_administer_system.py:90, app/ui/src/widgets/settings/__tests__/settings.test.tsx:84
-2. [x] `FR-UI-CONFIGURE_CLIENT` — evidence: tests/ui/unit/test_administer_system.py:108, app/ui/src/widgets/settings/__tests__/settings.test.tsx:119
-3. [x] `FR-UI-MANAGE_LICENSE` — evidence: tests/ui/unit/test_administer_system.py:122, app/ui/src/widgets/settings/__tests__/settings.test.tsx:159
+1. [x] `FR-UI-SET_APPEARANCE` — evidence: tests/ui/unit/test_administer_system.py:90, app/ui/src/widgets/settings/**tests**/settings.test.tsx:84
+2. [x] `FR-UI-CONFIGURE_CLIENT` — evidence: tests/ui/unit/test_administer_system.py:108, app/ui/src/widgets/settings/**tests**/settings.test.tsx:119
+3. [x] `FR-UI-MANAGE_LICENSE` — evidence: tests/ui/unit/test_administer_system.py:122, app/ui/src/widgets/settings/**tests**/settings.test.tsx:159
 4. `FR-UI-MANAGE_UPDATES` (mock build; completes at Stage 14 Orchestration de-mock gate — 14.11)
 5. `FR-UI-SET_LANGUAGE` (mock build; completes at Stage 3 Plugins de-mock gate — 3.10)
 6. `FR-UI-ADMINISTER_CAPABILITIES` (mock build; completes at Stage 15 Interfaces de-mock gate — 15.8)
-
 
 ##### 1.7 Partial — `FEAT-UI-ENSURE_ACCESS`
 
@@ -386,33 +385,25 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 4. `FR-UI-REPLACE_VIEW_PROVIDERS` (mock build; completes at Stage 3 Plugins de-mock gate — 3.8)
 5. `FR-UI-REMOVE_VIEW_CONTRIBUTIONS` (mock build; completes at Stage 3 Plugins de-mock gate — 3.8)
 
-
 ---
 
 ### Stage 2 — Workspace (D-WS)
 
 **Authority:** [Workspace README](../../app/services/workspace/README.md)
 
-
 **Scope:** 18 business FRs across 6 feature slices.
-
 
 **Purpose:** Manage workspace lifecycle, runtime configuration, local/hosted access, diagnostic bundles, distributed worker pools, and isolated storage/database fences.
 
-
 **Vertical path:** `CLI/Launcher/UI → Workspace lifecycle/storage → SQLite WAL isolation → diagnostic capture`
-
 
 **UI demo checkpoint:** Initialize, configure, backup, and restore workspaces, inspect readiness/diagnostics, and verify process isolation.
 
-
 **Exit gate:** Workspace schema migrations are idempotent; multi-process writer fencing prevents database corruption; local and hosted workspace isolation pass.
-
 
 **De-mock gate:** None — Workspace connects directly to shell/runtime.
 
-
-##### 2.1 [x] `FEAT-WS-MANAGE_WORKSPACES`
+#### 2.1 [x] `FEAT-WS-MANAGE_WORKSPACES`
 
 1. [X] `FR-WS-INITIALIZE_WORKSPACE` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:53
 2. [X] `FR-WS-MIGRATE_WORKSPACE_SCHEMA` — evidence: tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py:102
@@ -454,26 +445,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Plugins README](../../app/services/plugins/README.md)
 
-
 **Scope:** 9 domain FRs across 7 feature slices plus 11 de-mock FRs across 4 UI feature slices.
-
 
 **Purpose:** Manage plugin manifests, contributions, lifecycle, sandboxed execution, isolation, compatibility, and UI view extensions.
 
-
 **Vertical path:** `Plugin manifest/package → sandbox runtime → contribution registry → D-UI view contributions`
-
 
 **UI demo checkpoint:** Install, discover, replace, and remove an isolated plugin; verify view contributions, code tabs, and localized labels dynamically reflect state.
 
-
 **Exit gate:** Sandboxed plugins cannot access unauthorized resources; live plugin replacement reverses subscriptions cleanly; removing a plugin gracefully degrades contributed UI panels without crashes.
-
 
 **De-mock gate:** `FEAT-UI-EXTEND_VIEWS` (3.8: all five requirements), `FEAT-UI-EDIT_CODE` (3.9: `FR-UI-EDIT_CODE_TABS`, `FR-UI-MANAGE_CODE_FILES`, `FR-UI-SHOW_CODE_DIAGNOSTICS`, `FR-UI-TEST_EXTENSIONS`), `FEAT-UI-ADMINISTER_SYSTEM` (3.10: `FR-UI-SET_LANGUAGE`), and `FEAT-UI-ENSURE_ACCESS` (3.11: `FR-UI-PRESERVE_USABILITY`) switch from `app/ui/src/mocks/` to live Plugin capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 3.1 [x] `FEAT-PLUG-DECLARE_MANIFESTS`
+#### 3.1 [x] `FEAT-PLUG-DECLARE_MANIFESTS`
 
 1. [X] `FR-PLUG-DECLARE_PLUGIN_MANIFESTS` — evidence: tests/services/plugins/manifests/test_plugin_manifests.py:53
 
@@ -505,7 +489,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 3)
 
-
 ##### 3.8 [ ] `FEAT-UI-EXTEND_VIEWS`
 
 1. [ ] `FR-UI-DECLARE_VIEW_CONTRIBUTIONS`
@@ -535,26 +518,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Catalogue README](../../app/services/catalogue/README.md)
 
-
 **Scope:** 14 domain FRs across 7 feature slices plus 2 de-mock FRs across 1 UI feature slice.
-
 
 **Purpose:** Manage financial instruments, multi-provider and broker symbol mappings, trading sessions/calendars, trading rules, dynamic universes, currency conversion, and catalogue interchange.
 
-
 **Vertical path:** `D-UI data/catalogue → Catalogue service → Session/Calendar engine → Universe definitions`
-
 
 **UI demo checkpoint:** Define instruments, inspect provider symbol mappings, edit trading sessions and holiday calendars, create dynamic asset universes, and exchange definitions via JSON/YAML.
 
-
 **Exit gate:** All instrument definitions validate against asset-class constraints; currency conversion handles cross-rates deterministically; trading sessions enforce correct market-open/close boundaries.
-
 
 **De-mock gate:** `FEAT-UI-MANAGE_DATA` (4.8: `FR-UI-EDIT_INSTRUMENTS`, `FR-UI-EDIT_SESSIONS`) switches from `app/ui/src/mocks/` to live Catalogue capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 4.1 [ ] `FEAT-CAT-CATALOG_INSTRUMENTS`
+#### 4.1 [ ] `FEAT-CAT-CATALOG_INSTRUMENTS`
 
 1. [ ] `FR-CAT-DEFINE_INSTRUMENTS`
 2. [ ] `FR-CAT-VERSION_INSTRUMENTS`
@@ -591,7 +567,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 4)
 
-
 ##### 4.8 [ ] `FEAT-UI-MANAGE_DATA`
 
 1. [ ] `FR-UI-EDIT_INSTRUMENTS`
@@ -603,26 +578,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Broker Connectivity README](../../app/services/broker/README.md)
 
-
 **Scope:** 28 domain FRs across 7 feature slices plus 1 de-mock FR across 1 UI feature slice.
-
 
 **Purpose:** Manage broker profiles, environment/session isolation, read-only state/events, order transport, adapter certification suites, and safe offline behavior.
 
-
 **Vertical path:** `Broker adapter → Session/Environment isolation → Read state / Order transport → Certified adapter boundary`
-
 
 **UI demo checkpoint:** Configure broker connections, verify environment isolation (Demo vs Live), inspect provider readiness/health, and view adapter certification reports.
 
-
 **Exit gate:** Live trading remains disabled by default; broker adapters pass the certification suite; session disconnection triggers fail-closed safety without data loss.
-
 
 **De-mock gate:** `FEAT-UI-MANAGE_DATA` (5.8: `FR-UI-ADMINISTER_DATA`) switches from `app/ui/src/mocks/` to live Broker capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 5.1 [ ] `FEAT-BRK-DECLARE_CAPABILITIES`
+#### 5.1 [ ] `FEAT-BRK-DECLARE_CAPABILITIES`
 
 1. [ ] `FR-BRK-IDENTIFY_PROVIDER_PROFILE`
 2. [ ] `FR-BRK-DECLARE_OPERATION_CAPABILITIES`
@@ -673,7 +641,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 5)
 
-
 ##### 5.8 [ ] `FEAT-UI-MANAGE_DATA`
 
 1. [ ] `FR-UI-ADMINISTER_DATA`
@@ -684,26 +651,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Data README](../../app/services/data/README.md)
 
-
 **Scope:** 47 domain FRs across 14 feature slices plus 8 de-mock FRs across 2 UI feature slices.
-
 
 **Purpose:** Handle historical ingestion, QuantData/CSV import, tick normalization, quality resolution, bar aggregation, retention policies, series alignment, connectors, scenario generation, market news, and event streaming.
 
-
 **Vertical path:** `Data source/connector → Tick normalization → Bar aggregation → Quality resolution → Pinned data cache`
-
 
 **UI demo checkpoint:** Import historical data (CSV/QuantData), inspect data quality/gaps, configure timeframes and custom bars, generate market scenarios, and stream live events.
 
-
 **Exit gate:** Bar aggregation matches tick precision; quality resolver flags bad ticks and gaps deterministically; historical data partitions are immutable and verifiable.
-
 
 **De-mock gate:** `FEAT-UI-EDIT_INPUTS` (6.15: `FR-UI-RENDER_FIELDS`, `FR-UI-VALIDATE_INPUT`, `FR-UI-RESOLVE_CONFLICTS`, `FR-UI-CONFIRM_IMPACT`) and `FEAT-UI-MANAGE_DATA` (6.16: `FR-UI-BROWSE_DATASETS`, `FR-UI-IMPORT_DATA`, `FR-UI-EXPORT_DATA`, `FR-UI-SYNC_DATA`) switch from `app/ui/src/mocks/` to live Data capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 6.1 [ ] `FEAT-DATA-INGEST_HISTORY`
+#### 6.1 [ ] `FEAT-DATA-INGEST_HISTORY`
 
 1. [ ] `FR-DATA-REGISTER_DATA_CONNECTIONS`
 2. [ ] `FR-DATA-IMPORT_CSV_DATA`
@@ -794,7 +754,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 6)
 
-
 ##### 6.15 [ ] `FEAT-UI-EDIT_INPUTS`
 
 1. [ ] `FR-UI-RENDER_FIELDS`
@@ -815,26 +774,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Strategy README](../../app/services/strategy/README.md)
 
-
 **Scope:** 47 domain FRs across 13 feature slices plus 8 de-mock FRs across 3 UI feature slices.
-
 
 **Purpose:** Define the typed strategy AST, building block catalogue, chart configurations, strategy versioning, template editing, interchange (JSON/XML), indicator engine, ATM exit rules, and multi-target code generation (MQL5, Python, C++).
 
-
 **Vertical path:** `D-UI strategy editor → Typed Strategy AST → Validator/Versioning → Deterministic Codegen (MQL5/Python/C++)`
-
 
 **UI demo checkpoint:** Build and edit strategies visually via AST blocks, validate logic rules, configure indicators/ATM exits, and generate clean MQL5 / Python source code.
 
-
 **Exit gate:** Strategy AST is strictly typed and validates all inputs; code generation produces deterministic, compilable MQL5 / Python code; versioning preserves strategy lineage without mutation.
-
 
 **De-mock gate:** `FEAT-UI-AUTHOR_STRATEGIES` (7.14: `FR-UI-EDIT_STRATEGY_TREE`, `FR-UI-BROWSE_BLOCKS`, `FR-UI-CONFIGURE_STRATEGY`, `FR-UI-VALIDATE_STRATEGY`, `FR-UI-USE_STRATEGY_EXAMPLES`), `FEAT-UI-EDIT_CODE` (7.15: `FR-UI-NAVIGATE_CODE`, `FR-UI-SEARCH_CODE`), and `FEAT-UI-EXPLORE_RESULTS` (7.16: `FR-UI-INSPECT_SOURCE`) switch from `app/ui/src/mocks/` to live Strategy capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 7.1 [ ] `FEAT-STRAT-DEFINE_AST`
+#### 7.1 [ ] `FEAT-STRAT-DEFINE_AST`
 
 1. [ ] `FR-STRAT-REPRESENT_TYPED_AST`
 2. [ ] `FR-STRAT-DEFINE_AST_NODES`
@@ -922,7 +874,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 7)
 
-
 ##### 7.14 [ ] `FEAT-UI-AUTHOR_STRATEGIES`
 
 1. [ ] `FR-UI-EDIT_STRATEGY_TREE`
@@ -946,26 +897,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Runtime Risk README](../../app/services/risk/README.md)
 
-
 **Scope:** 30 domain FRs across 7 feature slices.
-
 
 **Purpose:** Define pre-trade and runtime risk contracts, risk calculations, deterministic kill-switch controls, order admission, human approvals, allocation governance, and cryptographically chained audit trails.
 
-
 **Vertical path:** `Proposed trade action → Runtime Risk Governor → Kill-switch check → Capacity/Approval check → Admission decision`
-
 
 **UI demo checkpoint:** Configure risk limits, trigger/reset kill switches, manage manual approval tokens, and inspect risk audit records.
 
-
 **Exit gate:** All trade admission decisions are strictly evaluated against active limits; kill switch immediately halts new order submissions; audit logs are immutable and tamper-evident.
-
 
 **De-mock gate:** None — Runtime Risk connects directly into Trading and D-IFACE gateways.
 
-
-##### 8.1 [ ] `FEAT-RISK-DEFINE_RISK_CONTRACTS`
+#### 8.1 [ ] `FEAT-RISK-DEFINE_RISK_CONTRACTS`
 
 1. [ ] `FR-RISK-DEFINE_DECISION_STATES`
 2. [ ] `FR-RISK-VERSION_RISK_PROFILES`
@@ -1022,26 +966,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Trading README](../../app/services/trading/README.md)
 
-
 **Scope:** 36 domain FRs across 8 feature slices plus 10 de-mock FRs across 2 UI feature slices.
-
 
 **Purpose:** Deliver the single canonical business execution lifecycle across SIM, PAPER, DEMO, and LIVE routes, trade plan validation, account operations, order dispatch, reconciliation, protective orders, and execution journaling.
 
-
 **Vertical path:** `D-UI trading intent → Trading session → Risk admission → Selected execution authority → Execution journal`
-
 
 **UI demo checkpoint:** Start/stop trading sessions, preview and submit trade plans, monitor orders/positions, trigger emergency protections, and inspect the transactional ledger.
 
-
 **Exit gate:** Execution parity is strictly enforced across SIM, PAPER, DEMO, and LIVE; unknown broker outcomes block blind retries; transaction ledger balances to zero discrepancy.
-
 
 **De-mock gate:** `FEAT-UI-OPERATE_TRADING` (9.9: all eight requirements) and `FEAT-UI-ENSURE_ACCESS` (9.10: `FR-UI-OPERATE_BY_KEYBOARD`, `FR-UI-LABEL_CONTROLS`) switch from `app/ui/src/mocks/` to live Trading capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 9.1 [ ] `FEAT-TRD-MANAGE_TRADING_SESSIONS`
+#### 9.1 [ ] `FEAT-TRD-MANAGE_TRADING_SESSIONS`
 
 1. [ ] `FR-TRD-DEFINE_TRADING_MODES`
 2. [ ] `FR-TRD-BIND_TRADING_SESSION`
@@ -1103,7 +1040,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 9)
 
-
 ##### 9.9 [ ] `FEAT-UI-OPERATE_TRADING`
 
 1. [ ] `FR-UI-MANAGE_TRADING_SESSIONS`
@@ -1126,26 +1062,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Simulator README](../../app/services/simulator/README.md)
 
-
 **Scope:** 45 domain FRs across 12 feature slices plus 6 de-mock FRs across 3 UI feature slices.
-
 
 **Purpose:** Provide deterministic backtesting and order simulation as the SIM/PAPER execution authority, precision fill models, execution cost calculations, authority-side exit mechanics, indicators, result commit/checkpointing, evaluation caching, and stockpicker simulation.
 
-
 **Vertical path:** `Strategy AST + Pinned Data → Simulation Engine → Fill models & Costs → Trading/Risk lifecycle → Committed backtest results`
-
 
 **UI demo checkpoint:** Run high-speed backtests, inspect precision fill logs, examine equity curves and trade lists, and test input perturbations.
 
-
 **Exit gate:** Repeated backtests on identical data yield byte-identical results; fill models accurately simulate slippage, spread, and commissions; evaluations are cached idempotently.
-
 
 **De-mock gate:** `FEAT-UI-AUTHOR_STRATEGIES` (10.13: `FR-UI-TEST_STRATEGY`), `FEAT-UI-EXPLORE_RESULTS` (10.14: `FR-UI-SUMMARIZE_RESULTS`, `FR-UI-PLOT_EQUITY`, `FR-UI-LIST_TRADES`, `FR-UI-PLOT_TRADES`), and `FEAT-UI-ENSURE_ACCESS` (10.15: `FR-UI-PROVIDE_DATA_ALTERNATIVES`) switch from `app/ui/src/mocks/` to live Simulator capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 10.1 [ ] `FEAT-SIM-CONFIGURE_ENGINE`
+#### 10.1 [ ] `FEAT-SIM-CONFIGURE_ENGINE`
 
 1. [ ] `FR-SIM-BUILD_RUN_MANIFEST`
 2. [ ] `FR-SIM-PIN_RUN_INPUTS`
@@ -1228,7 +1157,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 10)
 
-
 ##### 10.13 [ ] `FEAT-UI-AUTHOR_STRATEGIES`
 
 1. [ ] `FR-UI-TEST_STRATEGY`
@@ -1250,26 +1178,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Analytics README](../../app/services/analytics/README.md)
 
-
 **Scope:** 38 domain FRs across 9 feature slices plus 8 de-mock FRs across 2 UI feature slices.
-
 
 **Purpose:** Manage databank membership, result queries/views, result interpretation and comparisons, trade and benchmark analysis, result interchange, bulk databank operations, similarity matching, custom panels, and operational journals.
 
-
 **Vertical path:** `Committed backtest/live results → Analytics engine → Databank storage → Query/Filter/View API → D-UI explorer`
-
 
 **UI demo checkpoint:** Query and filter databanks, compare strategy results side-by-side, analyze trade distributions and drawdown profiles, and export databank packages.
 
-
 **Exit gate:** Databank filters and column calculations are deterministic; result comparisons accurately calculate correlations and statistical metrics; bulk actions are atomic.
-
 
 **De-mock gate:** `FEAT-UI-OPERATE_DATABANKS` (11.10: all six requirements) and `FEAT-UI-EXPLORE_RESULTS` (11.11: `FR-UI-ANALYZE_TRADES`, `FR-UI-EXPORT_RESULTS`) switch from `app/ui/src/mocks/` to live Analytics capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 11.1 [ ] `FEAT-ANA-DATABANK_MEMBERSHIP`
+#### 11.1 [ ] `FEAT-ANA-DATABANK_MEMBERSHIP`
 
 1. [ ] `FR-ANA-CREATE_DATABANK`
 2. [ ] `FR-ANA-LINK_STRATEGY_RESULT`
@@ -1336,7 +1257,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 11)
 
-
 ##### 11.10 [ ] `FEAT-UI-OPERATE_DATABANKS`
 
 1. [ ] `FR-UI-QUERY_DATABANKS`
@@ -1357,26 +1277,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Research README](../../app/services/research/README.md)
 
-
 **Scope:** 51 domain FRs across 13 feature slices plus 7 de-mock FRs across 2 UI feature slices.
-
 
 **Purpose:** Power strategy generation (Builder), evolutionary improvement, parameter optimization, robustness testing (Monte Carlo, multi-market, slippage), walk-forward matrix validation, acceptance criteria, budget governance, stockpicker research, AI/neural models, portfolio fitness, and market drift detection.
 
-
 **Vertical path:** `Research configuration & budget → Generation/Optimization engine → Parallel Simulator tasks → Acceptance filter → Databank commit`
-
 
 **UI demo checkpoint:** Launch Builder/evolutionary strategy search, run Monte Carlo and Walk-Forward tests, monitor research resource budgets, and inspect market drift alerts.
 
-
 **Exit gate:** Strategy generation and optimization runs are reproducible from seeds; budget governance enforces hard CPU/memory limits; robustness test metrics match mathematical definitions.
-
 
 **De-mock gate:** `FEAT-UI-RUN_RESEARCH` (12.14: all six requirements) and `FEAT-UI-EXPLORE_RESULTS` (12.15: `FR-UI-INSPECT_ROBUSTNESS`) switch from `app/ui/src/mocks/` to live Research capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 12.1 [ ] `FEAT-RES-RUN_RESEARCH`
+#### 12.1 [ ] `FEAT-RES-RUN_RESEARCH`
 
 1. [ ] `FR-RES-RUN_MANUAL_BACKTEST`
 2. [ ] `FR-RES-PREVIEW_RESEARCH_INPUTS`
@@ -1468,7 +1381,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 12)
 
-
 ##### 12.14 [ ] `FEAT-UI-RUN_RESEARCH`
 
 1. [ ] `FR-UI-SELECT_RESEARCH_MODE`
@@ -1488,26 +1400,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Portfolio README](../../app/services/portfolio/README.md)
 
-
 **Scope:** 24 domain FRs across 8 feature slices plus 5 de-mock FRs across 1 UI feature slice.
-
 
 **Purpose:** Enable portfolio composition, correlation analysis, aggregate simulation and constraints, automatic portfolio search, risk analysis, Markowitz mean-variance optimization, portfolio merge/split, and research method plugins.
 
-
 **Vertical path:** `Constituent strategies → Portfolio correlation/aggregation → Markowitz optimizer → Portfolio backtest → D-UI Portfolio Studio`
-
 
 **UI demo checkpoint:** Construct multi-strategy portfolios, inspect correlation matrices, run Markowitz optimization, analyze combined drawdowns, and export merged strategies.
 
-
 **Exit gate:** Correlation calculations are mathematically verified; Markowitz optimization handles singularity and constraints robustly; aggregate portfolio equity equals constituent sum.
-
 
 **De-mock gate:** `FEAT-UI-COMPOSE_PORTFOLIOS` (13.9: all five requirements) switches from `app/ui/src/mocks/` to live Portfolio capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 13.1 [ ] `FEAT-PORT-COMPOSE_PORTFOLIOS`
+#### 13.1 [ ] `FEAT-PORT-COMPOSE_PORTFOLIOS`
 
 1. [ ] `FR-PORT-VERSION_PORTFOLIOS`
 2. [ ] `FR-PORT-VALIDATE_PORTFOLIO_ADMISSION`
@@ -1557,7 +1462,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 13)
 
-
 ##### 13.9 [ ] `FEAT-UI-COMPOSE_PORTFOLIOS`
 
 1. [ ] `FR-UI-SELECT_CONSTITUENTS`
@@ -1572,26 +1476,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Orchestration README](../../app/services/orchestration/README.md)
 
-
 **Scope:** 33 domain FRs across 7 feature slices plus 11 de-mock FRs across 4 UI feature slices.
-
 
 **Purpose:** Deliver project workflows, task execution engine, condition evaluation, domain delegation, external utilities, neural network training, and execution run history.
 
-
 **Vertical path:** `D-UI project graph / CLI → Orchestration engine → Task dependency DAG → Domain execution → Checkpoints & Run history`
-
 
 **UI demo checkpoint:** Create visual project workflows, chain automated tasks (ingest -> build -> test -> deploy), pause/resume execution, and inspect run histories.
 
-
 **Exit gate:** Project task graphs execute in topological order without race conditions; task failure triggers configured rollback/retry; execution history is durably logged.
-
 
 **De-mock gate:** `FEAT-UI-START_WORK` (14.8: `FR-UI-RESUME_RECENT_WORK`, `FR-UI-LAUNCH_SHORTCUTS`), `FEAT-UI-EDIT_PROJECTS` (14.9: all six requirements), `FEAT-UI-MONITOR_WORK` (14.10: `FR-UI-CONTROL_JOBS`, `FR-UI-NOTIFY_OUTCOMES`), and `FEAT-UI-ADMINISTER_SYSTEM` (14.11: `FR-UI-MANAGE_UPDATES`) switch from `app/ui/src/mocks/` to live Orchestration capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 14.1 [ ] `FEAT-ORCH-DEFINE_PROJECTS`
+#### 14.1 [ ] `FEAT-ORCH-DEFINE_PROJECTS`
 
 1. [ ] `FR-ORCH-DEFINE_PROJECT_GRAPHS`
 2. [ ] `FR-ORCH-DECLARE_TASK_CONTRACTS`
@@ -1647,7 +1544,6 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 14)
 
-
 ##### 14.8 [ ] `FEAT-UI-START_WORK`
 
 1. [ ] `FR-UI-RESUME_RECENT_WORK`
@@ -1677,26 +1573,19 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 **Authority:** [Interfaces README](../../app/services/interfaces/README.md)
 
-
 **Scope:** 30 domain FRs across 7 feature slices plus 1 de-mock FR across 1 UI feature slice.
-
 
 **Purpose:** Expose public HTTP REST, WebSocket event streaming, CLI, MCP, and operator gateways across research, projects, portfolios, capability administration, and trading.
 
-
 **Vertical path:** `External HTTP/WS/CLI/MCP client → Gateway security & validation → Public domain capabilities → Event broadcasting`
-
 
 **UI demo checkpoint:** Test all REST endpoints via Swagger/OpenAPI, stream real-time events over WebSocket, execute CLI commands, and connect MCP tools.
 
-
 **Exit gate:** HTTP, WebSocket, CLI, and MCP gateways maintain strict semantic parity; concurrency tokens prevent lost updates; event streaming recovers from disconnections without dropped messages.
-
 
 **De-mock gate:** `FEAT-UI-ADMINISTER_SYSTEM` (15.8: `FR-UI-ADMINISTER_CAPABILITIES`) switches from `app/ui/src/mocks/` to live Interfaces capability connections here; each checkbox below completes only with UI↔backend contract-parity evidence.
 
-
-##### 15.1 [ ] `FEAT-IFACE-SERVE_API_EVENTS`
+#### 15.1 [ ] `FEAT-IFACE-SERVE_API_EVENTS`
 
 1. [X] `FR-IFACE-SERVE_VERSIONED_API` — evidence: tests/services/interfaces/api_events/test_api_events.py:34
 2. [X] `FR-IFACE-ENFORCE_CONCURRENCY_TOKENS` — evidence: tests/services/interfaces/api_events/test_api_events.py:74
@@ -1749,10 +1638,10 @@ This ordered non-FR foundation enables the existing 17 D-UI feature slices; it c
 
 #### `D-UI` — User Interface De-mock Gates (Stage 15)
 
-
 ##### 15.8 [ ] `FEAT-UI-ADMINISTER_SYSTEM`
 
 1. [ ] `FR-UI-ADMINISTER_CAPABILITIES`
+
 ---
 
 ### Stage 16 — Final System Integration and Complete-System Release Gate

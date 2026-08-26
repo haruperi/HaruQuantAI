@@ -4,6 +4,10 @@
     "anywidget",
     "bokeh",
     "CCXT",
+    "backtests",
+    "checkpointing",
+    "journaling",
+    "UNCONFIGURED",
     "chromadb",
     "dateparser",
     "dotenv",
@@ -39,6 +43,7 @@
     "setuptools",
     "sqlalchemy",
     "tqdm",
+    "unregistration",
     "uvicorn",
     "vertexai",
     "yfinance"

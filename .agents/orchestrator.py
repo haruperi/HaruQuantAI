@@ -1,13 +1,40 @@
 #!/usr/bin/env python3
+# pyright: reportPrivateUsage=false
 """CLI for the HaruQuantAI artifact-driven agent workflow."""
 
 from __future__ import annotations
 
+import argparse
+import contextlib
+import datetime as dt
+import shutil
 import sys
+import tempfile
+import tomllib
 from pathlib import Path
+from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from workflow_engine import *
+# pylint: disable=wrong-import-position
+from workflow_engine import TASK_REQUIRED, router
+from workflow_protocol import (
+    SLUG_RE,
+    OrchestratorError,
+    _git_ok,
+    _load_toml,
+    _parse_protocol,
+)
+from workflow_runtime import (
+    WorkflowLock,
+    _entry_gate,
+    _load_state,
+    _save_state,
+    assemble_config,
+    parse_next_agent,
+)
+
+AGENTS_DIR = Path(__file__).resolve().parent
+REPO_ROOT = AGENTS_DIR.parent
 
 
 def _require_cli_mode(cfg: dict[str, Any]) -> None:
@@ -58,6 +85,7 @@ def _collect_task(args: argparse.Namespace) -> dict[str, str]:
 
 
 def cmd_start(args: argparse.Namespace) -> int:
+    """Start a workflow run from a validated clean-main entry gate."""
     cfg = assemble_config(args.repo)
     _require_cli_mode(cfg)
     if args.max_iterations:
@@ -104,6 +132,7 @@ def cmd_start(args: argparse.Namespace) -> int:
 
 
 def cmd_resume(args: argparse.Namespace) -> int:
+    """Resume a saved workflow run from its persisted phase."""
     cfg = assemble_config(args.repo)
     _require_cli_mode(cfg)
     if args.max_iterations:
@@ -190,6 +219,7 @@ def _doctor_protocol(cfg: dict[str, Any]) -> bool:
 
 
 def cmd_doctor(args: argparse.Namespace) -> int:
+    """Validate workflow configuration and active-task artifacts."""
     try:
         cfg = assemble_config(args.repo)
     except (OSError, KeyError, tomllib.TOMLDecodeError, OrchestratorError) as exc:
@@ -200,7 +230,11 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         exists = path.exists()
         print(f"[{'ok' if exists else 'FAIL'}] template {name}: {path}")
         ok = ok and exists
-    for name, path in {**cfg["journals"], "next-agent": cfg["next_agent"]}.items():
+    active_files: dict[str, Path] = {
+        **cast("dict[str, Path]", cfg["journals"]),
+        "next-agent": cast("Path", cfg["next_agent"]),
+    }
+    for name, path in active_files.items():
         exists = path.exists()
         print(f"[{'ok' if exists else 'FAIL'}] active task file {name}: {path}")
         ok = ok and exists
@@ -240,6 +274,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
 
 
 def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any]:
+    """Create a temporary repository containing the workflow self-test fixture."""
     (tmp / ".agents/task").mkdir(parents=True)
     (tmp / ".agents/tests").mkdir(parents=True)
     (tmp / "docs/templates/prompt").mkdir(parents=True)
@@ -312,6 +347,7 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
 
 
 def cmd_self_test(_args: argparse.Namespace) -> int:
+    """Run the bounded workflow integration self-test."""
     source_cfg = assemble_config(str(REPO_ROOT))
     tmp = Path(tempfile.mkdtemp(prefix="hq-agent-workflow-v2-"))
     print(f"[self-test] {tmp}")
@@ -343,7 +379,7 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
             "next_agent": None,
         }
         result = router(cfg, state, auto_approve=True)
-        checks = {
+        checks: dict[str, bool] = {
             "status accepted": result.get("status") == "ACCEPTED",
             "reached iteration 3": result.get("iteration") == 3,
             "blocker recorded": any(
@@ -396,7 +432,8 @@ def _add_common(parser: argparse.ArgumentParser) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    """Build the command-line parser for workflow lifecycle commands."""
+    parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     subs = parser.add_subparsers(dest="command", required=True)
     start = subs.add_parser("start")
     start.add_argument("--task-file", default=None)
@@ -444,6 +481,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Parse arguments and execute the selected workflow command."""
     args = build_parser().parse_args(argv)
     for stream in (sys.stdout, sys.stderr):
         stream_obj = cast("Any", stream)
