@@ -33,6 +33,8 @@ This includes the very first Planner invocation. Task activation is an explicit 
 
 Every mode consumes the same validated `next-agent.md`, including initial Planner. Mode changes transport, not workflow semantics.
 
+Run `.agents/configure.py` before using the CLI. `start` and `resume` consume `.agents/run-config.toml` and run role processes only in `multi-delegate` mode; `solo`, `delegate`, and `manual` use their documented chat transports. Repository location defaults to the checked-out repository, with `--repo` available for explicit overrides and tests.
+
 ## Canonical workflow truth
 
 - `AGENTS.md` — contributor/role authority.
@@ -92,6 +94,10 @@ owner_gate = ""
 ```
 
 Later transitions use the same metadata contract. The orchestrator validates schema, transition, target template, branch, baseline, HEAD, protected role sentinels, owner-gate semantics, unfilled placeholders, prompt SHA-256, canonical-template SHA-256, and a working-tree fingerprint. Stale or contradictory artifacts fail closed.
+
+Executor handoffs additionally carry exact normalized `allowed_write_paths`. Python snapshots tracked and relevant untracked content around each invocation, rejects role writes outside intrinsic/path authority, rejects ordinary role commits or branch switches, and suppresses retries after any failed mutating attempt.
+
+State-mutating CLI commands hold the OS-backed `.agents/workflow.lock`. `cancel --reason "..."` records terminal `CANCELLED` state while preserving the branch, worktree, journals, and run evidence; ordinary resume is then refused.
 
 Outgoing roles may populate task-specific facts but may not weaken the incoming role's canonical role, authority, methodology, quality criteria, or handoff rules.
 

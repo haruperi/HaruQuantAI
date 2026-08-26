@@ -97,10 +97,14 @@ Correction paths:
 - Reviewer `CHANGES_REQUESTED` → next Planner dry run.
 - Owner rejection of execution or commit gate → next Planner dry run with the owner direction.
 - Planner `BLOCKED` → owner resolves the documented cause; Planner resumes.
+- Planner blocker resolution replaces the stale retry artifact with a fresh canonical `ORCHESTRATOR / BLOCKER_RESOLVED → PLANNER` prompt fingerprinted against the resolved repository state.
+- Owner cancellation records terminal `CANCELLED` state and preserves the task branch, worktree, journals, and evidence for deliberate recovery.
 
 Execution authorization is valid only when the entire trimmed owner message is exactly `APPROVED: EXECUTE`. Commit authorization is valid only when it is exactly `APPROVED: COMMIT`.
 
 **Deterministic owner-gate exception:** after exact `APPROVED: EXECUTE`, the orchestrator may append a factual gate record to `.agents/task/planner.md` containing the task, iteration, baseline, branch, and approved plan SHA-256. It may not alter the dry-run body. Planner is not re-invoked merely to transcribe owner authorization.
+
+The approved plan SHA-256 is computed from the exact bytes of `planner.md` immediately before the current owner-gate marker is appended. The orchestrator independently verifies those bytes and all gate identity fields before Executor and Reviewer invocation.
 
 ### 2.5 `next-agent.md` as the role boundary
 

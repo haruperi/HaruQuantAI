@@ -7,12 +7,29 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from workflow_engine import *  # noqa: F403,E402
+from workflow_engine import *
+
+
+def _require_cli_mode(cfg: dict[str, Any]) -> None:
+    """Require the CLI process-runner transport."""
+    mode = str(cfg.get("mode", "UNCONFIGURED"))
+    if mode != "multi-delegate":
+        if mode == "UNCONFIGURED":
+            raise OrchestratorError(
+                "Workflow mode is UNCONFIGURED; run .agents/configure.py first."
+            )
+        raise OrchestratorError(
+            f"CLI start/resume is only available in multi-delegate mode; "
+            f"configured mode is {mode!r}. Use its documented chat/manual transport."
+        )
 
 
 def _collect_task(args: argparse.Namespace) -> dict[str, str]:
     if args.task_file:
-        task = {key: str(value) for key, value in _load_toml(Path(args.task_file).resolve()).items()}
+        task = {
+            key: str(value)
+            for key, value in _load_toml(Path(args.task_file).resolve()).items()
+        }
     else:
         keys = (
             "task_kind",
@@ -27,7 +44,11 @@ def _collect_task(args: argparse.Namespace) -> dict[str, str]:
             "implementation_file",
             "implementation_entry",
         )
-        task = {key: str(getattr(args, key)) for key in keys if getattr(args, key, None) is not None}
+        task = {
+            key: str(getattr(args, key))
+            for key in keys
+            if getattr(args, key, None) is not None
+        }
     missing = [key for key in TASK_REQUIRED if not task.get(key)]
     if missing:
         raise OrchestratorError(f"Missing task fields: {missing}")
@@ -38,62 +59,115 @@ def _collect_task(args: argparse.Namespace) -> dict[str, str]:
 
 def cmd_start(args: argparse.Namespace) -> int:
     cfg = assemble_config(args.repo)
+    _require_cli_mode(cfg)
     if args.max_iterations:
         cfg["max_iterations"] = args.max_iterations
-    task = _collect_task(args)
-    baseline = _entry_gate(cfg)
-    stamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S")
-    state: dict[str, Any] = {
-        "run_id": f"{stamp}-{task['task_slug']}",
-        "task": task,
-        "baseline": baseline,
-        "branch": None,
-        "iteration": 1,
-        "phase": "task_activation",
-        "status": "RUNNING",
-        "owner_feedback": "",
-        "correction_context": "None",
-        "blockers": [],
-        "history": [],
-        "next_agent": None,
-    }
-    _save_state(cfg, state)
+    # Phase 9: Acquire workflow lock to prevent concurrent runs
+    lock = WorkflowLock(cfg["repo"])
+    lock.acquire()
     try:
-        result = router(
-            cfg,
-            state,
-            auto_approve=args.auto_approve,
-            approved=args.approved,
-            reject_feedback=args.reject_feedback,
-            commit_approved=args.approved_commit,
-            commit_reject_feedback=args.reject_commit_feedback,
-        )
-    except KeyboardInterrupt:
+        task = _collect_task(args)
+        baseline = _entry_gate(cfg)
+        stamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S")
+        state: dict[str, Any] = {
+            "run_id": f"{stamp}-{task['task_slug']}",
+            "task": task,
+            "baseline": baseline,
+            "branch": None,
+            "iteration": 1,
+            "phase": "task_activation",
+            "status": "RUNNING",
+            "owner_feedback": "",
+            "correction_context": "None",
+            "blockers": [],
+            "history": [],
+            "next_agent": None,
+        }
         _save_state(cfg, state)
-        print("\nStopped by owner; run state saved.")
-        return 130
-    return 0 if result.get("status") == "ACCEPTED" else 0
+        try:
+            result = router(
+                cfg,
+                state,
+                auto_approve=args.auto_approve,
+                approved=args.approved,
+                reject_feedback=args.reject_feedback,
+                commit_approved=args.approved_commit,
+                commit_reject_feedback=args.reject_commit_feedback,
+            )
+        except KeyboardInterrupt:
+            _save_state(cfg, state)
+            print("\nStopped by owner; run state saved.")
+            return 130
+        return 0 if result.get("status") == "ACCEPTED" else 0
+    finally:
+        lock.release()
 
 
 def cmd_resume(args: argparse.Namespace) -> int:
     cfg = assemble_config(args.repo)
+    _require_cli_mode(cfg)
     if args.max_iterations:
         cfg["max_iterations"] = args.max_iterations
-    state = _load_state(cfg, args.run_id)
+    # Phase 9: Acquire workflow lock to prevent concurrent runs
+    lock = WorkflowLock(cfg["repo"])
+    lock.acquire()
     try:
-        router(
-            cfg,
-            state,
-            auto_approve=args.auto_approve,
-            approved=args.approved,
-            reject_feedback=args.reject_feedback,
-            commit_approved=args.approved_commit,
-            commit_reject_feedback=args.reject_commit_feedback,
-        )
-    except KeyboardInterrupt:
+        state = _load_state(cfg, args.run_id)
+        if state.get("status") == "CANCELLED":
+            raise OrchestratorError("A CANCELLED run cannot be resumed.")
+        # Phase 7: Handle planner blocker resolution
+        resolve_blocker = getattr(args, "resolve_planner_blocker", None)
+        if resolve_blocker and state.get("phase") == "planner_blocked":
+            state["blocker_resolution"] = {
+                "evidence": resolve_blocker,
+                "resolved_at": dt.datetime.now(tz=dt.UTC).isoformat(),
+            }
+            _save_state(cfg, state)
+            print(f"[ok] Planner blocker resolved: {resolve_blocker}")
+        try:
+            router(
+                cfg,
+                state,
+                auto_approve=args.auto_approve,
+                approved=args.approved,
+                reject_feedback=args.reject_feedback,
+                commit_approved=args.approved_commit,
+                commit_reject_feedback=args.reject_commit_feedback,
+            )
+        except KeyboardInterrupt:
+            _save_state(cfg, state)
+            return 130
+        return 0
+    finally:
+        lock.release()
+
+
+def cmd_cancel(args: argparse.Namespace) -> int:
+    """Cancel an active run without destroying evidence."""
+    cfg = assemble_config(args.repo)
+    lock = WorkflowLock(cfg["repo"])
+    lock.acquire()
+    try:
+        state = _load_state(cfg, args.run_id)
+        if state.get("status") == "ACCEPTED":
+            print("[ok] Task already ACCEPTED; nothing to cancel.")
+            return 0
+        if state.get("status") == "CANCELLED":
+            print("[ok] Task already CANCELLED.")
+            return 0
+        reason = getattr(args, "reason", "") or "Owner-initiated cancellation"
+        state["status"] = "CANCELLED"
+        state["cancellation"] = {
+            "reason": reason,
+            "cancelled_at": dt.datetime.now(tz=dt.UTC).isoformat(),
+        }
         _save_state(cfg, state)
-        return 130
-    return 0
+        print(f"[ok] Run {state['run_id']} CANCELLED.")
+        print(f"     Reason: {reason}")
+        print("     Journals and task branch preserved for inspection.")
+        return 0
+    finally:
+        lock.release()
 
 
 def _doctor_protocol(cfg: dict[str, Any]) -> bool:
@@ -106,7 +180,10 @@ def _doctor_protocol(cfg: dict[str, Any]) -> bool:
             print(f"[FAIL] duplicate transition: {key}")
             ok = False
         seen.add(key)
-        if transition.target_template and not (cfg["repo"] / transition.target_template).exists():
+        if (
+            transition.target_template
+            and not (cfg["repo"] / transition.target_template).exists()
+        ):
             print(f"[FAIL] missing transition template: {transition.target_template}")
             ok = False
     return ok
@@ -135,10 +212,20 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         if obsolete.exists():
             print(f"[FAIL] obsolete workflow path still exists: {obsolete}")
             ok = False
+    mode = str(cfg.get("mode", "UNCONFIGURED"))
+    if mode == "UNCONFIGURED":
+        print("[FAIL] workflow mode: UNCONFIGURED (run .agents/configure.py)")
+        ok = False
+    else:
+        print(f"[ok] workflow mode: {mode}")
     for role, role_cfg in cfg["roles"].items():
         command = cast("list[str]", role_cfg.get("command", []))
         cli_ok = bool(command) and shutil.which(command[0]) is not None
-        print(f"[{'ok' if cli_ok else 'warn'}] role {role} CLI: {command[:1]}")
+        if mode == "multi-delegate":
+            print(f"[{'ok' if cli_ok else 'FAIL'}] role {role} CLI: {command[:1]}")
+            ok = ok and cli_ok
+        else:
+            print(f"[N/A] role {role} CLI is unused in {mode} mode")
     if cfg["next_agent"].exists() and cfg["next_agent"].stat().st_size:
         try:
             artifact = parse_next_agent(cfg["next_agent"])
@@ -160,7 +247,9 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
         (tmp / ".agents/task" / name).write_bytes(b"")
     for key in ("planner", "executor", "reviewer", "reviewer_closeout", "default"):
         source = source_cfg["templates"][key]
-        target_name = "reviewer-closeout.md" if key == "reviewer_closeout" else source.name
+        target_name = (
+            "reviewer-closeout.md" if key == "reviewer_closeout" else source.name
+        )
         (tmp / "docs/templates/prompt" / target_name).write_text(
             source.read_text(encoding="utf-8"), encoding="utf-8"
         )
@@ -323,8 +412,23 @@ def build_parser() -> argparse.ArgumentParser:
 
     resume = subs.add_parser("resume")
     resume.add_argument("--run-id", default=None)
+    resume.add_argument(
+        "--resolve-planner-blocker",
+        default=None,
+        help="Evidence that the planner blocker has been resolved externally.",
+    )
     _add_common(resume)
     resume.set_defaults(func=cmd_resume)
+
+    cancel = subs.add_parser("cancel")
+    cancel.add_argument("--run-id", default=None)
+    cancel.add_argument(
+        "--reason",
+        default=None,
+        help="Reason for cancellation (preserved in run state).",
+    )
+    cancel.add_argument("--repo", default=None)
+    cancel.set_defaults(func=cmd_cancel)
 
     doctor = subs.add_parser("doctor")
     doctor.add_argument("--repo", default=None)

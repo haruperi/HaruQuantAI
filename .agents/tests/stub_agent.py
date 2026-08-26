@@ -9,10 +9,12 @@ import subprocess
 import sys
 import tomllib
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 POINTER_RE = re.compile(r"instructions in (.*?) exactly")
-ITER_RE = re.compile(r"(?:Iteration|Dry-run/report number|Approved dry-run number)\s*:\s*`?(\d+)")
+ITER_RE = re.compile(
+    r"(?:Iteration|Dry-run/report number|Approved dry-run number)\s*:\s*`?(\d+)"
+)
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -35,7 +37,7 @@ def _parse_front_matter(text: str) -> dict[str, Any]:
     marker = text.find("\n+++\n", 4)
     if marker < 0:
         return {}
-    return cast("dict[str, Any]", tomllib.loads(text[4:marker]))
+    return tomllib.loads(text[4:marker])
 
 
 def _iteration(prompt: str) -> int:
@@ -64,8 +66,13 @@ def _meta(
     head: str,
     template: str,
     gate: str = "",
+    allowed_write_paths: tuple[str, ...] = (),
 ) -> str:
     required = "true" if gate else "false"
+    allowed = ""
+    if allowed_write_paths:
+        rendered = ", ".join(f'"{path}"' for path in allowed_write_paths)
+        allowed = f"allowed_write_paths = [{rendered}]\n"
     return (
         "+++\n"
         "prompt_schema_version = 1\n"
@@ -81,6 +88,7 @@ def _meta(
         f'template_path = "{template}"\n'
         f"requires_owner_gate = {required}\n"
         f'owner_gate = "{gate}"\n'
+        f"{allowed}"
         "+++\n\n"
     )
 
@@ -132,13 +140,10 @@ Act as the HaruQuantAI **Reviewer** defined by `AGENTS.md`.
 ## 2. Context
 Dry-run/report number: `{iteration}`
 
-### UPSTREAM CLAIMS — UNTRUSTED UNTIL INDEPENDENTLY VERIFIED
-Stub claims only.
-
 ## 3. Instruction / Task
 Stage A — Independent reconstruction
 Stage B — Independent verification
-Stage C — Claims reconciliation
+Stage C — Dry-run, report, and code reconciliation
 
 ## 5. Authority and Boundaries
 Never repair implementation.
@@ -172,23 +177,28 @@ def _write_next(
     template: str,
     body: str,
     gate: str = "",
+    allowed_write_paths: tuple[str, ...] = (),
 ) -> None:
     branch = _git(repo, "branch", "--show-current")
     baseline = _git(repo, "rev-parse", "main")
     head = _git(repo, "rev-parse", "HEAD")
-    raw = _meta(
-        run_id="self-test",
-        task_id="FEAT-DEMO",
-        iteration=iteration,
-        source_role=source,
-        target_role=target,
-        handoff=handoff,
-        branch=branch,
-        baseline=baseline,
-        head=head,
-        template=template,
-        gate=gate,
-    ) + body
+    raw = (
+        _meta(
+            run_id="self-test",
+            task_id="FEAT-DEMO",
+            iteration=iteration,
+            source_role=source,
+            target_role=target,
+            handoff=handoff,
+            branch=branch,
+            baseline=baseline,
+            head=head,
+            template=template,
+            gate=gate,
+            allowed_write_paths=allowed_write_paths,
+        )
+        + body
+    )
     (repo / ".agents/task/next-agent.md").write_text(raw, encoding="utf-8")
 
 
@@ -202,6 +212,7 @@ def _planner(repo: Path, iteration: int) -> None:
         "1. TASK TO DO: stub\n2. Files read: stub\n3. Files to create or edit: demo.txt\n"
         "4. Dependencies: None\n5. Blockers: None\n6. Scope boundaries: demo only\n"
         "7. Validation commands: stub\n8. Rollback: restore demo.txt\n"
+        "ALLOWED_WRITE_PATHS:\n- demo.txt\nEND_ALLOWED_WRITE_PATHS:\n"
         "STOPPED : PLANNER\nACTIVATING : EXECUTOR\nHANDOFF : PENDING_APPROVAL\n",
     )
     _write_next(
@@ -213,6 +224,7 @@ def _planner(repo: Path, iteration: int) -> None:
         template="docs/templates/prompt/executor.md",
         body=_executor_body(iteration),
         gate="APPROVED: EXECUTE",
+        allowed_write_paths=("demo.txt",),
     )
 
 
@@ -292,7 +304,9 @@ def _reviewer(repo: Path, iteration: int, incoming: dict[str, Any]) -> None:
 
 def _closeout(repo: Path, iteration: int) -> None:
     reviewer = repo / ".agents/task/reviewer.md"
-    _append(reviewer, f"\n### Commit Authorization — Review {iteration}\nAPPROVED: COMMIT\n")
+    _append(
+        reviewer, f"\n### Commit Authorization — Review {iteration}\nAPPROVED: COMMIT\n"
+    )
     branch = _git(repo, "branch", "--show-current")
     for name in ("planner.md", "executor.md", "reviewer.md", "next-agent.md"):
         (repo / ".agents/task" / name).write_bytes(b"")
@@ -306,7 +320,9 @@ def _closeout(repo: Path, iteration: int) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--role", choices=("planner", "executor", "reviewer"), required=True)
+    parser.add_argument(
+        "--role", choices=("planner", "executor", "reviewer"), required=True
+    )
     parser.add_argument("--repo", required=True)
     parser.add_argument("pointer", nargs="?", default="")
     args = parser.parse_args()

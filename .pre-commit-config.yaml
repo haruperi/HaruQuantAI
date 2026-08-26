@@ -4,7 +4,7 @@ default_install_hook_types:
   - pre-commit
   - pre-push
 
-exclude: ^\.agents/
+exclude: ^\.agents/task/
 
 repos:
   # Repository hygiene
@@ -81,3 +81,19 @@ repos:
         pass_filenames: false
         files: ^(app/|tests/|pyproject\.toml$|uv\.lock$)
         stages: [pre-commit]
+
+      - id: workflow-tests
+        name: Workflow controller tests
+        entry: uv run --locked pytest --no-cov .agents/tests
+        language: system
+        pass_filenames: false
+        files: ^(\.agents/|AGENTS\.md$|docs/templates/prompt/)
+        stages: [pre-push]
+
+      - id: workflow-self-test
+        name: Workflow controller self-test
+        entry: uv run --locked python .agents/orchestrator.py self-test
+        language: system
+        pass_filenames: false
+        files: ^(\.agents/|AGENTS\.md$|docs/templates/prompt/)
+        stages: [pre-push]

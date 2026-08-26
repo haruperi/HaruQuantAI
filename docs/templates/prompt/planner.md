@@ -44,14 +44,22 @@ The dry run must contain the eight sections required by `AGENTS.md`: task, files
 For a normal plan:
 
 1. append the complete dry run to `.agents/task/planner.md`;
-2. compute the SHA-256 of the entire Planner journal in that exact pre-approval state;
+2. compute the SHA-256 of the exact Planner-journal bytes in that pre-approval state;
 3. instantiate `docs/templates/prompt/executor.md` into `.agents/task/next-agent.md` and place that SHA-256 in its `approved_plan_hash` field;
 4. include structured handoff facts containing approved scope, exact path authority, implementation order, requirements, validation commands, rollback, and known risks.
+
+The dry-run entry must also contain this machine-readable block, with exactly the same normalized repository-relative paths as `allowed_write_paths` in the Executor prompt front matter:
+
+```text
+ALLOWED_WRITE_PATHS:
+- exact/path.py
+END_ALLOWED_WRITE_PATHS:
+```
 
 If planning is itself blocked, instantiate `docs/templates/prompt/planner.md` into `.agents/task/next-agent.md` for a future Planner retry and set `HANDOFF : BLOCKED`.
 
 The generated `next-agent.md` must begin with TOML front matter delimited by `+++` containing:
-`prompt_schema_version`, `run_id`, `task_id`, `iteration`, `source_role`, `target_role`, `handoff`, `branch`, `baseline_commit`, `source_head`, `template_path`, `requires_owner_gate`, and `owner_gate`.
+`prompt_schema_version`, `run_id`, `task_id`, `iteration`, `source_role`, `target_role`, `handoff`, `branch`, `baseline_commit`, `source_head`, `template_path`, `requires_owner_gate`, `owner_gate`, and (for Executor handoffs) `allowed_write_paths`.
 For normal planning use `source_role="PLANNER"`, `target_role="EXECUTOR"`, `handoff="PENDING_APPROVAL"`, `template_path="docs/templates/prompt/executor.md"`, `requires_owner_gate=true`, and `owner_gate="APPROVED: EXECUTE"`.
 For Planner `BLOCKED`, keep the same iteration, target Planner, set `requires_owner_gate=false`, and leave `owner_gate` empty; the workflow stops until the owner resolves the documented external cause.
 

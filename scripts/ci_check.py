@@ -48,6 +48,11 @@ def main() -> None:
         (["ruff", "format", "--check", "."], "Ruff Format Check"),
         (["ruff", "check", "."], "Ruff Lint Check"),
         (["mypy"], "Mypy Type Check"),
+        (["pytest", "--no-cov", ".agents/tests"], "Workflow Controller Tests"),
+        (
+            ["python", ".agents/orchestrator.py", "self-test"],
+            "Workflow Controller Self Test",
+        ),
         (["lint-imports"], "Import Linter Check"),
         (
             ["python", "scripts/generate_contracts.py", "--check"],

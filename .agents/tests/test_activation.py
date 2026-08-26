@@ -6,12 +6,14 @@ import importlib.util
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "orchestrator.py"
 SPEC = importlib.util.spec_from_file_location("hq_orchestrator_activation", MODULE_PATH)
-assert SPEC and SPEC.loader
+assert SPEC
+assert SPEC.loader
 orchestrator = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = orchestrator
 SPEC.loader.exec_module(orchestrator)
@@ -29,7 +31,7 @@ def _git(repo: Path, *args: str) -> str:
     return result.stdout.strip()
 
 
-def _activation_fixture(tmp_path: Path) -> tuple[dict, dict]:
+def _activation_fixture(tmp_path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     (tmp_path / ".agents/task").mkdir(parents=True)
     (tmp_path / "docs/templates/prompt").mkdir(parents=True)
     for name in ("planner.md", "executor.md", "reviewer.md", "next-agent.md"):
@@ -109,7 +111,9 @@ def test_activation_creates_branch_then_planner_artifact(tmp_path: Path) -> None
     assert state["next_agent"]["prompt_sha256"] == orchestrator._sha_text(artifact.raw)
 
 
-def test_activation_fails_before_branch_creation_for_empty_component(tmp_path: Path) -> None:
+def test_activation_fails_before_branch_creation_for_empty_component(
+    tmp_path: Path,
+) -> None:
     """Unusable task metadata fails closed before a role can be invoked."""
     cfg, state = _activation_fixture(tmp_path)
     state["task"]["task_id"] = "///"
@@ -149,6 +153,8 @@ def test_initial_planner_mutation_fails_before_invocation(
     runtime_module = sys.modules[orchestrator._invoke_pending.__module__]
     monkeypatch.setattr(runtime_module, "run_agent", _unexpected_run_agent)
 
-    with pytest.raises(orchestrator.OrchestratorError, match="changed after it was validated"):
+    with pytest.raises(
+        orchestrator.OrchestratorError, match="changed after it was validated"
+    ):
         orchestrator._invoke_pending(cfg, state, "PLANNER")
     assert called is False

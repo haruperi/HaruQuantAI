@@ -37,11 +37,11 @@ BLOCK_FIELD_COUNT = 3
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
 PLACEHOLDER_RE = re.compile(r"\{\{\w+\}\}")
 BLOCK_LINE_RES = {
-    "stopped": re.compile(r"^[>\s#`*_-]*STOPPED[\s`*_-]*:\s*(.+?)\s*$", re.I),
+    "stopped": re.compile(r"^[>\s#`*_-]*STOPPED[\s`*_-]*:\s*(.+?)\s*$", re.IGNORECASE),
     "activating": re.compile(
-        r"^[>\s#`*_-]*ACTIVATING[\s`*_-]*:\s*(.+?)\s*$", re.I
+        r"^[>\s#`*_-]*ACTIVATING[\s`*_-]*:\s*(.+?)\s*$", re.IGNORECASE
     ),
-    "handoff": re.compile(r"^[>\s#`*_-]*HANDOFF[\s`*_-]*:\s*(.+?)\s*$", re.I),
+    "handoff": re.compile(r"^[>\s#`*_-]*HANDOFF[\s`*_-]*:\s*(.+?)\s*$", re.IGNORECASE),
 }
 REQUIRED_NEXT_META = {
     "prompt_schema_version",
@@ -72,7 +72,8 @@ PROTECTED_SENTINELS = {
     "REVIEWER": (
         "Act as the HaruQuantAI **Reviewer** defined by `AGENTS.md`.",
         "Stage A — Independent reconstruction",
-        "UPSTREAM CLAIMS — UNTRUSTED UNTIL INDEPENDENTLY VERIFIED",
+        "Stage B — Independent verification",
+        "Stage C — Dry-run, report, and code reconciliation",
     ),
     "REVIEWER_CLOSEOUT": (
         "Act as the HaruQuantAI **Reviewer performing authorized close-out**.",
@@ -109,7 +110,7 @@ class Transition:
 def _load_toml(path: Path) -> dict[str, Any]:
     with path.open("rb") as handle:
         data = tomllib.load(handle)
-    return cast("dict[str, Any]", data)
+    return data
 
 
 def _sha_text(text: str) -> str:
@@ -122,7 +123,7 @@ def _sha_file(path: Path) -> str:
 
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
     git_exe = shutil.which("git") or "git"
-    return subprocess.run(  # noqa: S603
+    return subprocess.run(
         [git_exe, *args],
         cwd=str(repo),
         capture_output=True,
@@ -177,7 +178,9 @@ def _parse_protocol(path: Path) -> tuple[dict[str, Any], list[Transition]]:
                 handoff=str(item["handoff"]).upper(),
                 target_role=str(item["target_role"]).upper(),
                 target_template=(
-                    str(item["target_template"]) if item.get("target_template") else None
+                    str(item["target_template"])
+                    if item.get("target_template")
+                    else None
                 ),
                 gate=str(item["gate"]) if item.get("gate") else None,
             )
@@ -207,7 +210,9 @@ def assemble_config(repo_override: str | None = None) -> dict[str, Any]:
     orch = _load_toml(AGENTS_DIR / "orchestrator.toml")
     run_cfg = cast("dict[str, Any]", orch.get("run", {}))
     paths_cfg = cast("dict[str, Any]", orch.get("paths", {}))
-    repo = Path(repo_override or run_cfg.get("repo_path", REPO_ROOT)).resolve()
+    repo = Path(repo_override or REPO_ROOT).resolve()
+    runtime_path = repo / ".agents/run-config.toml"
+    runtime_cfg = _load_toml(runtime_path) if runtime_path.exists() else {}
     protocol_path = repo / str(paths_cfg.get("protocol", ".agents/protocol.toml"))
     protocol, transitions = _parse_protocol(protocol_path)
     workspace = cast("dict[str, Any]", protocol["task_workspace"])
@@ -235,6 +240,7 @@ def assemble_config(repo_override: str | None = None) -> dict[str, Any]:
         "stream": bool(run_cfg.get("stream_agent_output", True)),
         "heartbeat": int(run_cfg.get("stream_heartbeat_seconds", 60)),
         "retries": int(run_cfg.get("agent_retry_attempts", 1)),
+        "mode": str(runtime_cfg.get("mode", "UNCONFIGURED")),
         "protocol": protocol,
         "transitions": transitions,
         "protocol_path": protocol_path,
@@ -278,14 +284,21 @@ def _render_next_agent(metadata: dict[str, Any], body: str) -> str:
         "template_path",
         "requires_owner_gate",
         "owner_gate",
+        "allowed_write_paths",
     ]
     lines = ["+++"]
     for key in ordered:
+        if key not in metadata:
+            continue
         value = metadata[key]
         if isinstance(value, bool):
             rendered = "true" if value else "false"
         elif isinstance(value, int):
             rendered = str(value)
+        elif isinstance(value, list):
+            rendered = (
+                "[" + ", ".join(f'"{_escape_toml(str(item))}"' for item in value) + "]"
+            )
         else:
             rendered = f'"{_escape_toml(str(value))}"'
         lines.append(f"{key} = {rendered}")
@@ -298,14 +311,18 @@ def parse_next_agent(path: Path) -> NextAgentArtifact:
         raise OrchestratorError(f"Missing/empty next-agent artifact: {path}")
     raw = path.read_text(encoding="utf-8")
     if not raw.startswith("+++\n"):
-        raise OrchestratorError("next-agent.md must start with TOML front matter (+++).")
+        raise OrchestratorError(
+            "next-agent.md must start with TOML front matter (+++)."
+        )
     marker = raw.find("\n+++\n", 4)
     if marker < 0:
-        raise OrchestratorError("next-agent.md has no closing TOML front matter marker.")
+        raise OrchestratorError(
+            "next-agent.md has no closing TOML front matter marker."
+        )
     header = raw[4:marker]
     body = raw[marker + 5 :].lstrip("\n")
     try:
-        metadata = cast("dict[str, Any]", tomllib.loads(header))
+        metadata = tomllib.loads(header)
     except tomllib.TOMLDecodeError as exc:
         raise OrchestratorError(f"Invalid next-agent TOML metadata: {exc}") from exc
     missing = sorted(REQUIRED_NEXT_META - metadata.keys())
@@ -348,6 +365,34 @@ def validate_next_agent(
             raise OrchestratorError(
                 f"next-agent metadata {key}={meta.get(key)!r}; expected {value!r}."
             )
+    if (
+        expected_source.upper() == "PLANNER"
+        and expected_handoff.upper() == "PENDING_APPROVAL"
+    ):
+        raw_paths = meta.get("allowed_write_paths")
+        if not isinstance(raw_paths, list):
+            raise OrchestratorError(
+                "Planner handoff requires allowed_write_paths metadata."
+            )
+        metadata_paths = _normalize_path_list([str(item) for item in raw_paths])
+        journal_text = cfg["journals"]["planner"].read_text(encoding="utf-8")
+        matches = re.findall(
+            r"(?ms)^ALLOWED_WRITE_PATHS:\s*$\n(?P<body>.*?)^END_ALLOWED_WRITE_PATHS:\s*$",
+            journal_text,
+        )
+        if not matches:
+            raise OrchestratorError("Planner journal lacks a path-authority block.")
+        journal_paths = _normalize_path_list(
+            [
+                line.strip()[2:].strip()
+                for line in matches[-1].splitlines()
+                if line.strip().startswith("- ")
+            ]
+        )
+        if journal_paths != metadata_paths:
+            raise OrchestratorError(
+                "Planner journal path authority differs from next-agent metadata."
+            )
     if str(meta["branch"]) != str(state.get("branch") or meta["branch"]):
         raise OrchestratorError("next-agent branch does not match active run state.")
     if str(meta["baseline_commit"]) != str(state["baseline"]):
@@ -365,7 +410,9 @@ def validate_next_agent(
     if transition.target_template:
         template_path = cfg["repo"] / transition.target_template
         if not template_path.exists():
-            raise OrchestratorError(f"Canonical target template is missing: {template_path}")
+            raise OrchestratorError(
+                f"Canonical target template is missing: {template_path}"
+            )
         sentinel_key = _template_key(transition.target_role, transition.target_template)
         for sentinel in PROTECTED_SENTINELS.get(sentinel_key, ()):
             if sentinel not in artifact.body:
@@ -383,12 +430,18 @@ def validate_next_agent(
         "target_role": transition.target_role,
         "handoff": transition.handoff,
         "template_path": transition.target_template,
+        "source_head": str(meta["source_head"]),
+        "branch": str(meta["branch"]),
+        "baseline_commit": str(meta["baseline_commit"]),
         "worktree_sha256": _worktree_fingerprint(cfg["repo"]),
     }
     return artifact
 
 
-def _ensure_pending_artifact_unchanged(cfg: dict[str, Any], state: dict[str, Any]) -> None:
+def _ensure_pending_artifact_unchanged(
+    cfg: dict[str, Any], state: dict[str, Any]
+) -> None:
+    """Verify the pending next-agent artifact hasn't been tampered with."""
     pending = cast("dict[str, Any]", state.get("next_agent") or {})
     if not pending:
         raise OrchestratorError("Run state has no pending next-agent artifact.")
@@ -397,6 +450,54 @@ def _ensure_pending_artifact_unchanged(cfg: dict[str, Any], state: dict[str, Any
         raise OrchestratorError("next-agent.md changed after it was validated.")
     if _worktree_fingerprint(cfg["repo"]) != pending.get("worktree_sha256"):
         raise OrchestratorError("Working tree changed after next-agent validation.")
+    if str(pending.get("baseline_commit")) != str(state["baseline"]):
+        raise OrchestratorError("Pending artifact baseline contradicts active run.")
+    # Verify branch hasn't changed
+    current_branch = _git_ok(cfg["repo"], "branch", "--show-current")
+    expected_branch = state.get("branch")
+    if expected_branch and current_branch != expected_branch:
+        raise OrchestratorError(
+            f"Branch changed after validation: {current_branch!r} != {expected_branch!r}"
+        )
+    # Verify HEAD hasn't moved (no stealth commits)
+    current_head = _git_ok(cfg["repo"], "rev-parse", "HEAD")
+    expected_head = pending.get("source_head")
+    if expected_head and current_head != expected_head:
+        raise OrchestratorError(
+            f"HEAD changed after validation (possible commit): "
+            f"{current_head[:12]} != {expected_head[:12]}"
+        )
+    # Verify template hasn't been mutated
+    template_path = pending.get("template_path")
+    if template_path:
+        full_path = cfg["repo"] / template_path
+        if full_path.exists():
+            current_template_sha = _sha_file(full_path)
+            if current_template_sha != pending.get("template_sha256"):
+                raise OrchestratorError(
+                    f"Canonical template changed after validation: {template_path}"
+                )
+    # Verify target role hasn't changed
+    artifact = parse_next_agent(cfg["next_agent"])
+    expected_role = pending.get("target_role")
+    if (
+        expected_role
+        and str(artifact.metadata.get("target_role", "")).upper()
+        != expected_role.upper()
+    ):
+        raise OrchestratorError(
+            f"Target role changed: {artifact.metadata.get('target_role')!r} "
+            f"!= {expected_role!r}"
+        )
+    transition = _transition_for(
+        cfg["transitions"],
+        str(artifact.metadata["source_role"]),
+        str(artifact.metadata["handoff"]),
+    )
+    if transition.target_role != str(artifact.metadata["target_role"]).upper():
+        raise OrchestratorError("Pending target role no longer matches protocol.")
+    if transition.target_template != str(artifact.metadata["template_path"]):
+        raise OrchestratorError("Pending template no longer matches protocol.")
 
 
 def parse_handoff_block(lines: list[str]) -> dict[str, str] | None:
@@ -448,6 +549,232 @@ def _validate_activating(block: dict[str, str], transition: Transition) -> None:
         raise OrchestratorError(
             f"Handoff ACTIVATING {block['activating']!r}; expected {expected!r} "
             f"for {transition.source_role}/{transition.handoff}."
+        )
+
+
+# ---------------------------------------------------------------------------
+# Approval-chain integrity primitives
+# ---------------------------------------------------------------------------
+
+
+def _extract_pre_gate_content(journal_content: str, iteration: int) -> str | None:
+    """Extract journal content before the owner gate for a specific iteration."""
+    gate_marker = f"### Owner Gate — Dry Run {iteration}"
+    starts = [
+        match.start() for match in re.finditer(re.escape(gate_marker), journal_content)
+    ]
+    if len(starts) != 1:
+        return None
+    return journal_content[: starts[0]]
+
+
+def _verify_approval_chain(
+    journal: Path,
+    iteration: int,
+    task_id: str,
+    baseline: str,
+    branch: str,
+    approved_plan_hash: str,
+) -> None:
+    """Verify the approval chain for a given iteration.
+
+    Extracts the pre-gate journal content, recomputes SHA-256, and compares
+    against the stored approved_plan_hash.
+    """
+    content_bytes = journal.read_bytes()
+    gate_marker = f"### Owner Gate — Dry Run {iteration}"
+    marker_bytes = gate_marker.encode("utf-8")
+    starts = [
+        match.start() for match in re.finditer(re.escape(marker_bytes), content_bytes)
+    ]
+    if len(starts) != 1:
+        raise OrchestratorError(
+            f"Expected one owner gate for iteration {iteration}; found {len(starts)}."
+        )
+    computed_hash = hashlib.sha256(content_bytes[: starts[0]]).hexdigest()
+    if computed_hash != approved_plan_hash:
+        raise OrchestratorError(
+            f"Approval chain broken: computed {computed_hash[:16]}... "
+            f"!= approved {approved_plan_hash[:16]}..."
+        )
+    content = content_bytes.decode("utf-8")
+    gate_start = content.find(gate_marker)
+    next_gate = content.find("### Owner Gate ", gate_start + len(gate_marker))
+    gate_block = content[gate_start : next_gate if next_gate >= 0 else None]
+    if f"Plan SHA-256: {approved_plan_hash}" not in gate_block:
+        raise OrchestratorError("Owner gate plan hash mismatch.")
+    if f"Task ID: {task_id}" not in gate_block:
+        raise OrchestratorError("Owner gate task ID mismatch.")
+    if f"Dry Run: {iteration}" not in gate_block:
+        raise OrchestratorError("Owner gate iteration mismatch.")
+    if f"Main baseline: {baseline}" not in gate_block:
+        raise OrchestratorError("Owner gate baseline mismatch.")
+    if f"Task branch: {branch}" not in gate_block:
+        raise OrchestratorError("Owner gate branch mismatch.")
+
+
+# ---------------------------------------------------------------------------
+# Repository snapshot and mutation-delta primitives
+# ---------------------------------------------------------------------------
+
+# Patterns to exclude from snapshots (runtime scratch)
+_SNAPSHOT_IGNORE_PREFIXES = (
+    ".agents/logs/",
+    ".agents/runs/",
+    ".agents/workflow.lock",
+)
+
+
+def capture_repository_snapshot(repo: Path) -> dict[str, str]:
+    """Capture a snapshot of all tracked and relevant untracked files.
+
+    Returns a dict mapping repo-relative paths to their SHA-256 content hashes.
+    """
+    snapshot: dict[str, str] = {}
+    result = subprocess.run(
+        ["git", "ls-files"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
+    )
+    for line in result.stdout.splitlines():
+        path = line.strip()
+        if not path:
+            continue
+        full_path = repo / path
+        if full_path.is_file():
+            try:
+                snapshot[path] = _sha_file(full_path)
+            except OSError:
+                snapshot[path] = "ERROR"
+    untracked = subprocess.run(
+        ["git", "ls-files", "--others", "--exclude-standard"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
+    )
+    for line in untracked.stdout.splitlines():
+        path = line.strip()
+        if not path:
+            continue
+        if any(path.startswith(pfx) for pfx in _SNAPSHOT_IGNORE_PREFIXES):
+            continue
+        full_path = repo / path
+        if full_path.is_file():
+            try:
+                snapshot[path] = _sha_file(full_path)
+            except OSError:
+                snapshot[path] = "ERROR"
+    return snapshot
+
+
+def compute_snapshot_delta(
+    before: dict[str, str],
+    after: dict[str, str],
+) -> dict[str, set[str]]:
+    """Compute the delta between two repository snapshots."""
+    created = set(after.keys()) - set(before.keys())
+    deleted = set(before.keys()) - set(after.keys())
+    modified = {
+        p for p in set(before.keys()) & set(after.keys()) if before[p] != after[p]
+    }
+    return {"created": created, "modified": modified, "deleted": deleted}
+
+
+# ---------------------------------------------------------------------------
+# Role authority primitives
+# ---------------------------------------------------------------------------
+
+ROLE_INTRINSIC_PATHS: dict[str, frozenset[str]] = {
+    "PLANNER": frozenset(
+        {
+            ".agents/task/planner.md",
+            ".agents/task/next-agent.md",
+        }
+    ),
+    "EXECUTOR": frozenset(
+        {
+            ".agents/task/executor.md",
+            ".agents/task/next-agent.md",
+        }
+    ),
+    "REVIEWER": frozenset(
+        {
+            ".agents/task/reviewer.md",
+            ".agents/task/next-agent.md",
+        }
+    ),
+}
+
+ALL_COORDINATION_PATHS = frozenset(
+    {
+        ".agents/task/planner.md",
+        ".agents/task/executor.md",
+        ".agents/task/reviewer.md",
+        ".agents/task/next-agent.md",
+    }
+)
+
+
+def _normalize_path_list(paths: list[str]) -> list[str]:
+    """Normalize and validate a list of repository-relative paths."""
+    normalized: set[str] = set()
+    for raw in paths:
+        path = raw.strip().replace("\\", "/")
+        if not path:
+            continue
+        if path.startswith("/") or (len(path) > 1 and path[1] == ":"):
+            raise OrchestratorError(f"Absolute path not allowed: {path}")
+        if ".." in path.split("/"):
+            raise OrchestratorError(f"Path traversal not allowed: {path}")
+        if path.startswith(".git") or path == ".git":
+            raise OrchestratorError(f".git path not allowed: {path}")
+        normalized.add(path)
+    return sorted(normalized)
+
+
+def validate_role_mutations(
+    role: str,
+    delta: dict[str, set[str]],
+    *,
+    approved_write_paths: set[str] | None = None,
+) -> None:
+    """Validate that a role's mutations are within its authorized paths."""
+    role_upper = role.upper()
+    allowed = set(ROLE_INTRINSIC_PATHS.get(role_upper, frozenset()))
+    if role_upper == "EXECUTOR" and approved_write_paths is not None:
+        allowed |= approved_write_paths
+    all_mutations = delta["created"] | delta["modified"] | delta["deleted"]
+    violations = all_mutations - allowed
+    if violations:
+        raise OrchestratorError(
+            f"{role} modified unauthorized paths: {sorted(violations)}"
+        )
+
+
+def validate_no_commits(
+    repo: Path,
+    baseline_head: str,
+    current_head: str,
+) -> None:
+    """Verify that HEAD has not changed (no commits were made)."""
+    if current_head != baseline_head:
+        raise OrchestratorError(
+            f"Role made commits: HEAD changed from {baseline_head[:12]} "
+            f"to {current_head[:12]}"
+        )
+
+
+def validate_role_branch(repo: Path, expected_branch: str) -> None:
+    """Verify that the current branch has not changed."""
+    current = _git_ok(repo, "branch", "--show-current")
+    if current != expected_branch:
+        raise OrchestratorError(
+            f"Role changed branch: current={current!r}, expected={expected_branch!r}"
         )
 
 

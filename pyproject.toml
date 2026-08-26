@@ -63,11 +63,10 @@ required-environments = [
 [tool.ruff]
 target-version = "py314"
 line-length = 88
-src = ["app", "tests"]
+src = ["app", "tests", ".agents"]
 extend-exclude = [
     "docs",
     "htmlcov",
-    ".agents",
 ]
 
 [tool.ruff.format]
@@ -195,13 +194,16 @@ split-on-trailing-comma = true
 "scripts/*.py" = ["INP001", "D100", "D103", "ANN", "S603", "S607", "T201"]
 "docs/**/*.py" = ["INP001", "D", "DOC", "E501", "EM101", "EM102", "TRY003", "UP042", "C901"]
 "app/main.py" = ["T201"]
+".agents/*.py" = ["INP001", "T201", "S603", "S607", "F403", "F405", "EM102", "E501", "DOC201", "D103", "DOC501", "C901", "PLR0912", "PLR0915", "PLR0917", "PLR2004", "RUF005", "S105", "ARG001", "PYI034", "RUF034", "SIM105", "ANN001", "ANN401"]
+".agents/workflow_protocol.py" = ["F401"]
+".agents/tests/**/*.py" = ["INP001", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "ARG005", "ANN", "E501", "PT001", "PT018", "RUF043"]
 
 # ============================================================================
 # Mypy Strict Typing Configuration
 # ============================================================================
 [tool.mypy]
 python_version = "3.14"
-files = ["app", "tests"]
+files = ["app", "tests", ".agents"]
 strict = true
 mypy_path = "."
 warn_unreachable = true
@@ -225,7 +227,7 @@ show_error_code_links = true
 
 exclude = [
     "^scripts/",
-    "(^|/)\\.agents(/|$)",
+    "(^|/)\\.agents/(task|logs|runs)(/|$)",
     '(^|/)(build|dist)(/|$)',
     '(^|/)(generated|vendor|migrations)(/|$)',
 ]
@@ -245,6 +247,16 @@ check_untyped_defs = false
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 disallow_untyped_calls = false
+
+[[tool.mypy.overrides]]
+module = ["orchestrator", "workflow_engine", "workflow_runtime"]
+# Executable layers re-export private symbols through a runtime-populated __all__.
+disable_error_code = ["name-defined", "attr-defined"]
+
+[[tool.mypy.overrides]]
+module = ["orchestrator", "workflow_engine", "workflow_runtime"]
+# Executable layers re-export private symbols through a runtime-populated __all__.
+disable_error_code = ["name-defined", "attr-defined"]
 
 [[tool.mypy.overrides]]
 module = [

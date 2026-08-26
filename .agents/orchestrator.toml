@@ -1,7 +1,6 @@
 # HaruQuantAI artifact-driven agent orchestrator wiring.
 
 [run]
-repo_path = 'C:\\Users\\rharu\\AppDev\\HaruquantAI'
 main_branch = "main"
 max_iterations = 5
 invocation_timeout_seconds = 7200

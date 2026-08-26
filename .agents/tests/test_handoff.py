@@ -10,14 +10,15 @@ import pytest
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "orchestrator.py"
 SPEC = importlib.util.spec_from_file_location("hq_orchestrator_handoff", MODULE_PATH)
-assert SPEC and SPEC.loader
+assert SPEC
+assert SPEC.loader
 orchestrator = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = orchestrator
 SPEC.loader.exec_module(orchestrator)
 
 
 def _artifact(body: str) -> str:
-    return f'''+++
+    return f"""+++
 prompt_schema_version = 1
 run_id = "run"
 task_id = "TASK"
@@ -34,7 +35,7 @@ owner_gate = ""
 +++
 
 {body}
-'''
+"""
 
 
 def test_parse_next_agent_reads_toml_front_matter(tmp_path: Path) -> None:

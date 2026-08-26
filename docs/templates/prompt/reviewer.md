@@ -18,10 +18,6 @@ Executor report hash: `{{executor_report_hash}}`
 Additional review focus: `{{review_focus}}`
 Blocker ledger: {{blocker_ledger}}
 
-### UPSTREAM CLAIMS — UNTRUSTED UNTIL INDEPENDENTLY VERIFIED
-
-{{handoff_facts}}
-
 ## 3. Instruction / Task
 
 Perform an anti-anchored independent review in three stages.
@@ -30,7 +26,7 @@ Perform an anti-anchored independent review in three stages.
 
 **Stage B — Independent verification:** run applicable affected tests and non-mutating quality/architecture/usage checks (including type-checking, linter checks, and test suites). Do not treat upstream claims or execution logs as evidence.
 
-**Stage C — Dry-run, report, and code reconciliation:** only now read `.agents/task/planner.md` (the approved dry run) and `.agents/task/executor.md` (the execution report). Independently compute and verify journal hashes against `approved_plan_hash` and `executor_report_hash`. Reconcile the approved dry run against the execution report, and compare both against the actual code changes and test results to ensure all approved requirements were met without unauthorized scope expansion.
+**Stage C — Dry-run, report, and code reconciliation:** only now read `.agents/task/planner.md` (the approved dry run) and `.agents/task/executor.md` (the execution report), including its `UPSTREAM CLAIMS — UNTRUSTED UNTIL INDEPENDENTLY VERIFIED` section. Verify the approval-chain hash from the exact pre-owner-gate Planner bytes and verify the Executor journal hash. Reconcile both journals against independently observed code and test evidence.
 
 Append `Review {{iteration}}` to `.agents/task/reviewer.md`.
 

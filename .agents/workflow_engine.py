@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from workflow_runtime import *  # noqa: F403,E402
+from workflow_runtime import *
 
 
 def _handle_task_activation(cfg: dict[str, Any], state: dict[str, Any]) -> None:
@@ -33,7 +33,9 @@ def _handle_planner(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     state["plan_hash"] = _sha_file(cfg["journals"]["planner"])
     _record(state, "planner", handoff=block["handoff"], log=str(log))
     if block["handoff"] == "BLOCKED":
-        validate_next_agent(cfg, state, expected_source="PLANNER", expected_handoff="BLOCKED")
+        validate_next_agent(
+            cfg, state, expected_source="PLANNER", expected_handoff="BLOCKED"
+        )
         state.setdefault("blockers", []).append(
             {"iteration": iteration, "raised_by": "PLANNER", "status": "OPEN"}
         )
@@ -81,6 +83,15 @@ def _handle_approval(
 
 def _handle_executor(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     print(f"\n=== EXECUTOR — Report {state['iteration']} ===")
+    # Verify approval chain before invoking Executor
+    _verify_approval_chain(
+        journal=cfg["journals"]["planner"],
+        iteration=state["iteration"],
+        task_id=state["task"]["task_id"],
+        baseline=state["baseline"],
+        branch=state["branch"],
+        approved_plan_hash=state.get("approved_plan_hash", ""),
+    )
     stdout, log = _invoke_pending(cfg, state, "EXECUTOR")
     block = _resolve_handoff(
         cfg["journals"]["executor"], stdout, "EXECUTOR", {"READY_FOR_REVIEW", "BLOCKED"}
@@ -96,7 +107,9 @@ def _handle_executor(cfg: dict[str, Any], state: dict[str, Any]) -> None:
             {"iteration": blocked_iteration, "raised_by": "EXECUTOR", "status": "OPEN"}
         )
         state["iteration"] = blocked_iteration + 1
-        validate_next_agent(cfg, state, expected_source="EXECUTOR", expected_handoff="BLOCKED")
+        validate_next_agent(
+            cfg, state, expected_source="EXECUTOR", expected_handoff="BLOCKED"
+        )
         state["correction_context"] = (
             "This is a blocker-resolution dry run. Plan only the minimum authority/scope "
             "needed to resolve the recorded Executor blocker; suspend the remaining original "
@@ -113,6 +126,15 @@ def _handle_executor(cfg: dict[str, Any], state: dict[str, Any]) -> None:
 
 def _handle_reviewer(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     print(f"\n=== REVIEWER — Review {state['iteration']} ===")
+    # Verify approval chain before Reviewer (same chain Executor used)
+    _verify_approval_chain(
+        journal=cfg["journals"]["planner"],
+        iteration=state["iteration"],
+        task_id=state["task"]["task_id"],
+        baseline=state["baseline"],
+        branch=state["branch"],
+        approved_plan_hash=state.get("approved_plan_hash", ""),
+    )
     stdout, log = _invoke_pending(cfg, state, "REVIEWER")
     block = _resolve_handoff(
         cfg["journals"]["reviewer"],
@@ -180,9 +202,99 @@ def _handle_commit_gate(
     _save_state(cfg, state)
 
 
+def _archive_closeout_evidence(cfg: dict[str, Any], state: dict[str, Any]) -> Path:
+    """Archive journals and authorization evidence before close-out mutation."""
+    logs_dir = cfg.get("logs_dir", cfg["repo"] / ".agents" / "logs")
+    archive_dir = logs_dir / state["run_id"] / "closeout"
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    for key, journal_path in cfg["journals"].items():
+        if journal_path.exists():
+            (archive_dir / f"{key}.md").write_text(
+                journal_path.read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+    next_agent = cfg["next_agent"]
+    if next_agent.exists():
+        (archive_dir / "next-agent.md").write_text(
+            next_agent.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+    # Archive state summary
+    import json as _json
+
+    state_copy = {k: v for k, v in state.items() if k != "history"}
+    state_copy["history_length"] = len(state.get("history", []))
+    (archive_dir / "state.json").write_text(
+        _json.dumps(state_copy, indent=2, default=str),
+        encoding="utf-8",
+    )
+    # Archive reviewed HEAD and worktree fingerprint
+    head = _git_ok(cfg["repo"], "rev-parse", "HEAD")
+    (archive_dir / "reviewed_head.txt").write_text(head + "\n", encoding="utf-8")
+    fp = _worktree_fingerprint(cfg["repo"])
+    (archive_dir / "worktree_fingerprint.txt").write_text(fp + "\n", encoding="utf-8")
+    print(f"[ok] close-out evidence archived to {archive_dir}")
+    return Path(archive_dir)
+
+
+def _verify_closeout_lineage(
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+) -> None:
+    """Verify Git lineage after close-out: main is clean, ff-only merge correct."""
+    repo = cfg["repo"]
+    main_branch = cfg["main_branch"]
+    baseline = state["baseline"]
+    current_branch = _git_ok(repo, "branch", "--show-current")
+    if current_branch != main_branch:
+        raise OrchestratorError(
+            f"Close-out did not return to {main_branch}: current={current_branch!r}"
+        )
+    if _git_ok(repo, "status", "--porcelain"):
+        raise OrchestratorError("Close-out left main dirty.")
+    # Verify main HEAD is exactly one commit ahead of baseline
+    current_head = _git_ok(repo, "rev-parse", "HEAD")
+    parent = _git_ok(repo, "rev-parse", f"{current_head}^")
+    if parent != baseline:
+        raise OrchestratorError(
+            f"Close-out commit parent mismatch: expected {baseline[:12]}, "
+            f"got {parent[:12]}. Task commit must be direct child of baseline."
+        )
+    # Verify approved changed-path set
+    approved_paths = set(state.get("approved_write_paths", []))
+    diff_result = subprocess.run(
+        ["git", "diff", "--name-only", f"{baseline}..{current_head}"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
+    )
+    committed_paths = {p.strip() for p in diff_result.stdout.splitlines() if p.strip()}
+    # Add coordination paths (always allowed)
+    allowed = approved_paths | ALL_COORDINATION_PATHS
+    unexpected = committed_paths - allowed
+    if unexpected:
+        raise OrchestratorError(
+            f"Close-out committed unexpected paths: {sorted(unexpected)}"
+        )
+    # Verify task branch is gone
+    task_branch = state.get("branch", "")
+    branch_check = _git_ok(repo, "rev-parse", "--verify", task_branch)
+    if branch_check:
+        raise OrchestratorError(
+            f"Task branch {task_branch!r} still exists after close-out."
+        )
+    # Verify all four task files are empty
+    for path in [*cfg["journals"].values(), cfg["next_agent"]]:
+        if not path.exists() or path.stat().st_size != 0:
+            raise OrchestratorError(f"Close-out did not empty active-task file: {path}")
+
+
 def _handle_closeout(cfg: dict[str, Any], state: dict[str, Any]) -> bool:
     print(f"\n=== REVIEWER — authorized close-out for Review {state['iteration']} ===")
-    stdout, log = _invoke_pending(cfg, state, "REVIEWER")
+    _archive_closeout_evidence(cfg, state)
+    stdout, log = _invoke_pending(cfg, state, "REVIEWER", authorized_closeout=True)
     block = parse_handoff_block(stdout.splitlines()) or latest_handoff_block(
         cfg["journals"]["reviewer"]
     )
@@ -207,6 +319,39 @@ def _handle_closeout(cfg: dict[str, Any], state: dict[str, Any]) -> bool:
         raise OrchestratorError("Close-out did not return to main.")
     if _git_ok(cfg["repo"], "status", "--porcelain"):
         raise OrchestratorError("Close-out left main dirty.")
+    # Verify Git lineage: exactly one commit added, parent is baseline
+    log_output = _git_ok(
+        cfg["repo"],
+        "log",
+        "--oneline",
+        f"{state['baseline']}..HEAD",
+    )
+    commit_lines = [ln for ln in log_output.splitlines() if ln.strip()]
+    if len(commit_lines) != 1:
+        raise OrchestratorError(
+            f"Expected exactly one task commit, found {len(commit_lines)}."
+        )
+    # Verify committed paths are within approved write paths
+    diff_output = _git_ok(
+        cfg["repo"],
+        "diff",
+        "--name-only",
+        f"{state['baseline']}..HEAD",
+    )
+    committed_paths = [p for p in diff_output.splitlines() if p.strip()]
+    approved = set(state.get("approved_write_paths", []))
+    approved |= ALL_COORDINATION_PATHS
+    unexpected = [p for p in committed_paths if p not in approved]
+    if unexpected:
+        raise OrchestratorError(f"Close-out committed unexpected paths: {unexpected}")
+    # Verify task branch is gone
+    task_branch = state.get("branch", "")
+    if task_branch:
+        branch_check = _git_ok(cfg["repo"], "branch", "--list", task_branch)
+        if branch_check.strip():
+            raise OrchestratorError(
+                f"Task branch {task_branch!r} still exists after close-out."
+            )
     state["status"] = "ACCEPTED"
     state["phase"] = "done"
     state["next_agent"] = None
@@ -236,10 +381,21 @@ def router(
         elif phase == "planner":
             _handle_planner(cfg, state)
         elif phase == "planner_blocked":
-            print("Planner is BLOCKED. Resolve the documented cause, then run resume.")
-            state["phase"] = "planner"
-            _save_state(cfg, state)
-            return state
+            blocker_info = state.get("blocker_resolution")
+            if blocker_info:
+                # BLOCKER_RESOLVED: create fresh Planner prompt
+                print("Planner blocker resolved. Creating fresh Planner prompt.")
+                _write_orchestrator_planner_prompt(cfg, state, "BLOCKER_RESOLVED")
+                state["phase"] = "planner"
+                state.pop("blocker_resolution", None)
+                _save_state(cfg, state)
+            else:
+                print(
+                    "Planner is BLOCKED. Resolve the documented cause, then run:\n"
+                    "  uv run .agents/orchestrator.py resume "
+                    '--resolve-planner-blocker "<resolution evidence>"'
+                )
+                return state
         elif phase == "approve":
             _handle_approval(
                 cfg,

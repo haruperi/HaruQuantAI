@@ -3,11 +3,104 @@
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
+from types import TracebackType
+from typing import IO, Any, TextIO, cast
+
+# Cross-platform file locking
+try:
+    import fcntl  # Unix
+
+    _HAS_FCNTL = True
+except ImportError:
+    _HAS_FCNTL = False
+
+try:
+    import msvcrt  # Windows
+
+    _HAS_MSVCRT = True
+except ImportError:
+    _HAS_MSVCRT = False
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from workflow_protocol import *  # noqa: F403,E402
+from workflow_protocol import *
+
+# Phase 9: Concurrency protection
+_WORKFLOW_LOCK_FILE = ".agents/workflow.lock"
+
+
+class WorkflowLock:
+    """Cross-process file lock to prevent concurrent orchestrator runs."""
+
+    def __init__(self, repo: Path) -> None:
+        self.lock_path = repo / _WORKFLOW_LOCK_FILE
+        self.lock_file: TextIO | None = None
+
+    def acquire(self) -> None:
+        """Acquire exclusive lock. Raises OrchestratorError if already locked."""
+        try:
+            self.lock_path.parent.mkdir(parents=True, exist_ok=True)
+            self.lock_file = self.lock_path.open("a+", encoding="utf-8")
+            self.lock_file.seek(0)
+            self.lock_file.write("0")
+            self.lock_file.flush()
+            self.lock_file.seek(0)
+
+            if _HAS_MSVCRT:
+                # Windows: use msvcrt.locking
+                msvcrt.locking(self.lock_file.fileno(), msvcrt.LK_NBLCK, 1)
+            elif _HAS_FCNTL:
+                # Unix: use fcntl
+                fcntl.flock(self.lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            else:
+                raise OrchestratorError(
+                    "No supported operating-system file lock is available."
+                )
+
+            self.lock_file.seek(0)
+            self.lock_file.truncate()
+            self.lock_file.write(f"Locked by PID {os.getpid()}\n")
+            self.lock_file.flush()
+        except OSError as exc:
+            if self.lock_file:
+                self.lock_file.close()
+                self.lock_file = None
+            raise OrchestratorError(
+                "Another orchestrator instance is already running."
+            ) from exc
+
+    def release(self) -> None:
+        """Release the lock."""
+        if self.lock_file:
+            try:
+                if _HAS_MSVCRT:
+                    try:
+                        msvcrt.locking(self.lock_file.fileno(), msvcrt.LK_UNLCK, 1)
+                    except OSError:
+                        pass
+                elif _HAS_FCNTL:
+                    fcntl.flock(self.lock_file.fileno(), fcntl.LOCK_UN)
+
+                self.lock_file.close()
+                self.lock_file = None
+                if self.lock_path.exists():
+                    self.lock_path.unlink()
+            except OSError:
+                pass
+
+    def __enter__(self) -> WorkflowLock:
+        self.acquire()
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        self.release()
 
 
 def _stream_reader(
@@ -38,7 +131,7 @@ def _run_process(
     heartbeat: int,
 ) -> tuple[int, str, str]:
     try:
-        proc = subprocess.Popen(  # noqa: S603
+        proc = subprocess.Popen(
             cmd,
             cwd=str(cwd),
             stdin=subprocess.PIPE if stdin_text is not None else subprocess.DEVNULL,
@@ -78,7 +171,11 @@ def _run_process(
                 proc.kill()
                 raise OrchestratorError(f"Agent invocation timed out after {timeout}s.")
             now = time.monotonic()
-            if heartbeat > 0 and now - activity["t"] >= heartbeat and now - last_beat >= heartbeat:
+            if (
+                heartbeat > 0
+                and now - activity["t"] >= heartbeat
+                and now - last_beat >= heartbeat
+            ):
                 print(f"    [{int(now - started)}s] agent still running...", flush=True)
                 last_beat = now
             time.sleep(0.2)
@@ -133,6 +230,9 @@ def run_agent(
         if attempt > 1:
             print(f"    retry {attempt}/{attempts} after non-zero exit")
             time.sleep(1)
+        attempt_before = capture_repository_snapshot(cfg["repo"])
+        head_before = _git_ok(cfg["repo"], "rev-parse", "HEAD")
+        branch_before = _git_ok(cfg["repo"], "branch", "--show-current")
         code, stdout, stderr = _run_process(
             cmd,
             cfg["repo"],
@@ -141,7 +241,10 @@ def run_agent(
             stream=bool(cfg["stream"]),
             heartbeat=int(cfg["heartbeat"]),
         )
-        log = logs_dir / f"{stamp}-{tag}{'-retry'+str(attempt-1) if attempt > 1 else ''}.log"
+        log = (
+            logs_dir
+            / f"{stamp}-{tag}{'-retry' + str(attempt - 1) if attempt > 1 else ''}.log"
+        )
         log.write_text(
             f"command: {cmd!r}\nexit_code: {code}\n"
             f"{'=' * 20} stdout {'=' * 20}\n{stdout}\n"
@@ -150,8 +253,22 @@ def run_agent(
         )
         if code == 0:
             return stdout, log
+        attempt_after = capture_repository_snapshot(cfg["repo"])
+        delta = compute_snapshot_delta(attempt_before, attempt_after)
+        mutated = any(delta[kind] for kind in ("created", "modified", "deleted"))
+        mutated = mutated or _git_ok(cfg["repo"], "rev-parse", "HEAD") != head_before
+        mutated = mutated or (
+            _git_ok(cfg["repo"], "branch", "--show-current") != branch_before
+        )
+        if mutated:
+            raise OrchestratorError(
+                f"{role} mutated repository state before failing; "
+                "automatic retry suppressed."
+            )
         last_error = stderr or stdout
-    raise OrchestratorError(f"{role} agent failed after {attempts} attempt(s): {last_error[-500:]}")
+    raise OrchestratorError(
+        f"{role} agent failed after {attempts} attempt(s): {last_error[-500:]}"
+    )
 
 
 def _save_state(cfg: dict[str, Any], state: dict[str, Any]) -> Path:
@@ -207,7 +324,7 @@ def _entry_gate(cfg: dict[str, Any]) -> str:
             raise OrchestratorError(f"Missing active-task file: {path}")
         if path.stat().st_size != 0:
             raise OrchestratorError(f"Active-task file is not empty: {path}")
-    return _git_ok(repo, "rev-parse", "HEAD")
+    return str(_git_ok(repo, "rev-parse", "HEAD"))
 
 
 def _branch_component(value: str) -> str:
@@ -215,12 +332,16 @@ def _branch_component(value: str) -> str:
     component = component.strip("-.")
     if not component:
         raise OrchestratorError(f"Cannot derive branch component from {value!r}.")
-    return component
+    return str(component)
 
 
 def _derive_task_branch(task: dict[str, Any]) -> str:
     """Derive the deterministic task branch from validated task metadata."""
-    prefix = "feature" if str(task.get("task_kind", "feature")).lower() == "feature" else "task"
+    prefix = (
+        "feature"
+        if str(task.get("task_kind", "feature")).lower() == "feature"
+        else "task"
+    )
     task_id = _branch_component(str(task["task_id"]))
     slug = _branch_component(str(task["task_slug"]))
     return f"{prefix}/{task_id}-{slug}"
@@ -247,11 +368,19 @@ def _build_fields(state: dict[str, Any], cfg: dict[str, Any]) -> dict[str, Any]:
         "baseline_commit": state["baseline"],
         "correction_context": state.get("correction_context", "None"),
         "owner_feedback": state.get("owner_feedback", "None") or "None",
-        "approved_plan_hash": state.get("approved_plan_hash", "(recorded after owner gate)"),
-        "executor_report_hash": state.get("executor_report_hash", "(not available yet)"),
+        "approved_plan_hash": state.get(
+            "approved_plan_hash", "(recorded after owner gate)"
+        ),
+        "executor_report_hash": state.get(
+            "executor_report_hash", "(not available yet)"
+        ),
         "blocker_ledger": _blocker_ledger(state),
-        "handoff_facts": state.get("handoff_facts", "See active journals and repository evidence."),
-        "reviewed_worktree_hash": state.get("reviewed_worktree_hash", "(recorded by orchestrator)"),
+        "handoff_facts": state.get(
+            "handoff_facts", "See active journals and repository evidence."
+        ),
+        "reviewed_worktree_hash": state.get(
+            "reviewed_worktree_hash", "(recorded by orchestrator)"
+        ),
         "reviewed_head": state.get("reviewed_head", "(recorded by orchestrator)"),
     }
 
@@ -270,7 +399,10 @@ def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     """Create/verify the task branch and materialize the initial Planner artifact."""
     repo: Path = cfg["repo"]
     baseline = str(state["baseline"])
-    branch = str(state.get("branch") or _derive_task_branch(cast("dict[str, Any]", state["task"])))
+    branch = str(
+        state.get("branch")
+        or _derive_task_branch(cast("dict[str, Any]", state["task"]))
+    )
     current_branch = _git_ok(repo, "branch", "--show-current")
     current_head = _git_ok(repo, "rev-parse", "HEAD")
 
@@ -280,10 +412,14 @@ def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
                 f"Task activation expected branch {branch!r}; current branch is {current_branch!r}."
             )
         if current_head != baseline:
-            raise OrchestratorError("Task branch HEAD changed before initial Planner activation.")
+            raise OrchestratorError(
+                "Task branch HEAD changed before initial Planner activation."
+            )
     else:
         if current_branch != cfg["main_branch"] or current_head != baseline:
-            raise OrchestratorError("Task activation must begin from the recorded clean main baseline.")
+            raise OrchestratorError(
+                "Task activation must begin from the recorded clean main baseline."
+            )
         check = _git(repo, "check-ref-format", "--branch", branch)
         if check.returncode != 0:
             raise OrchestratorError(f"Derived task branch is invalid: {branch!r}.")
@@ -309,7 +445,8 @@ def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         "branch": branch,
         "baseline_commit": baseline,
         "source_head": _git_ok(repo, "rev-parse", "HEAD"),
-        "template_path": transition.target_template or "docs/templates/prompt/planner.md",
+        "template_path": transition.target_template
+        or "docs/templates/prompt/planner.md",
         "requires_owner_gate": False,
         "owner_gate": "",
     }
@@ -328,8 +465,21 @@ def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
 def _append_owner_approval(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     journal: Path = cfg["journals"]["planner"]
     plan_hash = state["plan_hash"]
+    # Extract approved_write_paths from Planner's next-agent metadata
+    next_agent_path = cfg["next_agent"]
+    if next_agent_path.exists() and next_agent_path.stat().st_size > 0:
+        artifact = parse_next_agent(next_agent_path)
+        approved_paths_raw = artifact.metadata.get("allowed_write_paths", [])
+        if isinstance(approved_paths_raw, list):
+            approved_write_paths = _normalize_path_list(approved_paths_raw)
+        else:
+            approved_write_paths = []
+    else:
+        approved_write_paths = []
+    state["approved_write_paths"] = approved_write_paths
+    # Build the owner gate block
     block = (
-        f"\n### Owner Gate — Dry Run {state['iteration']}\n\n"
+        f"### Owner Gate — Dry Run {state['iteration']}\n\n"
         "APPROVED: EXECUTE\n"
         f"Task ID: {state['task']['task_id']}\n"
         f"Dry Run: {state['iteration']}\n"
@@ -337,6 +487,10 @@ def _append_owner_approval(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         f"Main baseline: {state['baseline']}\n"
         f"Task branch: {state['branch']}\n"
     )
+    if approved_write_paths:
+        block += "Approved write paths:\n"
+        for path in approved_write_paths:
+            block += f"  - {path}\n"
     with journal.open("a", encoding="utf-8") as handle:
         handle.write(block)
     state["approved_plan_hash"] = plan_hash
@@ -359,7 +513,8 @@ def _write_orchestrator_planner_prompt(
         "branch": state["branch"],
         "baseline_commit": state["baseline"],
         "source_head": _git_ok(cfg["repo"], "rev-parse", "HEAD"),
-        "template_path": transition.target_template or "docs/templates/prompt/planner.md",
+        "template_path": transition.target_template
+        or "docs/templates/prompt/planner.md",
         "requires_owner_gate": False,
         "owner_gate": "",
     }
@@ -369,7 +524,9 @@ def _write_orchestrator_planner_prompt(
     )
 
 
-def _request_gate(exact: str, label: str, scripted: bool, rejection: str | None) -> tuple[bool, str]:
+def _request_gate(
+    exact: str, label: str, scripted: bool, rejection: str | None
+) -> tuple[bool, str]:
     if scripted:
         print(f"[gate] relaying exact owner authorization: {exact}")
         return True, ""
@@ -391,19 +548,49 @@ def _request_gate(exact: str, label: str, scripted: bool, rejection: str | None)
         print("Unrecognized gate response.")
 
 
-def _invoke_pending(cfg: dict[str, Any], state: dict[str, Any], role: str) -> tuple[str, Path]:
+def _invoke_pending(
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+    role: str,
+    *,
+    authorized_closeout: bool = False,
+) -> tuple[str, Path]:
+    """Invoke the pending next-agent with snapshot/delta enforcement."""
     _ensure_pending_artifact_unchanged(cfg, state)
     artifact = parse_next_agent(cfg["next_agent"])
     if str(artifact.metadata["target_role"]).upper() != role.upper():
         raise OrchestratorError(
             f"Pending prompt targets {artifact.metadata['target_role']}, not {role}."
         )
-    return run_agent(
+    # Pre-invocation checks: branch and HEAD
+    branch = state.get("branch", "")
+    baseline_head = _git_ok(cfg["repo"], "rev-parse", "HEAD")
+    validate_role_branch(cfg["repo"], branch)
+    # Capture pre-invocation snapshot
+    snapshot_before = capture_repository_snapshot(cfg["repo"])
+    # Run the agent
+    result = run_agent(
         cfg,
         role,
         artifact.raw,
         f"{state['run_id']}-{role.lower()}-{state['iteration']}",
     )
+    if authorized_closeout:
+        return result
+    # Post-invocation: check no commits, branch unchanged, mutations authorized
+    current_head = _git_ok(cfg["repo"], "rev-parse", "HEAD")
+    validate_no_commits(cfg["repo"], baseline_head, current_head)
+    validate_role_branch(cfg["repo"], branch)
+    snapshot_after = capture_repository_snapshot(cfg["repo"])
+    delta = compute_snapshot_delta(snapshot_before, snapshot_after)
+    approved_write_paths = state.get("approved_write_paths")
+    approved_set = set(approved_write_paths) if approved_write_paths else None
+    validate_role_mutations(
+        role,
+        delta,
+        approved_write_paths=approved_set,
+    )
+    return result
 
 
 __all__ = [name for name in globals() if not name.startswith("__")]

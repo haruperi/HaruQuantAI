@@ -8,7 +8,8 @@ from pathlib import Path
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "orchestrator.py"
 SPEC = importlib.util.spec_from_file_location("hq_orchestrator", MODULE_PATH)
-assert SPEC and SPEC.loader
+assert SPEC
+assert SPEC.loader
 orchestrator = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = orchestrator
 SPEC.loader.exec_module(orchestrator)
@@ -26,7 +27,9 @@ def test_protocol_contains_task_activation() -> None:
     """Initial Planner startup is a protocol-defined artifact transition."""
     protocol_path = Path(__file__).resolve().parents[1] / "protocol.toml"
     _, transitions = orchestrator._parse_protocol(protocol_path)
-    activation = orchestrator._transition_for(transitions, "ORCHESTRATOR", "TASK_ACTIVATED")
+    activation = orchestrator._transition_for(
+        transitions, "ORCHESTRATOR", "TASK_ACTIVATED"
+    )
     assert activation.target_role == "PLANNER"
     assert activation.target_template == "docs/templates/prompt/planner.md"
     assert activation.gate is None

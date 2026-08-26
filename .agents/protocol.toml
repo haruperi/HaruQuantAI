@@ -72,3 +72,9 @@ source_role = "ORCHESTRATOR"
 handoff = "COMMIT_REJECTED"
 target_role = "PLANNER"
 target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
+source_role = "ORCHESTRATOR"
+handoff = "BLOCKER_RESOLVED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"

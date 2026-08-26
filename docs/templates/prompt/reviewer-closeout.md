@@ -17,14 +17,14 @@ The owner has issued the exact authorization `APPROVED: COMMIT`. The orchestrato
 
 ## 3. Instruction / Task
 
-Re-verify branch, HEAD, review number, baseline, diff/path inventory, and clean unchanged `main` preconditions. If unchanged, append the deterministic commit-authorization record to `.agents/task/reviewer.md`, empty all four `.agents/task/` coordination files, stage only approved changes, create the one authorized local task commit, verify clean unchanged `main`, fast-forward merge, verify the merged commit, and safely delete the merged branch.
+Re-verify branch, HEAD, review number, baseline, diff/path inventory, and clean unchanged `main` preconditions. The orchestrator has already archived immutable close-out evidence. If unchanged, append the deterministic commit-authorization record, run final gates, stage only approved implementation paths, and create the one authorized local task commit. Only after that commit succeeds, empty all four `.agents/task/` coordination files, verify the task branch is clean, verify unchanged `main`, fast-forward merge, verify exact one-commit lineage and the approved changed-path set, and safely delete the merged branch with `git branch -d`.
 
 If any precondition changed or a gate fails, force nothing and return the task to Planner through `CHANGES_REQUESTED`.
 
 ## 4. Specification
 
 Normal success is terminal and no next-agent prompt remains. All four active-task files are zero bytes.
-On close-out failure, reconstruct a complete Planner prompt for the next iteration in `.agents/task/next-agent.md` with evidence of the failure.
+On close-out failure before the commit succeeds, preserve all journals and archived evidence, reconstruct a complete Planner prompt for the next iteration in `.agents/task/next-agent.md`, and force nothing.
 
 ## 5. Authority and Boundaries
 

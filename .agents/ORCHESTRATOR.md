@@ -93,7 +93,7 @@ Manual mode uses the identical initial Planner artifact produced by `TASK_ACTIVA
 | --- | --- |
 | `ORCHESTRATOR / TASK_ACTIVATED` | Planner prompt |
 | `PLANNER / PENDING_APPROVAL` | Owner gate; on approval execute the already-written Executor prompt |
-| `PLANNER / BLOCKED` | Owner resolves cause, then Planner retry prompt |
+| `PLANNER / BLOCKED` | Owner resolves cause; orchestrator materializes a fresh `BLOCKER_RESOLVED` Planner prompt |
 | `EXECUTOR / READY_FOR_REVIEW` | Reviewer prompt |
 | `EXECUTOR / BLOCKED` | Planner blocker-resolution prompt |
 | `REVIEWER / CHANGES_REQUESTED` | Planner correction prompt |

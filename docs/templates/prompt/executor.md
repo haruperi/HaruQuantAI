@@ -23,7 +23,7 @@ Main baseline commit: `{{baseline_commit}}`
 
 ## 3. Instruction / Task
 
-Verify the approval/baseline/branch/path inventory and independently compute `.agents/task/planner.md` SHA-256 before implementation; it must match the approved plan hash recorded by the owner gate. Read the approved plan and routed authorities, implement only that scope, run only its change-scoped validation, and append `Report {{iteration}}` to `.agents/task/executor.md`.
+Verify the approval/baseline/branch/path inventory and the owner-gate hash of the exact Planner-journal bytes preceding the current owner gate. Do not hash the entire post-approval journal. Read the approved plan and routed authorities, implement only that scope, run only its change-scoped validation, and append `Report {{iteration}}` to `.agents/task/executor.md`.
 
 After appending the report, compute the SHA-256 of the entire Executor journal in that state and pass that exact value into the Reviewer prompt's `executor_report_hash` field.
 
