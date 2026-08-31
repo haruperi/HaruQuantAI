@@ -1,0 +1,1 @@
+"""Trading contract definitions."""

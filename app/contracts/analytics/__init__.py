@@ -1,0 +1,1 @@
+"""Analytics contract definitions."""

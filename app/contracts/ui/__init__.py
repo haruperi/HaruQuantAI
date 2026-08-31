@@ -1,0 +1,1 @@
+"""Ui contract definitions."""
