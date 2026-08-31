@@ -60,8 +60,10 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.testmondata
 nosetests.xml
 coverage.xml
+removability-report.json
 *.cover
 *.py,cover
 .hypothesis/
@@ -72,17 +74,17 @@ cover/
 *.mo
 *.pot
 
-# Django stuff:
+# Django
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
-# Flask stuff:
+# Flask
 instance/
 .webassets-cache
 
-# Scrapy stuff:
+# Scrapy
 .scrapy
 
 # Sphinx documentation
@@ -99,22 +101,14 @@ target/
 profile_default/
 ipython_config.py
 
-# pyenv
+# Python environment and dependency managers
 .python-version
-
-# pipenv
 Pipfile.lock
-
-# poetry
 poetry.lock
-
-# pdm
 .pdm.toml
-
-# PEP 582
 __pypackages__/
 
-# Celery stuff
+# Celery
 celerybeat-schedule
 celerybeat.pid
 
@@ -130,28 +124,16 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
+# Python development tools
 .spyderproject
 .spyproject
-
-# Rope project settings
 .ropeproject
-
-# mkdocs documentation
 /site
-
-# mypy
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
-# Pyre type checker
 .pyre/
-
-# pytype static type analyzer
 .pytype/
-
-# Cython debug symbols
 cython_debug/
 
 # ============================================================================
@@ -164,20 +146,23 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Next.js
+# Next.js and production output
 .next/
 out/
 build/
-
-# Production
 dist/
-
-# Vercel
 .vercel
 
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Playwright browser-test output (snapshots under e2e/__screenshots__ are committed)
+app/ui/test-results/
+app/ui/playwright-report/
+app/ui/blob-report/
+app/ui/.playwright/
+gui-test-screenshots/
 
 # ============================================================================
 # SQLite Databases
@@ -188,6 +173,10 @@ next-env.d.ts
 *.db-journal
 *.db-shm
 *.db-wal
+
+# SQLite database backup files (created by VACUUM INTO and migration infrastructure)
+data/database/*.bak
+data/database/*.bak_*
 
 # ============================================================================
 # Logs
@@ -219,18 +208,15 @@ temp_data/
 tmp/
 cache/
 
-# CSV and Parquet data files
+# CSV, Parquet, Arrow, and binary data files
 *.csv
 *.parquet
 *.pq
 *.arrow
+*.dat
+data/*.dat
 
-# Exclude example/seed data if needed (uncomment to allow)
-# !data/examples/*.csv
-# !data/seed/*.csv
-
-# Root data now contains the database package and strategy source artifacts.
-# Keep source/control files trackable while runtime-heavy stores remain ignored.
+# Root data contains source/control files alongside ignored runtime-heavy stores.
 !/data/
 !/data/**/
 !/data/**/*.py
@@ -245,18 +231,33 @@ cache/
 /data/simulations/
 /data/states/
 
+# DATA owns this source package; global dataset-artifact exclusions do not apply.
+!app/services/data/datasets/
+!app/services/data/datasets/**
+# The source-package exception above must not re-admit generated Python bytecode.
+app/services/data/datasets/**/__pycache__/
+app/services/data/datasets/**/*.py[cod]
+
+# UI owns this widget package; global dataset-artifact exclusions do not apply.
+!app/ui/src/widgets/datasets/
+!app/ui/src/widgets/datasets/**
+
+# Strategy signal-audit frames written by tests/strategy/usage/10_strategy_library.py
+tests/strategy/usage/signal_audit/
+
 # ============================================================================
 # IDE & Editor Files
 # ============================================================================
-# VSCode
-.vscode/
+# VSCode and Visual Studio
+.vscode/*
+.vs
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
 
-# JetBrains IDEs (PyCharm, WebStorm, etc.)
+# JetBrains IDEs
 .idea/
 *.iml
 *.iws
@@ -272,7 +273,6 @@ cache/
 *~
 
 # Emacs
-*~
 \#*\#
 .\#*
 
@@ -300,7 +300,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # Linux
-*~
 .directory
 .Trash-*
 
@@ -351,405 +350,14 @@ app/configs/
 *.html
 !docs/**/*.html
 !templates/**/*.html
-
-# Job queue files
-job_queue/
-worker_state/
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# ============================================================================
-# Node / Next.js
-# ============================================================================
-# Dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Next.js
-.next/
-out/
-build/
-
-# Production
-dist/
-
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# ============================================================================
-# SQLite Databases
-# ============================================================================
-*.sqlite
-*.sqlite3
-*.db
-*.db-journal
-*.db-shm
-*.db-wal
-
-# ============================================================================
-# Logs
-# ============================================================================
-artifacts/logs/
-*.log
-*.log.*
-log_*.txt
-
-# ============================================================================
-# Data Files (market data, exports, results)
-# ============================================================================
-# Market data directories
-/data/
-datasets/
-historical_data/
-
-# Backtest results and exports
-results/
-exports/
-/reports/**
-!/reports/**/
-!/reports/**/README.md
-output/
-
-# Temporary data
-temp_data/
-tmp/
-cache/
-
-# CSV and Parquet data files
-*.csv
-*.parquet
-*.pq
-*.arrow
-
-# Exclude example/seed data if needed (uncomment to allow)
-# !data/examples/*.csv
-# !data/seed/*.csv
-
-# ============================================================================
-# IDE & Editor Files
-# ============================================================================
-# VSCode
-.vscode/
-.vs
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
-
-# JetBrains IDEs (PyCharm, WebStorm, etc.)
-.idea/
-*.iml
-*.iws
-*.ipr
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-
-# Vim
-*.swp
-*.swo
-*~
-
-# Emacs
-*~
-\#*\#
-.\#*
-
-# Cursor
-.cursor/
-.history/
-
-# ============================================================================
-# Operating System Files
-# ============================================================================
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-
-# Windows
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-ehthumbs_vista.db
-*.stackdump
-[Dd]esktop.ini
-$RECYCLE.BIN/
-*.lnk
-
-# Linux
-*~
-.directory
-.Trash-*
-
-# ============================================================================
-# Application Specific
-# ============================================================================
-# Configuration overrides (use .example versions in repo)
-config/local.json
-config/development.json
-config/production.json
-*.local.json
-
-# User-specific settings
-user_settings.json
-.user.ini
-
-# Profiling and benchmarking data
-*.prof
-*.lprof
-profiling_results/
-
-# Backup files
-*.bak
-*.backup
-*.old
-*.orig
-
-# Compressed archives
-*.zip
-*.tar.gz
-*.rar
-*.7z
-
-# ============================================================================
-# Project Specific
-# ============================================================================
-# Strategy source files (if keeping proprietary)
-# strategies/proprietary/
-
-# API keys and secrets
-.secrets
-secrets.json
-api_keys.json
-
-# Large exports
-*.pdf
-*.html
-!docs/**/*.html
-!templates/**/*.html
+!app/ui/index.html
+!app/ui/**/*.html
 
 # Job queue files
 job_queue/
 worker_state/
 
-# MT5 integration cache
-mt5_cache/
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# ============================================================================
-# Node / Next.js
-# ============================================================================
-# Dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Next.js
-.next/
-out/
-build/
-
-# Production
-dist/
-
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# ============================================================================
-# SQLite Databases
-# ============================================================================
-*.sqlite
-*.sqlite3
-*.db
-*.db-journal
-*.db-shm
-*.db-wal
-
-# ============================================================================
-# Logs
-# ============================================================================
-artifacts/logs/
-*.log
-*.log.*
-log_*.txt
-
-# ============================================================================
-# Data Files (market data, exports, results)
-# ============================================================================
-# Market data directories
-/data/
-datasets/
-historical_data/
-
-# Backtest results and exports
-results/
-exports/
-/reports/**
-!/reports/**/
-!/reports/**/README.md
-output/
-
-# Temporary data
-temp_data/
-tmp/
-cache/
-
-# CSV and Parquet data files
-*.csv
-*.parquet
-*.pq
-*.arrow
-
-# Exclude example/seed data if needed (uncomment to allow)
-# !data/examples/*.csv
-# !data/seed/*.csv
-
-# ============================================================================
-# IDE & Editor Files
-# ============================================================================
-# VSCode
-.vscode/
-.vs
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
-
-# JetBrains IDEs (PyCharm, WebStorm, etc.)
-.idea/
-*.iml
-*.iws
-*.ipr
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-
-# Vim
-*.swp
-*.swo
-*~
-
-# Emacs
-*~
-\#*\#
-.\#*
-
-# Cursor
-.cursor/
-.history/
-
-# ============================================================================
-# Operating System Files
-# ============================================================================
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-
-# Windows
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-ehthumbs_vista.db
-*.stackdump
-[Dd]esktop.ini
-$RECYCLE.BIN/
-*.lnk
-
-# Linux
-*~
-.directory
-.Trash-*
-
-# ============================================================================
-# Application Specific
-# ============================================================================
-# Configuration overrides (use .example versions in repo)
-config/local.json
-config/development.json
-config/production.json
-*.local.json
-
-# User-specific settings
-user_settings.json
-.user.ini
-
-# Profiling and benchmarking data
-*.prof
-*.lprof
-profiling_results/
-
-# Backup files
-*.bak
-*.backup
-*.old
-*.orig
-
-# Compressed archives
-*.zip
-*.tar.gz
-*.rar
-*.7z
-
-# ============================================================================
-# Project Specific
-# ============================================================================
-# Strategy source files (if keeping proprietary)
-# strategies/proprietary/
-
-# API keys and secrets
-.secrets
-secrets.json
-api_keys.json
-
-# Large exports
-*.pdf
-*.html
-!docs/**/*.html
-!templates/**/*.html
-
-# Job queue files
-job_queue/
-worker_state/
-
-# MT5 integration cache
+# MT5 integration cache and exports
 mt5_cache/
 mt5_exports/
 
@@ -758,49 +366,24 @@ mt5_exports/
 !alembic.ini
 !mypy.ini
 
-# Whitelist
+# Generated benchmark, artifact, and assistant files
 .benchmarks/
 artifacts/
+!tests/ui/visual/artifacts/
+!tests/ui/visual/artifacts/**
 .aider*
+
+# Source-package exceptions to global lib/artifacts exclusions
 !app/web/src/lib/
 !app/web/src/lib/**
 !app/services/research/artifacts/
-# Root data now contains the database package and strategy source artifacts.
-# Keep source/control files trackable while runtime-heavy stores remain ignored.
-!/data/
-!/data/**/
-!/data/**/*.py
-!/data/**/*.json
-!/data/**/*.md
-!/data/**/*.sql
-/data/cache/
-/data/data/
-/data/knowledge_db/
-/data/market_data/
-/data/saved/
-/data/simulations/
-/data/states/
+!tests/ui/visual/artifacts/
+!tests/ui/visual/artifacts/**
 
-# Strategy signal-audit frames written by tests/strategy/usage/10_strategy_library.py
-tests/strategy/usage/signal_audit/
+# ============================================================================
+# Agent orchestrator logs
+# ============================================================================
+.agents/logs/
 
-# SQLite database backup files (created by VACUUM INTO and migration infrastructure)
-data/database/*.bak
-data/database/*.bak_*
-
-# DATA owns this source package; global dataset-artifact exclusions do not apply.
-!app/services/data/datasets/
-!app/services/data/datasets/**
-# The source-package exception above must not re-admit generated Python bytecode.
-app/services/data/datasets/**/__pycache__/
-app/services/data/datasets/**/*.py[cod]
-
-# Playwright browser-test output (snapshots under e2e/__screenshots__ are committed)
-app/ui/test-results/
-app/ui/playwright-report/
-app/ui/blob-report/
-app/ui/.playwright/
-
-# Binary data files
-*.dat
-data/*.dat
+# V2 UI migration donor tree (docs/dev/UI_MIGRATION_PLAN.md Phase 0)
+.migration/

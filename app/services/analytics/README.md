@@ -4,7 +4,6 @@
 > **Domain ID:** `ANLT`
 > **Status:** `Complete` — all 10 registered features are implemented.
 > **Last updated:** `2026-07-28`
-
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
 

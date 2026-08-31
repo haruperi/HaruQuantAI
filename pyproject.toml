@@ -155,6 +155,8 @@ ignore = [
 "app/utils/time/__init__.py" = ["A005"]
 "scripts/*.py" = ["INP001", "D100", "D103", "ANN", "S603", "S607", "T201"]
 "docs/**/*.py" = ["INP001", "D", "DOC", "E501", "EM101", "EM102", "TRY003", "UP042", "C901"]
+".agents/**/*.py" = ["INP001", "D", "DOC", "E501", "EM101", "EM102", "TRY003", "S603", "S607", "T201", "ANN", "C901", "PLR0912", "PLR0915", "PLR2004", "PT", "SLF001", "ARG001", "ARG005", "F403", "F405", "SIM", "PYI034", "S105", "RUF005"]
+".agents/*.py" = ["INP001", "D", "DOC", "E501", "EM101", "EM102", "TRY003", "S603", "S607", "T201", "ANN", "C901", "PLR0912", "PLR0915", "PLR2004", "F403", "F405", "SIM", "PT", "PYI034", "S105", "RUF005"]
 
 [tool.ruff.lint.mccabe]
 # Standard strict function complexity ceiling

@@ -439,9 +439,62 @@ Example functions must:
 
 ## 5. Package-Wide Requirements and Shared Configuration
 
+### Persistence - Database
+
+This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `[namespace_]`.
+
+> **Guidance for Domain Authors:**
+> - If this domain is **stateless or calculation-only** (owns no tables, e.g. pure transformation, UI, or stateless calculation), explicitly state that the domain owns no database entities, describe why, and record the reserved table prefix if applicable.
+> - If this domain **persists state**, document the domain's table model, migration steps, and table definitions below.
+> - Tables must adhere to repository data modeling standards (`docs/ARCHITECTURE.md` § Data Models & Schema Management):
+>   - Use the domain-specific prefix for all tables and indexes (e.g. `[namespace_]`).
+>   - Tables must use `STRICT` mode.
+>   - Identifiers and timestamps (ISO 8601 UTC) use `TEXT`.
+>   - Financial amounts and precision-critical numbers use `TEXT` (parsed via `decimal.Decimal`).
+>   - Booleans use `INTEGER` with `CHECK (col IN (0, 1))`.
+>   - Dynamic payloads use `*_json TEXT NOT NULL CHECK (json_valid(payload_json))`.
+>   - Standard audit columns: `request_id TEXT NOT NULL`, `correlation_id TEXT NOT NULL`, `created_at TEXT NOT NULL`, `updated_at TEXT NOT NULL`.
+>   - Index naming convention: `idx_[namespace]_[table]_[columns]`.
+
+#### `[namespace_table_name]`
+
+[Describe the table's purpose, lifecycle, immutability rules, and access patterns.]
+
+```sql
+CREATE TABLE [namespace_table_name] (
+    [entity_id]          TEXT    PRIMARY KEY,
+    [code]               TEXT    NOT NULL UNIQUE,
+    [profile]            TEXT    NOT NULL CHECK (profile IN ('research', 'simulation', 'demo', 'live')),
+    [amount_decimal]     TEXT    NOT NULL,
+    [is_active]          INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+    [payload_json]       TEXT    NOT NULL CHECK (json_valid(payload_json)),
+    [request_id]         TEXT    NOT NULL,
+    [correlation_id]     TEXT    NOT NULL,
+    [created_at]         TEXT    NOT NULL,
+    [updated_at]         TEXT    NOT NULL,
+    [deleted_at]         TEXT
+) STRICT;
+
+CREATE INDEX idx_[namespace]_[table]_[col] ON [namespace_table_name]([profile], [created_at] DESC);
+```
+
+[Explain key columns, soft references (e.g., `-- soft ref → other_table`), indexing rationale, and constraint rules.]
+
+---
+
+### Shared Configuration
+
 Use this section only for requirements, settings, or limits that apply across multiple modules.
 
 For shared configuration, use the same manifest columns as the module-level Configuration and Limits Manifest.
+
+| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+|---|---|---|---|---|---|---|
+| Missing | `[SETTING_NAME]` | `[str]` | `None` | Yes | `[Class.method()]` | [Purpose and enforced behaviour] |
+
+---
+
+### Non-Functional Requirements
 
 | Status | Requirement ID | Type | Responsibility | Verification |
 |---|---|---|---|---|

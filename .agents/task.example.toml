@@ -1,0 +1,20 @@
+# Example task specification for:
+#   python .agents/orchestrator.py start --task-file <file>
+#
+# Required: task_id, task_slug, task_request.
+# task_slug must be lowercase filesystem-safe (letters, digits, '.', '_', '-').
+
+task_kind = "feature"
+task_id = "FEAT-DATA-INGEST_HISTORY"
+task_slug = "historical-data-ingestion"
+task_name = "Historical Data Ingestion"
+task_request = "Implement historical-data ingestion through its registered Data capability and expose the workflow in the UI."
+additional_context = "Reuse the existing Data contracts and Composition lifecycle."
+exclusions = "No live broker calls or unrelated Data features."
+owner_execution_notes = "None"
+review_focus = "Pay particular attention to physical removability and UI contract parity."
+
+# Implementation tracker this task completes (optional). The Planner includes marking
+# this entry [x] with evidence among the approved changed paths.
+implementation_file = "docs/dev/IMPLEMENTATION_ORDER.md"
+implementation_entry = "2.8"

@@ -1,131 +1,263 @@
 # Standards and Principles
 
-**Purpose**: Single Builder operating guide for HaruQuantAI.
+**Purpose:** Authoritative shared contributor and workflow constitution for HaruQuantAI.
 
-## 1. Coding Principles
+## 1. Core engineering principles
 
-- **Memory & Truth**: Memory lives in repo files (`AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, `docs/CHANGELOG.md`), **never in chat**. Read these before acting. Authority: Owner -> `AGENTS.md` -> `docs/PROJECT.md` -> `docs/ARCHITECTURE.md` -> `docs/CHANGELOG.md`.
-- **Feature Registry Authority**: Each owning package README contains exactly one `### Feature Registry` section and is the sole canonical current-state registry for that package's feature IDs, statuses, module ownership, public API, contracts, requirements, and usage evidence. `docs/PROJECT.md` indexes domains and owns system-level relationships; it does not duplicate domain feature internals. `docs/CHANGELOG.md` is a compact historical record of released versions and unreleased changes staged under an `## [Unreleased]` section, and may reference feature IDs, but it must not contain a second mutable feature registry or detailed current-state evidence.
-- **Think First Before Coding**: State assumptions explicitly. Surface tradeoffs. If multiple interpretations exist, present them. If unclear, stop and ask.
-- **Simplicity & Surgical Changes**: Write minimum code to solve the problem. No speculative features. Touch *only* what you must. Match existing style. Every changed line must trace to the request.
-- **Goal-Driven**: Transform tasks into verifiable goals. State a brief plan with verification steps before executing.
-- **Correctness > Speed**: Verify via tools. Never guess. Say "I don't know" rather than hallucinating.
-- **Test Performance Ceiling**: Optimize unit test code, mock database calls, or isolate network/IO operations whenever an individual unit test takes longer than 100ms.
-- **SOLID Class Design**: Enforce SOLID principles when designing classes: Single Responsibility per file/class, Open for extension closed for modification, Liskov Substitution, Interface Segregation, and Dependency Inversion.
-- **Document Assumptions**: Add inline comments explaining non-obvious domain assumptions, numeric thresholds, mathematical models, or boundary conditions.
-- **Research Workflow**: 1. **WebSearch** (landscape) → 2. **Context7** (verify syntax/deprecations) → 3. **DeepWiki** (design intent). Handle disagreements by explicitly calling out tradeoffs.
-- **Focused Domain Architecture (Domain Scoping)**: In `app/services/[DOMAIN]`, everything must be focused:
-  - **Agentic domain exception**: `app/agentic/` is the approved top-level orchestration domain. It follows the same focused rules below: one registered `FEAT-AGT-NN` capability per production module folder and one numbered standalone usage program per feature. This location does not make Agentic a deterministic service owner and does not permit it to bypass any `app/services/[DOMAIN]` public boundary.
-  - A **Module folder** inside a domain is dedicated to ONE feature / capability only (e.g., feature `FEAT-DATA-01: Retrieve historical data` has its own module folder inside the data domain focused solely on that feature).
-  - **Feature-group namespace exception**: A domain may define a documented non-feature organizational namespace that contains related feature module folders. The namespace may contain only `README.md`, `__init__.py`, and registered feature folders; it must not own feature behavior, requirements, persistence, or a second feature registry. Each child feature still satisfies one feature = one module folder = one usage example, and the domain package root remains the sole public import boundary. API workstation-facing page/widget capabilities use `app/services/api/widgets/` as this namespace.
-  - A **File** inside a module folder is for ONE use case or focused responsibility only.
-  - A **Class / function / method** inside a file addresses ONE functional requirement behavior at a time.
-  - One feature = One module folder = One usage example file demonstrating that feature, except for the explicit UI verification-evidence rule below.
-  - **UI Verification-Evidence Exception**: Registered `FEAT-UI-*` features do not require separate numbered standalone usage programs. Production UI code is not verification evidence by itself. Every completed UI feature must instead cite executable unit or component tests covering its public behavior and relevant loading, empty, stale, unavailable, error, interaction, and accessibility states. Page-level or multi-component workflows require integration or browser evidence when component tests cannot prove the complete interaction, and typed-client features require request plus backend/frontend contract-parity evidence. This exception applies only to `FEAT-UI-*`; API and every other domain retain the numbered standalone usage-program requirement.
-  - **Reconciliation Exclusions**: For feature-count reconciliation, count only README-registered production feature directories. Exclude cache directories (`__pycache__`), generated artifacts, package metadata (`py.typed`), migration infrastructure (`migrations/`), and explicitly documented non-feature support directories (`contracts/`, `schemas/`, `_shared/`). Support directories must have documented ownership and may not become a second implementation location for feature behavior.
-  - **Provider Infrastructure Exception**: `app/kernel/`, `app/capabilities/`, and `app/composition/` are non-feature system infrastructure packages. They own no `FEAT-*` identifier, define no `### Feature Registry` section, and require no standalone usage programs. `app/capabilities/` defines decoupled capability specifications; `app/kernel/` defines business-neutral component discovery, manifest parsing, dependency resolution, health, and lifecycle machinery; and `app/composition/` defines construction-time provider wiring and runtime activation.
-  - **Three-Feature Shared-Support Threshold**: A domain-level support folder or module is permitted only when at least three distinct registered features consume the same coherent capability. Count feature consumers, not import occurrences, composition wiring, package-root re-exports, or tests. Code used by one or two features remains inside one explicit owning feature; consumers depend on that owner rather than creating a horizontal catch-all. Registered standalone capabilities remain valid feature folders regardless of consumer count.
-  - **Domain Persistence Support**: A persistent domain may define one documented non-feature `persistence/` support package containing exactly `__init__.py`, `create.py`, `read.py`, `update.py`, and `delete.py`. The package owns only domain-record CRUD statement construction, execution delegation through `app.services.data`, and normalized row handoff; authorization, validation, policy, orchestration, and public behavior remain in the owning feature modules. Classify atomic multi-statement operations by their domain effect and never split one transaction across CRUD files. Unsupported verbs retain an empty module with an explicit empty `__all__`. Immutable schema definitions remain in `migrations/`. `app/services/data/persistence/` is exempt from this five-file layout because it owns shared database connection, transaction, locking, migration-ledger, backup, and recovery infrastructure in addition to Data-owned CRUD.
-    - If fewer than three registered features consume the persistence capability, put the same five-file package inside the owning feature folder instead of at the domain root.
-    - Feature-owned immutable schema definitions live in that feature's `migrations/` package. A shared composition entry point may aggregate feature manifests without owning or altering their migration steps.
-  - **Root-file Rule**: Except for explicitly allowed package infrastructure (`__init__.py`, `_settings.py`, `_limits.py`), production behavior must reside inside its owning feature module folder. A domain may impose a stricter root in its owning README; the API root permits only `__init__.py` as production Python, with bootstrap configuration and API-wide limits owned by `workstation/settings/`.
-  - **Package-Root Export Gate**: `app/services/[DOMAIN]/__init__.py` is the sole public import boundary for a domain. Any symbol not re-exported in `__init__.py` is strictly private and internal to that domain.
-  - **No Deep Cross-Domain Imports**: Public consumers outside a domain (production services, usage examples, workflow scripts, and integration tests) must import strictly from `app.services.[DOMAIN]` (e.g. `from app.services.data import ...`). Deep submodule imports (e.g. `from app.services.data.evidence.fx_contracts import FXConversionEvidence`) are strictly prohibited.
-  - **Function-Only Public API Surface**: Domain public exports (`__all__` in `app/services/[DOMAIN]/__init__.py`) must consist exclusively of standalone functions (`def func(...)`). Classes and constants must remain internal/private:
-    - *Constants*: Expose via getter functions (e.g., `get_...()`).
-    - *Classes*: Encapsulate classes internally. To expose class functionality publicly, convert the internal class method to a private helper (e.g. `_func()`) and expose a standalone public function outside the class (e.g. `func()`) that delegates to it.
-  - **Capability Boundary Export Exception**: Capability specifications in `app/capabilities/` and non-feature infrastructure packages are exempt from the function-only export constraint. They may export immutable data records (frozen dataclasses), `typing.Protocol` interfaces, Pydantic configuration schemas, and string enums representing stable capability contracts. Concrete providers in `app/services/[DOMAIN]/providers/` or feature folders may export only factory functions to composition.
-- **Dry Run Required**: Before editing, produce a dry-run report detailing:
-  - Selected feature to be built/edited and rationale
-  - Files read: authoritative documents, upstream dependency documentation, related source/test files.
-  - Files to create or edit; exact paths, purpose of each change, implementation order
-  - Requirements; exact `FR-*` requirements to be implemented, tests, usage evidence.
-  - Dependencies and contracts; upstream library/system/API/feature/contract, unresolved dependencies.
-  - Validation commands: formatting, tests, usage-example execution, feature-integration tests
-  - Scope boundaries: explicitly included work, explicitly excluded work,
-  - Blockers/risks; specification conflicts, missing info/dependencies, design trade-offs, implementation risks, compatibility risks
-  - Rollback path; files to revert, exports or registrations to remove, artifacts to clean up, verification commands after rollback
-- **Approval Gate**: Do not modify any files during the dry run. Execution is authorized only when the trimmed entire content of a standalone owner message equals exactly `APPROVED: EXECUTE` before modifying files. A message containing additional text does not authorize execution. Merely quoting or referencing the phrase does not authorize execution.
-- **Scope Control**: `APPROVED: EXECUTE` approves only the latest explicitly numbered dry-run or correction plan. It does not approve additional findings, unrelated refactoring, dependency upgrades, architectural redesigns, formatting outside approved scope, commits, pushes, or changes to other domains.
-  - Implement only the selected feature and work only in approved scope.
-  - Do not invent requirements and do not perform broad refactors without explicit approval.
-  - Preserve domain ownership boundaries.
-  - Reuse existing conforming behavior where appropriate.
-  - Use only verified upstream contracts and public dependency interfaces.
-  - If execution reveals a new finding that materially expands the approved scope, stop before implementing that additional work, issue a plan delta, and wait for a new standalone `APPROVED: EXECUTE`.
-- **No Guessing**: If info is missing, check active docs. If still missing, stop and report as `Pending`, `Assumption`, or `Proposed Decision`.
-- **Final Report Checklist**: After any requirement task, report:
-  - [ ] Scope strictly followed.
-    - Files changed.
-    - Decisions made and implications documented
-    - Requirements implemented
-    - Dependencies and contracts used
-    - Rollback path identified
-  - [ ] Validation performed
-    - Code quality (Google style, types, docstrings, logging, 80% coverage, secrets) applied.
-    - Tests run and passed
-    - Usage example execution and passed
-    - All commands run
-  - [ ] Affected active docs updated.
+- **Repository truth, not chat memory.** Permanent truth lives in `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and owning package READMEs. Temporary active-task coordination lives only in `.agents/task/`. Conversation history is useful context but is never authoritative.
+- **Scoped authority.** `AGENTS.md` owns shared contributor and workflow rules; `docs/PROJECT.md` owns product/system scope and cross-domain relationships; `docs/ARCHITECTURE.md` owns universal structural/runtime constraints; each owning package README is the canonical current-state feature/FR registry for that package. Satisfy all non-overlapping authorities and report real conflicts before editing.
+- **Donor evidence is optional, never authoritative.** Legacy donor material may inform implementation only when an approved normalized bundle is available. Its absence alone is not a blocker: implement the complete ratified V3 scope from the owning README and public contracts from scratch, do not substitute raw `.migration` staging, do not claim unverified donor parity, and record the evidence limitation truthfully in the legacy ledger.
+- **Think first.** State assumptions, boundaries, trade-offs, validation, and rollback before coding. Never silently resolve missing requirements.
+- **Surgical changes.** Implement the minimum complete change. No speculative features, unrelated refactors, or scope expansion.
+- **Correctness over speed.** Verify with tools and repository evidence; never invent behavior, tests, results, or upstream contracts.
+- **SOLID/focused ownership.** One feature owns one coherent capability. One module folder owns one feature/capability; files and classes/functions stay focused on one responsibility. Shared support exists only under documented exceptions and must not become a second feature registry or implementation location.
+- **Pure boundaries.** Python `__init__.py` files are empty or docstring-only. Cross-feature/domain collaboration uses public contracts/capabilities, not private service imports. Import-time registration/I/O/task creation/logging configuration is forbidden.
+- **Managed side effects.** Features use lifecycle-owned resources and `FeatureContext`/scope facilities for managed tasks, subscriptions, capabilities, and cleanup. Service packages do not configure global logging.
+- **Test performance.** Unit tests should avoid real network/database sleeps; mock or isolate I/O when a unit test exceeds roughly 100 ms.
+- **Document non-obvious assumptions.** Numeric thresholds, domain assumptions, boundary conditions, and policy decisions require concise source documentation.
 
-## 2. Coding Style
+### Focused domain architecture
 
-- **Strict Adherence**: [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).
-- **Format**: 4 spaces, formatted via `ruff format` (double quotes, magic trailing comma respected). Pre-commit order: `trailing-whitespace` → `end-of-file-fixer` → `check-yaml/toml` → `check-added-large-files` → `ruff --fix` → `ruff-format` → `detect-secrets` → `mypy` → `pytest`.
-- **Typing & Docs**: `mypy` type-checked (see `docs/ARCHITECTURE.md` for current strictness settings).
-  - Explicit type hints on all signatures.
-  - Every module, class, and function should be properly fitted with Google-style docstrings.
-  - Docstrings should always include description, args, return values, exceptions raised, and type hints.
-  - Use the system-wide logger (`from app.utils import logger`) at workflow boundaries, public service entry points, external interactions, state transitions, side-effect boundaries, important decisions, retries, and failures. Pure helpers, trivial accessors, deterministic transformations, and high-frequency numerical functions do not require logging unless specified. Logs must not expose secrets, credentials, personal information, full payloads, or sensitive trading data.
-- **Imports**: Absolute imports, grouped (stdlib, 3rd-party, local).
-- **Versioning**: Always confirm library versions before coding. Default to `pyproject.toml` pinned version.
-- **Quality**: 80% `pytest` coverage minimum. No bare `except:`. Application and library code uses `logger`, never `print`. Directly executable teaching and usage-example scripts may use `print` to display bounded, secret-safe results. No silent failures.
-- **Usage Evidence**: Usage examples are standalone numbered programs, not pytest tests. Except for the explicit `FEAT-UI-*` verification-evidence rule above, each registered `FEAT-[DOM]-NN` has exactly one corresponding program in `tests/[domain]/usage/`; that program calls every public operation and constructor in the feature through the documented public API using realistic, bounded, secret-safe data or genuine runtime state. Programs define `main()`, use an `if __name__ == "__main__"` guard, are excluded from pytest collection, and are verified by direct Python execution. Unit and integration behavior remains in pytest files outside `usage/`.
-- **Provider Test and Example Placement**: Standalone provider implementation tests and provider-specific usage demonstrations live in `tests/<domain>/providers/<provider_id>/` rather than inside the production provider folder. System-level removability, dependency-graph, and lifecycle tests live in `tests/architecture/` and `tests/removability/`. Registered business features retain their standard single usage example program in `tests/[domain]/usage/`.
-- **Clean Resource Lifecycles**: Always close SQLite handles, open sockets, and background sub-processes explicitly in test teardown or context managers to eliminate `ResourceWarning` leaks.
-- **Async Mocking Rigor**: Ensure mocks for asynchronous operations return genuine coroutines/futures (`async def`) to prevent unawaited coroutine warnings (`RuntimeWarning`).
+- Production service behavior belongs in `app/services/<domain>/<feature>/` unless an owning README documents an explicit support-package exception.
+- Cross-boundary DTOs, protocols, events, errors, and capability keys live in `app/contracts/`; business-neutral lifecycle/composition primitives live in `app/kernel/` and `app/composition/` according to `docs/ARCHITECTURE.md`.
+- A feature never imports another feature implementation. Consumers declare exact capability dependencies and resolve providers through `FeatureContext`.
+- A domain-level shared support capability is permitted only when at least three registered features genuinely consume the same coherent capability, unless another explicit architecture exception applies.
+- Persistent domains may use the documented persistence/migration conventions in the owning README and architecture guide; persistence support never absorbs authorization, policy, orchestration, or feature semantics.
+- D-UI follows its own owning README: registered `FEAT-UI-*` capabilities own widgets; widgets never have multiple feature owners; shared UI support folders do not become product-policy owners.
 
-## 3. Security
+## 2. Atomic Task workflow
 
-- **Secrets**: Never commit secrets. Redact sensitive values in logs. Use `.env.example` only.
-- **Fail-Closed**: If policy is uncertain or evidence is missing, block the action.
-- **No Live Action by Default**: Live trading, risk changes, and execution state mutations require explicit, deterministic approval. Real integration operations are permitted only against verified non-production targets (`ENVIRONMENT=dev`, demo/testnet/sandbox accounts), with one exception: MetaTrader 5 may connect to a live environment when the operator has elected `ACCOUNT_MODE=live` **and** supplied live MT5 credentials. A mode/credential mismatch fails closed rather than trading one environment under another's label. Every other provider remains non-production. Any attempt to touch or mutate production infrastructure is a blocking safety violation.
-- **Kill Switch**: Deterministic. No caller can override or bypass a kill switch.
-- **No Invented Data**: The system must never invent backtest results, live performance, or broker fills.
-- **Deterministic Policy**: Python code is the sole policy-enforcement authority.
-- **Credential Hygiene**: Ensure logging, exception payloads, and test outputs never capture plain-text API credentials, secret keys, JWT tokens, or account passwords.
+The atomic development workflow is **Planner → Executor → Reviewer**. `.agents/protocol.toml` is the machine-readable Task transition contract. Canonical role prompts live in `docs/templates/prompt/`; `.agents/task/next-agent.md` is the complete instantiated prompt for the next reasoning role.
 
-## 4. Documentation
+A **Task** is the smallest coherent implementation unit that should receive its own planning, implementation, independent review, branch and Git commit. Planner phases/tasks are subdivisions inside one Task; they are not separate workflow runs.
 
-- **Update Rules**: Current domain features, statuses, public API, contracts, requirements, database schema, prefix ownership, domain indexing policy, and target-vs-live reconciliation → the owning package `README.md`. Architecture, cross-domain models, universal database conventions, and shared storage policy → `docs/ARCHITECTURE.md`. System relationships and domain index → `docs/PROJECT.md`. Released-version history and unreleased changes → `docs/CHANGELOG.md`. Builder workflow → `AGENTS.md`.
-- **Schema Model Boundary**: Each owning package README's `### Persistence - Database` section is authoritative for that domain's current and target database model and authorises no migration. Executable schema remains in the owning domain's migration definitions. Where the model and an applied migration disagree, the migration is what the database contains and the README states what it should become.
-- **Changelog Guiding Principles**: Changelogs are for humans, not machines. Track ongoing work under a top `## [Unreleased]` section and aggregate work into a released version block when a release is published. Group the same types of changes together. Make versions and change-type sections linkable Markdown headings. Put the `## [Unreleased]` section first, followed by the latest released version.
-- **Changelog Format**: `docs/CHANGELOG.md` contains an optional `## [Unreleased]` block at the top followed by released-version history organized as newest-first release blocks. Each released version block contains `## <version>`, its release date, a `###` headline, one summary sentence, and counted non-empty change-type lists in canonical order. Category counts must equal their bullet counts, and each bullet stays concise and on one physical Markdown line. Do not add tables, test inventories, measurements, signatures, requirement ledgers, mutable feature registries, or detailed current-state evidence; put those details in their authoritative specification.
-- **Changelog Change Types**: `Added` for new features; `Changed` for changes in existing functionality; `Deprecated` for features that will soon be removed; `Removed` for features now removed; `Fixed` for bug fixes; and `Security` for vulnerability fixes. Omit empty types. Use the canonical order `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
-- **Decision Hygiene**: `Open Decisions` sections in `docs/PROJECT.md` and domain/module READMEs contain unresolved owner choices only. When an owner resolves a choice, write the outcome as an ordinary requirement, contract, workflow, configuration rule, boundary, or explicit exclusion in the authoritative specification, then delete the decision row and any resolved issue entry. The changelog is not a decision ledger; during release aggregation, summarize only release-visible effects under `Changed`. Do not retain resolved, superseded, retired, or deferred-from-initial-scope rows as decision history, and do not create ADR, or other standalone decision-record documents.
-- **Update Module/Service Documentation**: Add/update a `README.md` for each module/service as it's built.
-- **Manifest Canonical Authority**: Provider capability declarations are authored in static `manifest.toml` files per provider folder. Manifests are the canonical input authority for provider capabilities, requirements, and lifecycles, and owning package README `### Feature Registry` sections are verified and synchronized by executable architecture tooling.
-- **Checklist Evidence**: Every completed implementation-plan checklist item must end with the supporting code file path and line number.
+**Role-invocation invariant:** no Planner, Executor, or Reviewer invocation may occur unless its complete prompt already exists in `.agents/task/next-agent.md` and has passed protocol validation. This includes the initial Planner invocation after task activation and every same-role resumed iteration.
 
-## 5. Database Schema Rules
+### 2.1 Active-task workspace
 
-- **Authoritative Schema Manifest**: Database schema migrations are governed by authoritative domain migration manifests (e.g. `run_data_migrations`, `run_domain_migrations`).
-- **Ledger Verification & Locks**: All database schema changes require initial ledger table verification, explicit database write lock acquisition, and checksum validation before applying steps.
-- **Atomic Operations**: Database operations must be transactional (`execute_transaction`), with write lock leases and strict busy-timeout policies (`SQLITE_BUSY_TIMEOUT_SECONDS`).
-- **Immutable Historical Steps**: Applied migration steps in the migration ledger are immutable; step checksum mismatches block database access to enforce schema integrity.
-- **Migration Tombstones and Uninstall Retention**: Provider uninstallation is not data purging. When a provider is uninstalled or removed from runtime configuration, its historical migration entries remain immutable in the migration ledger to preserve database checksum integrity. Tables and records created by uninstalled providers are retained in a dormant state; destructive schema drop or table purge requires explicit, separate administrative authorization.
+Tracked files:
 
-## 6. API Connection
+```text
+.agents/task/
+├── planner.md
+├── executor.md
+├── reviewer.md
+└── next-agent.md
+```
 
-- **Verified Upstream Contracts**: Use only verified upstream contracts and public dependency interfaces for external API connections.
-- **Broker Session & Transport Isolation**: Broker connections must use dedicated session adapters (`_LazyBrokerSession`, transport circuit breakers) with deterministic retry and circuit recovery rules.
-- **Credential & Readiness Verification**: Connection attempts must validate credential availability (`CREDENTIALS_MISSING`) and readiness state before opening external sockets.
-- **Rate Limit & Circuit Governance**: API requests must respect declared source policy rate limits (`rate_limit`, `rate_window_seconds`) and circuit breaker state machines.
-- **Circuit Recovery Testing**: Configure transport circuit breakers (`_TransportCircuitBreaker`) with micro-timeouts (e.g., `0.001s`) in tests to verify failover and recovery without thread-sleep pauses.
+Rules:
 
-## 7. Integration
+- `planner.md`, `executor.md`, and `reviewer.md` are append-only during an active Task and written only by their owning role, except for the narrow deterministic owner-gate record described below.
+- `next-agent.md` is replace-only. Before every reasoning-role invocation it contains exactly one complete standalone prompt for that role.
+- All four files are zero bytes when no Task is active and after accepted close-out.
+- They are coordination artifacts, not product specifications, feature registries, permanent decision history, Goal state, or session storage.
+- Every non-terminal journal handoff must agree with a valid `next-agent.md`; missing, stale, contradictory, or partially instantiated prompts fail closed.
+- Native CLI session IDs are runtime-only transport state and must never appear in `next-agent.md`.
 
-- **Environment Boundaries**: Real integration operations are permitted only against verified non-production targets (`ENVIRONMENT=dev`, demo/testnet/sandbox accounts), except for operator-elected live MetaTrader 5 as defined in §3.
-- **Targeted Testing & Verification**: Development verification uses targeted test commands (`uv run pytest <test_file_path>`). Full test suites are restricted during iterative development to optimize time.
-- **Safe Commands**: `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, `uv run pytest <test_file_path>`, `uv run ruff check .`, `uv run mypy .`.
-- **Restricted Commands (Require `APPROVED: EXECUTE`)**: `rm -rf`, `git reset`, `git clean`, `uv add`/`uv remove`, `docker compose`, live broker calls, real email/Telegram sends, destructive SQL.
+### 2.2 Role declaration and single writer
+
+Every reasoning invocation has exactly one role: `PLANNER`, `EXECUTOR`, or `REVIEWER`. Only one role writes at a time. Roles never run concurrently on the same Task branch. A role stops if its authority conflicts with the active handoff.
+
+The orchestrator is not a reasoning role. It may only perform deterministic lifecycle actions, routing/validation, transport/session bookkeeping, Goal supervision, and deterministic owner-gate bookkeeping. It never authors planning, implementation, or review conclusions.
+
+### 2.3 Task activation and branch isolation
+
+- A Task specification does not activate work merely by existing on disk.
+- Every new Task begins from a clean `main` entry gate and recorded baseline HEAD.
+- Registered features use `feature/<feature-id>-<slug>`; other Tasks use `task/<task-id>-<slug>`. Names are lowercase filesystem-safe refs and must pass `git check-ref-format --branch`.
+- During `ORCHESTRATOR / TASK_ACTIVATED`, the orchestrator derives, validates, creates, and switches to exactly one Task branch from the recorded baseline.
+- After branch creation, the orchestrator instantiates the canonical Planner prompt into `.agents/task/next-agent.md`, validates the full `TASK_ACTIVATED -> PLANNER` artifact, and only then may Planner run.
+- Planner verifies but never creates or switches the Task branch.
+- Planner, Executor, and Reviewer work sequentially on that branch until authorized close-out.
+- `main` remains clean and unchanged throughout planning/execution/review.
+- Every dry run/report/review records Task ID, iteration, baseline, Task branch, and expected changed/untracked paths.
+
+### 2.4 Task state machine and owner gates
+
+```text
+ORCHESTRATOR READY / TASK NONE
+  → Task specification prepared
+  → ORCHESTRATOR: TASK_ACTIVATED
+  → Task branch creation
+  → Planner Dry Run N
+  → PENDING_APPROVAL
+  → execute gate: exact owner message or frozen run preauthorization
+  → Executor Report N
+  → READY_FOR_REVIEW
+  → Reviewer Review N
+  → PENDING_COMMIT
+  → commit gate: exact owner message or frozen run preauthorization
+  → Reviewer close-out
+  → ACCEPTED
+  → ORCHESTRATOR READY / TASK NONE
+```
+
+Correction paths:
+
+- Executor `BLOCKED` → next Planner dry run in the same Planner role conversation for this Task run.
+- Reviewer `CHANGES_REQUESTED` → next Planner dry run in the same Planner role conversation for this Task run.
+- Owner rejection of execution or commit gate → next Planner dry run with the owner direction.
+- Planner `BLOCKED` → owner resolves the documented cause; Planner resumes its same role conversation with a fresh canonical prompt.
+- Planner blocker resolution replaces the stale retry artifact with a fresh canonical `ORCHESTRATOR / BLOCKER_RESOLVED → PLANNER` prompt fingerprinted against the resolved repository state.
+- Owner cancellation records terminal `CANCELLED` state and preserves Task branch, worktree, journals, run evidence, and role-session evidence.
+
+In `approval_policy = "interactive"`, execution authorization is valid only when the entire trimmed owner message is exactly `APPROVED: EXECUTE`, and commit authorization is valid only when it is exactly `APPROVED: COMMIT`. In `approval_policy = "unattended"`, those same protocol gates may instead be satisfied by `RUN_PREAUTHORIZATION` frozen from schema-v3 `.agents/run-config.toml` at run activation. Execute requires `allow_execute`; close-out requires both `allow_local_commit` and `allow_local_merge`. A preauthorization record must state its true source plus the frozen policy and scope SHA-256 values and must never claim that a human sent an approval message.
+
+After either valid execute-gate source, the orchestrator may append only the deterministic factual gate record to Planner journal. The approved plan SHA-256 is computed from exact pre-gate Planner bytes and independently verified before Executor/Reviewer invocation.
+
+### 2.5 `next-agent.md` as role boundary
+
+Every reasoning-role prompt begins with TOML front matter using prompt schema version 1 and records run/task/iteration, source/target role, handoff, branch, baseline, source HEAD, canonical template path, and owner-gate requirement.
+
+The orchestrator validates transition/template, schema, branch/baseline/HEAD, protected incoming-role sentinels, unfilled placeholders, prompt/template hashes and complete working-tree fingerprint. Outgoing roles may populate Task-specific facts but may not weaken the incoming role's canonical role, authority, methodology, quality criteria, or handoff contract.
+
+### 2.6 Structured handoff facts
+
+- **Planner → Executor:** approved scope, exact path authority, implementation order, requirements, validation, rollback, risks.
+- **Executor → Reviewer:** changed paths, requirements claimed complete, commands/tests reported, limitations, deviations, assumptions, risks, labeled `UPSTREAM CLAIMS — UNTRUSTED UNTIL INDEPENDENTLY VERIFIED`.
+- **Executor → Planner (`BLOCKED`):** blocker, evidence, partial-work state, affected paths, safe retained work/rollback, exact decision required.
+- **Reviewer → Planner:** failed requirement/gate, independent evidence, required correction, valid retained work, scope needing reconsideration.
+
+### 2.7 Canonical professional role contracts
+
+`AGENTS.md` defines shared repository-wide law; each canonical template is the complete role-specific contract instantiated into `next-agent.md`:
+
+| Protocol role | Professional role contract | Canonical template |
+| --- | --- | --- |
+| `PLANNER` | Principal Software Architect and Implementation Planner | `docs/templates/prompt/planner.md` |
+| `EXECUTOR` | Senior Software Implementation Engineer | `docs/templates/prompt/executor.md` |
+| `REVIEWER` | Principal Software Verification and Code Review Engineer | `docs/templates/prompt/reviewer.md` |
+| `REVIEWER` close-out | Release Integrity and Change-Control Engineer | `docs/templates/prompt/reviewer-closeout.md` |
+
+### 2.8 Role Session Continuity
+
+**Cross-role isolation and same-role continuity are independent properties.** Every Task run owns one logical conversation for Planner, one for Executor, and one for Reviewer. Repeated iterations resume that same-role conversation; Reviewer close-out continues the same Reviewer conversation. A new Task run starts new role conversations.
+
+```text
+Planner 1 → Planner 2 → Planner 3
+Executor 1 → Executor 2 → Executor 3
+Reviewer 1 → Reviewer 2 → Reviewer 3 → Reviewer close-out
+
+Planner session ≠ Executor session ≠ Reviewer session
+```
+
+Session history is context only. Authority order remains repository evidence and deterministic Python workflow state, then the current validated `next-agent.md` role/Task contract.
+
+Mode semantics:
+
+- `solo`: the current IDE chat performs deterministic Controller duties and adopts Planner, Executor and Reviewer sequentially from each validated `next-agent.md`; it invokes no subagent or reasoning-role CLI session. Role boundaries remain explicit, but cross-role isolation is soft.
+- `solo-headless`: the deterministic Controller invokes one configured native CLI identity and one shared native conversation sequentially across Planner, Executor and Reviewer; cross-role isolation is soft.
+- `delegate`: the current IDE chat remains Controller and invokes one distinct inspectable app-native role agent for Planner, Executor and Reviewer per Task run. Later same-role iterations and Reviewer close-out resume the exact stored app-agent handle.
+- `delegate-headless`: the deterministic Controller invokes one configured CLI vendor with a distinct persistent native session per role per Task run; later same-role iterations resume that session.
+- `delegate-multi`: each CLI role may use a separately configured vendor/model and each turn may launch a fresh OS process, but it resumes the exact stored native conversation ID for that role under `.agents/runs/<task-run-id>/role-sessions.json`. Returned identity mismatch fails closed.
+- `manual`: operator keeps Orchestrator, Planner, Executor, Reviewer chats for the Task and returns to the same role chat on later iterations; close-out uses the existing Reviewer chat.
+
+Schema-v3 `.agents/run-config.toml` is authoritative for mode, headless role identities, approval policy, iteration limit, unattended local permissions and recovery policy. All six modes support interactive or frozen unattended gate authorization; unattended mode changes gate authorization only and does not change the selected role transport. All modes use the Task/Goal CLI for deterministic state transitions. IDE-native `solo` and `delegate` pause at a validated role boundary for this chat to perform or delegate the role; `solo-headless`, `delegate-headless` and `delegate-multi` invoke CLI sessions; `manual` waits for operator-managed role chats. Automatic Sol/high recovery-session generation remains headless-only. Schema-v2 names remain resume-compatible and map as `solo → solo-headless`, `delegate → delegate-headless`, and `multi-delegate → delegate-multi` without changing frozen schema-v2 fingerprints. Missing-schema legacy configuration is compatibility-only and does not enable unattended execution.
+
+Unattended runs remain finite. If the normal iteration limit is exceeded and recovery is enabled, the controller may create exactly one fresh recovery session generation for Planner/Executor/Reviewer using `codex/gpt-5.6-sol/high` and allow exactly one additional correction iteration. Exhaustion after that generation is terminal `MAX_ITERATIONS`. Recovery sessions never replace the configured parent identities and are never reused by the next Task or Goal child.
+
+### 2.9 Deterministic Goal supervision
+
+A **Goal** is a supervisory implementation objective containing multiple independently reviewable/committable Tasks. Goal orchestration extends the workflow **above** the atomic Task workflow; it does not modify or duplicate the Planner → Executor → Reviewer state machine.
+
+Architecture:
+
+```text
+Goal Controller
+    ↓ creates/selects one child Task
+Task Orchestrator
+    ↓
+Planner → Executor → Reviewer
+    ↓
+Task ACCEPTED
+    ↓
+Goal Controller → next child
+```
+
+Rules:
+
+- Goal Controller and Task Orchestrator are two deterministic state-machine layers in one orchestration system, not separate AI agents.
+- Goal Controller owns selection, frozen child order, child Task run identity, progress/checkpointing and Goal terminal state only.
+- Goal Controller never performs Planner/Executor/Reviewer reasoning and never directly invokes role-session transport.
+- `.agents/goal.toml` is runtime Goal input; `.agents/goals/<goal-run-id>/state.json` is runtime Goal state. Goal runtime state stores child Task run IDs but no Planner/Executor/Reviewer session IDs.
+- Supported v1 Goal selection is explicit tracker entries, one numbered phase/prefix, or all open tracker entries. Selection is resolved and frozen at Goal activation; later tracker edits never silently expand active Goal scope.
+- Exactly one child Task may be active. Child Tasks run sequentially through the existing Task API and existing Task protocol.
+- Every child Task begins from the latest clean accepted `main`, owns its own Task branch, Task run ID, P/E/R role-session set, owner gates, review, exactly one Task implementation commit, and one explicit merge commit on `main`.
+- Same-role session continuity is bounded to a child Task. Child N+1 always starts a fresh Planner/Executor/Reviewer conversation set. In `solo`, that logical boundary is also a physical IDE chat boundary guarded by a persisted handoff claim.
+- A Goal has no Goal branch and no Goal commit. Its durable implementation history is the ordered set of accepted child Task implementation commits and their explicit merge commits on `main`.
+- Goals add no authorization token. `APPROVED: EXECUTE` and `APPROVED: COMMIT` remain the only gate labels and always apply to the active child Task; each may be satisfied by its configured interactive or frozen unattended source.
+- Task correction loops do not advance Goal progress. Planner external `BLOCKED` pauses the active child/Goal until that same child is resumed.
+- `stop_on_blocked=false` is valid only with frozen unattended runtime policy. It never skips a child: the controller gives the same Planner conversation one bounded retry to resolve non-critical ambiguity through explicit, reversible, repository-grounded assumptions. It never permits assumptions about owner authorization, credentials, external facts, live-action safety, destructive authority, security policy, acceptance evidence, or scope expansion; protected/external blockers still pause the child.
+- Every child under that policy must carry an `Assumptions for Human Review` section through Planner, Executor and independent Reviewer evidence. The accepted Reviewer section is archived with a SHA-256 in the Goal assumption ledger, including an explicit `NONE` result when no assumption was used.
+- After child `ACCEPTED`, Goal Controller must verify clean `main`, zero-byte active Task workspace, child-run identity and completion of the frozen implementation tracker entry before starting the next child.
+- Child cancellation, max iterations, preparation failure or acceptance reconciliation failure blocks the Goal. Previously accepted child commits remain on `main`; Goal supervision never auto-rolls them back.
+- Goal becomes `ACCEPTED` only when every frozen child is accepted, every selected tracker entry is complete, `main` is clean, and no Task is active.
+
+Transport symmetry:
+
+- `solo`: one IDE chat per Goal child Task. That child chat performs Controller + Planner + Executor + Reviewer sequentially. After an accepted non-final child, the Goal checkpoints `NEXT_CHILD_CHAT_REQUIRED`; `/new` is the preferred desktop action and app-native task creation is the fallback. The fresh chat must claim the exact persisted handoff before the next child is prepared.
+- `solo-headless`: fresh shared native session per child.
+- `delegate`: fresh inspectable app-native P/E/R agent set per child; same-role handle continuity only inside a child.
+- `delegate-headless`: fresh same-vendor CLI P/E/R session set per child.
+- `delegate-multi`: fresh Task run ID and multi-vendor session ledger per child.
+- `manual`: same Goal Orchestrator chat across the Goal, but a new dedicated Planner/Executor/Reviewer chat set per child; reuse those chats only within that child.
+
+`CONTINUE: GOAL` may be used only as chat transport/resume after a child has validly reached `ACCEPTED`; it grants no authority.
+
+## 3. Coding style and verification
+
+- Follow the Google Python Style Guide and repository Ruff configuration. Use 4-space indentation and `ruff format`.
+- Public/module code uses explicit typing and appropriate Google-style docstrings. Run configured mypy strict checks for applicable code.
+- No bare `except:` and no silent failures.
+- Application/library code uses `logging.getLogger(__name__)`, not `print`; bounded executable teaching/usage harnesses may print secret-safe results.
+- Do not log secrets, credentials, personal information, full sensitive payloads, or trading account data.
+- Every service feature has one designated primary domain-logic module with bounded executable usage evidence. Tests verify behavior but do not become a second usage implementation.
+- Feature-level tests belong under the owning test namespace; system architecture/composition/removability tests remain in their documented locations.
+- Close SQLite handles, sockets, files, and subprocesses explicitly. Async mocks must return genuine awaitables.
+
+### Change-scoped testing
+
+During implementation/review, derive the affected set from `git diff --name-only`, staged diff, and untracked paths. Map changed production code to owning and affected contract/consumer/architecture tests.
+
+Run bounded tests explicitly, e.g. `uv run pytest --no-cov <selected paths>`. Never run bare/unfiltered pytest or coverage iteratively. Coverage and complete suite are final integration evidence through configured pre-commit/CI gates.
+
+Safe read/verification commands include `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, bounded pytest, Ruff, and mypy. Destructive commands and live external actions require explicit applicable authorization.
+
+## 4. Security and operational safety
+
+- Never commit secrets; use `.env.example` for examples and redact sensitive outputs.
+- Fail closed when policy, authority, credentials, environment, or evidence is uncertain.
+- No live trading/action by default. External integration operations use verified dev/demo/testnet/sandbox targets unless an owning policy explicitly permits an operator-selected live mode.
+- Kill switches and deterministic risk/policy gates cannot be bypassed by callers or agents.
+- Never invent backtest results, live performance, broker fills, or external data.
+- Python/runtime policy enforcement is authoritative; LLM prompts and remembered session context are not substitutes for deterministic controls.
+
+## 5. Documentation and ownership
+
+- Owning package README: domain feature/FR registry, current feature status, semantic contracts, persistence target model, usage/evidence mapping.
+- `docs/ARCHITECTURE.md`: universal structural/runtime/database conventions.
+- `docs/PROJECT.md`: product/system scope, domain index, cross-domain relationships and NFRs.
+- `AGENTS.md`: shared contributor/workflow constitution.
+- `docs/dev/IMPLEMENTATION_ORDER.md`: delivery sequencing.
+- `docs/dev/feature_implementation_pipeline.md`: feature delivery architecture/checklist.
+- `docs/templates/prompt/`: complete canonical role-specific workflow contracts.
+- `.agents/GOALS.md`: deterministic Goal supervision and operating contract.
+
+Planner identifies documentation impact; Executor applies only approved documentation changes; Reviewer verifies consistency and reports discrepancies without fixing them.
+
+## 6. Database and external API rules
+
+- Applied migration steps/checksums are immutable. Schema changes follow owning migration manifests, explicit write locks, ledger verification, and transactional execution.
+- Provider uninstall/removal does not imply destructive data purge; retention/purge follows explicit owning policy and separate authorization.
+- External APIs use verified public upstream contracts, credential/readiness checks, bounded rate limits, retries/circuit breakers, and deterministic recovery tests.
+- Broker/provider implementations stay isolated behind public contracts/capabilities; consumers do not import provider internals.
+
+## 7. Git authority summary
+
+- Goal Controller: no Goal branch, no Goal commit, no direct product mutation; it may prepare runtime Goal/child Task state and invoke the existing Task API sequentially.
+- Task Orchestrator: deterministic clean-main entry gate + one Task-branch creation/switch during `TASK_ACTIVATED`; no reasoning conclusions, ordinary commits, merge, or push.
+- Planner: no branch creation/switch and no commits/merge/push.
+- Executor: no branch creation/switch, commits/merge/push.
+- Reviewer: one authorized local Task implementation commit + one explicit `git merge --no-ff` commit on `main` + safe merged-branch deletion only after the `APPROVED: COMMIT` gate is satisfied. The merge commit's first parent must be the recorded `main` baseline and its second parent the exact Task commit.
+- Normal workflow never authorizes push, force-push, pull, fetch, rebase, reset, clean, amend, force deletion, merge-conflict resolution, or destructive abandonment without separate explicit owner authorization.
+- The `APPROVED: EXECUTE` gate authorizes only the latest dry run of the active child Task. Neither interactive approval nor run preauthorization permits unrelated findings/refactors/dependency upgrades/history rewrites/live or external actions, push, destructive operations, or the rest of a Goal.

@@ -1,0 +1,26 @@
+# Example deterministic Goal specification.
+# A Goal supervises multiple ordinary Task workflows; it is not a reasoning role.
+
+goal_id = "GOAL-STRATEGY-PHASE"
+goal_slug = "strategy-phase"
+goal_name = "Complete Strategy Phase"
+goal_request = "Complete every selected Strategy implementation entry through the normal HaruQuantAI Task workflow."
+child_additional_context = "For every child Task, read the phase coordination plan and update its matching status row with evidence."
+implementation_file = "docs/dev/IMPLEMENTATION_ORDER.md"
+
+# Supported v1 selectors: "entries", "phase", "all_open".
+selection_type = "phase"
+selection = "7"
+
+# Explicit-entry example instead:
+# selection_type = "entries"
+# entries = ["7.1", "7.2", "7.3"]
+# execution_order = "listed"
+
+execution_order = "tracker"
+skip_completed = true
+stop_on_blocked = true
+
+# Unattended-only alternative: one bounded, audited assumption retry per child.
+# This never skips children or overrides protected/external blockers.
+# stop_on_blocked = false

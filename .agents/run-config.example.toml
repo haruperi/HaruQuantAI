@@ -1,0 +1,33 @@
+# HaruQuantAI runtime-only workflow policy. Copy to .agents/run-config.toml.
+schema_version = 3
+mode = "solo-headless"
+approval_policy = "interactive"
+max_iterations = 5
+
+[unattended]
+allow_execute = false
+allow_local_commit = false
+allow_local_merge = false
+
+[recovery]
+enabled = false
+max_escalations = 0
+additional_iterations = 0
+vendor = "codex"
+model = "gpt-5.6-sol"
+effort = "high"
+
+[roles.planner]
+vendor = "codex"
+model = "gpt-5.6-sol"
+effort = "high"
+
+[roles.executor]
+vendor = "codex"
+model = "gpt-5.6-sol"
+effort = "high"
+
+[roles.reviewer]
+vendor = "codex"
+model = "gpt-5.6-sol"
+effort = "high"
