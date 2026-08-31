@@ -1,1 +1,1 @@
-"""Analytics contract definitions."""
+"""Public wire contracts for the Analytics domain."""

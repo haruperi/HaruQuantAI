@@ -1,54 +1,103 @@
 # HaruQuantAI
 
-Modular quantitative trading platform designed for typed service boundaries, governed trading, reproducible research, and strict risk controls.
+> **Quantitative Financial Trading & Research System**
+> Built on a strictly decoupled, capability-oriented spatiotemporal composability kernel in Python 3.14+.
 
 ---
 
-## Getting Started
+## 1. Project Overview
+
+**HaruQuantAI** is a quantitative trading and financial research platform designed around strict architectural isolation and dynamic runtime composability.
+
+Trading strategies, market-data pipelines, analytics, interfaces, and infrastructure communicate through typed, versioned capability contracts instead of importing one another's implementations.
+
+### Key Architectural Pillars
+
+- **Zero Coupling Between Service Features**: Feature packages never import or call one another directly. They interact through exact versioned capability contracts declared in `FeatureSpec`.
+- **Spatiotemporal Scoping**: Every feature executes within an isolated `FeatureScope` that owns its services, background tasks, context managers, and event subscriptions. Closing or replacing the feature disposes of those effects safely.
+- **Graceful Absence and Physical Removability**: A feature package and its local tests can be physically removed without breaking the shared runtime or unrelated features. Missing requirements block only the affected dependency closure.
+- **Profile-Driven Readiness**: Runtime profiles declare required capabilities. Composition reports liveness, readiness, active capabilities, feature states, and missing dependencies independently of any future transport.
+- **Interface Ownership**: Product-facing HTTP, CLI, MCP, and other gateways are registered D-IFACE features owned by `app/services/interfaces/`; they are not part of the shared composability foundation.
+- **Unified Trading Execution**: Simulation, paper, demo, and live execution share one Trading-owned business lifecycle. Simulator and Broker Connectivity provide route-specific execution authority mechanics through versioned capabilities rather than implementing parallel trading lifecycles.
+
+---
+
+## 2. Architecture and Documentation
+
+- [Project Specification](docs/PROJECT.md) — Product scope, system workflows, requirements, NFRs, and release gates.
+- [Architecture](docs/ARCHITECTURE.md) — Universal structural, lifecycle, persistence, and runtime constraints.
+- [Domain Specifications](app/services) — Authoritative domain boundaries, feature registries, responsibilities, and acceptance evidence.
+- [Feature Implementation Pipeline](docs/dev/feature_implementation_pipeline.md) — Procedure for designing, implementing, demonstrating, testing, replacing, and removing features.
+- [Builder Guide](AGENTS.md) — Contributor process, approval gates, coding standards, and verification policy.
+
+---
+
+## 3. Project Structure
+
+This repository is structured as a modular architecture organized around a pure kernel, runtime composition, contracts, and isolated service domains:
+
+- `app/kernel`: Pure composability kernel, manifests, lifecycle, resolvers, health, and diagnostics.
+- `app/composition`: Dynamic runtime engine, feature reconciler, generation manager, and profile controller.
+- `app/contracts`: Public cross-boundary DTOs, protocols, capability keys, and events.
+- `app/services`: Core quantitative and trading logic modules (analytics, broker, data, indicators, interfaces, optimization, orchestration, portfolio, research, risk, simulator, strategy, system, trading, workspace).
+- `docs/`: System specifications, architecture guide, and development standards.
+- `scripts/`: Quality assurance, release checks, schema validation, and CI tooling.
+- `tests/`: Change-scoped unit, integration, architecture, removability, and usage tests.
+
+---
+
+## 4. Getting Started
+
+HaruQuantAI uses **[uv](https://github.com/astral-sh/uv)** for fast, deterministic Python dependency and environment management.
 
 ### Prerequisites
-This project uses **[uv](https://github.com/astral-sh/uv)** for fast, reliable Python package management. Make sure `uv` is installed on your system.
+
+- Python `>= 3.14`
+- [uv](https://github.com/astral-sh/uv) `>= 0.12.3`
 
 ### Installation
-1.  **Install dependencies**:
-    Clone the repository and synchronize the environment (this will install the correct Python version and all dependencies into a local virtual environment):
-    ```bash
-    uv sync --all-extras --dev
-    ```
-2.  **Initialize Database**:
-    ```bash
-    uv run python scripts/init_db.py
-    ```
-3. **Install Frontend dependencies**:
-    ```bash
-    uv run npm install --prefix app/web
-    ```
-4.  **Run Backend**:
-    ```bash
-    uv run python app/api/main.py
-    ```
-5.  **Run Frontend**:
-    ```bash
-    uv run npm run dev --prefix app/web
-    ```
+
+Clone the repository and synchronize the environment (installs the correct Python version and all dependencies into a local virtual environment):
+
+```bash
+git clone https://github.com/haruperi/HaruQuantAI.git
+cd HaruQuantAI
+uv sync --all-extras --dev
+```
 
 ---
 
-## Project Structure
+## 5. Running the Application
 
-This repository is structured as a modular monolith containing a Python backend and a Next.js frontend:
+> [!WARNING]
+> HaruQuantAI is under active development. The current foundation exposes diagnostics and registered service features; live-capital trading requires verified broker integration and explicit gate authorization.
 
-*   `app/api`: FastAPI backend gateways, routing, and middlewares.
-*   `app/web`: Next.js frontend workspace (TypeScript, Tailwind CSS, Radix UI).
-*   `app/services`: Core quantitative and trading logic modules (data, indicators, risk, simulation, etc.).
-*   `/docs`: System architecture design, standard definitions, and requirements.
+Run the canonical CLI / API server:
 
-For design details, module boundaries, and implementation invariants, see `docs/ARCHITECTURE.md`
+```bash
+# Run with default settings:
+uv run haruquantai
+
+# Run with custom host, port, or auto-reload in development:
+uv run haruquantai --host 127.0.0.1 --port 8000 --reload
+```
+
 ---
 
-## Local Development Quality Gates
+## 6. Local Development Quality Gates
 
 We enforce high code quality standards via Ruff (formatting, linting, import-sorting), mypy (strict static typing), and pytest (testing & coverage).
+
+### Change-Scoped Testing
+
+During implementation, derive the affected test set from all uncommitted files and run only those tests:
+
+```bash
+git diff --name-only
+git diff --cached --name-only
+git status --short
+uv run pytest --no-cov <affected_test_path> [<affected_test_path> ...]
+```
 
 ### 1. Code Formatting (Ruff Format)
 Ruff format is the canonical formatter.
@@ -95,11 +144,19 @@ Pytest is the canonical unit and usage-test runner. Coverage must remain above *
   ```
   *Coverage HTML reports are generated at `htmlcov/index.html`.*
 
+### 5. Running Usage Examples
+To run usage examples (such as integration flows or sample domain workflows) under the `tests/usage/` directory:
+```bash
+uv run pytest tests/usage
+```
+Or run individual example scripts directly:
+```bash
+uv run python tests/usage/<example_script>.py
+```
+
 ---
 
-## Local CI and Pre-Release Checks
-
-Before committing or pushing, you should run the automated quality checks.
+## 7. Local CI, Pre-Release Checks & Pre-Commit
 
 ### Run Local CI Checks
 Executes Ruff format check, Ruff check, mypy strict, and pytest + coverage in the approved sequence:
@@ -113,10 +170,7 @@ Runs the full CI suite and performs additional safety checks before generating a
 uv run python scripts/release_check.py
 ```
 
----
-
-## Git Pre-Commit Hooks
-
+### Git Pre-Commit Hooks
 A git `pre-commit` configuration is provided to run formatting, linting, type-checking, and secret scanning locally before each commit.
 
 - **Install pre-commit hooks:**
@@ -128,14 +182,10 @@ A git `pre-commit` configuration is provided to run formatting, linting, type-ch
   uv run pre-commit run --all-files
   ```
 
+The authoritative testing and contributor procedure is defined in [AGENTS.md](AGENTS.md) and the [Feature Implementation Pipeline](docs/dev/feature_implementation_pipeline.md).
+
 ---
 
-## Running Usage Examples
-To run usage examples (such as integration flows or sample domain workflows) under the `tests/usage/` directory:
-```bash
-uv run pytest tests/usage
-```
-Or run individual example scripts directly:
-```bash
-uv run python tests/usage/<example_script>.py
-```
+## 8. License
+
+Proprietary / All Rights Reserved. Author: Haruperi (<r.haruperi@hotmail.com>).

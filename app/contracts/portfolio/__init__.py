@@ -1,1 +1,1 @@
-"""Portfolio contract definitions."""
+"""Public wire contracts for the Portfolio domain."""

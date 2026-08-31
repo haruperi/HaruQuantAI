@@ -1,1 +1,1 @@
-"""Composition runtime test suite."""
+"""Tests for composition package."""

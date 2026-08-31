@@ -1,1 +1,1 @@
-"""Data capability specifications."""
+"""Public wire contracts for the Data domain."""

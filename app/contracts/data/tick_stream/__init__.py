@@ -1,1 +1,0 @@
-"""Tick stream capability specifications."""

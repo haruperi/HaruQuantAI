@@ -1,1 +1,1 @@
-"""Strategy contract definitions."""
+"""Public wire contracts for the Strategy domain."""

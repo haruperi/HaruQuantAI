@@ -1,0 +1,4836 @@
+{
+  "$defs": {
+    "AdministerCapabilitiesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated capability administration gateway request.",
+      "properties": {
+        "capability_filter": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Capability Filter",
+          "type": "array"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "const": "PROJECT",
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "AdministerCapabilitiesRequest",
+      "type": "object"
+    },
+    "AdministerCapabilitiesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful capability administration gateway operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "projection": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CapabilityAdministrationProjection"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "AdministerCapabilitiesSuccess",
+      "type": "object"
+    },
+    "AlignmentPolicy": {
+      "additionalProperties": false,
+      "description": "One point-in-time alignment policy for external series.\n\nNo value timestamped after a decision event can affect that event;\n``look_ahead_prohibited`` is therefore pinned true.",
+      "properties": {
+        "direction": {
+          "enum": [
+            "EXACT",
+            "LAST_KNOWN",
+            "AGGREGATE"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "look_ahead_prohibited": {
+          "const": true,
+          "default": true,
+          "title": "Look Ahead Prohibited",
+          "type": "boolean"
+        },
+        "max_age_seconds": {
+          "minimum": 1,
+          "title": "Max Age Seconds",
+          "type": "integer"
+        },
+        "missing_policy": {
+          "enum": [
+            "NULL",
+            "CARRY_FORWARD",
+            "FAIL"
+          ],
+          "title": "Missing Policy",
+          "type": "string"
+        },
+        "timezone": {
+          "$ref": "#/$defs/IanaTimezone"
+        }
+      },
+      "required": [
+        "direction",
+        "max_age_seconds",
+        "missing_policy",
+        "timezone"
+      ],
+      "title": "AlignmentPolicy",
+      "type": "object"
+    },
+    "ApiVersion": {
+      "additionalProperties": false,
+      "description": "Wire projection of the served API semantic version (record R1).",
+      "properties": {
+        "is_deprecated": {
+          "default": false,
+          "title": "Is Deprecated",
+          "type": "boolean"
+        },
+        "label": {
+          "$ref": "#/$defs/ApiVersionLabel",
+          "default": "v1"
+        },
+        "major": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Major",
+          "type": "integer"
+        },
+        "minor": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Minor",
+          "type": "integer"
+        },
+        "patch": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Patch",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "title": "ApiVersionWire",
+      "type": "object"
+    },
+    "ApiVersionLabel": {
+      "pattern": "^v[1-9][0-9]*$",
+      "type": "string"
+    },
+    "ArtifactDownloadRequest": {
+      "additionalProperties": false,
+      "description": "Wire projection of an artifact download request (record R6).\n\nUncommitted artifacts and traversal attempts are denied\n``ARTIFACT_ACCESS_DENIED``; the v1 ``ArtifactRangeSpec`` and the binary\n``ArtifactDownloadResponse`` stay process contracts because response\nbytes are a transport body, not a record.",
+      "properties": {
+        "artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "filename": {
+          "$ref": "#/$defs/ArtifactFilename"
+        },
+        "range_end_byte": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Range End Byte"
+        },
+        "range_start_byte": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Range Start Byte",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "filename"
+      ],
+      "title": "ArtifactDownloadRequestWire",
+      "type": "object"
+    },
+    "ArtifactFilename": {
+      "pattern": "^[^/\\\\]+$",
+      "type": "string"
+    },
+    "AsyncJobRef": {
+      "additionalProperties": false,
+      "description": "Wire projection of an asynchronous job handle (record R5).\n\nLong-running actions return a job ID immediately; the wire progress\nratio is a ``DecimalValue`` string, not a binary float.",
+      "properties": {
+        "command_type": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "error_message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Message"
+        },
+        "job_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Job Id",
+          "type": "string"
+        },
+        "progress": {
+          "default": "0",
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Progress",
+          "type": "string"
+        },
+        "result_ref": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result Ref"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "stage": {
+          "default": "",
+          "title": "Stage",
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/AsyncJobStateValue",
+          "default": "QUEUED"
+        },
+        "updated_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id",
+        "command_type",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "AsyncJobRefWire",
+      "type": "object"
+    },
+    "AsyncJobStateValue": {
+      "enum": [
+        "QUEUED",
+        "RUNNING",
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED"
+      ],
+      "type": "string"
+    },
+    "AutomationCommand": {
+      "additionalProperties": false,
+      "description": "Wire-native presentation-neutral automation command (record R8).\n\nUI-exported manifests dry-run identically through CLI and API; secret\nvalues are ``SecretRef`` identities resolved explicitly before\nexecution, never inline payloads.",
+      "properties": {
+        "command_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "correlation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Correlation Id"
+        },
+        "payload": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "secret_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Secret Refs",
+          "type": "array"
+        },
+        "session_id": {
+          "default": "",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/CommandSourceValue",
+          "default": "CLI"
+        }
+      },
+      "required": [
+        "command_name"
+      ],
+      "title": "AutomationCommand",
+      "type": "object"
+    },
+    "AutomationCommandDescriptor": {
+      "additionalProperties": false,
+      "description": "Nested command descriptor inside ``AutomationSchema`` (record R9).\n\n``input_schema`` and ``output_schema`` are bounded JSON-Schema\ndocuments, the declared extension surface of the record.",
+      "properties": {
+        "command_name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "input_schema": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "is_durable": {
+          "title": "Is Durable",
+          "type": "boolean"
+        },
+        "output_schema": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "command_name",
+        "input_schema",
+        "output_schema",
+        "is_durable"
+      ],
+      "title": "AutomationCommandDescriptor",
+      "type": "object"
+    },
+    "AutomationSchema": {
+      "additionalProperties": false,
+      "description": "Wire-native published automation command schema set (record R9).",
+      "properties": {
+        "commands": {
+          "items": {
+            "$ref": "#/$defs/AutomationCommandDescriptor"
+          },
+          "title": "Commands",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "exported_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Exported At",
+          "type": "string"
+        },
+        "schema_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Schema Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_id",
+        "commands",
+        "exported_at",
+        "content_hash"
+      ],
+      "title": "AutomationSchema",
+      "type": "object"
+    },
+    "BrokerAccountSnapshot": {
+      "additionalProperties": false,
+      "description": "Provider-truth account and balance projection.",
+      "properties": {
+        "account_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "balances": {
+          "patternProperties": {
+            "^[A-Z]{3}$": {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            }
+          },
+          "title": "Balances",
+          "type": "object"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        },
+        "equity": {
+          "$ref": "#/$defs/Money"
+        },
+        "free_margin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "margin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "permissions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "provider_time": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Time"
+        },
+        "retrieved_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation",
+        "account_ref",
+        "currency",
+        "equity",
+        "retrieved_at"
+      ],
+      "title": "BrokerAccountSnapshot",
+      "type": "object"
+    },
+    "BrokerMarketState": {
+      "additionalProperties": false,
+      "description": "Provider-truth quote, tick, and market-status projection.",
+      "properties": {
+        "ask": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Ask"
+        },
+        "bid": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Bid"
+        },
+        "event_time": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Time"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "last": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Last"
+        },
+        "market_status": {
+          "$ref": "#/$defs/MarketStatus"
+        },
+        "provider_sequence": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Sequence"
+        },
+        "provider_symbol": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "receipt_time": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Receipt Time",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "generation",
+        "instrument",
+        "provider_symbol",
+        "market_status",
+        "receipt_time",
+        "bid",
+        "ask",
+        "last"
+      ],
+      "title": "BrokerMarketState",
+      "type": "object"
+    },
+    "BulkConflictPolicy": {
+      "enum": [
+        "REJECT",
+        "KEEP_EXISTING",
+        "CREATE_NEW_VERSION"
+      ],
+      "type": "string"
+    },
+    "BulkRequestToken": {
+      "additionalProperties": false,
+      "description": "Wire-native pinned bulk request token (record R7).\n\nPairs with the Analytics-owned ``BulkSelectionToken``; replay with the\nsame token and idempotency key never broadens scope or duplicates\nmutations.",
+      "properties": {
+        "conflict_policy": {
+          "$ref": "#/$defs/BulkConflictPolicy"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "estimated_impact": {
+          "minimum": 1,
+          "title": "Estimated Impact",
+          "type": "integer"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "pinned_query_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Pinned Query Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "token_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Token Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "token_id",
+        "pinned_query_hash",
+        "estimated_impact",
+        "idempotency_key",
+        "conflict_policy",
+        "created_at",
+        "expires_at"
+      ],
+      "title": "BulkRequestToken",
+      "type": "object"
+    },
+    "CapabilityAdministrationProjection": {
+      "additionalProperties": false,
+      "description": "Wire-native capability administration projection (record R14).\n\nNo secrets or credential values ever appear in the snapshot or its\ncomponent summaries.",
+      "properties": {
+        "capability_snapshot": {
+          "$ref": "#/$defs/CapabilitySnapshot"
+        },
+        "components": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ComponentStateSummary"
+          },
+          "title": "Components",
+          "type": "array"
+        },
+        "projection_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Projection Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "projection_id",
+        "capability_snapshot"
+      ],
+      "title": "CapabilityAdministrationProjection",
+      "type": "object"
+    },
+    "CapabilityProviderSnapshot": {
+      "additionalProperties": false,
+      "description": "Pinned provider identity and configuration evidence.",
+      "properties": {
+        "capability_key": {
+          "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+          "title": "Capability Key",
+          "type": "string"
+        },
+        "configuration_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Configuration Hash",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "implementation_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Implementation Hash",
+          "type": "string"
+        },
+        "provider_feature_id": {
+          "pattern": "^FEAT-[A-Z0-9_-]+$",
+          "title": "Provider Feature Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capability_key",
+        "provider_feature_id",
+        "generation",
+        "implementation_hash",
+        "configuration_hash"
+      ],
+      "title": "CapabilityProviderSnapshot",
+      "type": "object"
+    },
+    "CapabilitySnapshot": {
+      "additionalProperties": false,
+      "description": "Immutable ordered provider snapshot.",
+      "properties": {
+        "causal_request_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Causal Request Id"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "providers": {
+          "items": {
+            "$ref": "#/$defs/CapabilityProviderSnapshot"
+          },
+          "minItems": 1,
+          "title": "Providers",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "snapshot_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Snapshot Hash",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Snapshot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "created_at",
+        "providers",
+        "snapshot_hash"
+      ],
+      "title": "CapabilitySnapshot",
+      "type": "object"
+    },
+    "CommandSourceValue": {
+      "enum": [
+        "CLI",
+        "UI",
+        "MCP",
+        "API",
+        "SYSTEM"
+      ],
+      "type": "string"
+    },
+    "ComponentStateSummary": {
+      "additionalProperties": false,
+      "description": "Nested per-component state summary (record R14).\n\nInline record part of ``CapabilityAdministrationProjection``; the\nfeature-state literal is the Shared Contracts §4.3 core enum.",
+      "properties": {
+        "capability_key": {
+          "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+          "title": "Capability Key",
+          "type": "string"
+        },
+        "diagnostic": {
+          "default": "",
+          "title": "Diagnostic",
+          "type": "string"
+        },
+        "feature_id": {
+          "pattern": "^FEAT-[A-Z0-9_-]+$",
+          "title": "Feature Id",
+          "type": "string"
+        },
+        "feature_state": {
+          "$ref": "#/$defs/FeatureState"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "health": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HealthState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "capability_key",
+        "feature_id",
+        "feature_state",
+        "generation"
+      ],
+      "title": "ComponentStateSummary",
+      "type": "object"
+    },
+    "ConcurrencyToken": {
+      "additionalProperties": false,
+      "description": "Wire projection of an optimistic concurrency token (record R2).\n\nA stale ``If-Match`` returns 412 ``VERSION_CONFLICT`` with no partial\nmutation.",
+      "properties": {
+        "issued_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Issued At",
+          "type": "string"
+        },
+        "resource_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Resource Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "token_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Token Hash",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "resource_id",
+        "version",
+        "token_hash",
+        "issued_at"
+      ],
+      "title": "ConcurrencyTokenWire",
+      "type": "object"
+    },
+    "CorrelationMatrix": {
+      "additionalProperties": false,
+      "description": "One immutable correlation matrix artifact (R7).\n\nChanging any constituent or policy produces a different identity; the\nmatrix values live in the referenced artifact, not on this record.",
+      "properties": {
+        "candidate_set_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Set Hash",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "matrix_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Matrix Artifact Id",
+          "type": "string"
+        },
+        "matrix_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Matrix Id",
+          "type": "string"
+        },
+        "observation_counts": {
+          "additionalProperties": {
+            "$ref": "#/$defs/NonNegativeInt"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Observation Counts",
+          "type": "object"
+        },
+        "request": {
+          "$ref": "#/$defs/CorrelationRequest"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "settings_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Settings Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "matrix_id",
+        "request",
+        "candidate_set_hash",
+        "settings_hash",
+        "observation_counts",
+        "matrix_artifact_id",
+        "content_hash"
+      ],
+      "title": "CorrelationMatrix",
+      "type": "object"
+    },
+    "CorrelationRequest": {
+      "additionalProperties": false,
+      "description": "One versioned correlation input policy for a candidate set (R6).",
+      "properties": {
+        "alignment_policy": {
+          "$ref": "#/$defs/AlignmentPolicy"
+        },
+        "candidate_set_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Set Hash",
+          "type": "string"
+        },
+        "frequency": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "member_ids": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Member Ids",
+          "type": "array"
+        },
+        "method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "method_version": {
+          "minimum": 1,
+          "title": "Method Version",
+          "type": "integer"
+        },
+        "minimum_observations": {
+          "minimum": 1,
+          "title": "Minimum Observations",
+          "type": "integer"
+        },
+        "overlap_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "return_definition": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "candidate_set_hash",
+        "member_ids",
+        "return_definition",
+        "frequency",
+        "alignment_policy",
+        "overlap_policy",
+        "minimum_observations",
+        "method",
+        "method_version"
+      ],
+      "title": "CorrelationRequest",
+      "type": "object"
+    },
+    "DomainEvent": {
+      "additionalProperties": false,
+      "description": "Causally linked, ordered cross-boundary event envelope.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "component_instance_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Component Instance Id"
+        },
+        "event_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "title": "Event Type",
+          "type": "string"
+        },
+        "job_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Job Id"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "project_run_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Project Run Id"
+        },
+        "reconciliation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reconciliation Id"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "task_run_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Run Id"
+        }
+      },
+      "required": [
+        "event_id",
+        "sequence",
+        "event_type",
+        "occurred_at",
+        "request_id",
+        "capability_snapshot_id",
+        "payload"
+      ],
+      "title": "DomainEvent",
+      "type": "object"
+    },
+    "EditProjectsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated project graph gateway request.\n\nPROJECT_GRAPH, VALIDATE, and COMPARE require ``project_version_id``;\nCOMPARE additionally requires ``compared_version_id``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "compared_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Compared Version Id"
+        },
+        "operation": {
+          "enum": [
+            "PROJECT_GRAPH",
+            "VALIDATE",
+            "COMPARE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "project_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Project Version Id"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "EditProjectsRequest",
+      "type": "object"
+    },
+    "EditProjectsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful project graph gateway operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "projection": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProjectGraphProjection"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "EditProjectsSuccess",
+      "type": "object"
+    },
+    "EventCursor": {
+      "additionalProperties": false,
+      "description": "Wire projection of an SSE replay cursor position (record R3).\n\n``Last-Event-ID`` reconnect never duplicates an externally visible\ntransition.",
+      "properties": {
+        "last_event_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Last Event Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence_number": {
+          "minimum": 0,
+          "title": "Sequence Number",
+          "type": "integer"
+        },
+        "timestamp": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "last_event_id",
+        "sequence_number",
+        "timestamp"
+      ],
+      "title": "EventCursorWire",
+      "type": "object"
+    },
+    "EventReplayBatch": {
+      "additionalProperties": false,
+      "description": "Wire projection of one SSE replay batch (record R4).\n\nRetention-expired cursors raise ``EVENT_CURSOR_EXPIRED`` and set\n``is_resync_required``.",
+      "properties": {
+        "events": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/DomainEvent"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "has_more": {
+          "default": false,
+          "title": "Has More",
+          "type": "boolean"
+        },
+        "is_resync_required": {
+          "default": false,
+          "title": "Is Resync Required",
+          "type": "boolean"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Next Cursor"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "title": "EventReplayBatchWire",
+      "type": "object"
+    },
+    "ExecutionAuthorityRef": {
+      "additionalProperties": false,
+      "description": "Reference to the selected paper or broker authority (record R11).\n\nCross-authority and cross-environment dispatch is structurally\nimpossible: a paper authority carries only the registered\npaper-execution capability, and a demo/live authority carries only the\nexact Broker session environment.",
+      "properties": {
+        "authority_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Authority Id",
+          "type": "string"
+        },
+        "broker_session_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Broker Session Id"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/TradingModeValue"
+        },
+        "paper_capability": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Paper Capability"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "authority_id",
+        "kind",
+        "paper_capability",
+        "broker_session_id",
+        "generation"
+      ],
+      "title": "ExecutionAuthorityRef",
+      "type": "object"
+    },
+    "ExposureLimit": {
+      "additionalProperties": false,
+      "description": "One declared exposure limit kind with its bound and optional scope.\n\nNested record of ``Allocation`` (R4) and ``PortfolioConstraintSet`` (R5).",
+      "properties": {
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "instrument": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/InstrumentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "kind": {
+          "$ref": "#/$defs/ExposureLimitKind"
+        },
+        "limit": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Limit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "limit"
+      ],
+      "title": "ExposureLimit",
+      "type": "object"
+    },
+    "ExposureLimitKind": {
+      "enum": [
+        "GROSS",
+        "NET",
+        "PER_INSTRUMENT",
+        "PER_CURRENCY",
+        "PER_MARKET",
+        "PER_STRATEGY",
+        "CONCURRENT_POSITIONS"
+      ],
+      "type": "string"
+    },
+    "FeatureState": {
+      "enum": [
+        "DISCOVERED",
+        "DISABLED",
+        "MISSING",
+        "BLOCKED",
+        "PREPARING",
+        "ACTIVE",
+        "QUIESCING",
+        "STOPPING",
+        "STOPPED",
+        "FAILED_IMPORT",
+        "FAILED_CONFIG",
+        "FAILED_START",
+        "FAILED_RUNTIME"
+      ],
+      "type": "string"
+    },
+    "HealthState": {
+      "enum": [
+        "HEALTHY",
+        "DEGRADED",
+        "UNHEALTHY"
+      ],
+      "type": "string"
+    },
+    "IanaTimezone": {
+      "pattern": "^[A-Za-z0-9+\\-_]+(?:/[A-Za-z0-9+\\-_]+)*$",
+      "type": "string"
+    },
+    "InstrumentRef": {
+      "additionalProperties": false,
+      "description": "Reference to one canonical instrument identity.",
+      "properties": {
+        "instrument_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Instrument Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "instrument_id"
+      ],
+      "title": "InstrumentRef",
+      "type": "object"
+    },
+    "InterfaceFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope shared by the five new Interfaces gateways.\n\n``CAPABILITY_UNAVAILABLE`` performs no mutation. All five gateways\nenforce identical authentication, authorization, mode/environment\ngating, validation, idempotency, conflict, event, and audit semantics\nacross HTTP, CLI, MCP, and automation adapters (transport parity).",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/InterfaceFailureCode"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "InterfaceFailure",
+      "type": "object"
+    },
+    "InterfaceFailureCode": {
+      "enum": [
+        "INTERFACE_VALIDATION_FAILED",
+        "VERSION_CONFLICT",
+        "IDEMPOTENCY_CONFLICT",
+        "EVENT_CURSOR_EXPIRED",
+        "JOB_NOT_FOUND",
+        "DURABLE_JOB_NOT_FOUND",
+        "ARTIFACT_ACCESS_DENIED",
+        "API_INCOMPATIBLE",
+        "UPGRADE_REQUIRED",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "KillSwitchScope": {
+      "additionalProperties": false,
+      "description": "One hierarchical kill-switch scope identity.\n\nAn active broader scope dominates narrower clear states; the scope\nhash pins the exact scope identity used by state lookups.",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/KillSwitchScopeKind"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scope Hash",
+          "type": "string"
+        },
+        "scope_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Scope Id",
+          "type": "string"
+        },
+        "scope_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scope Value"
+        }
+      },
+      "required": [
+        "scope_id",
+        "kind",
+        "scope_hash"
+      ],
+      "title": "KillSwitchScope",
+      "type": "object"
+    },
+    "KillSwitchScopeKind": {
+      "enum": [
+        "GLOBAL",
+        "ENVIRONMENT",
+        "BROKER_ACCOUNT",
+        "PORTFOLIO",
+        "STRATEGY",
+        "SYMBOL"
+      ],
+      "type": "string"
+    },
+    "KillSwitchSignalState": {
+      "enum": [
+        "ACTIVE",
+        "CLEARED",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "KillSwitchState": {
+      "additionalProperties": false,
+      "description": "Current kill-switch state for one exact scope.\n\nPreflight and pre-dispatch checks read a known current version for the\nexact scope; active, unknown, stale, unavailable, or version-mismatched\nstate blocks (fail-closed).",
+      "properties": {
+        "last_transition_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Last Transition At",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "$ref": "#/$defs/KillSwitchScope"
+        },
+        "state": {
+          "$ref": "#/$defs/KillSwitchSignalState"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "scope",
+        "version",
+        "state",
+        "reason",
+        "last_transition_at"
+      ],
+      "title": "KillSwitchState",
+      "type": "object"
+    },
+    "MarketStatus": {
+      "enum": [
+        "OPEN",
+        "CLOSED",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "McpOperation": {
+      "additionalProperties": false,
+      "description": "Wire-native MCP tool invocation (record R10).\n\nMCP enforces identical validation, authorization, idempotency, and\naudit as direct API; no raw paths, database access, compilers, or\nplugin credentials cross the adapter.",
+      "properties": {
+        "arguments": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "operation": {
+          "$ref": "#/$defs/McpOperationName"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "operation"
+      ],
+      "title": "McpOperation",
+      "type": "object"
+    },
+    "McpOperationName": {
+      "enum": [
+        "LIST_PROJECTS",
+        "LIST_DATABANKS",
+        "LIST_STRATEGIES",
+        "GET_STRATEGY_STATISTICS",
+        "RUN_PROJECT",
+        "STOP_PROJECT"
+      ],
+      "type": "string"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "Currency-qualified canonical decimal amount.",
+      "properties": {
+        "amount": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "NonNegativeInt": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "OperatePortfoliosRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated portfolio operations gateway request.\n\nVIEW, VALIDATE, and COMPARE require ``portfolio_version_id``; COMPARE\nadditionally requires ``compared_result_id``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "compared_result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Compared Result Id"
+        },
+        "operation": {
+          "enum": [
+            "VIEW",
+            "VALIDATE",
+            "COMPARE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "portfolio_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Portfolio Version Id"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "OperatePortfoliosRequest",
+      "type": "object"
+    },
+    "OperatePortfoliosSuccess": {
+      "additionalProperties": false,
+      "description": "Successful portfolio operations gateway operation result.",
+      "properties": {
+        "issues": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "projection": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioBuilderProjection"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "OperatePortfoliosSuccess",
+      "type": "object"
+    },
+    "OperateResearchRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated research preview gateway request.\n\nPREVIEW requires ``manifest``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "manifest": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResearchManifest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "const": "PREVIEW",
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "OperateResearchRequest",
+      "type": "object"
+    },
+    "OperateResearchSuccess": {
+      "additionalProperties": false,
+      "description": "Successful research preview gateway operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "preview": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResearchPreview"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "OperateResearchSuccess",
+      "type": "object"
+    },
+    "OperateTradingEventSubscription": {
+      "additionalProperties": false,
+      "description": "Owner-required trading operations event stream subscription.\n\nThe subscription is the delivery companion of\n``interfaces.operate-trading@1``: ``resume_event_id`` reconnects after\ninterruption with ordered replay/resync semantics and ``replay_limit``\nbounds buffered replay per FR-IFACE-STREAM_TRADING_EVENTS.",
+      "properties": {
+        "replay_limit": {
+          "default": 0,
+          "maximum": 10000,
+          "minimum": 0,
+          "title": "Replay Limit",
+          "type": "integer"
+        },
+        "resume_event_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resume Event Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "$ref": "#/$defs/TradingEventScope",
+          "default": "ALL"
+        },
+        "session_ref": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Session Ref"
+        }
+      },
+      "title": "OperateTradingEventSubscription",
+      "type": "object"
+    },
+    "OperateTradingRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated trading operations gateway request.\n\nMANAGE_SESSION requires ``session`` and ``mode``; READINESS requires\n``session_ref``; PREVIEW_ACTION requires ``session_ref`` and ``plan``;\nEMERGENCY requires ``reason``, ``scope``, and ``current_version``\n(authenticated role, impact, and separate attestation are required by\nthe delegated Risk/Trading contracts); MARKET_DATA and\nOPERATOR_ANALYTICS carry no operation-specific fields.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "current_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Current Version"
+        },
+        "mode": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingModeValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "MANAGE_SESSION",
+            "READINESS",
+            "PREVIEW_ACTION",
+            "EMERGENCY",
+            "MARKET_DATA",
+            "OPERATOR_ANALYTICS"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradePlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSession"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "session_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSessionRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "OperateTradingRequest",
+      "type": "object"
+    },
+    "OperateTradingSuccess": {
+      "additionalProperties": false,
+      "description": "Successful trading operations gateway operation result.\n\n``session`` is returned for MANAGE_SESSION, ``readiness`` for\nREADINESS, ``preview`` for PREVIEW_ACTION, ``kill_switch`` for\nEMERGENCY, ``market`` for MARKET_DATA, and ``operational_journal``\nwith ``qualification`` for OPERATOR_ANALYTICS.",
+      "properties": {
+        "kill_switch": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/KillSwitchState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "market": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerMarketState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operational_journal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperationalJournalArtifact"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "preview": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingActionPreview"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "qualification": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorQualification"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "readiness": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingReadinessProjection"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradingSession"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "OperateTradingSuccess",
+      "type": "object"
+    },
+    "OperationalJournalArtifact": {
+      "additionalProperties": false,
+      "description": "One immutable derived operational-journal artifact.\n\nJoins immutable Strategy intent/manual plans, Risk decisions, Trading\noperations, annotations, and outcomes using stable identities keyed to\none source-set and policy hash.",
+      "properties": {
+        "annotation_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Annotation Refs",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "intent_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Intent Refs",
+          "type": "array"
+        },
+        "journal_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Journal Id",
+          "type": "string"
+        },
+        "output_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Output Artifact Id",
+          "type": "string"
+        },
+        "policy_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Policy Hash",
+          "type": "string"
+        },
+        "risk_decision_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Risk Decision Refs",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_set_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Set Hash",
+          "type": "string"
+        },
+        "time_basis": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "trading_operation_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Trading Operation Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "journal_id",
+        "source_set_hash",
+        "policy_hash",
+        "time_basis",
+        "output_artifact_id",
+        "content_hash"
+      ],
+      "title": "OperationalJournalArtifact",
+      "type": "object"
+    },
+    "OperatorQualification": {
+      "additionalProperties": false,
+      "description": "One operator qualification decision under a pinned profile version.\n\nSparse or biased evidence samples surface as ``INSUFFICIENT_EVIDENCE``,\nnever as defensible conclusions.",
+      "properties": {
+        "decided_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Decided At",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "outcome": {
+          "enum": [
+            "QUALIFIED",
+            "CONDITIONAL",
+            "NOT_QUALIFIED",
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "principal_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Principal Id",
+          "type": "string"
+        },
+        "profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "profile_version": {
+          "minimum": 1,
+          "title": "Profile Version",
+          "type": "integer"
+        },
+        "qualification_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Qualification Id",
+          "type": "string"
+        },
+        "reviewer_principal_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewer Principal Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "qualification_id",
+        "principal_id",
+        "profile_id",
+        "profile_version",
+        "outcome",
+        "decided_at"
+      ],
+      "title": "OperatorQualification",
+      "type": "object"
+    },
+    "OrderType": {
+      "enum": [
+        "MARKET",
+        "STOP",
+        "LIMIT",
+        "STOP_LIMIT"
+      ],
+      "type": "string"
+    },
+    "OrderedCheck": {
+      "additionalProperties": false,
+      "description": "One governor check at its fixed precedence position.\n\nThis is the inline ``OrderedCheck`` record of\n``RiskDecision.ordered_checks``.",
+      "properties": {
+        "check": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "precedence": {
+          "minimum": 0,
+          "title": "Precedence",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/RiskLimitState"
+        }
+      },
+      "required": [
+        "check",
+        "state",
+        "precedence"
+      ],
+      "title": "OrderedCheck",
+      "type": "object"
+    },
+    "PortSpec": {
+      "additionalProperties": false,
+      "description": "One named typed task port at a declared schema version.",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "minimum": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "schema_version"
+      ],
+      "title": "PortSpec",
+      "type": "object"
+    },
+    "PortfolioBuilderProjection": {
+      "additionalProperties": false,
+      "description": "Wire-native portfolio builder projection (record R13).\n\nEvery transport produces the same portfolio manifests and selected\nresults for the same versioned input.",
+      "properties": {
+        "constituents": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PortfolioMember"
+          },
+          "title": "Constituents",
+          "type": "array"
+        },
+        "constraints": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioConstraintSet"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "correlation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CorrelationMatrix"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "latest_result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PortfolioResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "portfolio_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Portfolio Version Id",
+          "type": "string"
+        },
+        "projection_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Projection Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "validation": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Validation",
+          "type": "array"
+        }
+      },
+      "required": [
+        "projection_id",
+        "portfolio_version_id"
+      ],
+      "title": "PortfolioBuilderProjection",
+      "type": "object"
+    },
+    "PortfolioConstraintSet": {
+      "additionalProperties": false,
+      "description": "One declared portfolio constraint set (R5).\n\nBreaches are prevented or resolved deterministically by the owning\nfeature; the record only freezes the declared limits.",
+      "properties": {
+        "constraint_set_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Constraint Set Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "custom_constraints": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "exposure_limits": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ExposureLimit"
+          },
+          "title": "Exposure Limits",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "constraint_set_id",
+        "content_hash"
+      ],
+      "title": "PortfolioConstraintSet",
+      "type": "object"
+    },
+    "PortfolioMember": {
+      "additionalProperties": false,
+      "description": "One constituent strategy version of a portfolio version (R3).\n\nAdmission validates date overlap, result compatibility, required\ncurrencies, duplicate exposure, and constituent availability.",
+      "properties": {
+        "data_manifest_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Manifest Id"
+        },
+        "member_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Member Id",
+          "type": "string"
+        },
+        "result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sizing_rule": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weight"
+        }
+      },
+      "required": [
+        "member_id",
+        "strategy_version_id"
+      ],
+      "title": "PortfolioMember",
+      "type": "object"
+    },
+    "PortfolioResult": {
+      "additionalProperties": false,
+      "description": "One aggregate portfolio simulation result (R9).\n\nAggregate totals reconcile to constituents; ``.sqxpf`` export preserves\nidentities, policies, metrics, and artifacts and reproduces the\ncanonical portfolio hash on round-trip.",
+      "properties": {
+        "aggregate_trades_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Aggregate Trades Artifact Id",
+          "type": "string"
+        },
+        "cashflow_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Cashflow Artifact Id",
+          "type": "string"
+        },
+        "constituent_attribution_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Constituent Attribution Artifact Id",
+          "type": "string"
+        },
+        "constraint_events_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Constraint Events Artifact Id"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "correlation_matrix_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Correlation Matrix Id"
+        },
+        "daily_returns_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Daily Returns Artifact Id",
+          "type": "string"
+        },
+        "equity_drawdown_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Equity Drawdown Artifact Id",
+          "type": "string"
+        },
+        "exposure_timeline_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Exposure Timeline Artifact Id",
+          "type": "string"
+        },
+        "manifest_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Manifest Id",
+          "type": "string"
+        },
+        "portfolio_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Portfolio Version Id",
+          "type": "string"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "turnover": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "result_id",
+        "portfolio_version_id",
+        "manifest_id",
+        "aggregate_trades_artifact_id",
+        "cashflow_artifact_id",
+        "equity_drawdown_artifact_id",
+        "exposure_timeline_artifact_id",
+        "constituent_attribution_artifact_id",
+        "turnover",
+        "daily_returns_artifact_id",
+        "content_hash"
+      ],
+      "title": "PortfolioResult",
+      "type": "object"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "ProjectExpression": {
+      "additionalProperties": false,
+      "description": "One sandboxed deterministic project expression.\n\nConditions run over declared task results, counters, and variables only;\nfilesystem, network, clock, and undeclared access are impossible by\nconstruction in the owning runtime, not by this wire record.",
+      "properties": {
+        "expression": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "expression_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Expression Id",
+          "type": "string"
+        },
+        "language_version": {
+          "minimum": 1,
+          "title": "Language Version",
+          "type": "integer"
+        },
+        "referenced_outputs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Referenced Outputs",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "expression_id",
+        "expression",
+        "language_version"
+      ],
+      "title": "ProjectExpression",
+      "type": "object"
+    },
+    "ProjectGraph": {
+      "additionalProperties": false,
+      "description": "One immutable executable task graph.\n\nDomain assumptions: ``task_key`` values identify tasks uniquely inside\none graph, every transition endpoint must reference a declared task key,\nand every transition lying on a directed cycle must carry an explicit\n``cycle_bound`` so no reachable cycle is unbounded. ``GOTO`` and\n``STOP_AND_START`` compile to explicit bounded transitions at runtime.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "graph_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Graph Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "tasks": {
+          "items": {
+            "$ref": "#/$defs/TaskDefinition"
+          },
+          "minItems": 1,
+          "title": "Tasks",
+          "type": "array"
+        },
+        "transitions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/TransitionEdge"
+          },
+          "title": "Transitions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "graph_id",
+        "tasks",
+        "content_hash"
+      ],
+      "title": "ProjectGraph",
+      "type": "object"
+    },
+    "ProjectGraphProjection": {
+      "additionalProperties": false,
+      "description": "Wire-native project graph visualization projection (record R12).\n\nA version rejected by the authoritative server validator carries its\nissues and cannot be published through any transport.",
+      "properties": {
+        "added_task_keys": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Added Task Keys",
+          "type": "array"
+        },
+        "changed_task_keys": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Changed Task Keys",
+          "type": "array"
+        },
+        "compared_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Compared Version Id"
+        },
+        "graph": {
+          "$ref": "#/$defs/ProjectGraph"
+        },
+        "has_bounded_cycles": {
+          "title": "Has Bounded Cycles",
+          "type": "boolean"
+        },
+        "ordered_task_keys": {
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "minItems": 1,
+          "title": "Ordered Task Keys",
+          "type": "array"
+        },
+        "project_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Project Version Id",
+          "type": "string"
+        },
+        "projection_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Projection Id",
+          "type": "string"
+        },
+        "removed_task_keys": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Removed Task Keys",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "validation": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Validation",
+          "type": "array"
+        }
+      },
+      "required": [
+        "projection_id",
+        "project_version_id",
+        "graph",
+        "ordered_task_keys",
+        "has_bounded_cycles"
+      ],
+      "title": "ProjectGraphProjection",
+      "type": "object"
+    },
+    "ProposedAction": {
+      "additionalProperties": false,
+      "description": "One complete immutable proposed action bound for admission.\n\n``intent`` embeds the complete Strategy intent or Trading manual plan\nunchanged; Risk adds scope, valuation, stop, route, evidence, and the\nrequested risk profile without altering it.",
+      "properties": {
+        "account_scope": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Account Scope",
+          "type": "array"
+        },
+        "action_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Action Id",
+          "type": "string"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RiskEvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "intent": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "portfolio_scope": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Portfolio Scope",
+          "type": "array"
+        },
+        "requested_profile": {
+          "$ref": "#/$defs/RiskProfileRef"
+        },
+        "route_profile": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "stop": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valuation": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "action_id",
+        "intent",
+        "account_scope",
+        "portfolio_scope",
+        "valuation",
+        "stop",
+        "route_profile",
+        "requested_profile"
+      ],
+      "title": "ProposedAction",
+      "type": "object"
+    },
+    "ProtectionSet": {
+      "additionalProperties": false,
+      "description": "One versioned set of owned protective orders (record R19).\n\nProtections bind an exact entry/order/position identity and never\nattach to another strategy or manual action; protected quantity never\nexceeds live residual quantity. Uniqueness\n``(owner_identity, version)`` spans records and is store-enforced.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "owner_identity": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "owner_kind": {
+          "enum": [
+            "STRATEGY",
+            "MANUAL",
+            "ATM"
+          ],
+          "title": "Owner Kind",
+          "type": "string"
+        },
+        "plan_version": {
+          "minimum": 1,
+          "title": "Plan Version",
+          "type": "integer"
+        },
+        "protections": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProtectionSpec"
+          },
+          "title": "Protections",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "owner_identity",
+        "version",
+        "owner_kind",
+        "plan_version",
+        "content_hash"
+      ],
+      "title": "ProtectionSet",
+      "type": "object"
+    },
+    "ProtectionSpec": {
+      "additionalProperties": false,
+      "description": "One protective-order specification inside a protection set (R19).\n\nInline nested record of ``ProtectionSet.protections``; not a numbered\npublic record itself.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "STOP",
+            "TARGET",
+            "TRAILING",
+            "BREAKEVEN",
+            "PARTIAL_EXIT"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "parameters": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "quantity_scope": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Quantity Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "quantity_scope",
+        "parameters"
+      ],
+      "title": "ProtectionSpec",
+      "type": "object"
+    },
+    "ResearchBudget": {
+      "additionalProperties": false,
+      "description": "Bound set enforced by research budget governance.\n\nPublic record R18, defined ahead of the table order because\n``ResearchManifest`` (R2) embeds it; every bound left ``None`` is\nunbounded, and bound exhaustion is a runtime policy, not a record rule.",
+      "properties": {
+        "budget_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Budget Id",
+          "type": "string"
+        },
+        "max_artifact_storage_mb": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Artifact Storage Mb"
+        },
+        "max_candidates": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Candidates"
+        },
+        "max_cpu_seconds": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Cpu Seconds"
+        },
+        "max_elapsed_seconds": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Elapsed Seconds"
+        },
+        "max_evaluations": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Evaluations"
+        },
+        "max_memory_mb": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Memory Mb"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "budget_id"
+      ],
+      "title": "ResearchBudget",
+      "type": "object"
+    },
+    "ResearchManifest": {
+      "additionalProperties": false,
+      "description": "Immutable pinned inputs of one research execution request (R2).\n\nEquivalent requests from every entry point produce one manifest\n``content_hash``; the approved preview hash must match at admission.",
+      "properties": {
+        "budgets": {
+          "$ref": "#/$defs/ResearchBudget"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "estimated_resource_use": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "inputs": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "manifest_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Manifest Id",
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "method_version": {
+          "minimum": 1,
+          "title": "Method Version",
+          "type": "integer"
+        },
+        "run_manifest_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Run Manifest Ids",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "seed_set": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Seed Set",
+          "type": "array"
+        }
+      },
+      "required": [
+        "manifest_id",
+        "method",
+        "method_version",
+        "capability_snapshot_id",
+        "inputs",
+        "budgets",
+        "content_hash"
+      ],
+      "title": "ResearchManifest",
+      "type": "object"
+    },
+    "ResearchPreview": {
+      "additionalProperties": false,
+      "description": "Wire-native research preview and admission envelope (record R11).\n\nAdmission must supply the approved ``manifest_hash``; a mismatch or\nany ``unbounded_domains`` member blocks launch.",
+      "properties": {
+        "estimated_evaluations": {
+          "minimum": 0,
+          "title": "Estimated Evaluations",
+          "type": "integer"
+        },
+        "manifest_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Manifest Hash",
+          "type": "string"
+        },
+        "preview_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Preview Id",
+          "type": "string"
+        },
+        "resolved_manifest": {
+          "$ref": "#/$defs/ResearchManifest"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "unbounded_domains": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Unbounded Domains",
+          "type": "array"
+        },
+        "warnings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "preview_id",
+        "resolved_manifest",
+        "estimated_evaluations",
+        "manifest_hash"
+      ],
+      "title": "ResearchPreview",
+      "type": "object"
+    },
+    "RiskDecision": {
+      "additionalProperties": false,
+      "description": "Canonical governor decision package for one proposed action.\n\nThe governor evaluates kill switch, evidence/profile validity,\neligibility, session/news/regime constraints, stop, size,\nportfolio/market limits, allocation budget, approval policy, and\ncapability availability in a fixed documented precedence; earlier\nblocking reasons cannot be masked by later approvals.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ProposedAction"
+        },
+        "allowed_action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "as_of": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "As Of",
+          "type": "string"
+        },
+        "authorization_requirement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "composite_reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Composite Reasons",
+          "type": "array"
+        },
+        "concurrency_disclosure": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "configuration_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Configuration Hash",
+          "type": "string"
+        },
+        "correlation_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Correlation Id"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "mandate_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Mandate Version Id"
+        },
+        "maximum_size": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum Size"
+        },
+        "ordered_checks": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/OrderedCheck"
+          },
+          "title": "Ordered Checks",
+          "type": "array"
+        },
+        "primary_reason": {
+          "title": "Primary Reason",
+          "type": "string"
+        },
+        "profile_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Version Id",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "verdict": {
+          "$ref": "#/$defs/RuntimeRiskDecision"
+        },
+        "workflow_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Workflow Id"
+        }
+      },
+      "required": [
+        "decision_id",
+        "action",
+        "verdict",
+        "primary_reason",
+        "expires_at",
+        "profile_version_id",
+        "mandate_version_id",
+        "configuration_hash",
+        "as_of",
+        "request_id",
+        "workflow_id",
+        "correlation_id"
+      ],
+      "title": "RiskDecision",
+      "type": "object"
+    },
+    "RiskEvidenceFreshness": {
+      "enum": [
+        "FRESH",
+        "STALE",
+        "MISSING"
+      ],
+      "type": "string"
+    },
+    "RiskEvidenceRef": {
+      "additionalProperties": false,
+      "description": "Reference to one consumed cross-owner source-evidence record.\n\nOwner schema, identity, UTC time, freshness, coverage, provenance,\nexplicit missingness, and exact units are validated without redefining\nthe source record itself.",
+      "properties": {
+        "evidence_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "freshness": {
+          "$ref": "#/$defs/RiskEvidenceFreshness"
+        },
+        "missingness": {
+          "default": "",
+          "title": "Missingness",
+          "type": "string"
+        },
+        "observed_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Hash",
+          "type": "string"
+        },
+        "source_owner": {
+          "$ref": "#/$defs/RiskEvidenceSourceOwner"
+        },
+        "source_record_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Source Record Id",
+          "type": "string"
+        },
+        "units": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "source_owner",
+        "source_record_id",
+        "source_hash",
+        "observed_at",
+        "freshness",
+        "units"
+      ],
+      "title": "RiskEvidenceRef",
+      "type": "object"
+    },
+    "RiskEvidenceSourceOwner": {
+      "enum": [
+        "ACCOUNT",
+        "FX",
+        "MARKET",
+        "NEWS",
+        "SESSION",
+        "STRATEGY",
+        "BROKER",
+        "PORTFOLIO"
+      ],
+      "type": "string"
+    },
+    "RiskLimitResult": {
+      "additionalProperties": false,
+      "description": "One evaluated limit with its precedence-ordered state.\n\n``(decision_id, precedence)`` uniqueness is enforced by the owning\nstore because it spans multiple result rows.",
+      "properties": {
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "limit_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "observed": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Observed"
+        },
+        "precedence": {
+          "minimum": 0,
+          "title": "Precedence",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/RiskLimitState"
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Threshold"
+        },
+        "unit": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "decision_id",
+        "limit_key",
+        "state",
+        "precedence",
+        "observed",
+        "threshold",
+        "unit"
+      ],
+      "title": "RiskLimitResult",
+      "type": "object"
+    },
+    "RiskLimitState": {
+      "enum": [
+        "PASS",
+        "WARN",
+        "MISSING",
+        "FAIL",
+        "BLOCKED"
+      ],
+      "type": "string"
+    },
+    "RiskProfileRef": {
+      "additionalProperties": false,
+      "description": "Reference to one risk profile identity.",
+      "properties": {
+        "profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profile_id"
+      ],
+      "title": "RiskProfileRef",
+      "type": "object"
+    },
+    "RiskSnapshot": {
+      "additionalProperties": false,
+      "description": "Immutable portfolio/account risk snapshot for one decision.\n\nPending, open, and reserved exposure are always carried explicitly and\nnever silently excluded; ``duplicate_treatment`` discloses the\ndeterministic duplicate and in-flight treatment used.",
+      "properties": {
+        "as_of": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "As Of",
+          "type": "string"
+        },
+        "base_currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Base Currency",
+          "type": "string"
+        },
+        "correlation_contribution": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "daily_loss": {
+          "$ref": "#/$defs/Money"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "dimensional_exposure": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "drawdown": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Drawdown",
+          "type": "string"
+        },
+        "duplicate_treatment": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "equity": {
+          "$ref": "#/$defs/Money"
+        },
+        "gross_exposure": {
+          "$ref": "#/$defs/Money"
+        },
+        "historical_tail_risk": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "leverage": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Leverage"
+        },
+        "limit_results": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RiskLimitResult"
+          },
+          "title": "Limit Results",
+          "type": "array"
+        },
+        "margin": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "net_exposure": {
+          "$ref": "#/$defs/Money"
+        },
+        "open_position_exposure": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "pending_order_exposure": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "reserved_exposure": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "total_loss": {
+          "$ref": "#/$defs/Money"
+        },
+        "volatility_contribution": {
+          "$ref": "#/$defs/JsonObject"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "decision_id",
+        "as_of",
+        "base_currency",
+        "equity",
+        "daily_loss",
+        "total_loss",
+        "drawdown",
+        "gross_exposure",
+        "net_exposure",
+        "dimensional_exposure",
+        "margin",
+        "leverage",
+        "historical_tail_risk",
+        "volatility_contribution",
+        "correlation_contribution",
+        "pending_order_exposure",
+        "open_position_exposure",
+        "reserved_exposure",
+        "duplicate_treatment"
+      ],
+      "title": "RiskSnapshot",
+      "type": "object"
+    },
+    "RuntimeRiskDecision": {
+      "enum": [
+        "APPROVE",
+        "WARN",
+        "NEEDS_APPROVAL",
+        "NEEDS_MORE_EVIDENCE",
+        "REJECT",
+        "BLOCK",
+        "ERROR"
+      ],
+      "type": "string"
+    },
+    "Side": {
+      "enum": [
+        "BUY",
+        "SELL"
+      ],
+      "type": "string"
+    },
+    "TaskContract": {
+      "additionalProperties": false,
+      "description": "Declared execution contract for one task type.",
+      "properties": {
+        "cancellation_behavior": {
+          "enum": [
+            "COOPERATIVE",
+            "IMMEDIATE",
+            "NONE"
+          ],
+          "title": "Cancellation Behavior",
+          "type": "string"
+        },
+        "contract_version": {
+          "minimum": 1,
+          "title": "Contract Version",
+          "type": "integer"
+        },
+        "input_ports": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PortSpec"
+          },
+          "title": "Input Ports",
+          "type": "array"
+        },
+        "output_ports": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PortSpec"
+          },
+          "title": "Output Ports",
+          "type": "array"
+        },
+        "permissions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "required_capabilities": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Required Capabilities",
+          "type": "array"
+        },
+        "resource_estimator": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "supports_checkpoint": {
+          "title": "Supports Checkpoint",
+          "type": "boolean"
+        },
+        "task_type": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "task_type",
+        "contract_version",
+        "supports_checkpoint",
+        "cancellation_behavior",
+        "resource_estimator"
+      ],
+      "title": "TaskContract",
+      "type": "object"
+    },
+    "TaskDefinition": {
+      "additionalProperties": false,
+      "description": "One task instance inside a project graph.",
+      "properties": {
+        "contract": {
+          "$ref": "#/$defs/TaskContract"
+        },
+        "resource_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Resource Refs",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "settings": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "task_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "task_type": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "task_key",
+        "task_type",
+        "settings",
+        "contract"
+      ],
+      "title": "TaskDefinition",
+      "type": "object"
+    },
+    "TimeInForce": {
+      "enum": [
+        "GTC",
+        "DAY",
+        "IOC",
+        "FOK"
+      ],
+      "type": "string"
+    },
+    "TradeIntentRef": {
+      "additionalProperties": false,
+      "description": "Reference to one exact Strategy intent or manual order (record R8).\n\nManual actions carry authenticated principal, reason, source interface,\nrequest/correlation IDs, and explicit discretionary identity; they\ncannot masquerade as Strategy signals.",
+      "properties": {
+        "intent_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Intent Hash",
+          "type": "string"
+        },
+        "intent_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Intent Id",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "STRATEGY_INTENT",
+            "MANUAL_ORDER"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Strategy Version Id"
+        }
+      },
+      "required": [
+        "intent_id",
+        "origin",
+        "strategy_version_id",
+        "intent_hash"
+      ],
+      "title": "TradeIntentRef",
+      "type": "object"
+    },
+    "TradePlan": {
+      "additionalProperties": false,
+      "description": "One validated immutable trade plan (record R9).\n\nAmbiguous or mutable inputs reject before Risk review; the plan hash\npins the exact normalized content.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "entry": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "evidence_version_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Evidence Version Ids",
+          "type": "array"
+        },
+        "instrument": {
+          "$ref": "#/$defs/InstrumentRef"
+        },
+        "intent": {
+          "$ref": "#/$defs/TradeIntentRef"
+        },
+        "order_type": {
+          "$ref": "#/$defs/OrderType"
+        },
+        "plan_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "protection": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProtectionSet"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quantity_method": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "route": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "side": {
+          "$ref": "#/$defs/Side"
+        },
+        "time_in_force": {
+          "$ref": "#/$defs/TimeInForce"
+        }
+      },
+      "required": [
+        "plan_id",
+        "intent",
+        "instrument",
+        "side",
+        "order_type",
+        "quantity_method",
+        "entry",
+        "protection",
+        "time_in_force",
+        "route",
+        "session_id",
+        "content_hash"
+      ],
+      "title": "TradePlan",
+      "type": "object"
+    },
+    "TradingActionKind": {
+      "enum": [
+        "ORDER",
+        "CANCEL",
+        "MODIFY",
+        "CLOSE",
+        "FLATTEN",
+        "HOLD",
+        "PROTECTION"
+      ],
+      "type": "string"
+    },
+    "TradingActionPreview": {
+      "additionalProperties": false,
+      "description": "Wire-native governed trading action preview (record R15).\n\nCommit must supply the matching ``preview_hash``; scope or preview\ndrift requires reconfirmation and no adapter is called directly.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/TradingActionKind"
+        },
+        "affected_orders": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Affected Orders",
+          "type": "array"
+        },
+        "affected_positions": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Affected Positions",
+          "type": "array"
+        },
+        "authority": {
+          "$ref": "#/$defs/ExecutionAuthorityRef"
+        },
+        "environment": {
+          "$ref": "#/$defs/TradingModeValue"
+        },
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "normalized_plan": {
+          "$ref": "#/$defs/TradePlan"
+        },
+        "preview_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Preview Hash",
+          "type": "string"
+        },
+        "preview_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Preview Id",
+          "type": "string"
+        },
+        "risk_result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskDecision"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "preview_id",
+        "action",
+        "normalized_plan",
+        "authority",
+        "environment",
+        "idempotency_key",
+        "preview_hash"
+      ],
+      "title": "TradingActionPreview",
+      "type": "object"
+    },
+    "TradingEventScope": {
+      "enum": [
+        "TRADING",
+        "RISK",
+        "BROKER",
+        "ALL"
+      ],
+      "type": "string"
+    },
+    "TradingModeValue": {
+      "enum": [
+        "PAPER",
+        "DEMO",
+        "LIVE"
+      ],
+      "type": "string"
+    },
+    "TradingReadinessProjection": {
+      "additionalProperties": false,
+      "description": "Wire-native trading readiness projection (record R16).\n\nStale, unknown, or degraded state is explicit and machine-readable so\nconsumers can block unsafe commands; cached state is never presented\nas authority.",
+      "properties": {
+        "account": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerAccountSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "authority": {
+          "$ref": "#/$defs/ExecutionAuthorityRef"
+        },
+        "critical_findings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Critical Findings",
+          "type": "array"
+        },
+        "environment": {
+          "$ref": "#/$defs/TradingModeValue"
+        },
+        "freshness_observed_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Freshness Observed At"
+        },
+        "is_stale": {
+          "title": "Is Stale",
+          "type": "boolean"
+        },
+        "market": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BrokerMarketState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "open_orders": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Open Orders",
+          "type": "array"
+        },
+        "permissions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "positions": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Positions",
+          "type": "array"
+        },
+        "projection_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Projection Id",
+          "type": "string"
+        },
+        "protections": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Protections",
+          "type": "array"
+        },
+        "reconciliation_clean": {
+          "title": "Reconciliation Clean",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_generation": {
+          "minimum": 1,
+          "title": "Session Generation",
+          "type": "integer"
+        },
+        "session_ref": {
+          "$ref": "#/$defs/TradingSessionRef"
+        },
+        "session_state": {
+          "$ref": "#/$defs/TradingSessionStateValue"
+        }
+      },
+      "required": [
+        "projection_id",
+        "session_ref",
+        "session_generation",
+        "session_state",
+        "environment",
+        "authority",
+        "reconciliation_clean",
+        "is_stale"
+      ],
+      "title": "TradingReadinessProjection",
+      "type": "object"
+    },
+    "TradingSession": {
+      "additionalProperties": false,
+      "description": "One durable trading session binding (record R3).\n\nBindings are immutable while active; changes create a new session\nversion. Uniqueness ``(session_id, generation)`` is enforced by the\nowning store because it spans multiple session records.",
+      "properties": {
+        "account_authority_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "archived_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Archived At"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "generation": {
+          "minimum": 1,
+          "title": "Generation",
+          "type": "integer"
+        },
+        "mode": {
+          "$ref": "#/$defs/TradingModeValue"
+        },
+        "opening_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "risk_profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Risk Profile Id",
+          "type": "string"
+        },
+        "route_profile_version": {
+          "minimum": 1,
+          "title": "Route Profile Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "started_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Started At"
+        },
+        "stopped_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stopped At"
+        }
+      },
+      "required": [
+        "session_id",
+        "mode",
+        "account_authority_ref",
+        "route_profile_version",
+        "capability_snapshot_id",
+        "risk_profile_id",
+        "created_at",
+        "generation"
+      ],
+      "title": "TradingSession",
+      "type": "object"
+    },
+    "TradingSessionRef": {
+      "additionalProperties": false,
+      "description": "Reference to one durable trading session and its explicit mode.",
+      "properties": {
+        "mode": {
+          "$ref": "#/$defs/TradingModeValue"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Session Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_id",
+        "mode"
+      ],
+      "title": "TradingSessionRef",
+      "type": "object"
+    },
+    "TradingSessionStateValue": {
+      "enum": [
+        "CREATED",
+        "STARTING",
+        "ACTIVE",
+        "DEGRADED",
+        "STOPPING",
+        "STOPPED",
+        "ARCHIVED"
+      ],
+      "type": "string"
+    },
+    "TransitionEdge": {
+      "additionalProperties": false,
+      "description": "One transition between two task keys of a project graph.",
+      "properties": {
+        "condition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProjectExpression"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "cycle_bound": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "from_task_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "kind": {
+          "default": "ORDERED",
+          "enum": [
+            "ORDERED",
+            "BRANCH",
+            "LOOP",
+            "GOTO",
+            "STOP_AND_START"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "to_task_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "from_task_key",
+        "to_task_key"
+      ],
+      "title": "TransitionEdge",
+      "type": "object"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {},
+  "failures": {
+    "InterfaceFailure": {
+      "$ref": "#/$defs/InterfaceFailure"
+    }
+  },
+  "models": {
+    "AdministerCapabilitiesRequest": {
+      "$ref": "#/$defs/AdministerCapabilitiesRequest"
+    },
+    "AdministerCapabilitiesSuccess": {
+      "$ref": "#/$defs/AdministerCapabilitiesSuccess"
+    },
+    "ApiVersion": {
+      "$ref": "#/$defs/ApiVersion"
+    },
+    "ArtifactDownloadRequest": {
+      "$ref": "#/$defs/ArtifactDownloadRequest"
+    },
+    "AsyncJobRef": {
+      "$ref": "#/$defs/AsyncJobRef"
+    },
+    "AutomationCommand": {
+      "$ref": "#/$defs/AutomationCommand"
+    },
+    "AutomationSchema": {
+      "$ref": "#/$defs/AutomationSchema"
+    },
+    "BulkRequestToken": {
+      "$ref": "#/$defs/BulkRequestToken"
+    },
+    "CapabilityAdministrationProjection": {
+      "$ref": "#/$defs/CapabilityAdministrationProjection"
+    },
+    "ConcurrencyToken": {
+      "$ref": "#/$defs/ConcurrencyToken"
+    },
+    "EditProjectsRequest": {
+      "$ref": "#/$defs/EditProjectsRequest"
+    },
+    "EditProjectsSuccess": {
+      "$ref": "#/$defs/EditProjectsSuccess"
+    },
+    "EventCursor": {
+      "$ref": "#/$defs/EventCursor"
+    },
+    "EventReplayBatch": {
+      "$ref": "#/$defs/EventReplayBatch"
+    },
+    "McpOperation": {
+      "$ref": "#/$defs/McpOperation"
+    },
+    "OperatePortfoliosRequest": {
+      "$ref": "#/$defs/OperatePortfoliosRequest"
+    },
+    "OperatePortfoliosSuccess": {
+      "$ref": "#/$defs/OperatePortfoliosSuccess"
+    },
+    "OperateResearchRequest": {
+      "$ref": "#/$defs/OperateResearchRequest"
+    },
+    "OperateResearchSuccess": {
+      "$ref": "#/$defs/OperateResearchSuccess"
+    },
+    "OperateTradingEventSubscription": {
+      "$ref": "#/$defs/OperateTradingEventSubscription"
+    },
+    "OperateTradingRequest": {
+      "$ref": "#/$defs/OperateTradingRequest"
+    },
+    "OperateTradingSuccess": {
+      "$ref": "#/$defs/OperateTradingSuccess"
+    },
+    "PortfolioBuilderProjection": {
+      "$ref": "#/$defs/PortfolioBuilderProjection"
+    },
+    "ProjectGraphProjection": {
+      "$ref": "#/$defs/ProjectGraphProjection"
+    },
+    "ResearchPreview": {
+      "$ref": "#/$defs/ResearchPreview"
+    },
+    "TradingActionPreview": {
+      "$ref": "#/$defs/TradingActionPreview"
+    },
+    "TradingReadinessProjection": {
+      "$ref": "#/$defs/TradingReadinessProjection"
+    }
+  },
+  "namespace": "interfaces",
+  "schema_version": 1,
+  "title": "interfaces wire contracts v1"
+}

@@ -1,1 +1,0 @@
-"""Api contract definitions."""

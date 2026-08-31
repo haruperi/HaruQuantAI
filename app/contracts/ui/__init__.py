@@ -1,1 +1,1 @@
-"""Ui contract definitions."""
+"""UI domain contract models, ports, and capability keys."""

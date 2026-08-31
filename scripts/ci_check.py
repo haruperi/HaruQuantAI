@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 """CI check script for HaruQuantAI.
 
-Runs Ruff format check, Ruff check, mypy, and pytest in sequence.
+Runs Ruff format check, Ruff lint check, Mypy type check, Import Linter,
+Architectural AST Invariants, and Pytest with coverage.
 """
 
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 
 def run_command(command: list[str], name: str) -> bool:
@@ -25,7 +27,6 @@ def run_command(command: list[str], name: str) -> bool:
     print("========================================\n")
 
     start_time = time.time()
-    # On Windows, we run commands via uv run
     full_command = ["uv", "run", *command]
     result = subprocess.run(full_command, capture_output=False, check=False)
     elapsed = time.time() - start_time
@@ -43,42 +44,24 @@ def run_command(command: list[str], name: str) -> bool:
 
 def main() -> None:
     """Run all CI check steps."""
-    steps = [
+    steps: list[tuple[list[str], str]] = [
         (["ruff", "format", "--check", "."], "Ruff Format Check"),
         (["ruff", "check", "."], "Ruff Lint Check"),
-        (["mypy", "."], "Mypy Type Check"),
+        (["mypy"], "Mypy Type Check"),
+        (["pytest", "--no-cov", ".agents/tests"], "Workflow Controller Tests"),
         (
-            [
-                "python",
-                "scripts/architecture/enforce_provider_boundaries.py",
-                "--root",
-                ".",
-                "--matrix",
-                "docs/dev/plugin-decoupling/audit/removability_matrix.json",
-            ],
-            "Provider Architecture Boundaries",
+            ["python", ".agents/orchestrator.py", "self-test"],
+            "Workflow Controller Self Test",
         ),
+        (["lint-imports"], "Import Linter Check"),
         (
-            [
-                "python",
-                "scripts/architecture/enforce_provider_manifests.py",
-                "--root",
-                ".",
-                "--matrix",
-                "docs/dev/plugin-decoupling/audit/removability_matrix.json",
-            ],
-            "Provider Manifests & Graph",
+            ["python", "scripts/generate_contracts.py", "--check"],
+            "Contract Generation Check",
         ),
+        (["python", "scripts/architecture_check.py"], "Architectural AST Check"),
         (
-            [
-                "python",
-                "scripts/architecture/enforce_provider_evidence.py",
-                "--root",
-                ".",
-                "--matrix",
-                "docs/dev/plugin-decoupling/audit/removability_matrix.json",
-            ],
-            "Provider Removability Evidence",
+            ["python", "scripts/validate_feature_docs.py"],
+            "Feature Documentation Check",
         ),
         (
             [
@@ -92,6 +75,39 @@ def main() -> None:
         ),
     ]
 
+    # Optional architecture checks when matrices are present
+    matrix_path = Path("docs/dev/plugin-decoupling/audit/removability_matrix.json")
+    if matrix_path.exists():
+        arch_scripts = [
+            (
+                "scripts/architecture/enforce_provider_boundaries.py",
+                "Provider Architecture Boundaries",
+            ),
+            (
+                "scripts/architecture/enforce_provider_manifests.py",
+                "Provider Manifests & Graph",
+            ),
+            (
+                "scripts/architecture/enforce_provider_evidence.py",
+                "Provider Removability Evidence",
+            ),
+        ]
+        for script_path, step_name in arch_scripts:
+            if Path(script_path).exists():
+                steps.append(
+                    (
+                        [
+                            "python",
+                            script_path,
+                            "--root",
+                            ".",
+                            "--matrix",
+                            str(matrix_path),
+                        ],
+                        step_name,
+                    )
+                )
+
     for command, name in steps:
         success = run_command(command, name)
         if not success:
@@ -100,7 +116,6 @@ def main() -> None:
     print("========================================")
     print("[SUCCESS] All quality gates passed!")
     print("========================================\n")
-    sys.exit(0)
 
 
 if __name__ == "__main__":

@@ -1,1 +1,1 @@
-"""Research contract definitions."""
+"""Public wire contracts for the Research domain."""

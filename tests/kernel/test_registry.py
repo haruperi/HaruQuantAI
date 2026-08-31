@@ -1,156 +1,270 @@
-"""Unit tests for provider inventory builder and indexing.
-
-Traces to: P4-T04, Gate G4
-"""
-
-from __future__ import annotations
-
-from pathlib import Path
+"""Tests for ServiceRegistry capability registration, generations, and exact-token revocation."""
 
 import pytest
-from app.kernel.discovery import DiscoveredProvider
-from app.kernel.errors import ResolutionError
-from app.kernel.identifiers import CapabilityId, ProviderId
-from app.kernel.manifests import load_manifest
-from app.kernel.registry import build_inventory
+from app.kernel.capability import CapabilityUnavailableError
+from app.kernel.registry import (
+    BindingToken,
+    CapabilityAlreadyBoundError,
+    ServiceRegistry,
+)
+from app.kernel.scope import FeatureScope
 
-_MANIFEST_RSI_1 = """
-[provider]
-id = "indicator.rsi.default"
-version = "1.0.0"
-entry_point = "mod:factory"
-
-[[provides]]
-capability_id = "indicator.rsi.v1"
-contract_version = "1.0.0"
-cardinality = "many"
-
-[runtime]
-profiles = ["research"]
-scopes = ["process"]
-effect_classes = ["reversible_ephemeral"]
-lifecycle = "pure"
-reload = "config_restart"
-"""
-
-_MANIFEST_RSI_2 = """
-[provider]
-id = "indicator.rsi.fast"
-version = "1.1.0"
-entry_point = "mod:factory"
-
-[[provides]]
-capability_id = "indicator.rsi.v1"
-contract_version = "1.0.0"
-cardinality = "many"
-
-[runtime]
-profiles = ["research"]
-scopes = ["process"]
-effect_classes = ["reversible_ephemeral"]
-lifecycle = "pure"
-reload = "config_restart"
-"""
-
-_MANIFEST_WILLIAMS = """
-[provider]
-id = "indicator.williams_r.default"
-version = "1.0.0"
-entry_point = "mod:factory"
-
-[[provides]]
-capability_id = "indicator.williams_r.v1"
-contract_version = "1.0.0"
-cardinality = "many"
-
-[runtime]
-profiles = ["research"]
-scopes = ["process"]
-effect_classes = ["reversible_ephemeral"]
-lifecycle = "pure"
-reload = "config_restart"
-"""
+from tests._support.composability import (
+    CONSUMER_CAPABILITY,
+    PROVIDER_CAPABILITY,
+    ROOT_CAPABILITY,
+)
 
 
-def test_build_inventory_empty() -> None:
-    """Verify empty discovered providers produces empty immutable inventory."""
-    inv = build_inventory(())
-    assert inv.providers == ()
-    assert len(inv.by_provider) == 0
-    assert len(inv.by_capability) == 0
+def test_registry_register_and_resolve() -> None:
+    """Test registering and resolving capability providers."""
+    registry = ServiceRegistry()
+    dummy_service = object()
 
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+    assert not registry.is_available(CONSUMER_CAPABILITY.identifier)
+    assert registry.resolve(CONSUMER_CAPABILITY) is None
 
-def test_build_inventory_sorted_indexes(tmp_path: Path) -> None:
-    """Verify inventory indexes providers and capabilities in deterministic sorted order."""
-    p_williams = tmp_path / "w.toml"
-    p_williams.write_text(_MANIFEST_WILLIAMS.strip(), encoding="utf-8")
-    m_williams = load_manifest(p_williams)
-
-    p_rsi = tmp_path / "r.toml"
-    p_rsi.write_text(_MANIFEST_RSI_1.strip(), encoding="utf-8")
-    m_rsi = load_manifest(p_rsi)
-
-    d1 = DiscoveredProvider(manifest_path=p_williams, manifest=m_williams)
-    d2 = DiscoveredProvider(manifest_path=p_rsi, manifest=m_rsi)
-
-    inv = build_inventory((d1, d2))
-    assert len(inv.providers) == 2
-    assert str(inv.providers[0].provider_id) == "indicator.rsi.default"
-    assert str(inv.providers[1].provider_id) == "indicator.williams_r.default"
-
-
-def test_build_inventory_immutable_maps(tmp_path: Path) -> None:
-    """Verify inventory mapping proxy cannot be mutated."""
-    p_rsi = tmp_path / "r.toml"
-    p_rsi.write_text(_MANIFEST_RSI_1.strip(), encoding="utf-8")
-    m_rsi = load_manifest(p_rsi)
-    d = DiscoveredProvider(manifest_path=p_rsi, manifest=m_rsi)
-
-    inv = build_inventory((d,))
-    with pytest.raises(TypeError):
-        inv.by_provider[ProviderId.parse("indicator.rsi.default")] = m_rsi  # type: ignore[index]
-
-    with pytest.raises(TypeError):
-        inv.by_capability[CapabilityId.parse("indicator.rsi.v1")] = ()  # type: ignore[index]
-
-
-def test_build_inventory_duplicate_rejection(tmp_path: Path) -> None:
-    """Verify duplicate provider IDs raise ResolutionError."""
-    p_rsi = tmp_path / "r.toml"
-    p_rsi.write_text(_MANIFEST_RSI_1.strip(), encoding="utf-8")
-    m_rsi = load_manifest(p_rsi)
-    d1 = DiscoveredProvider(manifest_path=p_rsi, manifest=m_rsi)
-    d2 = DiscoveredProvider(manifest_path=p_rsi, manifest=m_rsi)
-
-    with pytest.raises(
-        ResolutionError,
-        match=r"duplicate provider id: indicator\.rsi\.default",
-    ):
-        build_inventory((d1, d2))
-
-
-def test_build_inventory_multiple_providers_per_capability(tmp_path: Path) -> None:
-    """Verify multiple providers providing the same capability are indexed together."""
-    p1 = tmp_path / "r1.toml"
-    p1.write_text(_MANIFEST_RSI_1.strip(), encoding="utf-8")
-    m1 = load_manifest(p1)
-
-    p2 = tmp_path / "r2.toml"
-    p2.write_text(_MANIFEST_RSI_2.strip(), encoding="utf-8")
-    m2 = load_manifest(p2)
-
-    inv = build_inventory(
-        (
-            DiscoveredProvider(manifest_path=p1, manifest=m1),
-            DiscoveredProvider(manifest_path=p2, manifest=m2),
-        )
+    token = registry.register(
+        capability=CONSUMER_CAPABILITY,
+        provider=dummy_service,
+        owner_id="FEAT-TEST-CONSUME_SERVICE",
     )
 
-    cap_id = CapabilityId.parse("indicator.rsi.v1")
-    assert cap_id in inv.by_capability
-    provs = inv.by_capability[cap_id]
-    assert len(provs) == 2
-    assert [str(p.provider_id) for p in provs] == [
-        "indicator.rsi.default",
-        "indicator.rsi.fast",
-    ]
+    assert token.capability == "test.consumer@1"
+    assert token.owner_id == "FEAT-TEST-CONSUME_SERVICE"
+    assert token.generation == 1
+
+    assert registry.is_available(CONSUMER_CAPABILITY)
+    assert registry.is_available(CONSUMER_CAPABILITY.identifier)
+    assert registry.resolve(CONSUMER_CAPABILITY) is dummy_service
+    assert registry.require(CONSUMER_CAPABILITY) is dummy_service
+
+    binding = registry.get_binding(CONSUMER_CAPABILITY.identifier)
+    assert binding is not None
+    assert binding.token == token
+    assert binding.provider is dummy_service
+
+
+def test_registry_register_duplicate_raises_error() -> None:
+    """Test that ordinary register() raises CapabilityAlreadyBoundError if already bound."""
+    registry = ServiceRegistry()
+    registry.register(
+        capability=CONSUMER_CAPABILITY,
+        provider=object(),
+        owner_id="FEAT-TEST-CONSUME_SERVICE",
+    )
+
+    with pytest.raises(
+        CapabilityAlreadyBoundError,
+        match=r"(?i)already registered to 'FEAT-TEST-CONSUME_SERVICE'",
+    ):
+        registry.register(
+            capability=CONSUMER_CAPABILITY,
+            provider=object(),
+            owner_id="FEAT-TEST-PROVIDE_ALTERNATE",
+        )
+
+
+def test_registry_require_missing_raises() -> None:
+    """Test require raises CapabilityUnavailableError when no provider exists."""
+    registry = ServiceRegistry()
+    with pytest.raises(
+        CapabilityUnavailableError,
+        match=r"Capability 'test\.provider@1' is unavailable",
+    ):
+        registry.require(PROVIDER_CAPABILITY)
+
+
+def test_registry_revoke_active_token() -> None:
+    """Test revoking an active provider binding."""
+    registry = ServiceRegistry()
+    token = registry.register(
+        capability=CONSUMER_CAPABILITY,
+        provider=object(),
+        owner_id="FEAT-TEST-CONSUME_SERVICE",
+    )
+    assert registry.is_available(CONSUMER_CAPABILITY)
+
+    assert registry.revoke(token) is True
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+    assert registry.resolve(CONSUMER_CAPABILITY) is None
+
+    # Revoking again returns False
+    assert registry.revoke(token) is False
+
+
+def test_registry_generation_stale_token_protection() -> None:
+    """Test that a stale disposer token cannot revoke a newer replacement provider."""
+    registry = ServiceRegistry()
+    service_v1 = object()
+    service_v2 = object()
+
+    token_v1 = registry.register(
+        capability=CONSUMER_CAPABILITY,
+        provider=service_v1,
+        owner_id="FEAT-TEST-CONSUME_SERVICE",
+    )
+    assert token_v1.generation == 1
+
+    # Replace via explicit replace_binding
+    token_v2 = registry.replace_binding(
+        capability=CONSUMER_CAPABILITY,
+        provider=service_v2,
+        owner_id="FEAT-TEST-PROVIDE_ALTERNATE",
+    )
+    assert token_v2.generation == 2
+    assert registry.resolve(CONSUMER_CAPABILITY) is service_v2
+
+    # Old disposer for token_v1 attempts revocation
+    revoked = registry.revoke(token_v1)
+    assert revoked is False
+    # Newer provider is still active and safe
+    assert registry.resolve(CONSUMER_CAPABILITY) is service_v2
+
+    # New disposer revokes successfully
+    assert registry.revoke(token_v2) is True
+    assert registry.resolve(CONSUMER_CAPABILITY) is None
+
+
+@pytest.mark.asyncio
+async def test_registry_scope_automatic_revocation() -> None:
+    """Test passing scope to register automatically revokes binding on scope close."""
+    registry = ServiceRegistry()
+    scope = FeatureScope("FEAT-TEST-CONSUME_SERVICE")
+    service = object()
+
+    token = registry.register(
+        capability=CONSUMER_CAPABILITY,
+        provider=service,
+        owner_id="FEAT-TEST-CONSUME_SERVICE",
+        scope=scope,
+    )
+    assert isinstance(token, BindingToken)
+    assert registry.is_available(CONSUMER_CAPABILITY)
+
+    await scope.close()
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+    assert registry.resolve(CONSUMER_CAPABILITY) is None
+
+
+def test_registry_register_many_atomic() -> None:
+    """Test register_many atomically binds multiple capabilities or raises on conflict."""
+    registry = ServiceRegistry()
+    clock_service = object()
+    market_service = object()
+
+    tokens = registry.register_many(
+        [
+            (ROOT_CAPABILITY, clock_service, "FEAT-TEST-PROVIDE_ROOT"),
+            (PROVIDER_CAPABILITY, market_service, "FEAT-TEST-PROVIDE_SERVICE"),
+        ]
+    )
+    assert len(tokens) == 2
+    assert registry.resolve(ROOT_CAPABILITY) is clock_service
+    assert registry.resolve(PROVIDER_CAPABILITY) is market_service
+
+    # Attempt register_many with one conflicting capability
+    with pytest.raises(CapabilityAlreadyBoundError):
+        registry.register_many(
+            [
+                (CONSUMER_CAPABILITY, object(), "FEAT-TEST-CONSUME_SERVICE"),
+                (ROOT_CAPABILITY, object(), "FEAT-ANOTHER-CLOCK"),
+            ]
+        )
+
+    # Historical bars should NOT have been registered due to all-or-nothing validation
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+
+
+def test_registry_active_capabilities_and_clear() -> None:
+    """Test active_capabilities snapshot and registry clear."""
+    registry = ServiceRegistry()
+    token1 = registry.register(
+        CONSUMER_CAPABILITY, object(), "FEAT-TEST-CONSUME_SERVICE"
+    )
+    token2 = registry.register(
+        PROVIDER_CAPABILITY, object(), "FEAT-TEST-PROVIDE_SERVICE"
+    )
+
+    active = registry.active_capabilities()
+    assert active[CONSUMER_CAPABILITY.identifier] == token1
+    assert active[PROVIDER_CAPABILITY.identifier] == token2
+
+    registry.clear()
+    assert len(registry.active_capabilities()) == 0
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+
+
+def test_registry_validation_empty_owner_and_duplicate_bundle_keys() -> None:
+    """Test validation rejects empty owner_id and duplicate bundle keys."""
+    registry = ServiceRegistry()
+
+    with pytest.raises(ValueError, match="owner_id must not be empty"):
+        registry.register(
+            capability=CONSUMER_CAPABILITY,
+            provider=object(),
+            owner_id="   ",
+        )
+
+    with pytest.raises(
+        CapabilityAlreadyBoundError,
+        match="duplicate identifiers",
+    ):
+        registry.register_many(
+            [
+                (CONSUMER_CAPABILITY, object(), "FEAT-A"),
+                (CONSUMER_CAPABILITY, object(), "FEAT-B"),
+            ]
+        )
+
+
+def test_registry_register_many_attach_disposers_failure_rollback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test register_many rolls back bindings and generations if attach_disposers fails."""
+    registry = ServiceRegistry()
+
+    def failing_attach(tokens: object, scope: object) -> None:
+        raise RuntimeError("Scope attachment failed")
+
+    monkeypatch.setattr(registry, "_attach_disposers", failing_attach)
+
+    with pytest.raises(RuntimeError, match="Scope attachment failed"):
+        registry.register_many(
+            [(CONSUMER_CAPABILITY, object(), "FEAT-TEST-CONSUME_SERVICE")]
+        )
+
+    assert not registry.is_available(CONSUMER_CAPABILITY)
+    assert registry.get_binding(CONSUMER_CAPABILITY.identifier) is None
+
+
+def test_registry_replace_many_attach_disposers_failure_rollback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test replace_many rolls back previous bindings and generations on failure."""
+    registry = ServiceRegistry()
+    initial_service = object()
+    token1 = registry.register(
+        capability=CONSUMER_CAPABILITY,
+        provider=initial_service,
+        owner_id="FEAT-INITIAL",
+    )
+    assert token1.generation == 1
+
+    def failing_attach(tokens: object, scope: object) -> None:
+        raise RuntimeError("Replacement attach failed")
+
+    monkeypatch.setattr(registry, "_attach_disposers", failing_attach)
+
+    with pytest.raises(RuntimeError, match="Replacement attach failed"):
+        registry.replace_binding(
+            capability=CONSUMER_CAPABILITY,
+            provider=object(),
+            owner_id="FEAT-REPLACEMENT",
+        )
+
+    binding = registry.get_binding(CONSUMER_CAPABILITY.identifier)
+    assert binding is not None
+    assert binding.provider is initial_service
+    assert binding.token == token1

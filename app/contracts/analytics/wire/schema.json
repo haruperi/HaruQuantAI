@@ -1,0 +1,3367 @@
+{
+  "$defs": {
+    "AlignedMetricDelta": {
+      "additionalProperties": false,
+      "description": "One aligned metric delta of a result comparison.\n\nValues and delta are null when the metric cannot be aligned for the\ncompared pair; ``null_reason`` explains the missing alignment.",
+      "properties": {
+        "baseline_value": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Baseline Value"
+        },
+        "compared_value": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Compared Value"
+        },
+        "delta": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Delta"
+        },
+        "metric_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "metric_version": {
+          "minimum": 1,
+          "title": "Metric Version",
+          "type": "integer"
+        },
+        "null_reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "metric_id",
+        "metric_version",
+        "baseline_value",
+        "compared_value",
+        "delta"
+      ],
+      "title": "AlignedMetricDelta",
+      "type": "object"
+    },
+    "AnalysisPanelDescriptor": {
+      "additionalProperties": false,
+      "description": "One declared custom analysis panel contribution.\n\nIncompatible panels are disabled with diagnostics while core results\nremain available.",
+      "properties": {
+        "compatibility_range": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "frontend_bundle_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Frontend Bundle Hash",
+          "type": "string"
+        },
+        "panel_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "plugin_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "required_permissions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Required Permissions",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "supported_schemas": {
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Supported Schemas",
+          "type": "array"
+        }
+      },
+      "required": [
+        "panel_id",
+        "supported_schemas",
+        "frontend_bundle_hash",
+        "compatibility_range"
+      ],
+      "title": "AnalysisPanelDescriptor",
+      "type": "object"
+    },
+    "AnalyticsFailure": {
+      "additionalProperties": false,
+      "description": "Structured failure envelope shared by every analytics capability.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/AnalyticsFailureCode"
+        },
+        "outcome": {
+          "const": "FAILURE",
+          "default": "FAILURE",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "problem": {
+          "$ref": "#/$defs/ProblemDetails"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "code",
+        "problem"
+      ],
+      "title": "AnalyticsFailure",
+      "type": "object"
+    },
+    "AnalyticsFailureCode": {
+      "enum": [
+        "ANALYTICS_VALIDATION_FAILED",
+        "DATABANK_NOT_FOUND",
+        "DATABANK_NAME_CONFLICT",
+        "DATABANK_VERSION_CONFLICT",
+        "DATABANK_CAPACITY_EXCEEDED",
+        "RESULT_NOT_FOUND",
+        "QUERY_INVALID",
+        "QUERY_TOO_EXPENSIVE",
+        "FORMULA_INVALID",
+        "METRIC_NOT_FOUND",
+        "COMPARISON_INCOMPATIBLE",
+        "PANEL_INCOMPATIBLE",
+        "CAPABILITY_UNAVAILABLE"
+      ],
+      "type": "string"
+    },
+    "AnalyzeTradesRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated trade analysis request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "TIMING_ANALYSIS",
+            "RECONSTRUCT_CHART",
+            "COMPARE_BENCHMARK"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "AnalyzeTradesRequest",
+      "type": "object"
+    },
+    "AnalyzeTradesSuccess": {
+      "additionalProperties": false,
+      "description": "Successful trade analysis operation result.",
+      "properties": {
+        "analysis": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TradeAnalysis"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "benchmark": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BenchmarkComparison"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "AnalyzeTradesSuccess",
+      "type": "object"
+    },
+    "BenchmarkComparison": {
+      "additionalProperties": false,
+      "description": "One immutable benchmark comparison artifact of a result.\n\nNormalization recomputes only the benchmark initial-capital/allocation\ninput; the aligned equity artifact carries the shared series basis.",
+      "properties": {
+        "aligned_equity_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Aligned Equity Artifact Id",
+          "type": "string"
+        },
+        "benchmark_data_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Benchmark Data Version Id",
+          "type": "string"
+        },
+        "comparison_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Comparison Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "eligible_from": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Eligible From",
+          "type": "string"
+        },
+        "eligible_to": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Eligible To",
+          "type": "string"
+        },
+        "holding_method": {
+          "const": "BUY_AND_HOLD",
+          "title": "Holding Method",
+          "type": "string"
+        },
+        "initial_capital": {
+          "$ref": "#/$defs/Money"
+        },
+        "metric_ids": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Metric Ids",
+          "type": "array"
+        },
+        "normalization": {
+          "enum": [
+            "NONE",
+            "ABSOLUTE_DRAWDOWN",
+            "PERCENT_DRAWDOWN",
+            "MONEY_MANAGEMENT",
+            "EXPOSURE"
+          ],
+          "title": "Normalization",
+          "type": "string"
+        },
+        "normalization_version": {
+          "minimum": 1,
+          "title": "Normalization Version",
+          "type": "integer"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "comparison_id",
+        "result_id",
+        "benchmark_data_version_id",
+        "holding_method",
+        "eligible_from",
+        "eligible_to",
+        "initial_capital",
+        "normalization",
+        "normalization_version",
+        "aligned_equity_artifact_id",
+        "content_hash"
+      ],
+      "title": "BenchmarkComparison",
+      "type": "object"
+    },
+    "BulkDatabankCommand": {
+      "additionalProperties": false,
+      "description": "One idempotent bulk command over a pinned selection token.\n\nRetrying an interrupted bulk transfer is idempotent; conflicts,\ndeduplication, and rejected memberships are recorded in\n``impact_counts``.",
+      "properties": {
+        "action": {
+          "enum": [
+            "COPY",
+            "MOVE",
+            "EXPORT",
+            "DELETE",
+            "TAG",
+            "NOTE",
+            "RETEST",
+            "CUSTOM"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "command_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "conflict_policy": {
+          "enum": [
+            "REJECT",
+            "KEEP_EXISTING",
+            "CREATE_NEW_VERSION"
+          ],
+          "title": "Conflict Policy",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "impact_counts": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "selection_token_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Selection Token Id",
+          "type": "string"
+        },
+        "target_databank_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Databank Id"
+        }
+      },
+      "required": [
+        "command_id",
+        "selection_token_id",
+        "action",
+        "conflict_policy",
+        "idempotency_key"
+      ],
+      "title": "BulkDatabankCommand",
+      "type": "object"
+    },
+    "BulkDatabankRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated bulk databank request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "PIN_SELECTION",
+            "DRY_RUN",
+            "EXECUTE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "BulkDatabankRequest",
+      "type": "object"
+    },
+    "BulkDatabankSuccess": {
+      "additionalProperties": false,
+      "description": "Successful bulk databank operation result.",
+      "properties": {
+        "command": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BulkDatabankCommand"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "selection": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BulkSelectionToken"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "BulkDatabankSuccess",
+      "type": "object"
+    },
+    "BulkSelectionToken": {
+      "additionalProperties": false,
+      "description": "One pinned selection snapshot of databank item identities.\n\nMembership changes during bulk execution do not alter the target set;\nthe token expires at ``expires_at``.",
+      "properties": {
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "databank_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Databank Id",
+          "type": "string"
+        },
+        "dry_run_impact": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "item_ids": {
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Item Ids",
+          "type": "array"
+        },
+        "pinned_query_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Pinned Query Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "token_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Token Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "token_id",
+        "databank_id",
+        "item_ids",
+        "pinned_query_hash",
+        "created_at",
+        "expires_at"
+      ],
+      "title": "BulkSelectionToken",
+      "type": "object"
+    },
+    "ChartSpec": {
+      "additionalProperties": false,
+      "description": "One bounded chart specification over result series.\n\nDownsampled curves retain global and bucket min/max without loading\nfull artifacts into API memory.",
+      "properties": {
+        "bounded_points": {
+          "minimum": 1,
+          "title": "Bounded Points",
+          "type": "integer"
+        },
+        "chart_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Chart Id",
+          "type": "string"
+        },
+        "downsampling": {
+          "enum": [
+            "EXTREMA_PRESERVING",
+            "FULL"
+          ],
+          "title": "Downsampling",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "EQUITY",
+            "BALANCE",
+            "DRAWDOWN",
+            "VOLATILITY",
+            "BENCHMARK",
+            "VOLUME",
+            "CUSTOM"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "series_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Series Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "chart_id",
+        "kind",
+        "downsampling",
+        "bounded_points"
+      ],
+      "title": "ChartSpec",
+      "type": "object"
+    },
+    "CustomPanelsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated custom analysis panel request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "RUN_CUSTOM_ANALYSIS",
+            "DECLARE_PANEL"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "CustomPanelsRequest",
+      "type": "object"
+    },
+    "CustomPanelsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful custom analysis panel operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "output_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Artifact Id"
+        },
+        "panel": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AnalysisPanelDescriptor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "CustomPanelsSuccess",
+      "type": "object"
+    },
+    "DatabankDecision": {
+      "additionalProperties": false,
+      "description": "One transactional admission decision of a databank.\n\n``candidate`` carries the strategy-version or result identity under\nevaluation; a crash or retry yields exactly one membership outcome and\none decision record.",
+      "properties": {
+        "candidate": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Candidate",
+          "type": "string"
+        },
+        "databank_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Databank Id",
+          "type": "string"
+        },
+        "decided_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Decided At",
+          "type": "string"
+        },
+        "decision_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "observed": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "outcome": {
+          "enum": [
+            "ACCEPTED",
+            "REJECTED",
+            "REPLACED",
+            "DUPLICATE"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "policy_version": {
+          "minimum": 1,
+          "title": "Policy Version",
+          "type": "integer"
+        },
+        "replaced_item_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Replaced Item Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "stage": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "decision_id",
+        "databank_id",
+        "sequence",
+        "candidate",
+        "stage",
+        "policy_version",
+        "observed",
+        "outcome",
+        "decided_at"
+      ],
+      "title": "DatabankDecision",
+      "type": "object"
+    },
+    "DatabankItem": {
+      "additionalProperties": false,
+      "description": "One databank membership row referencing an immutable strategy version.\n\nInsertion is transactional and idempotent (one membership row per\nrepeat); copy, move, remove, and rename never mutate strategy versions,\nand referenced strategies, results, artifacts, and lineage are never\ndeleted by eviction or removal.",
+      "properties": {
+        "accepted_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Accepted At",
+          "type": "string"
+        },
+        "databank_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Databank Id",
+          "type": "string"
+        },
+        "display_name": {
+          "default": "",
+          "title": "Display Name",
+          "type": "string"
+        },
+        "item_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Item Id",
+          "type": "string"
+        },
+        "rank": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rank"
+        },
+        "result_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "databank_id",
+        "strategy_version_id",
+        "accepted_at",
+        "source"
+      ],
+      "title": "DatabankItem",
+      "type": "object"
+    },
+    "DatabankMembershipRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated databank membership request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "CREATE",
+            "RENAME",
+            "DELETE",
+            "ADMIT",
+            "MODIFY_ITEMS",
+            "DEFINE_POLICY"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "DatabankMembershipRequest",
+      "type": "object"
+    },
+    "DatabankMembershipSuccess": {
+      "additionalProperties": false,
+      "description": "Successful databank membership operation result.",
+      "properties": {
+        "databank": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DatabankVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DatabankDecision"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "item": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DatabankItem"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "DatabankMembershipSuccess",
+      "type": "object"
+    },
+    "DatabankName": {
+      "maxLength": 160,
+      "minLength": 1,
+      "type": "string"
+    },
+    "DatabankRef": {
+      "additionalProperties": false,
+      "description": "Reference to one databank identity.",
+      "properties": {
+        "databank_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Databank Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "databank_id"
+      ],
+      "title": "DatabankRef",
+      "type": "object"
+    },
+    "DatabankVersion": {
+      "additionalProperties": false,
+      "description": "One immutable version of a named project-scoped databank.\n\nDuplicate names are rejected, rename preserves membership, and a\nconcurrent rename/delete yields exactly one success and one version\nconflict; those cross-record rules are enforced by the owning store.",
+      "properties": {
+        "capacity": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capacity"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "databank_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Databank Id",
+          "type": "string"
+        },
+        "membership_policy": {
+          "$ref": "#/$defs/MembershipPolicy"
+        },
+        "name": {
+          "$ref": "#/$defs/DatabankName"
+        },
+        "project_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Project Id",
+          "type": "string"
+        },
+        "row_version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Row Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "view_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "View Id"
+        }
+      },
+      "required": [
+        "databank_id",
+        "version",
+        "name",
+        "project_id",
+        "membership_policy",
+        "content_hash"
+      ],
+      "title": "DatabankVersion",
+      "type": "object"
+    },
+    "Direction": {
+      "enum": [
+        "LONG",
+        "SHORT",
+        "BOTH"
+      ],
+      "type": "string"
+    },
+    "ExchangeResultsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated result interchange request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "EXPORT_ROWS",
+            "PACKAGE",
+            "IMPORT_EXTERNAL"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ExchangeResultsRequest",
+      "type": "object"
+    },
+    "ExchangeResultsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful result interchange operation result.",
+      "properties": {
+        "artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Id"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "package": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultExchangePackage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ExchangeResultsSuccess",
+      "type": "object"
+    },
+    "FilterSpec": {
+      "additionalProperties": false,
+      "description": "One typed column-filter predicate of a result query.",
+      "properties": {
+        "column": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "operator": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "value": {
+          "$ref": "#/$defs/JsonValue"
+        }
+      },
+      "required": [
+        "column",
+        "operator",
+        "value"
+      ],
+      "title": "FilterSpec",
+      "type": "object"
+    },
+    "FormulaColumn": {
+      "additionalProperties": false,
+      "description": "One sandboxed formula column of a result query.",
+      "properties": {
+        "expression": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "unit": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "name",
+        "expression",
+        "unit"
+      ],
+      "title": "FormulaColumn",
+      "type": "object"
+    },
+    "HexSeed": {
+      "pattern": "^[0-9a-fA-F]+$",
+      "type": "string"
+    },
+    "IanaTimezone": {
+      "pattern": "^[A-Za-z0-9+\\-_]+(?:/[A-Za-z0-9+\\-_]+)*$",
+      "type": "string"
+    },
+    "InterpretResultsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated result interpretation request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "OVERVIEW",
+            "LIST_TRADES",
+            "METRICS",
+            "COMPARE",
+            "SHOW_MANIFEST"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "InterpretResultsRequest",
+      "type": "object"
+    },
+    "InterpretResultsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful result interpretation operation result.\n\nThe typed overview spelling carries the applied scope on every result\nso overview, metrics, trades, and charts stay consistently filtered;\nthe run manifest remains Simulator-owned.",
+      "properties": {
+        "comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultComparison"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "direction": {
+          "$ref": "#/$defs/Direction"
+        },
+        "manifest": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunManifest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "metric_values": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MetricValue"
+          },
+          "title": "Metric Values",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "pl_unit": {
+          "$ref": "#/$defs/PlUnit"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "segment": {
+          "$ref": "#/$defs/Segment"
+        }
+      },
+      "required": [
+        "request_id",
+        "segment",
+        "direction",
+        "pl_unit"
+      ],
+      "title": "InterpretResultsSuccess",
+      "type": "object"
+    },
+    "JsonObject": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "type": "object"
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ManifestState": {
+      "enum": [
+        "VALIDATING",
+        "COMMITTED"
+      ],
+      "type": "string"
+    },
+    "MatchResultsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated result similarity request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "const": "QUERY_SIMILARITY",
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "MatchResultsRequest",
+      "type": "object"
+    },
+    "MatchResultsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful result similarity operation result.",
+      "properties": {
+        "matches": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SimilarityMatch"
+          },
+          "title": "Matches",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "MatchResultsSuccess",
+      "type": "object"
+    },
+    "MembershipPolicy": {
+      "additionalProperties": false,
+      "description": "Versioned admission policy of one databank.\n\nCapacity, duplicate scope, rank policy, replacement tie-breaker, and\noptional correlation policy are evaluated inside one transactional\nadmission decision; concurrent acceptance never exceeds capacity or\nproduces nondeterministic survivors.",
+      "properties": {
+        "capacity": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Capacity"
+        },
+        "correlation_policy": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "duplicate_scope": {
+          "enum": [
+            "STRATEGY",
+            "RUN",
+            "RESULT_FINGERPRINT"
+          ],
+          "title": "Duplicate Scope",
+          "type": "string"
+        },
+        "rank_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "replacement_tiebreaker": {
+          "enum": [
+            "OLDEST",
+            "LOWEST_RANK",
+            "REJECT"
+          ],
+          "title": "Replacement Tiebreaker",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capacity",
+        "duplicate_scope",
+        "rank_policy",
+        "replacement_tiebreaker"
+      ],
+      "title": "MembershipPolicy",
+      "type": "object"
+    },
+    "MetricDefinition": {
+      "additionalProperties": false,
+      "description": "One versioned catalogue metric formula.\n\nPhase 1 implements exactly the Project §9 catalogue; no unspecified\nmetric aliases another formula, and changing a formula version never\nalters previously committed values.",
+      "properties": {
+        "annualization": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "formula_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "input_series": {
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Input Series",
+          "type": "array"
+        },
+        "metric_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "minimum_sample": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Minimum Sample",
+          "type": "integer"
+        },
+        "null_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "rounding": {
+          "$ref": "#/$defs/Rounding"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "enum": [
+            "RESULT",
+            "SEGMENT",
+            "DIRECTION"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "MONEY",
+            "PERCENT",
+            "PIPS",
+            "RATIO",
+            "COUNT"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "metric_id",
+        "version",
+        "formula_ref",
+        "input_series",
+        "unit",
+        "scope",
+        "rounding",
+        "annualization",
+        "null_policy",
+        "content_hash"
+      ],
+      "title": "MetricDefinition",
+      "type": "object"
+    },
+    "MetricValue": {
+      "additionalProperties": false,
+      "description": "One committed metric value or its null reason.\n\nExactly one of ``value`` and ``null_reason`` is set, and the composite\nkey (result, segment, direction, metric definition) is unique per the\nmetric-values table anchor.",
+      "properties": {
+        "direction": {
+          "$ref": "#/$defs/Direction"
+        },
+        "metric_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "metric_version": {
+          "minimum": 1,
+          "title": "Metric Version",
+          "type": "integer"
+        },
+        "null_reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "segment": {
+          "$ref": "#/$defs/Segment"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "result_id",
+        "segment",
+        "direction",
+        "metric_id",
+        "metric_version"
+      ],
+      "title": "MetricValue",
+      "type": "object"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "Currency-qualified canonical decimal amount.",
+      "properties": {
+        "amount": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Amount",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NonEmptyStr": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "OperationalJournalArtifact": {
+      "additionalProperties": false,
+      "description": "One immutable derived operational-journal artifact.\n\nJoins immutable Strategy intent/manual plans, Risk decisions, Trading\noperations, annotations, and outcomes using stable identities keyed to\none source-set and policy hash.",
+      "properties": {
+        "annotation_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Annotation Refs",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "intent_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Intent Refs",
+          "type": "array"
+        },
+        "journal_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Journal Id",
+          "type": "string"
+        },
+        "output_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Output Artifact Id",
+          "type": "string"
+        },
+        "policy_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Policy Hash",
+          "type": "string"
+        },
+        "risk_decision_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Risk Decision Refs",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_set_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Set Hash",
+          "type": "string"
+        },
+        "time_basis": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "trading_operation_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Trading Operation Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "journal_id",
+        "source_set_hash",
+        "policy_hash",
+        "time_basis",
+        "output_artifact_id",
+        "content_hash"
+      ],
+      "title": "OperationalJournalArtifact",
+      "type": "object"
+    },
+    "OperatorQualification": {
+      "additionalProperties": false,
+      "description": "One operator qualification decision under a pinned profile version.\n\nSparse or biased evidence samples surface as ``INSUFFICIENT_EVIDENCE``,\nnever as defensible conclusions.",
+      "properties": {
+        "decided_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Decided At",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "outcome": {
+          "enum": [
+            "QUALIFIED",
+            "CONDITIONAL",
+            "NOT_QUALIFIED",
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "principal_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Principal Id",
+          "type": "string"
+        },
+        "profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "profile_version": {
+          "minimum": 1,
+          "title": "Profile Version",
+          "type": "integer"
+        },
+        "qualification_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Qualification Id",
+          "type": "string"
+        },
+        "reviewer_principal_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewer Principal Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "qualification_id",
+        "principal_id",
+        "profile_id",
+        "profile_version",
+        "outcome",
+        "decided_at"
+      ],
+      "title": "OperatorQualification",
+      "type": "object"
+    },
+    "PlUnit": {
+      "enum": [
+        "MONEY",
+        "PERCENT",
+        "PIPS"
+      ],
+      "type": "string"
+    },
+    "ProblemDetails": {
+      "additionalProperties": false,
+      "description": "Stable application failure envelope.",
+      "properties": {
+        "affected_object_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Affected Object Id"
+        },
+        "available_alternatives": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Available Alternatives",
+          "type": "array"
+        },
+        "capability_key": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Key"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "errors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationIssue"
+          },
+          "title": "Errors",
+          "type": "array"
+        },
+        "feature_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feature State"
+        },
+        "missing_dependencies": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+            "type": "string"
+          },
+          "title": "Missing Dependencies",
+          "type": "array"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "required_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Version"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "maximum": 599,
+          "minimum": 400,
+          "title": "Status",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "type": {
+          "pattern": "^(?:urn:|https?://).+",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "code",
+        "detail",
+        "request_id"
+      ],
+      "title": "ProblemDetails",
+      "type": "object"
+    },
+    "ProviderPin": {
+      "additionalProperties": false,
+      "description": "One pinned behavior provider binding of a run manifest.",
+      "properties": {
+        "capability_key": {
+          "pattern": "^[a-z][a-z0-9.-]*@[1-9]\\d*$",
+          "title": "Capability Key",
+          "type": "string"
+        },
+        "implementation_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Implementation Hash",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "capability_key",
+        "version",
+        "implementation_hash"
+      ],
+      "title": "ProviderPin",
+      "type": "object"
+    },
+    "QualificationProfileVersion": {
+      "additionalProperties": false,
+      "description": "One versioned operator-qualification policy.",
+      "properties": {
+        "competencies": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "evidence_kinds": {
+          "items": {
+            "enum": [
+              "TRAINING",
+              "REPLAY",
+              "LIVE"
+            ],
+            "type": "string"
+          },
+          "title": "Evidence Kinds",
+          "type": "array"
+        },
+        "profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "reviewer_approval_required": {
+          "default": true,
+          "title": "Reviewer Approval Required",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "thresholds": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "validity_days": {
+          "minimum": 1,
+          "title": "Validity Days",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profile_id",
+        "version",
+        "evidence_kinds",
+        "competencies",
+        "thresholds",
+        "validity_days",
+        "content_hash"
+      ],
+      "title": "QualificationProfileVersion",
+      "type": "object"
+    },
+    "QualifyOperationsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated operational analysis request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "BUILD_JOURNAL",
+            "MEASURE_ADHERENCE",
+            "SUMMARIZE_BEHAVIOR",
+            "ANALYZE_EMERGENCY",
+            "QUALIFY",
+            "EXPORT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "QualifyOperationsRequest",
+      "type": "object"
+    },
+    "QualifyOperationsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful operational analysis operation result.",
+      "properties": {
+        "export_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Export Artifact Id"
+        },
+        "journal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperationalJournalArtifact"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QualificationProfileVersion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "qualification": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorQualification"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "QualifyOperationsSuccess",
+      "type": "object"
+    },
+    "QueryResultsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated result query request.\n\nThe ratified v1 envelope spells only the operation set; per-operation\nrequest payloads beyond the common fields remain owned by the feature\nadmission rules rather than this frozen wire record.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "QUERY",
+            "SAVE_VIEW",
+            "EVALUATE_FORMULA",
+            "BOUND_SERIES"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "QueryResultsRequest",
+      "type": "object"
+    },
+    "QueryResultsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful result query operation result.",
+      "properties": {
+        "chart": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChartSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultPage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "view": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SavedResultView"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "QueryResultsSuccess",
+      "type": "object"
+    },
+    "ResultComparison": {
+      "additionalProperties": false,
+      "description": "One aligned comparison of two committed results.\n\nSegments, currencies, metric versions, and sampling align before any\ndelta is calculated; incompatible comparisons return a structured\n``incompatibility_reason`` instead of misleading values.",
+      "properties": {
+        "aligned_metrics": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AlignedMetricDelta"
+          },
+          "title": "Aligned Metrics",
+          "type": "array"
+        },
+        "baseline_result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Baseline Result Id",
+          "type": "string"
+        },
+        "compared_result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Compared Result Id",
+          "type": "string"
+        },
+        "comparison_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Comparison Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "incompatibility_reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "comparison_id",
+        "baseline_result_id",
+        "compared_result_id",
+        "content_hash"
+      ],
+      "title": "ResultComparison",
+      "type": "object"
+    },
+    "ResultExchangePackage": {
+      "additionalProperties": false,
+      "description": "One versioned ``.sqxr`` interchange package of a committed result.\n\nTampering with one member fails verification naming that member;\nexternal importers normalize through versioned adapters that preserve\nunmapped fields as namespaced attachments.",
+      "properties": {
+        "checksums": {
+          "additionalProperties": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Checksums",
+          "type": "object"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "equity_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Equity Artifact Id",
+          "type": "string"
+        },
+        "fills_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Fills Artifact Id",
+          "type": "string"
+        },
+        "journal_index_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Journal Index Artifact Id",
+          "type": "string"
+        },
+        "metrics_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Metrics Artifact Id",
+          "type": "string"
+        },
+        "orders_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Orders Artifact Id",
+          "type": "string"
+        },
+        "package_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Package Id",
+          "type": "string"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "selected_only": {
+          "default": true,
+          "title": "Selected Only",
+          "type": "boolean"
+        },
+        "settings_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Settings Artifact Id",
+          "type": "string"
+        },
+        "strategy_content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Strategy Content Hash",
+          "type": "string"
+        },
+        "strategy_ref": {
+          "$ref": "#/$defs/StrategyRef"
+        },
+        "trades_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Trades Artifact Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "package_id",
+        "result_id",
+        "strategy_ref",
+        "strategy_content_hash",
+        "settings_artifact_id",
+        "orders_artifact_id",
+        "fills_artifact_id",
+        "trades_artifact_id",
+        "equity_artifact_id",
+        "metrics_artifact_id",
+        "journal_index_artifact_id",
+        "checksums",
+        "content_hash"
+      ],
+      "title": "ResultExchangePackage",
+      "type": "object"
+    },
+    "ResultPage": {
+      "additionalProperties": false,
+      "description": "One bounded page of typed result rows.\n\nPages are planned server-side and bounded to 500 rows / 16 MiB per\nProject §15.7; exported full-resolution data is never downsampled.",
+      "properties": {
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Next Cursor"
+        },
+        "page_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Page Id",
+          "type": "string"
+        },
+        "query_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Query Id",
+          "type": "string"
+        },
+        "rows": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/JsonObject"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "total_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Count"
+        }
+      },
+      "required": [
+        "page_id",
+        "query_id"
+      ],
+      "title": "ResultPage",
+      "type": "object"
+    },
+    "ResultQuery": {
+      "additionalProperties": false,
+      "description": "One bounded result-table query with views, formulas, and paging.\n\nColumns, filter operators, and formula functions are evaluated against\nallowlisted fields with bounded complexity; that runtime policy is\nenforced by the owning feature, not by this wire record.",
+      "properties": {
+        "columns": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cursor"
+        },
+        "databank_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Databank Id"
+        },
+        "filters": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/FilterSpec"
+          },
+          "title": "Filters",
+          "type": "array"
+        },
+        "formulas": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/FormulaColumn"
+          },
+          "title": "Formulas",
+          "type": "array"
+        },
+        "grouping": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Grouping",
+          "type": "array"
+        },
+        "page_size": {
+          "default": 100,
+          "maximum": 500,
+          "minimum": 1,
+          "title": "Page Size",
+          "type": "integer"
+        },
+        "query_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Query Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sort": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SortSpec"
+          },
+          "title": "Sort",
+          "type": "array"
+        }
+      },
+      "required": [
+        "query_id"
+      ],
+      "title": "ResultQuery",
+      "type": "object"
+    },
+    "ResultSegment": {
+      "additionalProperties": false,
+      "description": "One half-open result segment with its trade-admission policies.\n\n``FULL`` segments may overlap other segments; every other segment is\ndisjoint and boundary events belong to exactly one segment. No-trade\nzones prohibit new or scale-in exposure while exits stay active.",
+      "properties": {
+        "entry_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "exit_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "from_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "From At",
+          "type": "string"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "segment": {
+          "$ref": "#/$defs/Segment"
+        },
+        "segment_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Segment Id",
+          "type": "string"
+        },
+        "to_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "To At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "segment_id",
+        "result_id",
+        "segment",
+        "from_at",
+        "to_at",
+        "entry_policy",
+        "exit_policy"
+      ],
+      "title": "ResultSegment",
+      "type": "object"
+    },
+    "Rounding": {
+      "enum": [
+        "DOWN",
+        "UP",
+        "HALF_UP",
+        "HALF_EVEN",
+        "TOWARD_ZERO"
+      ],
+      "type": "string"
+    },
+    "RunManifest": {
+      "additionalProperties": false,
+      "description": "Immutable pinned-input manifest of one deterministic simulation run.\n\nThe manifest is created atomically with its queued job after validation,\nis immutable after commit, and comparing two manifests reports every\nmaterial input difference.",
+      "properties": {
+        "behavior_providers": {
+          "items": {
+            "$ref": "#/$defs/ProviderPin"
+          },
+          "minItems": 1,
+          "title": "Behavior Providers",
+          "type": "array"
+        },
+        "block_version_hashes": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Block Version Hashes",
+          "type": "array"
+        },
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "catalogue_version_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Catalogue Version Ids",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "data_binding_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Data Binding Id",
+          "type": "string"
+        },
+        "engine_profile_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Engine Profile Id",
+          "type": "string"
+        },
+        "engine_profile_version": {
+          "minimum": 1,
+          "title": "Engine Profile Version",
+          "type": "integer"
+        },
+        "environment": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "job_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Job Id",
+          "type": "string"
+        },
+        "manifest_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Manifest Id",
+          "type": "string"
+        },
+        "output_artifact_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          "title": "Output Artifact Ids",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "seed_root": {
+          "$ref": "#/$defs/HexSeed"
+        },
+        "seed_streams": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Seed Streams",
+          "type": "array"
+        },
+        "segments": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ResultSegment"
+          },
+          "title": "Segments",
+          "type": "array"
+        },
+        "settings_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Settings Hash",
+          "type": "string"
+        },
+        "snapshot_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Snapshot Hash",
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/ManifestState"
+        },
+        "strategy_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Strategy Hash",
+          "type": "string"
+        },
+        "strategy_version_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Version Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "manifest_id",
+        "job_id",
+        "capability_snapshot_id",
+        "snapshot_hash",
+        "behavior_providers",
+        "engine_profile_id",
+        "engine_profile_version",
+        "strategy_version_id",
+        "strategy_hash",
+        "settings_hash",
+        "data_binding_id",
+        "seed_root",
+        "environment",
+        "state",
+        "content_hash"
+      ],
+      "title": "RunManifest",
+      "type": "object"
+    },
+    "SavedResultView": {
+      "additionalProperties": false,
+      "description": "One versioned saved view of a result query.\n\nReopening reproduces the query even after default column changes;\npinned segments and display units are versioned independently from\ndatabank membership.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "display_units": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "pinned_segments": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Segment"
+          },
+          "title": "Pinned Segments",
+          "type": "array"
+        },
+        "query": {
+          "$ref": "#/$defs/ResultQuery"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "view_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "View Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "view_id",
+        "version",
+        "name",
+        "query",
+        "content_hash"
+      ],
+      "title": "SavedResultView",
+      "type": "object"
+    },
+    "Segment": {
+      "enum": [
+        "FULL",
+        "IS",
+        "VALIDATION",
+        "OOS",
+        "NO_TRADE"
+      ],
+      "type": "string"
+    },
+    "SimilarityMatch": {
+      "additionalProperties": false,
+      "description": "One similarity verdict for a candidate result.\n\n``deviations`` reports the relative deviations of the candidate\nfingerprint against the query tolerances.",
+      "properties": {
+        "candidate_result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Candidate Result Id",
+          "type": "string"
+        },
+        "deviations": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "is_similar": {
+          "title": "Is Similar",
+          "type": "boolean"
+        },
+        "query_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Query Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "query_id",
+        "candidate_result_id",
+        "is_similar",
+        "deviations"
+      ],
+      "title": "SimilarityMatch",
+      "type": "object"
+    },
+    "SimilarityQuery": {
+      "additionalProperties": false,
+      "description": "One relative-tolerance result-similarity query.\n\nFingerprint matching is independent of semantic AST duplicates: two\nresults are similar when their relative deviations stay within the\ndeclared tolerance bands of one pinned rule version.",
+      "properties": {
+        "databank_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Databank Id",
+          "type": "string"
+        },
+        "query_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Query Id",
+          "type": "string"
+        },
+        "reference_result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Reference Result Id",
+          "type": "string"
+        },
+        "rule_version": {
+          "minimum": 1,
+          "title": "Rule Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "tolerances": {
+          "$ref": "#/$defs/Tolerances"
+        }
+      },
+      "required": [
+        "query_id",
+        "databank_id",
+        "reference_result_id",
+        "tolerances",
+        "rule_version"
+      ],
+      "title": "SimilarityQuery",
+      "type": "object"
+    },
+    "SortSpec": {
+      "additionalProperties": false,
+      "description": "One stable sort ordering of a result-query column.",
+      "properties": {
+        "ascending": {
+          "default": true,
+          "title": "Ascending",
+          "type": "boolean"
+        },
+        "column": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "column"
+      ],
+      "title": "SortSpec",
+      "type": "object"
+    },
+    "StrategyRef": {
+      "additionalProperties": false,
+      "description": "Reference to one strategy identity.",
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "strategy_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Strategy Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "strategy_id"
+      ],
+      "title": "StrategyRef",
+      "type": "object"
+    },
+    "Tolerances": {
+      "additionalProperties": false,
+      "description": "Relative-tolerance bands of one similarity query.\n\nEach band is an inclusive fraction in the closed interval [0, 1].",
+      "properties": {
+        "drawdown": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Drawdown",
+          "type": "string"
+        },
+        "net_profit": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Net Profit",
+          "type": "string"
+        },
+        "number_of_trades": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Number Of Trades",
+          "type": "string"
+        }
+      },
+      "required": [
+        "number_of_trades",
+        "net_profit",
+        "drawdown"
+      ],
+      "title": "Tolerances",
+      "type": "object"
+    },
+    "TradeAnalysis": {
+      "additionalProperties": false,
+      "description": "One immutable temporal trade-analysis artifact of a result.\n\nOne artifact exists per ``analysis_artifacts(result_id, type,\nsettings_hash)`` anchor; bucket details live in the referenced bucket\nartifact, not on this record.",
+      "properties": {
+        "analysis_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Analysis Id",
+          "type": "string"
+        },
+        "bucket_artifact_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Bucket Artifact Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "dimensions": {
+          "items": {
+            "enum": [
+              "YEAR",
+              "ENTRY_HOUR",
+              "EXIT_HOUR",
+              "DAY_OF_WEEK",
+              "DAY_OF_MONTH"
+            ],
+            "type": "string"
+          },
+          "title": "Dimensions",
+          "type": "array"
+        },
+        "direction": {
+          "$ref": "#/$defs/Direction"
+        },
+        "empty_bucket_policy": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "event_basis": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "metric_ids": {
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "title": "Metric Ids",
+          "type": "array"
+        },
+        "result_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Result Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "segment": {
+          "$ref": "#/$defs/Segment"
+        },
+        "timezone": {
+          "$ref": "#/$defs/IanaTimezone"
+        }
+      },
+      "required": [
+        "analysis_id",
+        "result_id",
+        "event_basis",
+        "timezone",
+        "dimensions",
+        "segment",
+        "direction",
+        "metric_ids",
+        "empty_bucket_policy",
+        "bucket_artifact_id",
+        "content_hash"
+      ],
+      "title": "TradeAnalysis",
+      "type": "object"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "Machine-readable validation issue.",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path",
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "events": {},
+  "failures": {
+    "AnalyticsFailure": {
+      "$ref": "#/$defs/AnalyticsFailure"
+    }
+  },
+  "models": {
+    "AnalysisPanelDescriptor": {
+      "$ref": "#/$defs/AnalysisPanelDescriptor"
+    },
+    "AnalyzeTradesRequest": {
+      "$ref": "#/$defs/AnalyzeTradesRequest"
+    },
+    "AnalyzeTradesSuccess": {
+      "$ref": "#/$defs/AnalyzeTradesSuccess"
+    },
+    "BenchmarkComparison": {
+      "$ref": "#/$defs/BenchmarkComparison"
+    },
+    "BulkDatabankCommand": {
+      "$ref": "#/$defs/BulkDatabankCommand"
+    },
+    "BulkDatabankRequest": {
+      "$ref": "#/$defs/BulkDatabankRequest"
+    },
+    "BulkDatabankSuccess": {
+      "$ref": "#/$defs/BulkDatabankSuccess"
+    },
+    "BulkSelectionToken": {
+      "$ref": "#/$defs/BulkSelectionToken"
+    },
+    "ChartSpec": {
+      "$ref": "#/$defs/ChartSpec"
+    },
+    "CustomPanelsRequest": {
+      "$ref": "#/$defs/CustomPanelsRequest"
+    },
+    "CustomPanelsSuccess": {
+      "$ref": "#/$defs/CustomPanelsSuccess"
+    },
+    "DatabankDecision": {
+      "$ref": "#/$defs/DatabankDecision"
+    },
+    "DatabankItem": {
+      "$ref": "#/$defs/DatabankItem"
+    },
+    "DatabankMembershipRequest": {
+      "$ref": "#/$defs/DatabankMembershipRequest"
+    },
+    "DatabankMembershipSuccess": {
+      "$ref": "#/$defs/DatabankMembershipSuccess"
+    },
+    "DatabankRef": {
+      "$ref": "#/$defs/DatabankRef"
+    },
+    "DatabankVersion": {
+      "$ref": "#/$defs/DatabankVersion"
+    },
+    "ExchangeResultsRequest": {
+      "$ref": "#/$defs/ExchangeResultsRequest"
+    },
+    "ExchangeResultsSuccess": {
+      "$ref": "#/$defs/ExchangeResultsSuccess"
+    },
+    "InterpretResultsRequest": {
+      "$ref": "#/$defs/InterpretResultsRequest"
+    },
+    "InterpretResultsSuccess": {
+      "$ref": "#/$defs/InterpretResultsSuccess"
+    },
+    "MatchResultsRequest": {
+      "$ref": "#/$defs/MatchResultsRequest"
+    },
+    "MatchResultsSuccess": {
+      "$ref": "#/$defs/MatchResultsSuccess"
+    },
+    "MetricDefinition": {
+      "$ref": "#/$defs/MetricDefinition"
+    },
+    "MetricValue": {
+      "$ref": "#/$defs/MetricValue"
+    },
+    "OperationalJournalArtifact": {
+      "$ref": "#/$defs/OperationalJournalArtifact"
+    },
+    "OperatorQualification": {
+      "$ref": "#/$defs/OperatorQualification"
+    },
+    "QualificationProfileVersion": {
+      "$ref": "#/$defs/QualificationProfileVersion"
+    },
+    "QualifyOperationsRequest": {
+      "$ref": "#/$defs/QualifyOperationsRequest"
+    },
+    "QualifyOperationsSuccess": {
+      "$ref": "#/$defs/QualifyOperationsSuccess"
+    },
+    "QueryResultsRequest": {
+      "$ref": "#/$defs/QueryResultsRequest"
+    },
+    "QueryResultsSuccess": {
+      "$ref": "#/$defs/QueryResultsSuccess"
+    },
+    "ResultComparison": {
+      "$ref": "#/$defs/ResultComparison"
+    },
+    "ResultExchangePackage": {
+      "$ref": "#/$defs/ResultExchangePackage"
+    },
+    "ResultPage": {
+      "$ref": "#/$defs/ResultPage"
+    },
+    "ResultQuery": {
+      "$ref": "#/$defs/ResultQuery"
+    },
+    "SavedResultView": {
+      "$ref": "#/$defs/SavedResultView"
+    },
+    "SimilarityMatch": {
+      "$ref": "#/$defs/SimilarityMatch"
+    },
+    "SimilarityQuery": {
+      "$ref": "#/$defs/SimilarityQuery"
+    },
+    "TradeAnalysis": {
+      "$ref": "#/$defs/TradeAnalysis"
+    }
+  },
+  "namespace": "analytics",
+  "schema_version": 1,
+  "title": "analytics wire contracts v1"
+}

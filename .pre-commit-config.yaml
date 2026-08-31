@@ -4,10 +4,12 @@ default_install_hook_types:
   - pre-commit
   - pre-push
 
+exclude: ^\.agents/task/
+
 repos:
   # Repository hygiene
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         stages: [pre-commit]
@@ -69,7 +71,7 @@ repos:
         entry: uv run --locked mypy
         language: system
         pass_filenames: false
-        files: ^(app/|tests/|pyproject\.toml$|uv\.lock$)
+        files: ^(app/|tests/|\.agents/|pyproject\.toml$|uv\.lock$)
         stages: [pre-push]
 
       - id: pytest
@@ -78,4 +80,20 @@ repos:
         language: system
         pass_filenames: false
         files: ^(app/|tests/|pyproject\.toml$|uv\.lock$)
+        stages: [pre-push]
+
+      - id: workflow-tests
+        name: Workflow controller tests
+        entry: uv run --locked pytest --no-cov .agents/tests
+        language: system
+        pass_filenames: false
+        files: ^(\.agents/|AGENTS\.md$|docs/templates/prompt/)
+        stages: [pre-push]
+
+      - id: workflow-self-test
+        name: Workflow controller self-test
+        entry: uv run --locked python .agents/orchestrator.py self-test
+        language: system
+        pass_filenames: false
+        files: ^(\.agents/|AGENTS\.md$|docs/templates/prompt/)
         stages: [pre-push]
