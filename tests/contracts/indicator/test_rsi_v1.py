@@ -9,14 +9,14 @@ from dataclasses import FrozenInstanceError
 from pathlib import Path
 from typing import Any
 
-import app.capabilities.indicator.rsi.v1 as rsi_v1
+import app.contracts.indicator.rsi.v1 as rsi_v1
 import pytest
-from app.capabilities.indicator.common.v1 import (
+from app.contracts.indicator.common.v1 import (
     IndicatorConfigV1,
     IndicatorResultV1,
     MarketDatasetV1,
 )
-from app.capabilities.indicator.rsi.v1 import (
+from app.contracts.indicator.rsi.v1 import (
     CAPABILITY_ID,
     RsiCapabilityV1,
 )
@@ -82,7 +82,7 @@ def test_rsi_contract_imports_without_services() -> None:
     """Verify RSI capability contract imports without pulling in any business services."""
     script = """
 import sys
-import app.capabilities.indicator.rsi.v1 as rsi_v1
+import app.contracts.indicator.rsi.v1 as rsi_v1
 assert rsi_v1 is not None
 for mod_name in sys.modules:
     assert not mod_name.startswith('app.services'), f'Forbidden business domain imported: {mod_name}'

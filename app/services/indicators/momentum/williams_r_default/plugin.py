@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, cast
 
-from app.capabilities.indicator.williams_r.v1 import (
+from app.contracts.indicator.williams_r.v1 import (
     WilliamsRCapabilityV1,
     WilliamsRFunctionV1,
 )

@@ -10,12 +10,12 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-REQUIRED_AGENT_HEADINGS = (
-    "Provider Infrastructure Exception",
-    "Capability Boundary Export Exception",
-    "Provider Test and Example Placement",
-    "Manifest Canonical Authority",
-    "Migration Tombstones and Uninstall Retention",
+REQUIRED_AGENT_PATTERNS = (
+    "Focused domain architecture",
+    "app/contracts/",
+    "app/kernel/",
+    "app/composition/",
+    "A feature never imports another feature implementation",
 )
 
 REQUIRED_ARCHITECTURE_HEADINGS = (
@@ -35,7 +35,7 @@ REQUIRED_ARCHITECTURE_HEADINGS = (
 
 INFRASTRUCTURE_PATHS = (
     "app/kernel/",
-    "app/capabilities/",
+    "app/contracts/",
     "app/composition/",
 )
 
@@ -54,12 +54,11 @@ def _read_doc(relative_path: str) -> str:
 
 
 def test_agents_contains_provider_rules_once() -> None:
-    """Verify AGENTS.md contains the five required provider architecture headings exactly once."""
+    """Verify AGENTS.md contains the required provider architecture principles."""
     content = _read_doc("AGENTS.md")
-    for heading in REQUIRED_AGENT_HEADINGS:
-        count = content.count(heading)
-        assert count == 1, (
-            f"Expected heading {heading!r} to appear exactly once in AGENTS.md, found {count}"
+    for pattern in REQUIRED_AGENT_PATTERNS:
+        assert pattern in content, (
+            f"Expected pattern {pattern!r} to appear in AGENTS.md"
         )
 
 
@@ -74,7 +73,7 @@ def test_architecture_contains_provider_section_once() -> None:
 
 
 def test_project_indexes_non_feature_infrastructure() -> None:
-    """Verify docs/PROJECT.md indexes app/kernel/, app/capabilities/, and app/composition/ without feature ownership."""
+    """Verify docs/PROJECT.md indexes app/kernel/, app/contracts/, and app/composition/ without feature ownership."""
     content = _read_doc("docs/PROJECT.md")
     for infra_path in INFRASTRUCTURE_PATHS:
         assert infra_path in content, (

@@ -92,13 +92,13 @@ def check_manifests_integrity(
             spec_file = (
                 repo_root
                 / "app"
-                / "capabilities"
+                / "contracts"
                 / cap_domain
                 / f"{cap_name}"
                 / f"v{cap_major}.py"
             )
             spec_file_alt = (
-                repo_root / "app" / "capabilities" / cap_domain / f"v{cap_major}.py"
+                repo_root / "app" / "contracts" / cap_domain / f"v{cap_major}.py"
             )
             if not spec_file.exists() and not spec_file_alt.exists():
                 violations.append(

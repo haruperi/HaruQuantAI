@@ -11,12 +11,12 @@ from pathlib import Path
 from tests.removability.harness import run_in_fresh_process
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_CAPABILITIES_ROOT = _REPO_ROOT / "app" / "capabilities"
+_CONTRACTS_ROOT = _REPO_ROOT / "app" / "contracts"
 
 
 def test_capability_specs_have_no_business_imports() -> None:
-    """Verify via AST that no file under app/capabilities imports app.services or app.agentic."""
-    cap_files = sorted(_CAPABILITIES_ROOT.rglob("*.py"))
+    """Verify via AST that no file under app/contracts imports app.services or app.agentic."""
+    cap_files = sorted(_CONTRACTS_ROOT.rglob("*.py"))
     assert len(cap_files) >= 5, "Expected at least 5 capability files"
 
     for cap_file in cap_files:
@@ -55,14 +55,14 @@ class BlockedDomainFinder(MetaPathFinder):
 
 sys.meta_path.insert(0, BlockedDomainFinder())
 
-import app.capabilities
-import app.capabilities.indicator
-import app.capabilities.indicator.common
-import app.capabilities.indicator.common.v1
-import app.capabilities.indicator.rsi
-import app.capabilities.indicator.rsi.v1
-import app.capabilities.indicator.williams_r
-import app.capabilities.indicator.williams_r.v1
+import app.contracts
+import app.contracts.indicator
+import app.contracts.indicator.common
+import app.contracts.indicator.common.v1
+import app.contracts.indicator.rsi
+import app.contracts.indicator.rsi.v1
+import app.contracts.indicator.williams_r
+import app.contracts.indicator.williams_r.v1
 
 for mod in sys.modules:
     assert not mod.startswith("app.services"), f"Blocked module was loaded: {mod}"
@@ -88,14 +88,14 @@ print("CAPABILITIES_ISOLATION_OK")
 
 def test_capability_public_exports_are_frozen() -> None:
     """Verify exact public exports for every capability module."""
-    import app.capabilities as cap_root
-    import app.capabilities.indicator as cap_ind
-    import app.capabilities.indicator.common as cap_common_pkg
-    import app.capabilities.indicator.common.v1 as cap_common_v1
-    import app.capabilities.indicator.rsi as cap_rsi_pkg
-    import app.capabilities.indicator.rsi.v1 as cap_rsi_v1
-    import app.capabilities.indicator.williams_r as cap_wr_pkg
-    import app.capabilities.indicator.williams_r.v1 as cap_wr_v1
+    import app.contracts as cap_root
+    import app.contracts.indicator as cap_ind
+    import app.contracts.indicator.common as cap_common_pkg
+    import app.contracts.indicator.common.v1 as cap_common_v1
+    import app.contracts.indicator.rsi as cap_rsi_pkg
+    import app.contracts.indicator.rsi.v1 as cap_rsi_v1
+    import app.contracts.indicator.williams_r as cap_wr_pkg
+    import app.contracts.indicator.williams_r.v1 as cap_wr_v1
 
     assert cap_root.__all__ == ()
     assert cap_ind.__all__ == ()

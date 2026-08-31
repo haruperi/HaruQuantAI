@@ -12,7 +12,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[5]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from app.capabilities.data.tick_stream.v1 import TickStreamRequestV1
+from app.contracts.data.tick_stream.v1 import TickStreamRequestV1
 from app.kernel.effects import EffectScope
 from app.services.data.market_events.fake_tick_stream.plugin import (
     create_provider,

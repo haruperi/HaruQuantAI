@@ -1,6 +1,6 @@
-"""RSI v1 capability contract specification.
+"""Williams %R v1 capability contract specification.
 
-Traces to: P3-T03, Gate G3
+Traces to: P3-T04, Gate G3
 """
 
 from __future__ import annotations
@@ -9,32 +9,30 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
-    from app.capabilities.indicator.common.v1 import (
+    from app.contracts.indicator.common.v1 import (
         IndicatorConfigV1,
         IndicatorResultV1,
         MarketDatasetV1,
     )
 
-CAPABILITY_ID = "indicator.rsi.v1"
+CAPABILITY_ID = "indicator.williams_r.v1"
 
 
-class RsiFunctionV1(Protocol):
-    """Protocol for callable RSI calculation functions."""
+class WilliamsRFunctionV1(Protocol):
+    """Protocol for callable Williams %R calculation functions."""
 
     def __call__(
         self,
         data: MarketDatasetV1,
         *,
         period: int,
-        source: str = "close",
         config: IndicatorConfigV1 | None = None,
     ) -> IndicatorResultV1:
-        """Calculate Wilder Relative Strength Index over market dataset.
+        """Calculate Williams %R over market dataset.
 
         Args:
             data: One normalized market dataset.
             period: Smoothing period.
-            source: Price source column name.
             config: Optional explicit configuration.
 
         Returns:
@@ -44,14 +42,14 @@ class RsiFunctionV1(Protocol):
 
 
 @dataclass(frozen=True, slots=True)
-class RsiCapabilityV1:
-    """Capability container holding the callable RSI implementation."""
+class WilliamsRCapabilityV1:
+    """Capability container holding the callable Williams %R implementation."""
 
-    calculate: RsiFunctionV1
+    calculate: WilliamsRFunctionV1
 
 
 __all__ = (
     "CAPABILITY_ID",
-    "RsiCapabilityV1",
-    "RsiFunctionV1",
+    "WilliamsRCapabilityV1",
+    "WilliamsRFunctionV1",
 )

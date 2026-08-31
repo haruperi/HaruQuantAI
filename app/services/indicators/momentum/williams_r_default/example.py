@@ -23,7 +23,7 @@ from app.services.indicators.core.results import get_indicator_result_values
 from app.services.indicators.momentum.williams_r_default.plugin import create_provider
 
 if TYPE_CHECKING:
-    from app.capabilities.indicator.williams_r.v1 import WilliamsRCapabilityV1
+    from app.contracts.indicator.williams_r.v1 import WilliamsRCapabilityV1
 
 _MANIFEST_PATH = Path(__file__).resolve().parent / "manifest.toml"
 

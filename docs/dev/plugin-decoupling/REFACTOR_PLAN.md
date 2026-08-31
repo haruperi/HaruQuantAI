@@ -30,7 +30,7 @@ The refactor succeeds when a removable unit can disappear and:
 |---|---|---|
 | Baseline | none | **Phase 0**: golden financial fixtures captured before any change |
 | Removal unit | feature folder | **provider** (a feature may have several; bundles declared explicitly) |
-| Contracts | Protocols inside the kernel | separate importable **`app/capabilities/`** spec tree |
+| Contracts | Protocols inside the kernel | separate importable **`app/contracts/`** spec tree |
 | Effect classes | binary revertible/irreversible | **three-way**: reversible ephemeral / durable compensatable / irreversible external |
 | Error model | 3 codes | 1 family + **reason codes** + `dependency_chain` evidence |
 | Lifecycle | activate/dispose | explicit **component state machine** + drain + shadow activation |
@@ -121,7 +121,7 @@ Retained from v1 unchanged: the migration-ledger blocker, removability tiers, ex
 | D-09 | Migration/schema | **G1** | Append-only + tombstones + **uninstall ≠ purge** (§Phase 8). *Amends AGENTS.md §5 — the hard blocker.* |
 | D-10 | Access mechanism | **G1** | Consumers import capability specs; providers injected at construction. **No repeated `registry.get(...)` in business code.** *Amends AGENTS.md §1; this is the "don't rewrite imports first" spine.* |
 | D-12 | Test/example placement | **G1** | §1.4. *Amends AGENTS.md §2.* |
-| D-01 | Kernel membership | **G1** | `app/kernel/` = machinery only: identifiers, manifests, discovery, registry, resolver, profiles, states, errors, health, diagnostics. Contracts live in `app/capabilities/`, not the kernel. |
+| D-01 | Kernel membership | **G1** | `app/kernel/` = machinery only: identifiers, manifests, discovery, registry, resolver, profiles, states, errors, health, diagnostics. Contracts live in `app/contracts/`, not the kernel. |
 | — | Export-surface amendment | **G1** | Per §0.2. *Amends AGENTS.md §1.* |
 | D-02 | Capability naming + version | G3 | `domain.capability.vN` (e.g. `indicator.rsi.v1`, `risk.order_authorization.v2`). `requires` carries a version range. |
 | D-03 | Cardinality | G3 | `exactly_one` \| `zero_or_one` \| `one_of_several` \| `many`. Brokers are `one_of_several`; indicators are `many`. |
@@ -143,8 +143,8 @@ These seven were resolved ahead of their gates because the Phase 3–5 work orde
 |---|---|---|
 | R-01 | Capability contract shape | **Hybrid.** `typing.Protocol` for effectful capabilities (brokers, streams, persistence, anything owning a scope); frozen dataclass of callables for pure ones (indicators, calculations). The split follows the §1.3 effect classes. |
 | R-02 | Concurrency model | **Sync core, async edge.** The kernel, resolver, registry, and lifecycle are synchronous. An async adapter layer wraps only streaming, broker transport, and API capabilities. Rationale: MetaTrader5 is a blocking C extension and cannot be made async; twelve domains are pure sync. *This supersedes the `AsyncExitStack` wording formerly in Phase 5.* |
-| R-03 | Governance of new top-level packages | `app/kernel/`, `app/capabilities/`, and `app/composition/` are **non-feature infrastructure**: no `FEAT-*` IDs, no Feature Registry section, no numbered usage programs. Declared as an `AGENTS.md` §1 exception extending "Reconciliation Exclusions". |
-| R-04 | Capability spec layout | `app/capabilities/<domain>/<capability>/vN.py` — e.g. `app/capabilities/indicator/rsi/v1.py`. Domain-owned specs were rejected: importing `app.services.data.capabilities` would execute a 60 KB domain `__init__.py`, defeating "importable with zero providers". |
+| R-03 | Governance of new top-level packages | `app/kernel/`, `app/contracts/`, and `app/composition/` are **non-feature infrastructure**: no `FEAT-*` IDs, no Feature Registry section, no numbered usage programs. Declared as an `AGENTS.md` §1 exception extending "Reconciliation Exclusions". |
+| R-04 | Capability spec layout | `app/contracts/<domain>/<capability>/vN.py` — e.g. `app/contracts/indicator/rsi/v1.py`. Domain-owned specs were rejected: importing `app.services.data.capabilities` would execute a 60 KB domain `__init__.py`, defeating "importable with zero providers". |
 | R-05 | Manifest format | `manifest.toml` per provider folder, parsed with stdlib `tomllib`. Discovery must not import implementation code, which rules out a Python manifest. No new dependency. |
 | R-06 | Composition root location | New top-level `app/composition/`. Not `app/services/api/composition/` — the API domain is Tier B and must itself be removable. Not `app/kernel/` — provider-selection policy must not live inside business-neutral machinery. |
 | R-07 | Approval granularity | One `APPROVED: EXECUTE` per **phase**; mechanical steps inside a phase are pre-authorised in that phase's dry run. |
@@ -243,7 +243,7 @@ The migration order is *generated* here, not assumed.
 
 ## Phase 3 — Capability specification layer
 
-`app/capabilities/<capability>/vN.py` — importable with **zero providers installed**.
+`app/contracts/<capability>/vN.py` — importable with **zero providers installed**.
 
 **May contain:** identifier, API version, protocol/ABC, immutable requests and responses, semantic errors, compatibility rules, event specifications, conformance helpers.
 **May not contain:** implementation, provider selection, DB/broker/network access, imports of `app.services.*` or `app.agentic.*`, registration side effects.
@@ -469,7 +469,7 @@ Every provider in every domain follows the same ten steps.
 |---|---|
 | **A — Removal boundary** | confirm the folder is one removable provider · split category folders holding independent providers · declare atomic bundles explicitly · assign stable provider ID · assign provided capabilities and versions |
 | **B — Classify code** | implementation · capability spec · domain-local shared support · historical migrations · compatibility exports · import-time side effects · runtime resources · all consumers |
-| **C — Extract contracts** | move neutral protocols/schemas to `app/capabilities/` · keep implementation-specific models inside the provider · version · compatibility rules · standard errors · required vs optional deps |
+| **C — Extract contracts** | move neutral protocols/schemas to `app/contracts/` · keep implementation-specific models inside the provider · version · compatibility rules · standard errors · required vs optional deps |
 | **D — Manifest** | ID, version, entry point, capabilities provided, required, optional, scope & profile permissions, lifecycle & reload policy, effect classes, config schema, state-schema version |
 | **E — Remove hidden construction** | eliminate import-time registration, module-level clients, module-level mutable state · add explicit factory · typed injection · config via activation context · register all resources with the effect scope |
 | **F — Migrate consumers** | concrete imports → capability-spec imports · constructor calls → injected deps · remove service-locator lookups from hot paths · declare transitive requirements · **preserve exact financial semantics** · add missing-capability behaviour · add profile-impact evidence |
@@ -486,7 +486,7 @@ leaf providers → shared support → hub providers, with effect-heavy providers
 
 # Part V — Shared-support policy
 
-1. **Stable cross-domain contracts** live in `app/capabilities/<capability>/vN.py` and must outlive any individual provider.
+1. **Stable cross-domain contracts** live in `app/contracts/<capability>/vN.py` and must outlive any individual provider.
 2. **Domain-local support** is permitted only when ≥3 independent features consume it, it owns one coherent capability, it contains no orchestration, it is not a second implementation location, and deleting one feature does not delete it.
 3. **One- or two-consumer support** stays inside an explicit owner feature; the other consumer depends on that owner's capability.
 4. **Category folders** (`momentum`, `trend`, `volatility`) may be organizational namespaces only.

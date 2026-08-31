@@ -20,7 +20,7 @@ def _setup_isolated_app_tree(tmp_path: Path) -> Path:
         "app/__init__.py",
         "app/runtime.py",
         "app/kernel",
-        "app/capabilities",
+        "app/contracts",
         "app/composition",
         "app/services/__init__.py",
         "app/services/data",

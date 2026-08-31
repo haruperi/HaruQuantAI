@@ -12,9 +12,9 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-import app.capabilities.indicator.common.v1 as common_v1
+import app.contracts.indicator.common.v1 as common_v1
 import pandas as pd
-from app.capabilities.indicator.common.v1 import (
+from app.contracts.indicator.common.v1 import (
     IndicatorConfigV1,
     IndicatorResultV1,
     MarketDatasetV1,
@@ -79,7 +79,7 @@ def test_common_module_imports_no_business_domain() -> None:
     """Verify common v1 contract does not import any business services or agentic packages."""
     script = """
 import sys
-import app.capabilities.indicator.common.v1 as common_v1
+import app.contracts.indicator.common.v1 as common_v1
 assert common_v1 is not None
 for mod_name in sys.modules:
     assert not mod_name.startswith('app.services'), f'Forbidden business domain imported: {mod_name}'

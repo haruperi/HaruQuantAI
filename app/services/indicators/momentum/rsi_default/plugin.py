@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, cast
 
-from app.capabilities.indicator.rsi.v1 import RsiCapabilityV1, RsiFunctionV1
+from app.contracts.indicator.rsi.v1 import RsiCapabilityV1, RsiFunctionV1
 from app.services.indicators.momentum.rsi_default.implementation import rsi
 
 if TYPE_CHECKING:

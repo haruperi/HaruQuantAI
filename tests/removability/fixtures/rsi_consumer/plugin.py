@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
-from app.capabilities.indicator.rsi.v1 import RsiCapabilityV1
+from app.contracts.indicator.rsi.v1 import RsiCapabilityV1
 from app.kernel.identifiers import CapabilityId
 
 if TYPE_CHECKING:

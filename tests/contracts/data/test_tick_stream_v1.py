@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator
 from pathlib import Path
 
 import pytest
-from app.capabilities.data.tick_stream.v1 import (
+from app.contracts.data.tick_stream.v1 import (
     CAPABILITY_ID,
     TickStreamCapabilityV1,
     TickStreamEventV1,
@@ -121,7 +121,7 @@ def test_import_isolation() -> None:
     """Verify capability contract can be loaded without importing business domains."""
     script = """
 import sys
-import app.capabilities.data.tick_stream.v1 as cap
+import app.contracts.data.tick_stream.v1 as cap
 
 for name, mod in list(sys.modules.items()):
     if mod is None:

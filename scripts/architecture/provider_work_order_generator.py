@@ -87,7 +87,7 @@ def build_provider_record(raw_provider: dict[str, Any], wave_id: str) -> dict[st
 
     source_paths = [f"app/services/{domain}/{sub_name}.py"]
     target_provider_path = f"app/services/{domain}/providers/{prov_id}"
-    cap_spec_paths = [f"app/capabilities/{domain}/{sub_name}/v1.py"]
+    cap_spec_paths = [f"app/contracts/{domain}/{sub_name}/v1.py"]
 
     return {
         "provider_id": prov_id,

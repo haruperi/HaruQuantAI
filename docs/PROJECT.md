@@ -373,7 +373,7 @@ The spatiotemporal provider architecture introduces three non-feature system inf
 | Package | Status | Owner | Feature Prefix | Registry | Responsibility |
 |---|---|---|---|---|---|
 | `app/kernel/` | `Planned until its gate passes` | `System infrastructure` | `None` | `None` | Business-neutral discovery, manifest parsing, dependency resolution, health, and lifecycle coordination. |
-| `app/capabilities/` | `Planned until its gate passes` | `System infrastructure` | `None` | `None` | Decoupled, versioned capability specifications (pure callable records and effectful Protocols). |
+| `app/contracts/` | `Planned until its gate passes` | `System infrastructure` | `None` | `None` | Decoupled, versioned capability specifications (pure callable records and effectful Protocols). |
 | `app/composition/` | `Planned until its gate passes` | `System infrastructure` | `None` | `None` | Construction-time provider assembly, injection, and runtime generation leasing. |
 
 **Cross-domain provider relationship:**

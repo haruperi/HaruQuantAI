@@ -36,8 +36,8 @@ def test_kernel_business_import_violation(tmp_path: Path) -> None:
 
 
 def test_spec_provider_import_violation(tmp_path: Path) -> None:
-    """Verify capability spec importing concrete provider triggers violation."""
-    file_path = tmp_path / "app" / "capabilities" / "bad.py"
+    """Verify contract spec importing concrete provider triggers violation."""
+    file_path = tmp_path / "app" / "contracts" / "bad.py"
     file_path.parent.mkdir(parents=True)
     file_path.write_text(
         "from app.services.data.providers import something\n", encoding="utf-8"

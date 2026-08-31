@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
-from app.capabilities.notification.delivery.v1 import (
+from app.contracts.notification.delivery.v1 import (
     NotificationDeliveryCapabilityV1,
     NotificationDeliveryResultV1,
 )

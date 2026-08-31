@@ -3,7 +3,7 @@
 # ruff: noqa: INP001
 from pathlib import Path
 
-from app.capabilities.notification.delivery.v1 import (
+from app.contracts.notification.delivery.v1 import (
     NotificationDeliveryCapabilityV1,
     NotificationDeliveryResultV1,
 )

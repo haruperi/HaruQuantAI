@@ -80,7 +80,7 @@ The dependency graph contains 36,577 static and runtime coupling edges across th
 
 | Cycle ID | Domains Involved | Cycle Kind | Break Edge | Break Method | Description |
 |---|---|---|---|---|---|
-| `HC-01` | `research` ⇄ `analytics` | `hard_code_cycle` | `research -> analytics` | `contract` | Decouple metric dependency by injecting `app/capabilities/analytics/metrics/v1.py` specification into Research consumers. |
+| `HC-01` | `research` ⇄ `analytics` | `hard_code_cycle` | `research -> analytics` | `contract` | Decouple metric dependency by injecting `app/contracts/analytics/metrics/v1.py` specification into Research consumers. |
 
 ---
 

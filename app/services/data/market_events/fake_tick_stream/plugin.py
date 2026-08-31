@@ -8,7 +8,7 @@ from collections.abc import AsyncIterator, Mapping
 from contextlib import suppress
 from typing import TYPE_CHECKING
 
-from app.capabilities.data.tick_stream.v1 import (
+from app.contracts.data.tick_stream.v1 import (
     TickStreamCapabilityV1,
     TickStreamEventV1,
     TickStreamRequestV1,

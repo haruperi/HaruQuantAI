@@ -8,7 +8,7 @@ from app.composition.facade import lease_capability
 from app.kernel.identifiers import CapabilityId
 
 if TYPE_CHECKING:
-    from app.capabilities.indicator.williams_r.v1 import WilliamsRCapabilityV1
+    from app.contracts.indicator.williams_r.v1 import WilliamsRCapabilityV1
     from app.services.indicators.core.contracts import (
         IndicatorConfig,
     )

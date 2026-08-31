@@ -5,10 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import pytest
-from app.capabilities.data.tick_stream.v1 import (
+from app.contracts.data.tick_stream.v1 import (
     TickStreamRequestV1,
 )
-from app.capabilities.notification.delivery.v1 import (
+from app.contracts.notification.delivery.v1 import (
     NotificationDeliveryCapabilityV1,
     NotificationDeliveryResultV1,
 )

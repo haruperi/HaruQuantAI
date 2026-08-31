@@ -144,7 +144,7 @@ def check_file_ast(
         return violations
 
     is_kernel = rel_path.startswith("app/kernel/")
-    is_cap = rel_path.startswith("app/capabilities/")
+    is_cap = rel_path.startswith("app/contracts/")
 
     for node in ast.walk(tree):
         if isinstance(node, (ast.Import, ast.ImportFrom)):

@@ -18,7 +18,7 @@ ALLOWED_THIRD_PARTY = {"numpy", "pandas"}
 ALLOWED_LOCAL_PREFIXES = (
     "app.utils",
     DOMAIN_PREFIX,
-    "app.capabilities",
+    "app.contracts",
     "app.composition",
     "app.kernel",
 )

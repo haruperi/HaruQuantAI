@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from app.capabilities.notification.delivery.v1 import (
+from app.contracts.notification.delivery.v1 import (
     NotificationDeliveryCapabilityV1,
     NotificationDeliveryResultV1,
 )

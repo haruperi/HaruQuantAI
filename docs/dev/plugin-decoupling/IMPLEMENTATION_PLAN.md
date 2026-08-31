@@ -167,7 +167,7 @@ def williams_r(
 Status is `CREATE` unless marked otherwise.
 
 ```text
-app/capabilities/
+app/contracts/
 ├── __init__.py                         empty infrastructure boundary
 ├── indicator/
 │   ├── __init__.py                     empty namespace
@@ -198,7 +198,7 @@ app/composition/
 └── reconciliation.py                   installed-provider config reconciliation
 ```
 
-`app/kernel/`, `app/capabilities/`, and `app/composition/` are non-feature infrastructure. They have no `FEAT-*` ID, Feature Registry, or usage program.
+`app/kernel/`, `app/contracts/`, and `app/composition/` are non-feature infrastructure. They have no `FEAT-*` ID, Feature Registry, or usage program.
 
 ### 3.2 Kernel identifiers and manifest values
 
@@ -517,7 +517,7 @@ Tests live at `tests/indicators/providers/indicator.rsi.default/` and `tests/ind
 
 ### 3.7 Public `__all__` values
 
-- `app/capabilities/__init__.py`, every domain namespace `__init__.py`, and every capability namespace `__init__.py`: `__all__: tuple[str, ...] = ()`.
+- `app/contracts/__init__.py`, every domain namespace `__init__.py`, and every capability namespace `__init__.py`: `__all__: tuple[str, ...] = ()`.
 - `app/kernel/__init__.py`: `("CapabilityId", "ProviderId", "SemanticVersion", "ProviderManifest", "load_manifest", "discover_manifests", "resolve_providers", "ResolutionReport", "RuntimeProfile", "ProfileReadiness", "evaluate_profile_readiness", "ComponentState", "CapabilityReasonCode", "CapabilityUnavailable", "CapabilityUnavailableError", "KernelHealth", "EffectScope", "AsyncEffectScopeAdapter")`.
 - `app/composition/__init__.py`: `("ProviderGeneration", "CapabilityLease", "PinnedCapabilityGraph", "CompositionRuntime", "reconcile_configuration")`.
 - Provider `plugin.py`: `__all__ = ("create_provider",)`.
@@ -639,8 +639,8 @@ Affected tasks: P0-T01 through P0-T04
 
 Conflict ID: CF-09
 Sources: `REFACTOR_PLAN.md` R-04 and Phase 3 shorthand
-Claim A: R-04 requires `app/capabilities/<domain>/<capability>/vN.py`.
-Claim B: Phase 3 abbreviates the path as `app/capabilities/<capability>/vN.py`.
+Claim A: R-04 requires `app/contracts/<domain>/<capability>/vN.py`.
+Claim B: Phase 3 abbreviates the path as `app/contracts/<capability>/vN.py`.
 Precedence: owner resolution R-04.
 Decision: always include the domain segment.
 Affected tasks: all capability-spec tasks
@@ -1249,7 +1249,7 @@ rg -n '^## Spatiotemporal Provider Architecture$|^### (Units|Contract Shape|Iden
 
 Anchor: the existing system/domain index heading located by exact text before editing. Preserve all domain counts and feature rows.
 
-**Specification (copy exactly):** add rows for `app/kernel/`, `app/capabilities/`, and `app/composition/`, each status `Planned until its gate passes`, owner `System infrastructure`, feature prefix `None`, registry `None`. Add relationship `composition → provider factory → injected capability; business consumer → capability spec; kernel ↛ business domain`.
+**Specification (copy exactly):** add rows for `app/kernel/`, `app/contracts/`, and `app/composition/`, each status `Planned until its gate passes`, owner `System infrastructure`, feature prefix `None`, registry `None`. Add relationship `composition → provider factory → injected capability; business consumer → capability spec; kernel ↛ business domain`.
 
 **Behaviour Rules:**
 1. Do not add feature IDs.
@@ -1272,12 +1272,12 @@ Anchor: the existing system/domain index heading located by exact text before ed
 P1-T04 owns structural tests. Text check expects each infrastructure path once.
 
 **Usage Example**
-Run `rg -n 'app/kernel/|app/capabilities/|app/composition/' docs/PROJECT.md`; inspect exactly the inserted index/relationship references.
+Run `rg -n 'app/kernel/|app/contracts/|app/composition/' docs/PROJECT.md`; inspect exactly the inserted index/relationship references.
 
 **Quality Gates:**
 ```powershell
 git diff --check
-rg -n 'app/kernel/|app/capabilities/|app/composition/' docs/PROJECT.md
+rg -n 'app/kernel/|app/contracts/|app/composition/' docs/PROJECT.md
 ```
 
 **Documentation Updates:** `docs/PROJECT.md` only.
@@ -1810,9 +1810,9 @@ git diff --check
 
 | Path | Action | Purpose |
 |---|---|---|
-| `app/capabilities/__init__.py` | CREATE | infrastructure root |
-| `app/capabilities/indicator/__init__.py` | CREATE | domain namespace |
-| `app/capabilities/indicator/common/__init__.py` | CREATE | capability namespace |
+| `app/contracts/__init__.py` | CREATE | infrastructure root |
+| `app/contracts/indicator/__init__.py` | CREATE | domain namespace |
+| `app/contracts/indicator/common/__init__.py` | CREATE | capability namespace |
 
 **Specification (copy exactly):** every file has a descriptive module docstring and `__all__: tuple[str, ...] = ()`; no imports.
 
@@ -1835,14 +1835,14 @@ git diff --check
 No pytest file in this skeleton task; P3-T05 supplies import enforcement.
 
 **Usage Example**
-Run `uv run --locked python -I -c "import app.capabilities; print(app.capabilities.__all__)"` → `()`.
+Run `uv run --locked python -I -c "import app.contracts; print(app.contracts.__all__)"` → `()`.
 
 **Quality Gates:**
 ```powershell
 uv run --locked ruff format app/capabilities
 uv run --locked ruff check app/capabilities
 uv run --locked mypy app/capabilities
-uv run --locked python -I -c "import app.capabilities; print(app.capabilities.__all__)"
+uv run --locked python -I -c "import app.contracts; print(app.contracts.__all__)"
 git diff --check
 ```
 
@@ -1877,8 +1877,8 @@ git diff --check
 
 | Path | Action | Purpose |
 |---|---|---|
-| `app/capabilities/indicator/common/v1.py` | CREATE | provider-neutral structural protocols |
-| `tests/capabilities/indicator/test_common_v1.py` | CREATE | runtime-checkable conformance fixtures |
+| `app/contracts/indicator/common/v1.py` | CREATE | provider-neutral structural protocols |
+| `tests/contracts/indicator/test_common_v1.py` | CREATE | runtime-checkable conformance fixtures |
 
 **Specification (copy exactly):** define `OHLCVRecordV1`, `MarketDatasetV1`, `IndicatorConfigV1`, and `IndicatorResultV1` as `Protocol` classes with only attributes accessed by the two pilot functions. Use `datetime`, `Decimal`, `Mapping`, `Sequence`, and `pandas.DataFrame/Series` types matching existing declarations. Exact `__all__ = ("IndicatorConfigV1", "IndicatorResultV1", "MarketDatasetV1", "OHLCVRecordV1")`.
 
@@ -1901,7 +1901,7 @@ git diff --check
 - Do not touch any PROTECTED path from §5.
 
 **Unit Tests**
-File: `tests/capabilities/indicator/test_common_v1.py` (CREATE)
+File: `tests/contracts/indicator/test_common_v1.py` (CREATE)
 
 | Test function | Expected |
 |---|---|
@@ -1914,10 +1914,10 @@ Run pytest; three passes demonstrate provider-free contract use.
 
 **Quality Gates:**
 ```powershell
-uv run --locked ruff format app/capabilities/indicator/common/v1.py tests/capabilities/indicator/test_common_v1.py
-uv run --locked ruff check app/capabilities/indicator/common/v1.py tests/capabilities/indicator/test_common_v1.py
-uv run --locked mypy app/capabilities/indicator/common/v1.py tests/capabilities/indicator/test_common_v1.py
-uv run --locked pytest tests/capabilities/indicator/test_common_v1.py -q
+uv run --locked ruff format app/contracts/indicator/common/v1.py tests/contracts/indicator/test_common_v1.py
+uv run --locked ruff check app/contracts/indicator/common/v1.py tests/contracts/indicator/test_common_v1.py
+uv run --locked mypy app/contracts/indicator/common/v1.py tests/contracts/indicator/test_common_v1.py
+uv run --locked pytest tests/contracts/indicator/test_common_v1.py -q
 git diff --check
 ```
 
@@ -1942,7 +1942,7 @@ git diff --check
 **Goal.** Define the pure callable-record contract for `indicator.rsi.v1` with the existing function signature unchanged.
 
 **Context to Read (and nothing else):**
-- `app/capabilities/indicator/common/v1.py` — shared protocols.
+- `app/contracts/indicator/common/v1.py` — shared protocols.
 - `app/services/indicators/momentum/rsi.py` — existing signature.
 - Shared Contracts §3.6.
 
@@ -1950,9 +1950,9 @@ git diff --check
 
 | Path | Action | Purpose |
 |---|---|---|
-| `app/capabilities/indicator/rsi/__init__.py` | CREATE | empty namespace |
-| `app/capabilities/indicator/rsi/v1.py` | CREATE | RSI callable record |
-| `tests/capabilities/indicator/test_rsi_v1.py` | CREATE | contract tests |
+| `app/contracts/indicator/rsi/__init__.py` | CREATE | empty namespace |
+| `app/contracts/indicator/rsi/v1.py` | CREATE | RSI callable record |
+| `tests/contracts/indicator/test_rsi_v1.py` | CREATE | contract tests |
 
 **Specification (copy exactly):**
 ```python
@@ -1992,7 +1992,7 @@ Exact exports: `("CAPABILITY_ID", "RsiCapabilityV1", "RsiFunctionV1")`.
 - Do not touch any PROTECTED path from §5.
 
 **Unit Tests**
-File: `tests/capabilities/indicator/test_rsi_v1.py` (CREATE)
+File: `tests/contracts/indicator/test_rsi_v1.py` (CREATE)
 
 | Test function | Expected |
 |---|---|
@@ -2006,10 +2006,10 @@ Construct `RsiCapabilityV1(calculate=fake)` in the test and call keyword argumen
 
 **Quality Gates:**
 ```powershell
-uv run --locked ruff format app/capabilities/indicator/rsi tests/capabilities/indicator/test_rsi_v1.py
-uv run --locked ruff check app/capabilities/indicator/rsi tests/capabilities/indicator/test_rsi_v1.py
-uv run --locked mypy app/capabilities/indicator/rsi tests/capabilities/indicator/test_rsi_v1.py
-uv run --locked pytest tests/capabilities/indicator/test_rsi_v1.py -q
+uv run --locked ruff format app/contracts/indicator/rsi tests/contracts/indicator/test_rsi_v1.py
+uv run --locked ruff check app/contracts/indicator/rsi tests/contracts/indicator/test_rsi_v1.py
+uv run --locked mypy app/contracts/indicator/rsi tests/contracts/indicator/test_rsi_v1.py
+uv run --locked pytest tests/contracts/indicator/test_rsi_v1.py -q
 git diff --check
 ```
 
@@ -2034,7 +2034,7 @@ git diff --check
 **Goal.** Define the pure callable-record contract for `indicator.williams_r.v1` with the existing function signature unchanged.
 
 **Context to Read (and nothing else):**
-- `app/capabilities/indicator/common/v1.py` — shared protocols.
+- `app/contracts/indicator/common/v1.py` — shared protocols.
 - `app/services/indicators/momentum/williams_r.py` — existing signature.
 - Shared Contracts §3.6.
 
@@ -2042,9 +2042,9 @@ git diff --check
 
 | Path | Action | Purpose |
 |---|---|---|
-| `app/capabilities/indicator/williams_r/__init__.py` | CREATE | empty namespace |
-| `app/capabilities/indicator/williams_r/v1.py` | CREATE | Williams callable record |
-| `tests/capabilities/indicator/test_williams_r_v1.py` | CREATE | contract tests |
+| `app/contracts/indicator/williams_r/__init__.py` | CREATE | empty namespace |
+| `app/contracts/indicator/williams_r/v1.py` | CREATE | Williams callable record |
+| `tests/contracts/indicator/test_williams_r_v1.py` | CREATE | contract tests |
 
 **Specification (copy exactly):**
 ```python
@@ -2083,17 +2083,17 @@ Exact exports: `("CAPABILITY_ID", "WilliamsRCapabilityV1", "WilliamsRFunctionV1"
 - Do not touch any PROTECTED path from §5.
 
 **Unit Tests**
-File: `tests/capabilities/indicator/test_williams_r_v1.py` (CREATE): exact counterparts of P3-T03 tests, with no `source` keyword accepted.
+File: `tests/contracts/indicator/test_williams_r_v1.py` (CREATE): exact counterparts of P3-T03 tests, with no `source` keyword accepted.
 
 **Usage Example**
 Construct the record with a fake callable and call it with period/config.
 
 **Quality Gates:**
 ```powershell
-uv run --locked ruff format app/capabilities/indicator/williams_r tests/capabilities/indicator/test_williams_r_v1.py
-uv run --locked ruff check app/capabilities/indicator/williams_r tests/capabilities/indicator/test_williams_r_v1.py
-uv run --locked mypy app/capabilities/indicator/williams_r tests/capabilities/indicator/test_williams_r_v1.py
-uv run --locked pytest tests/capabilities/indicator/test_williams_r_v1.py -q
+uv run --locked ruff format app/contracts/indicator/williams_r tests/contracts/indicator/test_williams_r_v1.py
+uv run --locked ruff check app/contracts/indicator/williams_r tests/contracts/indicator/test_williams_r_v1.py
+uv run --locked mypy app/contracts/indicator/williams_r tests/contracts/indicator/test_williams_r_v1.py
+uv run --locked pytest tests/contracts/indicator/test_williams_r_v1.py -q
 git diff --check
 ```
 
@@ -2118,7 +2118,7 @@ git diff --check
 **Goal.** Enforce that every capability module imports successfully while all business-domain imports are blocked.
 
 **Context to Read (and nothing else):**
-- `app/capabilities/` — files created in Phase 3.
+- `app/contracts/` — files created in Phase 3.
 - `tests/removability/harness.py` — fresh-process helper.
 - `tests/architecture/test_application_import_smoke.py` — subprocess assertion style.
 
@@ -2128,7 +2128,7 @@ git diff --check
 |---|---|---|
 | `tests/architecture/test_capability_import_boundaries.py` | CREATE | AST and fresh-process import ban |
 
-**Specification (copy exactly):** enumerate `app/capabilities/**/*.py` in sorted POSIX order. AST-reject imports whose module starts `app.services` or `app.agentic`. Fresh script installs a `MetaPathFinder` that raises `ImportError("blocked business import: {fullname}")` for those prefixes, then imports every module.
+**Specification (copy exactly):** enumerate `app/contracts/**/*.py` in sorted POSIX order. AST-reject imports whose module starts `app.services` or `app.agentic`. Fresh script installs a `MetaPathFinder` that raises `ImportError("blocked business import: {fullname}")` for those prefixes, then imports every module.
 
 **Behaviour Rules:**
 1. Test includes namespace `__init__.py` files.
@@ -3737,7 +3737,7 @@ git diff --check
 
 **Context to Read (and nothing else):**
 - `app/services/indicators/momentum/rsi.py` — exact formula to copy.
-- `app/capabilities/indicator/rsi/v1.py` — callable record.
+- `app/contracts/indicator/rsi/v1.py` — callable record.
 - `app/kernel/manifests.py` — TOML schema.
 - `app/kernel/lifecycle.py` — factory signature.
 - `tests/indicators/fixtures/momentum_golden.json` — parity source.
@@ -3879,7 +3879,7 @@ git diff --check
 
 **Context to Read (and nothing else):**
 - `app/services/indicators/momentum/williams_r.py` — exact formula.
-- `app/capabilities/indicator/williams_r/v1.py` — contract.
+- `app/contracts/indicator/williams_r/v1.py` — contract.
 - `app/services/indicators/momentum/rsi_default/manifest.toml` — manifest style.
 - `app/services/indicators/momentum/rsi_default/plugin.py` — factory style.
 - `tests/indicators/fixtures/momentum_golden.json` — parity source.
@@ -4251,10 +4251,10 @@ git diff --check
 
 | Path | Action | Purpose |
 |---|---|---|
-| `app/capabilities/notification/__init__.py` | CREATE | empty domain namespace |
-| `app/capabilities/notification/delivery/__init__.py` | CREATE | empty capability namespace |
-| `app/capabilities/notification/delivery/v1.py` | CREATE | delivery Protocol and immutable result |
-| `tests/capabilities/notification/test_delivery_v1.py` | CREATE | contract tests |
+| `app/contracts/notification/__init__.py` | CREATE | empty domain namespace |
+| `app/contracts/notification/delivery/__init__.py` | CREATE | empty capability namespace |
+| `app/contracts/notification/delivery/v1.py` | CREATE | delivery Protocol and immutable result |
+| `tests/contracts/notification/test_delivery_v1.py` | CREATE | contract tests |
 
 **Specification (copy exactly):** `CAPABILITY_ID = "notification.delivery.v1"`; frozen `NotificationDeliveryResultV1(channel: str, status: Literal["accepted"], recipient_count: int | None)`; Protocol properties `channel: str`, `active: bool`; method `send(title: str, text: str, html_body: str | None = None) -> NotificationDeliveryResultV1`; `close() -> None`. Exact exports are constant, Protocol, result.
 
@@ -4272,10 +4272,10 @@ Construct fake Protocol implementation in test and send bounded text.
 
 **Quality Gates:**
 ```powershell
-uv run --locked ruff format app/capabilities/notification tests/capabilities/notification
-uv run --locked ruff check app/capabilities/notification tests/capabilities/notification
-uv run --locked mypy app/capabilities/notification tests/capabilities/notification
-uv run --locked pytest tests/capabilities/notification -q
+uv run --locked ruff format app/contracts/notification tests/contracts/notification
+uv run --locked ruff check app/contracts/notification tests/contracts/notification
+uv run --locked mypy app/contracts/notification tests/contracts/notification
+uv run --locked pytest tests/contracts/notification -q
 git diff --check
 ```
 
@@ -4295,7 +4295,7 @@ git diff --check
 
 **Goal.** Add one manifest/factory/example/test unit per existing transport without changing its current delivery semantics.
 
-**Context to Read (and nothing else), per task:** the row's current module; `app/capabilities/notification/delivery/v1.py`; `app/kernel/effects.py`; `app/utils/notifications/manager.py`; the matching existing notification unit test from G2.
+**Context to Read (and nothing else), per task:** the row's current module; `app/contracts/notification/delivery/v1.py`; `app/kernel/effects.py`; `app/utils/notifications/manager.py`; the matching existing notification unit test from G2.
 
 | Task | Channel | Current module | Provider folder | Provider ID | Unavailable external operation in tests |
 |---|---|---|---|---|---|
@@ -4349,7 +4349,7 @@ Provider logs only channel name and lifecycle state; never title/body/recipient/
 - `app/utils/notifications/manager.py` — current direct constructors.
 - `app/utils/notifications/__init__.py` — public façade.
 - `app/composition/facade.py` — context binding.
-- `app/capabilities/notification/delivery/v1.py` — Protocol.
+- `app/contracts/notification/delivery/v1.py` — Protocol.
 - existing notification manager tests from G2.
 
 **Files to Create/Modify:**
@@ -4416,10 +4416,10 @@ git diff --check
 
 | Path | Action | Purpose |
 |---|---|---|
-| `app/capabilities/data/__init__.py` | CREATE | empty namespace |
-| `app/capabilities/data/tick_stream/__init__.py` | CREATE | empty namespace |
-| `app/capabilities/data/tick_stream/v1.py` | CREATE | stream Protocol/request/event |
-| `tests/capabilities/data/test_tick_stream_v1.py` | CREATE | contract tests |
+| `app/contracts/data/__init__.py` | CREATE | empty namespace |
+| `app/contracts/data/tick_stream/__init__.py` | CREATE | empty namespace |
+| `app/contracts/data/tick_stream/v1.py` | CREATE | stream Protocol/request/event |
+| `tests/contracts/data/test_tick_stream_v1.py` | CREATE | contract tests |
 
 **Specification (copy exactly):** `CAPABILITY_ID = "data.tick_stream.v1"`; frozen request fields `symbol: str`, `buffer_size: int = 256`; frozen event fields `sequence: int`, `symbol: str`, `payload: Mapping[str, object]`; Protocol `async def start(request)`, `def events() -> AsyncIterator[TickStreamEventV1]`, `async def stop()`, properties `active`, `generation_id`. Validate nonblank symbol, buffer 1..4096, sequence ≥1.
 
@@ -4437,10 +4437,10 @@ Test fake yields sequences 1,2,3 and stops.
 
 **Quality Gates:**
 ```powershell
-uv run --locked ruff format app/capabilities/data tests/capabilities/data/test_tick_stream_v1.py
-uv run --locked ruff check app/capabilities/data tests/capabilities/data/test_tick_stream_v1.py
-uv run --locked mypy app/capabilities/data tests/capabilities/data/test_tick_stream_v1.py
-uv run --locked pytest tests/capabilities/data/test_tick_stream_v1.py -q
+uv run --locked ruff format app/contracts/data tests/contracts/data/test_tick_stream_v1.py
+uv run --locked ruff check app/contracts/data tests/contracts/data/test_tick_stream_v1.py
+uv run --locked mypy app/contracts/data tests/contracts/data/test_tick_stream_v1.py
+uv run --locked pytest tests/contracts/data/test_tick_stream_v1.py -q
 git diff --check
 ```
 
@@ -4463,7 +4463,7 @@ git diff --check
 **Context to Read (and nothing else):**
 - `app/services/brokers/metatrader/snapshot_gateway.py` — bounded read stream.
 - `app/services/brokers/metatrader/adapter.py` — read-only tick mapping.
-- `app/capabilities/data/tick_stream/v1.py` — contract.
+- `app/contracts/data/tick_stream/v1.py` — contract.
 - `app/kernel/async_effects.py` — lifecycle owner.
 - `docs/dev/plugin-decoupling/audit/G2_REPORT.md` — exact broker read/session requirement IDs.
 
@@ -4523,7 +4523,7 @@ git diff --check
 **Goal.** Add a deterministic fake provider used to prove stream lifecycle and replacement without MT5 access.
 
 **Context to Read (and nothing else):**
-- `app/capabilities/data/tick_stream/v1.py` — contract.
+- `app/contracts/data/tick_stream/v1.py` — contract.
 - `app/services/data/market_events/metatrader_tick_stream/manifest.toml` — manifest style.
 - `app/kernel/async_effects.py` — lifecycle owner.
 - `tests/data/providers/data.tick_stream.metatrader/test_provider.py` — conformance names.

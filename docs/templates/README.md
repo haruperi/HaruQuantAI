@@ -1,598 +1,516 @@
 # [Domain Name]
 
-> **Package:** `[app/path/to/package]`
-> **Status:** `[Missing | Partial | Completed]`
+> **Package:** `app/services/[domain]/`
+> **Status:** `[Missing | Partial | Implemented]`
 > **Last updated:** `[YYYY-MM-DD]`
+> **Domain ID:** `D-[DOMAIN]`
 
-> This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
-> Update this file before changing the code.
+> This README is the domain package's **single source of truth** for domain boundaries, composable feature capabilities, architecture invariants, implementation sequence, progress, usage examples, and tests.
+> Update this document before modifying or adding code.
 
 ---
+
+## Code-Aligned Implementation Convention
+
+This README is the sole current target registry for the domain's feature IDs and statuses, functional requirements, domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence, and deletion behavior. `PROJECT.md` owns system scope, cross-domain behavior, system NFRs, and release gates; `ARCHITECTURE.md` owns universal package and runtime constraints. Feature-local READMEs, manifests, contract definitions, migrations, and tests provide current implementation evidence without silently changing this target registry.
+
+For focused work, load §1 for the boundary, the affected §4 feature entry, applicable §5 package rules, §7 acceptance gates, and any applicable stable labels in §9. Load the full README only for a domain-wide change or catalogue reconciliation.
+
+Implement each feature directly at `app/services/[domain]/[feature]/`, discover it through the `haruquantai.features` Python entry-point group, and declare one immutable `FeatureSpec` in `manifest.py`. Domain registries and YAML manifests are not used.
+
+Every implemented feature contains a mandatory runtime-validated `README.md`, pure `__init__.py`, strict `config.py`, lifecycle `feature.py`, and focused implementation modules. Dependencies and effects flow through `FeatureContext` and `FeatureScope`; cross-feature implementation imports are forbidden. Persistent state is declared by `FeatureSpec.state`. Capability keys use `<domain>.<name>@<major>`. FR IDs remain product, acceptance, and test-trace identities rather than separate runtime registrations. A requirement `Depends` cell expresses product sequencing, traceability, or acceptance evidence only; runtime dependencies are declared separately with exact keys in `FeatureSpec.requires` or `FeatureSpec.optional`.
+
+Feature-local automated tests live at `tests/services/[domain]/[feature]/`. Usage examples do not live under `tests/`: every core capability module documents Python and CLI usage, and exactly one designated primary domain-logic module per service feature contains the executable `if __name__ == "__main__":` demonstration. Follow the [Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md).
+
+For `D-UI`, substitute package `app/ui/` and the single-page workstation variant in `app/ui/README.md`. A `FEAT-UI-*` remains the capability/acceptance/removal owner; each visual contribution lives at `app/ui/src/widgets/[widget]/`, has exactly one owning feature, and uses a typed `manifest.ts`, strict configuration, lifecycle/render adapter, public `index.ts`, focused components, and an owning workflow README. One feature may contribute multiple widgets. Nonvisual infrastructure may live only in the documented `runtime/`, `workspaces/`, `clients/`, `context/`, `contracts/generated/`, and dev-only `mocks/` support folders, which own no second feature registry or product policy. Public contracts remain under `app/contracts/ui/`; generated TypeScript contracts are never hand-edited. Focused component tests may be colocated, while cross-widget, workspace, accessibility, browser, contract-parity, removal, and leak evidence lives under `tests/ui/`. UI features follow the same Domain → Feature → Responsibility → Functional Requirement identities and removal rules, but they do not use Python entry points or Python `__main__` harnesses. Production UI and its documentation are not verification evidence. The UI owns presentation, interaction, subscription lifecycle, and presentation state only, never business policy or authoritative domain state.
 
 ## 1. Purpose and Boundary
 
 ### Purpose
 
-[Describe the final outcome this package must deliver in 2–4 sentences.]
+[Describe the high-level purpose and business outcome this domain delivers in 2–4 sentences.]
 
 ### Owns
 
-- [Responsibility owned by this package]
-- [Responsibility owned by this package]
+- [Core domain responsibility / business capability]
+- [Core domain responsibility / business capability]
 
 ### Does not own
 
-- [Responsibility owned by another package]
-- [Explicitly unsupported behaviour]
+- [Responsibility owned by another domain package]
+- [Explicitly unsupported behaviour or external concern]
 
-### Shared contracts
+### Shared Contracts
 
-Contract definitions must match the name, version, and owner recorded in the top-level system document.
+Contracts define the domain's public API and event types. In accordance with architectural invariants, all contracts live in `app/contracts/[domain]/` outside removable feature implementation packages. Feature and FR IDs are documentation/acceptance identities; runtime bindings use exact versioned capability keys declared by contracts and `FeatureSpec`. A counterparty may be a producer, consumer, or observer and does not by itself establish import or runtime dependency direction:
 
-**Owned by this domain** (commands/requests it receives, events/results it produces, channels it provides) — defined authoritatively here:
+**Owned by this domain** (interfaces, DTOs, and typed events provided by this domain):
 
-| Status | Contract | Version | Counterparty | Purpose |
+| Status | Capability / Event | Protocol / DTO Symbol | Version | Purpose |
 |---|---|---|---|---|
-| Missing | `[ContractName]` | `v1` | `[Producing or consuming domain]` | [Purpose] |
+| Missing | `[domain].[capability-name]@1` | `[ProtocolName]` | `1` | [Primary capability purpose] |
+| Missing | `[domain].[event-name]` | `[EventDTO]` | `1` | [Domain event notification] |
 
-**Consumed from other domains** — referenced only, never redefined:
+**Consumed from other domains** (capabilities and events required or optionally consumed from other domains):
 
-| Contract | Version | Owner | Used for |
-|---|---|---|---|
-| `[ContractName]` | `v1` | `[Owning domain]` | [How this domain uses it] |
+| Capability / Event | Owning Domain | Required / Optional | Consuming Feature | Used For |
+|---|---|---|---|---|
+| `[domain].[capability-name]@1` | `[owning_domain]` | Required | `FEAT-[DOMAIN]-[VERB_ADJECTIVE]` | [Purpose] |
+| `[domain].[capability-name]@1` | `[owning_domain]` | Optional | `FEAT-[DOMAIN]-[VERB_ADJECTIVE]` | [Purpose] |
 
-### Persisted state
+### Persisted State Ownership
 
-Only for domains that persist state. Must match the data ownership table in the top-level system document. Only this domain writes this state; other domains read it through this domain's public contracts.
+Persisted state partitions are owned exclusively by features in this domain. External domains access state only via public capability contracts:
 
-| Status | State / Store | Read access (via contract) | Migration definitions |
-|---|---|---|---|
-| Missing | `[Table / artifact store]` | `[Consuming domains and contract]` | `[Path or None]` |
-
-### Four-level structure
-
-| Code level | Represents |
-|---|---|
-| **Package** | Domain |
-| **Module folder** | Feature / capability |
-| **File** | Use case or focused responsibility |
-| **Class / function / method** | Functional requirement behaviour |
-
-```text
-Package
-└── Module folder
-    └── File
-        └── Class / Function / Method
-```
-
-
-### Package capability map
-
-This diagram shows the package and its feature modules at a glance.
-
-```mermaid
-flowchart TD
-    DOMAIN[[Domain Package]]
-
-    DOMAIN --> MOD1[[Module 1: Feature / Capability]]
-    DOMAIN --> MOD2[[Module 2: Feature / Capability]]
-    DOMAIN --> MOD3[[Module 3: Feature / Capability]]
-
-    MOD1 --> FILE1[File: Use Case / Responsibility]
-    MOD1 --> FILE2[File: Use Case / Responsibility]
-    MOD2 --> FILE3[File: Use Case / Responsibility]
-    MOD3 --> FILE4[File: Use Case / Responsibility]
-```
-
-Replace the placeholders with the real package, module, and file names.
+| Status | State Namespace | Owning Feature | Driver | Retention Policy | Read Access (via Contract) |
+|---|---|---|---|---|---|
+| Missing | `[domain].[feature_partition]` | `FEAT-[DOMAIN]-[VERB_ADJECTIVE]` | `sqlite` | `retain` | `[Consuming domains via capability]` |
 
 ---
 
-## 2. Final Package Structure
+### Four-Level Structural Hierarchy
 
-Define the intended end state before implementation.
-
-Arrange module folders and files from the **lowest dependency to the highest dependency**. Their order in this README is also their implementation order.
+| Code Level | Represents | Example |
+|---|---|---|
+| **Package** | Domain Package | `app/services/data/` |
+| **Module Folder** | Composable Feature Package | `app/services/data/ingest_history/` (`FEAT-DATA-INGEST_HISTORY`) |
+| **File** | Lifecycle / Manifest / Use Case | `manifest.py`, `feature.py`, `config.py`, `ingest_history.py` |
+| **Class / Function / Method** | Functional Requirement Behavior | `FR-DATA-IMPORT_LOCAL_FILES` (`ingest_history()`) |
 
 ```text
-[package_name]/
-├── __init__.py
-├── README.md
-├── [module_1]/                         # Feature: [Feature name]
-│   ├── __init__.py                     # Public feature exports
-│   ├── [file_1].py                     # Use case: [Responsibility]
-│   ├── [file_2].py                     # Use case: [Responsibility]
-│   └── [file_3].py                     # Use case: [Responsibility]
-└── [module_2]/                         # Feature: [Feature name]
-    ├── __init__.py
-    └── [file_4].py
+app/services/[domain]/
+├── __init__.py                                     # Pure docstring only (ARCH-001)
+├── README.md                                       # Domain architecture & capability catalog
+└── [feature_folder]/                              # Feature: FEAT-[DOMAIN]-[VERB_ADJECTIVE]
+    ├── __init__.py                                 # Pure docstring only (ARCH-001)
+    ├── README.md                                   # Mandatory runtime mirror; use the feature template below
+    ├── manifest.py                                 # FeatureSpec (SPEC) declaration
+    ├── config.py                                   # Typed config schema with .from_dict()
+    ├── feature.py                                  # Feature mount adapter and zero-argument factory
+    ├── [use_case_1].py                             # Focused business use case / responsibility
+    └── [use_case_2].py                             # Focused business use case / responsibility
 ```
 
-### Module dependency diagram
+### Domain Capability Map
 
-This diagram is required. It shows the implementation and dependency direction between feature modules.
+```mermaid
+flowchart TD
+    DOMAIN[[Domain: app/services/[domain]]]
+
+    DOMAIN --> FEAT1[["FEAT-[DOM]-[FEAT_1]<br>(Provides: dom.cap1@1)"]]
+    DOMAIN --> FEAT2[["FEAT-[DOM]-[FEAT_2]<br>(Provides: dom.cap2@1)"]]
+
+    FEAT1 --> M1[manifest.py / config.py / feature.py]
+    FEAT1 --> F1[use_case_a.py: FR-[DOM]-[VERB_1]]
+    FEAT1 --> F2[use_case_b.py: FR-[DOM]-[VERB_2]]
+
+    FEAT2 --> M2[manifest.py / config.py / feature.py]
+    FEAT2 --> F3[use_case_c.py: FR-[DOM]-[VERB_3]]
+```
+
+---
+
+## 2. Final Package Structure and Feature Independence
+
+Feature modules inside a domain must be **completely independent and physically removable**:
+
+1. **No Inter-Feature Imports:** Feature A must never import Feature B directly (enforced by `ARCH-006` and Import Linter).
+2. **Contract-Only Communication:** If Feature A needs capabilities from Feature B, it declares a dependency on `FeatureSpec.requires` and resolves it via `context.require(CAPABILITY_KEY)`.
+3. **Init Purity:** All `__init__.py` files contain docstrings only — no executable code or imports (`ARCH-001`).
+
+```text
+app/services/[domain]/
+├── __init__.py
+├── README.md
+├── [feature_1]/                                    # FEAT-[DOMAIN]-[FEAT_1]
+│   ├── __init__.py
+│   ├── README.md
+│   ├── manifest.py
+│   ├── config.py
+│   ├── feature.py
+│   └── [use_case_1].py
+└── [feature_2]/                                    # FEAT-[DOMAIN]-[FEAT_2]
+    ├── __init__.py
+    ├── README.md
+    ├── manifest.py
+    ├── config.py
+    ├── feature.py
+    └── [use_case_2].py
+```
+
+### Feature Capability Dependency Direction
+
+Feature dependencies are resolved at runtime through the Composition Engine and Service Registry, pointing strictly towards contracts:
 
 ```mermaid
 flowchart LR
-    MOD1[[Module 1: Lowest dependency]]
-    MOD2[[Module 2]]
-    MOD3[[Module 3: Highest dependency]]
+    subgraph Contracts ["app/contracts/[domain]/"]
+        CAP1["Capability Contract 1"]
+        CAP2["Capability Contract 2"]
+    end
 
-    MOD1 --> MOD2
-    MOD1 --> MOD3
-    MOD2 --> MOD3
+    subgraph Domain ["app/services/[domain]/"]
+        FEAT1["FEAT-[DOM]-[FEAT_1]"]
+        FEAT2["FEAT-[DOM]-[FEAT_2]"]
+    end
+
+    FEAT1 -.->|"Provides"| CAP1
+    FEAT2 -.->|"Provides"| CAP2
+    FEAT2 -.->|"Requires via Context"| CAP1
+    FEAT2 x-.-x|"FORBIDDEN (Direct Import)"| FEAT1
 ```
-
-Rules:
-
-- Dependencies point from the required module to the module that consumes it.
-- The diagram must match the top-to-bottom order of module specifications in Section 4.
-- Circular dependencies are not allowed.
-
-### Structure rules
-
-- The package root normally contains only `README.md`, `__init__.py`, and module folders.
-- Each module folder represents one feature or capability.
-- Each file has one focused responsibility.
-- A public class, function, method, or constant represents required public behaviour or data.
-- Multiple functional requirements may be implemented in one file when they belong to the same focused responsibility.
-- Private helpers are implementation details and do not need requirement IDs unless they provide independently required behaviour.
-- Usage examples live under `tests/[domain]/usage/`, not inside the production package.
-- Add folders, files, classes, and design patterns only when a real requirement needs them.
 
 ---
 
 ## 3. Workflows
 
-Workflows show how public functions collaborate to deliver real value. They are behaviour descriptions, not an additional structural level.
+Workflows describe how functional requirements collaborate to deliver end-to-end domain outcomes.
 
-This section includes:
-
-- **Internal workflows:** Completed entirely inside this domain.
-- **Cross-domain workflows:** Workflows where this domain receives input from, or sends output to, another domain.
-
-For cross-domain workflows, document only this domain's participation:
-
-```text
-Input boundary
-→ this domain's responsibilities
-→ output boundary
-```
-
-Do not duplicate the internal implementation of other domains. The full multi-domain workflow may be documented in top-level system documentation when required.
-
-### Status values
-
-| Status | Meaning |
-|---|---|
-| **Missing** | Not implemented or not verified |
-| **Partial** | Partly implemented or tests are incomplete |
-| **Completed** | Implemented, tested, and verified |
-
-### Workflow scope values
+### Workflow Scope Values
 
 | Scope | Meaning |
 |---|---|
-| **Internal** | The complete workflow occurs within this domain. |
-| **Cross-domain** | This domain participates in a wider workflow involving other domains. |
+| **Internal** | Complete workflow executes within this domain's features. |
+| **Cross-Domain** | Initiated by external events/API and coordinates across domains via contracts. |
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
+| Status | Workflow ID | Scope | Workflow | Input Boundary | Output Boundary | Requirement Sequence |
 |---|---|---|---|---|---|---|
-| Missing | `WF-[DOM]-001` | Internal | [Workflow name] | [Internal trigger] | [Observable result] | `FR-[DOM]-001 → FR-[DOM]-002` |
-| Missing | `WF-[DOM]-002` | Cross-domain | [Workflow name] | [Input received from another domain] | [Output returned or published to another domain] | `FR-[DOM]-003 → FR-[DOM]-004` |
+| Missing | `WF-[DOM]-[VERB_1]` | Internal | [Workflow name] | [Internal trigger / call] | [Observable result] | `FR-[DOM]-[ACTION_1] → FR-[DOM]-[ACTION_2]` |
+| Missing | `WF-[DOM]-[VERB_2]` | Cross-Domain | [Workflow name] | [Contract invocation from external API] | [Event published / Persisted state] | `FR-[DOM]-[ACTION_3] → FR-[DOM]-[ACTION_4]` |
 
-### `WF-[DOM]-001` — [Workflow Name]
+### `WF-[DOM]-[VERB_1]` — [Workflow Name]
 
-**Scope:** `[Internal | Cross-domain]`
+**Scope:** `[Internal | Cross-Domain]`
 
-**System workflow:** [`SYS-WF-*` ID(s) from the top-level system document this workflow participates in, or `None` for internal workflows.]
+**Input Boundary:** [What enters this domain and where it comes from]
+**Output Boundary:** [What leaves this domain and where it goes]
 
-**Input boundary:** [What enters this domain and where it comes from. Use `Internal` when not applicable.]
+1. `[service.method()]` receives or retrieves [input].
+2. `[validate_request()]` enforces validation rules (`FR-[DOM]-[VALIDATE_INPUT]`).
+3. `[use_case.execute()]` coordinates business transformation (`FR-[DOM]-[EXECUTE_ACTION]`).
+4. Context publishes typed event `[DomainEventDTO]` to the event bus.
 
-**Output boundary:** [What leaves this domain and where it goes. Use `Internal` when not applicable.]
-
-1. `[function_a()]` receives or retrieves [input].
-2. `[function_b()]` validates or transforms [input].
-3. `[function_c()]` performs [main action].
-4. The package returns, stores, or publishes [result].
-
-**Failure behaviour:**
-
-- [Condition] → [Expected response]
-- [Condition] → [Expected response]
-
-**Integration test:**
-`tests/[domain]/integration/test_[workflow_name].py::test_[workflow_name]_[scenario]()`
-
-#### End-to-end workflow diagram
-
-Use a flowchart for a straightforward workflow:
-
-```mermaid
-flowchart LR
-    A[Trigger / Input]
-    B["FR-[DOM]-001: function_a"]
-    C["FR-[DOM]-002: function_b"]
-    D["FR-[DOM]-003: function_c"]
-    E[Final Outcome]
-
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-```
-
-Use a sequence diagram when interactions, responses, or external dependencies are important:
+**Failure Behaviour:**
+- [Invalid input condition] → Raises `ValueError`
+- [Missing dependency] → Feature transitions to `BLOCKED`
 
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant ModuleA
-    participant ModuleB
-    participant External
+    participant API as Public API / Caller
+    participant Feature as Feature Context
+    participant Service as Domain Service
+    participant Storage as System Storage
 
-    Client->>ModuleA: Call function_a()
-    ModuleA->>ModuleB: Call function_b()
-    ModuleB->>External: Perform operation
-    External-->>ModuleB: Return result
-    ModuleB-->>ModuleA: Return processed result
-    ModuleA-->>Client: Final outcome
+    API->>Feature: Call Capability Method
+    Feature->>Service: Execute Use Case (FR-[DOM]-[ACTION])
+    Service->>Storage: Store Persistent State (FR-SYS-STORE_PERSISTENT_DATA)
+    Service-->>Feature: Return Typed DTO
+    Feature-->>API: Return Result
 ```
-
-The diagram must show how the functional requirements collaborate.
-
-For a cross-domain workflow:
-
-- cite the `SYS-WF-*` ID(s) it participates in;
-- show the external domain only at the input or output boundary;
-- fully describe only this domain's functions and responsibilities;
-- do not describe another domain's internal steps.
-
-> Add detailed steps only for workflows involving multiple functions or files.
-> A simple one-function use case needs only a row in the workflow table.
 
 ---
 
-## 4. Module and Requirement Specifications
+## 4. Composable Feature Specifications
 
-This section is also the implementation plan.
+Every feature folder represents an isolated, composable, and physically removable unit. This domain section is authoritative for product behavior and acceptance scope; the mandatory feature-local `README.md` is its runtime-validated implementation mirror.
 
-Apply these ordering rules:
-
-1. Arrange module sections by dependency order.
-2. Inside each module, arrange file rows by dependency order.
-3. Inside each file, arrange functional requirements by dependency or execution order.
-4. Implement from the top of this section downward.
-
-Copy the following module block once for every module folder.
+Copy the following specification block for each feature module in this domain:
 
 ---
 
-### 4.1 `[module_name]/` — [Feature / Capability]
+### 4.1 `[feature_folder]/` — `FEAT-[DOMAIN]-[VERB_ADJECTIVE]`
 
-**Purpose:** [Describe the single capability this module provides.]
+> **Feature ID:** `FEAT-[DOMAIN]-[VERB_ADJECTIVE]`
+> **Domain:** `[domain]`
+> **Status:** `[Missing | Partial | Implemented]`
 
-**Module flow:**
+#### Purpose
 
-```text
-[input]
-  → [file_a.function_a()]
-  → [file_b.function_b()]
-  → [result]
-```
+[Describe the single capability and business purpose this feature provides in 2–3 sentences.]
 
-### Files
+#### Capability Declarations
 
-List files in implementation order.
+- **Provides:**
+  - `[domain].[capability-name]@1`
+- **Required Capabilities:**
+  - `[other-domain].[capability-name]@1` (or `None (root provider)`)
+- **Optional Capabilities:**
+  - `system.metrics@1`
+  - `data.bar-cache@1`
 
-| Status | File | Responsibility | Key exports | Dependencies |
+#### Feature Configuration & Limits Manifest
+
+Defined in `config.py` as a validated dataclass with `.from_dict()`:
+
+| Status | Setting / Limit | Type | Default | Required | Description |
+|---|---|---|---|---|---|
+| Missing | `[setting_name]` | `str` | `"default_val"` | No | [Purpose and default value] |
+| Missing | `[max_limit]` | `Decimal` | `[value]` | Yes | [Maximum threshold and violation rule] |
+
+#### Runtime Effects & Scope Disposal
+
+All runtime effects are owned by `FeatureScope` and disposed when reconciliation closes that scope. A feature-owned `unmount()` method is not mandatory:
+
+| Effect | Owner | Disposal Mechanism |
+|---|---|---|
+| `[CapabilityProtocol]` service binding | `FEAT-[DOMAIN]-[VERB_ADJECTIVE]` | Unregister capability from registry |
+| Background worker task | `FEAT-[DOMAIN]-[VERB_ADJECTIVE]` | Cancel and await task completion |
+| Event bus listener | `FEAT-[DOMAIN]-[VERB_ADJECTIVE]` | Unsubscribe listener from EventBus |
+
+#### Persistent State Ownership
+
+- **Namespace Partition:** `[domain].[feature_name]`
+- **Schema Version:** `1`
+- **Retention Policy:** `retain` (state remains on disk / SQLite across deactivate/reactivate cycles)
+- **Purge Policy:** `explicit`
+
+#### Feature Package Structure & Files
+
+| Status | File | Responsibility | Key Exports / Implementing Symbols | Dependencies |
 |---|---|---|---|---|
-| Missing | `[file_a].py` | [Single focused responsibility] | `[function_a]`, `[ClassA]`, `[CONSTANT_A]` | **Standard library:** `[decimal, datetime]`<br>**Required third-party:** `[pandas]`<br>**Local:** None |
-| Missing | `[file_b].py` | [Single focused responsibility] | `[function_b]` | **Standard library:** `[typing]`<br>**Required third-party:** `[MetaTrader5]`<br>**Local:** `[file_a].py → function_a` |
-| Missing | `__init__.py` | Expose the supported public feature API | `[function_a]`, `[ClassA]`, `[function_b]` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `[file_a].py → function_a, ClassA`; `[file_b].py → function_b` |
+| Missing | `manifest.py` | Declare `FeatureSpec` (`SPEC`) | `SPEC`, `FEATURE_ID` | Standard: None<br>Contracts: `[CAPABILITY_KEY]`<br>Kernel: `FeatureSpec`, `CapabilityKey` |
+| Missing | `config.py` | Validate feature configuration schema | `[FeatureConfig]` | Standard: `dataclasses`, `typing`<br>Contracts: None |
+| Missing | `feature.py` | Implement asynchronous `mount()` and the zero-argument factory | `[FeatureClass]`, `create_feature()` | Standard: `typing`<br>Kernel: `FeatureContext`, `FeatureScope` |
+| Missing | `[use_case_1].py` | Execute core business logic; this designated primary module owns the feature's `__main__` usage harness | `[UseCaseService]`, `_run_usage_example()` | Standard: `datetime`, `decimal`<br>Contracts: `[DTOs]` |
+| Missing | `README.md` | Feature-level specification | None | Markdown documentation |
 
-### Dependency writing format
+#### Functional Requirements (FR)
 
-Always list dependencies in this order:
-
-```text
-Standard library: [library names or None]
-Required third-party: [library names or None]
-Local: [file/module → imported class, function, or constant]
-```
-
-Example:
-
-```text
-Standard library: decimal, dataclasses
-Required third-party: pandas
-Local: validation.py → validate_order; models.py → OrderRequest
-```
-
-Do not list optional or unused imports.
-
-### Configuration and Limits Manifest
-
-Configuration and limits belong to the feature module that owns and enforces them.
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
+| Status | Requirement ID | Responsibility | Implementing Symbol | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
-| Missing | `[SETTING_NAME]` | `[str]` | `None` | Yes | `[Class.method()]` | [Purpose and enforced behaviour] |
-| Missing | `[MAX_LIMIT]` | `[Decimal]` | `[value]` | Yes | `[function_a()]` | [Maximum permitted value and failure behaviour] |
-| Missing | `[TIMEOUT_SECONDS]` | `[float]` | `[5.0]` | No | `[function_b()]` | [Operation timeout] |
-| Missing | `[ENABLE_FEATURE]` | `[bool]` | `False` | No | `[PublicClass]` | [Whether this feature is enabled] |
+| Missing | `FR-[DOM]-VALIDATE_CONFIG` | Validate feature configuration parameters | `[FeatureConfig].from_dict()` | None | `ValueError`: invalid config | **Unit:** `tests/services/[domain]/[feature]/test_config.py` |
+| Missing | `FR-[DOM]-[ACTION_1]` | The system shall [perform observable action] | `[function_name](...) -> DTO` | `None` (pure) | `ValueError`: invalid input | **Unit:** `tests/services/[domain]/[feature]/test_[use_case].py`<br>**Usage:** `app/services/[domain]/[feature]/[use_case_1].py::__main__` scenario `[action_1]` |
+| Missing | `FR-[DOM]-[ACTION_2]` | The system shall [persist state / coordinate] | `[Service.execute](...) -> Result` | `Persistence write` | `RuntimeError`: failed storage | **Unit:** `tests/services/[domain]/[feature]/test_[use_case].py` |
 
-Rules:
+#### Failure Behaviour
 
-- Define each feature-specific setting or limit once in this manifest.
-- Use the exact code constant, environment variable, or configuration field name.
-- `Used by` identifies the public classes, functions, or methods that consume or enforce it.
-- A limit must state what happens when it is exceeded.
-- Shared settings used by several modules belong in Section 5 as package-wide requirements or configuration.
-- Change a row to `Completed` only after the setting exists, is validated, and has tests.
+- **Missing Required Dependency:** Feature fails readiness check and transitions to `BLOCKED`.
+- **Optional Dependency Unavailable:** Feature operates in degraded fallback mode (e.g. bypasses caching).
+- **Mount Error:** Unwinds all partial registrations immediately and transitions to `FAILED_START`.
+
+#### Removal Behaviour
+
+Physically removing or disabling this feature unbinds `[domain].[capability-name]@1`. Downstream consumers requiring this capability transition cleanly to `BLOCKED` without runtime crashes.
 
 ---
 
-#### `[file_a].py` — [Use Case / Focused Responsibility]
+### Feature Usage Examples
 
-**File responsibility:** [One sentence describing why this file exists.]
-
-| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
-|---|---|---|---|---|---|---|
-| Missing | `FR-[DOM]-001` | The system shall [perform one observable behaviour]. | `[function_a](arg: Type) -> ResultType` | `[Side-effect label from the list below]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::test_usage_[file_a]_[function_a]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[function_a]_[scenario]()` |
-| Missing | `FR-[DOM]-002` | The system shall [perform one observable behaviour]. | `[ClassA.method](arg: Type) -> ResultType` | `[Side effect or None]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::test_usage_[file_a]_[method]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[method]_[scenario]()` |
-| Missing | `FR-[DOM]-003` | The system shall expose [required public constant or contract]. | `[CONSTANT_A]: Type` | `None` | None | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::test_usage_[file_a]_[constant_a]()`<br>**Unit:** `tests/[domain]/unit/test_[file_a].py::test_[constant_a]_[scenario]()` |
-
-### Side-effect values
-
-Use the smallest accurate label:
-
-```text
-None
-Read-only
-Local state mutation
-Persistence write
-External API call
-Broker mutation
-Event publication
-```
-
-Combine labels only when necessary, for example: `Broker mutation; persistence write`.
-
-**Rules:**
-
-- [Validation, business, security, or failure rule]
-- [Important guarantee or side effect]
-- [Boundary that this file must preserve]
-
-**Implementation notes:**
-
-- [Minimal technical direction needed to implement correctly]
-- [Existing component that must be reused]
-- [Constraint that prevents duplication or unnecessary abstraction]
-
----
-
-#### `[file_b].py` — [Use Case / Focused Responsibility]
-
-**File responsibility:** [One sentence describing why this file exists.]
-
-| Status | Requirement ID | Responsibility | Class / Function / Method | Side Effects | Raises | Usage / Test |
-|---|---|---|---|---|---|---|
-| Missing | `FR-[DOM]-004` | The system shall [perform one observable behaviour]. | `[function_b](arg: Type) -> ResultType` | `[Side effect or None]` | `[Error]`: [condition] | **Usage:** `tests/[domain]/usage/test_usage_[module_name].py::test_usage_[file_b]_[function_b]()`<br>**Unit:** `tests/[domain]/unit/test_[file_b].py::test_[function_b]_[scenario]()` |
-
-**Rules:**
-
-- [Rule]
-- [Rule]
-
-**Implementation notes:**
-
-- [Minimal technical direction]
-
----
-
-### Feature usage examples
-
-Keep all public feature examples under:
-
-```text
-tests/[domain]/usage/
-└── test_usage_[module_name].py
-```
-
-Use one example function for each public functional requirement, named `test_usage_*` so pytest collects it:
+Every core capability module starts with a comprehensive header docstring covering its purpose, key capabilities, Python API usage, and executable module command. Exactly one primary domain-logic module owns the service feature's executable demonstration:
 
 ```python
-def test_usage_[file_a]_[function_a]() -> None:
-    """Demonstrate FR-[DOM]-001."""
-    ...
+# app/services/[domain]/[feature]/[use_case_1].py
+def _run_usage_example() -> None:
+    """Demonstrate and verify the feature with bounded safe inputs."""
+    request = [RequestDTO](...)
+    result = [public_function](request)
+    if result is None:
+        raise RuntimeError("Usage verification failed")
+    print(result)
 
 
-def test_usage_[file_a]_[method]() -> None:
-    """Demonstrate FR-[DOM]-002."""
-    ...
-
-
-def test_usage_[file_b]_[function_b]() -> None:
-    """Demonstrate FR-[DOM]-004."""
-    ...
+if __name__ == "__main__":
+    _run_usage_example()
 ```
 
-Example functions must:
-
-- be independently runnable;
-- import only the documented public feature API;
-- demonstrate one functional requirement;
-- show realistic input and the expected result;
-- avoid duplicating implementation logic;
-- be collected and executed by pytest (`test_usage_*` naming guarantees this).
+Run it with `uv run python -m app.services.[domain].[feature].[use_case_1]`. Map every applicable FR to a named scenario in this single harness. Automated tests verify the behavior separately and are not usage examples.
 
 ---
 
-### 4.2 `[module_name]/` — [Feature / Capability]
+## 5. Package-Wide Requirements, Configuration, and Architecture Invariants
 
-> Copy Section 4.1 for every additional module folder.
-> Place this module after every module it depends on.
-
----
-
-## 5. Package-Wide Requirements and Shared Configuration
-
-### Persistence - Database
-
-This section is the canonical current-state and target database specification for this domain. Executable schema remains owned by the domain migration manifest; applied migration-ledger steps describe the live database when they differ from this target. The domain-owned table namespace is `[namespace_]`.
-
-> **Guidance for Domain Authors:**
-> - If this domain is **stateless or calculation-only** (owns no tables, e.g. pure transformation, UI, or stateless calculation), explicitly state that the domain owns no database entities, describe why, and record the reserved table prefix if applicable.
-> - If this domain **persists state**, document the domain's table model, migration steps, and table definitions below.
-> - Tables must adhere to repository data modeling standards (`docs/ARCHITECTURE.md` § Data Models & Schema Management):
->   - Use the domain-specific prefix for all tables and indexes (e.g. `[namespace_]`).
->   - Tables must use `STRICT` mode.
->   - Identifiers and timestamps (ISO 8601 UTC) use `TEXT`.
->   - Financial amounts and precision-critical numbers use `TEXT` (parsed via `decimal.Decimal`).
->   - Booleans use `INTEGER` with `CHECK (col IN (0, 1))`.
->   - Dynamic payloads use `*_json TEXT NOT NULL CHECK (json_valid(payload_json))`.
->   - Standard audit columns: `request_id TEXT NOT NULL`, `correlation_id TEXT NOT NULL`, `created_at TEXT NOT NULL`, `updated_at TEXT NOT NULL`.
->   - Index naming convention: `idx_[namespace]_[table]_[columns]`.
-
-#### `[namespace_table_name]`
-
-[Describe the table's purpose, lifecycle, immutability rules, and access patterns.]
-
-```sql
-CREATE TABLE [namespace_table_name] (
-    [entity_id]          TEXT    PRIMARY KEY,
-    [code]               TEXT    NOT NULL UNIQUE,
-    [profile]            TEXT    NOT NULL CHECK (profile IN ('research', 'simulation', 'demo', 'live')),
-    [amount_decimal]     TEXT    NOT NULL,
-    [is_active]          INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
-    [payload_json]       TEXT    NOT NULL CHECK (json_valid(payload_json)),
-    [request_id]         TEXT    NOT NULL,
-    [correlation_id]     TEXT    NOT NULL,
-    [created_at]         TEXT    NOT NULL,
-    [updated_at]         TEXT    NOT NULL,
-    [deleted_at]         TEXT
-) STRICT;
-
-CREATE INDEX idx_[namespace]_[table]_[col] ON [namespace_table_name]([profile], [created_at] DESC);
-```
-
-[Explain key columns, soft references (e.g., `-- soft ref → other_table`), indexing rationale, and constraint rules.]
-
----
-
-### Shared Configuration
-
-Use this section only for requirements, settings, or limits that apply across multiple modules.
-
-For shared configuration, use the same manifest columns as the module-level Configuration and Limits Manifest.
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Missing | `[SETTING_NAME]` | `[str]` | `None` | Yes | `[Class.method()]` | [Purpose and enforced behaviour] |
-
----
-
-### Non-Functional Requirements
-
-| Status | Requirement ID | Type | Responsibility | Verification |
+| Status | Requirement ID | Category | Rule & Architectural Constraint | Verification Method |
 |---|---|---|---|---|
-| Missing | `NFR-[DOM]-001` | Maintainability | Every file shall have one focused responsibility. | Structure review |
-| Missing | `NFR-[DOM]-002` | API boundary | Other packages shall use only documented public exports. | Import tests |
-| Missing | `NFR-[DOM]-003` | Testing | Automated tests shall cover every public functional requirement. | Test audit |
-| Missing | `NFR-[DOM]-004` | Performance | [Performance requirement.] | Benchmark |
-| Missing | `NFR-[DOM]-005` | Security | [Security requirement.] | Security test |
-| Missing | `NFR-[DOM]-006` | Reliability | [Reliability requirement.] | Failure-path test |
+| Missing | `ARCH-001` | Init Purity | All `__init__.py` files contain docstrings only; no imports or code. | `scripts/architecture_check.py` |
+| Missing | `ARCH-002` | Managed Tasks | Coroutines are spawned exclusively via `FeatureContext.spawn()`. | `scripts/architecture_check.py` |
+| Missing | `ARCH-003` | Logging Hygiene | No root `logging.basicConfig()` calls in service packages. | `scripts/architecture_check.py` |
+| Missing | `ARCH-004` | Contract Purity | Contracts live exclusively in `app/contracts/` and have no service dependencies. | Import Linter & AST |
+| Missing | `ARCH-005` | Interfaces Purity | D-IFACE features use public contracts and declared capabilities without importing service implementations. | Import Linter & AST |
+| Missing | `ARCH-006` | Feature Independence | Features never import other features directly. | Import Linter & AST |
+| Missing | `NFR-[DOM]-001` | Maintainability | Every file has exactly one focused responsibility. | Code Review & AST |
+| Missing | `NFR-[DOM]-002` | Type Safety | Python 3.14 strict typing with zero `type: ignore` bypasses. | `mypy` |
+| Missing | `NFR-[DOM]-003` | Test Coverage | Comprehensive branch and line test coverage $\ge 80\%$. | `pytest --cov` |
 
 ---
 
 ## 6. Open Decisions
 
-Use this section only for unresolved choices that would otherwise force the implementer to guess.
+Use this section only for unresolved architectural choices that would otherwise require guessing:
 
-| Status | Decision | Options / Notes |
-|---|---|---|
-| Open | [Decision still required] | [Available options, constraints, or missing information] |
-
-Rules:
-
-- `Open` means implementation of the affected requirement must not begin.
-- A decision affecting more than one domain must also appear in the top-level system document's Open Decisions section.
-- When a decision is resolved, encode its outcome in the authoritative requirements, contracts, workflows, configuration, boundaries, or exclusions, then delete the decision row and any resolved issue entry.
-- Do not retain resolved, superseded, retired, or deferred-from-initial-scope decisions as history; record the documentation change in the changelog.
-- Do not add an entry when the README already defines the answer clearly.
+| Status | Decision ID | Decision Required | Options / Constraints | Impacted Features |
+|---|---|---|---|---|
+| Closed | `DEC-[DOM]-001` | [Resolved decision description] | [Chosen option and rationale] | `FEAT-[DOM]-[FEAT_1]` |
 
 ---
 
 ## 7. Tests and Definition of Done
 
-### Test and usage locations
+### Test Suite Structure
 
 ```text
-tests/[domain]/
-├── unit/                         # Individual functions, methods, classes, and files
-├── integration/                  # Module and end-to-end workflow collaboration
-└── usage/                        # Runnable public usage examples
+tests/
+├── services/[domain]/[feature]/           # Feature-level automated verification (Category A)
+│   ├── test_config.py                     # FR-[DOM]-VALIDATE_CONFIG
+│   ├── test_manifest.py                   # FeatureSpec verification
+│   ├── test_feature.py                    # Mount / scope-teardown lifecycle
+│   └── test_[use_case].py                 # Core business algorithms & failure paths
+├── architecture/test_registered_feature_contracts.py # Generic feature contract suite
+├── composition/test_lifecycle_leak.py     # Lifecycle leak & 100x churn suite
+└── services/interfaces/<feature>/         # D-IFACE gateway and parity tests
 ```
 
 ### Commands
 
 ```bash
-uv run ruff check app/[path]/[package]
-uv run ruff format --check app/[path]/[package]
-uv run mypy app/[path]/[package]
+# 1. Format and lint
+uv run ruff format .
+uv run ruff check .
 
-uv run pytest tests/[domain]/unit
-uv run pytest tests/[domain]/integration
-uv run pytest tests/[domain]/usage
+# 2. Strict type check (Python 3.14)
+uv run mypy
 
-uv run pytest tests/[domain]   --cov=app/[path]/[package]   --cov-fail-under=80
+# 3. Architecture & import contracts
+uv run lint-imports
+uv run python scripts/architecture_check.py
+
+# 4. Feature physical removability test (Category D)
+uv run python scripts/verify_feature_removal.py --feature FEAT-[DOMAIN]-[VERB_ADJECTIVE]
+
+# 5. Full CI Quality Gate (all tests + coverage >= 80%)
+uv run python scripts/ci_check.py
 ```
 
-### Required test levels
+### Feature Definition of Done Checklist
 
-- **Unit:** Verify each `FR-*` requirement and each file's failure paths.
-- **Integration:** Verify feature workflows and important workflows across module boundaries.
-- **Usage:** Run every documented public usage example as a test.
+A feature within this domain is not complete until all 20 criteria are verified:
 
-### Package completion checklist
-
-- [ ] The actual package tree matches Section 2.
-- [ ] Module sections and file rows remain arranged in dependency order.
-- [ ] Every module folder represents one coherent feature.
-- [ ] Every file has one focused responsibility.
-- [ ] Every requirement table has a status of `Completed`.
-- [ ] Every workflow has a status of `Completed` and an integration test under `tests/[domain]/integration` when collaboration is involved.
-- [ ] Every package-wide requirement has a status of `Completed`.
-- [ ] Every public export is listed under `Key exports`.
-- [ ] Contracts owned by this domain match the top-level system document (name, version, owner).
-- [ ] Persisted state matches the top-level data ownership table; no other domain's state is written.
-- [ ] Every dependency is documented in the required order.
-- [ ] Every public functional requirement has one example under `tests/[domain]/usage` and at least one unit test under `tests/[domain]/unit`.
-- [ ] No undocumented public class, function, method, or constant exists.
-- [ ] No planned file or public export is missing.
-- [ ] No unresolved `Open` decision affects completed requirements.
-- [ ] No unnecessary abstraction was introduced.
-- [ ] All tests and quality checks pass.
+- [ ] 1. **Stable Feature ID:** Declares a permanent ID conforming to `FEAT-[DOMAIN]-[VERB_ADJECTIVE]`.
+- [ ] 2. **Single Domain Ownership:** Belongs to exactly one domain.
+- [ ] 3. **Cohesive Capability Set:** Provides one cohesive capability or closely related capability set.
+- [ ] 4. **External Contracts:** All contracts live outside feature package in `app/contracts/[domain]/`.
+- [ ] 5. **Declared Dependencies:** Required and optional capabilities declared in `FeatureSpec`.
+- [ ] 6. **Zero Feature Imports:** Never imports another feature implementation directly (`ARCH-006`).
+- [ ] 7. **Zero Import-Time I/O:** Performs no I/O, database access, or registration during module import.
+- [ ] 8. **Scoped Runtime Effects:** Every service binding, task, and listener registered through `FeatureContext`.
+- [ ] 9. **Mount Rollback:** Mount failure cleanly unwinds all partial effects without leaking state.
+- [ ] 10. **Idempotent Teardown:** Reconciler-owned `scope.close()` is completely safe when called repeatedly.
+- [ ] 11. **Required-Dependency Loss Tested:** Feature transitions to `BLOCKED` if required capability is absent.
+- [ ] 12. **Optional-Dependency Loss Tested:** Feature runs in degraded mode when optional capability is absent.
+- [ ] 13. **Persistent State Documented:** State namespace partition, schema version, and retention policy documented.
+- [ ] 14. **Irreversible Action Safety:** Idempotency, reconciliation, and audit persistence verified.
+- [ ] 15. **Starts Feature-Absent:** Application starts and operates cleanly with the feature deleted from disk.
+- [ ] 16. **Interfaces / UI Degradation Handled:** Public gateways expose stable unavailability or withdraw affected surfaces when the feature is absent.
+- [ ] 17. **README Complete:** README documents purpose, capability, dependencies, effects, state, and removal behavior.
+- [ ] 18. **Module Usage Documented:** Every core capability module documents purpose, key capabilities, Python API usage, and its executable command.
+- [ ] 19. **Usage Harness Green:** Exactly one primary domain-logic module owns a passing, bounded `if __name__ == "__main__":` harness covering every mapped FR scenario.
+- [ ] 20. **Quality Gates Green:** Ruff, Mypy, Import Linter, AST Invariants, and Pytest pass with $\ge 80\%$ coverage.
 
 ---
 
 ## 8. Change Process
 
-For every future change:
+For any future modification:
 
 ```text
-1. Update this README first.
-2. Add or change the workflow when system behaviour changes.
-3. Resolve or record any decision that would otherwise require guessing.
-4. Add or change the functional requirement row, including Side Effects.
-5. Update the file's key exports and dependencies.
-6. Reorder modules or files if dependency order changes.
-7. Implement the smallest code change.
-8. Add or update the usage example.
-9. Add or update tests.
-10. Change Status to Completed only after verification passes.
+1. Update this domain README or feature specification first.
+2. If contracts change, update app/contracts/[domain]/ and bump capability major version if breaking.
+3. Update FeatureSpec in manifest.py (requires, optional, provides).
+4. Update config schema in config.py if settings change.
+5. Implement minimal code changes within the focused use case file.
+6. Update comprehensive module documentation and the primary module's __main__ usage harness.
+7. Execute the usage harness and verify every mapped FR scenario.
+8. Add or update unit tests under tests/services/[domain]/[feature]/.
+9. Verify physical removability with scripts/verify_feature_removal.py.
+10. Execute uv run python scripts/ci_check.py to confirm all 6 quality gates pass 100%.
 ```
 
-This keeps requirements, dependency order, implementation, usage examples, tests, and final documentation aligned in one file.
+---
+
+## 9. Normative Domain Specification
+
+Use this section only for exact domain-owned semantics that would otherwise be duplicated in `PROJECT.md` or `ARCHITECTURE.md`: algorithms, formulas, constants, fixtures, domain schemas, state machines, parity rules, and domain-specific failure/recovery behavior. Preserve any established stable `§x.y` label when folding an older specification into this README. A label is an identifier, not this README's section number.
+
+- Keep universal representation, serialization, lifecycle, and shared persistence rules in `app/contracts/README.md`.
+- Keep package/runtime mechanics in the applicable shared-package README or `ARCHITECTURE.md`.
+- Keep system workflows, NFRs, and release gates in `PROJECT.md`.
+- Do not copy another owner's normative block; link to it and state only this domain's specialization.
+- Every normative rule must map to one or more §4 features/FRs and §7 acceptance evidence.
+
+---
+
+# Feature README Template
+
+Use this template for every implemented `app/services/[domain]/[feature]/README.md`. The level-two section names below are executable interface names consumed by `scripts/validate_feature_docs.py`; do not rename or nest them. The exact feature ID, domain, capability sets, configuration keys, and persistent-state declaration must match `FeatureSpec`.
+
+```markdown
+# [Feature Name]
+
+> **Feature ID:** `FEAT-[DOMAIN]-[ACTION_OBJECT]`
+> **Status:** `[Partial | Implemented]`
+> **Package:** `app/services/[domain]/[feature]/`
+> **Manifest:** `app/services/[domain]/[feature]/manifest.py`
+
+## Domain
+
+`[domain]`
+
+## Purpose
+
+[State the single independently selectable capability and business outcome owned by this feature.]
+
+## Provides
+
+None.
+
+<!-- Or list every exact FeatureSpec.provides identifier, for example: -->
+<!-- - `[domain].[capability]@1` -->
+
+## Required Capabilities
+
+None.
+
+<!-- Or list every exact FeatureSpec.requires identifier. -->
+
+## Optional Capabilities
+
+None.
+
+<!-- Or list every exact FeatureSpec.optional identifier and its named degradation behavior. -->
+
+## Configuration
+
+None.
+
+<!-- When config_keys is nonempty, the first column must contain every exact key and no others: -->
+<!--
+| Key | Type / unit | Default | Validation and failure |
+| --- | --- | --- | --- |
+| `[setting_name]` | `[type]` | `[value]` | [Rule and stable failure] |
+-->
+
+## Runtime Effects
+
+[List every capability binding, event subscription, supervised task, context-managed resource, contributor, route, or other effect acquired through `FeatureContext` and owned by `FeatureScope`. State its exact teardown behavior.]
+
+## Persistent State
+
+None.
+
+<!-- If FeatureSpec.state exists, include its exact namespace plus schema, retention, migration/export, reconciliation, and explicit purge behavior. -->
+
+## Failure Behavior
+
+[Describe invalid configuration, missing required capabilities, optional degradation, partial mount rollback, runtime failure containment, and cleanup diagnostics as applicable.]
+
+## Removal Behavior
+
+[Describe capability withdrawal, dependent blocking, unrelated-graph continuity, retained state, interface degradation, reinstall behavior, and physical-removal evidence.]
+
+## Verification
+
+- `tests/services/[domain]/[feature]/test_config.py`
+- `tests/services/[domain]/[feature]/test_feature.py`
+- [Focused use-case, contract, lifecycle, replacement, and removal tests]
+```
+
+The domain README remains authoritative for the complete product catalogue, workflows, FRs, ownership, and acceptance scope. The feature-local README must remain a faithful executable mirror of the implemented slice and is updated together with `manifest.py` and `config.py`.

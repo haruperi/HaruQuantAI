@@ -364,7 +364,7 @@
 The provider architecture decomposes runtime execution into nine distinct architectural units:
 
 * **Kernel**: Business-neutral runtime machinery (`app/kernel/`) that discovers manifests, resolves dependencies, coordinates lifecycles, tracks health, and manages effect scopes without business domain knowledge.
-* **Capability Specification**: Stable, versioned contract in `app/capabilities/<domain>/<capability>/v<N>.py` defining pure callable records or effectful protocols.
+* **Capability Specification**: Stable, versioned contract in `app/contracts/<domain>/<capability>/v<N>.py` defining pure callable records or effectful protocols.
 * **Provider**: Concrete implementation package of one or more capabilities. The provider is the fundamental unit of runtime removability and replacement.
 * **Component**: An activated provider generation paired with its parsed configuration, allocated resources, and registered effect scope.
 * **Feature**: Product capability owned by a business domain, comprising one or more cooperating providers.

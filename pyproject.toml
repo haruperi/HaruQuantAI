@@ -3,6 +3,9 @@ name = "haruquantai"
 version = "2.2.11"
 description = "Quantitative Financial Trading System"
 readme = "README.md"
+authors = [
+    { name = "Haruperi", email = "r.haruperi@hotmail.com" }
+]
 requires-python = ">=3.14"
 dependencies = [
     "ctrader-open-api>=0.9.2",
@@ -12,7 +15,7 @@ dependencies = [
     "numpy==2.4.6",
     "pandas==3.0.3",
     "pyarrow",
-    "pydantic>=2.13.4",
+    "pydantic>=2.13.4,<3",
     "pydantic-settings>=2.14.2",
     "pyyaml==6.0.3",
     "python-binance>=1.0.37",
@@ -30,13 +33,33 @@ dependencies = [
     # the Agentic public boundary. Requires the `requests` override below.
     "google-adk>=2.5.0",
     "tqdm>=4.70.0",
+    "httpx>=0.28.1",
+    "openai>=3.3.1",
 ]
 
+[project.scripts]
+haruquantai = "app.main:run"
+
+[project.entry-points."haruquantai.features"]
+
+# ============================================================================
+# Ruff Configuration (Formatting, Linting, Import Sorting, Security, Complexity)
+# ============================================================================
 [tool.ruff]
-# Target Python version rules
 target-version = "py314"
 line-length = 88
-src = ["app", "tests"]
+src = ["app", "tests", ".agents"]
+extend-exclude = [
+    "docs",
+    "htmlcov",
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
 [tool.ruff.lint]
 preview = true
@@ -170,13 +193,9 @@ convention = "google"
 # Never exempt a docstring merely because it fits on one physical line.
 ignore-one-line-docstrings = false
 
-[tool.ruff.format]
-docstring-code-format = true
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
-
+# ============================================================================
+# Pytest Configuration
+# ============================================================================
 [tool.pytest.ini_options]
 minversion = "7.0"
 testpaths = ["tests"]
@@ -189,35 +208,52 @@ filterwarnings = [
     "ignore:.*utcfromtimestamp.*",
 ]
 addopts = [
+    "--cov=app",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=80",
     "--import-mode=importlib",
     "-ra",
     "--strict-markers",
     "--strict-config",
 ]
 
+# ============================================================================
+# Coverage Configuration (80% minimum, fail command on under 80%)
+# ============================================================================
 [tool.coverage.run]
-branch = true
 source = ["app"]
+branch = true
+omit = [
+    "tests/*",
+]
 
 [tool.coverage.report]
+fail_under = 80
 show_missing = true
 skip_covered = false
-fail_under = 80
-exclude_also = [
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
     "if TYPE_CHECKING:",
+    "raise NotImplementedError",
     "if __name__ == .__main__.:",
     "\\s*\\.\\.\\.\\s*$",
 ]
 
+[tool.coverage.html]
+directory = "htmlcov"
+
+
+# ============================================================================
+# Mypy Strict Typing Configuration
+# ============================================================================
 [tool.mypy]
 # Set this to the minimum Python version supported by the project.
 python_version = "3.14"
 
 # First-party code checked when running: python -m mypy
-files = [
-    "app",
-    "tests",
-]
+files = ["app", "tests", ".agents"]
 
 # Main strictness policy
 strict = true
@@ -296,6 +332,14 @@ module = [
     "service_identity"
 ]
 ignore_missing_imports = true
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "app"
+module-root = "."
 
 [dependency-groups]
 # Development and verification tooling. Excluded from the runtime

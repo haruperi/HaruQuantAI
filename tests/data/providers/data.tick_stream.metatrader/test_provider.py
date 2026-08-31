@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from app.capabilities.data.tick_stream.v1 import (
+from app.contracts.data.tick_stream.v1 import (
     TickStreamCapabilityV1,
     TickStreamEventV1,
     TickStreamRequestV1,

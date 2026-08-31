@@ -9,9 +9,9 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
-from app.capabilities.indicator.williams_r.v1 import WilliamsRCapabilityV1
 from app.composition.facade import bind_runtime
 from app.composition.runtime import CompositionRuntime
+from app.contracts.indicator.williams_r.v1 import WilliamsRCapabilityV1
 from app.kernel.effects import EffectScope
 from app.kernel.errors import CapabilityReasonCode, CapabilityUnavailableError
 from app.kernel.identifiers import CapabilityId

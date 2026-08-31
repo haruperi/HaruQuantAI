@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-import app.capabilities.notification.delivery.v1 as delivery_mod
+import app.contracts.notification.delivery.v1 as delivery_mod
 import pytest
-from app.capabilities.notification.delivery.v1 import (
+from app.contracts.notification.delivery.v1 import (
     CAPABILITY_ID,
     NotificationDeliveryCapabilityV1,
     NotificationDeliveryResultV1,
@@ -106,7 +106,7 @@ def test_capability_module_import_isolation() -> None:
     """Verify importing capability module imports no provider implementations."""
     script = """
 import sys
-import app.capabilities.notification.delivery.v1 as delivery_v1
+import app.contracts.notification.delivery.v1 as delivery_v1
 assert delivery_v1 is not None
 for mod_name in sys.modules:
     assert not mod_name.startswith('app.services'), f'Forbidden business domain imported: {mod_name}'

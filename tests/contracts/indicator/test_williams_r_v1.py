@@ -9,14 +9,14 @@ from dataclasses import FrozenInstanceError
 from pathlib import Path
 from typing import Any
 
-import app.capabilities.indicator.williams_r.v1 as williams_r_v1
+import app.contracts.indicator.williams_r.v1 as williams_r_v1
 import pytest
-from app.capabilities.indicator.common.v1 import (
+from app.contracts.indicator.common.v1 import (
     IndicatorConfigV1,
     IndicatorResultV1,
     MarketDatasetV1,
 )
-from app.capabilities.indicator.williams_r.v1 import (
+from app.contracts.indicator.williams_r.v1 import (
     CAPABILITY_ID,
     WilliamsRCapabilityV1,
 )
@@ -81,7 +81,7 @@ def test_williams_r_contract_imports_without_services() -> None:
     """Verify Williams contract imports without pulling in any business services."""
     script = """
 import sys
-import app.capabilities.indicator.williams_r.v1 as williams_r_v1
+import app.contracts.indicator.williams_r.v1 as williams_r_v1
 assert williams_r_v1 is not None
 for mod_name in sys.modules:
     assert not mod_name.startswith('app.services'), f'Forbidden business domain imported: {mod_name}'
