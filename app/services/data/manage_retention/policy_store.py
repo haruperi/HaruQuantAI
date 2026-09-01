@@ -31,6 +31,11 @@ class RetentionPolicyStore:
         self._database_path = database_path
 
     def _connect(self) -> sqlite3.Connection:
+        """Open one bounded SQLite connection and ensure the feature schema.
+
+        Returns:
+            Configured SQLite connection.
+        """
         self._database_path.parent.mkdir(parents=True, exist_ok=True)
         connection = sqlite3.connect(self._database_path)
         connection.executescript(_SCHEMA)
@@ -41,6 +46,9 @@ class RetentionPolicyStore:
 
         Args:
             policy: Strict public retention policy.
+
+        Raises:
+            ValueError: If a policy identity is reused for different content.
         """
         payload = json.dumps(
             policy.model_dump(mode="json"),
