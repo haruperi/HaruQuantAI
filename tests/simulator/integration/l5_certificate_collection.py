@@ -20,6 +20,8 @@ from datetime import UTC, datetime, timedelta
 from decimal import ROUND_DOWN, Decimal
 from pathlib import Path
 
+from tests.brokers.conformance import create_configured_fake_broker_adapter
+
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
@@ -36,7 +38,6 @@ from app.services.brokers import (
     check_broker_order,
     connect_broker,
     create_broker_adapter,
-    create_configured_fake_broker_adapter,
     disconnect_broker,
     get_broker_account_info,
     get_broker_id,

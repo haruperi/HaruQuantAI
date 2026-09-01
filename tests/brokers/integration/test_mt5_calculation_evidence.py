@@ -104,7 +104,7 @@ def test_mt5_check_rejects_missing_projection_when_identity_is_bound() -> None:
 
 def test_operations_are_not_reregistered_and_default_suite_cannot_collect() -> None:
     """The delta changes evidence only and default conformance stays offline."""
-    suite = Path("app/services/brokers/conformance/suite.py")
+    suite = Path("tests/brokers/conformance/suite.py")
     tree = ast.parse(suite.read_text(encoding="utf-8"))
     calls = {
         node.func.id

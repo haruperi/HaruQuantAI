@@ -78,18 +78,33 @@ def test_fake_adapter_public_controls_validate_and_apply_fixtures() -> None:
     """Fake-adapter controls reject foreign values and apply bounded errors."""
     import app.services.brokers as operations
 
+    from tests.brokers import conformance
+
+    # Assert conformance exports are retired from package root
+    retired = {
+        "create_configured_fake_broker_adapter",
+        "create_fake_broker_adapter",
+        "set_fake_broker_error",
+        "run_broker_adapter_conformance",
+        "build_broker_calculation_fixture",
+        "dump_broker_calculation_fixture",
+        "parse_broker_calculation_fixture",
+        "collect_broker_calculation_fixture",
+    }
+    assert retired.isdisjoint(operations.__all__)
+
     with pytest.raises(TypeError, match="Broker connection configuration"):
-        operations.create_configured_fake_broker_adapter(object())
+        conformance.create_configured_fake_broker_adapter(object())
     with pytest.raises(TypeError, match="fake broker adapter"):
-        operations.set_fake_broker_error(object(), "get_quote")
+        conformance.set_fake_broker_error(object(), "get_quote")
 
     connection = operations.build_broker_connection_config(
         "yahoo", "sandbox", provider_enabled=True
     )
-    adapter = operations.create_configured_fake_broker_adapter(connection)
-    result = operations.set_fake_broker_error(adapter, "get_quote", "BROKER_TIMEOUT")
+    adapter = conformance.create_configured_fake_broker_adapter(connection)
+    result = conformance.set_fake_broker_error(adapter, "get_quote", "BROKER_TIMEOUT")
     assert result.status == "success"
-    cleared = operations.set_fake_broker_error(adapter, "get_quote")
+    cleared = conformance.set_fake_broker_error(adapter, "get_quote")
     assert cleared.status == "success"
 
 

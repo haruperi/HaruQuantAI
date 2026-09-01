@@ -21,10 +21,9 @@ def test_brokers_readme_has_one_reconciled_completed_registry() -> None:
         "FEAT-BRK-04",
         "FEAT-BRK-05",
         "FEAT-BRK-06",
-        "FEAT-BRK-10",
     ]
-    assert len({folder for _, folder, _ in rows}) == 6
-    assert len({usage for _, _, usage in rows}) == 6
+    assert len({folder for _, folder, _ in rows}) == 5
+    assert len({usage for _, _, usage in rows}) == 5
     for _, folder, usage in rows:
         assert (Path("app/services/brokers") / folder).is_dir()
         assert Path(usage).is_file()
