@@ -1,3 +1,8 @@
-# FEAT-BRK-06 Yahoo Direct Broker Channel
+# FEAT-BRK-CONNECT_YAHOO — Yahoo Provider
 
-This folder is the sole production owner of this focused Brokers feature. Current status is `Partial` until the validation gates in the package README complete. Public API, contracts, requirements, and usage evidence are registered only in `app/services/brokers/README.md`.
+Read-only, sandbox-only Yahoo provider feature. A caller must configure an explicit
+probe symbol; the feature never invents provider symbols or accepts account/order
+operations. Removing the feature removes Yahoo behavior without changing another
+provider or the dispatcher.
+
+Provides only `broker.provider.yahoo@1`.

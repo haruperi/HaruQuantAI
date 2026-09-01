@@ -1,3 +1,7 @@
-# FEAT-BRK-05 Dukascopy Direct Broker Channel
+# FEAT-BRK-CONNECT_DUKASCOPY — Dukascopy Provider
 
-This folder is the sole production owner of this focused Brokers feature. Current status is `Partial` until the validation gates in the package README complete. Public API, contracts, requirements, and usage evidence are registered only in `app/services/brokers/README.md`.
+Read-only, sandbox-only Dukascopy provider feature. Readiness probes use the caller's
+explicit configured provider symbol; the old hard-coded EURUSD readiness probe is not
+used by the feature boundary. Account and order operations fail closed.
+
+Provides only `broker.provider.dukascopy@1`.

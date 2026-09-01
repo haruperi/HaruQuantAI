@@ -1,3 +1,1 @@
-"""Internal Dukascopy direct broker channel."""
-
-__all__: list[str] = []
+"""Dukascopy read-only external-provider feature."""

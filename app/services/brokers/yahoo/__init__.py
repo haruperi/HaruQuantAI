@@ -1,3 +1,1 @@
-"""Internal Yahoo direct broker channel."""
-
-__all__: list[str] = []
+"""Yahoo read-only external-provider feature."""
