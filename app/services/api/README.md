@@ -544,9 +544,8 @@ below describe responsibilities; only symbols registered in Section 4 are public
    `utils.configure_logging()`.
 3. Compose the canonical application and its three owner sources —
    `api.create_api_app()`.
-4. Apply each authoritative domain migration manifest, including
-   `brokers.run_broker_migrations()`, through Data's verified migration boundary;
-   any required failure blocks startup and readiness.
+4. Apply each authoritative domain migration manifest through Data's verified
+   migration boundary; any required domain failure blocks startup and readiness.
 5. Report an approved optional failure as degraded rather than ready —
    `api.get_readiness()`.
 6. Flush and stop logging deterministically on shutdown —
