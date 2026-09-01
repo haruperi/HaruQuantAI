@@ -873,3 +873,345 @@ def _map_error_code(retcode: int) -> BrokerErrorCode:
     if retcode in {10006, 10007, 10010, 10017, 10031, 10032, 10033, 10034}:
         return BrokerErrorCode.BROKER_REQUEST_REJECTED
     return BrokerErrorCode.BROKER_PROVIDER_ERROR
+
+
+def _normalize_decimal_str(val: object) -> str | None:
+    """Normalize decimal/float/int/str value to canonical trimmed string.
+
+    Args:
+        val: Input value to normalize.
+
+    Returns:
+        Normalized decimal string or None.
+    """
+    if val is None:
+        return None
+    d = Decimal(str(val))
+    s = format(d, "f")
+    if "." in s:
+        s = s.rstrip("0").rstrip(".")
+    if s == "-0":
+        s = "0"
+    return s
+
+
+def _format_utc_timestamp(dt: datetime | None) -> str | None:
+    """Format aware UTC datetime to ISO8601 string.
+
+    Args:
+        dt: Input datetime to format.
+
+    Returns:
+        ISO8601 formatted UTC timestamp string or None.
+    """
+    if dt is None:
+        return None
+    dt = dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt.astimezone(UTC)
+    return dt.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+
+def map_market_state(
+    session_id: str,
+    generation: int,
+    instrument: Any,
+    provider_symbol: str,
+    quote: BrokerQuote,
+) -> Any:
+    """Map canonical quote to BrokerMarketState wire record.
+
+    Args:
+        session_id: Active broker session ID.
+        generation: Active session generation.
+        instrument: Associated instrument reference.
+        provider_symbol: Exact provider symbol.
+        quote: Resolved canonical quote.
+
+    Returns:
+        BrokerMarketState model.
+    """
+    import uuid
+
+    from app.contracts.broker.models import BrokerMarketState
+    from app.contracts.catalogue.models import InstrumentRef
+
+    inst = (
+        instrument
+        if isinstance(instrument, InstrumentRef)
+        else InstrumentRef(instrument_id=str(uuid.uuid7()))
+    )
+    bid_str = _normalize_decimal_str(quote.bid)
+    ask_str = _normalize_decimal_str(quote.ask)
+    last_str = bid_str or ask_str
+    now_str = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.000000Z")
+    event_time_str = (
+        _format_utc_timestamp(quote.provider_timestamp)
+        if quote.provider_timestamp
+        else now_str
+    )
+    return BrokerMarketState(
+        session_id=session_id,
+        generation=generation,
+        instrument=inst,
+        provider_symbol=provider_symbol,
+        market_status="OPEN",
+        receipt_time=now_str,
+        bid=bid_str,
+        ask=ask_str,
+        last=last_str,
+        event_time=event_time_str,
+    )
+
+
+def map_event_market_state(
+    session_id: str,
+    generation: int,
+    raw_event: dict[str, Any],
+    instrument: Any | None = None,
+) -> Any:
+    """Normalize raw MetaTrader event payload to BrokerMarketState.
+
+    Args:
+        session_id: Active session ID.
+        generation: Active session generation.
+        raw_event: Raw provider event dictionary.
+        instrument: Optional instrument reference.
+
+    Returns:
+        BrokerMarketState model.
+    """
+    import uuid
+
+    from app.contracts.broker.models import BrokerMarketState
+    from app.contracts.catalogue.models import InstrumentRef
+
+    symbol = str(raw_event.get("symbol", raw_event.get("provider_symbol", "EURUSD")))
+    inst = (
+        instrument
+        if isinstance(instrument, InstrumentRef)
+        else InstrumentRef(instrument_id=str(uuid.uuid7()))
+    )
+    bid_str = _normalize_decimal_str(raw_event.get("bid"))
+    ask_str = _normalize_decimal_str(raw_event.get("ask"))
+    last_str = _normalize_decimal_str(raw_event.get("last")) or bid_str or ask_str
+    now_str = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.000000Z")
+    return BrokerMarketState(
+        session_id=session_id,
+        generation=generation,
+        instrument=inst,
+        provider_symbol=symbol,
+        market_status="OPEN",
+        receipt_time=now_str,
+        bid=bid_str,
+        ask=ask_str,
+        last=last_str,
+        event_time=now_str,
+    )
+
+
+def map_account_snapshot(
+    session_id: str,
+    generation: int,
+    account_ref: str,
+    currency: str = "USD",
+    equity: Decimal | str | float = "10000",
+    balances: dict[str, Decimal | str | float] | None = None,
+    margin: Decimal | str | float | None = None,
+    free_margin: Decimal | str | float | None = None,
+    permissions: tuple[str, ...] = ("READ",),
+    provider_time: datetime | None = None,
+) -> Any:
+    """Map account fields to BrokerAccountSnapshot wire record.
+
+    Args:
+        session_id: Active broker session ID.
+        generation: Active session generation.
+        account_ref: Configured account reference.
+        currency: Base account currency.
+        equity: Account equity value.
+        balances: Currency balance mapping.
+        margin: Used margin value.
+        free_margin: Available free margin value.
+        permissions: Account permission tags.
+        provider_time: Timestamp from provider.
+
+    Returns:
+        BrokerAccountSnapshot model.
+    """
+    from app.contracts.broker.models import BrokerAccountSnapshot
+    from app.contracts.common.models import Money
+
+    now_str = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.000000Z")
+    eq_norm = _normalize_decimal_str(equity) or "10000"
+    b_dict = {
+        k: _normalize_decimal_str(v) or "0"
+        for k, v in (balances or {currency: eq_norm}).items()
+    }
+    m_money = (
+        Money(amount=_normalize_decimal_str(margin) or "0", currency=currency)
+        if margin is not None
+        else None
+    )
+    fm_money = (
+        Money(amount=_normalize_decimal_str(free_margin) or eq_norm, currency=currency)
+        if free_margin is not None
+        else None
+    )
+    return BrokerAccountSnapshot(
+        session_id=session_id,
+        generation=generation,
+        account_ref=account_ref,
+        currency=currency,
+        equity=Money(amount=eq_norm, currency=currency),
+        retrieved_at=now_str,
+        balances=b_dict,
+        margin=m_money,
+        free_margin=fm_money,
+        permissions=permissions,
+        provider_time=_format_utc_timestamp(provider_time) if provider_time else None,
+    )
+
+
+def map_trading_state(
+    session_id: str,
+    generation: int,
+    positions: tuple[BrokerPosition, ...] = (),
+    orders: tuple[BrokerOrder, ...] = (),
+    deals: tuple[BrokerDeal, ...] = (),
+    duplicate_or_contradictory: tuple[str, ...] = (),
+) -> Any:
+    """Map trading entities to BrokerTradingState wire record.
+
+    Args:
+        session_id: Active session ID.
+        generation: Active session generation.
+        positions: Open positions.
+        orders: Active or historical orders.
+        deals: Execution deals.
+        duplicate_or_contradictory: Anomaly tags.
+
+    Returns:
+        BrokerTradingState model.
+    """
+    from app.contracts.broker.models import BrokerTradingState, ProviderRecord
+
+    now_str = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.000000Z")
+    pos_records = tuple(
+        ProviderRecord(
+            provider_id=p.position_id,
+            record={
+                "position_id": p.position_id,
+                "symbol": p.symbol,
+                "side": p.side,
+                "quantity": _normalize_decimal_str(p.quantity) or "0",
+                "state": p.state,
+                "open_price": _normalize_decimal_str(p.open_price),
+            },
+        )
+        for p in positions
+    )
+    ord_records = tuple(
+        ProviderRecord(
+            provider_id=o.order_id,
+            record={
+                "order_id": o.order_id,
+                "symbol": o.symbol,
+                "side": o.side,
+                "order_type": o.order_type,
+                "state": o.state,
+                "quantity": _normalize_decimal_str(o.quantity) or "0",
+                "filled": _normalize_decimal_str(o.filled) or "0",
+            },
+        )
+        for o in orders
+    )
+    deal_records = tuple(
+        ProviderRecord(
+            provider_id=d.deal_id,
+            record={
+                "deal_id": d.deal_id,
+                "order_id": d.order_id,
+                "position_id": d.position_id,
+                "symbol": d.symbol,
+                "side": d.side,
+                "quantity": _normalize_decimal_str(d.quantity) or "0",
+                "price": _normalize_decimal_str(d.price) or "0",
+            },
+        )
+        for d in deals
+    )
+    return BrokerTradingState(
+        session_id=session_id,
+        generation=generation,
+        retrieved_at=now_str,
+        positions=pos_records,
+        orders=ord_records,
+        deals=deal_records,
+        duplicate_or_contradictory=duplicate_or_contradictory,
+    )
+
+
+def map_history_page(
+    values: tuple[BrokerBar, ...] | tuple[BrokerTick, ...],
+    symbol: str,
+    timeframe: str,
+    limit: int,
+    page_id: str,
+    retrieved_at: str | None = None,
+    requested_timeframe: str | None = None,
+    is_truncated: bool = False,
+    cursor: str | None = None,
+) -> Any:
+    """Map bar/tick sequence to BrokerHistoryPage wire record.
+
+    Args:
+        values: Sequence of BrokerBar or BrokerTick.
+        symbol: Provider symbol.
+        timeframe: Provider timeframe interval.
+        limit: Requested page size limit.
+        page_id: Unique page ID.
+        retrieved_at: Retrieval timestamp string.
+        requested_timeframe: Canonical requested timeframe.
+        is_truncated: Whether more records are available.
+        cursor: Pagination cursor string.
+
+    Returns:
+        BrokerHistoryPage model.
+    """
+    from app.contracts.broker.models import BrokerHistoryPage, ProviderRecord
+
+    del timeframe, requested_timeframe
+    now_str = retrieved_at or datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.000000Z")
+    records: list[ProviderRecord] = []
+    for idx, item in enumerate(values):
+        if isinstance(item, BrokerBar):
+            rec_dict: dict[str, Any] = {
+                "symbol": item.symbol,
+                "open": _normalize_decimal_str(item.open) or "0",
+                "high": _normalize_decimal_str(item.high) or "0",
+                "low": _normalize_decimal_str(item.low) or "0",
+                "close": _normalize_decimal_str(item.close) or "0",
+                "volume": _normalize_decimal_str(item.tick_volume) or "0",
+                "opening_timestamp": _format_utc_timestamp(item.opening_timestamp),
+                "closing_timestamp": _format_utc_timestamp(item.closing_timestamp),
+                "timeframe": item.provider_timeframe,
+            }
+        elif isinstance(item, BrokerTick):
+            rec_dict = {
+                "symbol": item.symbol,
+                "bid": _normalize_decimal_str(item.bid),
+                "ask": _normalize_decimal_str(item.ask),
+                "event_timestamp": _format_utc_timestamp(item.event_timestamp),
+            }
+        else:
+            rec_dict = {"symbol": symbol}
+        records.append(ProviderRecord(provider_id=f"{symbol}:{idx}", record=rec_dict))
+    selected = records[:limit]
+    return BrokerHistoryPage(
+        page_id=page_id,
+        requested_count=limit,
+        returned_count=len(selected),
+        is_truncated=is_truncated or (len(records) > limit),
+        retrieved_at=now_str,
+        provider_cursor=cursor,
+        records=tuple(selected),
+    )

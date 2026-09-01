@@ -73,11 +73,13 @@ class _MT5Transport:
             timeout_sec=self._config.connect_timeout_sec,
             **kwargs,
         )
-        logger.bind(
-            broker=self._config.broker_id.value,
-            environment=self._config.environment.value,
-            result="success" if result else "error",
-        ).info("MT5 terminal transport initialize/authenticate completed")
+        logger.info(
+            "MT5 terminal transport initialize/authenticate completed "
+            "broker=%s environment=%s result=%s",
+            self._config.broker_id.value,
+            self._config.environment.value,
+            "success" if result else "error",
+        )
         return bool(result)
 
     async def call(self, name: str, *args: object, **kwargs: object) -> Any:
