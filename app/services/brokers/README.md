@@ -126,10 +126,11 @@ coordination artifacts.
   additional Data, Trading, Simulator, system, and legacy consumers.
 
 The legacy Broker migration manifest defined five tables; `broker_symbol_map`
-was retired in Task 1.02 and `broker_environment_permissions` was retired in Task
-1.11, leaving three temporary operational tables:
-`broker_health_history`, `broker_route_recovery`, and `broker_event_checkpoints`.
-Their presence is current-state evidence only; none is ratified as final Broker ownership.
+was retired in Task 1.02, `broker_environment_permissions` was retired in Task
+1.11, and `broker_event_checkpoints` and `broker_route_recovery` were retired in Task
+1.12, leaving one temporary operational table:
+`broker_health_history`.
+Its presence is current-state evidence only; none is ratified as final Broker ownership.
 
 ### Legacy package disposition ledger
 
@@ -404,7 +405,7 @@ concrete DTO/event schema ID). Consumers never parse `schema_id` for compatibili
 
 ### Persisted state
 
-Brokers temporarily owns three durable operational tables: `broker_health_history`, `broker_route_recovery`, and `broker_event_checkpoints`. It persists no instrument identity, credential, reusable market-data payload, or invented order/fill/position state. `migrations/` retains immutable schema history plus guarded retirement, while `persistence/` exposes only the three operational-table statements. The migration manifest runs through Data's verified ledger, checksum, write-lock, and transaction boundary. Live session and SDK state remains bounded, in memory, adapter-instance scoped, and is discarded at disconnect.
+Brokers temporarily owns one durable operational table: `broker_health_history`. It persists no instrument identity, credential, reusable market-data payload, or invented order/fill/position state. `migrations/` retains immutable schema history plus guarded retirement, while `persistence/` exposes only the health-history statement. The migration manifest runs through Data's verified ledger, checksum, write-lock, and transaction boundary. Live session and SDK state remains bounded, in memory, adapter-instance scoped, and is discarded at disconnect.
 
 ### Sim, demo, and live parity boundaries
 
@@ -533,13 +534,10 @@ The tree below defines the final layout. The following table is the sole normati
 | Completed | `FEAT-BRK-04` Binance Direct Broker Channel | `binance/` | Direct health, snapshots, streams, and explicit command exclusions | Binance requirements in Sections 4.5 and 4.10 | `tests/brokers/usage/features/04_binance.py` |
 | Completed | `FEAT-BRK-05` Dukascopy Direct Broker Channel | `dukascopy/` | Direct health, tick/bar snapshots, and explicit command exclusions | Dukascopy requirements in Sections 4.6 and 4.10 | `tests/brokers/usage/features/05_dukascopy.py` |
 | Completed | `FEAT-BRK-06` Yahoo Direct Broker Channel | `yahoo/` | Direct health, historical snapshots, and explicit command exclusions | Yahoo requirements in Sections 4.7 and 4.10 | `tests/brokers/usage/features/06_yahoo.py` |
-| Completed | `FEAT-BRK-07` Authoritative Reads and Route Discipline | `reconciliation/` | Route plans, read/recovery fallback, unknown-outcome reconciliation, and recovery cursors | `FR-BRK-136`–`FR-BRK-138`, `FR-BRK-149` | `tests/brokers/usage/features/07_reconciliation.py` |
-| Completed | `FEAT-BRK-09` Broker Event Normalization | `events/` | Ordered, deduplicated event envelopes and source checkpoints | `FR-BRK-151` | `tests/brokers/usage/features/09_events.py` |
 | Completed | `FEAT-BRK-10` Adapter Contract Test Kit | `conformance/` | Reusable provider-disabled conformance suite, deterministic adapter fixture, and guarded checksummed calculation evidence | `FR-BRK-109`, `FR-BRK-190`–`FR-BRK-193` | `tests/brokers/usage/features/10_conformance.py` |
 | Completed | `FEAT-BRK-17` Simulation Broker Channel | `simulation/` | Exact `sim`/`simulation` factory, socket-free authority injection, canonical lifecycle/finalization, clock-safe authoritative reads, provider-shaped mutations, bounded deal/transaction history, and capability intersection | `FR-BRK-167`–`FR-BRK-172`, `FR-BRK-174`–`189`, `FR-BRK-194`–`196` | `tests/brokers/usage/features/17_simulation.py` |
-| Completed | `FEAT-BRK-18` Provider Specification Snapshots | `specifications/` | `build_provider_specification_snapshot`, `parse_provider_specification_snapshot`, `dump_provider_specification_snapshot`, `get_provider_specification_snapshot_field`, `verify_provider_specification_snapshot`, `get_broker_provider_specification` | `FR-BRK-159`–`FR-BRK-163` | `tests/brokers/usage/features/18_specifications.py` |
 
-Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **ten** completed features, `FEAT-BRK-02` through `FEAT-BRK-07`, `FEAT-BRK-09`, `FEAT-BRK-10`, `FEAT-BRK-17`, and `FEAT-BRK-18`. `FEAT-BRK-00` moved to Catalogue in Task 1.02; `FEAT-BRK-01` was retired in Task 1.10; `FEAT-BRK-08` was split and retired in Task 1.11; IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels, Events, Reconciliation, and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
+Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **seven** completed features, `FEAT-BRK-02` through `FEAT-BRK-06`, `FEAT-BRK-10`, and `FEAT-BRK-17`. `FEAT-BRK-00` moved to Catalogue in Task 1.02; `FEAT-BRK-01` was retired in Task 1.10; `FEAT-BRK-07`, `FEAT-BRK-09`, and `FEAT-BRK-18` were retired in Task 1.12 with market checkpoints moved to Data, trading reconciliation to Trading, provider events mapped to `app/contracts/broker` and published via Kernel EventBus, and provider specifications folded into MetaTrader provider truth; `FEAT-BRK-08` was split and retired in Task 1.11; IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
 
 #### Explicit order-policy v2 requirements
 

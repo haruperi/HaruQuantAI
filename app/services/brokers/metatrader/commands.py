@@ -30,7 +30,7 @@ from app.services.brokers.metatrader.mapping import (
     _map_position,
     _optional,
 )
-from app.services.brokers.specifications.public import (
+from app.services.brokers.metatrader.specifications import (
     get_provider_specification_snapshot_field,
 )
 

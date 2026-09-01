@@ -5,10 +5,8 @@
 state is in-memory, balances are fetched live, and credentials are never
 persisted. Decision D10 upheld that.
 
-One table is the exception. Provider-to-canonical symbol translation is
-reference data: it must be stable, versioned, and identical across restarts,
-because a mis-mapped symbol routes an order to the wrong instrument. Private
-support; see ``migrations/README.md`` and the Brokers README database specification.
+Only broker health history remains as temporary operational state.
+Support; see ``migrations/README.md`` and the Brokers README database specification.
 """
 
 from __future__ import annotations
@@ -25,7 +23,7 @@ from app.services.data import (
 
 logger = get_logger(__name__)
 
-BROKER_SCHEMA_VERSION = "v4"
+BROKER_SCHEMA_VERSION = "v5"
 
 _BROKER_SCHEMA_STATEMENTS = (
     """
@@ -148,6 +146,31 @@ _BROKER_ENVIRONMENT_PERMISSIONS_RETIREMENT_STATEMENTS = (
     "DROP TABLE broker_environment_permissions_retirement_guard",
 )
 
+_BROKER_EVENT_AND_ROUTE_RECOVERY_RETIREMENT_STATEMENTS = (
+    """
+    CREATE TEMP TABLE broker_event_checkpoints_retirement_guard (
+        row_count INTEGER NOT NULL CHECK (row_count = 0)
+    ) STRICT
+    """.strip(),
+    """
+    INSERT INTO broker_event_checkpoints_retirement_guard (row_count)
+    SELECT COUNT(*) FROM broker_event_checkpoints
+    """.strip(),
+    "DROP TABLE broker_event_checkpoints",
+    "DROP TABLE broker_event_checkpoints_retirement_guard",
+    """
+    CREATE TEMP TABLE broker_route_recovery_retirement_guard (
+        row_count INTEGER NOT NULL CHECK (row_count = 0)
+    ) STRICT
+    """.strip(),
+    """
+    INSERT INTO broker_route_recovery_retirement_guard (row_count)
+    SELECT COUNT(*) FROM broker_route_recovery
+    """.strip(),
+    "DROP TABLE broker_route_recovery",
+    "DROP TABLE broker_route_recovery_retirement_guard",
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Brokers schema statements.
@@ -189,6 +212,14 @@ BROKER_MIGRATIONS: tuple[Any, ...] = (
             _BROKER_ENVIRONMENT_PERMISSIONS_RETIREMENT_STATEMENTS
         ),
         statements=_BROKER_ENVIRONMENT_PERMISSIONS_RETIREMENT_STATEMENTS,
+    ),
+    build_migration_step(
+        domain="brokers",
+        migration_id="005_retire_broker_event_and_route_recovery",
+        checksum=_migration_checksum(
+            _BROKER_EVENT_AND_ROUTE_RECOVERY_RETIREMENT_STATEMENTS
+        ),
+        statements=_BROKER_EVENT_AND_ROUTE_RECOVERY_RETIREMENT_STATEMENTS,
     ),
 )
 

@@ -1,4 +1,4 @@
-"""Unit tests for provider specification snapshots (FEAT-BRK-18)."""
+"""Unit tests for MetaTrader provider specification snapshots (provider truth)."""
 
 from datetime import UTC, datetime
 from decimal import Decimal

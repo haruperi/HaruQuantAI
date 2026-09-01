@@ -24,7 +24,7 @@ def test_fr_brk_164_166_root_boundary_preserves_exact_values(
         }[field]
 
     domain = "brokers"
-    getter_path = f"app.services.{domain}.specifications.public.get_provider_specification_snapshot_field"
+    getter_path = f"app.services.{domain}.metatrader.specifications.get_provider_specification_snapshot_field"
     monkeypatch.setattr(getter_path, get_field)
     expiration = datetime(2026, 8, 16, 21, 59, 59, tzinfo=UTC)
     request = build_broker_order_request_v2(
