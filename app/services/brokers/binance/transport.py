@@ -1,11 +1,13 @@
 """Bounded Binance direct-channel REST transport."""
 
 # ruff: noqa: ANN401 - the optional SDK has a heterogeneous runtime payload surface.
+from __future__ import annotations
+
 import asyncio
 import importlib
 import time
 from collections.abc import AsyncIterator, Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from app.composition.logging import get_logger
 from app.services.brokers._shared.circuit_breaker import (
@@ -21,6 +23,9 @@ from app.services.brokers.canonical_contracts.protocols import (
     _RateLimitedError,
 )
 
+if TYPE_CHECKING:
+    from app.services.brokers.binance.config import BinanceConfig
+
 logger = get_logger(__name__)
 
 
@@ -29,7 +34,7 @@ class _BinanceTransport:
 
     def __init__(
         self,
-        config: BrokerConnectionConfig,
+        config: BinanceConfig | BrokerConnectionConfig,
         latency_sink: Callable[[float], None] | None = None,
     ) -> None:
         """Initialize the _BinanceTransport instance.
@@ -52,29 +57,65 @@ class _BinanceTransport:
         self._used_weight = 0
         self._weight_limit = 6_000
 
+    @property
+    def is_connected(self) -> bool:
+        """Return True if the client is connected."""
+        return self._client is not None
+
+    def _get_broker_and_env(self) -> tuple[str, str]:
+        """Return string representations for broker identifier and environment."""
+        from app.services.brokers.binance.config import BinanceConfig
+
+        if isinstance(self._config, BinanceConfig):
+            return "binance_spot", str(self._config.environment)
+        return str(self._config.broker_id.value), str(self._config.environment.value)
+
     async def connect(self) -> bool:
         """Create a Spot client and verify ping plus server time.
 
         Returns:
             ``True`` after both probes succeed.
         """
+        from app.services.brokers.binance.config import BinanceConfig
+
         module = importlib.import_module("binance")
-        credentials = self._config.credentials or {}
-        api_key = credentials.get("api_key")
-        api_secret = credentials.get("api_secret")
+
+        if isinstance(self._config, BinanceConfig):
+            api_key = self._config.api_key
+            api_secret = self._config.api_secret
+            is_testnet = self._config.environment.upper() in ("TESTNET", "SANDBOX")
+            timeout = self._config.connect_timeout_sec
+        else:
+            credentials = self._config.credentials or {}
+            k_obj = credentials.get("api_key")
+            s_obj = credentials.get("api_secret")
+            api_key = (
+                k_obj.get_secret_value()
+                if k_obj is not None and hasattr(k_obj, "get_secret_value")
+                else (str(k_obj) if k_obj is not None else None)
+            )
+            api_secret = (
+                s_obj.get_secret_value()
+                if s_obj is not None and hasattr(s_obj, "get_secret_value")
+                else (str(s_obj) if s_obj is not None else None)
+            )
+            is_testnet = self._config.environment == BrokerEnvironment.TESTNET
+            timeout = self._config.connect_timeout_sec
+
         self._client = await asyncio.wait_for(
             module.AsyncClient.create(
-                api_key.get_secret_value() if api_key else None,
-                api_secret.get_secret_value() if api_secret else None,
-                testnet=self._config.environment == BrokerEnvironment.TESTNET,
+                api_key,
+                api_secret,
+                testnet=is_testnet,
             ),
-            timeout=self._config.connect_timeout_sec,
+            timeout=timeout,
         )
         await self.call("ping")
         await self.call("get_server_time")
+        broker_str, env_str = self._get_broker_and_env()
         logger.bind(
-            broker=self._config.broker_id.value,
-            environment=self._config.environment.value,
+            broker=broker_str,
+            environment=env_str,
             result="success",
         ).info("Binance transport client created and verified")
         return True
@@ -105,6 +146,7 @@ class _BinanceTransport:
             raise _CircuitOpenError("Binance transport circuit is open")
         method = getattr(self._client, name)
         started = time.perf_counter()
+        broker_str, env_str = self._get_broker_and_env()
         try:
             result = await asyncio.wait_for(
                 method(**kwargs), timeout=self._config.request_timeout_sec
@@ -112,8 +154,8 @@ class _BinanceTransport:
         except TimeoutError, OSError, ConnectionError:
             await self._circuit.record_failure(BrokerErrorCode.BROKER_PROVIDER_ERROR)
             logger.bind(
-                broker=self._config.broker_id.value,
-                environment=self._config.environment.value,
+                broker=broker_str,
+                environment=env_str,
                 provider_call=name,
                 result="error",
                 provider_code=BrokerErrorCode.BROKER_PROVIDER_ERROR.value,
@@ -169,7 +211,8 @@ class _BinanceTransport:
             await self._client.close_connection()
             self._client = None
             self._socket_manager = None
+            broker_str, env_str = self._get_broker_and_env()
             logger.bind(
-                broker=self._config.broker_id.value,
-                environment=self._config.environment.value,
+                broker=broker_str,
+                environment=env_str,
             ).info("Binance transport client resources released")

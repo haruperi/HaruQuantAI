@@ -1,3 +1,1 @@
-"""Internal Binance direct broker channel."""
-
-__all__: list[str] = []
+"""Binance direct broker channel package."""
