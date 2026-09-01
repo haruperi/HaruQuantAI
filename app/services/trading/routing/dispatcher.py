@@ -288,12 +288,7 @@ def _validate_broker_selection(
     if not is_broker_connection_enabled(connection):
         raise TradingError("GATE_BLOCKED", "Broker provider is disabled")
     expected_provider = get_broker_connection_id(connection)
-    if intent.route.value == "sim":
-        if intent.provider_id not in {None, expected_provider}:
-            raise TradingError(
-                "SCOPE_MISMATCH", "Broker provider does not match intent"
-            )
-    elif intent.provider_id != expected_provider:
+    if intent.provider_id != expected_provider:
         raise TradingError("SCOPE_MISMATCH", "Broker provider does not match intent")
     if (
         intent.route.value == "live"
@@ -317,9 +312,6 @@ def _validate_route_environment(
 ) -> None:
     """Validate the exact route-to-Broker-environment pairing.
 
-    Phase 10b retains the simulation callback until Phase 14a, but requires its
-    Brokers-owned connection identity now so no route can alias an environment.
-
     Args:
         intent: Executable intent selecting one exact route.
         connection: Injected resolved Broker connection material.
@@ -328,26 +320,14 @@ def _validate_route_environment(
         TradingError: If route identity, environment, or enablement mismatches.
     """
     if intent.route.value == "sim":
-        if connection is None:
-            raise TradingError(
-                "SERVICE_UNAVAILABLE", "Simulation Broker route is unavailable"
-            )
-        if not is_broker_connection_enabled(connection):
-            raise TradingError("GATE_BLOCKED", "Simulation Broker route is disabled")
-        if (
-            get_broker_connection_id(connection) != "sim"
-            or get_broker_connection_environment(connection) != "simulation"
-        ):
-            raise TradingError(
-                "SCOPE_MISMATCH", "Sim route requires sim/simulation authority"
-            )
-        return
+        raise TradingError("SCOPE_MISMATCH", "Sim route does not use Broker connection")
     if (
         connection is not None
         and get_broker_connection_environment(connection) == "simulation"
     ):
         raise TradingError(
-            "SCOPE_MISMATCH", "Simulation environment is exclusive to sim route"
+            "SCOPE_MISMATCH",
+            "Simulation environment is not a supported broker environment",
         )
 
 
@@ -580,7 +560,11 @@ async def _dispatch_order_intent_value(
         "Dispatching Trading intent %s via %s", intent.client_order_id, intent.route
     )
     _validate_dispatch_policy(operation_timeout_seconds)
-    if intent.route.value == "sim" and simulation_execution_source is not None:
+    if intent.route.value == "sim":
+        if simulation_execution_source is None:
+            raise TradingError(
+                "SERVICE_UNAVAILABLE", "Simulation execution authority is unavailable"
+            )
         if connection is not None or broker_adapter is not None:
             raise TradingError(
                 "SCOPE_MISMATCH", "Sim route cannot use Broker mutation authority"
@@ -591,7 +575,7 @@ async def _dispatch_order_intent_value(
             operation_timeout_seconds=operation_timeout_seconds,
             clock=clock,
         )
-    if intent.route.value != "sim" and simulation_execution_source is not None:
+    if simulation_execution_source is not None:
         raise TradingError(
             "SCOPE_MISMATCH", "Non-sim route cannot use Simulator execution authority"
         )

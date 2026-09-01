@@ -52,7 +52,6 @@ The following table catalogues all **184 service features** across the 12 domain
 | **Brokers** | `FEAT-BRK-08` Simulation & Live Isolation | `broker.isolation@1` | `—` | `utils.logging@1` | Environment isolation safety checks must rely entirely on API runtime profile |
 | **Brokers** | `FEAT-BRK-09` Broker Event Normalization | `broker.events.normalizer@1` | `utils.time@1` | `utils.logging@1` | Raw broker deal/order events cannot be normalized into canonical DTOs |
 | **Brokers** | `FEAT-BRK-10` Adapter Conformance Kit | `broker.conformance@1` | `broker.capabilities@1` | `—` | Automated broker adapter conformance testing suite becomes unavailable |
-| **Brokers** | `FEAT-BRK-17` Simulation Broker Channel | `broker.sim.channel@1` | `broker.instruments@1` | `utils.logging@1` | Socket-free simulation broker execution channel becomes unavailable |
 | **Brokers** | `FEAT-BRK-18` Provider Spec Snapshots | `broker.spec.snapshots@1` | `broker.capabilities@1` | `—` | Deterministic parity snapshots for broker APIs become unavailable |
 | **Data** | `FEAT-DATA-01` Market Data Ingestion | `data.market-data@1` | `broker.instruments@1` | `data.bar-cache@1` | Historical and real-time market data retrieval becomes unavailable |
 | **Data** | `FEAT-DATA-02` Dataset Lifecycle & Catalog | `data.datasets@1` | `data.persistence@1` | `utils.logging@1` | Dataset registration, hashing, and versioned catalog become unavailable |

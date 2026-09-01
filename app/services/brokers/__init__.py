@@ -160,12 +160,6 @@ if typing.TYPE_CHECKING:
         verify_provider_specification_snapshot,
     )
     from app.services.brokers.migrations.public import run_broker_migrations
-    from app.services.brokers.simulation.public import (
-        build_simulation_mutation_envelope,
-        build_simulation_read_envelope,
-        create_simulation_broker_adapter,
-        finalize_simulation_broker_session,
-    )
 
 # Public export name to the module and attribute that owns it. Resolved on
 # first access so importing this boundary never loads every feature.
@@ -254,14 +248,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers.metatrader.specifications",
         "build_provider_specification_snapshot",
     ),
-    "build_simulation_mutation_envelope": (
-        "app.services.brokers.simulation.public",
-        "build_simulation_mutation_envelope",
-    ),
-    "build_simulation_read_envelope": (
-        "app.services.brokers.simulation.public",
-        "build_simulation_read_envelope",
-    ),
     "calculate_broker_margin": (
         "app.services.brokers._shared.public",
         "calculate_broker_margin",
@@ -300,10 +286,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers.conformance.public",
         "create_fake_broker_adapter",
     ),
-    "create_simulation_broker_adapter": (
-        "app.services.brokers.simulation.public",
-        "create_simulation_broker_adapter",
-    ),
     "disconnect_broker": ("app.services.brokers._shared.public", "disconnect_broker"),
     "dump_broker_calculation_fixture": (
         "app.services.brokers.conformance.public",
@@ -316,10 +298,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
     "enforce_no_blind_resubmission": (
         "app.services.brokers.canonical_contracts.unknown_outcome",
         "enforce_no_blind_resubmission",
-    ),
-    "finalize_simulation_broker_session": (
-        "app.services.brokers.simulation.public",
-        "finalize_simulation_broker_session",
     ),
     "get_broker_account_info": (
         "app.services.brokers._shared.public",
@@ -692,8 +670,6 @@ __all__ = (
     "build_broker_unknown_result",
     "build_broker_value",
     "build_provider_specification_snapshot",
-    "build_simulation_mutation_envelope",
-    "build_simulation_read_envelope",
     "calculate_broker_margin",
     "calculate_broker_profit",
     "cancel_broker_order",
@@ -705,12 +681,10 @@ __all__ = (
     "create_configured_fake_broker_adapter",
     "create_connected_broker",
     "create_fake_broker_adapter",
-    "create_simulation_broker_adapter",
     "disconnect_broker",
     "dump_broker_calculation_fixture",
     "dump_provider_specification_snapshot",
     "enforce_no_blind_resubmission",
-    "finalize_simulation_broker_session",
     "get_broker_account_info",
     "get_broker_adapter_contract_version",
     "get_broker_adapter_schema_id",

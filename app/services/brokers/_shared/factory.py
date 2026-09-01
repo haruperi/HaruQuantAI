@@ -43,14 +43,6 @@ class _ProviderRegistration:
 
 
 _FACTORIES = {
-    BrokerId.SIM: _ProviderRegistration(
-        "app.services.brokers.simulation.adapter",
-        "SimulationBrokerAdapter",
-        None,
-        None,
-        None,
-        "brokers",
-    ),
     BrokerId.MT5: _ProviderRegistration(
         "app.services.brokers.metatrader.adapter",
         "MT5BrokerAdapter",
@@ -180,14 +172,14 @@ def create_broker_adapter(
     Args:
         broker_id: Exact registered broker identifier.
         config: Validated broker connection configuration.
-        authority_port: Injected authority used only by the simulation channel.
+        authority_port: Reserved for backward-compatibility; must be None.
 
     Returns:
         The disconnected adapter or a canonical structured factory error.
     """
     start_time = time.perf_counter_ns()
     request_id = generate_id("req")
-    if not _is_registered_broker(broker_id):
+    if not _is_registered_broker(broker_id) or broker_id not in _FACTORIES:
         return _factory_error(
             broker=config.broker_id,
             config=config,
@@ -197,21 +189,11 @@ def create_broker_adapter(
             message="Broker profile is not registered",
             provider_metadata={"requested_broker": str(broker_id)},
         )
-    exact_simulation_pair = (
-        broker_id is BrokerId.SIM
-        and config.environment is BrokerEnvironment.SIMULATION
-        and authority_port is not None
-    )
-    invalid_authority = (broker_id is BrokerId.SIM) != (authority_port is not None)
     if (
         config.broker_id != broker_id
         or not config.provider_enabled
-        or invalid_authority
-        or (broker_id is BrokerId.SIM and not exact_simulation_pair)
-        or (
-            broker_id is not BrokerId.SIM
-            and config.environment is BrokerEnvironment.SIMULATION
-        )
+        or authority_port is not None
+        or config.environment is BrokerEnvironment.SIMULATION
     ):
         return _factory_error(
             broker=broker_id,
@@ -226,11 +208,7 @@ def create_broker_adapter(
         _require_dependency(registration)
         module = importlib.import_module(registration.module)
         adapter_type = getattr(module, registration.adapter_class)
-        adapter = (
-            adapter_type(config, authority_port)
-            if broker_id is BrokerId.SIM
-            else adapter_type(config)
-        )
+        adapter = adapter_type(config)
     except ModuleNotFoundError as error:
         metadata: dict[str, object] = {
             "package": registration.distribution or error.name or registration.module,
