@@ -12,7 +12,7 @@ import asyncio
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
-from app.contracts.common.models import ProblemDetails
+from app.contracts.common.models import ProblemDetails, UtcTimestamp, Uuid7
 from app.contracts.data.errors import DataFailure
 from app.contracts.data.models import ManageRetentionRequest, ManageRetentionSuccess
 from app.kernel.time import format_utc_timestamp, utc_now
@@ -24,6 +24,15 @@ if TYPE_CHECKING:
 
 
 def _failure(request_id: str, detail: str) -> DataFailure:
+    """Build a deterministic retention-management failure.
+
+    Args:
+        request_id: Public request identity.
+        detail: Safe human-readable failure detail.
+
+    Returns:
+        Contract-native Data failure.
+    """
     return DataFailure(
         request_id=request_id,
         code="DATA_NOT_FOUND",
@@ -45,7 +54,13 @@ class ManageRetentionService:
         store: RetentionPolicyStore,
         collector: DataSeriesRetentionCollectorCapability,
     ) -> None:
-        """Initialize retention policy and physical collection collaborators."""
+        """Initialize retention policy and physical collection collaborators.
+
+        Args:
+            config: Trusted feature configuration.
+            store: Feature-owned durable policy store.
+            collector: Owner-provided physical series collection capability.
+        """
         self._config = config
         self._store = store
         self._collector = collector
@@ -54,7 +69,14 @@ class ManageRetentionService:
         self,
         request: ManageRetentionRequest,
     ) -> ManageRetentionSuccess | DataFailure:
-        """Define policy or collect unreachable Data series after quarantine."""
+        """Define policy or collect unreachable Data series after quarantine.
+
+        Args:
+            request: Operation-discriminated retention request.
+
+        Returns:
+            Contract-native success or deterministic failure.
+        """
         if request.operation == "DEFINE_POLICY":
             assert request.policy is not None
             await self._store.define(request.policy)
@@ -92,7 +114,13 @@ async def _demo() -> None:
     from app.kernel.identity import generate_uuid7
 
     class _NoopCollector:
-        async def collect_unpinned_before(self, *, created_before: str, limit: int):
+        async def collect_unpinned_before(
+            self,
+            *,
+            created_before: UtcTimestamp,
+            limit: int,
+        ) -> tuple[Uuid7, ...]:
+            """Return no collected versions for the standalone demonstration."""
             del created_before, limit
             return ()
 
@@ -103,7 +131,7 @@ async def _demo() -> None:
         service = ManageRetentionService(
             config,
             RetentionPolicyStore(config.database_path),
-            _NoopCollector(),  # type: ignore[arg-type]
+            _NoopCollector(),
         )
         result = await service.manage_retention(
             ManageRetentionRequest(
