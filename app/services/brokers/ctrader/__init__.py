@@ -1,3 +1,1 @@
-"""Internal cTrader direct broker channel."""
-
-__all__: list[str] = []
+"""cTrader external-provider feature."""
