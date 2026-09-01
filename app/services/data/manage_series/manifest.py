@@ -1,13 +1,21 @@
 """Feature specification for Data immutable series storage."""
 
-from app.contracts.data.internal import DATA_SERIES_STORE_CAPABILITY
+from app.contracts.data.internal import (
+    DATA_SERIES_RETENTION_COLLECTOR_CAPABILITY,
+    DATA_SERIES_STORE_CAPABILITY,
+)
 from app.kernel.feature import FeatureSpec
 from app.kernel.state import RetentionPolicy, StateDeclaration
 
 SPEC = FeatureSpec(
     feature_id="FEAT-DATA-MANAGE_SERIES",
     domain="data",
-    provides=frozenset({DATA_SERIES_STORE_CAPABILITY}),
+    provides=frozenset(
+        {
+            DATA_SERIES_STORE_CAPABILITY,
+            DATA_SERIES_RETENTION_COLLECTOR_CAPABILITY,
+        }
+    ),
     requires=frozenset(),
     optional=frozenset(),
     conflicts=frozenset(),

@@ -1,7 +1,7 @@
 """Internal cross-feature contracts for Data-owned immutable series storage.
 
 These contracts are intentionally not UI/API wire surfaces. They exist so focused
-Data features collaborate through a declared capability instead of importing a
+Data features collaborate through declared capabilities instead of importing a
 sibling repository or reading another feature's private tables.
 """
 
@@ -13,6 +13,7 @@ from app.contracts.common.models import (
     ContentHash,
     JsonObject,
     Timeframe,
+    UtcTimestamp,
     Uuid7,
     WireModel,
 )
@@ -100,7 +101,27 @@ class DataSeriesStoreCapability(Protocol):
         ...
 
 
+@runtime_checkable
+class DataSeriesRetentionCollectorCapability(Protocol):
+    """Narrow owner-provided port for age-bounded series garbage collection."""
+
+    async def collect_unpinned_before(
+        self,
+        *,
+        created_before: UtcTimestamp,
+        limit: int,
+    ) -> tuple[Uuid7, ...]:
+        """Delete bounded unpinned versions created no later than the cutoff."""
+        ...
+
+
 DATA_SERIES_STORE_CAPABILITY: CapabilityKey[DataSeriesStoreCapability] = CapabilityKey(
     name="data.series-store",
+    major=1,
+)
+DATA_SERIES_RETENTION_COLLECTOR_CAPABILITY: CapabilityKey[
+    DataSeriesRetentionCollectorCapability
+] = CapabilityKey(
+    name="data.series-retention-collector",
     major=1,
 )

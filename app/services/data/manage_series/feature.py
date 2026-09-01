@@ -4,9 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from app.contracts.data.internal import DATA_SERIES_STORE_CAPABILITY
+from app.contracts.data.internal import (
+    DATA_SERIES_RETENTION_COLLECTOR_CAPABILITY,
+    DATA_SERIES_STORE_CAPABILITY,
+)
 from app.services.data.manage_series.config import ManageSeriesConfig
 from app.services.data.manage_series.manifest import SPEC
+from app.services.data.manage_series.retention_collector import SeriesRetentionCollector
 from app.services.data.manage_series.series_store import SeriesStoreService
 
 if TYPE_CHECKING:
@@ -19,7 +23,7 @@ class ManageSeriesFeature:
     spec = SPEC
 
     async def mount(self, context: FeatureContext, config: object) -> None:
-        """Parse configuration, construct the store, and publish its capability.
+        """Parse configuration, construct owner ports, and publish capabilities.
 
         Args:
             context: Scoped feature runtime context.
@@ -35,6 +39,10 @@ class ManageSeriesFeature:
         else:
             raise TypeError("config must be a dict or ManageSeriesConfig")
         context.provide(DATA_SERIES_STORE_CAPABILITY, SeriesStoreService(parsed))
+        context.provide(
+            DATA_SERIES_RETENTION_COLLECTOR_CAPABILITY,
+            SeriesRetentionCollector(parsed),
+        )
 
 
 def create_feature() -> ManageSeriesFeature:
