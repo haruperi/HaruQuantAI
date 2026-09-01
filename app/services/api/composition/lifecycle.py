@@ -19,15 +19,8 @@ from app.services.api.composition.migrations import run_api_migrations
 from app.services.api.composition.runtime_settings import (
     activate_runtime_logging,
     build_runtime_data_provider_sources,
-    build_runtime_mt5_snapshot_gateway_config,
     build_runtime_provider_settings,
     load_runtime_settings_snapshot,
-)
-from app.services.api.identity import IdentityError
-from app.services.brokers import (
-    run_broker_migrations,
-    start_metatrader_snapshot_gateway,
-    stop_metatrader_snapshot_gateway,
 )
 from app.services.data import (
     build_data_settings,
@@ -43,9 +36,9 @@ from app.services.trading import run_trading_migrations
 logger = get_logger(__name__)
 
 # Optional-capability migrations resolve tolerantly. An absent capability
-# supplies no migration and is reported degraded; required domain migrations
-# (api, brokers, indicators, simulator, trading) stay fatal per AGENTS.md
-# section 3.
+# supplies no migration and is reported degraded; required storage migrations
+# remain fatal. Broker provider lifecycle is owned by Composition/FeatureScope,
+# not by the API process lifecycle.
 _OPTIONAL_MIGRATIONS: tuple[tuple[str, str, str, str], ...] = (
     (
         "analytics",
@@ -111,6 +104,10 @@ class _MigrationResponse(Protocol):
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912, PLR0915
     """Initialize required storage and database-configured gateway resources.
 
+    Broker providers are discovered, mounted, and disposed by Composition and
+    FeatureScope. This lifecycle must not create a second Broker service locator,
+    run a Broker-global migration, or manually start an MT5 background gateway.
+
     Args:
         app: Canonical FastAPI application.
 
@@ -145,10 +142,17 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
             )
 
             def _resolve_connection(broker_id: str, request_id: str) -> object:
-                """Resolve one broker connection config for the active session.
+                """Resolve one legacy Data-provider connection configuration.
+
+                This compatibility callback remains until the Data domain consumes
+                provider capabilities directly. It does not own Broker lifecycle.
+
+                Args:
+                    broker_id: Exact configured provider identifier.
+                    request_id: Trace identifier for the resolution request.
 
                 Returns:
-                    Composed broker connection configuration.
+                    Composed connection configuration.
                 """
                 return build_system_broker_connection_config(
                     broker_id,
@@ -169,9 +173,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
             # Also cache on `app.state`: a ContextVar `.set()` here lives in the
             # lifespan task and never propagates to per-request tasks, so
             # `RuntimeSettingsMiddleware` re-enters these contexts on every
-            # request from these cached values. The lifespan-scoped context
-            # entries below remain useful for code that runs directly within
-            # startup (migrations, startup probes).
+            # request from these cached values.
             app.state.api_data_settings = effective_data_settings
             app.state.api_data_provider_settings = provider_settings
             app.state.api_data_provider_connection_resolver = _resolve_connection
@@ -192,25 +194,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         if indicators_result.status != "success" or indicators_result.data is None:
             app.state.api_ready = False
             raise StartupError("INDICATORS_STORAGE_INITIALIZATION_FAILED")
-        brokers_result = cast(
-            "_MigrationResponse",
-            run_broker_migrations(generate_id("req")),
-        )
-        if brokers_result.status != "success" or brokers_result.data is None:
-            app.state.api_ready = False
-            raise StartupError("BROKERS_STORAGE_INITIALIZATION_FAILED")
-        snapshot_gateway_started = False
-        try:
-            gateway_config = build_runtime_mt5_snapshot_gateway_config(
-                app.state.api_runtime_settings,
-                key_set=app.state.api_credential_key_set,
-                request_id=generate_id("req"),
-            )
-            if gateway_config is not None:
-                await start_metatrader_snapshot_gateway(**gateway_config)
-                snapshot_gateway_started = True
-        except IdentityError, OSError, TypeError, ValueError:
-            logger.exception("Optional MT5 snapshot gateway unavailable")
         simulator_result = cast(
             "_MigrationResponse",
             run_simulator_migrations(generate_id("req")),
@@ -260,8 +243,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         try:
             yield
         finally:
-            if snapshot_gateway_started:
-                await stop_metatrader_snapshot_gateway()
             provider_close_result = close_data_provider_sessions(generate_id("req"))
             if provider_close_result.status != "success":
                 logger.warning("Data provider-session shutdown failed")
