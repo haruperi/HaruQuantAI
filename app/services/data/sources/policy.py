@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -31,7 +33,6 @@ from app.services.data.sources.registry import (
     _get_source_descriptor_raw,
     update_source_descriptor_readiness,
 )
-from app.utils import generate_id, get_logger
 
 type AuthContext = Any
 

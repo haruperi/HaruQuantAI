@@ -14,8 +14,8 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
 from app.services.data.contracts._base import FrozenContract as _Contract
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

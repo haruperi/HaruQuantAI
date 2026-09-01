@@ -2,10 +2,10 @@
 
 from datetime import UTC, date
 
+from app.kernel.identity import generate_id
 from app.services.data import get_exchange_sessions
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.time_sessions.contracts import ExchangeSessionRequest
-from app.utils import generate_id
 
 
 def _unwrap(response):

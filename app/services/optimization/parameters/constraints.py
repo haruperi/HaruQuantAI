@@ -6,12 +6,12 @@ import ast
 import operator
 from collections.abc import Mapping, Sequence
 
+from app.composition.logging import get_logger
 from app.services.optimization.parameters.contracts import (
     ParameterKind,
     ParameterSpace,
     ParameterValue,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

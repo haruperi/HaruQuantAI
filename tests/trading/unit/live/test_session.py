@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.brokers import build_broker_connection_config
 from app.services.trading.live import LiveSession
 from app.services.trading.live.config import (
@@ -16,7 +17,6 @@ from app.services.trading.live.config import (
 )
 from app.services.trading.monitoring import OperationalEvent
 from app.services.trading.state import TradingStateStore
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

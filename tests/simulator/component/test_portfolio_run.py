@@ -7,13 +7,13 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.kernel.serialization import canonical_digest
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.run import (
     PortfolioBacktestRequest,
     PortfolioComponentRequest,
     run_portfolio_backtest,
 )
-from app.utils import canonical_digest
 
 from tests.simulator.component.test_orchestrator import (
     FakeDependencies,

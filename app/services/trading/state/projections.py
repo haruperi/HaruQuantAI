@@ -7,6 +7,8 @@ from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import to_json_safe
 from app.services.trading.contracts import TradingError, TradingRoute
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
@@ -18,7 +20,6 @@ from app.services.trading.state.events import (
 from app.services.trading.state.stores import (
     TradingStateStore,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import get_logger, to_json_safe
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

@@ -6,6 +6,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import pandas as pd
+from app.composition.config import load_broker_provider_settings
+from app.kernel.identity import generate_id
 from app.services.api import (
     build_system_broker_connection_config,
     get_default_watchlist_symbols,
@@ -24,7 +26,6 @@ from app.services.data import (
     to_ohlcv_dataframe,
 )
 from app.services.indicators import adr, rolling_volatility
-from app.utils import generate_id, load_broker_provider_settings
 from tqdm import tqdm
 
 SYMBOLS = get_default_watchlist_symbols()

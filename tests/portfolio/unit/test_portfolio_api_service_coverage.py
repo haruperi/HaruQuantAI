@@ -6,9 +6,10 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
 from app.services.portfolio.api.service import PortfolioService
 from app.services.portfolio.contracts.errors import PortfolioError
-from app.utils import create_auth_context, generate_id
 
 AuthContext = Any
 

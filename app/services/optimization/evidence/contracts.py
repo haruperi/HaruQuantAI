@@ -8,10 +8,11 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.optimization.robustness import MonteCarloResult  # noqa: TC001
 from app.services.optimization.search import SearchSummary  # noqa: TC001
 from app.services.optimization.validation import WalkForwardResult  # noqa: TC001
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

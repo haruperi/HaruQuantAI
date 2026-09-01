@@ -10,6 +10,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.market_events.contracts import (
     MarketStreamEvent,
@@ -17,7 +19,6 @@ from app.services.data.market_events.contracts import (
 )
 from app.services.data.market_events.mt5_ticks import iter_mt5_ticks
 from app.services.data.time_sessions.timeframes import _get_timeframe_spec_raw
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

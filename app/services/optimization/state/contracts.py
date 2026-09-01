@@ -8,8 +8,9 @@ from typing import Protocol, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.optimization.evidence import OptimizationResult  # noqa: TC001
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.intents.intent import TradeIntent
 from app.services.strategy.proposal_intake.requests import (
     StrategyProposalEvaluationRequest,  # noqa: TC001
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

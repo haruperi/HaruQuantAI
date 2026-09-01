@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import build_data_error
 from app.services.strategy import validate_strategy_ref
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
@@ -13,7 +14,6 @@ from app.services.strategy.registry.resolution import (
     _validate_record,
     _version_matches,
 )
-from app.utils import generate_id
 
 
 def _ref(**overrides: object) -> StrategyRef:

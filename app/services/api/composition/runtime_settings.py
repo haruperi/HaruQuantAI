@@ -9,16 +9,12 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, TypedDict
 
+from app.composition.config import load_broker_provider_settings, load_settings
+from app.composition.logging import configure_logging, get_logger
+from app.kernel.identity import derive_stable_id
 from app.services.api.identity import (
     get_system_settings,
     resolve_credential_reference,
-)
-from app.utils import (
-    configure_logging,
-    derive_stable_id,
-    get_logger,
-    load_broker_provider_settings,
-    load_settings,
 )
 
 if TYPE_CHECKING:

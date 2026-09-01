@@ -15,6 +15,8 @@ from dataclasses import replace
 from datetime import datetime
 from decimal import Decimal
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.brokers.specifications.contracts import (
     EXPIRATION_MODE_FLAGS,
     ORDER_TYPE_FLAGS,
@@ -23,7 +25,6 @@ from app.services.brokers.specifications.contracts import (
     ProviderCostEvidenceReference,
     ProviderSpecificationSnapshot,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

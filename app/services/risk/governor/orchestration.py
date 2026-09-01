@@ -10,6 +10,8 @@ from decimal import Decimal
 from time import monotonic
 from typing import TYPE_CHECKING, Any, Literal, Protocol
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
     ApprovalAttestation,
@@ -33,7 +35,6 @@ from app.services.risk.kill_switch import permits_risk_action
 from app.services.risk.limits import evaluate_market_context, evaluate_portfolio_limits
 from app.services.risk.scenarios import evaluate_stress_loss_gate
 from app.services.risk.stop_validation import validate_stop_loss
-from app.utils import canonical_json, get_logger
 
 type AuthContext = Any
 

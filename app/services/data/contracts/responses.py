@@ -24,16 +24,15 @@ from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
 from typing import Any, Literal, cast
 
-from app.services.data.contracts.errors import DATA_ERROR_MANIFEST, DataError
-from app.utils import (
+from app.composition.logging import get_logger
+from app.contracts.common.models import (
     build_response_metadata,
     error_response,
     exception_response,
-    generate_id,
-    get_logger,
     success_response,
-    validate_id,
 )
+from app.kernel.identity import generate_id, validate_id
+from app.services.data.contracts.errors import DATA_ERROR_MANIFEST, DataError
 
 logger = get_logger(__name__)
 
@@ -838,7 +837,7 @@ def _elapsed_ms(start_time: int) -> float:
     """
     # Local import keeps this module free of an unused-name at the top if the
     # timing helper is ever renamed upstream; the contract remains Utils-owned.
-    from app.utils import get_execution_ms
+    from app.contracts.common.models import get_execution_ms
 
     return get_execution_ms(start_time)
 

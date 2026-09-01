@@ -15,6 +15,8 @@ from typing import Any, NamedTuple
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import build_response_metadata, success_response
+from app.kernel.serialization import canonical_json
 from app.services.brokers import build_provider_specification_snapshot
 from app.services.trading import (
     create_execution_receipt,
@@ -32,11 +34,6 @@ from app.services.trading import (
     get_trading_route,
     map_trading_error,
     redact_trading_payload,
-)
-from app.utils import (
-    build_response_metadata,
-    canonical_json,
-    success_response,
 )
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)

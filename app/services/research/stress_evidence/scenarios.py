@@ -7,6 +7,8 @@ from datetime import datetime
 from types import MappingProxyType
 from typing import Any, TypedDict
 
+from app.kernel.identity import derive_stable_id
+from app.kernel.serialization import canonical_json
 from app.services.research.contracts.errors import ValidationError
 from app.services.research.stress_evidence.contracts import (
     build_stress_scenario_evidence,
@@ -14,7 +16,6 @@ from app.services.research.stress_evidence.contracts import (
 from app.services.research.stress_evidence.derivation import (
     build_reasoned_stress_shock,
 )
-from app.utils import canonical_json, derive_stable_id
 
 
 class _ScenarioDefinition(TypedDict):

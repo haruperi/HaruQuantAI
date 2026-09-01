@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.composition.logging import get_logger
 from app.services.simulator.errors import SimulationError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

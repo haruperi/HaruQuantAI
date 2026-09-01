@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import NoReturn
 
+from app.composition.logging import get_logger
 from app.services.data._settings import DataSettings, get_data_settings
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -21,7 +22,6 @@ from app.services.data.persistence.contracts import (
     TransactionRequest,
     TransactionResult,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -7,6 +7,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any, Protocol, cast, runtime_checkable
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.strategy.contracts.execution import (  # noqa: TC001
     StrategyEvent,
     StrategyExecutionContext,
@@ -25,7 +27,6 @@ from app.services.strategy.contracts.responses import (
     unwrap_strategy_response,
 )
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
-from app.utils import canonical_digest, canonical_json, get_logger
 
 type StandardResponse[T] = Any
 
@@ -310,8 +311,8 @@ def load_strategy_runtime_state(
     Returns:
         State mapping or None if uninitialized.
     """
+    from app.kernel.identity import generate_id
     from app.services.strategy.persistence import read_strategy_state_record
-    from app.utils import generate_id
 
     logger.info("Loading Strategy runtime state for %s", config_id)
     request_id = generate_id("req")

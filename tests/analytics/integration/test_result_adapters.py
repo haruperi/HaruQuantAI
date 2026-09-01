@@ -3,6 +3,7 @@
 from datetime import UTC, datetime
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.analytics import (
     AnalyticsRunConfig,
     ClosedTrade,
@@ -10,7 +11,6 @@ from app.services.analytics import (
     adapt_trading_result,
     build_closed_trade_equity_curve,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 from tests.analytics._support import unwrap  # noqa: E402

@@ -23,6 +23,7 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
+from app.kernel.identity import generate_id
 from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
@@ -32,7 +33,6 @@ from app.services.api.widgets.simulation.schemas import (
     SimulationBranchRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     SimulationRunRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
-from app.utils import generate_id
 
 type AuthContext = Any
 type _LiveSource = Callable[..., object]

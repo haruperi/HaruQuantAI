@@ -7,11 +7,11 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.portfolio import (
     create_portfolio_value,
     validate_construction_evidence,
 )
-from app.utils import get_logger
 
 from tests.portfolio import conftest as portfolio_fixtures
 from tests.portfolio.unit.test_evidence import (

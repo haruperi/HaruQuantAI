@@ -18,9 +18,9 @@ def test_codebase_architectural_invariants_pass() -> None:
 
 def test_init_purity_violation(tmp_path: Path) -> None:
     """Test ARCH-001: __init__.py containing executable code is flagged."""
-    init_file = tmp_path / "app" / "services" / "data" / "__init__.py"
+    init_file = tmp_path / "app" / "services" / "workspace" / "__init__.py"
     init_file.parent.mkdir(parents=True, exist_ok=True)
-    init_file.write_text("x = 10\nfrom app.kernel import foo\n", encoding="utf-8")
+    init_file.write_text("x = 10\nimport foo\n", encoding="utf-8")
 
     tree = ast.parse(init_file.read_text(encoding="utf-8"))
     visitor = ArchitecturalVisitor(init_file)
@@ -33,7 +33,9 @@ def test_init_purity_violation(tmp_path: Path) -> None:
 
 def test_unmanaged_task_violation(tmp_path: Path) -> None:
     """Test ARCH-002: direct asyncio.create_task in a service is flagged."""
-    service_file = tmp_path / "app" / "services" / "alpha" / "consumer" / "worker.py"
+    service_file = (
+        tmp_path / "app" / "services" / "workspace" / "consumer" / "worker.py"
+    )
     service_file.parent.mkdir(parents=True, exist_ok=True)
     service_file.write_text(
         "import asyncio\nasync def run(): asyncio.create_task(run())\n",
@@ -84,10 +86,12 @@ def test_contract_purity_violation(tmp_path: Path) -> None:
 
 def test_feature_independence_violation(tmp_path: Path) -> None:
     """Test ARCH-006: Feature A importing Feature B is flagged."""
-    feature_file = tmp_path / "app" / "services" / "alpha" / "consumer" / "consumer.py"
+    feature_file = (
+        tmp_path / "app" / "services" / "workspace" / "consumer" / "consumer.py"
+    )
     feature_file.parent.mkdir(parents=True, exist_ok=True)
     feature_file.write_text(
-        "from app.services.beta.provider.service import Provider\n",
+        "from app.services.workspace.provider.service import Provider\n",
         encoding="utf-8",
     )
 

@@ -18,13 +18,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     list_sqx_symbols,
     read_sqx_m1,
     read_sqx_ticks,
     sync_quantdata_reference,
 )
-from app.utils import generate_id
 
 
 def main() -> None:

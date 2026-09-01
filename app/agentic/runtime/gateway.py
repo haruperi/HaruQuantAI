@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 if TYPE_CHECKING:
     from app.agentic.runtime.models import (

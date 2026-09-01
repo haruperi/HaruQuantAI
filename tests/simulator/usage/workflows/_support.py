@@ -13,6 +13,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.data import (
     build_data_quality_report,
     build_fx_conversion_evidence,
@@ -44,12 +47,6 @@ from app.services.strategy import (
     create_strategy_decision,
 )
 from app.services.trading import build_approved_trading_request, create_order_intent
-from app.utils import (
-    canonical_digest,
-    canonical_json,
-    create_auth_context,
-    generate_id,
-)
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 
 _DATASET_ENV = "HARU_WORKFLOW_MARKET_DATASET"
@@ -90,8 +87,8 @@ def live_market_dataset() -> object:
             **json.loads(Path(captured).read_text(encoding="utf-8"))
         )
     try:
+        from app.composition.config import load_broker_provider_settings
         from app.services.data import data_provider_settings_context
-        from app.utils import load_broker_provider_settings
 
         ps = load_broker_provider_settings({"mt5_enabled": True})
         with data_provider_settings_context(ps):

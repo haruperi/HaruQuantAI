@@ -3,12 +3,12 @@
 import asyncio
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.simulator import (
     create_simulation_handle,
     execute_simulation_handle_operation,
     unwrap_simulation_response,
 )
-from app.utils import get_logger
 
 from tests.simulator.component.test_engine import _engine, _intent, _tick
 

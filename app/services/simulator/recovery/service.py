@@ -6,6 +6,9 @@ from collections.abc import Mapping, Sequence
 from types import MappingProxyType
 from typing import cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import format_utc_timestamp, parse_utc_timestamp, utc_now
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.persistence import (
     create_recovery_checkpoint_record,
@@ -19,13 +22,6 @@ from app.services.simulator.recovery.contracts import RecoveryCheckpoint, Replay
 from app.services.simulator.recovery.lifecycle import (
     RecoveryState,
     transition_recovery_state,
-)
-from app.utils import (
-    format_utc_timestamp,
-    generate_id,
-    get_logger,
-    parse_utc_timestamp,
-    utc_now,
 )
 
 logger = get_logger(__name__)

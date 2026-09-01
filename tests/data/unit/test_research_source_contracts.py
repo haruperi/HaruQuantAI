@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_research_source_ingest_request,
     build_research_source_policy,
@@ -9,7 +10,6 @@ from app.services.data import (
     get_research_source_value_field,
     is_research_source_value,
 )
-from app.utils import generate_id
 
 
 def test_builders_return_inspectable_opaque_values() -> None:

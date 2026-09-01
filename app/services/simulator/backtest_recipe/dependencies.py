@@ -25,6 +25,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.data import generate_tick_series, unwrap_data_response
 from app.services.simulator import create_simulation_value
 from app.services.strategy import (
@@ -42,7 +43,6 @@ from app.services.strategy import (
     unwrap_strategy_response,
 )
 from app.services.trading import create_order_intent
-from app.utils import canonical_digest, canonical_json
 
 if TYPE_CHECKING:
     from app.services.simulator.backtest_recipe.descriptors import StrategyDescriptor

@@ -6,11 +6,11 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics import (
     build_portfolio_allocation_evidence,
     build_portfolio_rebalance_measurement,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 from tests.analytics._support import _measurement_request, _report, unwrap  # noqa: E402

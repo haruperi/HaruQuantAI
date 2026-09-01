@@ -8,12 +8,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.serialization import canonical_digest
 from app.services.strategy import (
     adopt_approved_optimization_parameters,
     create_strategy_parameter_update_request,
     register_strategy_version,
 )
-from app.utils import canonical_digest, create_auth_context
 from tests.strategy.usage.workflows._support import (
     COR,
     REQ,

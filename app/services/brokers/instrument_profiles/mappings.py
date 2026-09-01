@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from decimal import Decimal, InvalidOperation
 
-from app.utils import generate_id, get_logger, utc_now
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 
 logger = get_logger(__name__)
 _MAX_TEXT_LENGTH = 256

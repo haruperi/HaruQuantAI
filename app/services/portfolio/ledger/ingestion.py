@@ -11,8 +11,9 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.portfolio.ledger.contracts import build_posting_batch
-from app.utils import canonical_digest, get_logger
 
 logger = get_logger(__name__)
 

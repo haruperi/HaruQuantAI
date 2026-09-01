@@ -9,6 +9,7 @@ from decimal import Decimal
 from typing import Any, Literal, cast
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.brokers import build_broker_connection_config, build_broker_value
 from app.services.data import (
     build_account_order,
@@ -38,7 +39,6 @@ from app.services.trading.state import (
     create_execution_position_store,
     set_execution_position,
 )
-from app.utils import get_logger
 
 from tests.trading.unit.routing.test_dispatcher import _Adapter
 

@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from types import MappingProxyType
 
+from app.composition.logging import get_logger
 from app.services.portfolio.contracts.errors import PortfolioError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -4,6 +4,7 @@ from dataclasses import replace
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.reports.allocation import (
     _correlation,
@@ -13,7 +14,6 @@ from app.services.analytics.reports.allocation import (
     build_portfolio_allocation_evidence,
     build_portfolio_rebalance_measurement,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

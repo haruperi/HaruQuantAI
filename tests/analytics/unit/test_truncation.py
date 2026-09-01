@@ -3,12 +3,12 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.dashboards.truncation import (
     _bucket_candidates,
     truncate_series,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

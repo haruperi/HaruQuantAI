@@ -8,6 +8,8 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any, Protocol, cast
 
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.brokers import get_broker_dashboard_snapshot
 from app.services.data import (
     build_audit_event_query,
@@ -19,7 +21,6 @@ from app.services.data import (
 from app.services.risk import get_kill_switch_state, list_risk_decisions
 from app.services.simulator import get_simulation_result
 from app.services.trading import get_trading_operational_events, get_trading_projection
-from app.utils import generate_id, utc_now
 
 type AuthContext = Any
 

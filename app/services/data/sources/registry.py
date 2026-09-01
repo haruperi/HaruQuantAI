@@ -6,6 +6,7 @@ import threading
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -13,7 +14,6 @@ from app.services.data.contracts.responses import (
     run_data_operation,
 )
 from app.services.data.sources.protocol import MarketDataSource
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

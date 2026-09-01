@@ -3,6 +3,7 @@
 from datetime import time
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -14,7 +15,6 @@ from app.services.data.time_sessions.contracts import (
     ActiveMarketSessionsRequest,
     NamedSessionDefinition,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

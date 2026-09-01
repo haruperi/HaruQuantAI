@@ -11,6 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_market_data_request,
@@ -23,7 +24,6 @@ from app.services.research import (
     create_research_value,
     prepare_research_dataset,
 )
-from app.utils import generate_id
 
 _DATASET_ENV = "HARU_WORKFLOW_MARKET_DATASET"
 

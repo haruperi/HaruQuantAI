@@ -14,6 +14,8 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.research.contracts.errors import ValidationError
 from app.services.research.expectancy.contracts import (
     parse_approved_expectancy_profile,
@@ -24,7 +26,6 @@ from app.services.research.persistence import (
     read_eligible_expectancy_profile,
     update_expectancy_governance,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

@@ -3,10 +3,10 @@
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.contracts import AnalyticsValidationError
 from app.services.analytics.metrics.trades import calculate_trade_evidence
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

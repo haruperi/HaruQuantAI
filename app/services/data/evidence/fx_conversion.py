@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Protocol, cast
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -29,7 +30,6 @@ from app.services.data.evidence.fx_contracts import (
     FXConversionRequest,
     FXRateLeg,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

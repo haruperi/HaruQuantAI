@@ -1,6 +1,7 @@
 """WF-OPT-003 scoring, ranking, and overfit integration."""
 
 # ruff: noqa: INP001
+from app.composition.logging import get_logger
 from app.services.optimization import (
     assess_overfit_evidence,
     calculate_candidate_score,
@@ -8,7 +9,6 @@ from app.services.optimization import (
     count_nominal_trials,
     rank_candidates,
 )
-from app.utils import get_logger
 from tests.analytics._support import _report
 
 logger = get_logger(__name__)

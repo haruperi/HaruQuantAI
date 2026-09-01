@@ -11,15 +11,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from app.contracts.common.models import create_audit_event
+from app.kernel.identity import generate_id
+from app.kernel.redaction import redact_mapping_value
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     persist_audit_event,
     run_data_migrations,
-)
-from app.utils import (
-    canonical_json,
-    create_audit_event,
-    generate_id,
-    redact_mapping_value,
 )
 
 

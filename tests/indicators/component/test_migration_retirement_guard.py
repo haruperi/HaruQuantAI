@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_migration_request,
     build_statement_plan,
@@ -13,7 +14,6 @@ from app.services.data import (
 )
 from app.services.indicators import run_indicators_migrations
 from app.services.indicators.migrations.definitions import INDICATOR_MIGRATIONS
-from app.utils import generate_id
 
 _NOW = "2026-08-06T00:00:00.000Z"
 

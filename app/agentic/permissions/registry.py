@@ -12,7 +12,7 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 from app.agentic.governance.models import FORBIDDEN_PERMISSION_CLASSES
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping

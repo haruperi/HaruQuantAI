@@ -9,6 +9,13 @@ import time
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any, Literal, ParamSpec, TypeVar, cast
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import (
+    build_response_metadata,
+    error_response,
+    success_response,
+)
+from app.kernel.identity import generate_id, validate_id
 from app.services.optimization.contracts import (
     OPTIMIZATION_ERROR_CATALOG,
     OptimizationError,
@@ -42,14 +49,6 @@ from app.services.optimization.search import SearchRequest, run_bounded_search
 from app.services.optimization.validation import (
     WalkForwardRequest,
     run_walk_forward_validation,
-)
-from app.utils import (
-    build_response_metadata,
-    error_response,
-    generate_id,
-    get_logger,
-    success_response,
-    validate_id,
 )
 
 type JsonValue = Any

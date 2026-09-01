@@ -1,11 +1,11 @@
 """WF-OPT-006 evidence and persistence handoff integration."""
 
 # ruff: noqa: INP001
+from app.composition.logging import get_logger
 from app.services.optimization import (
     build_optimization_handoff,
     persist_optimization_result,
 )
-from app.utils import get_logger
 from tests.optimization.unit.test_evidence_contracts import evidence_request
 from tests.optimization.unit.test_state_contracts import MemoryOptimizationStore
 

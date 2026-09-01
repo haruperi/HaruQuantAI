@@ -7,9 +7,10 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.brokers import create_broker_adapter, get_broker_id
 from app.services.trading import create_order_intent, dispatch_order_intent
-from app.utils import generate_id, get_logger
 
 from tests.brokers.integration.test_mt5_demo_mutations import (
     _authority_state,

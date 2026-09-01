@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.signals._mechanics import (
     _current_previous,
@@ -15,7 +16,6 @@ from app.services.strategy.signals._mechanics import (
     _SignalConfigError,
     _SignalEvaluatorBase,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -714,6 +714,7 @@ class AutomationSchema(WireModel):
     """Wire-native published automation command schema set (record R9)."""
 
     schema_id: Uuid7
+    contract_version: str = "1.0.0"
     commands: tuple[AutomationCommandDescriptor, ...]
     exported_at: UtcTimestamp
     content_hash: ContentHash

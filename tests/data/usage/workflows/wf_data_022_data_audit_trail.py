@@ -9,6 +9,8 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_audit_event, create_auth_context
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_audit_event_query,
     build_data_settings,
@@ -19,7 +21,6 @@ from app.services.data import (
     run_data_migrations,
     unwrap_data_response,
 )
-from app.utils import create_audit_event, create_auth_context, generate_id
 
 
 def _error_code(error: BaseException) -> str:

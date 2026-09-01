@@ -2,8 +2,8 @@
 
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import enforce_time_split
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

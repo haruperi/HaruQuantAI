@@ -48,8 +48,8 @@ from app.agentic.agents.portfolio_risk_advisory.portfolio_risk_advisor.tools imp
     get_registered_tool_names,
 )
 from app.agentic.runtime import ModelOutcome
+from app.kernel.identity import derive_stable_id, generate_id
 from app.services.risk import create_allocation_review_request
-from app.utils import derive_stable_id, generate_id
 from pydantic import ValidationError
 
 from tests.agentic.fixtures import (

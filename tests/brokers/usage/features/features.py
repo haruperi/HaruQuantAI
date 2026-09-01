@@ -21,8 +21,6 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-import _support  # noqa: F401
-from _support import create_real_adapter
 from app.services.brokers import (
     build_broker_margin_request,
     build_broker_order_request,
@@ -49,6 +47,9 @@ from app.services.brokers import (
     supports_broker_capability,
     unsubscribe_broker,
 )
+
+import _support  # noqa: F401
+from _support import create_real_adapter
 
 
 def _print_stage(stage_num: int, name: str, summary: str) -> None:

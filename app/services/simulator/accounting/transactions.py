@@ -10,7 +10,7 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from app.utils import canonical_digest
+from app.kernel.serialization import canonical_digest
 
 type TransactionKind = Literal[
     "profit",

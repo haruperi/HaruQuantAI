@@ -9,8 +9,9 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 from app.services.data.contracts.errors import DataError
-from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
 _ATTEMPTS: dict[str, deque[datetime]] = defaultdict(deque)

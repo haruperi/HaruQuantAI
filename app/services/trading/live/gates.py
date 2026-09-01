@@ -3,6 +3,7 @@
 from collections.abc import Mapping
 from typing import Any, Literal
 
+from app.composition.logging import get_logger
 from app.services.trading.contracts import (
     TradingError,
     TradingRequest,
@@ -23,7 +24,6 @@ from app.services.trading.validation.authority import (
     validate_kill_switch_hierarchy,
     validate_risk_authority,
 )
-from app.utils import get_logger
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

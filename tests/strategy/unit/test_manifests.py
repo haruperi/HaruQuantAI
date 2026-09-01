@@ -1,8 +1,8 @@
 """Strategy replay-manifest builder tests."""
 
 # ruff: noqa: PT018
+from app.composition.logging import get_logger
 from app.services.strategy import create_strategy_replay_manifest
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import HASH, make_config, make_context, make_ref
 

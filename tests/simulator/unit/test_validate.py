@@ -6,6 +6,7 @@ from hashlib import sha256
 from typing import Any
 
 import pytest
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     build_data_quality_report,
     build_market_dataset,
@@ -19,7 +20,6 @@ from app.services.simulator.validation.validate import (
     validate_phase_one_scope,
     validate_run_inputs,
 )
-from app.utils import canonical_json
 
 
 def _dataset() -> Any:

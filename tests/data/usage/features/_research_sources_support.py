@@ -10,6 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_research_source_ingest_request,
@@ -29,7 +30,6 @@ from app.services.data import (
     retrieve_research_provider_payload,
     run_data_migrations,
 )
-from app.utils import generate_id
 
 
 def main() -> None:

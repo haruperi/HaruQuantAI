@@ -9,8 +9,8 @@ a new migration id with its own checksum.
 
 import hashlib
 
+from app.kernel.serialization import canonical_json
 from app.services.data import build_migration_step
-from app.utils import canonical_json
 
 _SIMULATION_WORKBENCH_STATEMENTS = (
     """

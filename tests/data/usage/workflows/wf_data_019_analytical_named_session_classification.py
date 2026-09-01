@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from decimal import Decimal
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_active_market_sessions_request,
     build_data_settings,
@@ -23,7 +24,6 @@ from app.services.data import (
     run_data_migrations,
     unwrap_data_response,
 )
-from app.utils import generate_id
 
 WORKFLOW_ID = "WF-DATA-019"
 STAGES = (

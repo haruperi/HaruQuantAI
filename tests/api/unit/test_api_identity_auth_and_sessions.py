@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
 from app.services.api.identity.accounts import AuthenticatedUser
 from app.services.api.identity.authorization import (
     _coerce_non_empty_text,
@@ -30,7 +32,6 @@ from app.services.api.identity.persistence import (
 from app.services.api.identity.sessions import (
     create_session,
 )
-from app.utils import create_auth_context, generate_id
 from fastapi import HTTPException
 
 

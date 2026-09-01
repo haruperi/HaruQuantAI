@@ -6,6 +6,7 @@ from datetime import UTC, datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
+from app.kernel.errors import ValidationError as AppValidationError
 from app.services.brokers.canonical_contracts import (
     BrokerAccountInfo,
     BrokerAccountTransaction,
@@ -49,7 +50,6 @@ from app.services.brokers.canonical_contracts import (
     BrokerTick,
     BrokerTradingSession,
 )
-from app.utils.errors.exceptions import ValidationError as AppValidationError
 from pydantic import SecretStr
 
 from tests.brokers.response_factory import broker_response

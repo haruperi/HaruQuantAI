@@ -6,12 +6,12 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy import (
     get_strategy_timing_policy,
     run_event_strategy_hook,
     run_vectorized_strategy_signals,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_event_runner import Evaluator as EventEvaluator
 from tests.strategy.unit.test_models import (

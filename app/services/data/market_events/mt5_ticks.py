@@ -7,8 +7,8 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any, cast
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError, TickRecord
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

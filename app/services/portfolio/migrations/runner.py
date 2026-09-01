@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+from app.composition.logging import get_logger
 from app.services.data import (
     build_migration_request,
     run_domain_migrations,
 )
 from app.services.portfolio.migrations.definitions import get_portfolio_migrations
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

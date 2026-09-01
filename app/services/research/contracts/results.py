@@ -13,8 +13,8 @@ from typing import Annotated, Literal
 import pandas as pd
 from pydantic import PlainSerializer
 
+from app.composition.logging import get_logger
 from app.services.research.contracts.errors import SecurityError, ValidationError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -92,17 +92,17 @@ def _hash(value: str, detail: str) -> str:
     return value
 
 
-def _freeze(value: Mapping[str, JSONValue]) -> Mapping[str, JSONValue]:
+def _freeze(value: Mapping[str, JSONValue]) -> dict[str, JSONValue]:
     """Freeze one result mapping against mutation.
 
     Args:
         value: Mapping to copy.
 
     Returns:
-        Immutable shallow mapping.
+        Copied dictionary.
     """
     logger.debug("Freezing Research result mapping")
-    return MappingProxyType(dict(value))
+    return dict(value)
 
 
 def _schema(value: str) -> None:
@@ -561,11 +561,11 @@ class ResearchReport:
         if isinstance(leakage, Mapping) and leakage.get("severity") == "high":
             raise SecurityError("RES_LEAKAGE_DETECTED", "PUBLICATION_BLOCKED")
         object.__setattr__(self, "evidence", _freeze(self.evidence))
-        object.__setattr__(self, "seeds", MappingProxyType(dict(self.seeds)))
+        object.__setattr__(self, "seeds", dict(self.seeds))
         object.__setattr__(
             self,
             "dependency_versions",
-            MappingProxyType(dict(self.dependency_versions)),
+            dict(self.dependency_versions),
         )
 
 

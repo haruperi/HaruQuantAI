@@ -3,8 +3,8 @@
 from datetime import UTC, datetime
 
 import pytest
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.simulator.journal import JournalEvent
-from app.utils import canonical_digest, canonical_json
 
 
 def test_journal_event_rejects_secret_payload() -> None:

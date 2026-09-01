@@ -17,6 +17,8 @@ from typing import TYPE_CHECKING, Annotated, Any, cast
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.api import build_stream_event
 from app.services.api.identity import (
     require_auth_context,
@@ -42,7 +44,6 @@ from app.services.api.widgets.research.schemas import (
     ResearchStressScenarioCreateRequest,  # noqa: TC001 - FastAPI runtime annotation.
 )
 from app.services.research import get_stress_scenario_catalog, run_edge_lab_profile
-from app.utils import generate_id, get_logger
 
 if TYPE_CHECKING:
     from app.services.api.widgets.research.registry import (

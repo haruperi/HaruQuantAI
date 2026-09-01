@@ -5,6 +5,7 @@ from decimal import Decimal
 
 import pandas as pd
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import to_ohlcv_dataframe, to_tick_dataframe
 from app.services.data.contracts import DataError, DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord, TickRecord
@@ -17,7 +18,6 @@ from app.services.data.transformation.tabular import (
     compare_ohlcv,
     serialize_dataframe_records,
 )
-from app.utils import generate_id
 
 
 def _unwrap(response: object) -> object:

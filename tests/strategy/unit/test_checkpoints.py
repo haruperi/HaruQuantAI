@@ -3,11 +3,11 @@
 # ruff: noqa: PT018
 from unittest.mock import patch
 
+from app.composition.logging import get_logger
 from app.services.strategy import (
     create_strategy_checkpoint,
     validate_strategy_checkpoint,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import make_auth, make_config, make_ref
 

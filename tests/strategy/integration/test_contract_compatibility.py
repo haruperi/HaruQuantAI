@@ -4,6 +4,7 @@ import json
 from datetime import UTC, datetime
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy import (
     build_trade_intent,
     create_strategy_config,
@@ -16,7 +17,6 @@ from app.services.strategy import (
     create_trade_intent_value,
     get_strategy_environment,
 )
-from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_catalog import make_registration

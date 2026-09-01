@@ -7,12 +7,12 @@ from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+from app.kernel.identity import generate_id
 from app.services.analytics import (
     adapt_trading_result,
     build_performance_report,
     calculate_grouped_evidence,
 )
-from app.utils import generate_id
 from tests.analytics.usage.workflows._support import examples
 
 WORKFLOW_ID = "WF-ANLT-PRI"

@@ -19,13 +19,14 @@ from collections.abc import Callable
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 from app.services.data.contracts import DataError
 from app.services.data.market_events.contracts import (
     FeedEventResult,
     FeedStatus,
 )
 from app.services.data.persistence import create_feed_record, read_feed_record
-from app.utils import get_logger, utc_now
 
 if TYPE_CHECKING:
     from app.services.data.market_events.contracts import (

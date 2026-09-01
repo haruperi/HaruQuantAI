@@ -8,6 +8,7 @@ from decimal import Decimal
 
 import numpy as np
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
@@ -21,7 +22,6 @@ from app.services.analytics.metrics.trades import (
     ANNUALIZATION_POLICY,
     MIN_METRIC_SAMPLES,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

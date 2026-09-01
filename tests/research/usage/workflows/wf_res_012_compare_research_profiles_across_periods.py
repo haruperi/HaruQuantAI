@@ -7,12 +7,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.serialization import canonical_digest
 from app.services.research import (
     compare_research_profiles,
     create_research_value,
     get_research_value_field,
 )
-from app.utils import canonical_digest
 from tests.research.usage.workflows._support import prepared_dataset
 
 WORKFLOW_ID = "WF-RES-012"

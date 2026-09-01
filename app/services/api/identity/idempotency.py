@@ -11,6 +11,9 @@ from typing import Literal
 from fastapi import HTTPException, status
 from pydantic import BaseModel, ConfigDict
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
+from app.kernel.time import utc_now
 from app.services.api.identity.errors import IdentityError
 from app.services.api.identity.persistence import (
     create_idempotency_record,
@@ -21,7 +24,6 @@ from app.services.api.identity.persistence import (
 from app.services.api.widgets.settings.limits import (
     HTTP_IDEMPOTENCY_RETENTION_SECONDS,
 )
-from app.utils import canonical_json, get_logger, utc_now
 
 logger = get_logger(__name__)
 

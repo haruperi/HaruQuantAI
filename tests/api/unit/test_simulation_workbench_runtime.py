@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.api import register_api_user, run_api_migrations
 from app.services.api.widgets.simulator.batching import (
     build_batch_runner,
@@ -44,7 +45,6 @@ from app.services.data import (
     data_settings_context,
     run_domain_migrations,
 )
-from app.utils import generate_id
 
 _PRINCIPAL = "user-workbench-runtime"
 _NOW = datetime(2026, 3, 1, 12, 0, 0, tzinfo=UTC)

@@ -11,6 +11,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_audit_event, create_auth_context
+from app.kernel.identity import generate_id
 from app.services.data import (
     acquire_write_lock,
     build_backup_target,
@@ -44,7 +46,6 @@ from app.services.data import (
     run_domain_migrations,
     save_dataset,
 )
-from app.utils import create_audit_event, create_auth_context, generate_id
 
 _OBSERVED_AT = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 

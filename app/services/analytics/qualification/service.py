@@ -6,8 +6,8 @@ import json
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 
+from app.kernel.time import utc_now
 from app.services.analytics.persistence import build_analytics_insert
-from app.utils import utc_now
 
 
 def evaluate_qualification(

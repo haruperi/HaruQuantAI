@@ -2,12 +2,12 @@
 
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     build_validation_summary,
     create_research_value,
     label_realized_market_behavior,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

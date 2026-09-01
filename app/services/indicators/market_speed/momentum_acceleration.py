@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
@@ -27,7 +28,6 @@ from app.services.indicators.core.validation import validate_indicator
 from app.services.indicators.market_speed.price_velocity import (
     price_velocity as _price_velocity,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -19,6 +19,8 @@ from collections.abc import Coroutine, Sequence
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -36,7 +38,6 @@ from app.services.data.economic_calendar.profiling import (
 from app.services.data.economic_calendar.restriction import (
     _is_news_restricted_events_raw,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

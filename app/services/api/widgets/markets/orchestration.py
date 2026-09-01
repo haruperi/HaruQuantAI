@@ -7,6 +7,8 @@ import time
 from types import MappingProxyType
 from typing import Any, Final, Protocol, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.api.identity import get_system_settings
 from app.services.api.widgets.markets.schemas import build_gateway_response
 from app.services.data import (
@@ -20,7 +22,6 @@ from app.services.data import (
     list_market_directory,
 )
 from app.services.indicators import project_market_overlay
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

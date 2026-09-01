@@ -6,6 +6,9 @@ import hashlib
 import uuid
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_audit_event
+from app.kernel.serialization import canonical_digest
 from app.services.data import persist_audit_event
 from app.services.strategy.contracts.execution import (
     StrategyDecision,
@@ -28,7 +31,6 @@ from app.services.strategy.proposal_intake.validation import (
     _validate_strategy_proposal,
 )
 from app.services.strategy.signals.boundary import evaluate_strategy_signals
-from app.utils import canonical_digest, create_audit_event, get_logger
 
 if TYPE_CHECKING:
     from app.services.strategy.contracts.execution import StrategyExecutionContext

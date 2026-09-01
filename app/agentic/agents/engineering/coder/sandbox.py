@@ -22,7 +22,8 @@ from app.agentic.agents.engineering.coder.schemas import (
     build_sandbox_lease,
     build_sandbox_result,
 )
-from app.utils import derive_stable_id, get_logger
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
 
 if TYPE_CHECKING:
     from collections.abc import Mapping

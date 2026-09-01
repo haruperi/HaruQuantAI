@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from app.kernel.serialization import canonical_json
 from app.services.portfolio.persistence.create import (
     _execute,
     _mapping_field,
@@ -10,7 +11,6 @@ from app.services.portfolio.persistence.create import (
     _text_field,
     _time_field,
 )
-from app.utils import canonical_json
 
 _ALLOCATION_WRITE_ROWS = 4
 

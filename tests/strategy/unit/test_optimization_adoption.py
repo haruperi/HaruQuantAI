@@ -3,6 +3,8 @@
 import importlib
 
 import pytest
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.strategy import (
     adopt_approved_optimization_parameters,
     create_strategy_config,
@@ -11,7 +13,6 @@ from app.services.strategy import (
     create_strategy_ref,
     get_strategy_environment,
 )
-from app.utils import canonical_digest, get_logger
 
 from tests.strategy.unit.test_models import COR, NOW, REQ, WF, make_auth
 

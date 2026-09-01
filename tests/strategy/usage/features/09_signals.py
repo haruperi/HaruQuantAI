@@ -14,6 +14,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_quality_report,
     build_data_settings,
@@ -41,7 +43,6 @@ from app.services.strategy import (
     mark_strategy_signal_submitted,
     record_strategy_signals,
 )
-from app.utils import generate_id, get_logger
 from tests.strategy.unit.test_models import make_context, make_signal_evidence
 
 logger = get_logger(__name__)

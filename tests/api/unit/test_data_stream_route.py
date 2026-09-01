@@ -8,13 +8,13 @@ from collections.abc import AsyncGenerator
 from datetime import UTC, datetime
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.api.identity import build_auth_context
 from app.services.api.widgets.data import stream_routes as data_stream
 from app.services.api.widgets.data.stream_routes import (
     _resume_sequence,
     _stream_market_data,
 )
-from app.utils import generate_id
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict
 from starlette.requests import Request

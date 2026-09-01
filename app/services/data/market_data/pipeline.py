@@ -9,6 +9,9 @@ from typing import TYPE_CHECKING, Literal, cast
 
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.data.contracts import (
     DataError,
     DataQualityReport,
@@ -56,7 +59,6 @@ from app.services.data.sources.registry import (
     _resolve_source_raw,
     resolve_source_identity,
 )
-from app.utils import canonical_json, generate_id, get_logger
 
 logger = get_logger(__name__)
 

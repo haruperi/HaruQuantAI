@@ -9,6 +9,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 from app.services.data._settings import get_data_settings
 from app.services.data.contracts import DataError
 from app.services.data.data_jobs.contracts import (
@@ -31,7 +33,6 @@ from app.services.data.persistence.contracts import (
     DatasetSaveRequest,
 )
 from app.services.data.persistence.dataset_writer import _save_dataset_raw
-from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
 

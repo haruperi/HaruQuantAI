@@ -10,6 +10,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_audit_event, create_auth_context
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_audit_event_query,
     build_data_settings,
@@ -18,7 +20,6 @@ from app.services.data import (
     query_audit_events,
     run_data_migrations,
 )
-from app.utils import create_audit_event, create_auth_context, generate_id
 
 _START = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)
 _END = _START + timedelta(hours=1)

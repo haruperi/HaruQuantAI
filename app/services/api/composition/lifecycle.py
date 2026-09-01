@@ -6,6 +6,8 @@ from typing import Any, Protocol, cast
 
 from fastapi import FastAPI
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.api.composition.broker_config import (
     build_system_broker_connection_config,
 )
@@ -37,7 +39,6 @@ from app.services.data import (
 from app.services.indicators import run_indicators_migrations
 from app.services.simulator import run_simulator_migrations
 from app.services.trading import run_trading_migrations
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

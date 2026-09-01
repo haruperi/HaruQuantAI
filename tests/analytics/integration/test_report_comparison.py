@@ -2,8 +2,8 @@
 
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.analytics import compare_performance_reports
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 from tests.analytics._support import _report, unwrap  # noqa: E402

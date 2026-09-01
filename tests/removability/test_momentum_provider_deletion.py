@@ -27,7 +27,6 @@ def _setup_isolated_app_tree(tmp_path: Path) -> Path:
         "app/services/indicators/__init__.py",
         "app/services/indicators/core",
         "app/services/indicators/momentum",
-        "app/utils",
     ]
     for sub in subdirs:
         src = _REPO_ROOT / sub

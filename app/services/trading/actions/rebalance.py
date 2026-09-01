@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from app.composition.logging import get_logger
 from app.services.risk import get_decision_state
 from app.services.trading.actions._shared import response_data_json
 from app.services.trading.actions.positions import reduce_exposure
@@ -18,7 +19,6 @@ from app.services.trading.contracts.errors import _redacted_envelope_data
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.monitoring.budgets import validate_budget_authority
 from app.services.trading.validation.authority import validate_kill_switch_hierarchy
-from app.utils import get_logger
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

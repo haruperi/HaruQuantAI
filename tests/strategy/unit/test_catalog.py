@@ -3,12 +3,12 @@
 from contextlib import AbstractContextManager
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.data import build_data_settings, data_settings_context
 from app.services.strategy.contracts import (
     StrategyLifecycleStatus,
     StrategyRegistrationRequest,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     COR,

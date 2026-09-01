@@ -4,10 +4,11 @@ from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
+from app.contracts.common.models import create_auth_context
+from app.kernel.time import utc_now
 from app.services.api.identity import require_auth_context
 from app.services.api.widgets.trading import orchestration as trading_dependencies
 from app.services.api.widgets.trading import routes as trading
-from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI, HTTPException
 
 from tests.api._support import get_json

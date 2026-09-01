@@ -2,6 +2,8 @@
 
 import hashlib
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.strategy.contracts.execution import (
     StrategyExecutionContext,  # noqa: TC001
 )
@@ -13,7 +15,6 @@ from app.services.strategy.contracts.references import (  # noqa: TC001
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.replay.models import StrategyReplayManifest
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

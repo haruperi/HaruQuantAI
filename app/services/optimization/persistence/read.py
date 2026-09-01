@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any, cast
 
+from app.composition.logging import get_logger
 from app.services.data import (
     build_statement_plan,
     build_transaction_request,
@@ -13,7 +14,6 @@ from app.services.data import (
 from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.evidence import OptimizationResult
 from app.services.optimization.state.contracts import OptimizationCheckpoint
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

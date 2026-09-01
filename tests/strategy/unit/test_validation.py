@@ -2,6 +2,7 @@
 
 # ruff: noqa: PT018
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy import (
     validate_strategy_config,
     validate_strategy_ref,
@@ -11,7 +12,6 @@ from app.services.strategy.contracts import (
     StrategyEnvironment,
     StrategyRef,
 )
-from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_models import (

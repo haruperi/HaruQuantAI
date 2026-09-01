@@ -22,9 +22,9 @@ from decimal import Decimal, InvalidOperation
 from importlib import import_module
 from typing import TYPE_CHECKING, Final, Literal, Protocol
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.persistence.paths import resolve_approved_storage_path
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

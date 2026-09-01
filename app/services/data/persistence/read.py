@@ -8,13 +8,13 @@ from contextlib import closing
 from pathlib import Path
 from typing import Any
 
+from app.composition.logging import get_logger
 from app.services.data.persistence.contracts import (
     StatementPlan,
     TransactionRequest,
     TransactionResult,
 )
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

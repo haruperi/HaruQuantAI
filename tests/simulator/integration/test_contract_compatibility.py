@@ -11,6 +11,7 @@ from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.brokers import dump_provider_specification_snapshot
 from app.services.data import (
     build_data_settings,
@@ -25,7 +26,6 @@ from app.services.simulator import (
     get_simulation_value_field,
     get_simulation_value_fields,
 )
-from app.utils import get_logger
 
 from tests.simulator.component.test_orchestrator import _dataset, _request
 from tests.simulator.component.test_portfolio_run import _portfolio_request

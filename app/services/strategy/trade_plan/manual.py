@@ -7,8 +7,8 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
+from app.composition.logging import get_logger
 from app.services.strategy.trade_plan.models import build_trade_plan, parse_trade_plan
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

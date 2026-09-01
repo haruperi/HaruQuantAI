@@ -5,12 +5,14 @@ from __future__ import annotations
 import hashlib
 from typing import Literal
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
+from app.kernel.time import utc_now
 from app.services.api.alerts.models import (
     CriticalAlertDeliveryResult,
     CriticalAlertSink,
     CriticalOperationalAlert,
 )
-from app.utils import canonical_json, get_logger, utc_now
 
 logger = get_logger(__name__)
 

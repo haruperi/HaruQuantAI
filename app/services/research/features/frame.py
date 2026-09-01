@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, cast
 
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.indicators import (
     get_indicator_result_metadata,
     get_indicator_result_values,
@@ -18,7 +19,6 @@ from app.services.research.features.calculations import (
     rolling_hurst,
     simple_returns,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -4,13 +4,13 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from app.kernel.identity import generate_id
 from app.services.api.identity import require_auth_context, require_permission
 from app.services.api.widgets.markets import orchestration
 from app.services.api.widgets.settings.limits import (
     API_DEFAULT_PAGE_SIZE,
     API_MAX_PAGE_SIZE,
 )
-from app.utils import generate_id
 
 type AuthContext = Any
 

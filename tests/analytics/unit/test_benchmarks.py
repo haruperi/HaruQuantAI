@@ -7,6 +7,8 @@ from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.contracts import RiskFreeRateEvidence
 from app.services.analytics.metrics.benchmarks import (
@@ -18,7 +20,6 @@ from app.services.data import (
     build_market_dataset,
     build_ohlcv_record,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

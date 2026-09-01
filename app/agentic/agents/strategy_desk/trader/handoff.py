@@ -30,8 +30,10 @@ from app.agentic.agents.strategy_desk.trader.schemas import (
     TradeProposalReceipt,
     build_trade_proposal_receipt,
 )
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.time import utc_now
 from app.services.strategy import create_strategy_proposal_evaluation_request
-from app.utils import derive_stable_id, get_logger, utc_now
 
 if TYPE_CHECKING:
     from collections.abc import Mapping

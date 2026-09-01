@@ -10,6 +10,9 @@ from typing import ClassVar, Literal, cast, override
 
 from pydantic import SecretStr
 
+from app.kernel.identity import validate_id
+from app.kernel.redaction import redact_mapping_value, redact_text_value
+from app.kernel.time import format_utc_timestamp
 from app.services.brokers.canonical_contracts.enums import (
     BrokerCapabilityId,
     BrokerConnectionState,
@@ -17,12 +20,6 @@ from app.services.brokers.canonical_contracts.enums import (
     BrokerErrorCode,
     BrokerId,
     BrokerUncertainty,
-)
-from app.utils import (
-    format_utc_timestamp,
-    redact_mapping_value,
-    redact_text_value,
-    validate_id,
 )
 
 _SHA256_HEX_LENGTH = 64

@@ -10,6 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_research_source_policy,
@@ -26,7 +27,6 @@ from app.services.research import (
     build_sentiment_source_evidence,
     project_intelligence_evidence,
 )
-from app.utils import generate_id
 
 
 def _feature_header(title: str) -> None:

@@ -6,6 +6,7 @@ from decimal import Decimal
 from hashlib import sha256
 
 import pytest
+from app.kernel.serialization import canonical_json
 from app.services.trading.contracts import (
     TRADING_CONTRACT_VERSION,
     ExecutionReceipt,
@@ -16,7 +17,6 @@ from app.services.trading.contracts import (
     TradingRoute,
     redact_trading_payload,
 )
-from app.utils import canonical_json
 from pydantic import ValidationError
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)

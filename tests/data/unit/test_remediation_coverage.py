@@ -1,6 +1,7 @@
 """Focused coverage for small Data boundary modules."""
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     get_calendar_dashboard_snapshot,
     get_market_hours_dashboard_snapshot,
@@ -12,7 +13,6 @@ from app.services.data.persistence.contracts import (
     TransactionResult,
 )
 from app.services.data.persistence.dataset_writer import _raise_manifest_field_error
-from app.utils import generate_id
 
 
 def test_market_hours_dashboard_reports_explicit_missing_scope() -> None:

@@ -13,6 +13,7 @@ from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_auction_payload,
     build_corporate_action_payload,
@@ -37,7 +38,6 @@ from app.services.data import (
     stream_market_depth,
     stream_market_snapshots,
 )
-from app.utils import generate_id
 
 
 def _header(title: str) -> None:

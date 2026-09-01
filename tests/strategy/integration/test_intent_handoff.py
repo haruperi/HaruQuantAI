@@ -1,7 +1,7 @@
 """WF-STR-004 canonical intent handoff integration."""
 
+from app.composition.logging import get_logger
 from app.services.strategy import build_trade_intent
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import make_context, make_decision
 

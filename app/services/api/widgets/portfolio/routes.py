@@ -26,6 +26,7 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
+from app.kernel.identity import generate_id
 from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
@@ -42,7 +43,6 @@ from app.services.api.widgets.portfolio.schemas import (
     PortfolioRollbackRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
 from app.services.api.widgets.settings.account_mode import resolve_execution_route
-from app.utils import generate_id
 
 type AuthContext = Any
 type _PortfolioSource = Callable[..., object]

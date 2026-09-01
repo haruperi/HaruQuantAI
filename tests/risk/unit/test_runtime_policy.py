@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     data_settings_context,
@@ -20,7 +21,6 @@ from app.services.risk.config.runtime import _HASH_PATTERN
 from app.services.risk.contracts.enums import RiskErrorCode
 from app.services.risk.contracts.responses import unwrap_risk_response
 from app.services.risk.persistence.create import create_policy_version
-from app.utils import generate_id
 
 
 def _settings(tmp_path: Path) -> object:

@@ -3,6 +3,7 @@
 from datetime import UTC, datetime
 
 import pytest
+from app.kernel.errors import ValidationError
 from app.services.brokers import (
     build_instrument_venue_profile,
     parse_instrument_venue_profile,
@@ -10,7 +11,6 @@ from app.services.brokers import (
 )
 from app.services.brokers.canonical_contracts.enums import BrokerId
 from app.services.brokers.instrument_profiles import symbols
-from app.utils.errors.exceptions import ValidationError
 
 _NOW = datetime(2026, 8, 7, 12, 0, 0, tzinfo=UTC)
 _NAIVE = datetime(2026, 8, 7)  # noqa: DTZ001 - intentional invalid evidence.

@@ -6,8 +6,8 @@ import random
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
 from app.services.optimization.search.grid import iter_grid_candidates
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

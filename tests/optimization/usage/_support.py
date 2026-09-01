@@ -11,6 +11,8 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.analytics import (
     build_performance_report,
     create_analytics_run_config,
@@ -25,7 +27,6 @@ from app.services.optimization import (
     parameter_space_hash,
     run_bounded_search,
 )
-from app.utils import canonical_digest, canonical_json, generate_id
 from tests.simulator.usage.workflows._support import (
     authority,
     backtest_request,

@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.optimization.evidence.contracts import (
     EvidenceAssemblyRequest,
     FinalDecision,
     OptimizationResult,
 )
 from app.services.optimization.search import CandidateState
-from app.utils import canonical_digest, get_logger
 
 logger = get_logger(__name__)
 

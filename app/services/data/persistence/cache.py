@@ -9,6 +9,8 @@ from typing import Any, Literal
 
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 from app.services.data.contracts import DataError, MarketDataset
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -26,7 +28,6 @@ from app.services.data.persistence.contracts import (
 from app.services.data.persistence.delete import delete_cache_records
 from app.services.data.persistence.read import read_cache_record, read_cache_records
 from app.services.data.persistence.update import update_cache_record
-from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
 

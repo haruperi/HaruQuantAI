@@ -16,6 +16,7 @@ from collections.abc import Mapping
 from datetime import UTC, datetime
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.parity.contracts import (
     ParityCertificateScope,
@@ -29,7 +30,6 @@ from app.services.simulator.parity.contracts import (
     ParityRouteGatePolicy,
     ParityValidityInterval,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

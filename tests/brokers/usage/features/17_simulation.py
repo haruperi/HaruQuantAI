@@ -13,7 +13,6 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-import _support  # noqa: F401
 from app.services.brokers import (
     build_broker_connection_config,
     build_broker_order_modification_request,
@@ -34,6 +33,8 @@ from app.services.brokers import (
     list_broker_account_transactions,
     list_broker_deal_history,
 )
+
+import _support  # noqa: F401
 
 
 class _UsageAuthority:

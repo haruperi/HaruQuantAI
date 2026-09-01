@@ -5,11 +5,11 @@ from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 import pytest
+from app.kernel.serialization import canonical_json
 from app.services.simulator import run_simulator_migrations
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.migrations import definitions
 from app.services.simulator.state import SIMULATION_MIGRATIONS, SimulationStateStore
-from app.utils import canonical_json
 
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 

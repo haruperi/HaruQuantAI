@@ -11,13 +11,13 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from app.contracts.common.models import create_auth_context
 from app.services.api import (
     build_request_context_middleware,
     build_route_contract,
     build_route_contract_registry,
     build_secret_redaction_middleware,
 )
-from app.utils import create_auth_context
 from fastapi import FastAPI, Request
 
 _NOW = datetime(2026, 7, 24, 9, 30, 0, tzinfo=UTC)

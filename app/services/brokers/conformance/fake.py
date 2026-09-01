@@ -23,6 +23,12 @@ from typing import (
     override,
 )
 
+from app.contracts.common.models import (
+    build_response_metadata,
+    error_response,
+    success_response,
+)
+from app.kernel.identity import generate_id
 from app.services.brokers._shared.subscription import _BrokerSubscription
 from app.services.brokers.canonical_contracts import (
     BrokerCapability,
@@ -37,12 +43,6 @@ from app.services.brokers.canonical_contracts.error_catalog import BROKER_ERROR_
 from app.services.brokers.canonical_contracts.protocols import (
     BrokerAdapter,
     _UnsupportedAdapterBase,
-)
-from app.utils import (
-    build_response_metadata,
-    error_response,
-    generate_id,
-    success_response,
 )
 
 if TYPE_CHECKING:

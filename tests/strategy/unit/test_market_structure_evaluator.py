@@ -3,9 +3,9 @@
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy.contracts import StrategySignalEvidence
 from app.services.strategy.evaluators.market_structure import MarketStructureEvaluator
-from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_models import (

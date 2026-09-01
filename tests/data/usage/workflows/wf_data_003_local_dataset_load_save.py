@@ -10,6 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_dataset_load_request,
@@ -24,7 +25,6 @@ from app.services.data import (
     save_dataset,
     unwrap_data_response,
 )
-from app.utils import generate_id
 
 _END = datetime.now(UTC)
 _START = _END - timedelta(days=5)

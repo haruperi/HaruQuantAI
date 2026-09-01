@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import validate_error_catalog
+from app.kernel.errors import validate_error_catalog
 
 
 @dataclass(frozen=True, slots=True)

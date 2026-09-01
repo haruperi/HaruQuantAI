@@ -5,13 +5,13 @@ from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import pytest
+from app.contracts.common.models import create_auth_context
 from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.execution import (
     EngineOptimizationResult,
     SimulationAnalyticsBacktestAdapter,
     execute_candidate,
 )
-from app.utils import create_auth_context
 
 from tests.analytics._support import _report
 from tests.optimization.unit.test_execution_contracts import execution_request

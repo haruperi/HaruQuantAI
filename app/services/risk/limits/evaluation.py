@@ -8,6 +8,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from app.composition.logging import get_logger
 from app.services.risk.config import (
     DrawdownMode,
     FirmMandate,
@@ -27,7 +28,6 @@ from app.services.risk.contracts.responses import (
     guard_risk_boundary,
     unwrap_risk_response,
 )
-from app.utils import get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

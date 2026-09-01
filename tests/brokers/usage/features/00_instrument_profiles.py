@@ -9,6 +9,7 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.brokers import (
     build_instrument_venue_profile,
     get_broker_value_field,
@@ -24,7 +25,6 @@ from app.services.data import (
     data_settings_context,
     run_data_migrations,
 )
-from app.utils import generate_id
 
 _EFFECTIVE_FROM = "2026-01-01T00:00:00+00:00"
 

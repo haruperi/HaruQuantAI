@@ -10,6 +10,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     build_data_quality_report,
     build_data_settings,
@@ -34,7 +35,6 @@ from app.services.strategy import (
     run_event_strategy_hook,
     run_persisted_event_strategy_hook,
 )
-from app.utils import canonical_json
 
 _UNAVAILABLE = 3
 _HASH = "e" * 64

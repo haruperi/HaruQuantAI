@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import to_json_safe
 from app.services.trading.contracts import (
     ExecutionEvidenceReport,
     TradingError,
     TradingRequest,
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import get_logger, to_json_safe
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

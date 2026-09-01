@@ -8,6 +8,8 @@ from collections.abc import Mapping
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.data import to_ohlcv_dataframe
 from app.services.research.contracts import (
     CleaningConfig,
@@ -18,7 +20,6 @@ from app.services.research.contracts import (
     ResearchWarning,
 )
 from app.services.research.data.validation import _MarketDataset, validate_dataset
-from app.utils import canonical_digest, canonical_json, get_logger
 
 logger = get_logger(__name__)
 

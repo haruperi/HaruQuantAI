@@ -1,12 +1,12 @@
 """Unit tests for Research market-structure quality (FR-RES-076)."""
 
 import pandas as pd
+from app.composition.logging import get_logger
 from app.services.research import (
     create_research_value,
     evaluate_market_structure_quality,
     is_research_value,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

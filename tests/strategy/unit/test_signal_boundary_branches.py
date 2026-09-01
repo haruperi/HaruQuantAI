@@ -4,13 +4,13 @@ from datetime import timedelta
 from typing import Any
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy import create_strategy_evaluator, evaluate_strategy_signals
 from app.services.strategy.signals._mechanics import (
     _SignalConfigError,
     _SignalDataError,
     _SignalIndicatorError,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,

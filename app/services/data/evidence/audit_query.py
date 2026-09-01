@@ -16,6 +16,8 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_audit_event
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -27,7 +29,6 @@ from app.services.data.evidence.audit_contracts import (
     AuditEventQuery,
 )
 from app.services.data.persistence import read_audit_event_records
-from app.utils import create_audit_event, get_logger
 
 type AuthContext = Any
 

@@ -22,6 +22,9 @@ from decimal import Decimal
 from statistics import StatisticsError, correlation
 from typing import Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     build_market_context_evidence,
     build_market_data_request,
@@ -61,7 +64,6 @@ from app.services.strategy import (
     discretionary_strategy_version_for,
     get_discretionary_strategy_id,
 )
-from app.utils import canonical_json, derive_stable_id, get_logger
 
 logger = get_logger(__name__)
 

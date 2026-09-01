@@ -5,9 +5,9 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
+from app.kernel.serialization import to_json_safe
 from app.services.trading.contracts import TradingError
 from app.services.trading.protective_orders.contracts import _ProtectiveOrderPlan
-from app.utils import to_json_safe
 
 
 def create_protective_order_plan(**values: object) -> object:

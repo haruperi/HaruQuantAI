@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import to_report_json_safe
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

@@ -10,6 +10,7 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     data_settings_context,
@@ -21,7 +22,6 @@ from app.services.data import (
     run_data_migrations,
     sync_catalog_reference,
 )
-from app.utils import generate_id
 
 
 def main() -> None:

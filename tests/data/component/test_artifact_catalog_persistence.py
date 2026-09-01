@@ -7,6 +7,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     get_verified_research_source,
     record_catalog_fetch,
@@ -15,7 +16,6 @@ from app.services.data import (
     sync_catalog_reference,
 )
 from app.services.data.persistence.update import update_verified_research_source_record
-from app.utils import generate_id
 
 
 def _configure(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:

@@ -3,12 +3,12 @@
 from datetime import UTC, datetime
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_research_source_ingest_request,
     build_research_source_policy,
     validate_research_source_policy,
 )
-from app.utils import generate_id
 
 
 def test_policy_rejects_undeclared_host() -> None:

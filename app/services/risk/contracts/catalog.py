@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Literal
 
+from app.kernel.errors import normalize_error_code
 from app.services.risk.contracts.enums import RiskErrorCode
-from app.utils import normalize_error_code
 
 type ErrorSeverity = Literal["info", "warning", "error", "critical"]
 

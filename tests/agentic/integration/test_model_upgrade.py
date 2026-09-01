@@ -30,7 +30,8 @@ from app.agentic import (
     validate_model_upgrade,
 )
 from app.agentic.runtime import ModelOutcome
-from app.utils import canonical_digest, derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
+from app.kernel.serialization import canonical_digest
 
 from tests.agentic.fixtures import (
     FALLBACK_PROFILE_ID,

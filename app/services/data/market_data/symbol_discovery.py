@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, Final, Literal
 
+from app.composition.logging import get_logger
 from app.services.data._settings import get_data_settings
 from app.services.data.contracts import (
     DataError,
@@ -46,7 +47,6 @@ from app.services.data.sources.registry import (
     _get_source_descriptor_raw,
     _resolve_source_raw,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

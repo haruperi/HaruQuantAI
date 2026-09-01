@@ -12,6 +12,7 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 
+from app.kernel.identity import generate_id
 from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
@@ -22,7 +23,6 @@ from app.services.api.widgets.strategies.schemas import (
     StrategyRegistrationRequestModel,  # noqa: TC001 - FastAPI runtime annotation.
 )
 from app.services.strategy import list_strategy_versions
-from app.utils import generate_id
 
 type AuthContext = Any
 type _StrategySource = Callable[..., object]

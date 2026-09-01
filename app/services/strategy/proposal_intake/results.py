@@ -6,10 +6,10 @@ from typing import Literal
 
 from pydantic import field_validator, model_validator
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts._base import _Contract, _hash, _text
 from app.services.strategy.contracts.signals import StrategySignal  # noqa: TC001
 from app.services.strategy.intents.intent import TradeIntent  # noqa: TC001
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

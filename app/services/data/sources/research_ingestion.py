@@ -12,6 +12,9 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree as ET
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
+from app.kernel.time import utc_now
 from app.services.data.contracts.errors import DataError
 from app.services.data.persistence import (
     create_research_source_record,
@@ -23,7 +26,6 @@ from app.services.data.sources.research_contracts import (
     ResearchSourcePolicy,
 )
 from app.services.data.sources.research_policy import validate_research_source_policy
-from app.utils import canonical_digest, get_logger, utc_now
 
 logger = get_logger(__name__)
 _TAG = re.compile(r"<[^>]+>")

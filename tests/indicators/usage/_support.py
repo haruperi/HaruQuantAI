@@ -91,11 +91,12 @@ def get_mt5_usage_dataset(timeframe: str = "H1") -> MarketDataset:
     """
     cache_key = f"mt5_eurusd_{timeframe.lower()}_100d"
     if cache_key not in _MARKET_DATASET_CACHE:
+        from app.composition.config import load_broker_provider_settings
+        from app.kernel.identity import generate_id
         from app.services.data import (
             data_provider_connection_resolver_context,
             data_provider_settings_context,
         )
-        from app.utils import generate_id, load_broker_provider_settings
 
         req_id = generate_id("req")
         mt5_config = _resolve_mt5_usage_config(req_id)

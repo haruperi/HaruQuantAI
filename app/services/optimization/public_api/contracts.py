@@ -8,12 +8,13 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.optimization.robustness import (
     ExecutionStressRequest,
     MonteCarloRequest,
     MonteCarloResult,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

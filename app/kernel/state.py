@@ -39,3 +39,23 @@ class StateDeclaration:
         if self.schema_version < 1:
             msg = f"schema_version must be >= 1, got {self.schema_version}"
             raise ValueError(msg)
+
+
+type TransitionTable = dict[tuple[str, str], str]
+
+
+def build_transition_table(transitions: list[tuple[str, str, str]]) -> TransitionTable:
+    """Build a deterministic (from_state, event) -> to_state transition mapping."""
+    return {(source, event): target for source, event, target in transitions}
+
+
+def attempt_transition(
+    current_state: str,
+    event: str,
+    table: TransitionTable,
+) -> tuple[bool, str]:
+    """Attempt a state transition against the transition table."""
+    target = table.get((current_state, event))
+    if target is not None:
+        return True, target
+    return False, current_state

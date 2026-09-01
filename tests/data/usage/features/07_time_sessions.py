@@ -9,6 +9,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     apply_venue_halt,
     build_active_market_sessions_request,
@@ -28,7 +29,6 @@ from app.services.data import (
     require_utc,
     validate_resample_target,
 )
-from app.utils import generate_id
 
 _START = datetime(2026, 6, 1, 0, 0, tzinfo=UTC)
 _END = datetime(2026, 6, 1, 8, 0, tzinfo=UTC)

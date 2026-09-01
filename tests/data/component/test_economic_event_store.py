@@ -11,6 +11,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.economic_calendar.events import EconomicEvent, EventImpact
@@ -18,7 +19,6 @@ from app.services.data.economic_calendar.store import EconomicEventStore
 from app.services.data.persistence.contracts import StatementPlan, TransactionRequest
 from app.services.data.persistence.migrations import run_data_migrations
 from app.services.data.persistence.transactions import execute_transaction
-from app.utils import generate_id
 
 
 def _unwrap(response):

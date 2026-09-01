@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
@@ -28,7 +29,6 @@ from app.services.indicators.structure.donchian_channels import (
     donchian_channels as _donchian_channels,
 )
 from app.services.indicators.volatility.atr import atr as _atr
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -13,7 +13,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import ClassVar
 
-from app.utils import format_utc_timestamp
+from app.kernel.time import format_utc_timestamp
 
 #: Length of a lowercase hexadecimal SHA-256 digest.
 _SHA256_HEX_LENGTH = 64

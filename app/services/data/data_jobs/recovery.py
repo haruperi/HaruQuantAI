@@ -16,6 +16,9 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Any, Final
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.data.contracts import DataError
 from app.services.data.data_jobs.backfill import (
     _finalize_checkpoint,
@@ -28,7 +31,6 @@ from app.services.data.persistence import (
     read_prepared_backfill_records,
     update_job_recovery_blocked,
 )
-from app.utils import generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

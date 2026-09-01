@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+from app.kernel.serialization import canonical_digest
 from app.services.strategy.proposal_intake.requests import (
     StrategyProposalEvaluationRequest,
 )
 from app.services.strategy.proposal_intake.results import (
     StrategyProposalEvaluationResult,
 )
-from app.utils import canonical_digest
 
 
 def create_strategy_proposal_evaluation_request(

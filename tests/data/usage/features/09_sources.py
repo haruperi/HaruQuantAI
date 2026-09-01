@@ -11,6 +11,8 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from _research_sources_support import main as run_research_source_support
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_market_data_request,
@@ -31,7 +33,6 @@ from app.services.data import (
     verify_read_only_call,
     wrap_broker_client,
 )
-from app.utils import create_auth_context, generate_id
 
 _SYMBOL = "EURUSD"
 _END = datetime.now(UTC)

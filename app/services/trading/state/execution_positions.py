@@ -11,9 +11,9 @@ from typing import Any, Literal, Self, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.composition.logging import get_logger
 from app.services.brokers import get_broker_deal, get_broker_position
 from app.services.trading.contracts import TradingError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

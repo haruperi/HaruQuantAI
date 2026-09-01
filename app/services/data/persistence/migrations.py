@@ -11,6 +11,7 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.data._settings import DataSettings, get_data_settings
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -29,7 +30,6 @@ from app.services.data.persistence.contracts import (
 )
 from app.services.data.persistence.locking import _acquire_write_lock_raw
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

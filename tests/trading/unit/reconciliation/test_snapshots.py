@@ -4,8 +4,8 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
+from app.kernel.serialization import to_json_safe
 from app.services.trading.reconciliation import AuthoritySnapshot
-from app.utils import to_json_safe
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)
 

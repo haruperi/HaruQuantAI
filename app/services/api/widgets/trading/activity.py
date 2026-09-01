@@ -11,10 +11,11 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 
+from app.composition.config import load_settings
+from app.kernel.identity import generate_id
 from app.services.api import build_stream_event
 from app.services.api.identity import require_auth_context, require_permission
 from app.services.trading import get_execution_session
-from app.utils import generate_id, load_settings
 
 type AuthContext = Any
 

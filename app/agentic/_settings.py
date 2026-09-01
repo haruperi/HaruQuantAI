@@ -17,7 +17,7 @@ from typing import Annotated, Self
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 logger = get_logger(__name__)
 

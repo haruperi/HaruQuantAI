@@ -1,8 +1,8 @@
 """Strategy accepted error catalogue tests."""
 
+from app.composition.logging import get_logger
 from app.services.strategy import get_strategy_error_catalog
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -3,8 +3,8 @@
 from typing import Any
 
 import pytest
+from app.contracts.common.models import create_auth_context
 from app.services.risk import create_kill_switch_state
-from app.utils import create_auth_context
 
 from tests.trading.unit.actions.test_controls import switch as kill_switch
 from tests.trading.unit.actions.test_dependencies import (

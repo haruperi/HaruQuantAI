@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -35,7 +36,6 @@ from app.services.data.economic_calendar.restriction import (
     CALENDAR_STATE_UNKNOWN,
     _evaluate_calendar_state_raw,
 )
-from app.utils import generate_id
 
 if TYPE_CHECKING:
     from app.services.data.evidence.market_context_contracts import (

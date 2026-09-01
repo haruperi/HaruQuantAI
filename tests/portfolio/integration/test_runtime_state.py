@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     build_data_settings,
     build_statement_plan,
@@ -21,7 +23,6 @@ from app.services.portfolio import (
     get_portfolio_value_field,
     run_portfolio_migrations,
 )
-from app.utils import canonical_json, generate_id
 
 _ROW_COUNT_STATEMENTS = {
     "portfolio_definitions": "SELECT COUNT(*) AS row_count FROM portfolio_definitions",

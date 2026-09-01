@@ -6,6 +6,7 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query
 
+from app.kernel.identity import generate_id
 from app.services.api import build_api_metadata, build_api_response
 from app.services.api.identity import (
     require_auth_context,
@@ -25,7 +26,6 @@ from app.services.indicators import (
     get_indicator,
     list_indicators,
 )
-from app.utils import generate_id
 
 type AuthContext = Any
 

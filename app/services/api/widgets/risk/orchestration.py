@@ -20,12 +20,12 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from typing import Any, cast
 
+from app.kernel.time import utc_now
 from app.services.risk import (
     apply_kill_switch_command,
     create_kill_switch_command,
     get_kill_switch_state,
 )
-from app.utils import utc_now
 
 type AuthContext = Any
 type _RiskOperation = Callable[..., object]

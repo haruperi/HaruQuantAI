@@ -6,7 +6,7 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import Literal, Protocol, cast
 
-from app.utils import validate_error_catalog
+from app.kernel.errors import validate_error_catalog
 
 type ErrorSeverity = Literal["info", "warning", "error", "critical"]
 

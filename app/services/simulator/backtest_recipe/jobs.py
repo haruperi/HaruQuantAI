@@ -21,6 +21,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Literal
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.simulator.backtest_recipe.evidence import (
     BacktestRunEvidence,
     CompletionSink,
@@ -30,7 +32,6 @@ from app.services.simulator.backtest_recipe.pipeline import (
     run_strategy_backtest,
     utc_now,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

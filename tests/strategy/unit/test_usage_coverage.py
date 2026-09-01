@@ -3,8 +3,8 @@
 import ast
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services import strategy
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

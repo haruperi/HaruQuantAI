@@ -6,6 +6,9 @@ import asyncio
 from decimal import ROUND_DOWN, Decimal
 
 import pytest
+from app.composition.config import load_broker_provider_settings, load_settings
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.brokers import (
     build_broker_connection_config,
     build_broker_order_filter,
@@ -27,12 +30,6 @@ from app.services.brokers import (
     get_broker_symbol_info,
     get_broker_value_field,
     place_broker_order,
-)
-from app.utils import (
-    generate_id,
-    get_logger,
-    load_broker_provider_settings,
-    load_settings,
 )
 
 logger = get_logger("tests.brokers.integration.test_mt5_demo_mutations")

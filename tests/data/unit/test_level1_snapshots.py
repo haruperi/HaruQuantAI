@@ -7,9 +7,9 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import build_level1_snapshot_request, get_level1_snapshot
 from app.services.data.market_data import level1
-from app.utils import generate_id
 
 
 def _fake_tick(*, bid: str, ask: str, timestamp: datetime) -> SimpleNamespace:

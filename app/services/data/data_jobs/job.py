@@ -22,6 +22,9 @@ from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from typing import Any, Final, Literal
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.data.contracts import DataError, unwrap_data_response
 from app.services.data.data_jobs.backfill import (
     BACKFILL_MAX_RECORDS_PER_CHUNK,
@@ -54,7 +57,6 @@ from app.services.data.persistence import (
     update_job_stop,
 )
 from app.services.data.sources.policy import _evaluate_source_policy_raw
-from app.utils import generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

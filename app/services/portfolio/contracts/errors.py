@@ -7,13 +7,10 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any, Final, Literal, cast
 
-from app.utils import (
-    build_response_metadata,
-    generate_id,
-    get_logger,
-    success_response,
-    validate_error_catalog,
-)
+from app.composition.logging import get_logger
+from app.contracts.common.models import build_response_metadata, success_response
+from app.kernel.errors import validate_error_catalog
+from app.kernel.identity import generate_id
 
 type StandardResponse[T] = object
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

@@ -15,7 +15,7 @@ from typing import Any
 
 TIER_A_DOMAINS = {"indicators"}
 TIER_C_DOMAINS = {"utils", "kernel", "risk"}
-TOTAL_REQUIRED_FEATURES = 253
+TOTAL_REQUIRED_FEATURES = 237
 
 
 def get_git_commit(root: Path) -> str:

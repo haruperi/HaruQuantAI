@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 logger = get_logger(__name__)
 

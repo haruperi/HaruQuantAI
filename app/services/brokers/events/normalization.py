@@ -17,7 +17,7 @@ from __future__ import annotations
 from collections.abc import Collection, Mapping
 from datetime import datetime
 
-from app.utils import (
+from app.contracts.common.models import (
     build_event_envelope,
     find_sequence_gap,
     is_duplicate_event,

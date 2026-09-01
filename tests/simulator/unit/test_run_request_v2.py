@@ -7,6 +7,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import pytest
+from app.kernel.serialization import canonical_digest
 from app.services.simulator import (
     calculate_simulation_backtest_config_hash,
     create_simulation_value,
@@ -14,7 +15,6 @@ from app.services.simulator import (
     run_backtest_async,
     unwrap_simulation_response,
 )
-from app.utils import canonical_digest
 
 from tests.simulator.component.test_orchestrator import (
     FakeDependencies,

@@ -16,13 +16,13 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Final
 
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
     data_start_time,
     run_data_operation,
 )
-from app.utils import generate_id
 
 if TYPE_CHECKING:
     from app.services.data.economic_calendar.events import EconomicEvent, EventImpact

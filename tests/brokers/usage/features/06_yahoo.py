@@ -7,8 +7,6 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-import _support  # noqa: F401
-from _support import real_session, require_success
 from app.services.brokers import (
     build_broker_order_filter,
     get_broker_deal,
@@ -21,6 +19,9 @@ from app.services.brokers import (
     list_broker_order_history,
     supports_broker_capability,
 )
+
+import _support  # noqa: F401
+from _support import real_session, require_success
 
 
 def _header(title: str) -> None:

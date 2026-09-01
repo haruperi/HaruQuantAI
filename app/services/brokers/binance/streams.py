@@ -7,6 +7,8 @@ import asyncio
 from collections.abc import Callable, Mapping
 from typing import Any, cast
 
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.brokers._shared.subscription import _BrokerSubscription
 from app.services.brokers.binance.mapping import (
     _map_order_book,
@@ -24,7 +26,6 @@ from app.services.brokers.canonical_contracts import (
     BrokerSubscriptionInfo,
     StandardResponse,
 )
-from app.utils import generate_id, utc_now
 
 
 class _BinancePriceStreamsMixin:

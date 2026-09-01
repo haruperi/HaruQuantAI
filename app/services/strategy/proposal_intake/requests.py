@@ -7,13 +7,14 @@ from typing import Literal
 
 from pydantic import Field, field_validator, model_validator
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.strategy.contracts._base import (
     _Contract,
     _hash,
     _text,
     _utc,
 )
-from app.utils import canonical_digest, get_logger
 
 logger = get_logger(__name__)
 

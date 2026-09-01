@@ -37,7 +37,7 @@ from app.agentic.agents.strategy_desk.strategy_thesis_analyst import (
 )
 from app.agentic.deliberation import DissentRecord
 from app.agentic.runtime import ModelOutcome
-from app.utils import derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
 
 from tests.agentic.fixtures import (
     NOW,

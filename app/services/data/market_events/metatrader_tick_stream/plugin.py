@@ -8,17 +8,17 @@ from collections.abc import AsyncIterator, Mapping
 from contextlib import suppress
 from typing import TYPE_CHECKING, cast
 
+from app.composition.logging import get_logger
 from app.contracts.data.tick_stream.v1 import (
     TickStreamCapabilityV1,
     TickStreamEventV1,
     TickStreamRequestV1,
 )
-from app.services.brokers.metatrader.snapshot_gateway import (
+from app.services.brokers import (
     acquire_metatrader_snapshot_symbols,
     release_metatrader_snapshot_symbols,
     stream_metatrader_snapshots,
 )
-from app.utils.logging import get_logger
 
 if TYPE_CHECKING:
     from app.kernel.effects import EffectScope

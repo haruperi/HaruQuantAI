@@ -9,6 +9,8 @@ from decimal import Decimal, InvalidOperation
 from time import monotonic
 from typing import TYPE_CHECKING, Literal
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
     AllocationBudgetActivationRequest,
@@ -27,7 +29,6 @@ from app.services.risk.contracts.responses import (
     unwrap_risk_response,
 )
 from app.services.risk.limits import evaluate_market_context
-from app.utils import canonical_json, get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

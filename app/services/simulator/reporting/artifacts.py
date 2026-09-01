@@ -10,6 +10,7 @@ from hashlib import sha256
 from pathlib import Path
 from types import MappingProxyType
 
+from app.composition.logging import get_logger
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.reporting.contracts import (
     ANALYTICS_REPORT_ARTIFACT_NAME,
@@ -17,7 +18,6 @@ from app.services.simulator.reporting.contracts import (
     ArtifactEntry,
     ArtifactManifest,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

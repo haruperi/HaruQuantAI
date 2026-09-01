@@ -13,9 +13,10 @@ from typing import Literal
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.analytics.contracts.catalogs import EVIDENCE_CATALOG
 from app.services.analytics.contracts.errors import AnalyticsValidationError
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

@@ -8,6 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_economic_event,
     build_event_impact,
@@ -19,7 +20,6 @@ from app.services.data import (
     project_economic_event,
     unwrap_data_response,
 )
-from app.utils import generate_id
 
 WORKFLOW_ID = "WF-DATA-020"
 STAGES = (

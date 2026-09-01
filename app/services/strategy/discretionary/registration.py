@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id, generate_id
 from app.services.strategy.contracts.factories import (
     create_strategy_manifest,
     create_strategy_registration_request,
@@ -14,7 +16,6 @@ from app.services.strategy.contracts.factories import (
     get_strategy_timing_policy,
 )
 from app.services.strategy.registry.registration import register_strategy_version
-from app.utils import derive_stable_id, generate_id, get_logger
 
 if TYPE_CHECKING:
     from app.services.strategy.contracts.manifest import StrategyManifest

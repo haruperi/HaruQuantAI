@@ -10,13 +10,14 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING, Any, Literal, Protocol, cast
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.data import is_ohlcv_record
 from app.services.indicators import (
     get_indicator_result_metadata,
     get_indicator_result_values,
 )
 from app.services.strategy.contracts import StrategySignal
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

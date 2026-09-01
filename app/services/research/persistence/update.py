@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any, cast
 
+from app.composition.logging import get_logger
 from app.services.data import (
     build_statement_plan,
     build_transaction_request,
@@ -16,7 +17,6 @@ from app.services.research.contracts.errors import (
     ValidationError,
 )
 from app.services.research.migrations import build_research_migration_request
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 _TRANSITION_STATEMENT_COUNT = 2

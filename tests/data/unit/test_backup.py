@@ -10,6 +10,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data._settings import DataSettings, data_settings_context
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.backup import (
@@ -21,7 +22,6 @@ from app.services.data.persistence.contracts import (
     BackupTarget,
     StorageManifest,
 )
-from app.utils import generate_id
 
 
 def _unwrap(response):

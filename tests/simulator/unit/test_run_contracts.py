@@ -4,13 +4,13 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
+from app.kernel.serialization import canonical_digest
 from app.services.simulator.errors import unwrap_simulation_response
 from app.services.simulator.reporting import ReturnObservation
 from app.services.simulator.run import (
     PortfolioBacktestRequest,
     PortfolioComponentRequest,
 )
-from app.utils import canonical_digest
 from pydantic import ValidationError
 
 from tests.simulator.component.test_orchestrator import _dataset, _fx_evidence, _request

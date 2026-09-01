@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping, Sequence
 
+from app.kernel.time import utc_now
 from app.services.analytics.persistence import build_analytics_insert
-from app.utils import utc_now
 
 
 def detect_behavior_patterns(

@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_statement_plan,
@@ -30,7 +31,6 @@ from app.services.portfolio import (
     execute_portfolio_state_store_operation,
     run_portfolio_migrations,
 )
-from app.utils import generate_id
 
 _LEDGER_TABLES = {
     "portfolio_ledger_accounts": (

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 
 @dataclass(frozen=True, slots=True)

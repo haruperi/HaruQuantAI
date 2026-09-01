@@ -47,12 +47,12 @@ from app.agentic.agents.market_intelligence.sentiment_analyst.tools import (
     get_registered_tool_names as get_sentiment_tool_names,
 )
 from app.agentic.runtime import ModelOutcome
+from app.kernel.identity import derive_stable_id, generate_id
 from app.services.research import (
     assess_intelligence_applicability,
     create_research_value,
     project_intelligence_evidence,
 )
-from app.utils import derive_stable_id, generate_id
 
 from tests.agentic.fixtures import (
     INTELLIGENCE_DECISION_TIME,

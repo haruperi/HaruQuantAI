@@ -16,6 +16,7 @@ from typing import Annotated, Any, NoReturn
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
+from app.kernel.identity import generate_id
 from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
@@ -34,7 +35,6 @@ from app.services.api.widgets.optimization.schemas import (
     OptimizationWalkForwardMatrixRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     OptimizationWalkForwardRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
-from app.utils import generate_id
 
 type AuthContext = Any
 type _OptimizationSource = Callable[..., Any]

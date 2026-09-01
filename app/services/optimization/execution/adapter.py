@@ -7,6 +7,8 @@ from collections.abc import Awaitable, Callable, Iterable, Mapping
 from decimal import Decimal
 from typing import Any, cast
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import get_standard_response_type
 from app.services.analytics import (
     build_performance_report,
     is_analytics_value,
@@ -25,7 +27,6 @@ from app.services.simulator import (
     is_simulation_value,
     run_backtest_async,
 )
-from app.utils import get_logger, get_standard_response_type
 
 type AuthContext = Any
 type StandardResponse[T] = Any

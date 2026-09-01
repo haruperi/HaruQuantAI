@@ -4,6 +4,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.api import (
     create_account_watchlist,
     delete_account_watchlist,
@@ -20,7 +21,6 @@ from app.services.api.widgets.watchlists import (
     orchestration as watchlist_orchestration,
 )
 from app.services.data import build_data_settings, data_settings_context
-from app.utils import generate_id
 
 
 def _isolated_settings(tmp_path: Path, db_name: str) -> object:

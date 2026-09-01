@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.simulator.persistence.create import (
     _execute,
     _require_store,
@@ -11,7 +13,6 @@ from app.services.simulator.persistence.create import (
     _run_value,
     _text_field,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

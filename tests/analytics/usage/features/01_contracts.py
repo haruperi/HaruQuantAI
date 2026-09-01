@@ -16,6 +16,7 @@ from typing import Any
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.analytics import (
     ANALYTICS_SCHEMA_VERSION,
     BREAKEVEN_EPSILON,
@@ -44,7 +45,6 @@ from app.services.analytics import (
     validate_metric_catalog,
 )
 from app.services.data import build_data_settings, data_settings_context
-from app.utils import generate_id
 from tests.analytics.usage._support import unwrap
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)

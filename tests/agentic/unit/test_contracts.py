@@ -23,7 +23,8 @@ from app.agentic.contracts import (
     BudgetUsage,
     WorkflowCheckpoint,
 )
-from app.utils import canonical_digest, derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
+from app.kernel.serialization import canonical_digest
 from pydantic import ValidationError
 
 NOW = datetime(2026, 7, 29, 12, 0, tzinfo=UTC)

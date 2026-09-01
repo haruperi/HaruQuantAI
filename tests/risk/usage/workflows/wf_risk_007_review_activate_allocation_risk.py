@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     activate_allocation_budget,
     create_allocation_budget_activation_request,
@@ -14,7 +15,6 @@ from app.services.risk import (
     review_allocation_proposal,
     verify_risk_audit_chain,
 )
-from app.utils import canonical_json
 from tests.risk.integration.test_strategy_admission import _AuditStore
 from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 

@@ -31,9 +31,10 @@ from typing import Any, Final, override
 
 from pydantic import SecretStr
 
+from app.composition.config import load_broker_provider_settings
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.economic_calendar.scraper import CalendarTransport
-from app.utils import get_logger, load_broker_provider_settings
 
 logger = get_logger(__name__)
 

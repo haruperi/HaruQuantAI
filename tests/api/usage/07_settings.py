@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from app.kernel.identity import generate_id
 from app.services.api import (
     build_system_broker_connection_config,
     create_api_app,
@@ -16,7 +17,6 @@ from app.services.api import (
     resolve_system_credential_slot,
     run_api_migrations,
 )
-from app.utils import generate_id
 
 
 def main() -> None:

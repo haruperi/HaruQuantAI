@@ -9,8 +9,8 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal, Protocol
 
+from app.composition.logging import get_logger
 from app.services.risk.contracts import RiskApprovalToken  # noqa: TC001
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

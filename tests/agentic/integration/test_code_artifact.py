@@ -41,7 +41,7 @@ from app.agentic.agents.engineering.coder.artifact_store import verify_staged_ar
 from app.agentic.agents.engineering.coder.sandbox import build_deterministic_sandbox
 from app.agentic.agents.engineering.coder.tools import get_registered_tool_names
 from app.agentic.runtime import ModelOutcome
-from app.utils import derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
 
 from tests.agentic.fixtures import (
     CODER_ROLE_ID,

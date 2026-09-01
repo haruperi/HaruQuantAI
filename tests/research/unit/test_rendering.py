@@ -3,6 +3,7 @@
 from datetime import UTC, datetime
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     compare_research_profiles,
     create_research_value,
@@ -10,7 +11,6 @@ from app.services.research import (
     render_profile_comparison,
     render_research_report,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

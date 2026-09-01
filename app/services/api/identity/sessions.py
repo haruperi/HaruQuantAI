@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 
 from pydantic import BaseModel, ConfigDict
 
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 from app.services.api.identity.accounts import AuthenticatedUser
 from app.services.api.identity.errors import IdentityError
 from app.services.api.identity.persistence import (
@@ -17,7 +19,6 @@ from app.services.api.identity.persistence import (
     replace_active_session_record,
     revoke_session_record,
 )
-from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
 

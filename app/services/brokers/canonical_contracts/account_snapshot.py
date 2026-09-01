@@ -22,9 +22,9 @@ from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from typing import cast
 
+from app.kernel.errors import create_validation_error as ValidationError
+from app.kernel.serialization import canonical_digest, to_json_safe
 from app.services.brokers.canonical_contracts.enums import BrokerEnvironment, BrokerId
-from app.utils import canonical_digest, to_json_safe
-from app.utils import create_validation_error as ValidationError
 
 CONTRACT_VERSION = "v1"
 SCHEMA_ID = "brokers.account_snapshot.v1"

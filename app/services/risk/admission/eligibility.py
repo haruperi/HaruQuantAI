@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from time import monotonic
 from typing import TYPE_CHECKING, Literal, Protocol, cast, runtime_checkable
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.risk.config import RiskConfig, compute_config_hash
 from app.services.risk.contracts import (
     DecisionState,
@@ -27,7 +29,6 @@ from app.services.strategy import (
     get_strategy_environment,
     get_strategy_lifecycle_status,
 )
-from app.utils import canonical_json, get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

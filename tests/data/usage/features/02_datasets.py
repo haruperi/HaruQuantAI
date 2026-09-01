@@ -14,6 +14,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from _artifact_catalog_support import main as run_catalog_support
 from _persistence_support import main as run_persistence_support
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest
 from app.services.data import (
     build_data_settings,
     build_dataset_load_request,
@@ -32,7 +34,6 @@ from app.services.data import (
     save_market_data,
     to_ohlcv_dataframe,
 )
-from app.utils import canonical_digest, generate_id
 
 _CSV_PATH = Path("data/raw/EURUSD_H1.csv")
 _PARQUET_PATH = Path("data/raw/EURUSD_H1.parquet")

@@ -7,6 +7,8 @@ from typing import Any, cast
 from fastapi import APIRouter, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.api.composition.broker_config import (
     build_system_broker_connection_config,
 )
@@ -129,7 +131,6 @@ from app.services.api.widgets.trading.orchestration import (
 )
 from app.services.api.widgets.trading.routes import router as trading_router
 from app.services.api.widgets.watchlists.routes import router as watchlists_router
-from app.utils import generate_id, utc_now
 
 
 async def _connect_trading_account_profile_broker(route: str) -> object:

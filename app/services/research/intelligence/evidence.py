@@ -6,6 +6,7 @@ from collections import Counter
 from collections.abc import Mapping
 from datetime import datetime
 
+from app.composition.logging import get_logger
 from app.services.data import (
     get_research_source_value_field,
     project_research_source_evidence,
@@ -20,7 +21,6 @@ from app.services.research.intelligence.contracts import (
     SentimentSourceEvidence,
     evidence_hash,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

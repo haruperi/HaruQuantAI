@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
 from app.services.data import is_data_error
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.manifest import StrategyManifest
@@ -15,7 +16,6 @@ from app.services.strategy.contracts.references import (
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.persistence.read import read_strategy_versions
-from app.utils import get_logger
 
 if TYPE_CHECKING:
     from app.services.strategy.contracts.policy import StrategyValidationPolicy

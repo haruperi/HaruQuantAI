@@ -7,13 +7,13 @@ from collections.abc import Iterable, Sequence
 from statistics import NormalDist
 from typing import cast
 
+from app.composition.logging import get_logger
 from app.services.analytics import get_analytics_value_field
 from app.services.optimization.scoring.contracts import (
     OBJECTIVE_DIRECTIONS,
     CandidateScore,
     ObjectiveName,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

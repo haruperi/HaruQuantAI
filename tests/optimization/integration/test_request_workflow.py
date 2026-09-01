@@ -3,11 +3,11 @@
 # ruff: noqa: INP001
 import asyncio
 
+from app.composition.logging import get_logger
 from app.services.optimization import (
     run_parameter_sweep,
     run_robustness_analysis,
 )
-from app.utils import get_logger
 from tests.optimization.unit.test_robustness_contracts import monte_carlo_request
 from tests.optimization.unit.test_search_contracts import search_request
 from tests.optimization.unit.test_sweep import FakeAdapter

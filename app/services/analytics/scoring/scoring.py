@@ -17,6 +17,7 @@ from typing import TypeVar, cast
 
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import to_report_json_safe
 from app.services.analytics.scoring.models import (
@@ -30,7 +31,6 @@ from app.services.analytics.scoring.models import (
     SessionScore,
     compute_reproducibility_hash,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

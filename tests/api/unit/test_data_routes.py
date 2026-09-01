@@ -12,12 +12,14 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.api.identity import require_auth_context
 from app.services.api.widgets.data import orchestration as data_dependencies
 from app.services.api.widgets.data import routes as data
 from app.services.api.widgets.markets import orchestration as markets_orchestration
 from app.services.api.widgets.markets import routes as markets
-from app.utils import create_auth_context, generate_id, utc_now
 from fastapi import FastAPI
 
 from tests.api._support import get_json, post_json

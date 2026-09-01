@@ -16,6 +16,7 @@ from typing import Any
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.analytics import (
     AnalyticsRunConfig,
     ClosedTrade,
@@ -35,7 +36,6 @@ from app.services.analytics import (
     serialize_report,
 )
 from app.services.risk import get_drawdown_mode
-from app.utils import generate_id
 from tests.analytics._support import (
     _measurement_request,
     _portfolio_simulation_result,

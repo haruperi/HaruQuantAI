@@ -4,9 +4,9 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
 
+from app.kernel.serialization import to_json_safe
 from app.services.trading.contracts import TradingError
 from app.services.trading.trade_ownership.contracts import _TradeOwnership
-from app.utils import to_json_safe
 
 
 class _OwnershipRegistry:

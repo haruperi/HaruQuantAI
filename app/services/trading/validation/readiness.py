@@ -8,6 +8,8 @@ from typing import Any, Literal, Self, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import to_json_safe
 from app.services.risk import get_decision_state
 from app.services.trading.contracts import TradingError, TradingRequest
 from app.services.trading.contracts.models import (
@@ -17,7 +19,6 @@ from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.validation.snapshots import (
     RouteSnapshot,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import get_logger, to_json_safe
 
 type StandardResponse[T] = Any
 KillSwitchState = Any

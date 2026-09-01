@@ -9,8 +9,8 @@ from app.agentic.migrations.lifecycle import AGENTIC_LIFECYCLE_MIGRATION_STEPS
 from app.agentic.migrations.memory import AGENTIC_MEMORY_MIGRATION_STEPS
 from app.agentic.migrations.operations import AGENTIC_OPERATIONS_MIGRATION_STEPS
 from app.agentic.migrations.workflow import AGENTIC_MIGRATION_STEPS
+from app.composition.logging import get_logger
 from app.services.data import build_migration_request, run_domain_migrations
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

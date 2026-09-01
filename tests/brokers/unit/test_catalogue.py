@@ -4,14 +4,14 @@ from collections.abc import Mapping
 from types import MappingProxyType
 
 import pytest
+from app.contracts.common.models import RiskLevel
+from app.kernel.identity import validate_id
 from app.services.brokers import get_broker_capability_catalogue
 from app.services.brokers.canonical_contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerId,
 )
-from app.utils.identity import validate_id
-from app.utils.responses.models import RiskLevel
 
 # Verbatim transcription of the normative provider/profile capability matrix in
 # `app/services/brokers/README.md` Section 4.8. Column order is MT5, cTrader,

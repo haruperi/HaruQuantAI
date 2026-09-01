@@ -8,13 +8,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     import_economic_calendar_csv,
     run_data_migrations,
     sync_current_week_economic_calendar,
 )
 from app.services.data.contracts.responses import unwrap_data_response
-from app.utils import generate_id
 
 
 def _unwrap(response):

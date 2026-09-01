@@ -8,6 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.composition.logging import flush_logging
 from app.services.optimization import (
     calculate_robustness_score,
     estimate_drawdown_mode_sensitivity,
@@ -15,7 +16,6 @@ from app.services.optimization import (
     estimate_joint_first_passage,
 )
 from app.services.risk import create_firm_mandate
-from app.utils import flush_logging
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 FirmMandate = object

@@ -29,7 +29,7 @@ from app.agentic import (
     submit_task,
     validate_transition,
 )
-from app.utils import derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
 
 from tests.agentic.usage._runner import run_feature_usage
 

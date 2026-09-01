@@ -11,6 +11,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     data_settings_context,
@@ -21,7 +23,6 @@ from app.services.research import (
     create_research_value,
     write_research_artifact,
 )
-from app.utils import create_auth_context, generate_id
 
 type AuthContext = Any
 

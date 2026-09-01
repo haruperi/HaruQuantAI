@@ -5,6 +5,9 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.risk.persistence.create import (
     _execute,
     _field,
@@ -13,7 +16,6 @@ from app.services.risk.persistence.create import (
     _text_field,
     _time_field,
 )
-from app.utils import canonical_json, generate_id, get_logger
 
 logger = get_logger(__name__)
 _COMPOUND_WRITE_ROWS = 2

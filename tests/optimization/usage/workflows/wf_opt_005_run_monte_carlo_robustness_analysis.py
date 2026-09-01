@@ -8,6 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.composition.logging import flush_logging
 from app.services.optimization import (
     apply_execution_cost_stress,
     assess_strategy_robustness,
@@ -16,7 +17,6 @@ from app.services.optimization import (
     create_optimization_value,
     run_monte_carlo,
 )
-from app.utils import flush_logging
 from tests.optimization.usage._support import monte_carlo_request
 
 WORKFLOW_ID = "WF-OPT-005"

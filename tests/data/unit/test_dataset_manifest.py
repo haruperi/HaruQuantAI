@@ -4,13 +4,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+from app.kernel.identity import generate_id
 from app.services.data.datasets.contracts import DatasetLoadRequest
 from app.services.data.datasets.manifest import (
     verify_dataset_manifest,
     verify_manifest_compatibility,
 )
 from app.services.data.persistence.contracts import StorageManifest
-from app.utils import generate_id
 
 
 def test_verify_dataset_manifest_delegates_to_load_dataset() -> None:

@@ -19,6 +19,8 @@ from fastapi import (
     status,
 )
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
@@ -38,7 +40,6 @@ from app.services.api.widgets.simulator.workbench_schemas import (
     StepRequest,  # noqa: TC001
     ViewportQuery,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

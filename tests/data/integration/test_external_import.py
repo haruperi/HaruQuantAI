@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_column_mapping,
     build_data_settings,
@@ -14,7 +15,6 @@ from app.services.data import (
     load_dataset,
     run_data_migrations,
 )
-from app.utils import generate_id
 
 
 def test_external_import_measures_commits_and_reloads(tmp_path: Path) -> None:

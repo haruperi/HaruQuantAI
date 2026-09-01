@@ -1,6 +1,6 @@
 """Owner-authored unavailable market-hours dashboard snapshot."""
 
-from app.utils import utc_now
+from app.kernel.time import utc_now
 
 
 def get_market_hours_dashboard_snapshot() -> dict[str, object]:

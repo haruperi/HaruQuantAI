@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Protocol, cast, runtime_checkable
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.indicators import (
     get_indicator_result_metadata,
     get_indicator_result_values,
@@ -32,7 +34,6 @@ from app.services.strategy.diagnostics import export_strategy_diagnostics
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.intents import TradeIntent, build_trade_intent
 from app.services.strategy.replay import create_strategy_replay_manifest
-from app.utils import canonical_digest, get_logger
 
 AccountStateSnapshot = Any
 MarketDataset = Any

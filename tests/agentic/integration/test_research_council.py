@@ -41,7 +41,7 @@ from app.agentic import (
     validate_policy_registry,
 )
 from app.agentic.runtime import ModelOutcome
-from app.utils import derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
 
 from tests.agentic.fixtures import (
     COMPUTE_TOOL,

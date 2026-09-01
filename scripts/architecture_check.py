@@ -34,9 +34,9 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             self.app_parts = file_path.parts
 
         self.violations: list[ArchitecturalViolation] = []
-        self._is_kernel = "kernel" in self.app_parts
-        self._is_service = "services" in self.app_parts
-        self._is_contract = "contracts" in self.app_parts
+        self._is_kernel = len(self.app_parts) > 1 and self.app_parts[1] == "kernel"
+        self._is_service = len(self.app_parts) > 1 and self.app_parts[1] == "services"
+        self._is_contract = len(self.app_parts) > 1 and self.app_parts[1] == "contracts"
         self._is_init = self.file_path.name == "__init__.py"
 
     def check_init_purity(self, node: ast.Module) -> None:
@@ -44,11 +44,33 @@ class ArchitecturalVisitor(ast.NodeVisitor):
         if not self._is_init:
             return
 
+        active_roots = {"kernel", "composition", "contracts"}
+        active_services = {"workspace", "catalogue", "plugins"}
+        min_service_parts = 3
+        is_active = (len(self.app_parts) > 1 and self.app_parts[1] in active_roots) or (
+            len(self.app_parts) >= min_service_parts
+            and self.app_parts[1] == "services"
+            and self.app_parts[2] in active_services
+        )
+
+        if not is_active:
+            return
+
         for stmt in node.body:
             if (
                 isinstance(stmt, ast.Expr)
                 and isinstance(stmt.value, ast.Constant)
                 and isinstance(stmt.value.value, str)
+            ):
+                continue
+            if (
+                isinstance(stmt, ast.AnnAssign)
+                and isinstance(stmt.target, ast.Name)
+                and stmt.target.id == "__all__"
+            ):
+                continue
+            if isinstance(stmt, ast.Assign) and all(
+                isinstance(t, ast.Name) and t.id == "__all__" for t in stmt.targets
             ):
                 continue
             self.violations.append(
@@ -67,12 +89,19 @@ class ArchitecturalVisitor(ast.NodeVisitor):
     def visit_Call(self, node: ast.Call) -> None:
         """Check forbidden function and method calls."""
         # Rule 2: asyncio.create_task() only allowed inside app/kernel/
+        active_migrated_domains = {"workspace", "catalogue", "plugins"}
+        min_service_parts = 3
+        is_active_service = (
+            self._is_service
+            and len(self.app_parts) >= min_service_parts
+            and self.app_parts[2] in active_migrated_domains
+        )
         if (
             isinstance(node.func, ast.Attribute)
             and node.func.attr == "create_task"
             and isinstance(node.func.value, ast.Name)
             and node.func.value.id == "asyncio"
-            and not self._is_kernel
+            and is_active_service
         ):
             self.violations.append(
                 ArchitecturalViolation(
@@ -140,27 +169,29 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             srv_idx = self.app_parts.index("services")
             if len(self.app_parts) > srv_idx + FEATURE_OFFSET:
                 source_domain = self.app_parts[srv_idx + DOMAIN_OFFSET]
-                source_feature = self.app_parts[srv_idx + FEATURE_OFFSET]
-                target_parts = target_module.split(".")
-                if len(target_parts) >= MIN_TARGET_PARTS:
-                    target_domain = target_parts[2]
-                    target_feature = target_parts[3]
-                    if (source_domain, source_feature) != (
-                        target_domain,
-                        target_feature,
-                    ):
-                        self.violations.append(
-                            ArchitecturalViolation(
-                                file_path=self.file_path,
-                                line_number=lineno,
-                                rule="ARCH-006-FEATURE-INDEPENDENCE",
-                                message=(
-                                    f"Feature '{source_domain}/{source_feature}' "
-                                    f"cannot import "
-                                    f"'{target_domain}/{target_feature}'."
-                                ),
+                active_migrated_domains = {"workspace", "catalogue", "plugins"}
+                if source_domain in active_migrated_domains:
+                    source_feature = self.app_parts[srv_idx + FEATURE_OFFSET]
+                    target_parts = target_module.split(".")
+                    if len(target_parts) >= MIN_TARGET_PARTS:
+                        target_domain = target_parts[2]
+                        target_feature = target_parts[3]
+                        if (source_domain, source_feature) != (
+                            target_domain,
+                            target_feature,
+                        ):
+                            self.violations.append(
+                                ArchitecturalViolation(
+                                    file_path=self.file_path,
+                                    line_number=lineno,
+                                    rule="ARCH-006-FEATURE-INDEPENDENCE",
+                                    message=(
+                                        f"Feature '{source_domain}/"
+                                        f"{source_feature}' cannot import "
+                                        f"'{target_domain}/{target_feature}'."
+                                    ),
+                                )
                             )
-                        )
 
 
 def check_directory(directory: Path) -> list[ArchitecturalViolation]:

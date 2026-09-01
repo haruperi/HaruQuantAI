@@ -21,9 +21,9 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.persistence import update_feed_record
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

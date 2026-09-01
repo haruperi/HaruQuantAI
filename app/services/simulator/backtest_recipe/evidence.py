@@ -14,7 +14,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 logger = get_logger(__name__)
 

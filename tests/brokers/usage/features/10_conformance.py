@@ -7,7 +7,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-import _support  # noqa: F401
 from app.services.brokers import (
     build_broker_calculation_fixture,
     build_broker_connection_config,
@@ -18,6 +17,8 @@ from app.services.brokers import (
     get_broker_id,
     parse_broker_calculation_fixture,
 )
+
+import _support  # noqa: F401
 
 
 def fr_brokers_109_conformance() -> None:

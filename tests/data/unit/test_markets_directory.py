@@ -14,6 +14,7 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts.records import OHLCVRecord
 from app.services.data.market_data import directory_projection as projection
 from app.services.data.market_data import market_directory as directory
@@ -23,7 +24,6 @@ from app.services.data.market_data.level1 import Level1Snapshot
 from app.services.data.market_data.market_directory import list_market_directory
 from app.services.data.market_data.snapshot import MarketSnapshot
 from app.services.data.market_data.symbol_metadata import SymbolPage
-from app.utils import generate_id
 
 _T0 = datetime(2026, 8, 10, 12, tzinfo=UTC)
 _REQ_ID = generate_id("req")

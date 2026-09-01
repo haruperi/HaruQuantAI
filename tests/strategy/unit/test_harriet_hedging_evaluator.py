@@ -2,9 +2,9 @@
 
 from datetime import timedelta
 
+from app.composition.logging import get_logger
 from app.services.strategy import evaluate_strategy_signals
 from app.services.strategy.evaluators.harriet_hedging import HarrietHedgingEvaluator
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,

@@ -4,13 +4,13 @@ from dataclasses import replace
 from datetime import timedelta
 
 import pytest
+from app.kernel.serialization import canonical_json
 from app.services.risk import get_decision_state
 from app.services.trading import (
     create_portfolio_rebalance_execution_request,
     execute_portfolio_rebalance,
     validate_budget_authority,
 )
-from app.utils import canonical_json
 from pydantic import ValidationError
 
 from tests.trading.conftest import (

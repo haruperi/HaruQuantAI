@@ -22,7 +22,10 @@ from app.agentic.orchestration.models import (
     is_terminal_state,
     validate_transition,
 )
-from app.utils import canonical_digest, derive_stable_id, get_logger, utc_now
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.serialization import canonical_digest
+from app.kernel.time import utc_now
 
 if TYPE_CHECKING:
     from app.agentic.contracts import AgentTask

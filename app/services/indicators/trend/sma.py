@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, cast
 import pandas as pd
 from numpy.lib.stride_tricks import sliding_window_view
 
+from app.composition.logging import get_logger
 from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
@@ -16,7 +17,6 @@ from app.services.indicators.core.errors import (
 )
 from app.services.indicators.core.results import build_indicator_result
 from app.services.indicators.core.validation import validate_indicator
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

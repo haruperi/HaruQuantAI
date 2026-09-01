@@ -38,7 +38,7 @@ from app.agentic.migrations.lifecycle import (
     build_lifecycle_migration_request,
     get_lifecycle_migration_statements,
 )
-from app.utils import generate_id
+from app.kernel.identity import generate_id
 from pydantic import ValidationError
 
 from tests.agentic.fixtures import (

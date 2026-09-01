@@ -10,6 +10,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, cast
 
+from app.composition.logging import get_logger
 from app.services.api.widgets.research.projections import (
     STAGE_VIEWS,
     project_comparison,
@@ -20,7 +21,6 @@ from app.services.api.widgets.research.projections import (
     project_stage_view,
     project_warnings,
 )
-from app.utils import get_logger
 
 if TYPE_CHECKING:
     from app.services.api.widgets.research.registry import (

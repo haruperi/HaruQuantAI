@@ -5,6 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Literal, cast
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_mapping_value
+from app.kernel.serialization import canonical_json
 from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
 from app.services.strategy.contracts.execution import (
     StrategyExecutionContext,  # noqa: TC001
@@ -13,7 +16,6 @@ from app.services.strategy.contracts.outcomes import failure, success
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
 from app.services.strategy.diagnostics.models import StrategyDiagnostics
-from app.utils import canonical_json, get_logger, redact_mapping_value
 
 logger = get_logger(__name__)
 

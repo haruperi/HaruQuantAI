@@ -413,6 +413,11 @@
           "title": "Content Hash",
           "type": "string"
         },
+        "contract_version": {
+          "default": "1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
         "exported_at": {
           "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
           "title": "Exported At",
@@ -2855,14 +2860,19 @@
           "title": "Capability Key"
         },
         "code": {
+          "default": "ERROR",
           "pattern": "^[A-Z][A-Z0-9_]*$",
           "title": "Code",
           "type": "string"
         },
         "detail": {
+          "default": "Application operation failed",
           "minLength": 1,
           "title": "Detail",
           "type": "string"
+        },
+        "details": {
+          "$ref": "#/$defs/JsonObject"
         },
         "errors": {
           "default": [],
@@ -2894,9 +2904,16 @@
           "type": "array"
         },
         "request_id": {
-          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-          "title": "Request Id",
-          "type": "string"
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Id"
         },
         "required_version": {
           "anyOf": [
@@ -2918,30 +2935,25 @@
           "type": "integer"
         },
         "status": {
+          "default": 400,
           "maximum": 599,
           "minimum": 400,
           "title": "Status",
           "type": "integer"
         },
         "title": {
+          "default": "Application Error",
           "minLength": 1,
           "title": "Title",
           "type": "string"
         },
         "type": {
+          "default": "urn:haruquantai:error",
           "pattern": "^(?:urn:|https?://).+",
           "title": "Type",
           "type": "string"
         }
       },
-      "required": [
-        "type",
-        "title",
-        "status",
-        "code",
-        "detail",
-        "request_id"
-      ],
       "title": "ProblemDetails",
       "type": "object"
     },
@@ -4057,6 +4069,10 @@
         },
         "resource_estimator": {
           "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_id": {
+          "$ref": "#/$defs/NonEmptyStr",
+          "default": "orchestration.task_contract.v1"
         },
         "schema_version": {
           "const": 1,

@@ -9,6 +9,10 @@ import time
 from dataclasses import dataclass
 from typing import Literal, cast
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import build_response_metadata, success_response
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.brokers.canonical_contracts import (
     BrokerAdapter,
     BrokerCapabilityId,
@@ -20,13 +24,6 @@ from app.services.brokers.canonical_contracts import (
     StandardResponse,
 )
 from app.services.brokers.canonical_contracts.responses import build_broker_response
-from app.utils import (
-    build_response_metadata,
-    generate_id,
-    get_logger,
-    success_response,
-    utc_now,
-)
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

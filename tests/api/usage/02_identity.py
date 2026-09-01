@@ -9,6 +9,7 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from app.kernel.identity import generate_id
 from app.services.api import (
     authenticate_api_user,
     build_authoritative_auth_context,
@@ -35,7 +36,6 @@ from app.services.api import (
     validate_governed_api_request,
 )
 from app.services.data import build_data_settings, data_settings_context
-from app.utils import generate_id
 from pydantic import SecretStr
 
 

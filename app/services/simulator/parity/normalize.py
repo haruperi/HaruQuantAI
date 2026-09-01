@@ -16,6 +16,8 @@ from typing import TypeVar
 
 from pydantic import BaseModel
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.parity.contracts import (
     EvidenceEvent,
@@ -23,7 +25,6 @@ from app.services.simulator.parity.contracts import (
     ParityEnvelopeModel,
     ParityEvidenceModel,
 )
-from app.utils import canonical_digest, canonical_json, get_logger
 
 logger = get_logger(__name__)
 

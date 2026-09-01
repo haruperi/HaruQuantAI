@@ -8,9 +8,9 @@ from typing import TYPE_CHECKING
 
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.journal.replay import _computed_hash, _parse_event_line
-from app.utils import get_logger
 
 if TYPE_CHECKING:
     from app.services.simulator.journal.contracts import JournalEvent

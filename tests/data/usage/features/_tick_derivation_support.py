@@ -15,6 +15,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_synthetic_request,
@@ -25,7 +26,6 @@ from app.services.data import (
     run_data_migrations,
     to_tick_dataframe,
 )
-from app.utils import generate_id
 
 _START = datetime(2026, 6, 1, tzinfo=UTC)
 

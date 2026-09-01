@@ -2,11 +2,11 @@
 
 from datetime import datetime, timedelta
 
+from app.kernel.identity import generate_id
 from app.services.data.contracts.responses import (
     StandardResponse,
     data_start_time,
 )
-from app.utils import generate_id
 
 
 def _require_utc_raw(value: datetime) -> datetime:

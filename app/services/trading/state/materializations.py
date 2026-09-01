@@ -5,7 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from app.utils import canonical_json, get_logger
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 
 if TYPE_CHECKING:
     from app.services.trading.state.events import TradingEvent

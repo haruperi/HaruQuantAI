@@ -11,6 +11,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from _tick_derivation_support import main as run_tick_derivation_support
+from app.kernel.identity import generate_id
 from app.services.data import (
     aggregate_ticks_to_bars,
     align_multitimeframe_data,
@@ -22,7 +23,6 @@ from app.services.data import (
     to_ohlcv_dataframe,
     to_tick_dataframe,
 )
-from app.utils import generate_id
 
 _START = datetime(2026, 6, 22, tzinfo=UTC)
 

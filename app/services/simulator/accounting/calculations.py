@@ -8,8 +8,9 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.simulator.errors import SimulationError
-from app.utils import canonical_digest, get_logger
 
 FXConversionEvidence = Any
 

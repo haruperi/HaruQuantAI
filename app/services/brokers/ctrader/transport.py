@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.services.brokers.canonical_contracts import BrokerConnectionConfig
+from app.composition.logging import get_logger
 from app.services.brokers._shared.circuit_breaker import (
     _TransportCircuitBreaker,
 )
@@ -20,7 +21,6 @@ from app.services.brokers.canonical_contracts.protocols import (
     _CircuitOpenError,
     _RateLimitedError,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

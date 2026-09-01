@@ -7,16 +7,13 @@ from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Literal, TypedDict
 
+from app.contracts.common.models import build_response_metadata, success_response
+from app.kernel.identity import generate_id
 from app.services.brokers.canonical_contracts import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerId,
     StandardResponse,
-)
-from app.utils import (
-    build_response_metadata,
-    generate_id,
-    success_response,
 )
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

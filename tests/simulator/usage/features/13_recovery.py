@@ -6,6 +6,8 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.data import (
     build_data_settings,
     data_settings_context,
@@ -30,7 +32,6 @@ from app.services.simulator import (
     unwrap_simulation_response,
     verify_recovery_checkpoints,
 )
-from app.utils import generate_id, utc_now
 
 
 def _identity() -> object:

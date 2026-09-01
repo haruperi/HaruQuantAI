@@ -8,6 +8,8 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
 from app.services.trading.persistence import (
     archive_execution_session_record,
     assign_simulation_session_identity_record,
@@ -20,7 +22,6 @@ from app.services.trading.persistence import (
     update_execution_session_record,
 )
 from app.services.trading.session_registry.contracts import _SessionRecord
-from app.utils import derive_stable_id, get_logger
 
 logger = get_logger(__name__)
 _SIM_USERNAME_PATTERN = re.compile(r"[^A-Za-z0-9._-]+")

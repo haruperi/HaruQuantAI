@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Protocol, cast
 
+from app.composition.logging import get_logger
 from app.services.api.widgets.simulator.persistence.create import (
     SimulationWorkbenchPersistenceError,
 )
@@ -13,7 +14,6 @@ from app.services.data import (
     build_transaction_request,
     execute_transaction,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

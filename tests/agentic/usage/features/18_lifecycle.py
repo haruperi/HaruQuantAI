@@ -37,7 +37,7 @@ from app.agentic.lifecycle import (
     transition_artifact,
     validate_transition,
 )
-from app.utils import generate_id
+from app.kernel.identity import generate_id
 
 from tests.agentic.usage._runner import run_feature_usage
 

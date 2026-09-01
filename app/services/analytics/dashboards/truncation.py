@@ -7,8 +7,8 @@ from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.errors import AnalyticsValidationError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

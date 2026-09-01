@@ -4,8 +4,8 @@ import asyncio
 import time
 from enum import StrEnum
 
+from app.composition.logging import get_logger
 from app.services.brokers.canonical_contracts import BrokerErrorCode
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

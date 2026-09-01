@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 from app.services.data._settings import get_data_settings
 from app.services.data.contracts import (
     DataError,
@@ -33,7 +35,6 @@ from app.services.data.persistence.contracts import (
     StorageManifest,
 )
 from app.services.data.persistence.locking import _acquire_write_lock_raw
-from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
 

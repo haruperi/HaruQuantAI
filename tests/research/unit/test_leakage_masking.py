@@ -1,7 +1,7 @@
 """Unit tests for recursive Research masking."""
 
+from app.composition.logging import get_logger
 from app.services.research import mask_research_artifact
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

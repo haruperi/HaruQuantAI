@@ -10,11 +10,11 @@ from typing import TYPE_CHECKING, Any, Final
 
 from fastapi import HTTPException, status
 
+from app.kernel.time import utc_now
 from app.services.api.contracts.models import ApiMetadata, ApiResponse, ApiStatus
 from app.services.api.identity import require_human_permission
 from app.services.api.observability.errors import ValidationError
 from app.services.api.observability.metrics import _metrics_enabled
-from app.utils import utc_now
 
 if TYPE_CHECKING:
     from app.services.api.observability.sinks import MetricSample, MetricSink

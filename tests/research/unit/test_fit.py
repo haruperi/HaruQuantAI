@@ -1,8 +1,8 @@
 """Unit tests for Research advisory strategy fit (FR-RES-080)."""
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import build_strategy_fit, create_research_value
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

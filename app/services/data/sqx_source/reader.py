@@ -23,10 +23,10 @@ import numba as nb
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.data._settings import get_data_settings
 from app.services.data.contracts import DataError
 from app.services.data.persistence import read_quantdata_symbol_rows
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

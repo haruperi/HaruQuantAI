@@ -15,6 +15,8 @@ from typing import Any, ClassVar
 from uuid import uuid4
 
 import pytest
+from app.contracts.common.models import create_auth_context
+from app.kernel.time import utc_now
 from app.services.api import build_api_settings
 from app.services.api.identity import require_auth_context
 from app.services.api.widgets.portfolio import (
@@ -26,7 +28,6 @@ from app.services.api.widgets.portfolio.schemas import (
     PortfolioConstructRequest,
     PortfolioDefinitionRequest,
 )
-from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI, HTTPException
 
 from tests.api._support import get_json, post_json

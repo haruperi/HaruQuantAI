@@ -15,6 +15,7 @@ from collections.abc import Mapping, Sequence
 from datetime import datetime
 from typing import Any, cast
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.models import (
     AnalyticsWarning,
@@ -25,7 +26,6 @@ from app.services.analytics.contracts.models import (
     ReproducibilityHashes,
     SectionEvidence,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

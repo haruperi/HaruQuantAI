@@ -7,6 +7,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import (
     DataError,
     DataQualityReport,
@@ -31,7 +32,6 @@ from app.services.data.sources.policy import (
     register_source_policy,
 )
 from app.services.data.sources.registry import _reset_registry, register_source
-from app.utils import generate_id
 
 # --- Inlined fixtures (legacy helpers.py) --------------------------------------
 # The original shared helper built contracts DIRECTLY via the contract classes

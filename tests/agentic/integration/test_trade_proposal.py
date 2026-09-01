@@ -40,8 +40,8 @@ from app.agentic.agents.strategy_desk.trader.agent import propose_trade
 from app.agentic.agents.strategy_desk.trader.handoff import build_evaluation_request
 from app.agentic.agents.strategy_desk.trader.schemas import forbidden_fields
 from app.agentic.runtime import ModelOutcome
+from app.kernel.identity import derive_stable_id, generate_id
 from app.services.strategy import create_strategy_proposal_evaluation_request
-from app.utils import derive_stable_id, generate_id
 from pydantic import ValidationError
 
 from tests.agentic.fixtures import (

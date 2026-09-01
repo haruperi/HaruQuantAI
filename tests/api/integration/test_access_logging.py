@@ -6,13 +6,13 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from app.composition.logging import configure_logging, flush_logging, shutdown_logging
 from app.services.api import (
     build_request_context_middleware,
     build_route_contract,
     build_route_contract_registry,
     build_secret_redaction_middleware,
 )
-from app.utils import configure_logging, flush_logging, shutdown_logging
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from starlette.types import ASGIApp
@@ -65,10 +65,10 @@ def test_api_request_reaches_general_and_access_logs(
     app_log = (tmp_path / "app.log").read_text(encoding="utf-8")
     access_log = (tmp_path / "access.log").read_text(encoding="utf-8")
     debug_log = (tmp_path / "debug.log").read_text(encoding="utf-8")
-    errors_log = (tmp_path / "errors.log").read_text(encoding="utf-8")
+    error_log = (tmp_path / "error.log").read_text(encoding="utf-8")
     for content in (app_log, access_log):
         assert "api.request_telemetry" in content
         assert '"route":"/api/logging/access"' in content
         assert "must-not-be-logged" not in content
     assert "api.request_telemetry" not in debug_log
-    assert "api.request_telemetry" not in errors_log
+    assert "api.request_telemetry" not in error_log

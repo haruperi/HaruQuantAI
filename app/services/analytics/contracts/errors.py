@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from app.utils import get_logger, redact_mapping_value, redact_text_value
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_mapping_value, redact_text_value
 
 logger = get_logger(__name__)
 

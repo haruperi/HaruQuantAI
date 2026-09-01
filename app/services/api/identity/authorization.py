@@ -8,7 +8,9 @@ from typing import TYPE_CHECKING, Any, Final, Literal, NoReturn, cast
 
 from fastapi import HTTPException, status
 
-from app.utils import create_auth_context, get_logger, utc_now
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_auth_context
+from app.kernel.time import utc_now
 
 if TYPE_CHECKING:
     from app.services.api.contracts import GovernedRequestContext

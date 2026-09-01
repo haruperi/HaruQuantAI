@@ -1,8 +1,8 @@
 """Unit tests for Research multiple-comparison corrections."""
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import benjamini_hochberg, holm_bonferroni
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

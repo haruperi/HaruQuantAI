@@ -7,6 +7,7 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, cast
 
+from app.composition.logging import get_logger
 from app.services.trading.actions._shared import require_action
 from app.services.trading.actions.orders import _execute_request
 from app.services.trading.contracts import (
@@ -14,7 +15,6 @@ from app.services.trading.contracts import (
     TradingRequest,
 )
 from app.services.trading.state import get_execution_position
-from app.utils import get_logger
 
 type StandardResponse[T] = Any
 

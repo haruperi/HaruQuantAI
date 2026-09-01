@@ -15,13 +15,13 @@ from typing import Any
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.analytics import (
     build_analytics_workbench_payload,
     build_performance_report,
     deserialize_analytics_performance_report,
     serialize_report,
 )
-from app.utils import generate_id
 from tests.analytics._support import NOW, _configured, _source_with_profit, unwrap
 
 

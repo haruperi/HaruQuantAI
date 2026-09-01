@@ -7,6 +7,8 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Protocol, cast, override
 
+from app.composition.logging import get_logger
+from app.kernel.time import parse_utc_timestamp
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -24,7 +26,6 @@ from app.services.data.sources.contracts import (
     SourceReadRequest,
 )
 from app.services.data.sources.protocol import MarketDataSource
-from app.utils import get_logger, parse_utc_timestamp
 
 logger = get_logger(__name__)
 

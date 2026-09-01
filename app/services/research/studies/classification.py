@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 logger = get_logger(__name__)
 

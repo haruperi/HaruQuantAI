@@ -1,10 +1,10 @@
 """Registered-only evaluator security integration."""
 
+from app.composition.logging import get_logger
 from app.services.strategy import (
     get_strategy_timing_policy,
     run_vectorized_strategy_signals,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import make_config, make_context, make_ref
 from tests.strategy.unit.test_vectorized_runner import Evaluator, _dataset

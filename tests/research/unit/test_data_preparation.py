@@ -7,6 +7,7 @@ from decimal import Decimal
 
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.data import (
     build_data_quality_report,
     build_market_dataset,
@@ -18,7 +19,6 @@ from app.services.research import (
     enrich_dataset,
     prepare_research_dataset,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

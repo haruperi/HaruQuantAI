@@ -5,6 +5,9 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_audit_event
+from app.kernel.identity import generate_id
 from app.services.data import is_data_error, persist_audit_event
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
@@ -23,7 +26,6 @@ from app.services.strategy.persistence import (
     read_strategy_policy_record,
     update_strategy_mutation_publication,
 )
-from app.utils import create_audit_event, generate_id, get_logger
 
 type AuthContext = Any
 

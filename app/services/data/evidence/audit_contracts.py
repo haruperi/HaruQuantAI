@@ -7,9 +7,10 @@ from typing import TYPE_CHECKING, Final, Literal, Protocol
 
 from pydantic import ConfigDict, field_validator, model_validator
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import get_audit_event_type
 from app.services.data.contracts._base import DataContractModel, TracedOpenContract
 from app.services.data.contracts.validation import validate_request_id
-from app.utils import get_audit_event_type, get_logger
 
 if TYPE_CHECKING:
 

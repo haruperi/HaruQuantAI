@@ -13,7 +13,7 @@ import threading
 from collections import OrderedDict
 from collections.abc import Mapping
 
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 logger = get_logger(__name__)
 

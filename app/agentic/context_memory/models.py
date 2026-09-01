@@ -25,7 +25,8 @@ from pydantic import (
     model_validator,
 )
 
-from app.utils import canonical_digest, get_logger
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 
 logger = get_logger(__name__)
 

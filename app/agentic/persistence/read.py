@@ -6,7 +6,8 @@ import json
 from collections.abc import Mapping
 
 from app.agentic.persistence.create import _execute, _require_store
-from app.utils import canonical_json, get_logger
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 
 logger = get_logger(__name__)
 _MAX_READ_ROWS = 1_000

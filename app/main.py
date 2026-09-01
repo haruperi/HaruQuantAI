@@ -10,6 +10,9 @@ import logging
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
+
+import uvicorn
 
 from app.composition.config import AppConfig, load_config_from_file
 from app.composition.engine import CompositionEngine
@@ -21,6 +24,67 @@ from app.composition.logging import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the unified command-line argument parser.
+
+    Returns:
+        Configured ArgumentParser.
+    """
+    parser = argparse.ArgumentParser(
+        prog="haruquantai",
+        description="HaruQuantAI quantitative composition runtime and API server",
+    )
+    parser.add_argument(
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="API server bind host (default: 127.0.0.1)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="API server bind port (default: 8000)",
+    )
+    parser.add_argument(
+        "--reload",
+        dest="reload",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable/disable server auto-reload",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="Number of worker processes",
+    )
+    parser.add_argument(
+        "--log-level",
+        type=str,
+        default="info",
+        help="Logging level threshold",
+    )
+    parser.add_argument(
+        "--log-file",
+        type=str,
+        default=None,
+        help="Optional destination file for structured log records",
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help="Path to runtime configuration file",
+    )
+    parser.add_argument(
+        "--status",
+        action="store_true",
+        help="Print composition status diagnostics",
+    )
+    return parser
 
 
 def _status_payload(engine: CompositionEngine) -> dict[str, object]:
@@ -85,25 +149,7 @@ async def async_main(argv: Sequence[str] | None = None) -> int:  # noqa: C901, P
     Returns:
         Process exit code.
     """
-    parser = argparse.ArgumentParser(
-        prog="haruquantai",
-        description="HaruQuantAI quantitative composition runtime",
-    )
-    parser.add_argument("--config", type=str, default=None)
-    parser.add_argument("--status", action="store_true")
-    parser.add_argument(
-        "--log-level",
-        type=str,
-        default=None,
-        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-        help="Logging level threshold",
-    )
-    parser.add_argument(
-        "--log-file",
-        type=str,
-        default=None,
-        help="Optional destination file for structured log records",
-    )
+    parser = build_parser()
     args = parser.parse_args(args=argv if argv is not None else sys.argv[1:])
 
     loaded_app_config: AppConfig | None = None
@@ -122,13 +168,16 @@ async def async_main(argv: Sequence[str] | None = None) -> int:  # noqa: C901, P
     base_log_cfg = (
         loaded_app_config.logging if loaded_app_config is not None else LoggingConfig()
     )
-    log_level = args.log_level if args.log_level is not None else base_log_cfg.level
+    log_level = (
+        args.log_level.upper() if args.log_level is not None else base_log_cfg.level
+    )
     log_file = args.log_file if args.log_file is not None else base_log_cfg.file_path
 
     log_cfg = LoggingConfig(
         level=log_level,
         console=base_log_cfg.console,
         file_path=log_file,
+        format="json",
         max_bytes=base_log_cfg.max_bytes,
         backup_count=base_log_cfg.backup_count,
         capture_capacity=base_log_cfg.capture_capacity,
@@ -235,13 +284,35 @@ async def async_main(argv: Sequence[str] | None = None) -> int:  # noqa: C901, P
     return exit_code
 
 
-def run() -> None:
+def run(argv: Sequence[str] | None = None) -> None:
     """Synchronous project script entry point.
 
+    Launches the FastAPI API server by default, or executes the composition
+    diagnostics if --status is specified.
+
+    Args:
+        argv: Optional explicit command-line argument sequence.
+
     Raises:
-        SystemExit: Always, with the asynchronous runtime exit code.
+        SystemExit: When --status diagnostics mode is executed.
     """
-    raise SystemExit(asyncio.run(async_main()))
+    parser = build_parser()
+    args = parser.parse_args(args=argv if argv is not None else sys.argv[1:])
+
+    if args.status:
+        raise SystemExit(asyncio.run(async_main(argv)))
+
+    log_level = args.log_level.lower() if args.log_level else "info"
+    uvicorn_kwargs: dict[str, Any] = {
+        "host": args.host,
+        "port": args.port,
+        "reload": args.reload,
+        "log_level": log_level,
+    }
+    if not args.reload and args.workers > 1:
+        uvicorn_kwargs["workers"] = args.workers
+
+    uvicorn.run("app.services.api.composition.application:app", **uvicorn_kwargs)
 
 
 if __name__ == "__main__":

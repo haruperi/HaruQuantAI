@@ -16,6 +16,13 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import (
+    build_response_metadata,
+    create_auth_context,
+    success_response,
+)
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.analytics import (
     build_portfolio_rebalance_measurement,
     create_analytics_value,
@@ -57,13 +64,6 @@ from app.services.strategy import (
     get_strategy_environment,
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
-)
-from app.utils import (
-    build_response_metadata,
-    canonical_json,
-    create_auth_context,
-    generate_id,
-    success_response,
 )
 from tests.simulator.usage.workflows._support import (
     dependencies as simulation_dependencies,

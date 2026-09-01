@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.data import (
     build_data_settings,
     data_settings_context,
@@ -20,7 +22,6 @@ from app.services.simulator import (
     secure_simulation_session,
     unwrap_simulation_response,
 )
-from app.utils import generate_id, utc_now
 
 
 def _settings(tmp_path: Path) -> object:

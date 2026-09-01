@@ -15,12 +15,12 @@ from typing import Any
 # Add repository root to path so script can be run directly via `uv run`
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import get_standard_response_type
 from app.services.portfolio import (
     create_portfolio_value,
     dump_portfolio_value,
     to_portfolio_error_payload,
 )
-from app.utils import get_standard_response_type
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 HASH_A = "a" * 64

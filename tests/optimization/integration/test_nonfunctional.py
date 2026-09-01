@@ -12,6 +12,8 @@ import sys
 from pathlib import Path
 
 import pytest
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.optimization import (
     build_optimization_evidence,
     build_report_package,
@@ -20,7 +22,6 @@ from app.services.optimization import (
     iter_grid_candidates,
     run_bounded_search,
 )
-from app.utils import canonical_json, get_logger
 from tests.optimization.unit.test_evidence_contracts import evidence_request
 from tests.optimization.unit.test_search_contracts import search_request
 from tests.optimization.unit.test_sweep import FakeAdapter

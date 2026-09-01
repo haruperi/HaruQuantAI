@@ -4,6 +4,7 @@
 from pathlib import Path
 from unittest.mock import patch
 
+from app.composition.logging import get_logger
 from app.services.strategy import (
     create_strategy_config,
     create_strategy_parameter_update_request,
@@ -13,7 +14,6 @@ from app.services.strategy import (
     register_strategy_version,
     update_strategy_parameters,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_catalog import make_registration, storage_context
 from tests.strategy.unit.test_models import (

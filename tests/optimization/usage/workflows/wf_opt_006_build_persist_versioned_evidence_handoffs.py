@@ -7,13 +7,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.composition.logging import flush_logging
 from app.services.optimization import (
     build_optimization_evidence,
     build_optimization_handoff,
     build_report_package,
     persist_optimization_result,
 )
-from app.utils import flush_logging
 from tests.optimization.usage._support import (
     SqliteOptimizationStore,
     evidence_request,

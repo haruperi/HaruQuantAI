@@ -7,9 +7,10 @@ from datetime import datetime
 from hashlib import sha256
 from typing import Any
 
+from app.kernel.identity import derive_stable_id
+from app.kernel.serialization import canonical_json
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.recovery.contracts import RecoveryCheckpoint, ReplayIdentity
-from app.utils import canonical_json, derive_stable_id
 
 
 def build_replay_identity(**fields: object) -> ReplayIdentity:

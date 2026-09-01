@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import BaseModel
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.analytics import get_analytics_value_field, is_analytics_value
 from app.services.data import (
     is_account_state_snapshot,
@@ -24,7 +26,6 @@ from app.services.strategy import (
     create_validated_strategy_ref,
     get_strategy_lifecycle_status,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

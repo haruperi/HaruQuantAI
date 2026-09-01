@@ -10,6 +10,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     align_datasets,
     align_multitimeframe_data,
@@ -17,7 +18,6 @@ from app.services.data import (
     build_market_dataset,
     build_ohlcv_record,
 )
-from app.utils import generate_id
 
 
 def _dataset(*, symbol: str, minute_offset: int) -> Any:

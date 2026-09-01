@@ -14,13 +14,14 @@ from collections.abc import Callable
 from datetime import timedelta
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 from app.services.data.contracts import DataError
 from app.services.data.market_events.state import (
     _ACTIVE_FEEDS,
     ActiveFeed,
     _persist_feed_status,
 )
-from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
 

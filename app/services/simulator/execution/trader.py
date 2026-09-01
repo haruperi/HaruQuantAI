@@ -6,13 +6,13 @@ from collections.abc import Mapping
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal
 
+from app.composition.logging import get_logger
 from app.services.simulator.errors import (
     SimulationError,
     async_operation_guard,
     operation_guard,
     unwrap_simulation_response,
 )
-from app.utils import get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

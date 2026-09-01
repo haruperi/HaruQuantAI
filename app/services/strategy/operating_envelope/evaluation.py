@@ -3,8 +3,8 @@
 from collections.abc import Mapping
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.strategy.operating_envelope.models import parse_operating_envelope
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

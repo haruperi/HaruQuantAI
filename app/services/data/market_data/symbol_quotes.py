@@ -7,6 +7,8 @@ import time
 from datetime import UTC, datetime
 from typing import Final
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data.contracts.responses import (
     StandardResponse,
     data_start_time,
@@ -18,7 +20,6 @@ from app.services.data.market_data.directory_contracts import (
     SymbolsQuoteRequest,
 )
 from app.services.data.market_data.directory_projection import enrich_symbols
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

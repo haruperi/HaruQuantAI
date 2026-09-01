@@ -12,6 +12,8 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from _contracts_support import main as run_contract_support
+from app.composition.config import load_broker_provider_settings
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_availability_request,
     build_data_settings,
@@ -36,7 +38,6 @@ from app.services.data import (
     run_data_migrations,
     to_ohlcv_dataframe,
 )
-from app.utils import generate_id, load_broker_provider_settings
 
 _START = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
 _END = datetime(2026, 7, 1, 12, 0, tzinfo=UTC)

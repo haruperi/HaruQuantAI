@@ -23,10 +23,10 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
 from app.services.risk.config.mandates import DrawdownMode, LossReferenceBasis
 from app.services.risk.contracts import RiskDomainError, RiskErrorCode
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

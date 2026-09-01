@@ -12,6 +12,7 @@ import uuid
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.api import (
     build_api_settings,
     build_in_process_api_graph,
@@ -20,7 +21,6 @@ from app.services.api import (
     get_required_in_process_provider_names,
     register_api_user,
 )
-from app.utils import generate_id
 from fastapi.testclient import TestClient
 
 

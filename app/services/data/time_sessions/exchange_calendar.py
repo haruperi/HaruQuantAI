@@ -3,6 +3,7 @@
 from datetime import UTC, datetime, timedelta
 from importlib import import_module
 
+from app.composition.logging import get_logger
 from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -14,7 +15,6 @@ from app.services.data.time_sessions.contracts import (
     ExchangeSessionRequest,
     TradingSession,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

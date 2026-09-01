@@ -13,6 +13,7 @@ from collections.abc import Mapping, Sequence
 from datetime import datetime
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.portfolio.ledger.balances import CashBalance, cash_balance
 from app.services.portfolio.ledger.ingestion import ingest_event
 from app.services.portfolio.ledger.postings import (
@@ -25,7 +26,6 @@ from app.services.portfolio.ledger.snapshots import (
     build_snapshot,
     validate_snapshot,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

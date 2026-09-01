@@ -1,9 +1,9 @@
 """Integration evidence for Analytics portfolio composition."""
 
+from app.composition.logging import get_logger
 from app.services.analytics import (
     build_portfolio_performance_report,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 from tests.analytics._support import _report  # noqa: E402

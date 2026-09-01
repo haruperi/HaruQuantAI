@@ -13,13 +13,9 @@ from starlette.requests import Request
 from starlette.responses import Response
 from starlette.types import ASGIApp
 
+from app.composition.logging import get_logger, log_info
+from app.kernel.redaction import get_default_redaction_policy, redact_mapping_value
 from app.services.api.middleware.context import CANONICAL_CONTEXT_STATE_KEY
-from app.utils import (
-    get_default_redaction_policy,
-    get_logger,
-    log_info,
-    redact_mapping_value,
-)
 
 _REQUEST_STATE_REQUEST_ID = "request_id"
 _REQUEST_STATE_CORRELATION_ID = "correlation_id"

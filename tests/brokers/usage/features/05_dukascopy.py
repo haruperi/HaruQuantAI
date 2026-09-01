@@ -8,8 +8,6 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-import _support  # noqa: F401
-from _support import UsageEvidenceError, real_session, require_success
 from app.services.brokers import (
     build_broker_position_filter,
     get_broker_account_info,
@@ -26,6 +24,9 @@ from app.services.brokers import (
     select_broker_account,
     supports_broker_capability,
 )
+
+import _support  # noqa: F401
+from _support import UsageEvidenceError, real_session, require_success
 
 
 def _feature_header(title: str) -> None:

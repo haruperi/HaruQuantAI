@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import canonical_json
+from app.kernel.serialization import canonical_json
 
 EventStatus = Literal["pending", "cancelled", "completed", "failed"]
 EVENT_PRIORITIES: tuple[str, ...] = (

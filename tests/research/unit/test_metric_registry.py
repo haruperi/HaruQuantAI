@@ -4,13 +4,13 @@ from dataclasses import dataclass
 
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     build_default_registry,
     create_research_metric_registry,
     create_research_value,
     is_research_metric_calculator,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

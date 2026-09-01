@@ -4,8 +4,8 @@ from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
 
+from app.contracts.common.models import StandardResponse
 from app.services.research import is_research_value, run_edge_lab_profile
-from app.utils.responses import StandardResponse
 
 from tests.research._support import make_dataset, make_edge_lab_config
 

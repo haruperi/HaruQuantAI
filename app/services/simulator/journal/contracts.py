@@ -9,7 +9,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, field_serializer, field_validator
 
-from app.utils import canonical_json, get_logger
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 
 logger = get_logger(__name__)
 

@@ -14,6 +14,7 @@ from contextlib import AbstractContextManager, ExitStack
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, cast
 
+from app.kernel.identity import generate_id
 from app.services.simulator import (
     build_backtest_job_registry,
     create_backtest_provider_facts,
@@ -22,7 +23,6 @@ from app.services.simulator import (
     execute_backtest_job_operation,
     get_backtest_strategy_catalogue,
 )
-from app.utils import generate_id
 
 if TYPE_CHECKING:
     from app.services.api.widgets.simulator.schemas import SimulatorRunRequest

@@ -16,6 +16,9 @@ from typing import Any
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest
 from app.services.simulator import (
     build_evaluation_latency,
     build_point_in_time_dataset,
@@ -28,7 +31,6 @@ from app.services.simulator import (
     run_portfolio_backtest,
     unwrap_simulation_response,
 )
-from app.utils import canonical_digest, create_auth_context, generate_id
 from tests.simulator.usage.workflows._support import (
     authority,
     dependencies,

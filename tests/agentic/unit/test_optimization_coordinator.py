@@ -54,7 +54,7 @@ from app.agentic.agents.experimentation.optimization_coordinator.tools import (
 )
 from app.agentic.governance.registry import verify_prompt_artifact
 from app.agentic.runtime import ModelOutcome
-from app.utils import derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
 from pydantic import ValidationError
 
 from tests.agentic.fixtures import (

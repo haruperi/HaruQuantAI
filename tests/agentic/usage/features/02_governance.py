@@ -25,7 +25,7 @@ from app.agentic import (
     resolve_role_manifest,
     validate_firm_mandate,
 )
-from app.utils import canonical_digest
+from app.kernel.serialization import canonical_digest
 
 from tests.agentic.usage._runner import run_feature_usage
 

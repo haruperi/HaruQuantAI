@@ -15,6 +15,8 @@ import json
 import sqlite3
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 from app.services.data._settings import get_data_provider_settings
 from app.services.data.contracts import DataError
 from app.services.data.market_data import get_symbol_metadata
@@ -25,7 +27,6 @@ from app.services.data.persistence import (
     read_quantdata_series_and_broker_rows,
 )
 from app.services.data.sqx_source.reader import _resolve_database_path
-from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
 

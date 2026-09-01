@@ -9,13 +9,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_synthetic_request,
     generate_synthetic_bars,
     generate_synthetic_ticks,
     unwrap_data_response,
 )
-from app.utils import generate_id
 
 WORKFLOW_ID = "WF-DATA-005"
 STAGES = (

@@ -8,6 +8,7 @@ from decimal import Decimal
 from itertools import pairwise
 from typing import TYPE_CHECKING, Any, Protocol
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.signals._mechanics import (
     _bar_records,
@@ -17,7 +18,6 @@ from app.services.strategy.signals._mechanics import (
     _SignalDataError,
     _SignalEvaluatorBase,
 )
-from app.utils import get_logger
 
 if TYPE_CHECKING:
     from app.services.strategy.contracts import (

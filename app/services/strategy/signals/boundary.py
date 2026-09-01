@@ -6,6 +6,9 @@ from collections.abc import Mapping
 from datetime import UTC
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import get_standard_response_type
+from app.kernel.serialization import canonical_json
 from app.services.indicators import get_indicator_result_values, join_indicator_result
 from app.services.strategy.contracts import StrategySignal
 from app.services.strategy.contracts.outcomes import failure, success
@@ -20,11 +23,6 @@ from app.services.strategy.signals._mechanics import (
     _SignalConfigError,
     _SignalDataError,
     _SignalIndicatorError,
-)
-from app.utils import (
-    canonical_json,
-    get_logger,
-    get_standard_response_type,
 )
 
 logger = get_logger(__name__)
@@ -397,8 +395,8 @@ def list_strategy_signals(
     Returns:
         Tuple of signal record mappings.
     """
+    from app.kernel.identity import generate_id
     from app.services.strategy.persistence import read_strategy_signals
-    from app.utils import generate_id
 
     logger.info("Listing strategy signals for %s", config_id)
     request_id = generate_id("req")

@@ -9,6 +9,7 @@ from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     data_settings_context,
@@ -29,7 +30,6 @@ from app.services.trading import (
     stop_execution_session,
     update_execution_session_metadata,
 )
-from app.utils import generate_id
 
 
 async def _verified(_: object) -> dict[str, object]:

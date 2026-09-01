@@ -14,6 +14,8 @@ from typing import Any, Literal
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.serialization import canonical_json
 from app.services.data import build_market_context_evidence
 from app.services.risk import (
     compute_config_hash,
@@ -30,7 +32,6 @@ from app.services.risk import (
     review_trade_risk,
 )
 from app.services.strategy import create_trade_intent_value
-from app.utils import canonical_json, create_auth_context
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)

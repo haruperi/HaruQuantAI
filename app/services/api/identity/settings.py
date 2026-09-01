@@ -9,6 +9,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.kernel.redaction import is_sensitive_key
+from app.kernel.serialization import canonical_json
+from app.kernel.time import utc_now
 from app.services.api.identity.errors import IdentityError
 from app.services.api.identity.persistence import (
     create_settings_record,
@@ -20,7 +23,6 @@ from app.services.api.identity.system_settings import (
     system_settings_require_restart,
     validate_system_settings,
 )
-from app.utils import canonical_json, is_sensitive_key, utc_now
 
 _MAX_USER_SETTINGS = 32
 _MAX_SYSTEM_SETTINGS = len(get_system_settings_manifest())

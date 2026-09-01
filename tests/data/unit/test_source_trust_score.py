@@ -5,9 +5,9 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import compute_source_trust_score
 from app.services.data.sources import policy
-from app.utils import generate_id
 
 
 @pytest.fixture

@@ -11,6 +11,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
+from app.contracts.common.models import AuditEvent, AuthContext
+from app.kernel.identity import generate_id
 from app.services.data import (
     persist_audit_event,
     query_audit_events,
@@ -19,20 +21,16 @@ from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.evidence.audit_contracts import (
     AuditEventQuery,
 )
-from app.utils import create_audit_event, create_auth_context, generate_id
-from app.utils.contracts.auth import AuthContext
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(minutes=1)
 
 
 def make_audit_event(timestamp=START):
-    """Return one valid Utils-owned audit event."""
-    return create_audit_event(
-        contract_version="v1",
-        schema_id="utils.audit_event.v1",
+    """Return one valid audit event."""
+    return AuditEvent(
         event_id=generate_id("evt"),
-        timestamp=timestamp,
+        occurred_at=timestamp,
         domain="data",
         action="read",
         request_id=generate_id("req"),
@@ -66,11 +64,7 @@ def _configure_audit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
 
 def make_auth(*, admin: bool = True) -> AuthContext:
     """Helper to construct authenticated context."""
-    from app.utils import generate_id
-
-    return create_auth_context(
-        contract_version="v1",
-        schema_id="utils.auth_context.v1",
+    return AuthContext(
         principal_id="user-1",
         principal_type="USER",
         roles=("admin",) if admin else ("viewer",),

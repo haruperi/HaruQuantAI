@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_account_snapshot_request,
     build_data_error,
     get_account_state_snapshot,
     is_read_only_broker_proxy,
 )
-from app.utils import generate_id
 
 
 def test_account_evidence_wraps_every_injected_broker(

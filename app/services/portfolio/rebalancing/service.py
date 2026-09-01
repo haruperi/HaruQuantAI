@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.portfolio.contracts import (
     DriftObservation,
     PortfolioRebalanceAction,
@@ -21,7 +23,6 @@ from app.services.portfolio.rebalancing.cross_account import (
     measure_cross_account_correlation,
 )
 from app.services.risk import get_decision_state
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

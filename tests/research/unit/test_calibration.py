@@ -1,11 +1,11 @@
 """Unit tests for Research market-structure calibration (FR-RES-079)."""
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     calibrate_market_structure,
     create_research_value,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

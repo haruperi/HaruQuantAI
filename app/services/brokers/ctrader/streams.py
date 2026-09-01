@@ -5,6 +5,8 @@ from __future__ import annotations
 # mypy: disable-error-code="attr-defined,no-any-return,has-type"
 import asyncio
 
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.brokers._shared.subscription import _BrokerSubscription
 from app.services.brokers.canonical_contracts import (
     BrokerCapabilityId,
@@ -18,7 +20,6 @@ from app.services.brokers.ctrader.mapping import (
     _field,
     _map_quote,
 )
-from app.utils import generate_id, utc_now
 
 
 class _CTraderPriceStreamsMixin:

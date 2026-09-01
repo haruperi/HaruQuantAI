@@ -10,6 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data._settings import DataSettings, data_settings_context
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import unwrap_data_response
@@ -18,7 +19,6 @@ from app.services.data.persistence.external_import import (
     describe_import_dialects,
     import_external_dataset,
 )
-from app.utils import generate_id
 
 
 def _unwrap(response):

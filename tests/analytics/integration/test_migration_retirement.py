@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.analytics import get_analytics_migrations, run_analytics_migrations
 from app.services.data import (
     build_migration_request,
@@ -12,7 +13,6 @@ from app.services.data import (
     run_domain_migrations,
     unwrap_data_response,
 )
-from app.utils import generate_id
 
 _TABLES = {
     "analytics_metric_definitions",

@@ -7,12 +7,12 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.portfolio import (
     create_portfolio_handle,
     create_portfolio_value,
     execute_portfolio_handle_operation,
 )
-from app.utils import get_logger
 
 from tests.portfolio.unit.test_allocation import _activator, _inactive_kill_switch
 from tests.portfolio.unit.test_evidence import (

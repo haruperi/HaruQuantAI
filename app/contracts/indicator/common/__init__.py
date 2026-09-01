@@ -1,0 +1,1 @@
+"""Indicator common contract package."""

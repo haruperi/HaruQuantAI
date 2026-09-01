@@ -9,11 +9,11 @@ from pydantic import (
     field_validator,
 )
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts._base import (
     _Contract,
     _text,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

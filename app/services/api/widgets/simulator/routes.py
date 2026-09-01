@@ -15,6 +15,7 @@ from typing import Annotated, Any, cast
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 
+from app.kernel.identity import generate_id
 from app.services.api import build_stream_event
 from app.services.api.identity import (
     require_auth_context,
@@ -25,7 +26,6 @@ from app.services.api.identity import (
 from app.services.api.widgets.simulator.schemas import (
     SimulatorRunRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
-from app.utils import generate_id
 
 type AuthContext = Any
 type _StrategySource = Callable[[], tuple[object, ...]]

@@ -2,9 +2,9 @@
 
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.metrics.returns import calculate_return_evidence
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -12,6 +12,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.parity.contracts import (
     ComparisonOutcome,
@@ -22,7 +23,6 @@ from app.services.simulator.parity.contracts import (
 )
 from app.services.simulator.parity.envelope import load_parity_envelope
 from app.services.simulator.parity.normalize import normalize_parsed_evidence
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

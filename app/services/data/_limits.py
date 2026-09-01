@@ -25,8 +25,8 @@ from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Final
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

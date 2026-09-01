@@ -9,6 +9,7 @@ import time
 from datetime import UTC, datetime
 
 import pytest
+from app.contracts.common.models import StandardResponse
 from app.services.brokers._shared.circuit_breaker import (
     _TransportCircuitBreaker,
 )
@@ -22,7 +23,6 @@ from app.services.brokers.canonical_contracts import (
     BrokerId,
 )
 from app.services.brokers.yahoo.adapter import YahooBrokerAdapter
-from app.utils.responses.models import StandardResponse
 
 
 def _config() -> BrokerConnectionConfig:

@@ -17,7 +17,9 @@ from datetime import datetime
 from decimal import Decimal
 
 from app.agentic.context_memory.models import ContextBundle, EvidenceClaim
-from app.utils import derive_stable_id, get_logger, is_fresh
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.time import is_fresh
 
 logger = get_logger(__name__)
 

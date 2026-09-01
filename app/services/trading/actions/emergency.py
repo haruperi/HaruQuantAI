@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.risk import get_decision_state
 from app.services.trading.actions._shared import (
     authority_id,
@@ -24,7 +26,6 @@ from app.services.trading.contracts import (
 from app.services.trading.contracts.errors import _redacted_envelope_data
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.state import get_execution_position
-from app.utils import generate_id, get_logger
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

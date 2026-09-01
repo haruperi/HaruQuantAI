@@ -14,6 +14,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any, cast
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import to_report_json_safe
 from app.services.analytics.contracts.models import PerformanceReport
@@ -22,7 +23,6 @@ from app.services.analytics.workbench.contracts import (
     AnalyticsWorkbenchPayload,
     AnalyticsWorkbenchSection,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -7,7 +7,8 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from app.utils import get_logger, utc_now
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 
 logger = get_logger(__name__)
 

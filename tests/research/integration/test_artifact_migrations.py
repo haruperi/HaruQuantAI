@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_migration_request,
@@ -11,7 +12,6 @@ from app.services.data import (
     run_domain_migrations,
 )
 from app.services.research import build_research_migration_request
-from app.utils import generate_id
 
 
 def _settings(tmp_path: Path, database: str) -> object:

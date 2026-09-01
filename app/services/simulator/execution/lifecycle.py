@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Literal
 
-from app.utils import canonical_digest
+from app.kernel.serialization import canonical_digest
 
 type FillPolicy = Literal["FOK", "IOC", "RETURN", "BOC"]
 type TimePolicy = Literal["GTC", "DAY", "SPECIFIED", "SPECIFIED_DAY"]

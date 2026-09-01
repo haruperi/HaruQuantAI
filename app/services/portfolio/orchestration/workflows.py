@@ -9,6 +9,10 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_audit_event, get_standard_response_type
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.analytics import (
     create_portfolio_rebalance_measurement_request,
     get_analytics_value_field,
@@ -36,13 +40,6 @@ from app.services.simulator import get_simulation_value_field
 from app.services.trading import (
     create_portfolio_rebalance_execution_request,
     get_trading_route,
-)
-from app.utils import (
-    canonical_json,
-    create_audit_event,
-    generate_id,
-    get_logger,
-    get_standard_response_type,
 )
 
 logger = get_logger(__name__)

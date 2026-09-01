@@ -9,18 +9,17 @@ from decimal import Decimal
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import (
+    build_response_metadata,
+    error_response,
+    success_response,
+)
+from app.kernel.identity import generate_id, validate_id
+from app.kernel.serialization import canonical_digest
 from app.services.portfolio.contracts.errors import (
     PORTFOLIO_ERROR_CATALOG,
     PortfolioError,
-)
-from app.utils import (
-    build_response_metadata,
-    canonical_digest,
-    error_response,
-    generate_id,
-    get_logger,
-    success_response,
-    validate_id,
 )
 
 type AuthContext = Any

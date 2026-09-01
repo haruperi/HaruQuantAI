@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING, cast
 
+from app.composition.logging import get_logger
 from app.services.brokers._shared.circuit_breaker import (
     _TransportCircuitBreaker,
 )
@@ -24,7 +25,6 @@ from app.services.brokers.canonical_contracts.protocols import (
 )
 from app.services.brokers.dukascopy.candle_mapping import _provider_interval
 from app.services.brokers.dukascopy.instruments import _web_symbol
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

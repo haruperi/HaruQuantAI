@@ -7,8 +7,8 @@ from typing import cast
 
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.research.contracts import LeakageReport
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

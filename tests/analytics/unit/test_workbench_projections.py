@@ -39,7 +39,7 @@ def _two_trade_source() -> dict[str, object]:
 
 def _report_from(source: dict[str, object]) -> Any:
     """Build one validated report from producer-neutral source evidence."""
-    from app.utils import generate_id
+    from app.kernel.identity import generate_id
 
     return unwrap(
         build_performance_report(

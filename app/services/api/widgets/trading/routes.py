@@ -8,6 +8,7 @@ from typing import Annotated, Any, Literal, cast
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
+from app.kernel.identity import generate_id
 from app.services.api.identity import (
     get_username_for_principal,
     require_auth_context,
@@ -46,7 +47,6 @@ from app.services.trading import (
     stop_execution_session,
     update_execution_session_metadata,
 )
-from app.utils import generate_id
 
 type AuthContext = Any
 type _SessionSource = Callable[[str, str, str, AuthContext], object | None]

@@ -12,6 +12,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 import pandas as pd
+from app.kernel.identity import generate_id
 from app.services.indicators import rsi
 from app.services.strategy import (
     create_strategy_evaluator,
@@ -26,7 +27,6 @@ from app.services.strategy import (
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
 )
-from app.utils import generate_id
 from tests.indicators.usage._support import (
     print_indicator_evidence,
     print_market_evidence,

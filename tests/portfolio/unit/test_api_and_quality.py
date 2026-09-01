@@ -11,6 +11,9 @@ from typing import Any, cast
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_auth_context, get_standard_response_type
+from app.kernel.serialization import canonical_digest
 from app.services.portfolio import (
     activate_portfolio,
     assess_portfolio_drift,
@@ -42,12 +45,6 @@ from app.services.portfolio.contracts import (
 from app.services.portfolio.orchestration import PortfolioWorkflowService
 from app.services.portfolio.persistence import delete
 from app.services.portfolio.state import PortfolioRepository, scope_key
-from app.utils import (
-    canonical_digest,
-    create_auth_context,
-    get_logger,
-    get_standard_response_type,
-)
 
 from tests.portfolio.unit.test_repository import FakePortfolioStore
 from tests.portfolio.unit.test_workflows import _plan, _service

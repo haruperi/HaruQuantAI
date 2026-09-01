@@ -1,7 +1,7 @@
 """Unit tests for Analytics risk evidence."""
 
+from app.composition.logging import get_logger
 from app.services.analytics.metrics.risk import calculate_risk_evidence
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

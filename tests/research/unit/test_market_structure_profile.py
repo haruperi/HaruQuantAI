@@ -4,12 +4,12 @@ import math
 
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     build_market_structure_profile,
     create_research_value,
     is_research_value,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

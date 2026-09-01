@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from app.contracts.common.models import create_auth_context
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.data import (
     build_data_quality_report,
     build_fx_conversion_evidence,
@@ -25,7 +27,6 @@ from app.services.simulator.run import (
     run_backtest_async,
 )
 from app.services.trading import create_order_intent
-from app.utils import canonical_digest, canonical_json, create_auth_context
 
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 

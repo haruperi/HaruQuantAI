@@ -27,7 +27,7 @@ from app.agentic import (
     retrieve_memory,
     store_memory,
 )
-from app.utils import generate_id
+from app.kernel.identity import generate_id
 
 from tests.agentic.usage._runner import run_feature_usage
 

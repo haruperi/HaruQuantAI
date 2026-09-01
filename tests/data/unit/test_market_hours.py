@@ -3,6 +3,7 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.time_sessions.contracts import (
     MarketHours,
@@ -13,7 +14,6 @@ from app.services.data.time_sessions.market_hours import (
     apply_venue_halt,
     evaluate_market_hours,
 )
-from app.utils import generate_id
 
 
 def test_evaluate_market_hours_selects_current_and_next_sessions() -> None:

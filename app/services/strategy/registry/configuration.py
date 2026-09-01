@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Mapping
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
 from app.services.strategy.contracts.outcomes import failure
 from app.services.strategy.contracts.policy import (
@@ -17,7 +19,6 @@ from app.services.strategy.contracts.references import (
 )
 from app.services.strategy.contracts.responses import guard_strategy_boundary
 from app.services.strategy.diagnostics.errors import StrategyErrorCode
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

@@ -9,6 +9,7 @@ from decimal import Decimal
 from unittest.mock import MagicMock
 
 import pytest
+from app.contracts.common.models import StandardResponse
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import build_data_response, data_start_time
 from app.services.data.evidence.fx_contracts import (
@@ -19,7 +20,6 @@ from app.services.data.evidence.fx_contracts import (
 from app.services.data.evidence.fx_conversion import (
     get_fx_conversion_evidence,
 )
-from app.utils.responses.models import StandardResponse
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(minutes=1)

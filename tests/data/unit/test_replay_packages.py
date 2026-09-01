@@ -6,10 +6,10 @@ from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import build_replay_package, parse_replay_package
 from app.services.data.contracts import DataError
 from app.services.data.replay import packages as service
-from app.utils import generate_id
 
 _T0 = datetime(2026, 8, 7, 12, tzinfo=UTC)
 

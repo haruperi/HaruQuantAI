@@ -11,6 +11,8 @@ from typing import Any, cast, get_args, get_origin
 
 from pydantic import BaseModel
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioConstructionResult,
@@ -37,7 +39,6 @@ from app.services.portfolio.persistence import (
     read_plan_version_records,
     update_active_allocation_record,
 )
-from app.utils import canonical_digest, canonical_json, get_logger
 
 logger = get_logger(__name__)
 type AuditOutboxRecord = Mapping[str, str]

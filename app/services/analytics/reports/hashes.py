@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Mapping
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import to_report_json_safe
 from app.services.analytics.contracts.models import (
@@ -12,7 +14,6 @@ from app.services.analytics.contracts.models import (
     ReproducibilityHashes,
     TradingResult,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

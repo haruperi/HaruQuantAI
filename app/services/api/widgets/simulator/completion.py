@@ -15,7 +15,8 @@ from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, cast
 
-from app.utils import format_utc_timestamp, get_logger
+from app.composition.logging import get_logger
+from app.kernel.time import format_utc_timestamp
 
 if TYPE_CHECKING:  # pragma: no cover - typing-only import
     from app.services.api.widgets.simulator.registry import (
@@ -218,7 +219,7 @@ def build_catalogue_completion_sink(
     Returns:
         Callable accepting one ``BacktestRunEvidence`` and retaining it.
     """
-    from app.utils import generate_id
+    from app.kernel.identity import generate_id
 
     now = clock or (lambda: datetime.now(UTC))
     next_request_id = request_id_factory or (lambda: generate_id("req"))

@@ -10,9 +10,9 @@ from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.composition.logging import get_logger
 from app.services.analytics import is_analytics_value
 from app.services.optimization.parameters import ParameterValue  # noqa: TC001
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

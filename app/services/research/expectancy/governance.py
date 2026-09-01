@@ -14,6 +14,9 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any, Literal, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.serialization import canonical_json
 from app.services.research.contracts.errors import (
     ValidationError,
 )
@@ -22,7 +25,6 @@ from app.services.research.expectancy.contracts import (
     build_approved_expectancy_profile,
     parse_approved_expectancy_profile,
 )
-from app.utils import canonical_json, derive_stable_id, get_logger
 
 logger = get_logger(__name__)
 

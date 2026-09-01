@@ -11,6 +11,8 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.brokers import get_broker_connection_id
 from app.services.risk import get_decision_state
 from app.services.trading.actions.orders import _execute_request
@@ -28,7 +30,6 @@ from app.services.trading.contracts.models import (
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.monitoring import OperationalEvent, emit_runtime_event
 from app.services.trading.state import get_execution_position_snapshot
-from app.utils import canonical_json, get_logger
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

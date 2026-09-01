@@ -3,9 +3,9 @@
 from decimal import Decimal
 
 import pytest
+from app.kernel.serialization import canonical_digest
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.state.runtime import validate_initial_authority_state
-from app.utils import canonical_digest
 
 
 def _snapshot() -> dict[str, object]:

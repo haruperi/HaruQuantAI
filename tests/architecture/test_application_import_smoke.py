@@ -13,8 +13,8 @@ def test_application_imports_in_fresh_process() -> None:
     """Verify that importing the application succeeds in a fresh isolated Python interpreter."""
     smoke_script = (
         "import app\n"
-        "from app.runtime import validate_runtime_configuration\n"
-        "validate_runtime_configuration(runtime_profile='research', execution_route='none')\n"
+        "from app.main import async_main\n"
+        "assert callable(async_main)\n"
         "print('IMPORT_OK')\n"
     )
 

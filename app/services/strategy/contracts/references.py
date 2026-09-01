@@ -11,6 +11,7 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts._base import (
     JsonValue,
     _contains_executable_marker,
@@ -28,7 +29,6 @@ from app.services.strategy.contracts.manifest import StrategyManifest  # noqa: T
 from app.services.strategy.contracts.policy import (
     StrategyValidationPolicy,  # noqa: TC001
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

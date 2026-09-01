@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics import contracts
 from app.services.analytics.contracts import (
     AnalyticsValidationError,
@@ -15,7 +16,6 @@ from app.services.analytics.contracts import (
 from app.services.analytics.metrics.distributions import (
     calculate_distribution_evidence,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

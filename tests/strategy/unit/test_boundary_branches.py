@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy import (
     build_trade_intent,
     create_strategy_checkpoint,
@@ -45,7 +46,6 @@ from app.services.strategy.registry.configuration import (
     _matches_rule,
     _within_limits,
 )
-from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_models import (

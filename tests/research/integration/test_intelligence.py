@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_research_source_ingest_request,
@@ -19,7 +20,6 @@ from app.services.research import (
     build_sentiment_source_evidence,
     project_intelligence_evidence,
 )
-from app.utils import generate_id
 
 
 def test_intelligence_uses_persisted_eligible_source_evidence(

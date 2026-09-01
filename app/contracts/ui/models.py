@@ -173,6 +173,7 @@ class DraftEnvelope:
     payload: dict[str, Any]
     created_at_iso: str
     updated_at_iso: str
+    contract_version: int = 1
 
 
 @dataclass(frozen=True, slots=True)
@@ -463,6 +464,7 @@ class DraftEnvelopeWire(WireModel):
     payload: JsonObject
     created_at_iso: UtcTimestamp
     updated_at_iso: UtcTimestamp
+    contract_version: int = Field(default=1, ge=1)
     schema_version: typing.Literal[1] = 1
 
 

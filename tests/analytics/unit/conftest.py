@@ -1,7 +1,7 @@
 """Fast, isolated unit-test logging for Analytics."""
 
 import pytest
-from app.utils.logging.logger import BoundLogger
+from app.composition.logging import BoundLogger
 
 
 @pytest.fixture(autouse=True)

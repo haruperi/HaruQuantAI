@@ -16,6 +16,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_migration_request,
     build_migration_step,
@@ -26,7 +27,6 @@ from app.services.data import (
     unwrap_data_response,
 )
 from app.services.indicators import run_indicators_migrations
-from app.utils import generate_id
 
 _REQ_ID = "req-00000000-0000-4000-8000-000000000001"
 

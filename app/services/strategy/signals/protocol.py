@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Protocol
 
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 type StandardResponse[T] = Any
 

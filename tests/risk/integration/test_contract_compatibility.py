@@ -140,7 +140,7 @@ def test_risk_consumes_data_account_and_fx_contracts() -> None:
 
 def test_risk_consumes_utils_auth_context_contract() -> None:
     """Validate Utils auth context at the Risk boundary."""
-    from app.utils import create_auth_context
+    from app.contracts.common.models import create_auth_context
 
     auth = create_auth_context(
         principal_id="user-1",

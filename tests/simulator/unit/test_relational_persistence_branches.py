@@ -6,10 +6,10 @@ from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
+from app.kernel.serialization import canonical_json
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.persistence import create, read, update
 from app.services.simulator.state import runtime
-from app.utils import canonical_json
 
 
 def _store() -> object:

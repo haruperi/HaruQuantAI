@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import to_report_json_safe
 from app.services.analytics.contracts.models import DashboardPayload, PerformanceReport
@@ -11,7 +12,6 @@ from app.services.analytics.dashboards.truncation import (
     DASHBOARD_MAX_POINTS,
     truncate_series,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

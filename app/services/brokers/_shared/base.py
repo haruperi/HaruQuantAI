@@ -10,6 +10,9 @@ from collections.abc import AsyncIterator, Mapping
 from dataclasses import replace
 from typing import Any, Literal, cast, override
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import get_execution_ms
+from app.kernel.identity import generate_id
 from app.services.brokers._shared.errors import (
     _CircuitOpenError,
     _ProviderResponseError,
@@ -36,7 +39,6 @@ from app.services.brokers.canonical_contracts.responses import (
     build_broker_response,
 )
 from app.services.brokers.canonical_contracts.unsupported import _utc_now
-from app.utils import generate_id, get_execution_ms, get_logger
 
 logger = get_logger(__name__)
 

@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from decimal import ROUND_FLOOR, Decimal
 from typing import Literal
 
+from app.composition.logging import get_logger
 from app.services.risk.config import RiskConfig  # noqa: TC001
 from app.services.risk.contracts import (
     PortfolioRiskSnapshot,
@@ -13,7 +14,6 @@ from app.services.risk.contracts import (
     RiskErrorCode,
 )
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

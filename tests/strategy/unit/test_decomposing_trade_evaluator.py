@@ -3,10 +3,10 @@
 from typing import Any
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy.evaluators.decomposing_trade import (
     DecomposingTradeEvaluator,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,

@@ -43,8 +43,8 @@ from app.agentic.agents.market_intelligence.sentiment_analyst.tools import (
     verify_projection,
 )
 from app.agentic.runtime import ModelOutcome
+from app.kernel.identity import derive_stable_id, generate_id
 from app.services.research import assess_intelligence_applicability
-from app.utils import derive_stable_id, generate_id
 
 from tests.agentic.usage._runner import run_feature_usage
 

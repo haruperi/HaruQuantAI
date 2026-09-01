@@ -8,9 +8,10 @@ from datetime import datetime, timedelta
 from threading import RLock
 from typing import TYPE_CHECKING, Literal
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_mapping_value
 from app.services.risk.contracts import RiskAuditRecord, RiskDomainError, RiskErrorCode
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import get_logger, redact_mapping_value
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

@@ -7,10 +7,10 @@ SQL text is ever assembled from caller input.
 
 from __future__ import annotations
 
+from app.composition.logging import get_logger
 from app.services.api.widgets.simulator.persistence.create import (
     _execute_write,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -15,6 +15,7 @@ from typing import Any
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     build_data_quality_report,
     build_market_dataset,
@@ -30,7 +31,6 @@ from app.services.simulator import (
     validate_phase_one_scope,
     validate_run_inputs,
 )
-from app.utils import canonical_json
 
 
 def _feature_header(title: str) -> None:

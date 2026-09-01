@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from app.agentic.context_memory.repository import store_memory
 from app.agentic.permissions.authorization import ToolCallOutcome, call_governed_tool
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 if TYPE_CHECKING:
     from datetime import datetime

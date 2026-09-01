@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.api.widgets.research import presets
 from app.services.api.widgets.research.projections import (
     project_report,
@@ -24,7 +26,6 @@ from app.services.api.widgets.research.registry import (
     ResearchRun,
     ResearchWorkbenchRegistry,
 )
-from app.utils import generate_id, get_logger
 
 if TYPE_CHECKING:
     from app.services.api.widgets.research.schemas import (

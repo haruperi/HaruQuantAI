@@ -6,12 +6,13 @@ import json
 from collections.abc import Mapping
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.research.drift.contracts import parse_performance_drift_evidence
 from app.services.research.persistence import (
     create_governed_evidence,
     read_latest_governed_evidence,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

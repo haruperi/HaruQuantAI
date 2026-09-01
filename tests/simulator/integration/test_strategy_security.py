@@ -1,11 +1,11 @@
 """Workflow integration test for the registered-strategy security boundary."""
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.simulator import (
     unwrap_simulation_response,
     validate_run_inputs,
 )
-from app.utils import get_logger
 
 from tests.simulator.unit.test_validate import _valid_payload
 

@@ -11,6 +11,8 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import TYPE_CHECKING, Final, NamedTuple
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data._settings import get_data_settings
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -18,7 +20,6 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

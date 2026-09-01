@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.data_jobs import job
 from app.services.data.data_jobs.contracts import (
@@ -16,7 +17,6 @@ from app.services.data.data_jobs.contracts import (
     JobStatusRequest,
     ScheduleJobRequest,
 )
-from app.utils import generate_id
 
 _NOW = datetime(2026, 1, 1, 12, tzinfo=UTC)
 

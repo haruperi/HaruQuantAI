@@ -13,8 +13,8 @@ from datetime import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, cast
 
+from app.composition.logging import get_logger
 from app.services.research import create_research_value
-from app.utils import get_logger
 
 if TYPE_CHECKING:
     from app.services.api.widgets.research.schemas import ResearchRunCreateRequest

@@ -1,7 +1,8 @@
 """Integration evidence for Analytics serialization and hashing."""
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.analytics import serialize_report
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 from tests.analytics._support import _report, unwrap  # noqa: E402

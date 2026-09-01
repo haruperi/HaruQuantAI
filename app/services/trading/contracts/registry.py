@@ -6,6 +6,8 @@ from typing import Any, Literal
 
 from pydantic import ValidationError as PydanticValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_text_value
 from app.services.trading.contracts.models import (
     TRADING_CONTRACT_VERSION,
     JsonValue,
@@ -15,7 +17,6 @@ from app.services.trading.contracts.responses import (
     error_trading_response,
     success_trading_response,
 )
-from app.utils import get_logger, redact_text_value
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

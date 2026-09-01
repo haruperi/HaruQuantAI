@@ -17,14 +17,10 @@ from pydantic import (
     model_validator,
 )
 
-from app.utils import (
-    canonical_json,
-    get_logger,
-    is_sensitive_key,
-    redact_mapping_value,
-    to_json_safe,
-    validate_id,
-)
+from app.composition.logging import get_logger
+from app.kernel.identity import validate_id
+from app.kernel.redaction import is_sensitive_key, redact_mapping_value
+from app.kernel.serialization import canonical_json, to_json_safe
 
 logger = get_logger(__name__)
 

@@ -9,6 +9,9 @@ from decimal import Decimal
 from hashlib import sha256
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
+from app.kernel.time import parse_utc_timestamp
 from app.services.brokers import (
     build_broker_order_modification_request,
     build_broker_order_request,
@@ -32,11 +35,6 @@ from app.services.trading.contracts.responses import (
     success_trading_response,
 )
 from app.services.trading.routing.responses import _classify_authority_response_value
-from app.utils import (
-    canonical_json,
-    get_logger,
-    parse_utc_timestamp,
-)
 
 type StandardResponse[T] = Any
 type BrokerConnection = object

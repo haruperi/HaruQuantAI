@@ -7,6 +7,7 @@ import time
 from collections.abc import AsyncIterator, Callable
 from typing import Any
 
+from app.composition.logging import get_logger
 from app.services.brokers._shared.circuit_breaker import (
     _TransportCircuitBreaker,
 )
@@ -19,7 +20,6 @@ from app.services.brokers.canonical_contracts.protocols import (
     _CircuitOpenError,
     _RateLimitedError,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

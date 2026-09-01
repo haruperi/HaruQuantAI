@@ -14,10 +14,10 @@ from __future__ import annotations
 
 import hashlib
 
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     build_migration_step,
 )
-from app.utils import canonical_json
 
 _STATEMENTS = (
     """

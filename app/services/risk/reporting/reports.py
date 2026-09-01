@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from time import monotonic
 from typing import TYPE_CHECKING, Literal
 
+from app.composition.logging import get_logger
 from app.services.risk.contracts import (
     DecisionState,
     PortfolioRiskSnapshot,
@@ -18,7 +19,6 @@ from app.services.risk.contracts import (
     ScenarioResult,
 )
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

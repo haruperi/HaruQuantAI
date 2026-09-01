@@ -1,7 +1,7 @@
 """Integration evidence for deterministic grouped Analytics metrics."""
 
+from app.composition.logging import get_logger
 from app.services.analytics import calculate_grouped_evidence
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 from tests.analytics._support import _configured_result, unwrap  # noqa: E402

@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import build_data_settings, data_settings_context
 from app.services.research import (
     apply_expectancy_transition,
@@ -23,7 +24,6 @@ from app.services.research import (
     persist_expectancy_profile,
     transition_expectancy_governance,
 )
-from app.utils import generate_id
 
 
 def main() -> None:

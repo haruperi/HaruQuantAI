@@ -16,6 +16,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 import pandas as pd
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_research_source_policy,
@@ -52,7 +53,6 @@ from app.services.research import (
     validate_no_lookahead_features,
     write_research_artifact,
 )
-from app.utils import generate_id
 from tests.research._support import make_dataset, make_edge_lab_config
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
@@ -315,7 +315,7 @@ def main() -> None:
     _stage_header(12, "FEAT-RES-12", "Safe Research Artifact Persistence")
     import tempfile
 
-    from app.utils import create_auth_context
+    from app.contracts.common.models import create_auth_context
 
     auth_ctx = create_auth_context(
         contract_version="v1",

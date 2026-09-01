@@ -7,8 +7,8 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping, Sequence
 from hashlib import sha256
 
+from app.kernel.serialization import canonical_json
 from app.services.simulator.scenarios.contracts import MissionDefinition
-from app.utils import canonical_json
 
 
 class _ScenarioProvider:

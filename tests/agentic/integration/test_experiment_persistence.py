@@ -3,8 +3,8 @@
 from pathlib import Path
 
 from app.agentic import build_durable_experiment_store, run_agentic_migrations
+from app.kernel.identity import generate_id
 from app.services.data import build_data_settings, data_settings_context
-from app.utils import generate_id
 
 from tests.agentic.fixtures import NOW
 from tests.agentic.unit.test_experiment_designer import RESULT, _coordinate, _spec

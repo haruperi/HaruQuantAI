@@ -10,8 +10,9 @@ from datetime import UTC, datetime
 from types import MappingProxyType
 from typing import Literal
 
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest
 from app.services.data.contracts.errors import DataError
-from app.utils import canonical_digest, generate_id
 
 type SourceKind = Literal[
     "filing", "statement", "transcript", "macro", "news", "social", "alternative"

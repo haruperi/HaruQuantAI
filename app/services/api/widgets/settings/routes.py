@@ -6,6 +6,8 @@ from typing import Annotated, Any, Literal
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.api.identity import (
     IdentityError,
     finalize_idempotency_key,
@@ -20,7 +22,6 @@ from app.services.api.identity import (
     update_system_settings,
     update_user_settings,
 )
-from app.utils import canonical_digest, canonical_json, generate_id
 
 type AuthContext = Any
 

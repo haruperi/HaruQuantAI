@@ -1,8 +1,8 @@
 """Public Indicators error-boundary tests."""
 
+from app.kernel.errors import validate_error_catalog
 from app.services.indicators import build_indicator_config, get_indicator, sma
 from app.services.indicators.core.error_catalog import INDICATOR_ERROR_CATALOG
-from app.utils import validate_error_catalog
 
 from tests.indicators.helpers import assert_error, build_dataset
 

@@ -117,7 +117,7 @@ from app.agentic.governance import FirmMandate, RoleManifest
 from app.agentic.governance.models import UNIVERSAL_PROHIBITIONS
 from app.agentic.governance.registry import normalize_prompt_text
 from app.agentic.lifecycle.models import PROMOTION_PERMISSION
-from app.utils import canonical_digest
+from app.kernel.serialization import canonical_digest
 
 NOW = datetime(2026, 7, 29, 12, 0, tzinfo=UTC)
 MANDATE_START = datetime(2026, 7, 1, tzinfo=UTC)

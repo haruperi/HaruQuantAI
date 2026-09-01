@@ -5,6 +5,7 @@ from decimal import Decimal
 
 import pandas as pd
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.alignment.operations import align_datasets
 from app.services.data.contracts import (
     DataError,
@@ -27,7 +28,6 @@ from app.services.data.transformation.tabular import (
     to_tick_dataframe,
 )
 from app.services.data.transformation.tick_aggregation import aggregate_ticks
-from app.utils import generate_id
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 

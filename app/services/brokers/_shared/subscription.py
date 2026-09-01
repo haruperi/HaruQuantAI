@@ -6,6 +6,9 @@ import asyncio
 from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import replace
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.brokers.canonical_contracts import (
     BrokerCapabilityId,
     BrokerEnvironment,
@@ -19,7 +22,6 @@ from app.services.brokers.canonical_contracts.responses import (
     broker_start_time,
     build_broker_response,
 )
-from app.utils import generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

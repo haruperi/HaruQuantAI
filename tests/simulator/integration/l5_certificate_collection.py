@@ -25,6 +25,8 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
+from app.composition.config import load_broker_provider_settings, load_settings
+from app.kernel.identity import generate_id
 from app.services.api import get_system_settings, resolve_system_credential_slot
 from app.services.brokers import (
     build_broker_connection_config,
@@ -58,7 +60,6 @@ from app.services.simulator import (
     get_parity_envelope,
     normalize_parity_evidence,
 )
-from app.utils import generate_id, load_broker_provider_settings, load_settings
 
 _BUNDLE_FILES = frozenset(
     {

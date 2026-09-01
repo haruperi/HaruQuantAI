@@ -2,12 +2,12 @@
 
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.strategy import (
     create_strategy_checkpoint,
     create_strategy_replay_manifest,
     validate_strategy_checkpoint,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_catalog import storage_context
 from tests.strategy.unit.test_models import (

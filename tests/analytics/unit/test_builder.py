@@ -3,9 +3,10 @@
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.analytics.contracts import AnalyticsValidationError, SectionEvidence
 from app.services.analytics.reports import builder
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

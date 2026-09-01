@@ -4,6 +4,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest
 from app.services.data import (
     build_data_settings,
     data_settings_context,
@@ -13,7 +15,6 @@ from app.services.data import (
     run_data_migrations,
     unwrap_data_response,
 )
-from app.utils import canonical_digest, generate_id
 
 _FIRST = datetime(2026, 8, 15, 10, tzinfo=UTC)
 

@@ -10,6 +10,9 @@ from typing import Any, Final, Literal, NoReturn
 from fastapi import HTTPException, status
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.api.contracts.models import (
     ApiErrorCode,
     ApiMetadata,
@@ -24,7 +27,6 @@ from app.services.api.health.clock import (
     check_clock_drift,
 )
 from app.services.api.identity import require_human_permission
-from app.utils import generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 type AuthContext = Any

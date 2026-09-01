@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, cast
 
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.data import is_ohlcv_record
 from app.services.indicators.core.contracts import (
     IndicatorConfig,
@@ -29,7 +30,6 @@ from app.services.indicators.core.errors import (
     guard_public_boundary,
 )
 from app.services.indicators.core.registry import get_indicator
-from app.utils import get_logger
 
 if TYPE_CHECKING:
     from app.services.indicators.core.contracts import _MarketDataset as MarketDataset

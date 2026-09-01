@@ -2,11 +2,11 @@
 
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     create_research_value,
     run_unsupervised_research,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -8,13 +8,13 @@ from typing import TYPE_CHECKING, Literal, cast
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.research.contracts import EdgeResult
 from app.services.research.statistics import (
     compute_null_percentile,
     null_distribution_stats,
     random_entry_null,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

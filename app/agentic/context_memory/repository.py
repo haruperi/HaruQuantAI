@@ -21,7 +21,10 @@ from app.agentic.context_memory.models import (
     MemoryRecord,
     derive_content_hash,
 )
-from app.utils import derive_stable_id, get_logger, redact_mapping_value, utc_now
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.redaction import redact_mapping_value
+from app.kernel.time import utc_now
 
 logger = get_logger(__name__)
 

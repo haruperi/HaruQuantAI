@@ -29,7 +29,9 @@ from app.agentic.lifecycle.models import (
     missing_provenance,
     validate_transition,
 )
-from app.utils import derive_stable_id, get_logger, utc_now
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.time import utc_now
 
 if TYPE_CHECKING:
     from datetime import datetime

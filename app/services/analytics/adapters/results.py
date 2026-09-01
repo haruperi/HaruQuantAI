@@ -9,6 +9,9 @@ from typing import Any, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_mapping_value
+from app.kernel.serialization import canonical_json
 from app.services.analytics.contracts.catalogs import validate_contract_version
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.models import (
@@ -18,7 +21,6 @@ from app.services.analytics.contracts.models import (
     TradingResult,
 )
 from app.services.data import is_ohlcv_record
-from app.utils import canonical_json, get_logger, redact_mapping_value
 
 logger = get_logger(__name__)
 

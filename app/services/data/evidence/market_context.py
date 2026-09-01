@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol, cast
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -21,7 +22,6 @@ from app.services.data.contracts.responses import (
     run_data_operation,
     unwrap_data_response,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

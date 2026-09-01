@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     data_settings_context,
@@ -21,7 +22,6 @@ from app.services.trading import (
     start_execution_session,
     stop_execution_session,
 )
-from app.utils import generate_id
 
 
 def _settings(tmp_path: Path) -> object:

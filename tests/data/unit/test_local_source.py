@@ -5,6 +5,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import (
     DataError,
     DataQualityReport,
@@ -16,7 +17,6 @@ from app.services.data.sources.contracts import (
     SourceReadRequest,
 )
 from app.services.data.sources.local_adapter import LocalMarketDataSource
-from app.utils import generate_id
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(minutes=1)

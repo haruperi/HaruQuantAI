@@ -3,6 +3,8 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
+from app.contracts.common.models import create_audit_event
+from app.kernel.identity import generate_id
 from app.services.data import (
     __all__ as data_public_api,
 )
@@ -10,7 +12,6 @@ from app.services.data import (
     build_account_state_snapshot,
     build_audit_event_page,
 )
-from app.utils import create_audit_event, generate_id
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(minutes=1)

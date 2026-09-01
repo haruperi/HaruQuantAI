@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_simulator_runtime_store,
@@ -12,7 +13,6 @@ from app.services.data import (
     run_runtime_store_migrations,
     unwrap_data_response,
 )
-from app.utils import generate_id
 
 
 def _settings(tmp_path: Path) -> object:

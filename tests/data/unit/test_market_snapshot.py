@@ -7,10 +7,10 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import build_market_snapshot_request, get_market_snapshot
 from app.services.data.market_data import snapshot
 from app.services.data.market_data.level1 import Level1Snapshot
-from app.utils import generate_id
 
 _T0 = datetime(2026, 8, 7, 12, tzinfo=UTC)
 

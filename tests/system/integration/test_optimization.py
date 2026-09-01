@@ -6,6 +6,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.api.widgets.strategies.routes import router as strategies_router
 from app.services.data import (
     build_data_quality_report,
@@ -26,7 +27,6 @@ from app.services.strategy import (
     register_strategy_version,
     update_strategy_parameters,
 )
-from app.utils import get_logger
 
 from tests.analytics._support import _report
 from tests.optimization.unit.test_adapter import _auth

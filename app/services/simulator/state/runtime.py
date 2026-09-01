@@ -11,6 +11,8 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal, cast
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.simulator.errors.exception import SimulationError
 from app.services.simulator.errors.responses import operation_guard
 from app.services.simulator.persistence import (
@@ -25,7 +27,6 @@ from app.services.simulator.reporting.contracts import (
     PortfolioSimulationResult,
     SimulationResult,
 )
-from app.utils import canonical_digest, canonical_json, get_logger
 
 logger = get_logger(__name__)
 type RunStatus = Literal["started", "completed", "failed"]

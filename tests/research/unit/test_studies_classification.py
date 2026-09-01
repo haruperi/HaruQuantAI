@@ -1,8 +1,8 @@
 """Unit tests for Research symbol classification (FR-RES-068)."""
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import classify_symbol, create_research_value
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -9,7 +9,8 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import get_logger, redact_text_value
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_text_value
 
 logger = get_logger(__name__)
 

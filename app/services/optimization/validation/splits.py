@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
+from app.composition.logging import get_logger
 from app.services.optimization.validation.contracts import (
     SplitMode,
     TimeSeriesSplit,
     WalkForwardRequest,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

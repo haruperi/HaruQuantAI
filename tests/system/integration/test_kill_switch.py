@@ -5,6 +5,7 @@ from dataclasses import replace
 from datetime import timedelta
 from typing import Any
 
+from app.kernel.serialization import canonical_json
 from app.services.api.widgets.operator.routes import router
 from app.services.risk import (
     apply_kill_switch_command,
@@ -17,7 +18,6 @@ from app.services.risk import (
     get_decision_state,
 )
 from app.services.trading import resume_strategy
-from app.utils import canonical_json
 
 from tests.risk import _support as risk_support
 from tests.trading.unit.actions.test_controls import authority, projection

@@ -3,8 +3,8 @@
 from pathlib import Path
 
 from app.agentic import get_agentic_migrations, run_agentic_migrations
+from app.kernel.identity import generate_id
 from app.services.data import build_data_settings, data_settings_context
-from app.utils import generate_id
 
 
 def _settings(tmp_path: Path) -> object:

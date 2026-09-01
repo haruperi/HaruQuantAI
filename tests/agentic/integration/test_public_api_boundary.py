@@ -55,7 +55,7 @@ from app.agentic.public_api import (
     replay_firm_run,
     submit_firm_request,
 )
-from app.utils import generate_id
+from app.kernel.identity import generate_id
 
 from tests.agentic.fixtures import (
     NOW,

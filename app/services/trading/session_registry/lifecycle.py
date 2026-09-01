@@ -5,13 +5,13 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable, Mapping
 from datetime import UTC, datetime
 
+from app.composition.logging import get_logger
 from app.services.trading.persistence import update_execution_session_record
 from app.services.trading.session_registry.contracts import _SessionRecord
 from app.services.trading.session_registry.registry import (
     get_execution_session,
     list_execution_sessions,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 type AuthorityStart = Callable[[Mapping[str, object]], Awaitable[Mapping[str, object]]]

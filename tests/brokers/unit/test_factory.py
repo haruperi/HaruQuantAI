@@ -5,6 +5,8 @@ import sys
 from collections.abc import Mapping
 from unittest.mock import patch
 
+from app.contracts.common.models import RiskLevel
+from app.kernel.identity import validate_id
 from app.services.brokers import (
     create_broker_adapter,
     get_registered_brokers,
@@ -16,8 +18,6 @@ from app.services.brokers.canonical_contracts import (
     BrokerErrorCode,
     BrokerId,
 )
-from app.utils.identity import validate_id
-from app.utils.responses.models import RiskLevel
 
 
 def _config(enabled: bool = True) -> BrokerConnectionConfig:

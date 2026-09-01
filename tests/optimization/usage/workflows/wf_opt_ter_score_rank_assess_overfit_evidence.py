@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.composition.logging import flush_logging
 from app.services.optimization import (
     assess_overfit_evidence,
     calculate_candidate_score,
@@ -14,7 +15,6 @@ from app.services.optimization import (
     count_nominal_trials,
     rank_candidates,
 )
-from app.utils import flush_logging
 from tests.optimization.usage._support import performance_report
 
 WORKFLOW_ID = "WF-OPT-TER"

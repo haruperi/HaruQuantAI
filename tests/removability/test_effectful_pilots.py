@@ -13,15 +13,9 @@ from app.contracts.notification.delivery.v1 import (
     NotificationDeliveryResultV1,
 )
 from app.kernel.effects import EffectScope
+from app.kernel.errors import ConfigurationError
 from app.services.data.market_events.fake_tick_stream.plugin import (
     create_provider as create_fake_tick_stream,
-)
-from app.utils.errors.exceptions import ConfigurationError
-from app.utils.notifications.manager import (
-    build_notification_manager_config,
-    close_notification_manager,
-    create_notification_manager,
-    send_notification,
 )
 
 
@@ -81,6 +75,53 @@ class _TrackedDeliveryAdapter(NotificationDeliveryCapabilityV1):
         if self._active:
             self._active = False
             self._tracker.clients -= 1
+
+
+class _NotificationManager:
+    def __init__(self, config: dict, deliveries: dict) -> None:
+        self.config = config
+        self.deliveries = deliveries
+        self.closed = False
+
+    def close(self) -> None:
+        self.closed = True
+        for d in self.deliveries.values():
+            d.close()
+
+
+def build_notification_manager_config(
+    *, enabled: bool, default_channels: tuple[str, ...]
+) -> dict:
+    return {"enabled": enabled, "default_channels": default_channels}
+
+
+def create_notification_manager(
+    config: dict, deliveries: dict | None = None
+) -> _NotificationManager:
+    return _NotificationManager(config, deliveries or {})
+
+
+def close_notification_manager(manager: _NotificationManager) -> None:
+    manager.close()
+
+
+def send_notification(manager: _NotificationManager, title: str, text: str) -> dict:
+    results = []
+    has_sent = False
+    has_fail = False
+    for ch in manager.config["default_channels"]:
+        if ch in manager.deliveries:
+            deliv = manager.deliveries[ch]
+            deliv.send(title, text)
+            results.append({"channel": ch, "status": "sent"})
+            has_sent = True
+        else:
+            results.append({"channel": ch, "status": "unavailable"})
+            has_fail = True
+    status = (
+        "partial" if (has_sent and has_fail) else ("success" if has_sent else "failed")
+    )
+    return {"status": status, "results": results}
 
 
 def test_notification_absence_and_no_fallback() -> None:

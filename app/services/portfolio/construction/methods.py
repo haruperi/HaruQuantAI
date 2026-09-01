@@ -6,8 +6,8 @@ from collections.abc import Mapping, Sequence
 from decimal import Decimal, localcontext
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
 from app.services.portfolio.contracts.errors import PortfolioError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

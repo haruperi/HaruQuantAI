@@ -4,6 +4,7 @@ import hashlib
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_research_source_policy,
@@ -18,7 +19,6 @@ from app.services.data import (
     query_research_source_observations,
     run_data_migrations,
 )
-from app.utils import generate_id
 
 
 def test_observation_revision_and_decision_time(tmp_path: Path) -> None:

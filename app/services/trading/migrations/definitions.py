@@ -3,13 +3,13 @@
 from hashlib import sha256
 from typing import Any, Literal
 
+from app.composition.logging import get_logger
 from app.services.data import (
     build_migration_request,
     build_migration_step,
     run_domain_migrations,
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import get_logger
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

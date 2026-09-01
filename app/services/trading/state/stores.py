@@ -6,8 +6,8 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import TYPE_CHECKING, Literal, Protocol
 
+from app.composition.logging import get_logger
 from app.services.trading.contracts.models import JsonValue, TradingRoute
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

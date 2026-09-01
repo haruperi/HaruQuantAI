@@ -13,6 +13,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Final
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.time import utc_now
 from app.services.api.identity.errors import IdentityError
 from app.services.api.widgets.markets.orchestration import resolve_runtime_source_id
 from app.services.api.widgets.watchlists.persistence import (
@@ -34,7 +37,6 @@ from app.services.data import (
     classify_symbol,
     get_symbol_metadata,
 )
-from app.utils import derive_stable_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

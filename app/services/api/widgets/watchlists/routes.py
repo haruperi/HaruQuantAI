@@ -12,6 +12,8 @@ from typing import Annotated, Any, NoReturn
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.api.identity import (
     IdentityError,
     finalize_idempotency_key,
@@ -30,7 +32,6 @@ from app.services.api.widgets.watchlists.schemas import (
     _WatchlistCreate,  # noqa: TC001 - FastAPI resolves request models at runtime
     _WatchlistUpdate,  # noqa: TC001 - FastAPI resolves request models at runtime
 )
-from app.utils import canonical_json, generate_id
 
 type AuthContext = Any
 

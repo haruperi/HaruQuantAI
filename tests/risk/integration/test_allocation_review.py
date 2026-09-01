@@ -1,5 +1,6 @@
 """Integration test for allocation review and Risk-budget activation."""
 
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     activate_allocation_budget,
     create_allocation_budget_activation_request,
@@ -8,7 +9,6 @@ from app.services.risk import (
     get_decision_state,
     review_allocation_proposal,
 )
-from app.utils import canonical_json
 
 from tests.risk import _support as examples
 from tests.risk.integration.test_strategy_admission import _AuditStore

@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     compute_null_percentile,
     create_research_value,
@@ -13,7 +14,6 @@ from app.services.research import (
     session_randomized_null,
     shuffle_returns_null,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

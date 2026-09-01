@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from app.agentic.persistence.create import _execute, _field, _model_value
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 logger = get_logger(__name__)
 

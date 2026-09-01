@@ -2,13 +2,13 @@
 
 import numpy as np
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     block_bootstrap_ci,
     block_bootstrap_distribution,
     create_research_value,
     permutation_test,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

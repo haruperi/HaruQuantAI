@@ -16,8 +16,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, Literal, cast
 
+from app.kernel.serialization import canonical_digest, to_json_safe
 from app.services.research.contracts.errors import ConfigurationError, ValidationError
-from app.utils import canonical_digest, to_json_safe
 
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 # Drift thresholds are bounded fractions; a 100% relative drop is the sane

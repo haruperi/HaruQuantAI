@@ -7,6 +7,9 @@ import time
 from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.analytics import get_analytics_value_field
 from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.execution import (
@@ -25,7 +28,6 @@ from app.services.optimization.search.contracts import (
 )
 from app.services.optimization.search.grid import iter_grid_candidates
 from app.services.optimization.search.random import sample_random_candidates
-from app.utils import canonical_json, generate_id, get_logger
 
 logger = get_logger(__name__)
 

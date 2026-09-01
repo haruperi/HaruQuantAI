@@ -5,6 +5,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
+from app.kernel.identity import validate_id
 from app.services.brokers import get_broker_error_code
 from app.services.trading.actions import (
     cancel_all_orders,
@@ -20,7 +21,6 @@ from app.services.trading.state import (
     create_execution_position_store,
     set_execution_position,
 )
-from app.utils import validate_id
 
 from tests.trading.unit.actions.test_dependencies import (
     NOW,

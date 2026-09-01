@@ -19,8 +19,8 @@ def test_merges_all_edge_evidence(tmp_path: Path) -> None:
     matrix = generate_matrix(repo_root)
 
     assert matrix["schema_version"] == 1
-    assert len(matrix["features"]) == 253
-    assert len(matrix["providers"]) == 253
+    assert len(matrix["features"]) == 237
+    assert len(matrix["providers"]) == 237
     assert len(matrix["domains"]) >= 14
     assert len(matrix["edges"]) > 0
 

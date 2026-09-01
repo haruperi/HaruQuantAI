@@ -6,12 +6,12 @@ import asyncio
 from datetime import UTC, datetime
 from typing import Any
 
+from app.contracts.common.models import create_auth_context
 from app.services.api import (
     build_request_context_middleware,
     build_route_contract,
     build_route_contract_registry,
 )
-from app.utils import create_auth_context
 from fastapi import FastAPI, Request
 
 type AuthContext = Any

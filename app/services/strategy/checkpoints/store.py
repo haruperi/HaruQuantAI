@@ -6,6 +6,9 @@ import hashlib
 from collections.abc import Mapping
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_mapping_value
+from app.kernel.serialization import canonical_json
 from app.services.data import is_data_error
 from app.services.strategy.checkpoints.models import StrategyCheckpoint
 from app.services.strategy.contracts._base import JsonValue  # noqa: TC001
@@ -23,11 +26,6 @@ from app.services.strategy.migrations.definitions import _ensure_strategy_storag
 from app.services.strategy.persistence import (
     create_strategy_checkpoint_record,
     read_strategy_checkpoint_record,
-)
-from app.utils import (
-    canonical_json,
-    get_logger,
-    redact_mapping_value,
 )
 
 type AuthContext = Any
@@ -259,8 +257,8 @@ def list_strategy_checkpoints(
     Returns:
         Tuple of StrategyCheckpoint contracts.
     """
+    from app.kernel.identity import generate_id
     from app.services.strategy.persistence import read_strategy_checkpoints
-    from app.utils import generate_id
 
     logger.info("Listing strategy checkpoints for %s", config_id)
     request_id = generate_id("req")

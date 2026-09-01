@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any, Literal
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.data import is_ohlcv_record, is_tick_record
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.validation.contracts import (
@@ -14,7 +16,6 @@ from app.services.simulator.validation.contracts import (
     MarketEvidenceLineage,
     ValidatedMarketDataEvidence,
 )
-from app.utils import canonical_digest, canonical_json, get_logger
 
 MarketDataset = Any
 OHLCVRecord = Any

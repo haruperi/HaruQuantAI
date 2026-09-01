@@ -7,7 +7,14 @@ import tomllib
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Final, cast
+from typing import Any, Final, cast
+
+from pydantic import SecretStr
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 from app.composition.logging import LoggingConfig
 from app.composition.readiness import KNOWN_PROFILES
@@ -334,3 +341,211 @@ def load_config_from_file(path: str | Path) -> AppConfig:
         msg = f"Configuration file not found: {file_path}"
         raise FileNotFoundError(msg)
     return load_config_from_toml_string(file_path.read_text(encoding="utf-8"))
+
+
+@dataclass
+class AppSettings:
+    """Standard global application runtime settings."""
+
+    environment: str = "dev"
+    runtime_profile: str = "simulation"
+    database_url: str | None = None
+    data_dir: str | None = None
+    logging: LoggingConfig = field(default_factory=LoggingConfig)
+
+
+def get_app_settings_model_config() -> SettingsConfigDict:
+    """Return the shared Pydantic SettingsConfigDict configuration.
+
+    Returns:
+        Configured SettingsConfigDict instance.
+    """
+    return SettingsConfigDict(
+        extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+    )
+
+
+def get_app_settings_sources(
+    settings_cls: type[BaseSettings],
+    init_settings: PydanticBaseSettingsSource,
+    env_settings: PydanticBaseSettingsSource,
+    dotenv_settings: PydanticBaseSettingsSource,
+    file_secret_settings: PydanticBaseSettingsSource,
+) -> tuple[PydanticBaseSettingsSource, ...]:
+    """Return the canonical order of settings sources.
+
+    Args:
+        settings_cls: Target settings class.
+        init_settings: Direct initialization source.
+        env_settings: Environment variables source.
+        dotenv_settings: Dotenv file source.
+        file_secret_settings: Secret files source.
+
+    Returns:
+        Tuple of prioritized settings sources.
+    """
+    _ = settings_cls
+    return (init_settings, env_settings, dotenv_settings, file_secret_settings)
+
+
+def load_settings(
+    values: dict[str, Any] | None = None,
+    overrides: dict[str, Any] | None = None,
+) -> AppSettings:
+    """Load application runtime settings.
+
+    Args:
+        values: Optional explicit source dictionary.
+        overrides: Optional override dictionary.
+
+    Returns:
+        AppSettings instance.
+    """
+    import os
+
+    merged = dict(values or {})
+    if overrides:
+        merged.update(overrides)
+
+    env = merged.get("environment") or os.environ.get("ENVIRONMENT", "dev")
+    profile = merged.get("runtime_profile") or os.environ.get(
+        "RUNTIME_PROFILE", "simulation"
+    )
+    db_url = merged.get("database_url") or os.environ.get("DATABASE_URL")
+    data_dir = merged.get("data_dir") or os.environ.get("DATA_DIR")
+
+    log_level = (
+        merged.get("LOG_LEVEL")
+        or merged.get("log_level")
+        or os.environ.get("LOG_LEVEL", "INFO")
+    )
+    log_cfg = LoggingConfig(level=str(log_level))
+
+    return AppSettings(
+        environment=env,
+        runtime_profile=profile,
+        database_url=db_url,
+        data_dir=data_dir,
+        logging=log_cfg,
+    )
+
+
+@dataclass
+class BrokerProviderSettings:
+    """Settings for external broker adapters and feeds."""
+
+    mt5_enabled: bool = False
+    mt5_login: int | None = None
+    mt5_password: SecretStr | str | None = None
+    mt5_server: str | None = None
+    mt5_path: Path | None = None
+    mt5_terminal_path: SecretStr | str | Path | None = None
+    mt5_environment: str = "demo"
+    mt5_timeout_ms: int = 60000
+
+    ctrader_enabled: bool = False
+    ctrader_client_id: str | None = None
+    ctrader_client_secret: SecretStr | str | None = None
+    ctrader_access_token: SecretStr | str | None = None
+    ctrader_account_id: str | None = None
+    ctrader_environment: str = "demo"
+
+    binance_enabled: bool = False
+    binance_api_key: str | None = None
+    binance_api_secret: SecretStr | str | None = None
+    binance_testnet: bool = True
+
+    dukascopy_enabled: bool = False
+    yahoo_enabled: bool = False
+    interactive_brokers_enabled: bool = False
+
+
+def load_broker_provider_settings(
+    values: dict[str, Any] | None = None,
+) -> BrokerProviderSettings:
+    """Load broker provider settings mapping.
+
+    Args:
+        values: Optional broker provider overrides.
+
+    Returns:
+        BrokerProviderSettings instance.
+    """
+    raw = dict(values or {})
+    known_fields = {
+        "mt5_enabled",
+        "mt5_login",
+        "mt5_password",
+        "mt5_server",
+        "mt5_path",
+        "mt5_terminal_path",
+        "mt5_environment",
+        "mt5_timeout_ms",
+        "ctrader_enabled",
+        "ctrader_client_id",
+        "ctrader_client_secret",
+        "ctrader_access_token",
+        "ctrader_account_id",
+        "ctrader_environment",
+        "binance_enabled",
+        "binance_api_key",
+        "binance_api_secret",
+        "binance_testnet",
+        "dukascopy_enabled",
+        "yahoo_enabled",
+        "interactive_brokers_enabled",
+    }
+    filtered = {k: v for k, v in raw.items() if k in known_fields}
+    bool_fields = {
+        "mt5_enabled",
+        "ctrader_enabled",
+        "binance_enabled",
+        "binance_testnet",
+        "dukascopy_enabled",
+        "yahoo_enabled",
+        "interactive_brokers_enabled",
+    }
+    for field_name in bool_fields:
+        if field_name in filtered:
+            val = filtered[field_name]
+            if isinstance(val, str):
+                filtered[field_name] = val.strip().lower() in {
+                    "true",
+                    "1",
+                    "yes",
+                    "on",
+                }
+            elif val is not None:
+                filtered[field_name] = bool(val)
+
+    secret_fields = {
+        "mt5_password",
+        "mt5_terminal_path",
+        "ctrader_client_secret",
+        "ctrader_access_token",
+        "binance_api_secret",
+    }
+    for field_name in secret_fields:
+        if field_name in filtered:
+            val = filtered[field_name]
+            if isinstance(val, str):
+                filtered[field_name] = SecretStr(val)
+
+    return BrokerProviderSettings(**filtered)
+
+
+def load_profile_document(path: str | Path | None = None) -> dict[str, Any]:
+    """Load profile configuration document.
+
+    Args:
+        path: Optional path to profile configuration TOML file.
+
+    Returns:
+        Parsed profile mapping dictionary.
+    """
+    if path and Path(path).is_file():
+        return tomllib.loads(Path(path).read_text(encoding="utf-8"))
+    return {}

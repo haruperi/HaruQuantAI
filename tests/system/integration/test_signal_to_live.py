@@ -8,6 +8,7 @@ from datetime import timedelta
 from decimal import ROUND_DOWN, Decimal
 from typing import Any
 
+from app.kernel.identity import generate_id
 from app.services.brokers import (
     connect_broker,
     create_broker_adapter,
@@ -50,7 +51,6 @@ from app.services.trading import (
     stop_live_session,
     submit_order,
 )
-from app.utils import generate_id
 
 from tests.brokers.integration.test_mt5_demo_mutations import (
     _authority_state,

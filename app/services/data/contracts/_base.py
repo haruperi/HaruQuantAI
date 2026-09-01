@@ -10,9 +10,9 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
 
+from app.composition.logging import get_logger
 from app.services.data.contracts.errors import DataError
 from app.services.data.contracts.validation import validate_request_id
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -1,6 +1,7 @@
 """Strategy migration-definition tests."""
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy import (
     list_strategy_versions,
     validate_strategy_ref,
@@ -8,7 +9,6 @@ from app.services.strategy import (
 from app.services.strategy.contracts import StrategyRef
 from app.services.strategy.contracts.responses import unwrap_strategy_response
 from app.services.strategy.migrations.definitions import _strategy_migration_steps
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     make_manifest,

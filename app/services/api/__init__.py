@@ -868,10 +868,10 @@ def resolve_system_credential_slot(slot: str, *, request_id: str) -> object:
         TypeError: If the typed API settings snapshot is unavailable.
         IdentityError: If the credential is unavailable or cannot be verified.
     """
+    from app.kernel.identity import derive_stable_id
     from app.services.api.composition.runtime_settings import build_credential_key_set
     from app.services.api.identity import resolve_credential_reference
     from app.services.api.widgets.settings.bootstrap import ApiSettings
-    from app.utils import derive_stable_id
 
     reference_id = derive_stable_id("id", f"api-credential:system:{slot}")
     settings = get_api_settings()

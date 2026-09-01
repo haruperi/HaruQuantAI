@@ -15,6 +15,9 @@ from typing import Any
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.data import (
     build_data_settings,
     data_settings_context,
@@ -31,7 +34,6 @@ from app.services.portfolio import (
     register_portfolio_definition,
     run_portfolio_migrations,
 )
-from app.utils import canonical_digest, canonical_json, create_auth_context, generate_id
 
 NOW = datetime(2026, 7, 19, 12, 0, tzinfo=UTC)
 

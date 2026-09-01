@@ -1,12 +1,12 @@
 """Atomic event-driven Strategy runner tests."""
 
+from app.composition.logging import get_logger
 from app.services.strategy import run_event_strategy_hook
 from app.services.strategy.contracts import StrategyExecutionResult
 from app.services.strategy.contracts.responses import unwrap_strategy_response
 from app.services.strategy.diagnostics import export_strategy_diagnostics
 from app.services.strategy.event import EventStrategyEvaluator
 from app.services.strategy.replay import create_strategy_replay_manifest
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,

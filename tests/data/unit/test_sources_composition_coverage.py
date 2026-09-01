@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from app.composition.config import BrokerProviderSettings
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.sources.composition import (
@@ -19,7 +20,6 @@ from app.services.data.sources.composition import (
     list_composable_sources,
     resolve_calendar,
 )
-from app.utils.settings.models import BrokerProviderSettings
 
 _REQ_ID = "req-11111111-1111-4111-8111-111111111111"
 _NOW = datetime.now(UTC)

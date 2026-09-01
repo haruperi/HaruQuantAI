@@ -16,6 +16,8 @@ from typing import Any, Literal
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.composition.config import load_broker_provider_settings, load_settings
+from app.kernel.identity import generate_id
 from app.services.api import build_system_broker_connection_config
 from app.services.brokers import (
     build_broker_margin_request,
@@ -54,7 +56,6 @@ from app.services.trading import (
     stop_live_session,
     submit_order,
 )
-from app.utils import generate_id, load_broker_provider_settings, load_settings
 from tests.trading.usage.workflows._support import examples
 
 Target = Literal["sim", "mt5", "ctrader"]

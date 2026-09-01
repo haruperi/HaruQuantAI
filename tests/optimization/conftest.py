@@ -3,7 +3,7 @@
 from collections.abc import Generator
 
 import pytest
-from app.utils import shutdown_logging
+from app.composition.logging import shutdown_logging
 
 
 @pytest.fixture(scope="session", autouse=True)

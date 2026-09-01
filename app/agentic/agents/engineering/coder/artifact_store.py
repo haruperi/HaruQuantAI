@@ -18,7 +18,7 @@ from __future__ import annotations
 from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING
 
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 if TYPE_CHECKING:
     from app.agentic.agents.engineering.coder.schemas import (

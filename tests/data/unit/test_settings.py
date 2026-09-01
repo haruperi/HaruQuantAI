@@ -2,13 +2,14 @@
 
 from pathlib import Path
 
+from app.composition.config import load_broker_provider_settings
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     data_provider_settings_context,
     ensure_source,
     list_composable_sources,
 )
-from app.utils import generate_id, load_broker_provider_settings
 
 
 def test_data_settings_load_required_persistence_bootstrap() -> None:

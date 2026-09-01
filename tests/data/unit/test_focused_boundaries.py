@@ -7,6 +7,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.economic_calendar.normalization import (
     normalize_calendar_number,
@@ -22,7 +23,6 @@ from app.services.data.synthetic_data.provenance import SYNTHETIC_SOURCE
 from app.services.data.synthetic_data.randomness import require_seed
 from app.services.data.time_sessions import schedule
 from app.services.data.time_sessions.contracts import MarketSchedule, SessionWindow
-from app.utils import generate_id
 
 _NOW = datetime(2026, 7, 23, 12, tzinfo=UTC)
 

@@ -13,6 +13,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.portfolio.ledger import (
     build_ledger_account,
     build_ledger_entry,
@@ -31,7 +32,6 @@ from app.services.portfolio.ledger import (
     recompute_balances,
     validate_snapshot,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

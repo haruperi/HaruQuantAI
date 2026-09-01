@@ -8,6 +8,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from app.contracts.common.models import create_auth_context
 from app.services.api import (
     build_critical_alert_delivery_result,
     build_critical_alert_trigger,
@@ -21,7 +22,6 @@ from app.services.trading import (
     build_broker_state_unknown_event,
     create_execution_receipt,
 )
-from app.utils import create_auth_context
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 KillSwitchState = object

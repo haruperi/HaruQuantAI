@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from app.agentic.runtime.gateway import invoke_model
 from app.agentic.runtime.models import ModelOutcome
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 if TYPE_CHECKING:
     from google.adk import Agent as AdkAgent

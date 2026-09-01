@@ -5,8 +5,8 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics.metrics.statistics import run_statistical_validation
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

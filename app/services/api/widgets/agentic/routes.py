@@ -27,6 +27,7 @@ from fastapi import (
     status,
 )
 
+from app.kernel.identity import generate_id
 from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
@@ -38,7 +39,6 @@ from app.services.api.widgets.agentic.schemas import (
     AgenticQuarantineRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
     AgenticRunSubmitRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
-from app.utils import generate_id
 
 type AuthContext = Any
 type _AgenticSource = Callable[..., object]

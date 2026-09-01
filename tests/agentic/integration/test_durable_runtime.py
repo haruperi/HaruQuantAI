@@ -20,11 +20,11 @@ from app.agentic.lifecycle.runtime import DurableLifecycleStore
 from app.agentic.operations import build_incident_record, build_replay_request
 from app.agentic.operations.models import build_replay_outcome
 from app.agentic.operations.runtime import DurableOperationsStore
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     data_settings_context,
 )
-from app.utils import generate_id
 
 from tests.agentic.fixtures import NOW
 from tests.agentic.integration.test_public_api_boundary import (

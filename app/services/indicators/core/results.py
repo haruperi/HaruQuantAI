@@ -18,12 +18,13 @@ from dataclasses import dataclass
 from importlib import import_module
 from typing import TYPE_CHECKING, Final, Literal, cast
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.indicators.core.errors import (
     IndicatorError,
     IndicatorErrorCode,
     guard_public_boundary,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

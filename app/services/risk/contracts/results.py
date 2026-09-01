@@ -15,8 +15,10 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
+from app.kernel.identity import validate_id
+from app.kernel.redaction import is_sensitive_key
 from app.services.risk.contracts.enums import DecisionState, LimitStatus, RiskErrorCode
-from app.utils import get_logger, is_sensitive_key, validate_id
 
 logger = get_logger(__name__)
 

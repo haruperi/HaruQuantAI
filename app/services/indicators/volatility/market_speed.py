@@ -5,12 +5,12 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping
 
+from app.composition.logging import get_logger
 from app.services.indicators.core.errors import (
     IndicatorError,
     IndicatorErrorCode,
     guard_public_boundary,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

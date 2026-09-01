@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.strategy import (
     create_strategy_config,
     create_strategy_ref,
@@ -10,7 +11,6 @@ from app.services.strategy import (
     validate_strategy_config,
     validate_strategy_ref,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_catalog import make_registration, storage_context
 from tests.strategy.unit.test_models import COR, REQ, make_auth, make_policy

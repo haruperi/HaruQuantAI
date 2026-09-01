@@ -18,13 +18,14 @@ from typing import TYPE_CHECKING, Protocol, cast
 
 from pydantic import SecretStr
 
+from app.composition.config import load_broker_provider_settings
+from app.composition.logging import get_logger
 from app.services.brokers._shared.factory import create_broker_adapter
 from app.services.brokers._shared.public import connect_broker
 from app.services.brokers.canonical_contracts.enums import BrokerEnvironment, BrokerId
 from app.services.brokers.canonical_contracts.public import (
     build_broker_connection_config,
 )
-from app.utils import get_logger, load_broker_provider_settings
 
 if TYPE_CHECKING:
     from app.services.brokers.canonical_contracts.models import BrokerConnectionConfig

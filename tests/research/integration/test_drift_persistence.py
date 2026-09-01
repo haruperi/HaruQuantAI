@@ -3,13 +3,13 @@
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+from app.kernel.identity import generate_id
 from app.services.data import build_data_settings, data_settings_context
 from app.services.research import (
     build_performance_drift_evidence,
     load_latest_performance_drift_evidence,
     persist_performance_drift_evidence,
 )
-from app.utils import generate_id
 
 
 def test_drift_evidence_round_trips_immutably(tmp_path: Path) -> None:

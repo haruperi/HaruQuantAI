@@ -1,8 +1,8 @@
 """Unit tests for Research leakage evidence."""
 
 import pandas as pd
+from app.composition.logging import get_logger
 from app.services.research import validate_no_lookahead_features
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

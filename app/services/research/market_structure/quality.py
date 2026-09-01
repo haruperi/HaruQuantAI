@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from app.composition.logging import get_logger
 from app.services.research.contracts import (
     MarketStructureQualityReport,
     ResearchWarning,
@@ -13,7 +14,6 @@ from app.services.research.contracts import (
 from app.services.research.market_structure.profile import (
     canonical_structure_score,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

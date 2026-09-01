@@ -1,12 +1,12 @@
 """Integration evidence for WF-RES-009: scorecard and snapshot determinism."""
 
+from app.composition.logging import get_logger
 from app.services.research import (
     build_research_profile_snapshot,
     build_research_scorecard,
     create_research_value,
     is_research_value,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

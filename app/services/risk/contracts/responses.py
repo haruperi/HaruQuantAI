@@ -11,18 +11,17 @@ from typing import Any, Literal, ParamSpec, Protocol, TypeVar, cast
 
 from pydantic import ValidationError as PydanticValidationError
 
-from app.services.risk.contracts.catalog import RISK_ERROR_CATALOG
-from app.services.risk.contracts.enums import RiskErrorCode
-from app.services.risk.contracts.errors import RiskDomainError
-from app.utils import (
+from app.composition.logging import get_logger
+from app.contracts.common.models import (
     build_response_metadata,
     error_response,
     exception_response,
-    generate_id,
-    get_logger,
     success_response,
-    validate_id,
 )
+from app.kernel.identity import generate_id, validate_id
+from app.services.risk.contracts.catalog import RISK_ERROR_CATALOG
+from app.services.risk.contracts.enums import RiskErrorCode
+from app.services.risk.contracts.errors import RiskDomainError
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

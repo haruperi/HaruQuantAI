@@ -11,7 +11,7 @@ from decimal import Decimal
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import canonical_digest
+from app.kernel.serialization import canonical_digest
 
 _COMPONENTS = frozenset(
     {"latency", "slippage", "queue_position", "partial_fill", "requote", "fault"}

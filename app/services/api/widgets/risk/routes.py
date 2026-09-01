@@ -15,6 +15,7 @@ from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
+from app.kernel.identity import generate_id
 from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
@@ -23,7 +24,6 @@ from app.services.api.identity import (
 from app.services.api.widgets.risk.schemas import (
     KillSwitchCommandRequest,  # noqa: TC001 - FastAPI resolves runtime annotations.
 )
-from app.utils import generate_id
 
 type AuthContext = Any
 type _RiskSource = Callable[[str, Mapping[str, object], AuthContext], object]

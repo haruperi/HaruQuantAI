@@ -1,12 +1,12 @@
 """Unit tests for the Research core metric profile."""
 
 import pandas as pd
+from app.composition.logging import get_logger
 from app.services.research import (
     build_core_metric_profile,
     build_default_registry,
     create_research_value,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -31,7 +31,8 @@ from app.agentic import (
     run_deliberation,
 )
 from app.agentic.runtime import ModelOutcome
-from app.utils import canonical_digest, derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
+from app.kernel.serialization import canonical_digest
 
 from tests.agentic.usage._runner import run_feature_usage
 

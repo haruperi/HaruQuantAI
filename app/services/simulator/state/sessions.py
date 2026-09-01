@@ -8,6 +8,10 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id, generate_id
+from app.kernel.serialization import canonical_json
+from app.kernel.time import format_utc_timestamp, parse_utc_timestamp, utc_now
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.journal.playback import stream_journal_events
 from app.services.simulator.persistence import (
@@ -16,15 +20,6 @@ from app.services.simulator.persistence import (
     read_completed_run_record,
     read_session_record,
     update_session_record,
-)
-from app.utils import (
-    canonical_json,
-    derive_stable_id,
-    format_utc_timestamp,
-    generate_id,
-    get_logger,
-    parse_utc_timestamp,
-    utc_now,
 )
 
 if TYPE_CHECKING:

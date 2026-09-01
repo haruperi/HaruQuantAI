@@ -13,6 +13,8 @@ from typing import Annotated, Any, cast
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.api.identity import (
     require_auth_context,
     require_human_permission,
@@ -24,7 +26,6 @@ from app.services.api.widgets.analytics.schemas import (
     AnalyticsArchiveRequest,  # noqa: TC001
     AnalyticsCompareRequest,  # noqa: TC001
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

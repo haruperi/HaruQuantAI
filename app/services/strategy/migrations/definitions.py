@@ -5,6 +5,7 @@
 import hashlib
 from typing import Any
 
+from app.composition.logging import get_logger
 from app.services.data import (
     build_migration_request,
     build_migration_step,
@@ -12,7 +13,6 @@ from app.services.data import (
     run_domain_migrations,
 )
 from app.services.strategy.contracts.responses import unwrap_data_response
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -546,7 +546,7 @@ def _ensure_strategy_storage(request_id: str) -> None:
     """
     logger.info("Ensuring Strategy-owned persistence schema")
     try:
-        from app.utils import validate_id
+        from app.kernel.identity import validate_id
 
         valid_req_id = validate_id(request_id, expected_prefix="req")
     except ValueError, TypeError, AttributeError:

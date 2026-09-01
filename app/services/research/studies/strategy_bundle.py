@@ -16,8 +16,8 @@ from datetime import UTC, datetime
 from types import MappingProxyType
 from typing import Any, Literal, cast
 
+from app.kernel.serialization import canonical_digest, to_json_safe
 from app.services.research.contracts.errors import ValidationError
-from app.utils import canonical_digest, to_json_safe
 
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 _MAX_INSTRUMENTS = 64

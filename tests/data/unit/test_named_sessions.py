@@ -2,13 +2,13 @@
 
 from datetime import UTC, datetime, time
 
+from app.kernel.identity import generate_id
 from app.services.data import get_active_market_sessions
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.time_sessions.contracts import (
     ActiveMarketSessionsRequest,
     NamedSessionDefinition,
 )
-from app.utils import generate_id
 
 
 def _unwrap(response):

@@ -4,12 +4,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_auth_context
 from app.services.research import (
     create_research_value,
     is_research_value,
     write_research_artifact,
 )
-from app.utils import create_auth_context, get_logger
 
 logger = get_logger(__name__)
 

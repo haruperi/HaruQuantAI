@@ -8,17 +8,16 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any, Literal, cast
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import (
+    build_response_metadata,
+    error_response,
+    success_response,
+)
+from app.kernel.identity import generate_id, validate_id
 from app.services.analytics.contracts.errors import (
     AnalyticsError,
     AnalyticsValidationError,
-)
-from app.utils import (
-    build_response_metadata,
-    error_response,
-    generate_id,
-    get_logger,
-    success_response,
-    validate_id,
 )
 
 type JsonValue = Any

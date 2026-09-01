@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts.enums import (
     StrategyEnvironment,
     StrategyTimingPolicy,
@@ -23,7 +24,6 @@ from app.services.strategy.contracts.responses import (
     guard_strategy_boundary,
     unwrap_strategy_response,
 )
-from app.utils import get_logger
 
 if TYPE_CHECKING:
     type AuthContext = Any

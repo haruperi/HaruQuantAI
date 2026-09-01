@@ -8,6 +8,7 @@ from typing import Protocol, cast
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.data import (
     is_data_error,
     is_market_dataset,
@@ -18,7 +19,6 @@ from app.services.research.contracts import (
     ResearchResourceLimits,
     ResearchWarning,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

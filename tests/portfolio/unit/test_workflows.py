@@ -8,6 +8,8 @@ from time import perf_counter_ns
 from typing import Any
 
 import pytest
+from app.composition.logging import get_logger
+from app.contracts.common.models import build_response_metadata, success_response
 from app.services.analytics import (
     PortfolioRebalanceMeasurementRequest,
     build_portfolio_rebalance_measurement,
@@ -27,7 +29,6 @@ from app.services.risk import (
     create_allocation_risk_decision,
     get_decision_state,
 )
-from app.utils import build_response_metadata, get_logger, success_response
 
 from tests.portfolio.unit.test_allocation import (
     _activator,

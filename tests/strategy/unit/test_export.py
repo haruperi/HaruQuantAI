@@ -1,8 +1,8 @@
 """Strategy diagnostics export tests."""
 
 # ruff: noqa: PT018
+from app.composition.logging import get_logger
 from app.services.strategy import export_strategy_diagnostics
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import make_context
 

@@ -43,7 +43,7 @@ from app.agentic.orchestration import (
     resume_task,
     submit_task,
 )
-from app.utils import derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
 
 from tests.agentic.fixtures import NOW
 

@@ -9,6 +9,7 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_agentic_runtime_store,
     build_data_settings,
@@ -22,7 +23,6 @@ from app.services.data import (
     run_runtime_store_migrations,
     unwrap_data_response,
 )
-from app.utils import generate_id
 
 
 def _encode(value: object) -> str:

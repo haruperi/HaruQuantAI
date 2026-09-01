@@ -24,6 +24,8 @@ _project_root = str(Path(__file__).resolve().parents[2])
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
+from app.composition.config import load_broker_provider_settings
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_account_state_snapshot,
     build_market_data_request,
@@ -55,7 +57,6 @@ from app.services.risk import (
     validate_stop_loss,
 )
 from app.services.strategy import create_trade_intent_value
-from app.utils import generate_id, load_broker_provider_settings
 
 _START = datetime(2026, 8, 1, tzinfo=UTC)
 _END = _START + timedelta(hours=1000)

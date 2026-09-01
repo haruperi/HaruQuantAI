@@ -3,6 +3,7 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
+from app.kernel.identity import generate_id
 from app.services.data import build_data_settings, data_settings_context
 from app.services.research import (
     build_reasoned_stress_shock,
@@ -10,7 +11,6 @@ from app.services.research import (
     load_latest_stress_scenario_evidence,
     persist_stress_scenario_evidence,
 )
-from app.utils import generate_id
 
 
 def test_stress_evidence_round_trips_immutably(tmp_path: Path) -> None:

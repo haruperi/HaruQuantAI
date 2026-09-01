@@ -21,7 +21,9 @@ from app.agentic.governance.models import (
     FirmMandate,
     RoleManifest,
 )
-from app.utils import canonical_digest, get_logger, utc_now
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
+from app.kernel.time import utc_now
 
 logger = get_logger(__name__)
 

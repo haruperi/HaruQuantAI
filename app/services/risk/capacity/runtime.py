@@ -6,11 +6,12 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Literal
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.risk.persistence import (
     create_capacity_reservation,
     read_active_capacity_reservations,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.api.identity import build_auth_context
 from app.services.api.widgets.simulator.workbench_routes import (
     _cancel_batch,
@@ -27,7 +28,6 @@ from app.services.api.widgets.simulator.workbench_schemas import (
     StepRequest,
     ViewportQuery,
 )
-from app.utils import generate_id
 from fastapi import HTTPException
 
 

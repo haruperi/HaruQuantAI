@@ -17,11 +17,11 @@ import threading
 from collections.abc import Callable
 from typing import Any, cast
 
+from app.composition.logging import get_logger
 from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

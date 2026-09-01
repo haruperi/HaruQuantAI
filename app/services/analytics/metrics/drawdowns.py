@@ -6,6 +6,7 @@ import math
 from datetime import datetime
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
@@ -15,7 +16,6 @@ from app.services.analytics.contracts.models import (
     SectionEvidence,
     TradingResult,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

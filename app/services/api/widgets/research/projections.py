@@ -12,7 +12,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Final, cast
 
-from app.utils import get_logger, to_json_safe
+from app.composition.logging import get_logger
+from app.kernel.serialization import to_json_safe
 
 logger = get_logger(__name__)
 

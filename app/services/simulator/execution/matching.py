@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict
 
+from app.composition.logging import get_logger
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.execution.lifecycle import resolve_fill_remainder
 from app.services.simulator.execution.pricing import ExecutionProfile, price_order
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

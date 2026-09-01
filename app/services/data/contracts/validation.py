@@ -1,7 +1,8 @@
 """Private validation helpers shared by canonical DATA request boundaries."""
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id, validate_id
 from app.services.data.contracts.errors import DataError
-from app.utils import generate_id, get_logger, validate_id
 
 logger = get_logger(__name__)
 

@@ -19,6 +19,8 @@ _project_root = str(Path(__file__).resolve().parents[2])
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
+from app.composition.config import load_broker_provider_settings
+from app.kernel.identity import generate_id
 from app.services.api import resolve_system_credential_slot
 from app.services.brokers import (
     build_broker_margin_request,
@@ -61,7 +63,6 @@ from app.services.trading import (
     start_live_session,
     stop_live_session,
 )
-from app.utils import generate_id, load_broker_provider_settings
 
 Target = Literal["sim", "mt5", "ctrader"]
 EXECUTION_TARGET: Target = "mt5"

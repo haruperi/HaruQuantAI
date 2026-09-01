@@ -20,6 +20,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal, Protocol, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -43,7 +46,6 @@ from app.services.data.time_sessions.contracts import (
     ScheduleRequest,
 )
 from app.services.data.time_sessions.market_hours import evaluate_market_hours
-from app.utils import generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

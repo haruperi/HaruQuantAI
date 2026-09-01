@@ -7,9 +7,9 @@ from collections import Counter, deque
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 
+from app.composition.logging import get_logger
 from app.services.api.contracts import StreamEvent
 from app.services.api.contracts.models import StreamEventType
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

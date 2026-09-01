@@ -25,7 +25,7 @@ from app.agentic import (
     validate_transition,
 )
 from app.agentic.orchestration import AgenticWorkflowStore
-from app.utils import derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
 from pydantic import ValidationError
 
 from tests.agentic.fixtures import NOW

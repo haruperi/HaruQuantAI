@@ -9,11 +9,11 @@ from typing import cast
 
 from typing_extensions import TypedDict
 
+from app.composition.logging import get_logger
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.asset_classifier import OTHER, classify_symbol
 from app.services.data.market_data.directory_contracts import MarketDirectoryRow
 from app.services.data.market_data.snapshot import MarketSnapshot, get_market_snapshot
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

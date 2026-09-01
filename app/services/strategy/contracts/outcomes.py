@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Literal, NoReturn, TypeVar
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts.references import (  # noqa: TC001
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
@@ -16,7 +17,6 @@ from app.services.strategy.contracts.responses import (
     StrategyOperationError,
     unwrap_strategy_response,
 )
-from app.utils import get_logger
 
 type StandardResponse[T] = Any
 

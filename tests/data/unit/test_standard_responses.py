@@ -14,6 +14,8 @@ from decimal import Decimal
 from types import MappingProxyType
 
 import pytest
+from app.contracts.common.models import StandardResponse
+from app.kernel.identity import generate_id
 from app.services.data.contracts.errors import DATA_ERROR_MANIFEST, DataError
 from app.services.data.contracts.responses import (
     OPERATION_TRAITS,
@@ -26,8 +28,6 @@ from app.services.data.contracts.responses import (
     run_data_operation_async,
     unwrap_data_response,
 )
-from app.utils import generate_id
-from app.utils.responses.models import StandardResponse
 
 _OPERATION = "data.quality.get_quality_policy"
 _REQ = "req-11111111-1111-4111-8111-111111111111"
@@ -247,9 +247,9 @@ def test_every_current_data_code_appears_exactly_once() -> None:
 
 def test_unapproved_code_is_rejected() -> None:
     """A code absent from the catalogue fails validation at the factory."""
-    from app.utils.errors.exceptions import ValidationError
+    from app.contracts.common.models import ResponseMetadata
+    from app.kernel.errors import ValidationError
     from app.utils.responses.factories import error_response
-    from app.utils.responses.models import ResponseMetadata
 
     metadata = ResponseMetadata(
         name=_OPERATION,

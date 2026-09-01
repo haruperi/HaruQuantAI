@@ -13,6 +13,10 @@ from typing import TYPE_CHECKING
 
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_audit_event
+from app.kernel.identity import derive_stable_id, generate_id
+from app.kernel.time import utc_now
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -32,13 +36,6 @@ from app.services.data.persistence.dataset_writer import (
     resolve_data_root,
 )
 from app.services.data.persistence.locking import _acquire_write_lock_raw
-from app.utils import (
-    create_audit_event,
-    derive_stable_id,
-    generate_id,
-    get_logger,
-    utc_now,
-)
 
 logger = get_logger(__name__)
 

@@ -5,6 +5,7 @@ import sys
 from collections.abc import Iterator
 
 import pytest
+from app.composition.config import load_broker_provider_settings
 from app.services.brokers import (
     build_broker_connection_config,
     connect_broker,
@@ -13,7 +14,6 @@ from app.services.brokers import (
     get_broker_id,
     get_broker_value_field,
 )
-from app.utils import load_broker_provider_settings
 
 
 @pytest.fixture(autouse=True)

@@ -6,6 +6,9 @@ from collections.abc import Mapping
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     build_statement_plan,
     build_transaction_request,
@@ -18,7 +21,6 @@ from app.services.optimization.state.contracts import (
     OptimizationCheckpoint,
     OptimizationPersistenceReceipt,
 )
-from app.utils import canonical_json, generate_id, get_logger
 
 logger = get_logger(__name__)
 

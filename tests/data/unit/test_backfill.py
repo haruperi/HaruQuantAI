@@ -6,6 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_quality_report,
     build_market_dataset,
@@ -18,7 +19,6 @@ from app.services.data.data_jobs.contracts import (
     BackfillChunkResult,
 )
 from app.services.data.sources import composition
-from app.utils import generate_id
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(minutes=1)

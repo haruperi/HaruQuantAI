@@ -8,6 +8,8 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.portfolio import (
     create_portfolio_handle,
     create_portfolio_value,
@@ -21,7 +23,6 @@ from app.services.simulator import (
     dump_simulation_value,
     unwrap_simulation_response,
 )
-from app.utils import canonical_digest, get_logger
 
 from tests.portfolio.unit.test_allocation import (
     _activator,

@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Annotated, Final, NoReturn
 from fastapi import APIRouter, Cookie, Header, HTTPException, Request, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.api.contracts import ROUTE_CONTRACT_REGISTRY
 from app.services.api.identity import (
     IdentityError,
@@ -18,7 +20,6 @@ from app.services.api.identity import (
 )
 from app.services.api.widgets.settings.account_mode import resolve_runtime_profile
 from app.services.api.widgets.settings.bootstrap import get_api_settings
-from app.utils import generate_id, get_logger
 
 if TYPE_CHECKING:
     from app.services.api.identity.sessions import SessionCredential

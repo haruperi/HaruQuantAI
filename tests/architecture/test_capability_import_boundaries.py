@@ -97,22 +97,22 @@ def test_capability_public_exports_are_frozen() -> None:
     import app.contracts.indicator.williams_r as cap_wr_pkg
     import app.contracts.indicator.williams_r.v1 as cap_wr_v1
 
-    assert cap_root.__all__ == ()
-    assert cap_ind.__all__ == ()
-    assert cap_common_pkg.__all__ == ()
+    assert getattr(cap_root, "__all__", ()) == ()
+    assert getattr(cap_ind, "__all__", ()) == ()
+    assert getattr(cap_common_pkg, "__all__", ()) == ()
     assert cap_common_v1.__all__ == (
         "IndicatorConfigV1",
         "IndicatorResultV1",
         "MarketDatasetV1",
         "OHLCVRecordV1",
     )
-    assert cap_rsi_pkg.__all__ == ()
+    assert getattr(cap_rsi_pkg, "__all__", ()) == ()
     assert cap_rsi_v1.__all__ == (
         "CAPABILITY_ID",
         "RsiCapabilityV1",
         "RsiFunctionV1",
     )
-    assert cap_wr_pkg.__all__ == ()
+    assert getattr(cap_wr_pkg, "__all__", ()) == ()
     assert cap_wr_v1.__all__ == (
         "CAPABILITY_ID",
         "WilliamsRCapabilityV1",

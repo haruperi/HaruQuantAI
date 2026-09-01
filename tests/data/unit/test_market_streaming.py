@@ -10,6 +10,7 @@ from typing import Any
 
 import app.services.brokers as brokers_root
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_auction_payload,
     build_corporate_action_payload,
@@ -31,7 +32,6 @@ from app.services.data.market_events.subscriptions import (
     _StreamHub,
     stream_market_data,
 )
-from app.utils import generate_id
 
 _NOW = datetime(2026, 8, 3, 12, tzinfo=UTC)
 

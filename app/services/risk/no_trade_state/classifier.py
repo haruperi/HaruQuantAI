@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Sequence
 from datetime import datetime
 
+from app.composition.logging import get_logger
 from app.services.risk.contracts.responses import guard_risk_boundary
 from app.services.risk.no_trade_state.models import build_no_trade_outcome
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -7,12 +7,13 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_statement_plan,
     build_transaction_request,
     execute_transaction,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 type _Codec = tuple[Callable[[object], str], Callable[[str], object]]

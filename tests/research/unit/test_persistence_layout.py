@@ -4,8 +4,8 @@ import importlib
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.research.persistence.create import create_artifact_metadata
-from app.utils import generate_id
 
 
 def test_persistence_verbs_match_registered_feature_needs() -> None:

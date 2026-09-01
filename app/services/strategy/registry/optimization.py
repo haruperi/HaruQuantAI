@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.strategy.contracts.outcomes import StrategyMutationResult
 from app.services.strategy.contracts.requests import (
     StrategyParameterUpdateRequest,  # noqa: TC001
@@ -14,7 +16,6 @@ from app.services.strategy.contracts.responses import (
 )
 from app.services.strategy.registry._mutations import _mutation_id
 from app.services.strategy.registry.parameters import update_strategy_parameters
-from app.utils import canonical_digest, get_logger
 
 logger = get_logger(__name__)
 

@@ -8,11 +8,11 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import app.services.brokers as brokers_root
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_market_snapshot_stream_request,
     stream_market_snapshots,
 )
-from app.utils import generate_id
 
 
 def test_snapshot_stream_filters_atomically_and_calculates_spread(

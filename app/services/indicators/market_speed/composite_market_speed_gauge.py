@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
@@ -41,7 +42,6 @@ from app.services.indicators.market_speed.volatility_expansion_rate import (
 from app.services.indicators.market_speed.volume_acceleration import (
     volume_acceleration as _volume_acceleration,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -21,11 +21,13 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Final, Literal, Protocol, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.api.widgets.research.projections import (
     hydrate_report,
     project_report,
 )
-from app.utils import generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

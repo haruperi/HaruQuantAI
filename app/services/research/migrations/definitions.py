@@ -15,11 +15,11 @@ from __future__ import annotations
 
 import hashlib
 
+from app.composition.logging import get_logger
 from app.services.data import build_migration_request, build_migration_step
 from app.services.research.contracts.errors import (
     ConfigurationError,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

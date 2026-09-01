@@ -15,8 +15,9 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
+from app.kernel.identity import validate_id
 from app.services.strategy import create_trade_intent_value
-from app.utils import get_logger, validate_id
 
 logger = get_logger(__name__)
 

@@ -5,13 +5,13 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
+from app.composition.logging import get_logger
 from app.services.risk import get_decision_state
 from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,
     TradingError,
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import get_logger
 
 type StandardResponse[T] = Any
 AllocationRiskDecision = Any

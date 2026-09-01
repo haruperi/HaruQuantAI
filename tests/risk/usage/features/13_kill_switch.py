@@ -14,6 +14,9 @@ from typing import Any, Literal
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     apply_kill_switch_command,
     check_risk_kill_switch,
@@ -23,7 +26,6 @@ from app.services.risk import (
     create_risk_audit_chain,
     create_risk_config,
 )
-from app.utils import canonical_json, create_auth_context, generate_id
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)

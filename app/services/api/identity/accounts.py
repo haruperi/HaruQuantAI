@@ -10,6 +10,9 @@ from typing import Literal, Self, cast
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.time import utc_now
 from app.services.api.identity.errors import IdentityError
 from app.services.api.identity.passwords import hash_password, verify_password
 from app.services.api.identity.persistence import (
@@ -22,7 +25,6 @@ from app.services.api.identity.persistence import (
     update_account_last_login,
     update_auth_failure_record,
 )
-from app.utils import derive_stable_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

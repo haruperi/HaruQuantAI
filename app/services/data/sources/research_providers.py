@@ -8,6 +8,7 @@ from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
+from app.kernel.serialization import canonical_digest
 from app.services.data.contracts.errors import DataError
 from app.services.data.persistence import (
     create_research_source_record,
@@ -19,7 +20,6 @@ from app.services.data.sources.research_ingestion import (
 from app.services.data.sources.research_observations import (
     persist_research_source_observations,
 )
-from app.utils import canonical_digest
 
 if TYPE_CHECKING:
     from app.services.data.sources.research_contracts import (

@@ -3,6 +3,7 @@
 from datetime import UTC, date, datetime, time, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -16,7 +17,6 @@ from app.services.data.time_sessions.contracts import (
     WeeklyHoliday,
     WeeklyScheduleDefinition,
 )
-from app.utils import generate_id
 
 
 class WeeklyScheduleProvider:

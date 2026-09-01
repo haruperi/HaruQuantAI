@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     compare_to_null,
     create_research_value,
@@ -11,7 +12,6 @@ from app.services.research import (
     is_research_value,
     run_eds_null_baseline,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

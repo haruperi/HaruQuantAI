@@ -7,6 +7,8 @@ from typing import Literal, cast
 
 from pydantic import BaseModel
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.risk.contracts import (
     AllocationRiskDecision,
     KillSwitchState,
@@ -31,7 +33,6 @@ from app.services.risk.persistence import (
     update_active_allocation_record,
     update_kill_switch_with_audit,
 )
-from app.utils import canonical_digest, get_logger
 
 logger = get_logger(__name__)
 _MAX_DECISION_PAGE = 200

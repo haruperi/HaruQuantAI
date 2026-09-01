@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from decimal import Decimal
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_feed_config,
@@ -28,7 +29,6 @@ from app.services.data import (
     start_internal_feed,
     unwrap_data_response,
 )
-from app.utils import generate_id
 
 _END = datetime.now(UTC)
 _START = _END - timedelta(days=5)

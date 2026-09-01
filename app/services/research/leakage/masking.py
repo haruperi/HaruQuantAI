@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import is_sensitive_key
 from app.services.research.contracts.errors import (
     SecurityError,
 )
-from app.utils import get_logger, is_sensitive_key
 
 logger = get_logger(__name__)
 

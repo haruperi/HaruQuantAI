@@ -27,9 +27,10 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Final, Literal, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.api.identity import get_system_settings
 from app.services.api.widgets.settings.bootstrap import get_api_settings
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

@@ -7,13 +7,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from app.kernel.identity import generate_id
 from app.services.api import (
     get_default_watchlist_symbols,
     list_account_watchlists,
     run_api_migrations,
 )
 from app.services.api.identity.persistence.read import read_account_record
-from app.utils import generate_id
 
 
 def main() -> None:

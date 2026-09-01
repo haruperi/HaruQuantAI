@@ -5,6 +5,8 @@ from __future__ import annotations
 import itertools
 from collections.abc import Iterator
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.optimization.parameters import (
     ParameterKind,
     ParameterRange,
@@ -14,7 +16,6 @@ from app.services.optimization.parameters import (
     get_executable_parameters,
     validate_parameter_space,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

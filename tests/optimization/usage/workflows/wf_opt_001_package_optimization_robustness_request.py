@@ -8,8 +8,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.composition.logging import flush_logging
 from app.services.optimization import run_parameter_sweep, run_robustness_analysis
-from app.utils import flush_logging
 from tests.optimization.usage._support import (
     genuine_execution_bundle,
     monte_carlo_request,

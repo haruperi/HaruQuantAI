@@ -11,6 +11,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_replay_package,
@@ -19,7 +20,6 @@ from app.services.data import (
     run_data_migrations,
     stream_replay_events,
 )
-from app.utils import generate_id
 
 
 def _header(title: str) -> None:

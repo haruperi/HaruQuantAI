@@ -4,6 +4,7 @@ from datetime import timedelta
 from decimal import Decimal
 from typing import Any, Literal
 
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     apply_kill_switch_command,
     compute_config_hash,
@@ -16,7 +17,6 @@ from app.services.risk import (
     issue_risk_approval_token,
     review_trade_risk,
 )
-from app.utils import canonical_json
 
 from tests.risk import _support as approval_examples
 from tests.risk import _support as decision_examples

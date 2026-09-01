@@ -6,13 +6,13 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     apply_kill_switch_command,
     check_risk_kill_switch,
     create_kill_switch_command,
     create_risk_audit_chain,
 )
-from app.utils import canonical_json
 from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 
 WORKFLOW_ID = "WF-RISK-SEC"

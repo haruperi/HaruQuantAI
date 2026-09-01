@@ -9,11 +9,12 @@ was never exercised.
 # ruff: noqa: PT018
 from datetime import timedelta
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.strategy import (
     get_strategy_timing_policy,
     run_vectorized_strategy_signals,
 )
-from app.utils import canonical_digest, get_logger
 
 from tests.strategy.unit.test_models import (
     NOW,

@@ -21,8 +21,8 @@ from app.agentic.agents.experimentation.simulation_interpreter import (
     interpret_analytics_evidence,
 )
 from app.agentic.runtime import ModelOutcome
+from app.kernel.identity import derive_stable_id, generate_id
 from app.services.analytics import validate_contract_version
-from app.utils import derive_stable_id, generate_id
 
 from tests.agentic.fixtures import (
     NOW,

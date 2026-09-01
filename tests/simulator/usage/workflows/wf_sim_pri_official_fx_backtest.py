@@ -10,6 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.serialization import canonical_digest
 from app.services.simulator import (
     build_tick_timeline,
     create_simulation_value,
@@ -19,7 +20,6 @@ from app.services.simulator import (
     validate_market_data,
     validate_run_inputs,
 )
-from app.utils import canonical_digest
 from tests.simulator.usage.workflows._support import (
     authority,
     backtest_request,

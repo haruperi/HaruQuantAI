@@ -16,6 +16,9 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_audit_event
+from app.kernel.identity import generate_id
 from app.services.data._settings import get_data_settings
 from app.services.data.contracts import (
     DataError,
@@ -40,7 +43,6 @@ from app.services.data.persistence.contracts import (
     StorageManifest,
 )
 from app.services.data.persistence.dataset_writer import _save_dataset_raw
-from app.utils import create_audit_event, generate_id, get_logger
 
 logger = get_logger(__name__)
 

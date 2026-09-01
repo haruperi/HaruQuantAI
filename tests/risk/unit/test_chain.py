@@ -5,11 +5,11 @@ from decimal import Decimal
 from typing import Literal
 
 import pytest
+from app.kernel.serialization import canonical_json
 from app.services.risk.audit import RiskAuditChain
 from app.services.risk.config import RiskConfig
 from app.services.risk.contracts import RiskAuditRecord, RiskDomainError, RiskErrorCode
 from app.services.risk.contracts.responses import unwrap_risk_response
-from app.utils import canonical_json
 
 NOW = datetime(2026, 7, 19, tzinfo=UTC)
 

@@ -19,9 +19,9 @@ from typing import Literal
 
 from pydantic import field_serializer, field_validator, model_validator
 
+from app.composition.logging import get_logger
 from app.services.data.contracts._base import FrozenContract as _SymbolContract
 from app.services.data.contracts._base import TracedOpenContract as _ReferenceContract
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

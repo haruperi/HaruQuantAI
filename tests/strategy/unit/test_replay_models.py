@@ -1,9 +1,9 @@
 """Strategy replay contract tests."""
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy.checkpoints.models import StrategyCheckpoint
 from app.services.strategy.replay.models import StrategyReplayManifest
-from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_models import COR, HASH, NOW, REQ, WF

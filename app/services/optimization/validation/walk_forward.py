@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from itertools import pairwise
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.optimization.contracts import OptimizationError
 from app.services.optimization.execution import (
     BacktestExecutionAdapter,
@@ -21,7 +23,6 @@ from app.services.optimization.validation.contracts import (
     WalkForwardResult,
 )
 from app.services.optimization.validation.splits import build_time_series_splits
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

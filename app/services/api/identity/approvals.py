@@ -7,13 +7,16 @@ from datetime import datetime, timedelta
 
 from pydantic import BaseModel, ConfigDict
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.serialization import canonical_json
+from app.kernel.time import utc_now
 from app.services.api.identity.errors import IdentityError
 from app.services.api.identity.persistence import (
     consume_approval_record,
     create_approval_record,
     read_approval_record,
 )
-from app.utils import canonical_json, derive_stable_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

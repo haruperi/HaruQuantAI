@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.strategy.contracts.references import (
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
@@ -22,7 +24,6 @@ from app.services.strategy.proposal_intake.results import (
 )
 from app.services.strategy.registry.configuration import validate_strategy_config
 from app.services.strategy.registry.resolution import validate_strategy_ref
-from app.utils import canonical_digest, get_logger
 
 if TYPE_CHECKING:
     from app.services.strategy.contracts.execution import StrategyExecutionContext

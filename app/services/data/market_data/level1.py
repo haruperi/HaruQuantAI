@@ -14,6 +14,8 @@ from typing import TYPE_CHECKING, cast
 
 from pydantic import field_validator
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data.contracts._base import TracedOpenContract as _Contract
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -22,7 +24,6 @@ from app.services.data.contracts.responses import (
 )
 from app.services.data.market_data.pipeline import _fetch_market_dataset_raw
 from app.services.data.market_data.requests import MarketDataRequest
-from app.utils import generate_id, get_logger
 
 if TYPE_CHECKING:
     from app.services.data.contracts.records import TickRecord

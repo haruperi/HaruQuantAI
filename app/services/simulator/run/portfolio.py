@@ -7,6 +7,8 @@ from decimal import Decimal
 from hashlib import sha256
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.simulator.accounting import validate_fx_evidence
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.journal import JournalWriter
@@ -25,7 +27,6 @@ from app.services.simulator.run.orchestrator import (
     _run_backtest_with_evidence_async,
     _write_completed_text,
 )
-from app.utils import canonical_digest, canonical_json, get_logger
 
 type AuthContext = Any
 

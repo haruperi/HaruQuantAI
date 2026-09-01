@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from app.composition.logging import get_logger
 from app.services.optimization.evidence.contracts import (
     OptimizationResult,  # noqa: TC001
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

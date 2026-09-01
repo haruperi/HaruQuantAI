@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
+from app.composition.logging import get_logger
 from app.services.simulator.checklists.contracts import (
     ChecklistDefinition,
     ChecklistRuntime,
@@ -15,7 +16,6 @@ from app.services.simulator.checklists.contracts import (
 )
 from app.services.simulator.checklists.policies import get_simulation_mode_policy
 from app.services.simulator.errors import SimulationError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

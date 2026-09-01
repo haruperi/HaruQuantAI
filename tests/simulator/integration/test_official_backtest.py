@@ -7,13 +7,13 @@ from decimal import Decimal
 from pathlib import Path
 from time import perf_counter
 
+from app.composition.logging import get_logger
 from app.services.data import (
     build_data_quality_report,
     build_market_dataset,
     build_tick_record,
 )
 from app.services.simulator import run_backtest_async, unwrap_simulation_response
-from app.utils import get_logger
 
 from tests.simulator.component.test_orchestrator import (
     FakeDependencies,

@@ -14,12 +14,12 @@ from datetime import UTC, datetime, time
 from typing import Final, override
 from zoneinfo import ZoneInfo
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.economic_calendar.firecrawl_transport import (
     _week_params_covering,
 )
 from app.services.data.economic_calendar.scraper import CalendarTransport
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

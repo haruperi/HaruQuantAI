@@ -4,12 +4,12 @@ from collections.abc import Mapping
 from decimal import Decimal, InvalidOperation
 from typing import Any, Literal
 
+from app.composition.logging import get_logger
 from app.services.trading.contracts import OrderIntent, TradingError
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import get_logger
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

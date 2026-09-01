@@ -7,6 +7,7 @@ import struct
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data._settings import DataSettings, data_settings_context
 from app.services.data.contracts import DataError
 from app.services.data.sqx_source.reader import (
@@ -14,7 +15,6 @@ from app.services.data.sqx_source.reader import (
     read_sqx_m1,
     read_sqx_ticks,
 )
-from app.utils import generate_id
 
 _REQUEST_ID = "req-00000000-0000-4000-8000-000000000000"
 _OP_SUB = 0

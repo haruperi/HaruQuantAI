@@ -14,6 +14,8 @@ from pathlib import Path
 from random import Random
 from typing import TYPE_CHECKING, Any, NamedTuple, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import (
@@ -32,7 +34,6 @@ from app.services.data.persistence.paths import resolve_approved_storage_path
 from app.services.data.time_sessions.timeframes import (
     _get_timeframe_spec_raw as get_timeframe_spec,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

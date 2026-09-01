@@ -5,11 +5,11 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
 from app.services.research.contracts import ResearchWarning
 from app.services.research.market_structure.profile import (
     canonical_structure_score,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

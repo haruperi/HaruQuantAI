@@ -10,6 +10,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
 from app.services.research import (
     create_research_value,
     mask_research_artifact,
@@ -17,7 +18,6 @@ from app.services.research import (
     run_edge_lab_profile,
     write_research_artifact,
 )
-from app.utils import create_auth_context
 from tests.research._support import make_edge_lab_config
 from tests.research.usage.workflows._support import limits, live_market_dataset
 

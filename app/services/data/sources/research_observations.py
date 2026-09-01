@@ -6,6 +6,7 @@ import json
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 
+from app.kernel.serialization import canonical_digest
 from app.services.data.contracts.errors import DataError
 from app.services.data.persistence import (
     create_research_observation_record,
@@ -13,7 +14,6 @@ from app.services.data.persistence import (
     read_research_observation_records,
 )
 from app.services.data.sources.research_contracts import ResearchSourceObservation
-from app.utils import canonical_digest
 
 _MAX_OBSERVATIONS = 200
 

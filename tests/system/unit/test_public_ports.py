@@ -8,7 +8,6 @@ import pytest
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 _APP_ROOT = _REPOSITORY_ROOT / "app"
 _DOMAIN_PORTS = (
-    "app.utils",
     "app.services.brokers",
     "app.services.data",
     "app.services.indicators",

@@ -14,6 +14,7 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts._base import (
     JsonValue,
     _Contract,
@@ -24,7 +25,6 @@ from app.services.strategy.contracts._base import (
     _thaw_json,
     _utc,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

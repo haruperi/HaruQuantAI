@@ -3,6 +3,8 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest
 from app.services.data import (
     get_provider_specification_revision,
     register_provider_specification_revision,
@@ -13,7 +15,6 @@ from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.datasets.migrations import (
     PROVIDER_SPECIFICATION_MIGRATION_STEP,
 )
-from app.utils import canonical_digest, generate_id
 
 _OBSERVED = datetime(2026, 8, 15, 10, tzinfo=UTC)
 

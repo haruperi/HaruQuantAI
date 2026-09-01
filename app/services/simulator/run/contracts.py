@@ -17,12 +17,9 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.simulator.errors import guard_operation
-from app.utils import (
-    canonical_digest,
-    canonical_json,
-    get_logger,
-)
 
 type StandardResponse[T] = Any
 

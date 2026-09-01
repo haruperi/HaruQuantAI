@@ -6,6 +6,7 @@ from decimal import Decimal
 from hashlib import sha256
 
 import pytest
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     create_allocation_risk_decision,
     create_portfolio_budget_execution_verdict,
@@ -23,7 +24,6 @@ from app.services.trading.state import (
     create_execution_position_store,
     set_execution_position,
 )
-from app.utils import canonical_json
 from pydantic import ValidationError
 
 from tests.trading.unit.actions.test_dependencies import (

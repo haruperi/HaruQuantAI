@@ -9,13 +9,13 @@ from decimal import Decimal
 
 import app.services.brokers as brokers_root
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_market_depth_stream_request,
     stream_market_depth,
 )
 from app.services.data.contracts import DataError
 from app.services.data.market_events import mt5_depth
-from app.utils import generate_id
 
 
 def test_depth_stream_filters_atomically_without_synthesizing_missing_levels(

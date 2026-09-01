@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.api import (
     authenticate_api_user,
     build_api_settings,
@@ -32,7 +33,6 @@ from app.services.data import (
     data_settings_context,
     list_composable_sources,
 )
-from app.utils import generate_id
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
 

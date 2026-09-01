@@ -8,8 +8,8 @@ from collections.abc import Mapping
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
+from app.kernel.redaction import is_sensitive_key
 from app.services.api.observability.errors import SecurityError, ValidationError
-from app.utils import is_sensitive_key
 
 if TYPE_CHECKING:
     from app.services.api.observability.sinks import MetricSink

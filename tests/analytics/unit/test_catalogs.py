@@ -3,6 +3,7 @@
 from types import MappingProxyType
 
 import pytest
+from app.composition.logging import get_logger
 from app.services import analytics
 from app.services.analytics.contracts import (
     EVIDENCE_CATALOG,
@@ -11,7 +12,6 @@ from app.services.analytics.contracts import (
     validate_contract_version,
     validate_metric_catalog,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

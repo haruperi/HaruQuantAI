@@ -6,8 +6,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-import _support  # noqa: F401
 from app.services.brokers import normalize_broker_event_envelope
+
+import _support  # noqa: F401
 
 
 def fr_brokers_151_event_normalization() -> None:

@@ -13,6 +13,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord
@@ -25,7 +27,6 @@ from app.services.data.time_sessions.timeframes import (
     _get_timeframe_spec_raw,
     _validate_resample_target_raw,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

@@ -6,6 +6,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.economic_calendar import (
@@ -21,7 +22,6 @@ from app.services.data.economic_calendar import (
     populate_market_context_calendar,
 )
 from app.services.data.evidence.market_context_contracts import MarketContextEvidence
-from app.utils import generate_id
 
 _NOW = datetime(2026, 7, 26, 12, tzinfo=UTC)
 

@@ -8,6 +8,8 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal, cast
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.risk.contracts import RiskApprovalToken
 from app.services.risk.persistence import (
     create_approval_state_record,
@@ -17,7 +19,6 @@ from app.services.risk.persistence import (
     read_approval_state_record_with_revision,
     update_approval_state_record,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 type _State = dict[str, object]

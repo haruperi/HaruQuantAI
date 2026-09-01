@@ -18,6 +18,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     build_data_quality_report,
     build_data_settings,
@@ -47,7 +48,6 @@ from app.services.strategy import (
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
 )
-from app.utils import canonical_json
 
 _UNAVAILABLE = 3
 _AUDIT_BARS = 10

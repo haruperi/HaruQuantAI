@@ -4,8 +4,10 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_audit_event
+from app.kernel.identity import generate_id
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
-from app.utils import create_audit_event, generate_id, get_logger
 
 type AuthContext = Any
 

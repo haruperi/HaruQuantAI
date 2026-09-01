@@ -1,6 +1,6 @@
 """Owner-authored unavailable Analytics dashboard snapshots."""
 
-from app.utils import utc_now
+from app.kernel.time import utc_now
 
 
 def get_analytics_dashboard_snapshot(view: str) -> dict[str, object]:

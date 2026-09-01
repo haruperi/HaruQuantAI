@@ -10,6 +10,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from app.kernel.serialization import to_json_safe
 from app.services.portfolio._settings import PortfolioSettings, RebalanceSchedule
 from app.services.portfolio.allocation.service import AllocationService
 from app.services.portfolio.api.service import PortfolioService
@@ -48,7 +49,6 @@ from app.services.portfolio.rebalancing.cross_account import (
 )
 from app.services.portfolio.rebalancing.service import RebalancingService
 from app.services.portfolio.state.repository import PortfolioRepository
-from app.utils import to_json_safe
 
 _VALUE_TYPES = MappingProxyType(
     {

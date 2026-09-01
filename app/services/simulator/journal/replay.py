@@ -9,9 +9,10 @@ from types import MappingProxyType
 
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.journal.contracts import JournalEvent
-from app.utils import canonical_digest, canonical_json, get_logger
 
 logger = get_logger(__name__)
 

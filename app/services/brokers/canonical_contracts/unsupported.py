@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from app.kernel.time import utc_now
 from app.services.brokers.canonical_contracts.enums import (
     BrokerCapabilityId,
     BrokerEnvironment,
@@ -16,7 +17,6 @@ from app.services.brokers.canonical_contracts.responses import (
     broker_start_time,
     build_broker_response,
 )
-from app.utils import utc_now
 
 if TYPE_CHECKING:
     from app.services.brokers.canonical_contracts.responses import StandardResponse

@@ -6,6 +6,9 @@ from decimal import Decimal
 from hashlib import sha256
 from typing import cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.analytics import (
     AnalyticsRunConfig,
     PerformanceReport,
@@ -21,7 +24,6 @@ from app.services.data import (
     build_market_dataset,
     build_ohlcv_record,
 )
-from app.utils import canonical_json, generate_id, get_logger
 
 logger = get_logger(__name__)
 

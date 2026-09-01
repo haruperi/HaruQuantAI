@@ -18,6 +18,7 @@ import yaml
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import build_data_settings, data_settings_context
 from app.services.risk import (
     build_development_risk_config,
@@ -34,7 +35,6 @@ from app.services.risk import (
     register_risk_policy,
     run_risk_migrations,
 )
-from app.utils import generate_id
 from tests.risk._support import unwrap_risk_response
 
 

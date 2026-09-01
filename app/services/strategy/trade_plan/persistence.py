@@ -4,11 +4,12 @@ import json
 from collections.abc import Mapping
 from typing import Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, to_json_safe
 from app.services.strategy.persistence import (
     create_strategy_plan_record,
     read_strategy_plans,
 )
-from app.utils import canonical_digest, get_logger, to_json_safe
 
 logger = get_logger(__name__)
 

@@ -16,8 +16,8 @@ from typing import Literal
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.errors import AnalyticsValidationError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -313,7 +313,7 @@ def compute_reproducibility_hash(
     """
     from hashlib import sha256
 
-    from app.utils import canonical_json
+    from app.kernel.serialization import canonical_json
 
     material = {
         "contract_version": SCORING_CONTRACT_VERSION,

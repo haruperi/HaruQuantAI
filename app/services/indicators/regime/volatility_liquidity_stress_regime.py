@@ -25,6 +25,7 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.indicators.core.contracts import IndicatorConfig
 from app.services.indicators.core.errors import (
     IndicatorError,
@@ -40,7 +41,6 @@ from app.services.indicators.liquidity.amihud_illiquidity import (
 from app.services.indicators.volatility.volatility_percentile import (
     volatility_percentile as _volatility_percentile,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

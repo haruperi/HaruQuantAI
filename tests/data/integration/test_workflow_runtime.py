@@ -8,6 +8,8 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
 from app.services.data import (
     aggregate_ticks_to_bars,
     align_multitimeframe_data,
@@ -64,7 +66,6 @@ from app.services.data import (
     to_ohlcv_dataframe,
     unwrap_data_response,
 )
-from app.utils import create_auth_context, generate_id
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 END = START + timedelta(minutes=1)

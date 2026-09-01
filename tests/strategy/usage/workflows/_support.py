@@ -13,6 +13,8 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_quality_report,
     build_data_settings,
@@ -41,7 +43,6 @@ from app.services.strategy import (
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
 )
-from app.utils import create_auth_context, generate_id
 
 HASH = "a" * 64
 CONFIG_HASH = "b" * 64

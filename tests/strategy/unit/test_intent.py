@@ -3,8 +3,8 @@
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy import create_trade_intent_value
-from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.strategy.unit.test_models import HASH, NOW

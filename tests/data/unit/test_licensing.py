@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.sources.contracts import SourceDescriptor, SourceLicensePolicy
 from app.services.data.sources.licensing import enforce_license, get_attribution_text
-from app.utils import generate_id
 
 
 def _make_descriptor(

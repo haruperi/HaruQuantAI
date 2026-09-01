@@ -772,6 +772,30 @@ class _RouteFilter(logging.Filter):
         super().__init__()
         self._route = route
 
+    def _matches_access(self, record: logging.LogRecord) -> bool:
+        """Check whether record represents access telemetry."""
+        if getattr(record, "log_type", None) == "access":
+            return True
+        event = getattr(record, "event", "")
+        if isinstance(event, str) and (
+            event.upper() in {"ACCESS", "HTTP_REQUEST", "API_REQUEST"}
+            or event == "api.request_telemetry"
+        ):
+            return True
+        if "api.request_telemetry" in str(getattr(record, "msg", "")):
+            return True
+        fields = getattr(record, "fields", None)
+        if (
+            isinstance(fields, Mapping)
+            and cast("Mapping[str, object]", fields).get("log_type") == "access"
+        ):
+            return True
+        context = getattr(record, "context", None)
+        return bool(
+            isinstance(context, Mapping)
+            and cast("Mapping[str, object]", context).get("log_type") == "access"
+        )
+
     @override
     def filter(self, record: logging.LogRecord) -> bool:
         """Return whether record matches the route criteria.
@@ -780,20 +804,7 @@ class _RouteFilter(logging.Filter):
             True if record matches route criteria, False otherwise.
         """
         if self._route == "access":
-            if getattr(record, "log_type", None) == "access":
-                return True
-            event = getattr(record, "event", "")
-            if isinstance(event, str) and event.upper() in {
-                "ACCESS",
-                "HTTP_REQUEST",
-                "API_REQUEST",
-            }:
-                return True
-            fields = getattr(record, "fields", None)
-            return bool(
-                isinstance(fields, Mapping)
-                and cast("Mapping[str, object]", fields).get("log_type") == "access"
-            )
+            return self._matches_access(record)
         if self._route == "debug":
             return record.levelno == logging.DEBUG
         if self._route == "error":
@@ -1218,7 +1229,25 @@ def configure_logging(
         ValueError: If configuration is invalid.
         OSError: If a requested file handler cannot be constructed.
     """
-    cfg = config or LoggingConfig()
+    if config is None:
+        import os
+
+        log_dir_env = os.environ.get("LOG_DIRECTORY")
+        level_env = os.environ.get("LOG_LEVEL", "INFO")
+        render_env = os.environ.get("LOG_RENDER", "text")
+        colorize_env = os.environ.get("LOG_COLORIZE", "true").lower() not in {
+            "false",
+            "0",
+            "no",
+        }
+        cfg = LoggingConfig(
+            level=level_env,
+            log_directory=Path(log_dir_env) if log_dir_env else Path("data/logs"),
+            format="json" if render_env == "json" else "text",
+            colorize=colorize_env,
+        )
+    else:
+        cfg = config
     level_name = cfg.normalized_level()
     numeric_level = _VALID_LEVELS[level_name]
     logger_target = target_logger or logging.getLogger()
@@ -1270,6 +1299,253 @@ def configure_logging(
         generation=generation,
         cleanup_diagnostics=stale_diagnostics,
     )
+
+
+_root_logger = logging.getLogger("haruquantai")
+if not _root_logger.handlers:
+    _root_logger.addHandler(logging.NullHandler())
+
+
+class BoundLogger:
+    """Import-safe contextual logger with structured binding."""
+
+    def __init__(
+        self,
+        name: str = "haruquantai",
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize a contextual logger.
+
+        Args:
+            name: Logger hierarchy name.
+            context: Mapping of structured context key-values.
+        """
+        self._name = name
+        self._context = dict(context or {})
+
+    def bind(self, **context: object) -> BoundLogger:
+        """Return a new logger carrying merged structured context.
+
+        Args:
+            **context: Keyword arguments representing structured context key-values.
+
+        Returns:
+            A new BoundLogger instance with the merged context.
+        """
+        merged = dict(self._context)
+        merged.update(context)
+        return BoundLogger(self._name, merged)
+
+    def _emit(
+        self,
+        level: int,
+        message: str,
+        *args: object,
+        exc_info: bool = False,
+        extra_kwargs: Mapping[str, object] | None = None,
+    ) -> None:
+        """Internal emitter that bridges to standard logging child instances.
+
+        Args:
+            level: Numeric logging level.
+            message: Raw log message string.
+            *args: Optional positional arguments for formatting.
+            exc_info: If True, include the current exception traceback.
+            extra_kwargs: Extra context key-values.
+        """
+        caller = sys._getframe(2)  # noqa: SLF001
+        context = dict(self._context)
+        if extra_kwargs:
+            context.update(extra_kwargs)
+        context.update(
+            {
+                "_source_module": caller.f_globals.get(
+                    "__name__",
+                    caller.f_code.co_name,
+                ),
+                "_source_function": caller.f_code.co_name,
+                "_source_line": caller.f_lineno,
+            }
+        )
+        target_logger = logging.getLogger(self._name)
+        target_logger.log(
+            level,
+            message,
+            *args,
+            exc_info=exc_info,
+            extra={"fields": context, **context},
+            stacklevel=3,
+        )
+
+    def debug(self, message: str, *args: object, **kwargs: object) -> None:
+        """Emit a DEBUG record.
+
+        Args:
+            message: Log message string.
+            *args: Positional format arguments.
+            **kwargs: Extra context fields.
+        """
+        self._emit(logging.DEBUG, message, *args, extra_kwargs=kwargs)
+
+    def info(self, message: str, *args: object, **kwargs: object) -> None:
+        """Emit an INFO record.
+
+        Args:
+            message: Log message string.
+            *args: Positional format arguments.
+            **kwargs: Extra context fields.
+        """
+        self._emit(logging.INFO, message, *args, extra_kwargs=kwargs)
+
+    def warning(self, message: str, *args: object, **kwargs: object) -> None:
+        """Emit a WARNING record.
+
+        Args:
+            message: Log message string.
+            *args: Positional format arguments.
+            **kwargs: Extra context fields.
+        """
+        self._emit(logging.WARNING, message, *args, extra_kwargs=kwargs)
+
+    def error(self, message: str, *args: object, **kwargs: object) -> None:
+        """Emit an ERROR record.
+
+        Args:
+            message: Log message string.
+            *args: Positional format arguments.
+            **kwargs: Extra context fields.
+        """
+        self._emit(logging.ERROR, message, *args, extra_kwargs=kwargs)
+
+    def critical(self, message: str, *args: object, **kwargs: object) -> None:
+        """Emit a CRITICAL record.
+
+        Args:
+            message: Log message string.
+            *args: Positional format arguments.
+            **kwargs: Extra context fields.
+        """
+        self._emit(logging.CRITICAL, message, *args, extra_kwargs=kwargs)
+
+    def exception(self, message: str, *args: object, **kwargs: object) -> None:
+        """Emit an ERROR record with the current exception traceback.
+
+        Args:
+            message: Log message string.
+            *args: Positional format arguments.
+            **kwargs: Extra context fields.
+        """
+        self._emit(logging.ERROR, message, *args, exc_info=True, extra_kwargs=kwargs)
+
+
+def get_logger(name: str = "haruquantai") -> BoundLogger:
+    """Return a named child logger without configuring handlers.
+
+    Args:
+        name: Logger name or existing hierarchy child name.
+
+    Returns:
+        Named BoundLogger facade.
+    """
+    if name == "haruquantai" or name.startswith("haruquantai."):
+        return BoundLogger(name)
+    return BoundLogger(f"haruquantai.{name}")
+
+
+logger: BoundLogger = BoundLogger()
+
+
+def log_info(target_or_message: object, *args: object, **kwargs: object) -> None:
+    """Emit an INFO level log record.
+
+    Args:
+        target_or_message: Target logger or log message string.
+        *args: Positional format arguments.
+        **kwargs: Extra context fields.
+    """
+    if isinstance(target_or_message, (logging.Logger, BoundLogger)):
+        msg = str(args[0]) if args else ""
+        target_or_message.info(msg, *args[1:], **kwargs)
+    else:
+        logger.info(str(target_or_message), *args, **kwargs)
+
+
+def log_warning(target_or_message: object, *args: object, **kwargs: object) -> None:
+    """Emit a WARNING level log record.
+
+    Args:
+        target_or_message: Target logger or log message string.
+        *args: Positional format arguments.
+        **kwargs: Extra context fields.
+    """
+    if isinstance(target_or_message, (logging.Logger, BoundLogger)):
+        msg = str(args[0]) if args else ""
+        target_or_message.warning(msg, *args[1:], **kwargs)
+    else:
+        logger.warning(str(target_or_message), *args, **kwargs)
+
+
+def log_error(target_or_message: object, *args: object, **kwargs: object) -> None:
+    """Emit an ERROR level log record.
+
+    Args:
+        target_or_message: Target logger or log message string.
+        *args: Positional format arguments.
+        **kwargs: Extra context fields.
+    """
+    if isinstance(target_or_message, (logging.Logger, BoundLogger)):
+        msg = str(args[0]) if args else ""
+        target_or_message.error(msg, *args[1:], **kwargs)
+    else:
+        logger.error(str(target_or_message), *args, **kwargs)
+
+
+def log_debug(target_or_message: object, *args: object, **kwargs: object) -> None:
+    """Emit a DEBUG level log record.
+
+    Args:
+        target_or_message: Target logger or log message string.
+        *args: Positional format arguments.
+        **kwargs: Extra context fields.
+    """
+    if isinstance(target_or_message, (logging.Logger, BoundLogger)):
+        msg = str(args[0]) if args else ""
+        target_or_message.debug(msg, *args[1:], **kwargs)
+    else:
+        logger.debug(str(target_or_message), *args, **kwargs)
+
+
+def log_exception(target_or_message: object, *args: object, **kwargs: object) -> None:
+    """Emit an EXCEPTION level log record.
+
+    Args:
+        target_or_message: Target logger or log message string.
+        *args: Positional format arguments.
+        **kwargs: Extra context fields.
+    """
+    if isinstance(target_or_message, (logging.Logger, BoundLogger)):
+        msg = str(args[0]) if args else ""
+        target_or_message.exception(msg, *args[1:], **kwargs)
+    else:
+        logger.exception(str(target_or_message), *args, **kwargs)
+
+
+def flush_logging() -> None:
+    """Flush all handlers attached to the root and owned loggers."""
+    root = logging.getLogger()
+    for handler in list(root.handlers):
+        with contextlib.suppress(Exception):
+            handler.flush()
+
+
+def shutdown_logging() -> None:
+    """Flush, close, and remove all handlers attached to the root logger."""
+    root = logging.getLogger()
+    for handler in list(root.handlers):
+        with contextlib.suppress(Exception):
+            handler.flush()
+            handler.close()
+            root.removeHandler(handler)
 
 
 def _run_scenario_1(config: LoggingConfig) -> bool:

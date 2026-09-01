@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Self
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     assess_research_source_eligibility,
     build_data_settings,
@@ -19,7 +20,6 @@ from app.services.data import (
     query_research_sources,
     run_data_migrations,
 )
-from app.utils import generate_id
 
 
 def _settings(tmp_path: Path) -> object:

@@ -10,6 +10,8 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.api.identity import (
     IdentityError,
     finalize_idempotency_key,
@@ -24,7 +26,6 @@ from app.services.api.widgets.event_delivery import (
 from app.services.api.widgets.simulation.schemas import (
     SimulationSessionCreateRequest,  # noqa: TC001 - FastAPI resolves annotations.
 )
-from app.utils import canonical_json, generate_id
 
 type AuthContext = Any
 type _SessionSource = Callable[..., object]

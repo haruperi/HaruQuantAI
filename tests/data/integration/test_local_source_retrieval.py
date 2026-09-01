@@ -14,6 +14,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_quality_report,
     build_data_settings,
@@ -25,7 +26,6 @@ from app.services.data import (
     list_composable_sources,
     resolve_source,
 )
-from app.utils import generate_id
 
 _SYMBOL = "EURUSD"
 _START = datetime(2026, 1, 1, tzinfo=UTC)

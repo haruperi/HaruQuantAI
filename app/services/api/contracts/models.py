@@ -18,11 +18,13 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import is_sensitive_key
+from app.kernel.time import utc_now
 from app.services.api.widgets.settings.limits import (
     MAX_ERROR_DETAILS,
     MAX_ERROR_TEXT_LENGTH,
 )
-from app.utils import get_logger, is_sensitive_key, utc_now
 
 _MAX_VISIBLE_IDS = 200
 _MAX_REFERENCE_LENGTH = 200

@@ -7,6 +7,16 @@ from dataclasses import dataclass
 from time import perf_counter_ns
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import (
+    build_response_metadata,
+    error_response,
+    exception_response,
+    get_execution_ms,
+    success_response,
+)
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest
 from app.services.analytics import get_analytics_value_field
 from app.services.research.contracts import (
     EdgeLabConfig,
@@ -54,16 +64,6 @@ from app.services.research.studies import (
     run_eds_mean_reversion,
     run_eds_session,
     run_eds_trend_persistence,
-)
-from app.utils import (
-    build_response_metadata,
-    canonical_digest,
-    error_response,
-    exception_response,
-    generate_id,
-    get_execution_ms,
-    get_logger,
-    success_response,
 )
 
 type JsonValue = Any

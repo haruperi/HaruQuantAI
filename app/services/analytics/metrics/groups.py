@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import build_warning
 from app.services.analytics.contracts.models import (
@@ -22,7 +23,6 @@ from app.services.analytics.metrics.returns import calculate_return_evidence
 from app.services.analytics.metrics.risk import calculate_risk_evidence
 from app.services.analytics.metrics.statistics import run_statistical_validation
 from app.services.analytics.metrics.trades import calculate_trade_evidence
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

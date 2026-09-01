@@ -8,6 +8,8 @@ from collections.abc import Mapping
 from hashlib import sha256
 from typing import TYPE_CHECKING, Any, Literal
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.trading.actions._shared import authority_id, require_action
 from app.services.trading.contracts import (
     ExecutionReceipt,
@@ -45,7 +47,6 @@ from app.services.trading.validation.authority import (
     validate_kill_switch_hierarchy,
     validate_risk_authority,
 )
-from app.utils import canonical_json, get_logger
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

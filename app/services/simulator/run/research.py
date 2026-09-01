@@ -5,6 +5,7 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.reporting import FastResearchResult
 from app.services.simulator.run.audit import emit_simulation_audit
@@ -14,7 +15,6 @@ from app.services.simulator.validation import (
     validate_phase_one_scope,
     validate_run_inputs,
 )
-from app.utils import get_logger
 
 type AuthContext = Any
 

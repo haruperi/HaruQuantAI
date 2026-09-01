@@ -6,6 +6,8 @@ from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.trading.contracts import (
     ExecutionReceipt,
     TradingError,
@@ -25,7 +27,6 @@ from app.services.trading.state import (
     TradingStateStore,
 )
 from app.services.trading.state.projections import _apply_execution_event_value
-from app.utils import canonical_json, get_logger
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

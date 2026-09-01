@@ -2,6 +2,7 @@
 
 import asyncio
 
+from app.contracts.common.models import StandardResponse
 from app.services.brokers._shared.base import _UnsupportedAdapterBase
 from app.services.brokers.canonical_contracts import (
     BrokerCapabilityId,
@@ -9,7 +10,6 @@ from app.services.brokers.canonical_contracts import (
     BrokerEnvironment,
     BrokerId,
 )
-from app.utils.responses.models import StandardResponse
 from pydantic import SecretStr
 
 

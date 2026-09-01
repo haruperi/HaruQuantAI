@@ -9,17 +9,13 @@ from typing import cast
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_mapping_value
+from app.kernel.serialization import canonical_json
+from app.kernel.serialization import to_json_safe as _utils_to_json_safe
 from app.services.analytics.contracts.catalogs import EVIDENCE_CATALOG
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.models import AnalyticsWarning, QualityFlag
-from app.utils import (
-    canonical_json,
-    get_logger,
-    redact_mapping_value,
-)
-from app.utils import (
-    to_json_safe as _utils_to_json_safe,
-)
 
 logger = get_logger(__name__)
 

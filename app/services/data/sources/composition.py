@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data._settings import (
     LOCAL_SYMBOL_MANIFEST_NAME,
     get_data_provider_connection_resolver,
@@ -47,7 +49,6 @@ from app.services.data.sources.registry import (
     resolve_source_identity,
 )
 from app.services.data.time_sessions.contracts import MarketSchedule, SessionWindow
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

@@ -5,8 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.portfolio.contracts.errors import PortfolioError
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

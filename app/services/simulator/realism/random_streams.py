@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from hashlib import sha256
 
-from app.utils import canonical_digest, canonical_json
+from app.kernel.serialization import canonical_digest, canonical_json
 
 _ALGORITHM = "sha256-counter-u256-v1"
 _TRACE_FIELDS = frozenset(

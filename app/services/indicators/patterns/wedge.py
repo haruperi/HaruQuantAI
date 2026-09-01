@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.indicators.core.errors import (
     _unwrap_indicator_response,
     guard_public_boundary,
@@ -27,7 +28,6 @@ from app.services.indicators.patterns._shared import (
     fit_line,
     recent_pivot_points,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

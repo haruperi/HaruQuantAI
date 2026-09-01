@@ -15,12 +15,9 @@ from app.services.trading.contracts.responses import (
 
 if TYPE_CHECKING:
     from app.services.trading.contracts.models import JsonValue
-from app.utils import (
-    get_logger,
-    redact_mapping_value,
-    redact_text_value,
-    to_json_safe,
-)
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_mapping_value, redact_text_value
+from app.kernel.serialization import to_json_safe
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

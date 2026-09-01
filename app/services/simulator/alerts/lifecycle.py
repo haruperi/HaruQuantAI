@@ -6,9 +6,9 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from app.kernel.state import attempt_transition, build_transition_table
 from app.services.simulator.alerts.contracts import AlertEvent, AlertState
 from app.services.simulator.errors import SimulationError
-from app.utils import attempt_transition, build_transition_table
 
 _ALERT_TRANSITIONS = build_transition_table(
     {

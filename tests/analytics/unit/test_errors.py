@@ -1,12 +1,12 @@
 """Unit tests for the Analytics error taxonomy."""
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics.contracts import (
     AnalyticsError,
     AnalyticsValidationError,
     to_analytics_error_payload,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -13,7 +13,7 @@ from app.agentic.public_api.dependencies import (
     AgenticDependencies,
     build_agentic_dependencies,
 )
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 if TYPE_CHECKING:
     from app.agentic._settings import AgenticSettings

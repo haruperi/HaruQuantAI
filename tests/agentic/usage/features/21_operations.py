@@ -48,7 +48,7 @@ from app.agentic.orchestration import (
     is_terminal_state,
     submit_task,
 )
-from app.utils import derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
 
 from tests.agentic.usage._runner import run_feature_usage
 

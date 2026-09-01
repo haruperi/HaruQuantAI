@@ -17,8 +17,8 @@ from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING, cast
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.evidence import to_report_json_safe
-from app.utils import get_logger
 
 if TYPE_CHECKING:
     from app.services.analytics.contracts.models import PerformanceReport

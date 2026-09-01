@@ -8,7 +8,7 @@ from datetime import UTC, datetime, time, timedelta
 from decimal import Decimal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from app.utils import canonical_digest
+from app.kernel.serialization import canonical_digest
 
 _LAST_HOUR = 23
 _LAST_MINUTE = 59

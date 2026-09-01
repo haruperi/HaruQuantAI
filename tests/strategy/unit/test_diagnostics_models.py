@@ -1,7 +1,7 @@
 """Strategy diagnostics model tests."""
 
+from app.composition.logging import get_logger
 from app.services.strategy.diagnostics.models import StrategyDiagnostics
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import COR, HASH, NOW, REQ, WF
 

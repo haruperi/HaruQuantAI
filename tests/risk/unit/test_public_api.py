@@ -4,10 +4,10 @@ import ast
 import inspect
 from pathlib import Path
 
+from app.contracts.common.models import get_standard_response_type
 from app.services import risk
 from app.services.risk import persistence
 from app.services.risk.persistence import delete
-from app.utils import get_standard_response_type
 
 from tests.risk import _support as examples
 

@@ -6,10 +6,10 @@ from collections.abc import Iterator, Mapping
 from datetime import datetime, timedelta
 from typing import Any, cast
 
+from app.composition.logging import get_logger
 from app.services.data.market_data.pipeline import _fetch_market_dataset_raw
 from app.services.data.market_data.requests import MarketDataRequest
 from app.services.data.replay.contracts import ReplayEvent, ReplayPackage
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

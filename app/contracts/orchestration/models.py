@@ -99,6 +99,7 @@ class PortSpec(WireModel):
 class TaskContract(WireModel):
     """Declared execution contract for one task type."""
 
+    schema_id: NonEmptyStr = "orchestration.task_contract.v1"
     task_type: NonEmptyStr
     contract_version: int = Field(ge=1)
     input_ports: tuple[PortSpec, ...] = ()

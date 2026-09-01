@@ -9,13 +9,13 @@ from typing import Literal
 
 from pydantic import field_serializer, field_validator, model_validator
 
+from app.composition.logging import get_logger
 from app.services.data.contracts._base import TracedOpenContract as _Contract
 from app.services.data.contracts.dataset import (  # noqa: TC001 - Pydantic runtime types.
     DataGap,
     DataKind,
     DataRange,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -10,6 +10,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     append_risk_audit_record,
     compute_config_hash,
@@ -17,7 +18,6 @@ from app.services.risk import (
     create_risk_audit_record,
     load_risk_config,
 )
-from app.utils import canonical_json
 from tests.risk.integration.test_strategy_admission import _AuditStore
 from tests.risk.usage.workflows._support import examples, unwrap_risk_response
 

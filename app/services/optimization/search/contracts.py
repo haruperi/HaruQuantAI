@@ -8,6 +8,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.composition.logging import get_logger
 from app.services.optimization.execution import BacktestExecutionContext  # noqa: TC001
 from app.services.optimization.parameters import (  # noqa: TC001
     ParameterSpace,
@@ -17,7 +18,6 @@ from app.services.optimization.scoring import (  # noqa: TC001
     CandidateScore,
     ObjectiveName,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

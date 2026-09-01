@@ -6,14 +6,13 @@ from collections.abc import Mapping
 from time import perf_counter_ns
 from typing import Any, Literal, TypeVar, cast
 
-from app.utils import (
+from app.contracts.common.models import (
     build_response_metadata,
     error_response,
-    generate_id,
-    get_common_error_catalog,
     get_standard_response_type,
-    validate_id,
 )
+from app.kernel.errors import get_common_error_catalog
+from app.kernel.identity import generate_id, validate_id
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

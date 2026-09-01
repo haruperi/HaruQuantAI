@@ -8,6 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.composition.logging import flush_logging
 from app.services.optimization import (
     evaluate_constraints,
     execute_candidate,
@@ -16,7 +17,6 @@ from app.services.optimization import (
     sample_random_candidates,
     validate_parameter_space,
 )
-from app.utils import flush_logging
 from tests.optimization.usage._support import genuine_execution_bundle
 from tests.optimization.usage.workflows._support import (
     live_search_request,

@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     forward_max_adverse_excursion,
     forward_max_favorable_excursion,
@@ -12,7 +13,6 @@ from app.services.research import (
     rolling_hurst,
     simple_returns,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

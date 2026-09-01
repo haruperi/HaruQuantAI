@@ -7,13 +7,13 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.market_data import directory_projection as projection
 from app.services.data.market_data import symbol_discovery
 from app.services.data.market_data import symbol_quotes as quotes
 from app.services.data.market_data.directory_contracts import SymbolsQuoteRequest
 from app.services.data.market_data.level1 import Level1Snapshot
 from app.services.data.market_data.snapshot import MarketSnapshot
-from app.utils import generate_id
 
 _T0 = datetime(2026, 8, 10, 12, tzinfo=UTC)
 

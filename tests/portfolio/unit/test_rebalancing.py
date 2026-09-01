@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.portfolio._settings import PortfolioSettings
 from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
@@ -22,7 +23,6 @@ from app.services.risk import (
     create_strategy_operational_eligibility_decision,
     get_decision_state,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

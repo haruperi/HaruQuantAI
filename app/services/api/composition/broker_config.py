@@ -4,11 +4,12 @@ from collections.abc import Mapping
 
 from pydantic import SecretStr
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
 from app.services.api.composition.runtime_settings import build_credential_key_set
 from app.services.api.identity import get_system_settings, resolve_credential_reference
 from app.services.api.widgets.settings.bootstrap import get_api_settings
 from app.services.brokers import build_broker_connection_config as _build_broker_config
-from app.utils import derive_stable_id, get_logger
 
 logger = get_logger(__name__)
 

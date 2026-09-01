@@ -16,6 +16,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Final
 from zoneinfo import ZoneInfo
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -36,7 +38,6 @@ from app.services.data.persistence import (
     reconcile_economic_event_definition_records,
     update_economic_event_definition_record,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

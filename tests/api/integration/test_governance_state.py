@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.api import (
     consume_api_approval,
     create_api_approval,
@@ -11,7 +12,6 @@ from app.services.api import (
     run_api_migrations,
 )
 from app.services.data import build_data_settings, data_settings_context
-from app.utils import generate_id
 
 
 def test_scoped_approval_and_terminal_idempotency_replay(tmp_path: Path) -> None:

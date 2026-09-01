@@ -6,12 +6,12 @@ import random
 from collections.abc import Sequence
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.optimization.robustness.contracts import (
     MonteCarloMethod,
     MonteCarloRequest,
     MonteCarloResult,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

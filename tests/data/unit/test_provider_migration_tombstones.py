@@ -9,6 +9,7 @@ import sqlite3
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts.errors import DataError
 from app.services.data.persistence.contracts import (
     MigrationRequest,
@@ -16,7 +17,6 @@ from app.services.data.persistence.contracts import (
     MigrationTombstone,
 )
 from app.services.data.persistence.migrations import _run_domain_migrations_raw
-from app.utils import generate_id
 
 
 def _configure(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:

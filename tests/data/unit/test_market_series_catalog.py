@@ -6,6 +6,7 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.datasets.catalog import (
     get_instrument_spec,
@@ -15,7 +16,6 @@ from app.services.data.datasets.catalog import (
     update_instrument_spec,
     update_market_series,
 )
-from app.utils import generate_id
 
 
 class _Result:

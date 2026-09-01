@@ -10,6 +10,7 @@ from typing import Literal, Self
 
 from pydantic import field_serializer, field_validator, model_validator
 
+from app.composition.logging import get_logger
 from app.services.portfolio.contracts.requests import (
     PortfolioContractModel,
     _decimal,
@@ -20,7 +21,6 @@ from app.services.portfolio.contracts.requests import (
 from app.services.portfolio.contracts.results import (
     PortfolioComponentWeight,  # noqa: TC001
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

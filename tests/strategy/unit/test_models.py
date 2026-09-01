@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import time
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from types import MappingProxyType, SimpleNamespace
@@ -10,6 +9,15 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
+from app.contracts.common.models import (
+    AuthContext,
+    ProblemDetails,
+    ResponseMetadata,
+    StandardResponse,
+    create_auth_context,
+)
+from app.kernel.time import utc_now
 from app.services.data import (
     build_data_quality_report,
     build_market_dataset,
@@ -33,69 +41,40 @@ from app.services.strategy.contracts import (
     ValidatedStrategyConfig,
     ValidatedStrategyRef,
 )
-from app.utils import build_response_metadata, get_logger
-from app.utils.contracts.auth import AuthContext
-from app.utils.responses.models import StandardError, StandardResponse
 from pydantic import ValidationError
 
 logger = get_logger(__name__)
 
 
 def make_success_response[T](data: T) -> StandardResponse[T]:
-    """Build a valid Utils StandardResponse success envelope.
-
-    Args:
-        data: Success payload object to encapsulate.
-
-    Returns:
-        StandardResponse envelope with success status and metadata.
-    """
+    """Build a valid StandardResponse success envelope."""
     return StandardResponse[T](
-        status="success",
+        status="SUCCESS",
         message="success",
         data=data,
         error=None,
-        metadata=build_response_metadata(
-            name="test.operation",
-            domain="test",
-            risk_level="none",
+        metadata=ResponseMetadata(
             request_id=REQ,
-            start_time=time.perf_counter_ns(),
-            read_only=True,
-            writes_file=False,
-            modifies_database=False,
-            places_trade=False,
-            requires_network=False,
+            timestamp=utc_now(),
         ),
     )
 
 
 def make_error_response[T](code: str, message: str = "error") -> StandardResponse[T]:
-    """Build a valid Utils StandardResponse error envelope.
-
-    Args:
-        code: Error code string.
-        message: Human-readable error message summary.
-
-    Returns:
-        StandardResponse envelope with error status and metadata.
-    """
+    """Build a valid StandardResponse error envelope."""
     return StandardResponse[T](
-        status="error",
+        status="ERROR",
         message=message,
         data=None,
-        error=StandardError(code=code, details={}),
-        metadata=build_response_metadata(
-            name="test.operation",
-            domain="test",
-            risk_level="none",
+        error=ProblemDetails(
+            type="about:blank",
+            title=code,
+            status=400,
+            detail=message,
+        ),
+        metadata=ResponseMetadata(
             request_id=REQ,
-            start_time=time.perf_counter_ns(),
-            read_only=True,
-            writes_file=False,
-            modifies_database=False,
-            places_trade=False,
-            requires_network=False,
+            timestamp=utc_now(),
         ),
     )
 
@@ -576,9 +555,7 @@ def make_auth(
     if checkpoint:
         default_permissions += ("strategy:checkpoint",)
         default_scopes = ("checkpoint-auth",)
-    return AuthContext(
-        contract_version="v1",
-        schema_id="utils.auth_context.v1",
+    return create_auth_context(
         principal_id="builder",
         principal_type="USER",
         roles=("strategy-admin",),

@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, s
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+from app.kernel.identity import generate_id
 from app.services.api.identity import require_auth_context, require_permission
 from app.services.api.widgets.event_delivery import (
     StreamLimitError,
@@ -23,7 +24,6 @@ from app.services.data import (
     stream_market_depth,
     stream_market_snapshots,
 )
-from app.utils import generate_id
 
 type AuthContext = Any
 

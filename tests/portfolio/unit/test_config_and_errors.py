@@ -6,13 +6,13 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.portfolio._settings import PortfolioSettings, RebalanceSchedule
 from app.services.portfolio.contracts.errors import (
     PORTFOLIO_ERROR_CATALOG,
     PortfolioError,
     PortfolioErrorPayload,
 )
-from app.utils import get_logger
 from pydantic import ValidationError
 
 HaruQuantError = Exception

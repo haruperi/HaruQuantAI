@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Literal
 
+from app.kernel.state import attempt_transition, build_transition_table
 from app.services.simulator.errors import SimulationError
-from app.utils import attempt_transition, build_transition_table
 
 RecoveryState = Literal[
     "STARTING",

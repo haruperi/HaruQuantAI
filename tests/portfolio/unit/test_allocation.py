@@ -7,6 +7,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.portfolio._settings import PortfolioSettings
 from app.services.portfolio.allocation import AllocationService
 from app.services.portfolio.contracts import (
@@ -19,7 +20,6 @@ from app.services.risk import (
     create_kill_switch_state,
     get_decision_state,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -5,13 +5,13 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics import is_analytics_value
 from app.services.portfolio import (
     create_portfolio_value,
     execute_portfolio_handle_operation,
     get_portfolio_value_field,
 )
-from app.utils import get_logger
 from pydantic import ValidationError
 
 from tests.portfolio.unit.test_workflows import _plan, _service

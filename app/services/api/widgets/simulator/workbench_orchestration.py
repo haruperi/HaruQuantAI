@@ -13,6 +13,9 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import format_utc_timestamp, utc_now
 from app.services.api.widgets.simulator.migrations import (
     get_simulation_workbench_migration_steps,
 )
@@ -48,7 +51,6 @@ from app.services.simulator import (
     seek_live_simulation,
     step_live_simulation,
 )
-from app.utils import format_utc_timestamp, generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

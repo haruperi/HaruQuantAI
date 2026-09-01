@@ -1,8 +1,8 @@
 """Deterministic create_trade_intent_value builder tests."""
 
 # ruff: noqa: PT018
+from app.composition.logging import get_logger
 from app.services.strategy import build_trade_intent
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import make_context, make_decision
 

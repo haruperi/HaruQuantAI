@@ -7,6 +7,9 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id, validate_id
+from app.kernel.serialization import canonical_json
 from app.services.analytics.adapters.results import adapt_trading_result
 from app.services.analytics.contracts.errors import AnalyticsValidationError
 from app.services.analytics.contracts.evidence import (
@@ -31,7 +34,6 @@ from app.services.analytics.reports.presentation import (
     build_drawdown_series,
     build_monthly_return_rows,
 )
-from app.utils import canonical_json, derive_stable_id, get_logger, validate_id
 
 logger = get_logger(__name__)
 

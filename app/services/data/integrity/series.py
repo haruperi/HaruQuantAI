@@ -19,6 +19,8 @@ from decimal import Decimal
 from itertools import pairwise
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import DataQualityReport, QualityIssue
 from app.services.data.contracts.records import OHLCVRecord
@@ -33,7 +35,6 @@ from app.services.data.integrity.scoring import (
     _fit_samples,
     _issue,
 )
-from app.utils import generate_id, get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

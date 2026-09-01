@@ -2,13 +2,13 @@
 
 from datetime import UTC, datetime
 
+from app.kernel.serialization import canonical_json
 from app.services.simulator import (
     create_simulation_scheduler,
     restore_simulation_scheduler,
     schedule_simulation_event,
     serialize_simulation_scheduler,
 )
-from app.utils import canonical_json
 
 
 def test_fr_sim_204_state_round_trip_contains_no_runtime_objects() -> None:

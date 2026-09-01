@@ -14,6 +14,8 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import DataQualityReport, MarketDataset
 from app.services.data.contracts.records import OHLCVRecord, SpreadRecord, TickRecord
@@ -22,7 +24,6 @@ from app.services.data.contracts.responses import (
     data_start_time,
     run_data_operation,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

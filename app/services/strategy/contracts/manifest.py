@@ -12,6 +12,7 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts._base import (
     JsonValue,
     _Contract,
@@ -24,7 +25,6 @@ from app.services.strategy.contracts.enums import (  # noqa: TC001
     StrategyEnvironment,
     StrategyTimingPolicy,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

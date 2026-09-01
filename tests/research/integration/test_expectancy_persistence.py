@@ -3,6 +3,7 @@
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+from app.kernel.identity import generate_id
 from app.services.data import build_data_settings, data_settings_context
 from app.services.research import (
     apply_expectancy_transition,
@@ -10,7 +11,6 @@ from app.services.research import (
     load_expectancy_profile,
     persist_expectancy_profile,
 )
-from app.utils import generate_id
 
 
 def test_expectancy_projection_and_transition_history_are_atomic(

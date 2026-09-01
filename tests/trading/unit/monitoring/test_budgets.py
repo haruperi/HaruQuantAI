@@ -4,6 +4,8 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     create_allocation_risk_decision,
     create_portfolio_budget_execution_verdict,
@@ -14,7 +16,6 @@ from app.services.trading.contracts import (
     TradingRoute,
 )
 from app.services.trading.monitoring import BudgetGate
-from app.utils import canonical_json, get_logger
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 AllocationRiskDecision = object

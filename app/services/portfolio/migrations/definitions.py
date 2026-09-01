@@ -18,8 +18,8 @@ from __future__ import annotations
 from hashlib import sha256
 from typing import Any
 
+from app.composition.logging import get_logger
 from app.services.data import build_migration_step
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

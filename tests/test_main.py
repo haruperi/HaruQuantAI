@@ -39,32 +39,20 @@ async def test_main_status_without_config(capsys: pytest.CaptureFixture[str]) ->
 
 @pytest.mark.asyncio
 async def test_main_status_with_example_configs(
+    tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Test --status with research, backtest, and live example configurations."""
-    # Research config
-    code_research = await async_main(
-        ["--config", "config/examples/research.toml", "--status"]
-    )
-    assert code_research == 0
-    res_data = json.loads(capsys.readouterr().out)
-    assert res_data["profile"] == "research"
-
-    # Backtest config
-    code_backtest = await async_main(
-        ["--config", "config/examples/backtest.toml", "--status"]
-    )
-    assert code_backtest == 0
-    bt_data = json.loads(capsys.readouterr().out)
-    assert bt_data["profile"] == "backtest"
-
-    # Live config (profile is live, missing capabilities expected, but exits 0)
-    code_live = await async_main(["--config", "config/examples/live.toml", "--status"])
-    assert code_live == 0
-    live_data = json.loads(capsys.readouterr().out)
-    assert live_data["profile"] == "live"
-    assert live_data["is_ready"] is False
-    assert len(live_data["missing_profile_capabilities"]) > 0
+    """Test --status with research, backtest, and live configurations."""
+    for profile in ("research", "backtest", "live"):
+        cfg_file = tmp_path / f"{profile}.toml"
+        cfg_file.write_text(f'[application]\nprofile = "{profile}"\n', encoding="utf-8")
+        exit_code = await async_main(["--config", str(cfg_file), "--status"])
+        assert exit_code == 0
+        data = json.loads(capsys.readouterr().out)
+        assert data["profile"] == profile
+        if profile == "live":
+            assert data["is_ready"] is False
+            assert len(data["missing_profile_capabilities"]) > 0
 
 
 @pytest.mark.asyncio

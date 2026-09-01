@@ -2,6 +2,7 @@
 
 import pandas as pd
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     analyze_cluster_outperformance,
     build_unsupervised_insight_report,
@@ -10,7 +11,6 @@ from app.services.research import (
     run_pca,
     summarize_investment_data,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import ValidationError
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.simulator.accounting import AccountLedger
 from app.services.simulator.errors import SimulationError, unwrap_simulation_response
 from app.services.simulator.execution import EventDrivenExecutionEngine
@@ -42,7 +44,6 @@ from app.services.simulator.validation import (
 )
 from app.services.simulator.validation.contracts import MarketDataValidationContext
 from app.services.trading import create_execution_receipt, is_execution_receipt
-from app.utils import canonical_digest, canonical_json, get_logger
 
 if TYPE_CHECKING:
     from app.services.simulator.run.contracts import (

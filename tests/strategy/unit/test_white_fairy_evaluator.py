@@ -1,7 +1,7 @@
 """White Fairy concrete signal tests."""
 
+from app.composition.logging import get_logger
 from app.services.strategy.evaluators.white_fairy import WhiteFairyEvaluator
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,

@@ -2,9 +2,10 @@
 
 from typing import Any
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.time import utc_now
 from app.services.api.identity import require_auth_context
 from app.services.api.widgets.risk import routes as risk
-from app.utils import create_auth_context, utc_now
 from fastapi import FastAPI
 
 from tests.api._support import get_json

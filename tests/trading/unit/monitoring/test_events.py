@@ -4,13 +4,13 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.trading.contracts import ExecutionReceipt
 from app.services.trading.monitoring import (
     OperationalEvent,
     build_broker_state_unknown_event,
     emit_runtime_event,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

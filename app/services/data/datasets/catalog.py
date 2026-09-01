@@ -11,6 +11,9 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
+from app.kernel.time import utc_now
 from app.services.data.contracts import DataError
 from app.services.data.persistence import (
     create_catalog_artifact_records,
@@ -39,7 +42,6 @@ from app.services.data.persistence import (
 )
 from app.services.data.persistence.contracts import StorageManifest
 from app.services.data.persistence.dataset_writer import resolve_data_root
-from app.utils import canonical_digest, canonical_json, get_logger, utc_now
 
 logger = get_logger(__name__)
 

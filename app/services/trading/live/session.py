@@ -10,6 +10,10 @@ from datetime import datetime
 from hashlib import sha256
 from typing import TYPE_CHECKING, Any, Literal
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_audit_event
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.brokers import (
     get_broker_adapter_contract_version,
     get_broker_adapter_schema_id,
@@ -32,12 +36,6 @@ from app.services.trading.monitoring import (
     emit_runtime_event,
 )
 from app.services.trading.validation import ReadinessAssessment
-from app.utils import (
-    canonical_json,
-    create_audit_event,
-    generate_id,
-    get_logger,
-)
 
 type StandardResponse[T] = Any
 ActionPolicyVerdict = Any

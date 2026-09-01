@@ -1,11 +1,11 @@
 """WF-STR-007 runtime safety-boundary integration."""
 
 # ruff: noqa: PT018
+from app.composition.logging import get_logger
 from app.services.strategy import (
     get_strategy_timing_policy,
     run_vectorized_strategy_signals,
 )
-from app.utils import get_logger
 
 from tests.strategy.integration.test_vectorized_workflow import _ProposingEvaluator
 from tests.strategy.unit.test_models import make_config, make_context, make_ref

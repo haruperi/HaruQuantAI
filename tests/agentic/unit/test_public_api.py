@@ -53,7 +53,7 @@ from app.agentic.public_api import (
     replay_firm_run,
     submit_firm_request,
 )
-from app.utils import derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
 from pydantic import ValidationError
 
 from tests.agentic.fixtures import NOW, build_technical_mandate

@@ -11,6 +11,10 @@ from datetime import datetime
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from pydantic import BaseModel, ConfigDict, SecretStr
 
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.serialization import canonical_json
+from app.kernel.time import utc_now
 from app.services.api.identity.errors import IdentityError
 from app.services.api.identity.persistence import (
     read_credential_record,
@@ -20,7 +24,6 @@ from app.services.api.identity.system_settings import (
     get_credential_manifest,
     validate_credential_material,
 )
-from app.utils import canonical_json, derive_stable_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

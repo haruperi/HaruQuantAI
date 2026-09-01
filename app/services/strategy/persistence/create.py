@@ -7,13 +7,13 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
 from app.services.data import (
     build_statement_plan,
     build_transaction_request,
     execute_transaction,
 )
 from app.services.strategy.contracts.responses import unwrap_data_response
-from app.utils import get_logger
 
 if TYPE_CHECKING:
     from app.services.strategy.checkpoints.models import StrategyCheckpoint

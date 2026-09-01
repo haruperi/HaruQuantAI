@@ -12,6 +12,8 @@ from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.brokers import (
     create_connected_broker,
     disconnect_broker,
@@ -21,7 +23,6 @@ from app.services.data import (
     get_account_state_snapshot,
     unwrap_data_response,
 )
-from app.utils import generate_id, utc_now
 
 WORKFLOW_ID = "WF-DATA-013"
 STAGES = (

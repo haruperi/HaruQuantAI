@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts.errors import DataError
 from app.services.data.datasets import catalog
 from app.services.data.datasets.contracts import (
@@ -14,7 +15,6 @@ from app.services.data.datasets.contracts import (
     _ProviderSpecificationRevision,
     _relative_path,
 )
-from app.utils import generate_id
 
 
 def test_relative_path_validation() -> None:

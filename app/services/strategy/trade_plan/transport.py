@@ -4,8 +4,8 @@
 
 from collections.abc import Mapping
 
+from app.composition.logging import get_logger
 from app.services.strategy.trade_plan.models import parse_trade_plan
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -5,11 +5,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-import _support  # noqa: F401
 from app.services.brokers import (
     get_broker_capability_catalogue,
     get_broker_dashboard_snapshot,
 )
+
+import _support  # noqa: F401
 
 
 def fr_brokers_010_011_103_capability_matrix() -> None:

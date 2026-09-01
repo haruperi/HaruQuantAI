@@ -8,6 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import (
     DataQualityReport,
     MarketDataset,
@@ -42,7 +43,6 @@ from app.services.data.sources.policy import (
     register_source_policy,
 )
 from app.services.data.sources.registry import _reset_registry, register_source
-from app.utils import generate_id
 
 # --- Inlined fixtures (legacy helpers.py) --------------------------------------
 # The original shared helper built contracts DIRECTLY via the contract classes

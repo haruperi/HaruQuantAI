@@ -36,7 +36,10 @@ from app.agentic.operations.service import (
 )
 from app.agentic.orchestration.models import is_terminal_state
 from app.agentic.orchestration.service import cancel_task, submit_task
-from app.utils import derive_stable_id, get_logger, map_exception, utc_now
+from app.composition.logging import get_logger
+from app.kernel.errors import map_exception
+from app.kernel.identity import derive_stable_id
+from app.kernel.time import utc_now
 
 if TYPE_CHECKING:
     from app.agentic.contracts.models import AgentTask

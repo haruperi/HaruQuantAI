@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.data import is_data_error
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.outcomes import (
@@ -32,7 +34,6 @@ from app.services.strategy.registry._mutations import (
     _mutation_id,
     _publish_mutation,
 )
-from app.utils import canonical_json, get_logger
 
 type AuthContext = Any
 

@@ -4,13 +4,13 @@ from datetime import timedelta
 from types import SimpleNamespace
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy import (
     create_strategy_config,
     create_strategy_ref,
     get_strategy_environment,
     validate_strategy_proposal,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     COR,

@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
 from app.services.research.contracts import (
     ResearchWarning,
     UnsupervisedResearchResult,
@@ -14,7 +15,6 @@ from app.services.research.modeling.clustering import cluster_feature_space
 from app.services.research.modeling.insights import (
     build_unsupervised_insight_report,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

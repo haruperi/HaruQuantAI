@@ -3,6 +3,8 @@
 from collections.abc import Mapping
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data import is_data_error
 from app.services.strategy.contracts.enums import StrategyLifecycleStatus
 from app.services.strategy.contracts.manifest import StrategyManifest
@@ -20,7 +22,6 @@ from app.services.strategy.persistence.read import (
     read_strategy_definitions,
     read_strategy_versions,
 )
-from app.utils import generate_id, get_logger
 
 logger = get_logger(__name__)
 

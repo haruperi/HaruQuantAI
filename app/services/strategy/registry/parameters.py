@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.composition.logging import get_logger
 from app.services.data import is_data_error
 from app.services.strategy.contracts.outcomes import (
     StrategyMutationResult,
@@ -30,7 +31,6 @@ from app.services.strategy.registry._mutations import (
 )
 from app.services.strategy.registry.configuration import validate_strategy_config
 from app.services.strategy.registry.resolution import validate_strategy_ref
-from app.utils import get_logger
 
 type AuthContext = Any
 

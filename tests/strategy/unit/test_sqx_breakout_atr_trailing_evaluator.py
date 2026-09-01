@@ -1,9 +1,9 @@
 """SQX breakout and ATR concrete signal tests."""
 
+from app.composition.logging import get_logger
 from app.services.strategy.evaluators.sqx_breakout_atr_trailing import (
     SQXBreakoutAtrTrailingEvaluator,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,

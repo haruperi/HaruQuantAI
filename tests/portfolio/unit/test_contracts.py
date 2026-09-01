@@ -7,6 +7,7 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.portfolio.contracts import (
     FixedWeightInput,
     PortfolioComponentWeight,
@@ -14,7 +15,6 @@ from app.services.portfolio.contracts import (
     PortfolioConstructionResult,
 )
 from app.services.portfolio.contracts.errors import PortfolioError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

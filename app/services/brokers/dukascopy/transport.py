@@ -13,13 +13,13 @@ from collections.abc import Callable
 from datetime import datetime
 from typing import TYPE_CHECKING, cast
 
+from app.composition.logging import get_logger
 from app.services.brokers._shared.circuit_breaker import _TransportCircuitBreaker
 from app.services.brokers.canonical_contracts.protocols import (
     _CircuitOpenError,
     _ProviderResponseError,
 )
 from app.services.brokers.dukascopy.instruments import _web_symbol
-from app.utils import get_logger
 
 if TYPE_CHECKING:
     from app.services.brokers.canonical_contracts import BrokerConnectionConfig

@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics.adapters.results import (
     adapt_trading_result,
     build_closed_trade_equity_curve,
@@ -14,7 +15,6 @@ from app.services.analytics.contracts import (
     ClosedTrade,
     StatisticalValidationConfig,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

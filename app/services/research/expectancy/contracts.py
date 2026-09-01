@@ -23,11 +23,11 @@ from datetime import UTC, datetime
 from types import MappingProxyType
 from typing import Any, Literal, cast
 
+from app.kernel.serialization import canonical_digest, to_json_safe
 from app.services.research.contracts.errors import (
     ConfigurationError,
     ValidationError,
 )
-from app.utils import canonical_digest, to_json_safe
 
 type GovernanceState = Literal[
     "draft", "under_review", "approved", "suspended", "expired", "revoked"

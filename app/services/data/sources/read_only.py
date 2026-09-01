@@ -25,13 +25,13 @@ from __future__ import annotations
 
 from typing import Final, override
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
     data_start_time,
     run_data_operation,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

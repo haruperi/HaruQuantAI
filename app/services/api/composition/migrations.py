@@ -1,5 +1,6 @@
 """Aggregate feature-local API migrations for canonical startup."""
 
+from app.composition.logging import get_logger
 from app.services.api.identity.migrations import get_identity_migration_steps
 from app.services.api.widgets.simulator.migrations import (
     get_simulation_workbench_migration_steps,
@@ -8,7 +9,6 @@ from app.services.api.widgets.watchlists.migrations import (
     get_watchlist_migration_steps,
 )
 from app.services.data import build_migration_request, run_domain_migrations
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

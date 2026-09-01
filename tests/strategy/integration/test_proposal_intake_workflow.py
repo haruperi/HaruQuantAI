@@ -3,6 +3,8 @@
 from datetime import timedelta
 from pathlib import Path
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
 from app.services.data import run_data_migrations
 from app.services.strategy import (
     create_strategy_config,
@@ -12,7 +14,6 @@ from app.services.strategy import (
     get_strategy_environment,
     register_strategy_version,
 )
-from app.utils import generate_id, get_logger
 
 from tests.strategy.unit.test_catalog import make_registration, storage_context
 from tests.strategy.unit.test_models import (

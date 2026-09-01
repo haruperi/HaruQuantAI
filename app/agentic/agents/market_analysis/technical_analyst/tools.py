@@ -31,7 +31,7 @@ from app.agentic.permissions.authorization import (
     ToolCallOutcome,
     call_governed_tool,
 )
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Callable

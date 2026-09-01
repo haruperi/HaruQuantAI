@@ -6,13 +6,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.strategy import (
     discretionary_strategy_version_for,
     get_discretionary_strategy_id,
     list_strategy_versions,
     register_discretionary_strategy,
 )
-from app.utils import create_auth_context, generate_id, utc_now
 
 
 def _emit(requirement: str, value: object) -> None:

@@ -4,8 +4,8 @@ import importlib
 from datetime import timedelta
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.strategy import create_strategy_signal, evaluate_strategy_proposal
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,

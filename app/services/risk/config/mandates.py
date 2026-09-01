@@ -14,9 +14,9 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import yaml
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from app.composition.logging import get_logger
 from app.services.risk.contracts import RiskDomainError, RiskErrorCode
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

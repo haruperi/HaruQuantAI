@@ -20,6 +20,9 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, cast
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest
 from app.services.analytics import (
     build_performance_report,
     create_analytics_value,
@@ -48,7 +51,6 @@ from app.services.simulator.backtest_recipe.evidence import (
     CompletionSink,
     sink_backtest_evidence,
 )
-from app.utils import canonical_digest, create_auth_context, generate_id
 
 #: Ordered metric keys reported for a completed run, mirroring the legacy
 #: catalogue's printed performance report.

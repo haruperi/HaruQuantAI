@@ -10,11 +10,11 @@ from contextlib import suppress
 from datetime import UTC, datetime
 from typing import cast
 
+from app.composition.logging import get_logger
 from app.services.brokers.metatrader.snapshot_protocol import (
     build_set_symbols_frame,
     parse_snapshot_frame,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

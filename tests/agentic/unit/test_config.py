@@ -150,7 +150,8 @@ def _envelope(now, request_id, workflow_id, correlation_id) -> dict[str, object]
 def test_every_builder_derives_a_canonical_digest() -> None:
     from datetime import timedelta
 
-    from app.utils import canonical_digest, derive_stable_id, generate_id
+    from app.kernel.identity import derive_stable_id, generate_id
+    from app.kernel.serialization import canonical_digest
 
     from tests.agentic.fixtures import NOW
 

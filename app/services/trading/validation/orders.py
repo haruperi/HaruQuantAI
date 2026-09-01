@@ -6,10 +6,10 @@ from collections.abc import Mapping
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from typing import TYPE_CHECKING, Any, Literal, cast
 
+from app.composition.logging import get_logger
 from app.services.trading.contracts import TradingError, TradingRequest
 from app.services.trading.contracts.models import TradingRequestV2
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import get_logger
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

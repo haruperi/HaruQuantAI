@@ -1,8 +1,8 @@
 """WF-STR-003 event evaluation integration."""
 
 # ruff: noqa: PT018
+from app.composition.logging import get_logger
 from app.services.strategy import run_event_strategy_hook
-from app.utils import get_logger
 
 from tests.strategy.unit.test_event_runner import Evaluator
 from tests.strategy.unit.test_models import (

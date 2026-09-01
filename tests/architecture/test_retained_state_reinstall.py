@@ -37,7 +37,7 @@ os.environ["WRITE_LOCK_LEASE_SECONDS"] = "30"
 import sqlite3
 from app.services.data.persistence.contracts import MigrationRequest, MigrationStep
 from app.services.data.persistence.migrations import _run_domain_migrations_raw
-from app.utils import generate_id
+from app.kernel.identity import generate_id
 
 step1 = MigrationStep(
     domain="trading",
@@ -76,7 +76,7 @@ print("PHASE_1_OK")
 import sqlite3
 from app.services.data.persistence.contracts import MigrationRequest, MigrationStep, MigrationTombstone
 from app.services.data.persistence.migrations import _run_domain_migrations_raw
-from app.utils import generate_id
+from app.kernel.identity import generate_id
 
 tombstone = MigrationTombstone(
     domain="trading",
@@ -124,7 +124,7 @@ print("PHASE_2_OK")
         + """
 from app.services.data.persistence.contracts import MigrationRequest, MigrationStep
 from app.services.data.persistence.migrations import _run_domain_migrations_raw
-from app.utils import generate_id
+from app.kernel.identity import generate_id
 
 req3 = MigrationRequest(
     domain="trading",
@@ -155,7 +155,7 @@ _run_domain_migrations_raw(req3)
         + """
 from app.services.data.persistence.contracts import MigrationRequest, MigrationStep, MigrationTombstone
 from app.services.data.persistence.migrations import _run_domain_migrations_raw
-from app.utils import generate_id
+from app.kernel.identity import generate_id
 
 tombstone_bad = MigrationTombstone(
     domain="trading",
@@ -194,7 +194,7 @@ _run_domain_migrations_raw(req4)
 import sqlite3
 from app.services.data.persistence.contracts import MigrationRequest, MigrationStep
 from app.services.data.persistence.migrations import _run_domain_migrations_raw
-from app.utils import generate_id
+from app.kernel.identity import generate_id
 
 step1 = MigrationStep(
     domain="trading",

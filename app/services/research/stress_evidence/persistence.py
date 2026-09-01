@@ -6,6 +6,8 @@ import json
 from collections.abc import Mapping
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.research.persistence import (
     create_governed_evidence,
     read_latest_governed_evidence,
@@ -13,7 +15,6 @@ from app.services.research.persistence import (
 from app.services.research.stress_evidence.contracts import (
     parse_stress_scenario_evidence,
 )
-from app.utils import canonical_json, get_logger
 
 logger = get_logger(__name__)
 

@@ -12,8 +12,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.portfolio.ledger.postings import recompute_balances
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -119,7 +119,7 @@ def _snapshot_hash(
     Returns:
         Lowercase SHA-256 digest.
     """
-    from app.utils import canonical_digest
+    from app.kernel.serialization import canonical_digest
 
     material = {
         "snapshot_id": snapshot_id,

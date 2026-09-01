@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.research.features import forward_returns
 from app.services.research.modeling.clustering import cluster_feature_space
 from app.services.research.modeling.decomposition import run_pca
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

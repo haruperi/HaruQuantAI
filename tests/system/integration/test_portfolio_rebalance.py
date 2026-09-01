@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any
 
 import pytest
-from app.utils import get_logger
+from app.composition.logging import get_logger
 
 from tests.portfolio import conftest as portfolio_fixtures
 from tests.portfolio.integration import (

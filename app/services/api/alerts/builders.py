@@ -6,12 +6,14 @@ import hashlib
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_mapping_value
+from app.kernel.serialization import canonical_json
 from app.services.api.alerts.models import (
     CriticalAlertError,
     CriticalAlertTrigger,
     CriticalOperationalAlert,
 )
-from app.utils import canonical_json, get_logger, redact_mapping_value
 
 type AuthContext = Any
 

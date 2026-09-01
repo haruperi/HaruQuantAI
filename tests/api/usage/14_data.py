@@ -18,6 +18,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from app.composition.config import load_broker_provider_settings
+from app.kernel.identity import generate_id
 from app.services.api import (
     build_system_broker_connection_config,
     get_default_watchlist_symbols,
@@ -35,7 +37,6 @@ from app.services.data import (
     get_symbol_metadata,
     to_ohlcv_dataframe,
 )
-from app.utils import generate_id, load_broker_provider_settings
 
 # Keep the evidence bounded: only the first few default watchlist symbols.
 SYMBOLS = tuple(get_default_watchlist_symbols())[:1]

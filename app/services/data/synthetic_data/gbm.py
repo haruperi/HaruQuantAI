@@ -12,6 +12,7 @@ from datetime import timedelta
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.contracts.dataset import (
     DataQualityReport,
@@ -27,7 +28,6 @@ from app.services.data.time_sessions.timeframes import (
     TimeframeSpec,
     _get_timeframe_spec_raw,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -10,6 +10,7 @@ from typing import Literal, Self
 
 from pydantic import field_serializer, field_validator, model_validator
 
+from app.composition.logging import get_logger
 from app.services.portfolio.contracts.requests import (
     ConstructionMethod,
     PortfolioContractModel,
@@ -18,7 +19,6 @@ from app.services.portfolio.contracts.requests import (
     _text,
     _utc,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

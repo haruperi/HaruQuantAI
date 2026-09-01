@@ -42,8 +42,8 @@ from app.agentic.agents.strategy_desk.trader.schemas import (
 )
 from app.agentic.governance.registry import verify_prompt_artifact
 from app.agentic.runtime import ModelOutcome
+from app.kernel.identity import derive_stable_id, generate_id
 from app.services.strategy import create_strategy_proposal_evaluation_request
-from app.utils import derive_stable_id, generate_id
 from pydantic import ValidationError
 
 from tests.agentic.fixtures import (

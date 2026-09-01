@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 import pandas as pd
 
+from app.composition.logging import get_logger
 from app.services.indicators.core.errors import (
     _unwrap_indicator_response,
     guard_public_boundary,
@@ -20,7 +21,6 @@ from app.services.indicators.core.errors import (
 from app.services.indicators.core.results import build_indicator_result
 from app.services.indicators.core.validation import validate_indicator
 from app.services.indicators.patterns._shared import build_pattern_config, fetch_atr
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

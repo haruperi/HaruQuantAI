@@ -10,6 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_availability_request,
     build_data_settings,
@@ -26,7 +27,6 @@ from app.services.data import (
     save_dataset,
     unwrap_data_response,
 )
-from app.utils import generate_id
 
 WORKFLOW_ID = "WF-DATA-009"
 STAGES = (

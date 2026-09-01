@@ -11,6 +11,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_job_definition,
@@ -24,7 +25,6 @@ from app.services.data import (
     start_data_update_job,
     stop_data_update_job,
 )
-from app.utils import generate_id
 
 _JOB_NAME = "usage_sync_eurusd"
 _CALENDAR_JOB_NAME = "usage_sync_economic_calendar"

@@ -9,6 +9,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from app.contracts.common.models import StandardResponse
 from app.services.brokers import (
     build_broker_connection_config,
     build_broker_value,
@@ -26,7 +27,6 @@ from app.services.trading.routing.dispatcher import (
 from app.services.trading.routing.dispatcher import (
     dispatch_order_intent as _dispatch_order_intent,
 )
-from app.utils.responses.models import StandardResponse
 from tests.brokers.response_factory import broker_response
 
 NOW = datetime(2026, 7, 19, 8, 0, tzinfo=UTC)

@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 
+from app.kernel.identity import generate_id
 from app.services.data import build_data_settings, data_settings_context
 from app.services.risk import (
     build_personal_account_risk_config,
@@ -13,7 +14,6 @@ from app.services.risk import (
     run_risk_migrations,
 )
 from app.services.risk.contracts.responses import unwrap_risk_response
-from app.utils import generate_id
 
 
 def _settings(tmp_path: Path) -> object:

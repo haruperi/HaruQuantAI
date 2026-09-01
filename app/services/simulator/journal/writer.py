@@ -6,13 +6,14 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import TYPE_CHECKING, Literal
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.simulator.errors import (
     SimulationError,
     operation_guard,
     unwrap_simulation_response,
 )
 from app.services.simulator.journal.contracts import JournalEvent
-from app.utils import canonical_digest, canonical_json, get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

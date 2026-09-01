@@ -4,9 +4,9 @@ import ast
 import inspect
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.strategy import persistence
 from app.services.strategy.persistence import delete
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

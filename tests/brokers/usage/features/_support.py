@@ -9,6 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.api import build_system_broker_connection_config
 from app.services.brokers import (
     connect_broker,
@@ -17,7 +18,6 @@ from app.services.brokers import (
     get_broker_id,
     get_broker_value_field,
 )
-from app.utils import generate_id
 
 _NON_PRODUCTION_ENVIRONMENTS = frozenset({"demo", "testnet", "sandbox"})
 

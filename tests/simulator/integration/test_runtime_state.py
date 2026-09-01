@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_statement_plan,
@@ -18,7 +19,6 @@ from app.services.simulator import (
     run_simulator_migrations,
     unwrap_simulation_response,
 )
-from app.utils import generate_id
 
 from tests.simulator.unit.test_reporting_contracts import _result
 

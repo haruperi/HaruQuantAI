@@ -8,6 +8,8 @@ from typing import Literal, cast
 
 from pydantic import BaseModel
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.trading.contracts.models import JsonValue, TradingRoute
 from app.services.trading.persistence import (
     create_event_record,
@@ -27,7 +29,6 @@ from app.services.trading.persistence import (
 from app.services.trading.state.events import TradingEvent
 from app.services.trading.state.idempotency import IdempotencyReservation
 from app.services.trading.state.projections import TradingProjection
-from app.utils import canonical_digest, get_logger
 
 logger = get_logger(__name__)
 type TradingScope = tuple[TradingRoute, str, str]

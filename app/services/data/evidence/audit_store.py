@@ -18,6 +18,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -28,7 +29,6 @@ from app.services.data.evidence.audit_contracts import (
     AuditPersistenceResult,
 )
 from app.services.data.persistence import create_audit_event_record
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -68,9 +68,15 @@ def _persist_audit_event_raw(event: Any) -> AuditPersistenceResult:
     """
     try:
         payload_json = json.dumps(dict(event.payload))
+        ts_val = getattr(event, "occurred_at", None) or getattr(
+            event, "timestamp", None
+        )
+        ts_str = (
+            ts_val.isoformat() if hasattr(ts_val, "isoformat") else str(ts_val or "")
+        )
         params = (
             event.event_id,
-            event.timestamp.isoformat(),
+            ts_str,
             event.domain,
             event.action,
             event.principal_id,

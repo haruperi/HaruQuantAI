@@ -17,7 +17,8 @@ from pydantic import (
     model_validator,
 )
 
-from app.utils import is_sensitive_key, validate_id
+from app.kernel.identity import validate_id
+from app.kernel.redaction import is_sensitive_key
 
 _SHA256_PATTERN = re.compile(r"[0-9a-f]{64}")
 _MAX_MAPPING_ITEMS = 8

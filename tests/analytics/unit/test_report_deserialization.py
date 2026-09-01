@@ -5,12 +5,12 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
+from app.kernel.identity import generate_id
 from app.services.analytics import (
     build_performance_report,
     deserialize_analytics_performance_report,
     serialize_report,
 )
-from app.utils import generate_id
 
 from tests.analytics._support import NOW, _configured, _source_with_profit, unwrap
 

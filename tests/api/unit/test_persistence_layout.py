@@ -5,12 +5,12 @@ import inspect
 import re
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.api.identity import persistence as identity_persistence
 from app.services.api.widgets.simulator import (
     persistence as simulation_workbench_persistence,
 )
 from app.services.api.widgets.watchlists import persistence as watchlist_persistence
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

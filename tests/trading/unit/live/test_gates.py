@@ -8,6 +8,8 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_auth_context
 from app.services.brokers import build_broker_connection_config
 from app.services.risk import (
     create_action_policy_verdict,
@@ -20,7 +22,6 @@ from app.services.trading.contracts import TradingRequest, TradingRoute
 from app.services.trading.live import LiveSession, evaluate_live_gate
 from app.services.trading.state import IdempotencyReservation, TradingStateStore
 from app.services.trading.validation import ReadinessAssessment
-from app.utils import create_auth_context, get_logger
 
 # Private type-only aliases; Risk exposes functions, not contract classes.
 ActionPolicyVerdict = object

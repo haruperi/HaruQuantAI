@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 
+from app.composition.logging import get_logger
 from app.services.data.datasets.migrations import (
     PROVIDER_SPECIFICATION_MIGRATION_STEP,
 )
@@ -34,7 +35,6 @@ from app.services.data.migrations.research_sources import (
     RESEARCH_SOURCE_MIGRATION_STEP,
 )
 from app.services.data.persistence.contracts import MigrationStep
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

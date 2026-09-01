@@ -7,6 +7,7 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.api.identity import build_auth_context
 from app.services.api.widgets.simulator.orchestration import (
     build_simulator_run_source,
@@ -21,7 +22,6 @@ from app.services.api.widgets.simulator.routes import (
     _simulator_strategy_source,
 )
 from app.services.api.widgets.simulator.schemas import SimulatorRunRequest
-from app.utils import generate_id
 from fastapi import HTTPException
 from pydantic import ValidationError
 

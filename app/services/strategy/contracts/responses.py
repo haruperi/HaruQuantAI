@@ -8,15 +8,14 @@ import time
 from collections.abc import Callable, Mapping
 from typing import Any, Literal, ParamSpec, Protocol, TypeGuard, TypeVar, cast
 
-from app.utils import (
+from app.composition.logging import get_logger
+from app.contracts.common.models import (
     build_response_metadata,
     error_response,
-    generate_id,
-    get_logger,
     get_standard_response_type,
     success_response,
-    validate_id,
 )
+from app.kernel.identity import generate_id, validate_id
 
 type JsonValue = Any
 type ResponseMetadata = Any

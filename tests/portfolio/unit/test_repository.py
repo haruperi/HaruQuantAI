@@ -6,6 +6,7 @@ import inspect
 from collections.abc import Mapping
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.portfolio.contracts import (
     ActivePortfolioAllocation,
     PortfolioConstructionResult,
@@ -20,7 +21,6 @@ from app.services.portfolio.state import (
     scope_key,
 )
 from app.services.portfolio.state import repository as repository_module
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

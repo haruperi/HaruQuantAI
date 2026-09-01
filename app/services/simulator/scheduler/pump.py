@@ -10,11 +10,11 @@ from dataclasses import replace
 from datetime import datetime
 from typing import cast
 
+from app.kernel.serialization import canonical_digest
 from app.services.simulator.realism.random_streams import serialize
 from app.services.simulator.scheduler.clock import _SimulatedClock
 from app.services.simulator.scheduler.contracts import _ScheduledEvent
 from app.services.simulator.scheduler.queue import _EventQueue
-from app.utils import canonical_digest
 
 type _Handler = Callable[[Mapping[str, object]], object | Awaitable[object]]
 

@@ -6,6 +6,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, override
 
+from app.composition.logging import get_logger
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -27,7 +28,6 @@ from app.services.data.sources.contracts import (
     SourceReadRequest,
 )
 from app.services.data.sources.protocol import MarketDataSource
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

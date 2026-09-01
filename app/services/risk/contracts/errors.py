@@ -2,8 +2,9 @@
 
 import re
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import is_sensitive_key, redact_text_value
 from app.services.risk.contracts.enums import RiskErrorCode  # noqa: TC001
-from app.utils import get_logger, is_sensitive_key, redact_text_value
 
 
 class HaruQuantError(Exception):

@@ -8,6 +8,7 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics import create_analytics_value
 from app.services.data import (
     build_account_state_snapshot,
@@ -40,7 +41,6 @@ from app.services.strategy import (
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -5,10 +5,10 @@ from __future__ import annotations
 from collections.abc import Mapping
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.risk.contracts import LimitStatus, RiskErrorCode, RiskLimitResult
 from app.services.risk.contracts.responses import guard_risk_boundary
 from app.services.risk.stop_validation.models import parse_stop_validation
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

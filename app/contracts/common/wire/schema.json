@@ -1,5 +1,171 @@
 {
   "$defs": {
+    "AuditEvent": {
+      "additionalProperties": false,
+      "description": "Redacted, versioned audit trail event.",
+      "properties": {
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "causation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Causation Id"
+        },
+        "correlation_id": {
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "domain": {
+          "title": "Domain",
+          "type": "string"
+        },
+        "event_id": {
+          "title": "Event Id",
+          "type": "string"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "principal_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Principal Id"
+        },
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "event_id",
+        "occurred_at",
+        "domain",
+        "action",
+        "request_id",
+        "correlation_id",
+        "payload"
+      ],
+      "title": "AuditEvent",
+      "type": "object"
+    },
+    "AuthContext": {
+      "additionalProperties": false,
+      "description": "Immutable trace and authenticated principal context.",
+      "properties": {
+        "correlation_id": {
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "issued_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Issued At",
+          "type": "string"
+        },
+        "permissions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "principal_id": {
+          "title": "Principal Id",
+          "type": "string"
+        },
+        "principal_type": {
+          "enum": [
+            "USER",
+            "SERVICE_ACCOUNT"
+          ],
+          "title": "Principal Type",
+          "type": "string"
+        },
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "roles": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Roles",
+          "type": "array"
+        },
+        "runtime_profile": {
+          "default": "simulation",
+          "enum": [
+            "research",
+            "simulation",
+            "demo",
+            "live"
+          ],
+          "title": "Runtime Profile",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scopes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Scopes",
+          "type": "array"
+        },
+        "tenant_or_environment": {
+          "title": "Tenant Or Environment",
+          "type": "string"
+        },
+        "workflow_id": {
+          "title": "Workflow Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "principal_id",
+        "principal_type",
+        "tenant_or_environment",
+        "request_id",
+        "workflow_id",
+        "correlation_id",
+        "issued_at"
+      ],
+      "title": "AuthContext",
+      "type": "object"
+    },
     "CapabilityFailure": {
       "additionalProperties": false,
       "description": "Explicit failed capability outcome.",
@@ -241,6 +407,38 @@
       "title": "DomainEvent",
       "type": "object"
     },
+    "IdempotencyKey": {
+      "additionalProperties": false,
+      "description": "Owner-bound TTL idempotency key.",
+      "properties": {
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "owner_id": {
+          "title": "Owner Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "key",
+        "owner_id",
+        "expires_at"
+      ],
+      "title": "IdempotencyKey",
+      "type": "object"
+    },
     "JsonObject": {
       "additionalProperties": {
         "$ref": "#/$defs/JsonValue"
@@ -340,14 +538,19 @@
           "title": "Capability Key"
         },
         "code": {
+          "default": "ERROR",
           "pattern": "^[A-Z][A-Z0-9_]*$",
           "title": "Code",
           "type": "string"
         },
         "detail": {
+          "default": "Application operation failed",
           "minLength": 1,
           "title": "Detail",
           "type": "string"
+        },
+        "details": {
+          "$ref": "#/$defs/JsonObject"
         },
         "errors": {
           "default": [],
@@ -379,9 +582,16 @@
           "type": "array"
         },
         "request_id": {
-          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-          "title": "Request Id",
-          "type": "string"
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Id"
         },
         "required_version": {
           "anyOf": [
@@ -403,31 +613,215 @@
           "type": "integer"
         },
         "status": {
+          "default": 400,
           "maximum": 599,
           "minimum": 400,
           "title": "Status",
           "type": "integer"
         },
         "title": {
+          "default": "Application Error",
           "minLength": 1,
           "title": "Title",
           "type": "string"
         },
         "type": {
+          "default": "urn:haruquantai:error",
           "pattern": "^(?:urn:|https?://).+",
           "title": "Type",
           "type": "string"
         }
       },
-      "required": [
-        "type",
-        "title",
-        "status",
-        "code",
-        "detail",
-        "request_id"
-      ],
       "title": "ProblemDetails",
+      "type": "object"
+    },
+    "ProfileRef": {
+      "additionalProperties": false,
+      "description": "Versioned reference to a named configuration profile.",
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "profile_id": {
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "profile_kind": {
+          "title": "Profile Kind",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profile_kind",
+        "profile_id",
+        "version",
+        "content_hash"
+      ],
+      "title": "ProfileRef",
+      "type": "object"
+    },
+    "ProgressUpdate": {
+      "additionalProperties": false,
+      "description": "Structured progress update for asynchronous tasks and jobs.",
+      "properties": {
+        "job_id": {
+          "title": "Job Id",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "progress_pct": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Progress Pct",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "updated_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id",
+        "task_id",
+        "progress_pct",
+        "message",
+        "updated_at"
+      ],
+      "title": "ProgressUpdate",
+      "type": "object"
+    },
+    "ResponseMetadata": {
+      "additionalProperties": false,
+      "description": "Monotonic execution and trace metadata for standard operation responses.",
+      "properties": {
+        "correlation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Correlation Id"
+        },
+        "domain": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Domain"
+        },
+        "execution_ms": {
+          "default": 0.0,
+          "title": "Execution Ms",
+          "type": "number"
+        },
+        "extensions": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "modifies_database": {
+          "default": false,
+          "title": "Modifies Database",
+          "type": "boolean"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name"
+        },
+        "places_trade": {
+          "default": false,
+          "title": "Places Trade",
+          "type": "boolean"
+        },
+        "read_only": {
+          "default": true,
+          "title": "Read Only",
+          "type": "boolean"
+        },
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "requires_network": {
+          "default": false,
+          "title": "Requires Network",
+          "type": "boolean"
+        },
+        "risk_level": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": "none",
+          "title": "Risk Level"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "timestamp": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "writes_file": {
+          "default": false,
+          "title": "Writes File",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "request_id",
+        "timestamp"
+      ],
+      "title": "ResponseMetadata",
       "type": "object"
     },
     "SeriesPointKey": {
@@ -451,6 +845,16 @@
       ],
       "title": "SeriesPointKey",
       "type": "object"
+    },
+    "SeverityRank": {
+      "enum": [
+        "INFO",
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ],
+      "type": "string"
     },
     "Timeframe": {
       "additionalProperties": false,
@@ -511,6 +915,142 @@
       ],
       "title": "ValidationIssue",
       "type": "object"
+    },
+    "ValidationOutcome": {
+      "additionalProperties": false,
+      "description": "Cross-domain validation outcome.",
+      "properties": {
+        "evaluated_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Evaluated At",
+          "type": "string"
+        },
+        "reasons": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ValidationReason"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "verdict": {
+          "$ref": "#/$defs/ValidationVerdict"
+        }
+      },
+      "required": [
+        "verdict",
+        "evaluated_at"
+      ],
+      "title": "ValidationOutcome",
+      "type": "object"
+    },
+    "ValidationReason": {
+      "additionalProperties": false,
+      "description": "Structured validation reason code with severity and corrective actions.",
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "corrective_action": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Corrective Action"
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Ref"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "severity": {
+          "$ref": "#/$defs/SeverityRank",
+          "default": "MEDIUM"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "ValidationReason",
+      "type": "object"
+    },
+    "ValidationVerdict": {
+      "enum": [
+        "PASS",
+        "WARN",
+        "BLOCK",
+        "FAIL",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "VersionRef": {
+      "additionalProperties": false,
+      "description": "Versioned reference to an immutable artifact or policy.",
+      "properties": {
+        "artifact_id": {
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "artifact_kind": {
+          "title": "Artifact Kind",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_kind",
+        "artifact_id",
+        "version",
+        "content_hash"
+      ],
+      "title": "VersionRef",
+      "type": "object"
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -525,17 +1065,35 @@
     }
   },
   "models": {
+    "AuditEvent": {
+      "$ref": "#/$defs/AuditEvent"
+    },
+    "AuthContext": {
+      "$ref": "#/$defs/AuthContext"
+    },
     "CapabilityProviderSnapshot": {
       "$ref": "#/$defs/CapabilityProviderSnapshot"
     },
     "CapabilitySnapshot": {
       "$ref": "#/$defs/CapabilitySnapshot"
     },
+    "IdempotencyKey": {
+      "$ref": "#/$defs/IdempotencyKey"
+    },
     "Money": {
       "$ref": "#/$defs/Money"
     },
     "ProblemDetails": {
       "$ref": "#/$defs/ProblemDetails"
+    },
+    "ProfileRef": {
+      "$ref": "#/$defs/ProfileRef"
+    },
+    "ProgressUpdate": {
+      "$ref": "#/$defs/ProgressUpdate"
+    },
+    "ResponseMetadata": {
+      "$ref": "#/$defs/ResponseMetadata"
     },
     "SeriesPointKey": {
       "$ref": "#/$defs/SeriesPointKey"
@@ -545,6 +1103,15 @@
     },
     "ValidationIssue": {
       "$ref": "#/$defs/ValidationIssue"
+    },
+    "ValidationOutcome": {
+      "$ref": "#/$defs/ValidationOutcome"
+    },
+    "ValidationReason": {
+      "$ref": "#/$defs/ValidationReason"
+    },
+    "VersionRef": {
+      "$ref": "#/$defs/VersionRef"
     }
   },
   "namespace": "common",

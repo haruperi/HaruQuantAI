@@ -6,13 +6,13 @@ from collections.abc import Mapping
 from datetime import UTC, datetime
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.risk.config.factories import create_risk_config
 from app.services.risk.config.runtime import register_risk_policy
 from app.services.risk.contracts.responses import (
     guard_risk_boundary,
     unwrap_risk_response,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

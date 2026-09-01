@@ -8,6 +8,7 @@ from decimal import Decimal
 from typing import cast
 
 import pytest
+from app.contracts.common.models import StandardResponse
 from app.services.brokers._shared.subscription import _BrokerSubscription
 from app.services.brokers.canonical_contracts import (
     AccountProvider,
@@ -30,7 +31,6 @@ from app.services.brokers.canonical_contracts import (
     TradeExecutionProvider,
 )
 from app.services.brokers.canonical_contracts.protocols import _UnsupportedAdapterBase
-from app.utils.responses.models import StandardResponse
 
 from tests.brokers.response_factory import broker_response
 

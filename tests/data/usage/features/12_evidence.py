@@ -13,6 +13,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from _audit_support import main as run_audit_support
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_account_snapshot_request,
     build_data_settings,
@@ -28,7 +29,6 @@ from app.services.data import (
     run_data_migrations,
     run_data_operation,
 )
-from app.utils import generate_id
 
 
 def _header(title: str) -> None:

@@ -9,6 +9,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
+from app.composition.logging import get_logger
+from app.contracts.common.models import create_audit_event
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.research.contracts import (
     ArtifactReference,
     ArtifactWriteConfig,
@@ -22,12 +26,6 @@ from app.services.research.contracts.errors import (
 from app.services.research.leakage import mask_research_artifact
 from app.services.research.persistence import create_artifact_metadata
 from app.services.research.profiles import render_research_report
-from app.utils import (
-    canonical_json,
-    create_audit_event,
-    generate_id,
-    get_logger,
-)
 
 type AuthContext = Any
 

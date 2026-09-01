@@ -13,15 +13,15 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import Any, Final, Literal, ParamSpec, TypeVar, cast
 
-from app.services.indicators.core.error_catalog import INDICATOR_ERROR_CATALOG
-from app.utils import (
+from app.composition.logging import get_logger
+from app.contracts.common.models import (
     build_response_metadata,
     error_response,
-    generate_id,
-    get_logger,
-    redact_text_value,
     success_response,
 )
+from app.kernel.identity import generate_id
+from app.kernel.redaction import redact_text_value
+from app.services.indicators.core.error_catalog import INDICATOR_ERROR_CATALOG
 
 type JsonValue = Any
 type StandardResponse[T] = Any

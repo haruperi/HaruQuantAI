@@ -7,7 +7,8 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Literal
 
-from app.utils import get_logger, redact_mapping_value
+from app.composition.logging import get_logger
+from app.kernel.redaction import redact_mapping_value
 
 
 class HaruQuantError(Exception):

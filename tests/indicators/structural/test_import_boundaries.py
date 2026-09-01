@@ -16,7 +16,6 @@ DATA_PUBLIC_ROOT = "app.services.data"
 # The complete approved runtime dependency surface for this pure domain.
 ALLOWED_THIRD_PARTY = {"numpy", "pandas"}
 ALLOWED_LOCAL_PREFIXES = (
-    "app.utils",
     DOMAIN_PREFIX,
     "app.contracts",
     "app.composition",

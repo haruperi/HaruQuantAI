@@ -12,6 +12,7 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
 from app.services.strategy.contracts._base import (
     JsonValue,
     _contains_executable_marker,
@@ -27,7 +28,6 @@ from app.services.strategy.contracts.references import (  # noqa: TC001
     StrategyConfig,
     StrategyRef,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.analytics.contracts import (
     AnalyticsRunConfig,
     AnalyticsValidationError,
@@ -24,7 +25,6 @@ from app.services.analytics.contracts import (
     build_quality_flag,
     build_warning,
 )
-from app.utils import get_logger
 from pydantic import ValidationError as PydanticValidationError
 
 logger = get_logger(__name__)

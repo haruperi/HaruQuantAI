@@ -17,6 +17,8 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
+from app.kernel.identity import validate_id
 from app.services.data import (
     build_account_state_snapshot,
     build_fx_conversion_evidence,
@@ -25,7 +27,6 @@ from app.services.data import (
 from app.services.risk.contracts.enums import LimitStatus, RiskErrorCode
 from app.services.risk.contracts.errors import RiskDomainError
 from app.services.risk.contracts.responses import guard_risk_boundary
-from app.utils import get_logger, validate_id
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

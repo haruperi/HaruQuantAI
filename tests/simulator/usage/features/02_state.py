@@ -16,6 +16,8 @@ from typing import Any, cast
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     build_data_settings,
     data_settings_context,
@@ -41,7 +43,6 @@ from app.services.simulator import (
     stream_simulation_session_frames,
     unwrap_simulation_response,
 )
-from app.utils import canonical_json, generate_id
 from tests.simulator.usage.workflows._support import (
     backtest_request,
     live_tick_dataset,

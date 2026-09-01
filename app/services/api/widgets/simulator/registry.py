@@ -13,6 +13,8 @@ from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from typing import cast
 
+from app.composition.logging import get_logger
+from app.kernel.time import format_utc_timestamp
 from app.services.api.widgets.simulator.persistence import (
     annotate_simulation_result_record,
     archive_simulation_result_record,
@@ -25,7 +27,6 @@ from app.services.api.widgets.simulator.persistence import (
     transition_simulation_result_completion,
     update_simulation_batch_record,
 )
-from app.utils import format_utc_timestamp, get_logger
 
 logger = get_logger(__name__)
 

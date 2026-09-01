@@ -16,11 +16,11 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
+from app.kernel.errors import create_validation_error as ValidationError
 from app.services.brokers.canonical_contracts.enums import (
     BrokerResubmissionPolicy,
     BrokerUncertainty,
 )
-from app.utils import create_validation_error as ValidationError
 
 _OUTCOME_VERDICTS = frozenset({"ACCEPTED", "REJECTED", "PARTIAL", "UNKNOWN"})
 

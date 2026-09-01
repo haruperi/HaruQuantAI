@@ -3,11 +3,11 @@
 # ruff: noqa: PT018
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.strategy import (
     get_strategy_lifecycle_status,
     register_strategy_version,
 )
-from app.utils import get_logger
 
 from tests.strategy.unit.test_catalog import make_registration, storage_context
 from tests.strategy.unit.test_models import make_auth, make_policy

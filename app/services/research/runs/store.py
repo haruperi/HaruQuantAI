@@ -15,6 +15,7 @@ import json
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from app.composition.logging import get_logger
 from app.services.research.contracts.errors import ValidationError
 from app.services.research.persistence import (
     create_research_experiment_row,
@@ -24,7 +25,6 @@ from app.services.research.persistence import (
     read_research_run_rows,
     upsert_research_run_row,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from typing import Any
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import DataError
 from app.services.data.market_events import buffer, reconnection, state, status
 from app.services.data.market_events.contracts import (
@@ -18,7 +19,6 @@ from app.services.data.market_events.heartbeat import (
     touch_heartbeat,
 )
 from app.services.data.market_events.state import _ACTIVE_FEEDS, ActiveFeed
-from app.utils import generate_id
 
 _NOW = datetime(2026, 1, 1, 12, tzinfo=UTC)
 

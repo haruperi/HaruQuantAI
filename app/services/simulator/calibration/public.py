@@ -10,6 +10,8 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_digest
 from app.services.simulator.calibration import execution, spread
 from app.services.simulator.calibration.contracts import (
     _CalibrationArtifact,
@@ -18,7 +20,6 @@ from app.services.simulator.calibration.contracts import (
 )
 from app.services.simulator.calibration.partition import partition
 from app.services.simulator.calibration.validate import validate
-from app.utils import canonical_digest, get_logger
 
 logger = get_logger(__name__)
 

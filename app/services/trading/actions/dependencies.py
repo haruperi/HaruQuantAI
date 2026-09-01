@@ -8,6 +8,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Protocol
 
+from app.composition.logging import get_logger
 from app.services.trading.contracts import (
     PortfolioRebalanceExecutionRequest,
     TradingError,
@@ -17,7 +18,6 @@ from app.services.trading.contracts import (
 from app.services.trading.contracts.models import JsonValue
 from app.services.trading.reconciliation import AuthoritySnapshot
 from app.services.trading.state import create_execution_position_store
-from app.utils import get_logger
 
 AccountStateSnapshot = Any
 ActionPolicyVerdict = Any

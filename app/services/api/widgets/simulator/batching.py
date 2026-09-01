@@ -15,6 +15,9 @@ from contextlib import AbstractContextManager, nullcontext
 from datetime import UTC, datetime
 from typing import Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import format_utc_timestamp
 from app.services.api.widgets.simulator.persistence import (
     create_simulation_batch_item_records,
     create_simulation_batch_record,
@@ -27,7 +30,6 @@ from app.services.api.widgets.simulator.workbench_schemas import (
     MAX_BATCH_CONCURRENCY,
     MAX_BATCH_ITEMS,
 )
-from app.utils import format_utc_timestamp, generate_id, get_logger
 
 logger = get_logger(__name__)
 

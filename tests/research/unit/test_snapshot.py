@@ -1,6 +1,7 @@
 """Unit tests for Research snapshots and summaries (FR-RES-090 to 092)."""
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.research import (
     build_dashboard_summary,
     build_profile_summary,
@@ -8,7 +9,6 @@ from app.services.research import (
     create_research_value,
     is_research_value,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

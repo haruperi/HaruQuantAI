@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.simulator import run_fast_research, unwrap_simulation_response
-from app.utils import get_logger
 
 from tests.simulator.component.test_orchestrator import (
     FakeDependencies,

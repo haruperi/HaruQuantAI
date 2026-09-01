@@ -1,5 +1,6 @@
 """Workflow integration test for canonical Risk kill-switch control."""
 
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     apply_kill_switch_command,
     check_risk_kill_switch,
@@ -7,7 +8,6 @@ from app.services.risk import (
     create_risk_audit_chain,
     get_decision_state,
 )
-from app.utils import canonical_json
 
 from tests.risk import _support as examples
 

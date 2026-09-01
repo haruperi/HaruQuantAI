@@ -34,7 +34,9 @@ from app.agentic.governance.registry import (
     verify_prompt_artifact,
 )
 from app.agentic.runtime.models import build_model_invocation
-from app.utils import derive_stable_id, get_logger, utc_now
+from app.composition.logging import get_logger
+from app.kernel.identity import derive_stable_id
+from app.kernel.time import utc_now
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence

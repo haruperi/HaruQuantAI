@@ -7,6 +7,9 @@ from decimal import Decimal
 from types import MappingProxyType
 from typing import Any, Final, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import utc_now
 from app.services.api.identity import get_username_for_principal
 from app.services.api.widgets.settings.account_mode import resolve_execution_route
 from app.services.api.widgets.trading.schemas import TradingAccountProfileResponse
@@ -20,7 +23,6 @@ from app.services.trading import (
     resolve_active_execution_session,
     submit_order,
 )
-from app.utils import generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 
@@ -480,10 +482,10 @@ def _resolve_approval_signing_key(request_id: str) -> bytes:
     Raises:
         ValueError: If the credential slot has not been configured yet.
     """
+    from app.kernel.identity import derive_stable_id
     from app.services.api.composition.runtime_settings import build_credential_key_set
     from app.services.api.identity import resolve_credential_reference
     from app.services.api.widgets.settings.bootstrap import get_api_settings
-    from app.utils import derive_stable_id
 
     reference_id = derive_stable_id("id", "api-credential:system:risk_approval_signing")
     material = resolve_credential_reference(

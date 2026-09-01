@@ -11,6 +11,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.contracts.common.models import create_auth_context
+from app.kernel.serialization import canonical_digest
 from app.services.data import (
     build_data_quality_report,
     build_data_settings,
@@ -30,7 +32,6 @@ from app.services.strategy import (
     register_strategy_version,
     validate_strategy_proposal,
 )
-from app.utils import canonical_digest, create_auth_context
 from tests.strategy.usage.workflows._support import (
     COR,
     REQ,

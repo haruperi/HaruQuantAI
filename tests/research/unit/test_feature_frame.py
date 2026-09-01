@@ -1,12 +1,12 @@
 """Unit tests for canonical Research feature-frame assembly."""
 
 import pandas as pd
+from app.composition.logging import get_logger
 from app.services.indicators import sma
 from app.services.research import (
     build_research_feature_frame,
     create_research_value,
 )
-from app.utils import get_logger
 
 from tests.indicators.helpers import build_dataset, unwrap_response
 

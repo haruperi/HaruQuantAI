@@ -23,7 +23,8 @@ from app.agentic import (
     build_budget_usage,
     build_workflow_checkpoint,
 )
-from app.utils import canonical_digest, derive_stable_id, generate_id
+from app.kernel.identity import derive_stable_id, generate_id
+from app.kernel.serialization import canonical_digest
 
 from tests.agentic.usage._runner import run_feature_usage
 

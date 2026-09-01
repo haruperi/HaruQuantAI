@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from hashlib import sha256
 
+from app.kernel.serialization import canonical_json, to_json_safe
 from app.services.trading.contracts.errors import TradingError
 from app.services.trading.contracts.models import (
     TRADING_CONTRACT_VERSION,
@@ -20,7 +21,6 @@ from app.services.trading.contracts.models import (
     TradingRequestV2,
     TradingRoute,
 )
-from app.utils import canonical_json, to_json_safe
 
 
 def get_trading_contract_version() -> str:

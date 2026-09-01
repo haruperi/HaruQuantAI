@@ -6,13 +6,14 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 from app.services.data.contracts import DataError
 from app.services.data.market_events.contracts import (
     FeedStatus,
     FeedStatusRequest,
 )
 from app.services.data.persistence import read_feed_record
-from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
 

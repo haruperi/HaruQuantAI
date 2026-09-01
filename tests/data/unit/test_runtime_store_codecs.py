@@ -4,6 +4,7 @@ import json
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_agentic_runtime_store,
     execute_runtime_store_operation,
@@ -11,7 +12,6 @@ from app.services.data import (
 )
 from app.services.data.persistence.contracts import TransactionResult
 from app.services.data.runtime_stores import codecs
-from app.utils import generate_id
 
 
 def _encode(value: object) -> str:

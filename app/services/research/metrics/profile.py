@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
 
+from app.composition.logging import get_logger
 from app.services.research.contracts import CoreMetricProfile, ResearchWarning
 from app.services.research.metrics.registry import (
     MetricContext,
     build_default_registry,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

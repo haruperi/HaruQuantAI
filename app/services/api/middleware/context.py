@@ -14,11 +14,13 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.types import ASGIApp
 
+from app.contracts.common.models import get_auth_context_type
+from app.kernel.identity import generate_id, validate_id
+from app.kernel.time import utc_now
 from app.services.api.contracts.catalog import (
     ROUTE_CONTRACT_REGISTRY,
     RouteContractRegistry,
 )
-from app.utils import generate_id, get_auth_context_type, utc_now, validate_id
 
 if TYPE_CHECKING:
     from app.services.api.contracts.models import RouteContract

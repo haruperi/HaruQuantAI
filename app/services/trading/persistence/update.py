@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime
 
+from app.composition.logging import get_logger
 from app.services.trading.persistence.create import (
     _EventValue,
     _execute,
@@ -12,7 +13,6 @@ from app.services.trading.persistence.create import (
     _require_store,
     _ReservationValue,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 _MIN_ATOMIC_AFFECTED_ROWS = 2
@@ -40,7 +40,7 @@ def _append_session_event(
     Returns:
         Parameterized SQL and bound values.
     """
-    from app.utils import generate_id
+    from app.kernel.identity import generate_id
 
     return (
         "INSERT INTO trading_session_events "

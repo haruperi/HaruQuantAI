@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.api import register_api_user, run_api_migrations
 from app.services.api.widgets.simulator.migrations import (
     get_simulation_workbench_migration_steps,
@@ -28,7 +29,6 @@ from app.services.data import (
     data_settings_context,
     run_domain_migrations,
 )
-from app.utils import generate_id
 
 _FIXED_DAYS = (1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6)
 

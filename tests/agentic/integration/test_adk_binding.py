@@ -24,7 +24,7 @@ from app.agentic.runtime.adk import (
     _structured_output,
     build_adk_runtime,
 )
-from app.utils import canonical_digest
+from app.kernel.serialization import canonical_digest
 
 FAKE_KEY = "test-key-not-a-real-credential"
 

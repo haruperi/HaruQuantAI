@@ -5,6 +5,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
+from app.composition.logging import get_logger
 from app.services.portfolio.construction.methods import (
     equal_weights,
     fixed_weights,
@@ -12,7 +13,6 @@ from app.services.portfolio.construction.methods import (
 )
 from app.services.portfolio.contracts import FixedWeightInput
 from app.services.portfolio.contracts.errors import PortfolioError
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

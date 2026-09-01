@@ -6,12 +6,14 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Protocol, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_json
 from app.services.data import (
     build_statement_plan,
     build_transaction_request,
     execute_transaction,
 )
-from app.utils import canonical_json, generate_id, get_logger
 
 logger = get_logger(__name__)
 

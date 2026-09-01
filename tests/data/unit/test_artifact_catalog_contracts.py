@@ -4,6 +4,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data import (
     get_catalog_evidence,
     get_catalog_table_lifecycles,
@@ -12,7 +13,6 @@ from app.services.data import (
 )
 from app.services.data.contracts import DataError
 from app.services.data.datasets import catalog as operations
-from app.utils import generate_id
 
 _REQUEST_ID = generate_id("req")
 

@@ -32,6 +32,10 @@ _project_root = str(Path(__file__).resolve().parents[2])
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
+from app.composition.config import load_broker_provider_settings
+from app.contracts.common.models import create_auth_context
+from app.kernel.identity import generate_id
+from app.kernel.serialization import canonical_digest, canonical_json
 from app.services.analytics import (
     build_performance_report,
     create_analytics_value,
@@ -89,13 +93,6 @@ from app.services.strategy import (
     get_strategy_timing_policy,
 )
 from app.services.trading import create_order_intent
-from app.utils import (
-    canonical_digest,
-    canonical_json,
-    create_auth_context,
-    generate_id,
-    load_broker_provider_settings,
-)
 
 from tests.simulator._fixtures.sqlite_store import SqliteSimulationStateStore
 

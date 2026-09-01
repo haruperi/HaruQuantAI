@@ -7,6 +7,8 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
+from app.contracts.common.models import AuthContext
+from app.kernel.identity import generate_id
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.requests import MarketDataRequest
 from app.services.data.persistence.contracts import TransactionResult
@@ -28,8 +30,6 @@ from app.services.data.sources.registry import (
     _reset_registry,
     register_source,
 )
-from app.utils import generate_id
-from app.utils.contracts.auth import AuthContext
 
 # Base timestamps
 START = datetime.now(UTC)

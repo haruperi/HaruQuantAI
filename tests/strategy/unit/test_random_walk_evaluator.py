@@ -1,7 +1,7 @@
 """RandomWalk concrete trigger tests."""
 
+from app.composition.logging import get_logger
 from app.services.strategy.evaluators.random_walk import RandomWalkEvaluator
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,

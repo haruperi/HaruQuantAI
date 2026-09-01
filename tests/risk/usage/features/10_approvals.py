@@ -15,6 +15,7 @@ from typing import Any, Literal
 # Add repository root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     compute_config_hash,
     create_approval_attestation,
@@ -27,7 +28,6 @@ from app.services.risk import (
     revoke_risk_approval_scope,
     validate_risk_approval_token,
 )
-from app.utils import canonical_json
 from tests.risk._support import unwrap_risk_response
 
 NOW = datetime(2026, 7, 19, 5, tzinfo=UTC)

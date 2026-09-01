@@ -3,8 +3,8 @@
 import asyncio
 from pathlib import Path
 
+from app.composition.logging import get_logger
 from app.services.simulator import run_backtest_async, unwrap_simulation_response
-from app.utils import get_logger
 
 from tests.simulator.component.test_orchestrator import (
     FakeDependencies,

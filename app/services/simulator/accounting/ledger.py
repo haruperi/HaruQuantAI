@@ -9,6 +9,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
+from app.composition.logging import get_logger
 from app.services.simulator.accounting.calculations import (
     ExecutionCostInput,
     ExecutionCostModel,
@@ -18,7 +19,6 @@ from app.services.simulator.accounting.calculations import (
     normalize_volume,
 )
 from app.services.simulator.errors import SimulationError, operation_guard
-from app.utils import get_logger
 
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 

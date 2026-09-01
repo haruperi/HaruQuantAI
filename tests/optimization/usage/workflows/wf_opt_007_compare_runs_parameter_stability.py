@@ -8,13 +8,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.composition.logging import flush_logging
 from app.services.optimization import (
     calculate_parameter_stability,
     compare_optimization_runs,
     dump_optimization_value,
     run_parameter_sweep,
 )
-from app.utils import flush_logging
 from tests.optimization.usage._support import (
     genuine_execution_bundle,
     search_request,

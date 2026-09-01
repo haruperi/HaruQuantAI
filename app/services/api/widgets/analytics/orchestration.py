@@ -13,6 +13,9 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.identity import generate_id
+from app.kernel.time import format_utc_timestamp, utc_now
 from app.services.api.widgets.simulator.persistence import (
     annotate_simulation_result_record,
     archive_simulation_result_record,
@@ -28,7 +31,6 @@ from app.services.api.widgets.simulator.workbench_schemas import (
     MAX_PAGE_SIZE,
     MAX_TRADE_PAGE_SIZE,
 )
-from app.utils import format_utc_timestamp, generate_id, get_logger, utc_now
 
 logger = get_logger(__name__)
 

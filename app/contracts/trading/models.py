@@ -692,6 +692,7 @@ class PublicTradingAction(WireModel):
     and commit.
     """
 
+    schema_id: NonEmptyStr = "trading.public_action.v1"
     action_id: Uuid7
     action: Literal[
         "CREATE",

@@ -4,6 +4,7 @@ import sqlite3
 from contextlib import closing
 from pathlib import Path
 
+from app.kernel.identity import generate_id
 from app.services.api import run_api_migrations
 from app.services.api.composition.migrations import get_api_migration_steps
 from app.services.data import (
@@ -12,7 +13,6 @@ from app.services.data import (
     data_settings_context,
     run_domain_migrations,
 )
-from app.utils import generate_id
 
 
 def test_api_0006_preserves_legacy_user_settings(tmp_path: Path) -> None:

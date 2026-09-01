@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from datetime import datetime, timedelta
 
+from app.composition.logging import get_logger
+from app.kernel.identity import validate_id
 from app.services.risk.config.profiles import RiskConfig, compute_config_hash
 from app.services.risk.contracts.enums import RiskErrorCode
 from app.services.risk.contracts.errors import RiskDomainError
@@ -13,7 +15,6 @@ from app.services.risk.contracts.responses import (
     unwrap_risk_response,
 )
 from app.services.risk.persistence import create_policy_version, read_policy_version
-from app.utils import get_logger, validate_id
 
 logger = get_logger(__name__)
 

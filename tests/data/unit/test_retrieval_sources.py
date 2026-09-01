@@ -7,6 +7,7 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts import OHLCVRecord
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.market_data.pipeline import fetch_market_dataset
@@ -18,7 +19,6 @@ from app.services.data.sources.contracts import (
     SourceDescriptor,
     SourceLicensePolicy,
 )
-from app.utils import generate_id
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 _REQUEST_ID = generate_id("req")

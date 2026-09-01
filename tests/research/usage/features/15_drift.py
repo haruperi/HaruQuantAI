@@ -8,6 +8,7 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
+from app.kernel.identity import generate_id
 from app.services.data import build_data_settings, data_settings_context
 from app.services.research import (
     build_performance_drift_evidence,
@@ -17,7 +18,6 @@ from app.services.research import (
     persist_performance_drift_evidence,
     propose_drift_suspension,
 )
-from app.utils import generate_id
 
 
 def main() -> None:

@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.api.identity import build_auth_context
 from app.services.api.widgets.event_delivery import StreamLimitError
 from app.services.api.widgets.simulation import (
@@ -18,7 +19,6 @@ from app.services.api.widgets.simulation.session_routes import (
     _create_session,
     _stream_frames,
 )
-from app.utils import generate_id
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict
 from starlette.requests import Request

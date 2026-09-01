@@ -3,6 +3,7 @@
 from datetime import timedelta
 from decimal import Decimal
 
+from app.kernel.serialization import canonical_json
 from app.services.risk import create_risk_audit_chain
 from app.services.risk.config import compute_config_hash
 from app.services.risk.contracts import (
@@ -17,7 +18,6 @@ from app.services.risk.kill_switch import (
     check_risk_kill_switch,
     permits_risk_action,
 )
-from app.utils import canonical_json
 
 from tests.risk import _support as examples
 

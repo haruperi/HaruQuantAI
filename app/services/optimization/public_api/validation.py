@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from app.composition.logging import get_logger
 from app.services.optimization.evidence import OptimizationResult  # noqa: TC001
 from app.services.optimization.validation import WalkForwardRequest  # noqa: TC001
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

@@ -7,6 +7,8 @@ from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json, to_json_safe
 from app.services.trading.contracts import TradingError
 from app.services.trading.contracts.models import (
     JsonValue,  # noqa: TC001 - runtime annotation and model resolution
@@ -17,11 +19,6 @@ from app.services.trading.reconciliation.snapshots import (
 )
 from app.services.trading.state import (
     TradingProjection,  # noqa: TC001 - runtime annotation and model resolution
-)
-from app.utils import (
-    canonical_json,
-    get_logger,
-    to_json_safe,
 )
 
 type StandardResponse[T] = Any

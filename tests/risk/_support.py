@@ -8,6 +8,13 @@ from decimal import Decimal
 from time import perf_counter_ns
 from typing import Literal, TypeVar, cast
 
+from app.contracts.common.models import (
+    build_response_metadata,
+    create_auth_context,
+    get_standard_response_type,
+    success_response,
+)
+from app.kernel.serialization import canonical_json
 from app.services.data import build_market_context_evidence
 from app.services.risk import (
     calculate_position_size,
@@ -36,13 +43,6 @@ from app.services.strategy import (
     get_strategy_environment,
     get_strategy_lifecycle_status,
     get_strategy_timing_policy,
-)
-from app.utils import (
-    build_response_metadata,
-    canonical_json,
-    create_auth_context,
-    get_standard_response_type,
-    success_response,
 )
 
 _ResponseValue = TypeVar("_ResponseValue")

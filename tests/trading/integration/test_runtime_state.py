@@ -5,6 +5,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, cast
 
+from app.kernel.identity import generate_id
 from app.services.data import (
     build_data_settings,
     build_migration_request,
@@ -31,7 +32,6 @@ from app.services.trading import (
     persist_trade_ownership,
     run_trading_migrations,
 )
-from app.utils import generate_id
 
 
 def _settings(tmp_path: Path) -> object:

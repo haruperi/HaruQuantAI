@@ -9,12 +9,6 @@ from typing import Any, NamedTuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-import _support  # noqa: F401
-from _support import (
-    create_real_adapter,
-    real_session,
-    require_success,
-)
 from app.services.brokers import (
     acquire_metatrader_snapshot_symbols,
     build_broker_order_request_v2,
@@ -32,6 +26,13 @@ from app.services.brokers import (
     release_metatrader_snapshot_symbols,
     stream_metatrader_book_snapshots,
     supports_broker_capability,
+)
+
+import _support  # noqa: F401
+from _support import (
+    create_real_adapter,
+    real_session,
+    require_success,
 )
 
 

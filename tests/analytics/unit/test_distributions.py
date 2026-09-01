@@ -1,9 +1,9 @@
 """Unit tests for Analytics distribution evidence."""
 
+from app.composition.logging import get_logger
 from app.services.analytics.metrics.distributions import (
     calculate_distribution_evidence,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

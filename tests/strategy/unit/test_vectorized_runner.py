@@ -3,10 +3,10 @@
 # ruff: noqa: PT018
 from datetime import timedelta
 
+from app.composition.logging import get_logger
 from app.services.strategy import run_vectorized_strategy_signals
 from app.services.strategy.contracts import StrategyTimingPolicy
 from app.services.strategy.vectorized import VectorizedStrategyEvaluator
-from app.utils import get_logger
 
 from tests.strategy.unit.test_models import (
     HASH,

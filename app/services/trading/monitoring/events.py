@@ -14,6 +14,10 @@ from pydantic import (
     model_validator,
 )
 
+from app.composition.logging import get_logger
+from app.kernel.identity import validate_id
+from app.kernel.redaction import is_sensitive_key, redact_text_value
+from app.kernel.serialization import canonical_json, to_json_safe
 from app.services.trading.contracts import (
     ExecutionReceipt,
     TradingError,
@@ -26,14 +30,6 @@ from app.services.trading.contracts.models import (
     _validation_field_name,
 )
 from app.services.trading.contracts.responses import success_trading_response
-from app.utils import (
-    canonical_json,
-    get_logger,
-    is_sensitive_key,
-    redact_text_value,
-    to_json_safe,
-    validate_id,
-)
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

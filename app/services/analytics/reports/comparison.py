@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from app.composition.logging import get_logger
 from app.services.analytics.contracts.catalogs import (
     METRIC_DEFINITION_CATALOG,
     validate_contract_version,
@@ -14,7 +15,6 @@ from app.services.analytics.contracts.models import (
     PerformanceReport,
     SectionEvidence,
 )
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

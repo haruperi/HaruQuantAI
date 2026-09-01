@@ -7,9 +7,9 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
+from app.kernel.identity import generate_id
 from app.services.data.contracts.responses import unwrap_data_response
 from app.services.data.persistence.migrations import run_data_migrations
-from app.utils import generate_id
 
 
 def _unwrap(response):

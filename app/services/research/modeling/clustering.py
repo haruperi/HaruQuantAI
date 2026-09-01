@@ -8,8 +8,8 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
+from app.composition.logging import get_logger
 from app.services.research.modeling.decomposition import _select_finite_features
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

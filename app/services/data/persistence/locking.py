@@ -9,6 +9,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import Self
 
+from app.composition.logging import get_logger
 from app.services.data._settings import get_data_settings
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -21,7 +22,6 @@ from app.services.data.persistence.contracts import (
     TransactionRequest,
 )
 from app.services.data.persistence.transactions import _execute_transaction_raw
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

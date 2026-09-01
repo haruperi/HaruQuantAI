@@ -1,7 +1,7 @@
 """Workflow integration test for Analytics dashboard projection."""
 
+from app.composition.logging import get_logger
 from app.services.analytics import build_dashboard_payload
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 from tests.analytics._support import _report, unwrap  # noqa: E402

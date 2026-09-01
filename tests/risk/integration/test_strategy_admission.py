@@ -3,6 +3,7 @@
 from decimal import Decimal
 from typing import Any, Literal
 
+from app.kernel.serialization import canonical_json
 from app.services.risk import (
     create_risk_audit_chain,
     create_strategy_operational_eligibility_request,
@@ -10,7 +11,6 @@ from app.services.risk import (
     review_strategy_admission,
     verify_risk_audit_chain,
 )
-from app.utils import canonical_json
 
 from tests.risk import _support as examples
 

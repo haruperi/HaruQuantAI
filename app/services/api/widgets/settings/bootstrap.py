@@ -10,6 +10,10 @@ from typing import Literal, override
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
+from app.composition.config import (
+    get_app_settings_model_config,
+    get_app_settings_sources,
+)
 from app.services.api.widgets.settings.limits import (
     API_DEFAULT_PAGE_SIZE,
     API_ENDPOINT_TIMEOUT_SECONDS,
@@ -17,10 +21,6 @@ from app.services.api.widgets.settings.limits import (
     HTTP_IDEMPOTENCY_RETENTION_SECONDS,
     PREFLIGHT_WARNING_TTL_SECONDS,
     get_default_rate_limits,
-)
-from app.utils import (
-    get_app_settings_model_config,
-    get_app_settings_sources,
 )
 
 

@@ -5,10 +5,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
+from app.composition.logging import get_logger
 from app.services.data import is_tick_record
 from app.services.simulator.errors import SimulationError
 from app.services.simulator.timeline.contracts import Tick
-from app.utils import get_logger
 
 MarketDataset = Any
 

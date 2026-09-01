@@ -16,6 +16,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, cast
 
+from app.composition.logging import get_logger
+from app.kernel.time import utc_now
 from app.services.data._limits import get_limit
 from app.services.data.contracts import DataError
 from app.services.data.contracts.responses import (
@@ -31,7 +33,6 @@ from app.services.data.evidence.account_contracts import (
     AccountStateSnapshot,
 )
 from app.services.data.sources.read_only import _wrap_broker_client_raw
-from app.utils import get_logger, utc_now
 
 logger = get_logger(__name__)
 

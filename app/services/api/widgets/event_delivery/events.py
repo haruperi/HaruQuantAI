@@ -7,8 +7,11 @@ from dataclasses import asdict, is_dataclass
 
 from pydantic import BaseModel
 
+from app.composition.logging import get_logger
+from app.kernel.redaction import is_sensitive_key
+from app.kernel.serialization import to_json_safe
+from app.kernel.time import utc_now
 from app.services.api.contracts import StreamEvent
-from app.utils import get_logger, is_sensitive_key, to_json_safe, utc_now
 
 logger = get_logger(__name__)
 

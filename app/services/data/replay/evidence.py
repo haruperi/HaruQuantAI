@@ -13,6 +13,7 @@ from typing import Literal
 
 from pydantic import field_validator
 
+from app.composition.logging import get_logger
 from app.services.data.contracts._base import TracedOpenContract as _Contract
 from app.services.data.contracts.responses import (
     StandardResponse,
@@ -21,7 +22,6 @@ from app.services.data.contracts.responses import (
 )
 from app.services.data.replay.contracts import ReplayEvent, ReplayPackage
 from app.services.data.replay.packages import stream_replay_events
-from app.utils import get_logger
 
 logger = get_logger(__name__)
 

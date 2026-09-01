@@ -3,13 +3,14 @@
 from hashlib import sha256
 from typing import Any, Literal
 
+from app.composition.logging import get_logger
+from app.kernel.serialization import canonical_json
 from app.services.trading.contracts import OrderIntent, TradingError, TradingRequest
 from app.services.trading.contracts.models import OrderIntentV2, TradingRequestV2
 from app.services.trading.contracts.responses import success_trading_response
 from app.services.trading.validation.readiness import (
     ReadinessAssessment,  # noqa: TC001 - runtime annotation and model resolution
 )
-from app.utils import canonical_json, get_logger
 
 type StandardResponse[T] = Any
 RiskLevel = Literal["none", "low", "medium", "high", "critical"]

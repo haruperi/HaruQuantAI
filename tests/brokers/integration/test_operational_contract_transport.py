@@ -10,6 +10,7 @@ import json
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from app.kernel.errors import create_validation_error
 from app.services.brokers import (
     build_broker_account_snapshot,
     build_broker_failover_decision,
@@ -24,7 +25,6 @@ from app.services.brokers import (
     parse_broker_route_plan,
     parse_instrument_venue_profile,
 )
-from app.utils import create_validation_error
 
 _NOW = datetime(2026, 8, 7, 12, 0, 0, tzinfo=UTC)
 

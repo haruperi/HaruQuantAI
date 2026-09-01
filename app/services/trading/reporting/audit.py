@@ -5,7 +5,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict
 
-from app.utils import to_json_safe
+from app.kernel.serialization import to_json_safe
 
 
 class _ExecutionAuditRecord(BaseModel):
