@@ -22,6 +22,14 @@ if TYPE_CHECKING:
 
 
 def _content_hash(request: ImportIndicatorsRequest) -> str:
+    """Hash semantic import content independently of request correlation.
+
+    Args:
+        request: Strict external-indicator import request.
+
+    Returns:
+        Canonical SHA-256 digest of the semantic import description.
+    """
     payload = request.model_dump(
         mode="json",
         exclude={"request_id", "capability_snapshot_id"},
