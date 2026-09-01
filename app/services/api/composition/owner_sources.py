@@ -10,7 +10,6 @@ from typing import Any, Protocol, cast
 
 from app.kernel.identity import generate_id
 from app.kernel.time import utc_now
-from app.services.brokers import get_broker_dashboard_snapshot
 from app.services.data import (
     build_audit_event_query,
     get_calendar_dashboard_snapshot,
@@ -47,7 +46,13 @@ def read_dashboard_snapshot(name: str, _auth: AuthContext) -> dict[str, object]:
         ValueError: If the view is not part of the canonical dashboard set.
     """
     if name == "broker":
-        return get_broker_dashboard_snapshot()
+        return {
+            "view": "broker",
+            "owner": "brokers",
+            "status": "unavailable",
+            "reason": "BROKER_SESSION_CONTEXT_REQUIRED",
+            "observed_at": utc_now(),
+        }
     if name in {"equity_curve", "summary"}:
         # Analytics is an optional capability; resolve it only when a dashboard
         # view that needs it is actually requested.

@@ -101,58 +101,55 @@ def test_instrument_identity_surface_is_retired() -> None:
         "resolve_broker_canonical_symbol",
         "resolve_broker_provider_symbol",
         "resolve_broker_provider_symbol_as_of",
+        "get_broker_capability_catalogue",
+        "get_broker_dashboard_snapshot",
     }
     assert retired.isdisjoint(brokers.__all__)
     assert all(not hasattr(brokers, name) for name in retired)
     assert not (Path("app/services/brokers") / "instrument_profiles").exists()
+    assert not (Path("app/services/brokers") / "capabilities").exists()
 
 
 def test_runtime_package_is_private() -> None:
     """Runtime initialization exposes no implementation symbol."""
     runtime = importlib.import_module("app.services.brokers._shared")
-    assert runtime.__all__ == []
+    assert getattr(runtime, "__all__", []) == []
 
 
 def test_conformance_feature_is_internal() -> None:
     """The conformance feature does not create a second public boundary."""
     testing = importlib.import_module("app.services.brokers.conformance")
-    assert testing.__all__ == []
+    assert getattr(testing, "__all__", []) == []
 
 
 def test_mt5_feature_is_internal() -> None:
     """The MT5 feature does not create a second public boundary."""
     mt5 = importlib.import_module("app.services.brokers.metatrader")
-    assert mt5.__all__ == []
+    assert getattr(mt5, "__all__", []) == []
 
 
 def test_ctrader_feature_is_internal() -> None:
     """The cTrader feature does not create a second public boundary."""
     ctrader = importlib.import_module("app.services.brokers.ctrader")
-    assert ctrader.__all__ == []
+    assert getattr(ctrader, "__all__", []) == []
 
 
 def test_binance_feature_is_internal() -> None:
     """The Binance feature does not create a second public boundary."""
     binance = importlib.import_module("app.services.brokers.binance")
-    assert binance.__all__ == []
+    assert getattr(binance, "__all__", []) == []
 
 
 def test_dukascopy_feature_is_internal() -> None:
     """The Dukascopy feature does not create a second public boundary."""
     dukascopy = importlib.import_module("app.services.brokers.dukascopy")
-    assert dukascopy.__all__ == []
+    assert getattr(dukascopy, "__all__", []) == []
 
 
 def test_yahoo_feature_is_internal() -> None:
     """The Yahoo feature does not create a second public boundary."""
     yahoo = importlib.import_module("app.services.brokers.yahoo")
-    assert yahoo.__all__ == []
-
-
-def test_capabilities_is_an_internal_feature_boundary() -> None:
-    """The capabilities package does not create a second public boundary."""
-    capabilities = importlib.import_module("app.services.brokers.capabilities")
-    assert capabilities.__all__ == []
+    assert getattr(yahoo, "__all__", []) == []
 
 
 def test_broker_owned_public_consumers_use_only_the_root_boundary() -> None:

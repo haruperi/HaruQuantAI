@@ -6,7 +6,6 @@ from decimal import Decimal
 
 from app.services.brokers import (
     create_fake_broker_adapter,
-    get_broker_capability_catalogue,
 )
 from app.services.brokers.canonical_contracts import (
     BrokerAdapter,
@@ -165,8 +164,18 @@ def test_fixture_cannot_bypass_declared_unavailable_capability() -> None:
     """A fixture never overrides a capability declared UNAVAILABLE."""
 
     async def exercise() -> None:
+        capability = BrokerCapability(
+            capability=BrokerCapabilityId.GET_QUOTE,
+            implementation_status="IMPLEMENTED",
+            availability="UNAVAILABLE",
+            access_mode="READ",
+            requirement="NONE",
+            verification_status="NOT_TESTED",
+            execution_model="TEST_DOUBLE",
+        )
         fake = FakeBrokerAdapter(
             _config(),
+            capabilities={BrokerCapabilityId.GET_QUOTE: capability},
             fixtures={BrokerCapabilityId.GET_QUOTE: _quote()},
         )
         result = await fake.get_quote("A")
@@ -181,7 +190,19 @@ def test_injected_error_cannot_bypass_declared_unavailable_capability() -> None:
     """Error injection never re-enables a capability declared UNAVAILABLE."""
 
     async def exercise() -> None:
-        fake = FakeBrokerAdapter(_config())
+        capability = BrokerCapability(
+            capability=BrokerCapabilityId.GET_QUOTE,
+            implementation_status="IMPLEMENTED",
+            availability="UNAVAILABLE",
+            access_mode="READ",
+            requirement="NONE",
+            verification_status="NOT_TESTED",
+            execution_model="TEST_DOUBLE",
+        )
+        fake = FakeBrokerAdapter(
+            _config(),
+            capabilities={BrokerCapabilityId.GET_QUOTE: capability},
+        )
         fake.inject_error(
             BrokerCapabilityId.GET_QUOTE,
             BrokerError(code=BrokerErrorCode.BROKER_TIMEOUT, message="timeout"),
@@ -194,18 +215,23 @@ def test_injected_error_cannot_bypass_declared_unavailable_capability() -> None:
 
 
 def test_fake_adapter_honours_the_genuine_provider_catalogue() -> None:
-    """Supplied the real Yahoo catalogue, unreleased reads stay fail-closed."""
+    """Supplied an unreleased capability, reads stay fail-closed."""
 
     async def exercise() -> None:
-        catalogue_response = get_broker_capability_catalogue()
-        assert catalogue_response.status == "success"
-        assert catalogue_response.data is not None
-        capabilities = {
-            entry.capability: entry for entry in catalogue_response.data[BrokerId.YAHOO]
-        }
+        capability = BrokerCapability(
+            capability=BrokerCapabilityId.GET_QUOTE,
+            implementation_status="IMPLEMENTED",
+            availability="UNAVAILABLE",
+            access_mode="READ",
+            requirement="NONE",
+            verification_status="TESTED_SANDBOX",
+            release_approval_reference="UNRELEASED",
+            reason="Unreleased read",
+            execution_model="ASYNC",
+        )
         fake = FakeBrokerAdapter(
             _config(),
-            capabilities,
+            {BrokerCapabilityId.GET_QUOTE: capability},
             fixtures={BrokerCapabilityId.GET_QUOTE: _quote()},
         )
         result = await fake.get_quote("A")

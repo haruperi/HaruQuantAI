@@ -26,6 +26,8 @@ def test_constraints_preserve_provider_values(monkeypatch: pytest.MonkeyPatch) -
         trade_contract_size=Decimal(100000),
         currency_profit="USD",
         trade_stops_level=10,
+        supported_order_types=("MARKET", "LIMIT", "STOP", "STOP_LIMIT"),
+        supported_time_in_force=("IOC", "FOK"),
         retrieved_at=datetime(2026, 8, 17, tzinfo=UTC),
     )
     monkeypatch.setattr(
@@ -35,16 +37,6 @@ def test_constraints_preserve_provider_values(monkeypatch: pytest.MonkeyPatch) -
     )
     monkeypatch.setattr(
         routes, "build_symbol_metadata_request", lambda **kwargs: kwargs
-    )
-    capability = SimpleNamespace(
-        capability=SimpleNamespace(value="place_order"),
-        supported_order_types=("MARKET", "LIMIT", "STOP", "STOP_LIMIT"),
-        supported_time_in_force=("IOC", "FOK"),
-    )
-    monkeypatch.setattr(
-        routes,
-        "get_broker_capability_catalogue",
-        lambda: SimpleNamespace(data={"mt5": (capability,)}),
     )
 
     result = routes._get_instrument_constraints(
@@ -78,6 +70,8 @@ def test_constraints_keep_incomplete_calculator_evidence_explicit(
         volume_step=Decimal("0.01"),
         price_step=Decimal("0.00001"),
         trade_stops_level=10,
+        supported_order_types=("MARKET",),
+        supported_time_in_force=("IOC",),
         retrieved_at=datetime(2026, 8, 17, tzinfo=UTC),
     )
     monkeypatch.setattr(
@@ -87,16 +81,6 @@ def test_constraints_keep_incomplete_calculator_evidence_explicit(
     )
     monkeypatch.setattr(
         routes, "build_symbol_metadata_request", lambda **kwargs: kwargs
-    )
-    capability = SimpleNamespace(
-        capability=SimpleNamespace(value="place_order"),
-        supported_order_types=("MARKET",),
-        supported_time_in_force=("IOC",),
-    )
-    monkeypatch.setattr(
-        routes,
-        "get_broker_capability_catalogue",
-        lambda: SimpleNamespace(data={"mt5": (capability,)}),
     )
 
     result = routes._get_instrument_constraints("EURUSD", SimpleNamespace())

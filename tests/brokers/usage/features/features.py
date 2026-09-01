@@ -32,7 +32,6 @@ from app.services.brokers import (
     disconnect_broker,
     get_broker_account_info,
     get_broker_balances,
-    get_broker_capability_catalogue,
     get_broker_connection_status,
     get_broker_error_catalog,
     get_broker_historical_bars,
@@ -62,8 +61,8 @@ def _print_stage(stage_num: int, name: str, summary: str) -> None:
 def _run_stage_1_registry() -> Any:
     _print_stage(
         1,
-        "Registry & Capability Discovery (FEAT-BRK-01)",
-        "Discover registered broker platforms, verify capability catalogue, and load error catalog.",
+        "Registry & Error Catalog Discovery",
+        "Discover registered broker platforms and load error catalog.",
     )
     reg_response = get_registered_brokers()
     registered = (
@@ -72,21 +71,13 @@ def _run_stage_1_registry() -> Any:
         else []
     )
 
-    cat_response = get_broker_capability_catalogue()
-    catalogue = (
-        cat_response.data
-        if cat_response.status == "success" and cat_response.data
-        else {}
-    )
-
     error_catalog = get_broker_error_catalog()
 
     print(
         f"Data -> registered_brokers={[b.value for b in registered]}, "
-        f"catalogue_entries={len(catalogue)}, "
         f"error_codes={len(error_catalog)}"
     )
-    return catalogue
+    return registered
 
 
 def _run_stage_2_adapter_creation() -> Any:
