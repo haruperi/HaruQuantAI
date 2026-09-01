@@ -105,6 +105,22 @@ def test_sim_route_requires_exact_simulation_pair() -> None:
     assert _dispatch(_intent()).status == "accepted"
 
 
+def test_sim_route_requires_simulation_execution_source() -> None:
+    """Sim route dispatches only when Simulator execution source is provided."""
+    with pytest.raises(TradingError) as captured:
+        asyncio.run(
+            _dispatch_order_intent_value(
+                _intent(),
+                None,
+                None,
+                operation_timeout_seconds=Decimal(1),
+                clock=lambda: NOW,
+                simulation_execution_source=None,
+            )
+        )
+    assert captured.value.code == "SERVICE_UNAVAILABLE"
+
+
 @pytest.mark.parametrize("environment", ["live", "demo", "testnet", "sandbox"])
 def test_sim_route_rejects_every_other_environment(environment: str) -> None:
     """No provider-like environment aliases simulation.
@@ -173,6 +189,24 @@ def test_non_sim_routes_forbid_simulation_environment(route: str) -> None:
                 _Adapter(),
                 operation_timeout_seconds=Decimal(1),
                 clock=lambda: NOW,
+            )
+        )
+    assert captured.value.code == "SCOPE_MISMATCH"
+
+
+@pytest.mark.parametrize("route", ["demo", "live"])
+def test_non_sim_routes_forbid_simulation_source(route: str) -> None:
+    """Non-sim routes reject Simulator direct authority."""
+    connection = build_broker_connection_config("mt5", "demo")
+    with pytest.raises(TradingError) as captured:
+        asyncio.run(
+            _dispatch_order_intent_value(
+                _intent(route),
+                connection,
+                _Adapter(broker="mt5", environment="demo"),
+                operation_timeout_seconds=Decimal(1),
+                clock=lambda: NOW,
+                simulation_execution_source=lambda _: None,
             )
         )
     assert captured.value.code == "SCOPE_MISMATCH"

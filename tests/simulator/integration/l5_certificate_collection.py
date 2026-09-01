@@ -19,7 +19,6 @@ from collections.abc import Awaitable, Callable, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import ROUND_DOWN, Decimal
 from pathlib import Path
-from typing import Any
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(_PROJECT_ROOT) not in sys.path:
@@ -33,13 +32,11 @@ from app.services.brokers import (
     build_broker_order_filter,
     build_broker_order_request,
     build_broker_position_filter,
-    build_simulation_mutation_envelope,
     cancel_broker_order,
     check_broker_order,
     connect_broker,
     create_broker_adapter,
     create_configured_fake_broker_adapter,
-    create_simulation_broker_adapter,
     disconnect_broker,
     get_broker_account_info,
     get_broker_id,
@@ -1219,54 +1216,6 @@ def validate_authority_interval(
         raise RuntimeError("foreign/manual activity occurred during collection")
 
 
-class _OperationalAuthority:
-    """Socket-free authority for the paired Simulation mutation lifecycle."""
-
-    def __init__(self, target: object, order_id: str) -> None:
-        self._target = target
-        self._order_id = order_id
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self._target, name)
-
-    async def ping(self) -> object:
-        """Return the configured fake authority connection state."""
-        return await self._target.is_connected()  # type: ignore[attr-defined, no-any-return]
-
-    async def finalize_session(self) -> object:
-        """Finalize the socket-free authority.
-
-        Returns:
-            Authority disconnection result.
-        """
-        return await self._target.disconnect()  # type: ignore[attr-defined, no-any-return]
-
-    async def read(self, operation: object, arguments: Mapping[str, object]) -> object:
-        """Reject unneeded reads during this bounded mutation trace.
-
-        Raises:
-            RuntimeError: Always; this trace admits no Simulation reads.
-        """
-        del operation, arguments
-        raise RuntimeError("certificate Simulation trace requested an undeclared read")
-
-    async def mutate(self, operation: object, request: object) -> object:
-        """Return an exact request-bound successful operational result."""
-        now = datetime.now(UTC)
-        return build_simulation_mutation_envelope(
-            provider_result={
-                "retcode": 0 if str(operation) == "check_order" else 10009,
-                "order": self._order_id,
-                "deal": 0,
-                "volume": "0",
-                "price": "0",
-                "comment": "operational certificate trace",
-            },
-            request_echo=request,
-            simulated_at=now,
-        )
-
-
 async def _state(adapter: object) -> dict[str, object]:
     """Capture complete allowlisted authority state without account identity.
 
@@ -1701,11 +1650,7 @@ async def _collect(args: argparse.Namespace) -> Path:
         )
         sim_config = build_broker_connection_config("sim", "simulation")
         sim_order_id = "sim-operational-order"
-        authority = _OperationalAuthority(
-            create_configured_fake_broker_adapter(sim_config), sim_order_id
-        )
-        sim_response = create_simulation_broker_adapter(sim_config, authority)
-        sim = _success_data(sim_response, "create_simulation_broker_adapter")
+        sim = create_configured_fake_broker_adapter(sim_config)
         _require_success(await connect_broker(sim), "connect_simulation_broker")
         try:
             sim_order_id, sim_stamps = await _exercise(sim, sim_request)

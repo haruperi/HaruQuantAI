@@ -15,7 +15,7 @@ def test_usage_parity_and_reachability() -> None:  # noqa: C901
     standalone-execution guard, and no deep Brokers imports.
     """
     usage_files = sorted(USAGE_DIR.glob("[0-9][0-9]_*.py"))
-    assert len(usage_files) == 7
+    assert len(usage_files) == 6
 
     deep_imports: list[str] = []
 
