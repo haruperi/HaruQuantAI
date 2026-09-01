@@ -2,11 +2,12 @@
 
 from app.services.brokers import (
     build_broker_connection_config,
-    create_configured_fake_broker_adapter,
     get_broker_value_field,
     get_registered_brokers,
 )
 from pydantic import SecretStr
+
+from tests.brokers.conformance import create_configured_fake_broker_adapter
 
 
 def _config(broker_id: str | object) -> object:

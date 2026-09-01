@@ -12,8 +12,9 @@ from app.services.brokers.canonical_contracts import (
     BrokerErrorCode,
     BrokerId,
 )
-from app.services.brokers.conformance.fake import FakeBrokerAdapter
 from pydantic import SecretStr
+
+from tests.brokers.conformance import FakeBrokerAdapter
 
 _SECRET = "super-secret-credential-value"
 _LOGGER_NAME = "haruquant"

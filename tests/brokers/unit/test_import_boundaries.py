@@ -116,10 +116,22 @@ def test_runtime_package_is_private() -> None:
     assert getattr(runtime, "__all__", []) == []
 
 
-def test_conformance_feature_is_internal() -> None:
-    """The conformance feature does not create a second public boundary."""
-    testing = importlib.import_module("app.services.brokers.conformance")
-    assert getattr(testing, "__all__", []) == []
+def test_conformance_feature_is_retired_from_production() -> None:
+    """The conformance suite lives in test infrastructure and is not in production."""
+    assert not (Path("app/services/brokers") / "conformance").exists()
+    brokers = importlib.import_module("app.services.brokers")
+    retired = {
+        "build_broker_calculation_fixture",
+        "collect_broker_calculation_fixture",
+        "create_configured_fake_broker_adapter",
+        "create_fake_broker_adapter",
+        "dump_broker_calculation_fixture",
+        "parse_broker_calculation_fixture",
+        "run_broker_adapter_conformance",
+        "set_fake_broker_error",
+    }
+    assert retired.isdisjoint(brokers.__all__)
+    assert all(not hasattr(brokers, name) for name in retired)
 
 
 def test_mt5_feature_is_internal() -> None:

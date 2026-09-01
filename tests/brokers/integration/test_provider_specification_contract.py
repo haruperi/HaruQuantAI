@@ -6,11 +6,12 @@ from datetime import UTC, datetime
 from app.services.brokers import (
     build_broker_connection_config,
     build_provider_specification_snapshot,
-    create_configured_fake_broker_adapter,
     dump_provider_specification_snapshot,
     verify_provider_specification_snapshot,
 )
 from pydantic import SecretStr
+
+from tests.brokers.conformance import create_configured_fake_broker_adapter
 
 _SYMBOL_INFO = {
     "name": "EURUSD",

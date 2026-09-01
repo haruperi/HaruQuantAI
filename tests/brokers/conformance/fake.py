@@ -6,7 +6,6 @@ never invokes the separately guarded provider collector.
 
 from __future__ import annotations
 
-# ruff: noqa: ANN401 - generated fixed protocol methods preserve fixture types.
 import inspect
 import time
 import types

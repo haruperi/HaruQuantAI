@@ -15,7 +15,7 @@ def test_usage_parity_and_reachability() -> None:  # noqa: C901
     standalone-execution guard, and no deep Brokers imports.
     """
     usage_files = sorted(USAGE_DIR.glob("[0-9][0-9]_*.py"))
-    assert len(usage_files) == 6
+    assert len(usage_files) == 5
 
     deep_imports: list[str] = []
 
@@ -29,7 +29,7 @@ def test_usage_parity_and_reachability() -> None:  # noqa: C901
                 isinstance(node, ast.ImportFrom)
                 and node.module
                 and node.module.startswith("app.services.brokers.")
-                and node.module != "app.services.brokers.conformance"
+                # conformance moved to test infrastructure
             ):
                 deep_imports.append(
                     f"{file_path.name}:{node.lineno} imports {node.module}"

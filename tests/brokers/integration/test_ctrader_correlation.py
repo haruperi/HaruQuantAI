@@ -4,11 +4,12 @@ import asyncio
 
 from app.services.brokers import (
     build_broker_connection_config,
-    create_configured_fake_broker_adapter,
     get_broker_connection_status,
     get_broker_value_field,
 )
 from pydantic import SecretStr
+
+from tests.brokers.conformance import create_configured_fake_broker_adapter
 
 
 def _config() -> object:

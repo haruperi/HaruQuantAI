@@ -8,14 +8,17 @@ from datetime import UTC, datetime
 
 from app.services.brokers import (
     build_broker_connection_config,
-    create_configured_fake_broker_adapter,
 )
 from app.services.brokers.canonical_contracts.enums import (
     BrokerCapabilityId,
     BrokerEnvironment,
     BrokerId,
 )
-from app.services.brokers.conformance.suite import run_adapter_conformance
+
+from tests.brokers.conformance import (
+    create_configured_fake_broker_adapter,
+    run_adapter_conformance,
+)
 
 _NOW = datetime(2026, 8, 7, 12, 0, 0, tzinfo=UTC)
 
