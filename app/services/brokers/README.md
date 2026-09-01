@@ -5,11 +5,217 @@ The immutable Broker error catalogue uses only the Utils-owned `TRANSIENT`,
 categories. Ambiguous mutation outcomes remain non-retryable `UNKNOWN_STATE`.
 
 > **Package:** `app/services/brokers`
-> **Status:** `Completed` — thirteen focused features (`FEAT-BRK-00`..`10`, `FEAT-BRK-17`, `FEAT-BRK-18`) are implemented with package-root APIs, tests, and numbered usage evidence, including the bounded shared MT5 operational-parity contracts.
-> **Last updated:** `2026-08-16`
+> **Status:** `Brownfield refactor active` — the legacy provider behavior remains
+> implemented, but the horizontal package layout and package-root facade are not
+> the ratified V3 target. Goal `GOAL-BROKERS-SPATIAL-COMPOSABILITY` migrates the
+> domain through independently reviewed Tasks.
+> **Last updated:** `2026-09-01`
 
 > This README is the package's **single source of truth** for requirements, final structure, implementation sequence, progress, usage examples, and tests.
 > Update this file before changing the code.
+
+## Ratified V3 target boundary
+
+The Brokers domain is the external-provider integration boundary that opens
+provider sessions, translates exact provider-native requests, performs provider
+I/O, and reports provider truth. Every operation is addressed to one provider
+explicitly. Brokers does not choose a provider, approve a business action, or
+silently substitute another source.
+
+Until the refactor Tasks below are accepted, the detailed legacy feature and FR
+registry in this README remains brownfield behavior evidence. It does not make
+the current physical layout the approved final architecture, and this target
+section does not claim that the gateway or provider features already exist.
+
+### Final Brokers owns
+
+- Provider SDK/API integrations and provider authentication handshake mechanics.
+- Process-local provider sessions, provider transport state, and reconnect
+  mechanics local to the same provider session.
+- Provider-local throttling, adapter-local circuit breaking, and bounded provider
+  subscriptions.
+- Exact provider request serialization, response decoding, and structural
+  provider-native-to-Broker contract mapping.
+- Current provider-reported technical, account, market, order, deal, position,
+  quote, tick, bar, and session facts where Brokers is the direct source.
+- Provider timestamps, sequences/cursors when genuine, correlation identifiers,
+  provenance, and provider error translation.
+- External order validation and transport only after upstream authorization,
+  returning provider truth as accepted, rejected, unknown, or unavailable.
+
+### Final Brokers does not own
+
+- Canonical or friendly instruments, provider/broker alias administration,
+  provider-symbol mapping history, calendars, canonical trading rules, or
+  business cost models.
+- Cross-provider ranking, route planning, source selection, fallback, failover,
+  or cheapest/best-provider policy.
+- Portfolio/risk policy, mutation or live authorization, runtime-profile
+  admission, kill switches, business idempotency, or business reconciliation.
+- Durable consumer checkpoints, execution recovery cursors, or durable business
+  and operational state.
+- Simulation matching, accounting, scheduling, execution journals, or a fake
+  Broker simulation channel.
+- Generic event dispatch, runtime capability discovery, feature configuration,
+  service location, or duplicate registries already owned by Kernel and
+  Composition.
+- Adapter release/CI certification as runtime business behavior.
+- Database connections, Broker-owned tables, or Broker migration execution.
+
+### Target public and physical model
+
+The final public business capabilities are:
+
+- `broker.manage-sessions@1` for open, close, reconnect, health, provider
+  authentication truth, provider session state, and expected-versus-reported
+  provider environment verification.
+- `broker.read-provider-state@1` for direct provider-truth reads.
+- `broker.transport-orders@1` for structurally valid, upstream-authorized order
+  transport and provider correlation/evidence, never trade approval.
+
+One typed provider-backend port in `app/contracts/broker/` is implemented by the
+MetaTrader, cTrader, Binance, Dukascopy, and Yahoo provider features. A provider
+gateway exposes the three business capabilities and dispatches exactly once to
+the explicitly requested mounted provider. Absence fails capability-unavailable;
+there is no implicit fallback. Composition selects installed/enabled providers;
+Kernel owns mounted-capability state and generations.
+
+The ratified surviving runtime features are:
+
+- `FEAT-BRK-DISPATCH_PROVIDERS`
+- `FEAT-BRK-CONNECT_YAHOO`
+- `FEAT-BRK-CONNECT_DUKASCOPY`
+- `FEAT-BRK-CONNECT_BINANCE`
+- `FEAT-BRK-CONNECT_CTRADER`
+- `FEAT-BRK-CONNECT_METATRADER`
+
+Each must independently own `README.md`, a pure `__init__.py`, immutable
+`manifest.py`, frozen strict `config.py`, wiring-only `feature.py`, focused
+provider logic, and one primary executable usage module. Effects are acquired
+through `FeatureContext`/`FeatureScope`; providers never import a sibling feature
+implementation, the gateway implementation, or `app.composition`.
+
+## Refactor baseline (Task 1.01)
+
+This inventory was captured before product modification on branch
+`task/task-1.01-ratify-brokers-spatial-composability-ownership-model` at HEAD
+`208d41e290547dbf395c80b3f6ab303b895962ea`. The owner-provided dry-run
+reference `11bafbcede4a3cfa44a4b7d2adc4172d88e01092` is historical and is not the
+Task activation baseline. The working tree was clean apart from active role
+coordination artifacts.
+
+### Physical and dependency inventory
+
+- The tracked production package has 17 top-level implementation packages:
+  `_shared`, `binance`, `canonical_contracts`, `capabilities`, `conformance`,
+  `ctrader`, `dukascopy`, `environment_guards`, `events`,
+  `instrument_profiles`, `metatrader`, `migrations`, `persistence`,
+  `reconciliation`, `simulation`, `specifications`, and `yahoo`.
+- `app/contracts/broker/` contains `__init__.py`, `capabilities.py`, `errors.py`,
+  `events.py`, `models.py`, `ports.py`, and `wire/schema.json`.
+- `[project.entry-points."haruquantai.features"]` is empty; no current Brokers
+  package is independently discoverable through the V3 feature registry.
+- The legacy root facade lazily re-exports provider, contract, matrix,
+  configuration, persistence, reconciliation, simulation, conformance, and
+  specification operations.
+- Production root-facade consumers exist in API composition/widgets, Data source
+  and MT5 market-event modules, Trading routing/live/state/actions/contracts, and
+  Simulator API orchestration. UI/interface public models already consume
+  `app.contracts.broker` models.
+- Broker tests and usage evidence are concentrated under `tests/brokers`, with
+  additional Data, Trading, Simulator, system, and legacy consumers.
+
+The legacy Broker migration manifest defines five tables:
+`broker_symbol_map`, `broker_health_history`, `broker_route_recovery`,
+`broker_environment_permissions`, and `broker_event_checkpoints`. Their presence
+is current-state evidence only; none is ratified as final Broker ownership.
+
+### Legacy package disposition ledger
+
+| Current path | Disposition | Final owner or destination |
+| --- | --- | --- |
+| `instrument_profiles/` | MOVE + DELETE | Catalogue instruments and provider mappings; only current provider-observed technical facts remain in provider features. |
+| `capabilities/` | DISSOLVE + DELETE | Kernel/Composition mounted-capability truth plus provider-local technical descriptors. |
+| `environment_guards/` | SPLIT + DELETE | Workspace/Composition admission/configuration, Trading/Risk mutation authority, and provider-local endpoint/account verification. |
+| `events/` | SPLIT + DELETE | `app/contracts/broker` payloads, provider mapping/publication, Kernel EventBus, and consumer-owned checkpoints. |
+| `reconciliation/` | SPLIT + DELETE | Provider-local same-provider recovery, Data source selection/fallback, and Trading business reconciliation. |
+| `simulation/` | MOVE + DELETE | `simulator.simulate-orders@1` plus Trading SIM/DEMO/LIVE route selection. |
+| `conformance/` | MOVE + DELETE | `tests/services/brokers/conformance/` shared test infrastructure. |
+| `specifications/` | MERGE + DELETE | Current observations in provider truth; retained point-in-time history in its authoritative historical owner. |
+| `persistence/` | SPLIT/MOVE + DELETE | Each authoritative state owner or explicit retirement after evidence review. |
+| `migrations/` | SPLIT/MOVE + DELETE | Each authoritative state owner or explicit retirement after evidence review. |
+| `canonical_contracts/` | MOVE/SPLIT + DELETE | Public cross-boundary types in `app/contracts/broker/`; provider-private helpers in provider features. |
+| `_shared/` | SPLIT + DELETE | Provider-local implementation, provider gateway, public contracts, or Kernel/Composition; no renamed horizontal replacement. |
+| `metatrader/` | ADAPT | Independent `FEAT-BRK-CONNECT_METATRADER` provider feature. |
+| `ctrader/` | ADAPT | Independent `FEAT-BRK-CONNECT_CTRADER` provider feature. |
+| `binance/` | ADAPT | Independent `FEAT-BRK-CONNECT_BINANCE` provider feature. |
+| `dukascopy/` | ADAPT | Independent `FEAT-BRK-CONNECT_DUKASCOPY` provider feature. |
+| `yahoo/` | ADAPT | Independent `FEAT-BRK-CONNECT_YAHOO` provider feature. |
+| `__init__.py` | REPLACE | Empty or docstring-only package initializer after consumer cutover. |
+| `provider_gateway/` | CREATE | Child 1.04 creates `FEAT-BRK-DISPATCH_PROVIDERS`; an empty untracked local directory is not implementation evidence. |
+
+### Legacy behavior disposition ledger
+
+| Current behavior | Disposition | Preservation/destination evidence required before deletion |
+| --- | --- | --- |
+| Public Broker DTOs, errors, events, capability keys, and provider-backend protocols | MOVE/SPLIT | One physical cross-boundary definition under `app/contracts/broker/`; provider intermediaries remain private. |
+| Global adapter factory, registration, and package-root service location | DISSOLVE/REPLACE | Composition installation, Kernel capability registry/generations, and explicit gateway dispatch. |
+| Provider authentication and session lifecycle | ADAPT/MERGE | Provider-local session implementations mounted behind the session gateway capability. |
+| Provider market/account/order/deal/history/calculation reads | ADAPT/MERGE | Provider-local implementations mounted behind provider-state reads, preserving provenance and unsupported truth. |
+| Order check/submit/cancel/modify transport | ADAPT/MERGE | Provider-local transport behind `broker.transport-orders@1`; Trading/Risk retains authorization, idempotency, and reconciliation. |
+| Provider technical health/specification observations | ADAPT/MERGE | Current provider truth only; durable health history moves to diagnostics/observability if independently required, otherwise retires. |
+| Canonical identity, symbol maps, calendars, and application rules | MOVE | Catalogue capabilities and provider-mapping history before Broker profile/map deletion. |
+| Cross-provider fallback/source ranking and business reconciliation | MOVE | Data source policy and Trading reconciliation/idempotency with public contract cutover. |
+| Generic event normalization/dispatch and durable checkpoints | SPLIT | Provider structural mapping, Broker payload contracts, Kernel EventBus, and consumer-owned checkpoints. |
+| Simulation translation/session channel | MOVE/RETIRE | Simulator execution capability and Trading route selection; no Broker SDK/session/credential for SIM. |
+| Runtime adapter conformance and fake provider | MOVE | Shared tests/CI conformance suite; no production certification feature. |
+| Five Broker tables and migration/CRUD infrastructure | SPLIT/MOVE/RETIRE | Destination-owner or explicit-obsolescence proof for every table before removal. |
+
+No behavior may disappear because its legacy mechanism is deleted. A later Task
+must prove that behavior exists in the new provider/gateway, has moved to the
+correct owner, is superseded by Kernel/Composition, is test-only, or is explicitly
+obsolete.
+
+### Non-negotiable safety invariants
+
+- No live-money mutation is implementation or completion evidence, and the
+  refactor grants no new provider write permission.
+- Provider endpoint/account/environment verification remains fail closed. The
+  provider reports environment truth; Trading/Risk decides business permission.
+- A possibly transmitted mutation remains an unknown outcome; it is never
+  relabelled as failure/success and is never retried automatically.
+- Unsupported or unreleased operations remain explicitly unavailable and never
+  silently degrade to a substitute provider or fabricated result.
+- Credentials, secret values, private account identifiers, and full sensitive
+  payloads never enter persisted feature config, logs, events, exceptions,
+  snapshots, or fixtures.
+- Demo/testnet/sandbox integration evidence remains separately gated and absent
+  credentials do not fail ordinary CI.
+
+### Donor and evidence limitation
+
+No `.migration` directory or approved normalized Brokers donor bundle was found
+at this baseline. The tracked providers, contracts, tests, usage programs,
+README, and active consumers are brownfield behavioral evidence. They do not
+prove external donor parity. Later Tasks must implement the complete ratified V3
+scope from repository and verified public-contract evidence, must not substitute
+raw staging, and must not claim unverified donor parity.
+
+### Pre-refactor validation baseline
+
+| Command | Baseline result |
+| --- | --- |
+| `uv run --frozen python scripts/architecture_check.py` | PASS — all architectural AST rules passed. |
+| `uv run --frozen python scripts/validate_feature_docs.py` | PASS — no production features are currently registered. |
+| `uv run --frozen python scripts/generate_contracts.py --check` | PASS — 33 artifacts checked, 0 problems. |
+| `uv run --frozen ruff check app tests` | PASS. |
+| `uv run --frozen ruff format --check app tests` | PASS — 3,232 files already formatted. |
+| `uv run --frozen mypy` | PRE-EXISTING FAIL — 275 errors in 42 files, including cross-domain failures, legacy Broker profile/response typing failures, and agent-workflow namespace/import defects. |
+| `uv run --frozen pytest` | PRE-EXISTING FAIL during collection — six errors: Indicators Composition binding, removed `app.utils` imports in Portfolio/Strategy, Simulator lifecycle API mismatch, and missing `StandardError`. |
+
+These failures predate this documentation Task and are not attributed to the
+Brokers refactor. Child 1.18 owns the final complete quality gate after all
+approved migrations; intervening children run change-scoped tests.
 
 ### Current implementation evidence
 
