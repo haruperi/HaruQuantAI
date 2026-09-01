@@ -1,32 +1,114 @@
-"""Fail-closed construction of provider specification snapshots.
+"""MetaTrader 5 provider specification snapshot observations (provider truth).
 
-Maps one raw MT5 ``symbol_info`` observation plus explicit connection
-identity into a typed current snapshot. Every required field must be present
-and finite; missing evidence raises before any snapshot exists. No effective
-bounds are invented and no static commission rate is guessed.
+The snapshot represents current provider observation only: it carries no
+effective bounds and never invents historical validity. Missing required
+fields fail closed at construction. Dynamic cost evidence remains a separate
+typed reference.
 """
 
 from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping
+from dataclasses import dataclass, field, replace
 from dataclasses import fields as dataclass_fields
-from dataclasses import replace
 from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING, ClassVar
 
 from app.composition.logging import get_logger
 from app.kernel.serialization import canonical_json
-from app.services.brokers.specifications.contracts import (
-    EXPIRATION_MODE_FLAGS,
-    ORDER_TYPE_FLAGS,
-    ROLLOVER_WEEKDAYS,
-    ProviderAccountPermissions,
-    ProviderCostEvidenceReference,
-    ProviderSpecificationSnapshot,
-)
+from app.kernel.time import format_utc_timestamp
+
+if TYPE_CHECKING:
+    from app.services.brokers.canonical_contracts.protocols import BrokerAdapter
+    from app.services.brokers.canonical_contracts.responses import StandardResponse
 
 logger = get_logger(__name__)
+
+#: Length of a lowercase hexadecimal SHA-256 digest.
+_SHA256_HEX_LENGTH = 64
+
+#: Filling policies admitted by verified MT5 ``filling_mode`` bit flags.
+FILLING_MODES: tuple[str, ...] = ("FOK", "IOC", "RETURN")
+
+#: Order types admitted by verified MT5 ``order_mode`` bit flags.
+ORDER_TYPE_FLAGS: tuple[tuple[int, str], ...] = (
+    (1, "MARKET"),
+    (2, "LIMIT"),
+    (4, "STOP"),
+    (8, "STOP_LIMIT"),
+    (16, "CLOSE_BY"),
+    (32, "STOPLOSS"),
+    (64, "TAKEPROFIT"),
+)
+
+#: Expiration policies admitted by verified MT5 ``expiration_mode`` bit flags.
+EXPIRATION_MODE_FLAGS: tuple[tuple[int, str], ...] = (
+    (1, "GTC"),
+    (2, "DAY"),
+    (4, "SPECIFIED"),
+    (8, "SPECIFIED_DAY"),
+)
+
+#: Order-lifetime modes from verified MT5 ``order_gtc_mode`` values.
+GTC_MODES: tuple[str, ...] = ("GTC", "DAILY", "SPECIFIED")
+
+#: Symbol execution modes from verified MT5 ``trade_exemode`` values.
+EXECUTION_MODES: tuple[str, ...] = (
+    "REQUEST",
+    "INSTANT",
+    "MARKET",
+    "EXCHANGE",
+)
+
+#: Symbol trade modes from the verified in-repo MT5 ``trade_mode`` mapping.
+TRADE_MODES: tuple[str, ...] = (
+    "DISABLED",
+    "LONGONLY",
+    "SHORTONLY",
+    "CLOSEONLY",
+    "FULL",
+)
+
+#: Swap modes from the verified in-repo MT5 ``swap_mode`` mapping.
+SWAP_MODES: tuple[str, ...] = (
+    "DISABLED",
+    "POINTS",
+    "CURRENCY_SYMBOL",
+    "CURRENCY_MARGIN",
+    "CURRENCY_DEPOSIT",
+    "INTEREST_CURRENT",
+    "REOPEN_CURRENT",
+    "REOPEN_BID",
+)
+
+#: Calculation modes from the documented MQL5 ``SYMBOL_CALC_MODE`` members.
+CALCULATION_MODES: tuple[str, ...] = (
+    "FOREX",
+    "FOREX_NO_LEVERAGE",
+    "FUTURES",
+    "CFD",
+    "CFDINDEX",
+    "CFDLEVERAGE",
+    "EXCHANGES_STOCKS",
+    "EXCHANGES_FUTURES",
+    "EXCHANGES_FUTURES_FORTS",
+    "FOREX_MARGIN",
+    "UNKNOWN",
+)
+
+#: Rollover weekday names plus MT5's observed non-weekday sentinel.
+ROLLOVER_WEEKDAYS: tuple[str, ...] = (
+    "SUNDAY",
+    "MONDAY",
+    "TUESDAY",
+    "WEDNESDAY",
+    "THURSDAY",
+    "FRIDAY",
+    "SATURDAY",
+    "UNSPECIFIED",
+)
 
 _TRADE_MODE_VALUES: tuple[str, ...] = (
     "DISABLED",
@@ -70,19 +152,242 @@ _MARGIN_MODE_VALUES: Mapping[int, str] = {
 }
 
 
+def _require_text(value: str, name: str) -> None:
+    if not value.strip():
+        message = f"{name} must not be empty"
+        raise ValueError(message)
+
+
+def _require_utc(value: datetime, name: str) -> None:
+    try:
+        format_utc_timestamp(value)
+    except Exception as error:
+        message = f"{name} must be UTC-aware"
+        raise ValueError(message) from error
+
+
+def _require_finite(value: Decimal | None, name: str) -> None:
+    if value is None or not value.is_finite():
+        message = f"{name} is required and must be finite"
+        raise ValueError(message)
+
+
+def _optional_finite(value: Decimal | None, name: str) -> None:
+    if value is not None and not value.is_finite():
+        message = f"{name} must be finite"
+        raise ValueError(message)
+
+
+def _require_checksum(value: str, name: str) -> None:
+    _require_text(value, name)
+    if len(value) != _SHA256_HEX_LENGTH or value != value.lower():
+        message = f"{name} must be a lowercase sha256 digest"
+        raise ValueError(message)
+
+
+def _require_choice(value: str, allowed: tuple[str, ...], name: str) -> None:
+    if value not in allowed:
+        message = f"unknown {name}"
+        raise ValueError(message)
+
+
+class _Schema:
+    CONTRACT_VERSION: ClassVar[str] = "v1"
+    SCHEMA_ID: ClassVar[str]
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProviderCostEvidenceReference(_Schema):
+    """Typed reference to separate dynamic provider cost evidence."""
+
+    SCHEMA_ID: ClassVar[str] = "brokers.provider_cost_evidence.v1"
+    evidence_id: str
+    checksum: str
+    evidence_kind: str = "dynamic_commission_schedule"
+
+    def __post_init__(self) -> None:
+        """Validate cost evidence fields fail closed."""
+        _require_text(self.evidence_id, "evidence_id")
+        _require_checksum(self.checksum, "cost evidence checksum")
+        _require_text(self.evidence_kind, "evidence_kind")
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProviderAccountPermissions(_Schema):
+    """Account-level trading permissions bound to one snapshot observation."""
+
+    SCHEMA_ID: ClassVar[str] = "brokers.provider_account_permissions.v1"
+    margin_mode: str | None = None
+    stop_out_mode: str | None = None
+    fifo: bool | None = None
+    hedging_permitted: bool | None = None
+    unverified: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        """Validate account permission fields and unverified overlap.
+
+        Raises:
+            ValueError: If unverified fields overlap with populated fields.
+        """
+        populated = {
+            "margin_mode": self.margin_mode,
+            "stop_out_mode": self.stop_out_mode,
+            "fifo": self.fifo,
+            "hedging_permitted": self.hedging_permitted,
+        }
+        overlap = sorted(
+            name for name in self.unverified if populated[name] is not None
+        )
+        if overlap:
+            message = "unverified fields must remain unpopulated: " + ",".join(overlap)
+            raise ValueError(message)
+        if self.margin_mode is not None:
+            _require_choice(
+                self.margin_mode, ("NETTING", "RETAIL_HEDGING"), "margin_mode"
+            )
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ProviderSpecificationSnapshot(_Schema):
+    """Typed current provider specification observation for one symbol."""
+
+    SCHEMA_ID: ClassVar[str] = "brokers.provider_specification.v1"
+    broker: str
+    server: str
+    account_digest: str
+    environment: str
+    terminal_build: str
+    source_revision: str
+    observed_at: datetime
+    retrieval_provenance: str
+    provider_symbol: str
+    filling_modes: tuple[str, ...]
+    order_types: tuple[str, ...]
+    expiration_modes: tuple[str, ...]
+    gtc_mode: str
+    execution_mode: str
+    trade_mode: str
+    calculation_mode: str
+    stops_level_points: int
+    freeze_level_points: int
+    volume_min: Decimal
+    volume_max: Decimal
+    volume_step: Decimal
+    directional_volume_limit: Decimal | None
+    point: Decimal
+    digits: int
+    tick_size: Decimal
+    tick_value: Decimal | None
+    tick_value_profit: Decimal | None
+    tick_value_loss: Decimal | None
+    contract_size: Decimal
+    base_currency: str
+    profit_currency: str
+    margin_currency: str
+    margin_initial: Decimal | None
+    margin_maintenance: Decimal | None
+    margin_hedged: Decimal | None
+    margin_hedged_use_leg: bool | None
+    swap_mode: str
+    swap_long: Decimal
+    swap_short: Decimal
+    swap_rollover3days: str
+    account_permissions: ProviderAccountPermissions = field(
+        default_factory=ProviderAccountPermissions
+    )
+    cost_evidence: ProviderCostEvidenceReference | None = None
+    checksum: str = ""
+
+    def __post_init__(self) -> None:
+        """Validate snapshot identity, modes, and numerics fail closed."""
+        self._validate_identity()
+        self._validate_modes()
+        self._validate_numerics()
+
+    def _validate_identity(self) -> None:
+        for name in (
+            "broker",
+            "server",
+            "account_digest",
+            "environment",
+            "terminal_build",
+            "source_revision",
+            "retrieval_provenance",
+            "provider_symbol",
+            "base_currency",
+            "profit_currency",
+            "margin_currency",
+        ):
+            _require_text(getattr(self, name), name)
+        _require_utc(self.observed_at, "observed_at")
+        if self.checksum:
+            _require_checksum(self.checksum, "checksum")
+
+    def _validate_modes(self) -> None:
+        mode_blocks: tuple[tuple[tuple[str, ...], tuple[str, ...], str], ...] = (
+            (self.filling_modes, FILLING_MODES, "filling mode"),
+            (
+                self.order_types,
+                tuple(name for _, name in ORDER_TYPE_FLAGS),
+                "order type",
+            ),
+            (
+                self.expiration_modes,
+                tuple(name for _, name in EXPIRATION_MODE_FLAGS),
+                "expiration mode",
+            ),
+        )
+        for values, allowed, label in mode_blocks:
+            if not values:
+                message = label + "s must not be empty"
+                raise ValueError(message)
+            for value in values:
+                _require_choice(value, allowed, label)
+        for value, allowed, name in (
+            (self.gtc_mode, GTC_MODES, "gtc_mode"),
+            (self.execution_mode, EXECUTION_MODES, "execution_mode"),
+            (self.trade_mode, TRADE_MODES, "trade_mode"),
+            (self.calculation_mode, CALCULATION_MODES, "calculation_mode"),
+            (self.swap_mode, SWAP_MODES, "swap_mode"),
+            (self.swap_rollover3days, ROLLOVER_WEEKDAYS, "swap_rollover3days"),
+        ):
+            _require_choice(value, allowed, name)
+
+    def _validate_numerics(self) -> None:
+        if self.digits < 0:
+            raise ValueError("digits must not be negative")
+        if self.stops_level_points < 0 or self.freeze_level_points < 0:
+            raise ValueError("stop and freeze levels must not be negative")
+        for name in (
+            "volume_min",
+            "volume_max",
+            "volume_step",
+            "point",
+            "tick_size",
+            "contract_size",
+            "swap_long",
+            "swap_short",
+        ):
+            _require_finite(getattr(self, name), name)
+        for name in (
+            "directional_volume_limit",
+            "tick_value",
+            "tick_value_profit",
+            "tick_value_loss",
+            "margin_initial",
+            "margin_maintenance",
+            "margin_hedged",
+        ):
+            _optional_finite(getattr(self, name), name)
+        if self.volume_min <= 0 or self.volume_step <= 0:
+            raise ValueError("volume minimum and step must be positive")
+        if self.volume_max < self.volume_min:
+            raise ValueError("volume maximum is below the minimum")
+        if self.point <= 0 or self.tick_size <= 0 or self.contract_size <= 0:
+            raise ValueError("point, tick size, and contract size must be positive")
+
+
 def _field(value: object, name: str) -> object:
-    """Read one required raw provider field.
-
-    Args:
-        value: Raw provider record (mapping, namedtuple, or attribute object).
-        name: Raw provider field name.
-
-    Returns:
-        The raw field value.
-
-    Raises:
-        ValueError: If the field is absent.
-    """
     result = _optional(value, name)
     if result is None:
         message = "missing required provider specification field: " + name
@@ -91,15 +396,6 @@ def _field(value: object, name: str) -> object:
 
 
 def _optional(value: object, name: str) -> object | None:
-    """Read one optional raw provider field.
-
-    Args:
-        value: Raw provider record.
-        name: Raw provider field name.
-
-    Returns:
-        The raw field value, or None when absent.
-    """
     if isinstance(value, Mapping):
         return value.get(name)
     if hasattr(value, "_asdict"):
@@ -109,21 +405,6 @@ def _optional(value: object, name: str) -> object | None:
 
 
 def _decimal(value: object, name: str) -> Decimal:
-    """Convert one raw numeric field to a finite Decimal.
-
-    Binary floats are stringified before parsing, matching the established
-    MT5 mapping convention.
-
-    Args:
-        value: Raw provider value.
-        name: Raw provider field name.
-
-    Returns:
-        The parsed finite Decimal.
-
-    Raises:
-        ValueError: If the value is missing or not finite.
-    """
     if value is None or isinstance(value, bool):
         message = "missing required provider specification field: " + name
         raise ValueError(message)
@@ -135,32 +416,12 @@ def _decimal(value: object, name: str) -> Decimal:
 
 
 def _decimal_or_none(value: object) -> Decimal | None:
-    """Convert one optional raw numeric field to a Decimal when present.
-
-    Args:
-        value: Raw optional provider value.
-
-    Returns:
-        The parsed finite Decimal, or None when the value is absent.
-    """
     if value is None or isinstance(value, bool):
         return None
     return Decimal(str(value))
 
 
 def _int(value: object, name: str) -> int:
-    """Read one required raw integer field.
-
-    Args:
-        value: Raw provider value.
-        name: Raw provider field name.
-
-    Returns:
-        The parsed integer.
-
-    Raises:
-        ValueError: If the value is missing or unparsable.
-    """
     if value is None or isinstance(value, bool):
         message = "missing required provider specification field: " + name
         raise ValueError(message)
@@ -168,18 +429,6 @@ def _int(value: object, name: str) -> int:
 
 
 def _text(value: object, name: str) -> str:
-    """Read one required raw text field.
-
-    Args:
-        value: Raw provider value.
-        name: Raw provider field name.
-
-    Returns:
-        The stripped non-empty text.
-
-    Raises:
-        ValueError: If the value is missing or blank.
-    """
     if value is None or not str(value).strip():
         message = "missing required provider specification field: " + name
         raise ValueError(message)
@@ -187,20 +436,6 @@ def _text(value: object, name: str) -> str:
 
 
 def _index_name(value: int, table: tuple[str, ...], name: str, unknown: str) -> str:
-    """Map one raw enum index onto the verified vocabulary.
-
-    Args:
-        value: Raw provider index.
-        table: Verified value table.
-        name: Field name for the error message.
-        unknown: Marker returned for unmapped indices.
-
-    Returns:
-        The mapped name, or ``unknown`` when the index is unmapped.
-
-    Raises:
-        ValueError: If the index is negative.
-    """
     if value < 0:
         message = name + " must not be negative"
         raise ValueError(message)
@@ -210,57 +445,21 @@ def _index_name(value: int, table: tuple[str, ...], name: str, unknown: str) -> 
 
 
 def _flag_names(mask: int, flags: tuple[tuple[int, str], ...]) -> tuple[str, ...]:
-    """Expand one verified provider bit mask into sorted mode names.
-
-    Args:
-        mask: Provider bit mask.
-        flags: Verified bit-to-name pairs.
-
-    Returns:
-        Sorted tuple of admitted mode names for the set bits.
-    """
     return tuple(sorted(name for bit, name in flags if mask & bit))
 
 
 def _account_digest(broker: str, server: str, account_id: str) -> str:
-    """Return the redacted digest binding one provider account identity.
-
-    Args:
-        broker: Broker identifier.
-        server: Provider server name.
-        account_id: Raw provider account identifier (never stored).
-
-    Returns:
-        Lowercase SHA-256 digest over the account identity material.
-    """
     material = "brokers.account.v1|" + broker + "|" + server + "|" + account_id
     return hashlib.sha256(material.encode("utf-8")).hexdigest()
 
 
 def _checksum(snapshot_fields: Mapping[str, object]) -> str:
-    """Return the canonical checksum over snapshot material.
-
-    Args:
-        snapshot_fields: Canonical field mapping without the checksum itself.
-
-    Returns:
-        SHA-256 digest over the canonical JSON material.
-    """
     return hashlib.sha256(
         canonical_json(dict(snapshot_fields)).encode("utf-8")
     ).hexdigest()
 
 
 def _json_safe(value: object) -> object:
-    """Convert one snapshot value to deterministic JSON-safe material.
-
-    Args:
-        value: Snapshot field value.
-
-    Returns:
-        JSON-safe representation (strings for Decimals and datetimes,
-        lists for tuples, dicts for nested contract blocks).
-    """
     if isinstance(value, Decimal):
         return str(value)
     if isinstance(value, datetime):
@@ -277,14 +476,6 @@ def _json_safe(value: object) -> object:
 def _block_safe(
     value: ProviderCostEvidenceReference | ProviderAccountPermissions,
 ) -> dict[str, object]:
-    """Serialize one nested contract block.
-
-    Args:
-        value: Cost-evidence reference or account-permission block.
-
-    Returns:
-        JSON-safe mapping of the block's fields.
-    """
     if isinstance(value, ProviderCostEvidenceReference):
         return {
             "evidence_id": value.evidence_id,
@@ -301,19 +492,12 @@ def _block_safe(
 
 
 def dump_provider_specification_snapshot(
-    snapshot: ProviderSpecificationSnapshot,
+    snapshot: object,
 ) -> dict[str, object]:
-    """Return the canonical JSON-safe mapping of one snapshot.
-
-    Args:
-        snapshot: Snapshot to serialize.
-
-    Returns:
-        Deterministic JSON-safe field mapping including the checksum.
-    """
+    """Return the canonical JSON-safe mapping of one snapshot."""
     return {
         entry.name: _json_safe(getattr(snapshot, entry.name))
-        for entry in dataclass_fields(snapshot)
+        for entry in dataclass_fields(ProviderSpecificationSnapshot)
     }
 
 
@@ -323,15 +507,13 @@ def parse_provider_specification_snapshot(
     """Parse one canonical snapshot mapping back into the typed contract.
 
     Args:
-        value: JSON-safe mapping produced by ``dump_provider_specification_snapshot``.
+        value: Canonical snapshot dictionary representation.
 
     Returns:
-        The validated immutable snapshot with a verified checksum.
+        Validated typed ProviderSpecificationSnapshot instance.
 
     Raises:
-        ValueError: If fields are missing, mistyped, the checksum does not
-            match the canonical material, or effective-date fields are
-            present (the snapshot is current-observation only).
+        ValueError: If effective bounds, schema keys, or checksum fail validation.
     """
     if "effective_from" in value or "effective_to" in value:
         raise ValueError("provider specification snapshots carry no effective bounds")
@@ -370,15 +552,6 @@ _TUPLE_FIELDS = frozenset(
 
 
 def _convert_field(name: str, raw: object) -> object:
-    """Convert one dumped snapshot field back into its typed value.
-
-    Args:
-        name: Canonical field name.
-        raw: JSON-safe dumped value.
-
-    Returns:
-        The typed field value for snapshot construction.
-    """
     if name in _DECIMAL_FIELDS:
         return None if raw is None else Decimal(str(raw))
     if name in _TUPLE_FIELDS:
@@ -394,29 +567,10 @@ def _convert_field(name: str, raw: object) -> object:
 
 
 def _optional_str(value: object) -> str | None:
-    """Return one optional dumped value as text.
-
-    Args:
-        value: Optional dumped value.
-
-    Returns:
-        The stringified value, or None when absent.
-    """
     return None if value is None else str(value)
 
 
 def _convert_permissions(raw: object) -> ProviderAccountPermissions:
-    """Convert one dumped account-permission block.
-
-    Args:
-        raw: Raw dumped permission block.
-
-    Returns:
-        The validated permission block.
-
-    Raises:
-        TypeError: If the dumped block is not a mapping.
-    """
     if raw is None:
         return ProviderAccountPermissions(
             unverified=(
@@ -444,17 +598,6 @@ def _convert_permissions(raw: object) -> ProviderAccountPermissions:
 
 
 def _convert_cost_evidence(raw: object) -> ProviderCostEvidenceReference | None:
-    """Convert one dumped cost-evidence reference.
-
-    Args:
-        raw: Raw dumped evidence reference.
-
-    Returns:
-        The typed reference, or None when the dump carried no evidence.
-
-    Raises:
-        TypeError: If the dumped reference is not a mapping.
-    """
     if raw is None:
         return None
     if not isinstance(raw, Mapping):
@@ -484,27 +627,24 @@ def build_provider_specification_snapshot(
     """Build one typed current provider specification snapshot.
 
     Args:
-        symbol_info: Raw MT5 ``symbol_info`` record for one symbol.
-        broker: Broker identifier (e.g. ``mt5``).
+        symbol_info: Raw provider symbol information mapping or object.
+        broker: Broker identifier string.
         server: Provider server name.
-        account_id: Raw provider account identifier; stored only as a digest.
-        environment: Broker environment (``demo``/``live``/...).
-        terminal_build: Provider terminal build identifier.
-        source_revision: Source revision of the observation.
-        observed_at: Aware-UTC observation time.
-        retrieval_provenance: Provenance label of the retrieval path.
-        account_info: Optional raw MT5 ``account_info`` record for the
-            account-permission block; fields the upstream contract does not
-            expose stay unverified exclusions.
-        cost_evidence_id: Optional separate dynamic cost-evidence identifier.
-        cost_evidence_checksum: Optional checksum of the cost evidence.
+        account_id: Account identifier for digest construction.
+        environment: Environment string.
+        terminal_build: Terminal build identifier.
+        source_revision: Provider source revision identifier.
+        observed_at: Aware UTC observation timestamp.
+        retrieval_provenance: Provenance tag string.
+        account_info: Optional raw account info mapping or object.
+        cost_evidence_id: Optional dynamic cost evidence identifier.
+        cost_evidence_checksum: Optional dynamic cost evidence checksum.
 
     Returns:
-        The validated immutable current snapshot.
+        Complete checksummed ProviderSpecificationSnapshot.
 
     Raises:
-        ValueError: If any required field is missing, non-finite, or outside
-            the verified vocabulary.
+        ValueError: If mandatory fields or numeric bounds fail validation.
     """
     filling_mask = _int(_field(symbol_info, "filling_mode"), "filling_mode")
     filling_modes = _flag_names(filling_mask, ((1, "FOK"), (2, "IOC"))) or ("RETURN",)
@@ -639,42 +779,66 @@ def build_provider_specification_snapshot(
 
 
 def verify_provider_specification_snapshot(
-    snapshot: ProviderSpecificationSnapshot,
+    snapshot: object,
 ) -> bool:
     """Recompute and compare the snapshot checksum.
 
     Args:
-        snapshot: Snapshot to verify.
+        snapshot: Candidate snapshot instance.
 
     Returns:
-        True when the stored checksum matches the canonical material.
+        True if the recomputed checksum matches snapshot.checksum.
 
     Raises:
-        ValueError: If the snapshot carries no checksum.
+        ValueError: If snapshot has no checksum.
     """
-    if not snapshot.checksum:
+    checksum_val = getattr(snapshot, "checksum", None)
+    if not checksum_val:
         raise ValueError("snapshot checksum is required for verification")
     material = dump_provider_specification_snapshot(snapshot)
     material.pop("checksum", None)
-    return _checksum(material) == snapshot.checksum
+    return bool(_checksum(material) == checksum_val)
+
+
+def get_provider_specification_snapshot_field(
+    snapshot: object,
+    field: str,
+) -> object:
+    """Read one named snapshot field.
+
+    Args:
+        snapshot: Snapshot instance.
+        field: Name of the field to retrieve.
+
+    Returns:
+        Field value from the serialized snapshot mapping.
+
+    Raises:
+        ValueError: If the field name is not recognized.
+    """
+    dumped = dump_provider_specification_snapshot(snapshot)
+    if field not in dumped:
+        message = "unknown snapshot field: " + field
+        raise ValueError(message)
+    return dumped[field]
+
+
+async def get_broker_provider_specification(
+    adapter: BrokerAdapter, symbol: str
+) -> StandardResponse[ProviderSpecificationSnapshot]:
+    """Read one current provider specification snapshot through the adapter.
+
+    Args:
+        adapter: Target broker adapter.
+        symbol: Exact provider-native symbol name.
+
+    Returns:
+        StandardResponse containing the ProviderSpecificationSnapshot.
+    """
+    return await adapter.get_provider_specification(symbol)
 
 
 def _build_permissions(account_info: object | None) -> ProviderAccountPermissions:
-    """Build the account-permission block from optional raw account evidence.
-
-    The upstream ``account_info`` contract exposes ``margin_mode``; stop-out
-    policy and FIFO discipline are not exposed and remain explicit
-    unverified exclusions.
-
-    Args:
-        account_info: Raw MT5 ``account_info`` record or None.
-
-    Returns:
-        The validated permission block.
-
-    Raises:
-        ValueError: If a present field is outside the verified vocabulary.
-    """
     if account_info is None:
         return ProviderAccountPermissions(
             unverified=(
@@ -708,18 +872,6 @@ def _build_permissions(account_info: object | None) -> ProviderAccountPermission
 def _build_cost_evidence(
     evidence_id: str | None, checksum: str | None
 ) -> ProviderCostEvidenceReference | None:
-    """Build the separate cost-evidence reference when supplied.
-
-    Args:
-        evidence_id: Dynamic cost-evidence identifier or None.
-        checksum: Cost-evidence checksum or None.
-
-    Returns:
-        The typed reference, or None when no evidence is supplied.
-
-    Raises:
-        ValueError: If only one of identifier and checksum is supplied.
-    """
     if evidence_id is None and checksum is None:
         return None
     if evidence_id is None or checksum is None:
@@ -728,8 +880,22 @@ def _build_cost_evidence(
 
 
 __all__ = [
+    "CALCULATION_MODES",
+    "EXECUTION_MODES",
+    "EXPIRATION_MODE_FLAGS",
+    "FILLING_MODES",
+    "GTC_MODES",
+    "ORDER_TYPE_FLAGS",
+    "ROLLOVER_WEEKDAYS",
+    "SWAP_MODES",
+    "TRADE_MODES",
+    "ProviderAccountPermissions",
+    "ProviderCostEvidenceReference",
+    "ProviderSpecificationSnapshot",
     "build_provider_specification_snapshot",
     "dump_provider_specification_snapshot",
+    "get_broker_provider_specification",
+    "get_provider_specification_snapshot_field",
     "parse_provider_specification_snapshot",
     "verify_provider_specification_snapshot",
 ]

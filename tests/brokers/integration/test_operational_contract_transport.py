@@ -13,15 +13,11 @@ import pytest
 from app.kernel.errors import create_validation_error
 from app.services.brokers import (
     build_broker_account_snapshot,
-    build_broker_failover_decision,
     build_broker_health,
     build_broker_reconciliation_snapshot,
-    build_broker_route_plan,
     parse_broker_account_snapshot,
-    parse_broker_failover_decision,
     parse_broker_health,
     parse_broker_reconciliation_snapshot,
-    parse_broker_route_plan,
 )
 
 _NOW = datetime(2026, 8, 7, 12, 0, 0, tzinfo=UTC)
@@ -145,43 +141,6 @@ def test_broker_reconciliation_snapshot_survives_json_transport() -> None:
     )
     parsed = parse_broker_reconciliation_snapshot(_round_trip_through_json(snapshot))
     assert parsed["fills_state"] == "PARTIAL"
-
-
-def test_route_plan_survives_json_transport() -> None:
-    """RoutePlan v1 round-trips through JSON."""
-    plan = build_broker_route_plan(
-        plan_id="plan-1",
-        primary_broker="mt5",
-        primary_environment="demo",
-        primary_readiness="READY",
-        backup_broker="ctrader",
-        backup_environment="demo",
-        backup_readiness="DEGRADED",
-        selected_route="mt5",
-        route_state="READY",
-        write_failover_policy="RECOVERY_ONLY",
-        created_at=_NOW,
-    )
-    parsed = parse_broker_route_plan(_round_trip_through_json(plan))
-    assert parsed["selected_route"] == "mt5"
-
-
-def test_failover_decision_survives_json_transport() -> None:
-    """FailoverDecision v1 round-trips through JSON."""
-    decision = build_broker_failover_decision(
-        decision_id="dec-1",
-        plan_id="plan-1",
-        decision="FAILOVER_RECOVERY",
-        active_broker="ctrader",
-        active_environment="demo",
-        write_permitted=False,
-        read_permitted=True,
-        reason="primary_unhealthy",
-        decided_at=_NOW,
-    )
-    parsed = parse_broker_failover_decision(_round_trip_through_json(decision))
-    assert parsed["decision"] == "FAILOVER_RECOVERY"
-    assert parsed["write_permitted"] is False
 
 
 def test_unknown_contract_version_is_rejected() -> None:

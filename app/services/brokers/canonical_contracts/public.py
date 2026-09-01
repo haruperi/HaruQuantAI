@@ -125,7 +125,7 @@ def build_broker_order_request_v2(
         TypeError: If revision evidence has an invalid type.
         ValueError: If a policy is unsupported by the bound revision.
     """
-    from app.services.brokers.specifications.public import (
+    from app.services.brokers.metatrader.specifications import (
         get_provider_specification_snapshot_field,
     )
 

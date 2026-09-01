@@ -139,14 +139,6 @@ if typing.TYPE_CHECKING:
     )
     from app.services.brokers.ctrader.health import record_ctrader_health_checkpoint
     from app.services.brokers.dukascopy.health import record_dukascopy_health_checkpoint
-    from app.services.brokers.events.checkpoints import (
-        get_broker_event_checkpoint,
-        record_broker_event_checkpoint,
-    )
-    from app.services.brokers.events.normalization import (
-        classify_broker_event,
-        normalize_broker_event_envelope,
-    )
     from app.services.brokers.metatrader.health import (
         record_metatrader_health_checkpoint,
     )
@@ -159,30 +151,20 @@ if typing.TYPE_CHECKING:
         stream_metatrader_book_snapshots,
         stream_metatrader_snapshots,
     )
-    from app.services.brokers.migrations.public import run_broker_migrations
-    from app.services.brokers.reconciliation.checkpoints import (
-        get_broker_route_recovery,
-        record_broker_route_recovery,
-    )
-    from app.services.brokers.reconciliation.public import (
-        build_broker_failover_decision,
-        build_broker_route_plan,
-        parse_broker_failover_decision,
-        parse_broker_route_plan,
-    )
-    from app.services.brokers.simulation.public import (
-        build_simulation_mutation_envelope,
-        build_simulation_read_envelope,
-        create_simulation_broker_adapter,
-        finalize_simulation_broker_session,
-    )
-    from app.services.brokers.specifications.public import (
+    from app.services.brokers.metatrader.specifications import (
         build_provider_specification_snapshot,
         dump_provider_specification_snapshot,
         get_broker_provider_specification,
         get_provider_specification_snapshot_field,
         parse_provider_specification_snapshot,
         verify_provider_specification_snapshot,
+    )
+    from app.services.brokers.migrations.public import run_broker_migrations
+    from app.services.brokers.simulation.public import (
+        build_simulation_mutation_envelope,
+        build_simulation_read_envelope,
+        create_simulation_broker_adapter,
+        finalize_simulation_broker_session,
     )
 
 # Public export name to the module and attribute that owns it. Resolved on
@@ -207,10 +189,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
     "build_broker_connection_config": (
         "app.services.brokers.canonical_contracts.public",
         "build_broker_connection_config",
-    ),
-    "build_broker_failover_decision": (
-        "app.services.brokers.reconciliation.public",
-        "build_broker_failover_decision",
     ),
     "build_broker_health": (
         "app.services.brokers.canonical_contracts.health",
@@ -264,10 +242,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers.canonical_contracts.reconciliation",
         "build_broker_reconciliation_snapshot",
     ),
-    "build_broker_route_plan": (
-        "app.services.brokers.reconciliation.public",
-        "build_broker_route_plan",
-    ),
     "build_broker_unknown_result": (
         "app.services.brokers.canonical_contracts.unknown_outcome",
         "build_broker_unknown_result",
@@ -277,7 +251,7 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "build_broker_value",
     ),
     "build_provider_specification_snapshot": (
-        "app.services.brokers.specifications.public",
+        "app.services.brokers.metatrader.specifications",
         "build_provider_specification_snapshot",
     ),
     "build_simulation_mutation_envelope": (
@@ -301,10 +275,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "cancel_broker_order",
     ),
     "check_broker_order": ("app.services.brokers._shared.public", "check_broker_order"),
-    "classify_broker_event": (
-        "app.services.brokers.events.normalization",
-        "classify_broker_event",
-    ),
     "close_broker_position": (
         "app.services.brokers._shared.public",
         "close_broker_position",
@@ -340,7 +310,7 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "dump_broker_calculation_fixture",
     ),
     "dump_provider_specification_snapshot": (
-        "app.services.brokers.specifications.public",
+        "app.services.brokers.metatrader.specifications",
         "dump_provider_specification_snapshot",
     ),
     "enforce_no_blind_resubmission": (
@@ -412,10 +382,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers.canonical_contracts.public",
         "get_broker_error_code",
     ),
-    "get_broker_event_checkpoint": (
-        "app.services.brokers.events.checkpoints",
-        "get_broker_event_checkpoint",
-    ),
     "get_broker_feature_flag_environment": (
         "app.services.brokers.canonical_contracts.public",
         "get_broker_feature_flag_environment",
@@ -467,17 +433,13 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "get_broker_positions",
     ),
     "get_broker_provider_specification": (
-        "app.services.brokers.specifications.public",
+        "app.services.brokers.metatrader.specifications",
         "get_broker_provider_specification",
     ),
     "get_broker_quote": ("app.services.brokers._shared.public", "get_broker_quote"),
     "get_broker_resubmission_policy": (
         "app.services.brokers.canonical_contracts.public",
         "get_broker_resubmission_policy",
-    ),
-    "get_broker_route_recovery": (
-        "app.services.brokers.reconciliation.checkpoints",
-        "get_broker_route_recovery",
     ),
     "get_broker_server_time": (
         "app.services.brokers._shared.public",
@@ -507,7 +469,7 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "get_metatrader_snapshot_gateway_status",
     ),
     "get_provider_specification_snapshot_field": (
-        "app.services.brokers.specifications.public",
+        "app.services.brokers.metatrader.specifications",
         "get_provider_specification_snapshot_field",
     ),
     "get_registered_brokers": (
@@ -555,10 +517,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers._shared.public",
         "modify_broker_position",
     ),
-    "normalize_broker_event_envelope": (
-        "app.services.brokers.events.normalization",
-        "normalize_broker_event_envelope",
-    ),
     "parse_broker_account_snapshot": (
         "app.services.brokers.canonical_contracts.account_snapshot",
         "parse_broker_account_snapshot",
@@ -566,10 +524,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
     "parse_broker_calculation_fixture": (
         "app.services.brokers.conformance.public",
         "parse_broker_calculation_fixture",
-    ),
-    "parse_broker_failover_decision": (
-        "app.services.brokers.reconciliation.public",
-        "parse_broker_failover_decision",
     ),
     "parse_broker_health": (
         "app.services.brokers.canonical_contracts.health",
@@ -579,12 +533,8 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers.canonical_contracts.reconciliation",
         "parse_broker_reconciliation_snapshot",
     ),
-    "parse_broker_route_plan": (
-        "app.services.brokers.reconciliation.public",
-        "parse_broker_route_plan",
-    ),
     "parse_provider_specification_snapshot": (
-        "app.services.brokers.specifications.public",
+        "app.services.brokers.metatrader.specifications",
         "parse_provider_specification_snapshot",
     ),
     "ping_broker": ("app.services.brokers._shared.public", "ping_broker"),
@@ -593,14 +543,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
     "record_binance_health_checkpoint": (
         "app.services.brokers.binance.health",
         "record_binance_health_checkpoint",
-    ),
-    "record_broker_event_checkpoint": (
-        "app.services.brokers.events.checkpoints",
-        "record_broker_event_checkpoint",
-    ),
-    "record_broker_route_recovery": (
-        "app.services.brokers.reconciliation.checkpoints",
-        "record_broker_route_recovery",
     ),
     "record_ctrader_health_checkpoint": (
         "app.services.brokers.ctrader.health",
@@ -692,7 +634,7 @@ _EXPORTS: dict[str, tuple[str, str]] = {
     ),
     "unsubscribe_broker": ("app.services.brokers._shared.public", "unsubscribe_broker"),
     "verify_provider_specification_snapshot": (
-        "app.services.brokers.specifications.public",
+        "app.services.brokers.metatrader.specifications",
         "verify_provider_specification_snapshot",
     ),
 }
@@ -734,7 +676,6 @@ __all__ = (
     "build_broker_account_snapshot",
     "build_broker_calculation_fixture",
     "build_broker_connection_config",
-    "build_broker_failover_decision",
     "build_broker_health",
     "build_broker_margin_request",
     "build_broker_order_filter",
@@ -748,7 +689,6 @@ __all__ = (
     "build_broker_position_reduce_request",
     "build_broker_profit_request",
     "build_broker_reconciliation_snapshot",
-    "build_broker_route_plan",
     "build_broker_unknown_result",
     "build_broker_value",
     "build_provider_specification_snapshot",
@@ -758,7 +698,6 @@ __all__ = (
     "calculate_broker_profit",
     "cancel_broker_order",
     "check_broker_order",
-    "classify_broker_event",
     "close_broker_position",
     "collect_broker_calculation_fixture",
     "connect_broker",
@@ -788,7 +727,6 @@ __all__ = (
     "get_broker_environment",
     "get_broker_error_catalog",
     "get_broker_error_code",
-    "get_broker_event_checkpoint",
     "get_broker_feature_flag_environment",
     "get_broker_feature_flag_id",
     "get_broker_feature_flags",
@@ -806,7 +744,6 @@ __all__ = (
     "get_broker_provider_specification",
     "get_broker_quote",
     "get_broker_resubmission_policy",
-    "get_broker_route_recovery",
     "get_broker_server_time",
     "get_broker_spread",
     "get_broker_symbol_info",
@@ -829,20 +766,15 @@ __all__ = (
     "list_broker_subscriptions",
     "modify_broker_order",
     "modify_broker_position",
-    "normalize_broker_event_envelope",
     "parse_broker_account_snapshot",
     "parse_broker_calculation_fixture",
-    "parse_broker_failover_decision",
     "parse_broker_health",
     "parse_broker_reconciliation_snapshot",
-    "parse_broker_route_plan",
     "parse_provider_specification_snapshot",
     "ping_broker",
     "place_broker_order",
     "reconnect_broker",
     "record_binance_health_checkpoint",
-    "record_broker_event_checkpoint",
-    "record_broker_route_recovery",
     "record_ctrader_health_checkpoint",
     "record_dukascopy_health_checkpoint",
     "record_metatrader_health_checkpoint",

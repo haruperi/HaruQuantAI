@@ -44,7 +44,11 @@ def _snapshot_fields(monkeypatch: pytest.MonkeyPatch) -> None:
         }[field]
 
     monkeypatch.setattr(
-        "app.services.brokers.specifications.public.get_provider_specification_snapshot_field",
+        "app.services.brokers.metatrader.specifications.get_provider_specification_snapshot_field",
+        get_field,
+    )
+    monkeypatch.setattr(
+        "app.services.brokers.metatrader.commands.get_provider_specification_snapshot_field",
         get_field,
     )
 

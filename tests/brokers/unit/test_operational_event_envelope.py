@@ -1,7 +1,6 @@
-"""Broker EventEnvelope normalization and conformance-suite unit tests.
+"""Broker conformance-suite unit tests.
 
-Covers ``feature`` (ordered, deduplicated broker EventEnvelope records)
-and ``feature`` (one reusable adapter conformance suite).
+Covers reusable adapter conformance suite invariants.
 """
 
 import asyncio
@@ -9,9 +8,7 @@ from datetime import UTC, datetime
 
 from app.services.brokers import (
     build_broker_connection_config,
-    classify_broker_event,
     create_configured_fake_broker_adapter,
-    normalize_broker_event_envelope,
 )
 from app.services.brokers.canonical_contracts.enums import (
     BrokerCapabilityId,
@@ -21,74 +18,6 @@ from app.services.brokers.canonical_contracts.enums import (
 from app.services.brokers.conformance.suite import run_adapter_conformance
 
 _NOW = datetime(2026, 8, 7, 12, 0, 0, tzinfo=UTC)
-
-
-# --- feature: broker EventEnvelope normalization ---
-
-
-def test_normalize_broker_event_envelope_uses_utils_envelope() -> None:
-    """Normalization produces a Utils EventEnvelope v1 mapping."""
-    envelope = normalize_broker_event_envelope(
-        source_id="mt5:sub-1",
-        source_sequence=1,
-        event_id="evt-1",
-        correlation_id="corr-1",
-        causation_id=None,
-        emitted_at=_NOW,
-        event_type="quote",
-        broker="mt5",
-        payload={"symbol": "EURUSD"},
-    )
-    assert envelope["schema_id"] == "utils.event_envelope.v1"
-    assert envelope["source_sequence"] == 1
-    assert envelope["deduplication_key"] == "mt5:quote:evt-1"
-
-
-def test_classify_broker_event_detects_duplicate() -> None:
-    """A previously observed dedup key is reported as a duplicate."""
-    envelope = normalize_broker_event_envelope(
-        source_id="mt5:sub-1",
-        source_sequence=2,
-        event_id="evt-2",
-        correlation_id="corr-2",
-        causation_id=None,
-        emitted_at=_NOW,
-        event_type="quote",
-        broker="mt5",
-        payload={"symbol": "EURUSD"},
-    )
-    verdict = classify_broker_event(
-        envelope=envelope,
-        observed_keys={"mt5:quote:evt-2"},
-        expected_sequence=2,
-    )
-    assert verdict["is_duplicate"] is True
-    assert verdict["gap"] is None
-
-
-def test_classify_broker_event_reports_gap() -> None:
-    """A sequence jump is reported without discarding the event."""
-    envelope = normalize_broker_event_envelope(
-        source_id="mt5:sub-1",
-        source_sequence=5,
-        event_id="evt-5",
-        correlation_id="corr-5",
-        causation_id=None,
-        emitted_at=_NOW,
-        event_type="bar",
-        broker="mt5",
-        payload={"symbol": "EURUSD"},
-    )
-    verdict = classify_broker_event(
-        envelope=envelope,
-        observed_keys=set(),
-        expected_sequence=2,
-    )
-    assert verdict["is_duplicate"] is False
-    assert verdict["gap"]["missing_count"] == 3
-
-
-# --- feature: reusable adapter conformance suite ---
 
 
 def test_conformance_suite_passes_for_conforming_adapter() -> None:

@@ -44,13 +44,13 @@ from app.services.brokers.metatrader.mapping import (
     _map_tick,
     _optional,
 )
-from app.services.brokers.metatrader.transport import _MT5Transport
-from app.services.brokers.specifications.build import (
+from app.services.brokers.metatrader.specifications import (
     build_provider_specification_snapshot,
 )
+from app.services.brokers.metatrader.transport import _MT5Transport
 
 if TYPE_CHECKING:
-    from app.services.brokers.specifications.contracts import (
+    from app.services.brokers.metatrader.specifications import (
         ProviderSpecificationSnapshot,
     )
 

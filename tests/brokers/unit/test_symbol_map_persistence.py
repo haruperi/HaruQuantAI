@@ -51,12 +51,10 @@ def test_remaining_persistence_exports_exclude_symbol_identity() -> None:
     """Expose only temporary operational state operations."""
     assert persistence.__all__ == [
         "create_health_record",
-        "read_event_checkpoint",
-        "read_route_recovery",
-        "upsert_event_checkpoint_record",
-        "upsert_route_recovery_record",
     ]
     assert delete.__all__ == []
+    assert read.__all__ == []
+    assert update.__all__ == []
 
 
 def test_remaining_create_read_update_operations_are_bounded(
@@ -67,20 +65,9 @@ def test_remaining_create_read_update_operations_are_bounded(
     assert create.create_health_record(("health",), request_id="req-1") is _FAKE_RESULT
     assert create_capture["request"]["max_rows"] == 1
 
-    read_capture = _capture_executor(monkeypatch, read)
-    assert read.read_route_recovery("route", request_id="req-2") is _FAKE_RESULT
-    assert read_capture["request"]["max_rows"] == 1
-
-    update_capture = _capture_executor(monkeypatch, update)
-    assert (
-        update.upsert_route_recovery_record(("route",), request_id="req-3")
-        is _FAKE_RESULT
-    )
-    assert update_capture["request"]["max_rows"] == 1
-
 
 def test_manifest_preserves_history_and_adds_guarded_retirement() -> None:
-    """Keep immutable steps 001/002 and append retirement steps 003/004."""
+    """Keep immutable steps 001/002 and append retirement steps 003/004/005."""
     migrations = get_broker_migrations()
     assert migrations == BROKER_MIGRATIONS
     assert [step.migration_id for step in migrations] == [
@@ -88,8 +75,9 @@ def test_manifest_preserves_history_and_adds_guarded_retirement() -> None:
         "002_broker_channel_state_v1",
         "003_retire_broker_symbol_map",
         "004_retire_broker_environment_permissions",
+        "005_retire_broker_event_and_route_recovery",
     ]
-    assert BROKER_SCHEMA_VERSION == "v4"
+    assert BROKER_SCHEMA_VERSION == "v5"
     retirement_symbol = migrations[2]
     assert any("CHECK (row_count = 0)" in sql for sql in retirement_symbol.statements)
     assert "DROP TABLE broker_symbol_map" in retirement_symbol.statements
@@ -100,6 +88,12 @@ def test_manifest_preserves_history_and_adds_guarded_retirement() -> None:
     assert (
         "DROP TABLE broker_environment_permissions" in retirement_permissions.statements
     )
+    retirement_event_route = migrations[4]
+    assert any(
+        "CHECK (row_count = 0)" in sql for sql in retirement_event_route.statements
+    )
+    assert "DROP TABLE broker_event_checkpoints" in retirement_event_route.statements
+    assert "DROP TABLE broker_route_recovery" in retirement_event_route.statements
 
 
 def test_run_broker_migrations_delegates_complete_manifest(

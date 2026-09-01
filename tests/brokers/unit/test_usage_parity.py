@@ -7,15 +7,15 @@ USAGE_DIR = pathlib.Path("tests/brokers/usage/features")
 
 
 def test_usage_parity_and_reachability() -> None:  # noqa: C901
-    """Verify 10 feature programs, reachable evidence functions, root-only imports.
+    """Verify 7 feature programs, reachable evidence functions, root-only imports.
 
     The Brokers README cites usage evidence at file level (one standalone program
-    per registered feature), so parity is structural: exactly ten numbered
+    per registered feature), so parity is structural: exactly seven numbered
     programs, each with evidence functions reachable from ``main()`` behind a
     standalone-execution guard, and no deep Brokers imports.
     """
     usage_files = sorted(USAGE_DIR.glob("[0-9][0-9]_*.py"))
-    assert len(usage_files) == 10
+    assert len(usage_files) == 7
 
     deep_imports: list[str] = []
 

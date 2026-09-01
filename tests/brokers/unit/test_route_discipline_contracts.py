@@ -2,8 +2,7 @@
 
 Covers the versioned cross-domain contract build/parse pairs added by
 ``feature`` (BrokerHealth), ``feature`` (BrokerAccountSnapshot), ``feature`` (UNKNOWN result),
-``feature`` (BrokerReconciliationSnapshot), and ``feature``
-(RoutePlan / FailoverDecision). Each test exercises the build/parse round-trip,
+and ``feature`` (BrokerReconciliationSnapshot). Each test exercises the build/parse round-trip,
 integrity-hash tamper detection, version-incompatibility rejection, and the
 fail-closed policy that the operational safety boundary requires.
 """
@@ -14,18 +13,14 @@ import pytest
 from app.kernel.errors import ValidationError
 from app.services.brokers import (
     build_broker_account_snapshot,
-    build_broker_failover_decision,
     build_broker_health,
     build_broker_reconciliation_snapshot,
-    build_broker_route_plan,
     build_broker_unknown_result,
     enforce_no_blind_resubmission,
     is_broker_unknown_result,
     parse_broker_account_snapshot,
-    parse_broker_failover_decision,
     parse_broker_health,
     parse_broker_reconciliation_snapshot,
-    parse_broker_route_plan,
 )
 from app.services.brokers.canonical_contracts.enums import (
     BrokerEnvironment,
@@ -304,187 +299,3 @@ def test_reconciliation_rejects_invalid_section_evidence(
     kwargs[field] = value
     with pytest.raises(ValidationError):
         build_broker_reconciliation_snapshot(**kwargs)
-
-
-# --- feature: RoutePlan / FailoverDecision ---
-
-
-def test_route_plan_round_trip() -> None:
-    """Build then parse yields a stable route plan."""
-    plan = build_broker_route_plan(
-        plan_id="plan-1",
-        primary_broker=BrokerId.MT5,
-        primary_environment=BrokerEnvironment.DEMO,
-        primary_readiness="READY",
-        backup_broker=BrokerId.CTRADER,
-        backup_environment=BrokerEnvironment.DEMO,
-        backup_readiness="DEGRADED",
-        selected_route="mt5",
-        route_state="READY",
-        write_failover_policy="RECOVERY_ONLY",
-        created_at=_NOW,
-    )
-    parsed = parse_broker_route_plan(plan)
-    assert parsed["selected_route"] == "mt5"
-    assert parsed["schema_id"] == "brokers.route_plan.v1"
-
-
-def test_route_plan_fail_closed_when_no_ready_route() -> None:
-    """A non-ready primary with no backup cannot report a ready aggregate."""
-    with pytest.raises(ValidationError):
-        build_broker_route_plan(
-            plan_id="plan-2",
-            primary_broker=BrokerId.MT5,
-            primary_environment=BrokerEnvironment.DEMO,
-            primary_readiness="UNAVAILABLE",
-            backup_broker=None,
-            backup_environment=None,
-            backup_readiness=None,
-            selected_route=None,
-            route_state="READY",
-            write_failover_policy="NEVER",
-            created_at=_NOW,
-        )
-
-
-@pytest.mark.parametrize(
-    ("field", "value"),
-    [
-        ("primary_readiness", "INVALID"),
-        ("backup_readiness", "INVALID"),
-        ("route_state", "INVALID"),
-        ("write_failover_policy", "INVALID"),
-        ("selected_route", "ctrader"),
-        ("created_at", _NAIVE),
-    ],
-)
-def test_route_plan_rejects_invalid_policy_evidence(field: str, value: object) -> None:
-    """Malformed or contradictory route-plan evidence fails closed."""
-    kwargs: dict[str, object] = {
-        "plan_id": "plan-1",
-        "primary_broker": BrokerId.MT5,
-        "primary_environment": BrokerEnvironment.DEMO,
-        "primary_readiness": "READY",
-        "backup_broker": None,
-        "backup_environment": None,
-        "backup_readiness": None,
-        "selected_route": "mt5",
-        "route_state": "READY",
-        "write_failover_policy": "RECOVERY_ONLY",
-        "created_at": _NOW,
-    }
-    kwargs[field] = value
-    with pytest.raises(ValidationError):
-        build_broker_route_plan(**kwargs)
-
-
-def test_route_plan_rejects_incomplete_backup_identity() -> None:
-    """A backup route requires both broker and environment evidence."""
-    with pytest.raises(ValidationError):
-        build_broker_route_plan(
-            plan_id="plan-1",
-            primary_broker=BrokerId.MT5,
-            primary_environment=BrokerEnvironment.DEMO,
-            primary_readiness="READY",
-            backup_broker=BrokerId.CTRADER,
-            backup_environment=None,
-            backup_readiness="READY",
-            selected_route="mt5",
-            route_state="READY",
-            write_failover_policy="RECOVERY_ONLY",
-            created_at=_NOW,
-        )
-
-
-def test_failover_decision_round_trip() -> None:
-    """Build then parse yields a stable failover decision."""
-    decision = build_broker_failover_decision(
-        decision_id="dec-1",
-        plan_id="plan-1",
-        decision="HOLD_PRIMARY",
-        active_broker=BrokerId.MT5,
-        active_environment=BrokerEnvironment.DEMO,
-        write_permitted=True,
-        read_permitted=True,
-        reason="primary_healthy",
-        decided_at=_NOW,
-    )
-    parsed = parse_broker_failover_decision(decision)
-    assert parsed["decision"] == "HOLD_PRIMARY"
-    assert parsed["schema_id"] == "brokers.failover_decision.v1"
-
-
-def test_failover_decision_blocks_writes_on_failover() -> None:
-    """A read-only failover never permits writes (no silent cross-broker write)."""
-    with pytest.raises(ValidationError):
-        build_broker_failover_decision(
-            decision_id="dec-2",
-            plan_id="plan-1",
-            decision="FAILOVER_READ_ONLY",
-            active_broker=BrokerId.CTRADER,
-            active_environment=BrokerEnvironment.DEMO,
-            write_permitted=True,
-            read_permitted=True,
-            reason="primary_degraded",
-            decided_at=_NOW,
-        )
-
-
-def test_failover_decision_block_permits_neither() -> None:
-    """A BLOCK decision permits neither reads nor writes."""
-    with pytest.raises(ValidationError):
-        build_broker_failover_decision(
-            decision_id="dec-3",
-            plan_id="plan-1",
-            decision="BLOCK",
-            active_broker=None,
-            active_environment=None,
-            write_permitted=False,
-            read_permitted=True,
-            reason="no_route",
-            decided_at=_NOW,
-        )
-
-
-@pytest.mark.parametrize(
-    ("field", "value"),
-    [
-        ("decision_id", ""),
-        ("decision", "INVALID"),
-        ("write_permitted", 1),
-        ("read_permitted", 1),
-        ("decided_at", _NAIVE),
-    ],
-)
-def test_failover_decision_rejects_invalid_evidence(field: str, value: object) -> None:
-    """Malformed failover decisions fail closed."""
-    kwargs: dict[str, object] = {
-        "decision_id": "dec-1",
-        "plan_id": "plan-1",
-        "decision": "HOLD_PRIMARY",
-        "active_broker": BrokerId.MT5,
-        "active_environment": BrokerEnvironment.DEMO,
-        "write_permitted": True,
-        "read_permitted": True,
-        "reason": "primary_healthy",
-        "decided_at": _NOW,
-    }
-    kwargs[field] = value
-    with pytest.raises(ValidationError):
-        build_broker_failover_decision(**kwargs)
-
-
-def test_failover_decision_rejects_incomplete_active_route() -> None:
-    """An active broker and environment must be supplied together."""
-    with pytest.raises(ValidationError):
-        build_broker_failover_decision(
-            decision_id="dec-1",
-            plan_id="plan-1",
-            decision="HOLD_PRIMARY",
-            active_broker=BrokerId.MT5,
-            active_environment=None,
-            write_permitted=False,
-            read_permitted=True,
-            reason="incomplete_route",
-            decided_at=_NOW,
-        )
