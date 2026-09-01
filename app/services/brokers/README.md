@@ -147,7 +147,7 @@ is current-state evidence only; none is ratified as final Broker ownership.
 | `canonical_contracts/` | MOVE/SPLIT + DELETE | Public cross-boundary types in `app/contracts/broker/`; provider-private helpers in provider features. |
 | `_shared/` | SPLIT + DELETE | Provider-local implementation, provider gateway, public contracts, or Kernel/Composition; no renamed horizontal replacement. |
 | `metatrader/` | ADAPT | Independent `FEAT-BRK-CONNECT_METATRADER` provider feature. |
-| `ctrader/` | ADAPT | Independent `FEAT-BRK-CONNECT_CTRADER` provider feature. |
+| `ctrader/` | ADAPT | Implemented by Child 1.08 as independent `FEAT-BRK-CONNECT_CTRADER` provider feature providing `broker.provider.ctrader@1`. |
 | `binance/` | ADAPT | Implemented by Child 1.07 as independent `FEAT-BRK-CONNECT_BINANCE` provider feature providing `broker.provider.binance@1`. |
 | `dukascopy/` | ADAPT | Implemented by Child 1.06 as independent `FEAT-BRK-CONNECT_DUKASCOPY` provider feature providing `broker.provider.dukascopy@1`. |
 | `yahoo/` | ADAPT | Implemented by Child 1.05 as independent `FEAT-BRK-CONNECT_YAHOO` provider feature providing `broker.provider.yahoo@1`. |
