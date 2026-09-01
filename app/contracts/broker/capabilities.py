@@ -6,35 +6,11 @@ from app.kernel.capability import CapabilityKey
 
 if TYPE_CHECKING:
     from app.contracts.broker.ports import (
-        CertifyAdaptersCapability,
-        ConfigureProvidersCapability,
-        DeclareCapabilitiesCapability,
-        IsolateEnvironmentsCapability,
         ManageSessionsCapability,
+        ProviderBackend,
         ReadProviderStateCapability,
         TransportOrdersCapability,
     )
-
-DECLARE_CAPABILITIES_CAPABILITY: CapabilityKey[DeclareCapabilitiesCapability] = (
-    CapabilityKey(
-        name="broker.declare-capabilities",
-        major=1,
-    )
-)
-
-CONFIGURE_PROVIDERS_CAPABILITY: CapabilityKey[ConfigureProvidersCapability] = (
-    CapabilityKey(
-        name="broker.configure-providers",
-        major=1,
-    )
-)
-
-ISOLATE_ENVIRONMENTS_CAPABILITY: CapabilityKey[IsolateEnvironmentsCapability] = (
-    CapabilityKey(
-        name="broker.isolate-environments",
-        major=1,
-    )
-)
 
 MANAGE_SESSIONS_CAPABILITY: CapabilityKey[ManageSessionsCapability] = CapabilityKey(
     name="broker.manage-sessions",
@@ -53,7 +29,27 @@ TRANSPORT_ORDERS_CAPABILITY: CapabilityKey[TransportOrdersCapability] = Capabili
     major=1,
 )
 
-CERTIFY_ADAPTERS_CAPABILITY: CapabilityKey[CertifyAdaptersCapability] = CapabilityKey(
-    name="broker.certify-adapters",
+PROVIDER_METATRADER_CAPABILITY: CapabilityKey[ProviderBackend] = CapabilityKey(
+    name="broker.provider.metatrader",
+    major=1,
+)
+
+PROVIDER_CTRADER_CAPABILITY: CapabilityKey[ProviderBackend] = CapabilityKey(
+    name="broker.provider.ctrader",
+    major=1,
+)
+
+PROVIDER_BINANCE_CAPABILITY: CapabilityKey[ProviderBackend] = CapabilityKey(
+    name="broker.provider.binance",
+    major=1,
+)
+
+PROVIDER_DUKASCOPY_CAPABILITY: CapabilityKey[ProviderBackend] = CapabilityKey(
+    name="broker.provider.dukascopy",
+    major=1,
+)
+
+PROVIDER_YAHOO_CAPABILITY: CapabilityKey[ProviderBackend] = CapabilityKey(
+    name="broker.provider.yahoo",
     major=1,
 )

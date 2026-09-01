@@ -171,9 +171,9 @@ bindings process-locally, and failures include the precise
 
 ### 4.13 `app/contracts/broker/`
 
-**Public records:** `BrokerProviderProfile`, `BrokerCapabilityMatrix`, `BrokerEnvironment`, `BrokerSessionRef`, `BrokerSessionState`, `BrokerSessionReadiness`, `BrokerAccountSnapshot`, `BrokerTradingState`, `BrokerMarketState`, `ProviderEvent`, `BrokerOperationRequest`, `BrokerOperationReceipt`, `BrokerOperationOutcome`, `ProviderCorrelation`, `BrokerAdapterCertification`, `BrokerWriteCertification`, and `BrokerHistoryPage`.
+**Public records:** `BrokerProviderProfile`, `BrokerSessionRef`, `BrokerSessionState`, `BrokerSessionReadiness`, `BrokerAccountSnapshot`, `BrokerTradingState`, `BrokerMarketState`, `ProviderEvent`, `BrokerOperationRequest`, `BrokerOperationReceipt`, `BrokerOperationOutcome`, `ProviderCorrelation`, and `BrokerHistoryPage`.
 
-**Capability bundles (7):** `DeclareCapabilitiesCapability`, `ConfigureProvidersCapability`, `IsolateEnvironmentsCapability`, `ManageSessionsCapability`, `ReadProviderStateCapability`, `TransportOrdersCapability`, and `CertifyAdaptersCapability`.
+**Capability bundles (8):** `ManageSessionsCapability`, `ReadProviderStateCapability`, `TransportOrdersCapability`, plus one `ProviderBackend` binding each for `broker.provider.metatrader@1`, `broker.provider.ctrader@1`, `broker.provider.binance@1`, `broker.provider.dukascopy@1`, and `broker.provider.yahoo@1`.
 
 ### 4.14 `app/contracts/risk/`
 

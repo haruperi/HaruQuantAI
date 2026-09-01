@@ -57,7 +57,7 @@ EXPECTED_RECORD_COUNTS: dict[str, int] = {
     "interfaces": 16,
     "ui": 37,
     "plugins": 13,
-    "broker": 17,
+    "broker": 13,
     "risk": 24,
     "trading": 28,
 }
@@ -76,7 +76,7 @@ EXPECTED_CAPABILITY_COUNTS: dict[str, int] = {
     "interfaces": 7,
     "ui": 17,
     "plugins": 7,
-    "broker": 7,
+    "broker": 8,
     "risk": 7,
     "trading": 8,
 }
@@ -142,7 +142,7 @@ AUXILIARY_REGISTRY_KEYS: dict[str, frozenset[str]] = {
     "interfaces": frozenset(),
     "ui": frozenset(),
     "plugins": frozenset(),
-    "broker": frozenset({"BrokerCapabilityDeclaration", "ProviderRecord"}),
+    "broker": frozenset({"ProviderRecord"}),
     "risk": frozenset({"OrderedCheck", "ScenarioShock"}),
     "trading": frozenset(),
 }

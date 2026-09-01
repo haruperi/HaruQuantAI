@@ -110,7 +110,7 @@ SCHEMA_VERSIONLESS_COMPONENT_MODELS: dict[str, frozenset[str]] = {
         {"ExposureLimit", "RebalancePolicy", "ObjectiveSpec", "FrontierPoint"}
     ),
     "orchestration": frozenset({"TransitionEdge"}),
-    "broker": frozenset({"BrokerCapabilityDeclaration", "ProviderRecord"}),
+    "broker": frozenset({"ProviderRecord"}),
     "risk": frozenset({"OrderedCheck", "ScenarioShock"}),
 }
 
