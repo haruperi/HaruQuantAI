@@ -146,7 +146,7 @@ is current-state evidence only; none is ratified as final Broker ownership.
 | `migrations/` | SPLIT/MOVE + DELETE | Each authoritative state owner or explicit retirement after evidence review. |
 | `canonical_contracts/` | MOVE/SPLIT + DELETE | Public cross-boundary types in `app/contracts/broker/`; provider-private helpers in provider features. |
 | `_shared/` | SPLIT + DELETE | Provider-local implementation, provider gateway, public contracts, or Kernel/Composition; no renamed horizontal replacement. |
-| `metatrader/` | ADAPT | Independent `FEAT-BRK-CONNECT_METATRADER` provider feature. |
+| `metatrader/` | ADAPT | Implemented by Child 1.09 as independent `FEAT-BRK-CONNECT_METATRADER` provider feature providing `broker.provider.metatrader@1`. |
 | `ctrader/` | ADAPT | Implemented by Child 1.08 as independent `FEAT-BRK-CONNECT_CTRADER` provider feature providing `broker.provider.ctrader@1`. |
 | `binance/` | ADAPT | Implemented by Child 1.07 as independent `FEAT-BRK-CONNECT_BINANCE` provider feature providing `broker.provider.binance@1`. |
 | `dukascopy/` | ADAPT | Implemented by Child 1.06 as independent `FEAT-BRK-CONNECT_DUKASCOPY` provider feature providing `broker.provider.dukascopy@1`. |
