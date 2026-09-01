@@ -15,7 +15,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, cast
 
-from app.contracts.common.models import ContentHash, JsonObject, Uuid7
+from app.contracts.common.models import ContentHash, JsonObject, Timeframe, Uuid7
 from app.contracts.data.internal import StoredSeriesKind, StoredSeriesSnapshot
 from app.contracts.data.models import Bar, Tick
 from app.kernel.time import format_utc_timestamp, utc_now
@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS data_series_versions (
     kind TEXT NOT NULL,
     content_hash TEXT NOT NULL,
     row_count INTEGER NOT NULL,
+    timeframe_json TEXT,
     payload_json TEXT NOT NULL,
     created_at TEXT NOT NULL
 );
@@ -60,6 +61,14 @@ class SeriesStoreService:
         connection = sqlite3.connect(self._database_path)
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(_SCHEMA)
+        columns = {
+            str(row[1])
+            for row in connection.execute("PRAGMA table_info(data_series_versions)")
+        }
+        if "timeframe_json" not in columns:
+            connection.execute(
+                "ALTER TABLE data_series_versions ADD COLUMN timeframe_json TEXT"
+            )
         return connection
 
     @staticmethod
@@ -82,6 +91,7 @@ class SeriesStoreService:
         kind: StoredSeriesKind,
         content_hash: ContentHash,
         row_count: int,
+        timeframe: Timeframe | None,
         payload_json: str,
     ) -> StoredSeriesSnapshot:
         """Persist one immutable payload or verify an identical replay.
@@ -91,6 +101,7 @@ class SeriesStoreService:
             kind: Stored payload kind.
             content_hash: Canonical payload digest.
             row_count: Number of logical records.
+            timeframe: Bar cadence when the payload is bar-shaped.
             payload_json: Canonical JSON payload.
 
         Returns:
@@ -99,27 +110,44 @@ class SeriesStoreService:
         Raises:
             ValueError: If the same version identity is reused for different content.
         """
+        timeframe_json = (
+            json.dumps(
+                timeframe.model_dump(mode="json"),
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            if timeframe is not None
+            else None
+        )
 
         def write() -> StoredSeriesSnapshot:
             with self._connect() as connection:
                 existing = connection.execute(
-                    "SELECT kind, content_hash, row_count, payload_json "
+                    "SELECT kind, content_hash, row_count, timeframe_json, payload_json "
                     "FROM data_series_versions WHERE version_id = ?",
                     (version_id,),
                 ).fetchone()
+                expected = (
+                    kind,
+                    content_hash,
+                    row_count,
+                    timeframe_json,
+                    payload_json,
+                )
                 if existing is not None:
-                    if existing != (kind, content_hash, row_count, payload_json):
+                    if existing != expected:
                         raise ValueError("immutable series version conflict")
                 else:
                     connection.execute(
                         "INSERT INTO data_series_versions "
-                        "(version_id, kind, content_hash, row_count, payload_json, created_at) "
-                        "VALUES (?, ?, ?, ?, ?, ?)",
+                        "(version_id, kind, content_hash, row_count, timeframe_json, "
+                        "payload_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
                         (
                             version_id,
                             kind,
                             content_hash,
                             row_count,
+                            timeframe_json,
                             payload_json,
                             format_utc_timestamp(utc_now()),
                         ),
@@ -133,6 +161,7 @@ class SeriesStoreService:
                 kind=kind,
                 content_hash=content_hash,
                 row_count=row_count,
+                timeframe=timeframe,
                 pinned=pinned,
             )
 
@@ -160,6 +189,7 @@ class SeriesStoreService:
             kind="TICKS",
             content_hash=content_hash,
             row_count=len(ticks),
+            timeframe=None,
             payload_json=self._serialize_models(ticks),
         )
 
@@ -169,6 +199,7 @@ class SeriesStoreService:
         bars: tuple[Bar, ...],
         *,
         content_hash: ContentHash,
+        timeframe: Timeframe,
         kind: StoredSeriesKind = "BARS",
     ) -> StoredSeriesSnapshot:
         """Persist one immutable bar or scenario version.
@@ -177,6 +208,7 @@ class SeriesStoreService:
             version_id: Immutable version identity.
             bars: Bar payload.
             content_hash: Canonical payload digest.
+            timeframe: Exact source cadence for closed-bar reasoning.
             kind: ``BARS`` or ``SCENARIO``.
 
         Returns:
@@ -192,6 +224,7 @@ class SeriesStoreService:
             kind=kind,
             content_hash=content_hash,
             row_count=len(bars),
+            timeframe=timeframe,
             payload_json=self._serialize_models(bars),
         )
 
@@ -225,6 +258,7 @@ class SeriesStoreService:
             kind=kind,
             content_hash=content_hash,
             row_count=1,
+            timeframe=None,
             payload_json=payload_json,
         )
 
@@ -306,8 +340,8 @@ class SeriesStoreService:
         def read() -> StoredSeriesSnapshot | None:
             with self._connect() as connection:
                 row = connection.execute(
-                    "SELECT kind, content_hash, row_count FROM data_series_versions "
-                    "WHERE version_id = ?",
+                    "SELECT kind, content_hash, row_count, timeframe_json "
+                    "FROM data_series_versions WHERE version_id = ?",
                     (version_id,),
                 ).fetchone()
                 if row is None:
@@ -316,11 +350,17 @@ class SeriesStoreService:
                     "SELECT 1 FROM data_series_pins WHERE version_id = ? LIMIT 1",
                     (version_id,),
                 ).fetchone() is not None
+            timeframe = (
+                Timeframe.model_validate(json.loads(row[3]))
+                if row[3] is not None
+                else None
+            )
             return StoredSeriesSnapshot(
                 version_id=version_id,
                 kind=cast(StoredSeriesKind, row[0]),
                 content_hash=cast(ContentHash, row[1]),
                 row_count=int(row[2]),
+                timeframe=timeframe,
                 pinned=pinned,
             )
 
