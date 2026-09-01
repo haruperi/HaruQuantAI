@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
-# ruff: noqa: S310 - URL is constructed from a fixed HTTPS provider base.
+# ruff: noqa: ANN401, S310 - URL is constructed from a fixed HTTPS provider base.
 import asyncio
 import hashlib
 import json
+import logging
 import time
 import urllib.parse
 import urllib.request
 from collections.abc import Callable
 from datetime import datetime
-from typing import TYPE_CHECKING, cast
+from enum import StrEnum
+from typing import TYPE_CHECKING, Any, cast
 
-from app.composition.logging import get_logger
-from app.services.brokers._shared.circuit_breaker import _TransportCircuitBreaker
 from app.services.brokers.canonical_contracts.protocols import (
     _CircuitOpenError,
     _ProviderResponseError,
@@ -22,9 +22,102 @@ from app.services.brokers.canonical_contracts.protocols import (
 from app.services.brokers.dukascopy.instruments import _web_symbol
 
 if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts import BrokerConnectionConfig
+    from app.services.brokers.dukascopy.config import DukascopyConfig
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
+
+
+class _CircuitState(StrEnum):
+    CLOSED = "closed"
+    OPEN = "open"
+    HALF_OPEN = "half_open"
+
+
+class _DukascopyCircuitBreaker:
+    """Deterministic closed/open/half-open transport circuit."""
+
+    def __init__(
+        self,
+        *,
+        failure_threshold: int,
+        recovery_timeout_sec: float,
+        half_open_max_calls: int,
+    ) -> None:
+        if min(failure_threshold, recovery_timeout_sec, half_open_max_calls) <= 0:
+            raise ValueError("circuit bounds must be positive")
+        self._failure_threshold = failure_threshold
+        self._recovery_timeout_sec = recovery_timeout_sec
+        self._half_open_max_calls = half_open_max_calls
+        self._state = _CircuitState.CLOSED
+        self._consecutive_failures = 0
+        self._half_open_in_flight = 0
+        self._half_open_successes = 0
+        self._opened_at: float | None = None
+        self._lock = asyncio.Lock()
+
+    @property
+    def state(self) -> str:
+        return self._state.value
+
+    async def before_call(self) -> str | None:
+        """Return None if call is allowed, or state reason if circuit is open."""
+        async with self._lock:
+            if self._state == _CircuitState.OPEN:
+                opened_at = self._opened_at
+                elapsed = (
+                    time.monotonic() - opened_at
+                    if opened_at is not None
+                    else self._recovery_timeout_sec
+                )
+                if opened_at is None or elapsed < self._recovery_timeout_sec:
+                    return self._state.value
+                self._state = _CircuitState.HALF_OPEN
+                self._half_open_in_flight = 0
+                self._half_open_successes = 0
+                logger.info(
+                    "Dukascopy transport circuit entering half-open probe state"
+                )
+            if self._state == _CircuitState.HALF_OPEN:
+                if self._half_open_in_flight >= self._half_open_max_calls:
+                    return self._state.value
+                self._half_open_in_flight += 1
+            return None
+
+    async def record_success(self) -> None:
+        async with self._lock:
+            if self._state == _CircuitState.HALF_OPEN:
+                self._half_open_in_flight = max(0, self._half_open_in_flight - 1)
+                self._half_open_successes += 1
+                if self._half_open_successes >= self._half_open_max_calls:
+                    self._state = _CircuitState.CLOSED
+                    self._opened_at = None
+                    self._consecutive_failures = 0
+                    self._half_open_in_flight = 0
+                    self._half_open_successes = 0
+                    logger.info("Dukascopy transport circuit closed; resumed")
+            elif self._state == _CircuitState.CLOSED:
+                self._consecutive_failures = 0
+
+    async def record_failure(self, _code: object = None) -> None:
+        async with self._lock:
+            if self._state == _CircuitState.HALF_OPEN:
+                self._half_open_in_flight = max(0, self._half_open_in_flight - 1)
+                self._state = _CircuitState.OPEN
+                self._opened_at = time.monotonic()
+                self._half_open_in_flight = 0
+                self._half_open_successes = 0
+                logger.warning("Dukascopy transport circuit opened on probe failure")
+                return
+            if self._state == _CircuitState.CLOSED:
+                self._consecutive_failures += 1
+                if self._consecutive_failures >= self._failure_threshold:
+                    self._state = _CircuitState.OPEN
+                    self._opened_at = time.monotonic()
+                    self._half_open_in_flight = 0
+                    self._half_open_successes = 0
+                    logger.warning(
+                        "Dukascopy transport circuit opened; provider calls fail closed"
+                    )
 
 
 class _DukascopyTransport:
@@ -34,7 +127,7 @@ class _DukascopyTransport:
 
     def __init__(
         self,
-        config: BrokerConnectionConfig,
+        config: DukascopyConfig | Any,
         latency_sink: Callable[[float], None] | None = None,
     ) -> None:
         """Initialize the tick transport.
@@ -45,7 +138,7 @@ class _DukascopyTransport:
         """
         self._config = config
         self._latency_sink = latency_sink
-        self._circuit = _TransportCircuitBreaker(
+        self._circuit = _DukascopyCircuitBreaker(
             failure_threshold=config.circuit_failure_threshold,
             recovery_timeout_sec=config.circuit_recovery_timeout_sec,
             half_open_max_calls=config.circuit_half_open_max_calls,
@@ -170,15 +263,8 @@ class _DukascopyTransport:
             )
             rows = self._parse_page(body, callback)
         except TimeoutError, OSError, UnicodeError, _ProviderResponseError:
-            from app.services.brokers.canonical_contracts import BrokerErrorCode
-
-            await self._circuit.record_failure(BrokerErrorCode.BROKER_PROVIDER_ERROR)
-            logger.bind(
-                broker=self._config.broker_id.value,
-                environment=self._config.environment.value,
-                symbol=symbol,
-                result="error",
-            ).warning("Dukascopy tick transport call failed")
+            await self._circuit.record_failure()
+            logger.warning("Dukascopy tick transport call failed for symbol %s", symbol)
             raise
         finally:
             if self._latency_sink is not None:
@@ -190,14 +276,17 @@ class _DukascopyTransport:
             for row in rows
             if row and isinstance(row[0], int) and cursor <= row[0] < end_ms
         )[:limit]
-        logger.bind(
-            broker=self._config.broker_id.value,
-            environment=self._config.environment.value,
-            symbol=symbol,
-            result="success",
-            returned_count=len(bounded),
-        ).info("Dukascopy tick transport call completed")
+        logger.info(
+            "Dukascopy tick transport call completed for symbol %s returned %d",
+            symbol,
+            len(bounded),
+        )
         return bounded
 
 
-__all__: list[str] = []
+__all__: list[str] = [
+    "_CircuitOpenError",
+    "_DukascopyCircuitBreaker",
+    "_DukascopyTransport",
+    "_ProviderResponseError",
+]

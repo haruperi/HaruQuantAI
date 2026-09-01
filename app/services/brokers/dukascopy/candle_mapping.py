@@ -4,9 +4,14 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
+from typing import TYPE_CHECKING
 
+from app.contracts.broker.models import BrokerHistoryPage, ProviderRecord
 from app.services.brokers.canonical_contracts import BrokerBar
-from app.services.brokers.canonical_contracts.protocols import _ProviderResponseError
+from app.services.brokers.dukascopy.transport import _ProviderResponseError
+
+if TYPE_CHECKING:
+    from app.contracts.common.models import JsonObject
 
 _TIMEFRAMES = {
     "M1": ("1MIN", timedelta(minutes=1)),
@@ -134,4 +139,85 @@ def _map_candles(
     return tuple(bars)
 
 
-__all__: list[str] = []
+def map_history_page(
+    rows: tuple[tuple[object, ...], ...],
+    *,
+    symbol: str,
+    timeframe: str,
+    limit: int,
+    page_id: str,
+    retrieved_at: str,
+    start: datetime,
+    end: datetime,
+    truncated: bool = False,
+    requested_timeframe: str | None = None,
+) -> BrokerHistoryPage:
+    """Map Dukascopy candle rows into a ratified BrokerHistoryPage wire model.
+
+    Args:
+        rows: Raw provider candle rows.
+        symbol: Exact provider symbol.
+        timeframe: Canonical requested timeframe.
+        limit: Max requested items.
+        page_id: UUID7 string for the history page.
+        retrieved_at: UTC timestamp string.
+        start: Range start boundary.
+        end: Range end boundary.
+        truncated: Whether the underlying batch was truncated.
+        requested_timeframe: Optional caller requested timeframe.
+
+    Returns:
+        Validated BrokerHistoryPage.
+    """
+    bars = _map_candles(
+        rows,
+        symbol=symbol,
+        timeframe=timeframe,
+        start=start,
+        end=end,
+    )
+    records: list[ProviderRecord] = []
+    for bar in bars[:limit]:
+        vol_str = str(bar.trade_volume) if bar.trade_volume is not None else None
+        record_data: JsonObject = {
+            "symbol": bar.symbol,
+            "opening_timestamp": bar.opening_timestamp.isoformat(),
+            "closing_timestamp": bar.closing_timestamp.isoformat(),
+            "open": str(bar.open),
+            "high": str(bar.high),
+            "low": str(bar.low),
+            "close": str(bar.close),
+            "provider_timeframe": bar.provider_timeframe,
+            "requested_timeframe": requested_timeframe or bar.requested_timeframe,
+            "trade_volume": vol_str,
+            "is_closed": bar.is_closed,
+            "provenance": {
+                "provider": "dukascopy",
+                "offer_side": "BID",
+                "research_only": True,
+            },
+        }
+        records.append(
+            ProviderRecord(
+                provider_id="dukascopy",
+                record=record_data,
+            )
+        )
+
+    return BrokerHistoryPage(
+        page_id=page_id,
+        requested_count=limit,
+        returned_count=len(records),
+        is_truncated=truncated or len(bars) > limit,
+        retrieved_at=retrieved_at,
+        provider_cursor=None,
+        records=tuple(records),
+    )
+
+
+__all__: list[str] = [
+    "_map_candles",
+    "_normalize_timeframe",
+    "_provider_interval",
+    "map_history_page",
+]
