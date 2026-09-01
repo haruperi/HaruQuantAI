@@ -7,14 +7,6 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 if TYPE_CHECKING:
     from app.contracts.broker.errors import BrokerFailure
     from app.contracts.broker.models import (
-        CertifyAdaptersRequest,
-        CertifyAdaptersSuccess,
-        ConfigureProvidersRequest,
-        ConfigureProvidersSuccess,
-        DeclareCapabilitiesRequest,
-        DeclareCapabilitiesSuccess,
-        IsolateEnvironmentsRequest,
-        IsolateEnvironmentsSuccess,
         ManageSessionsRequest,
         ManageSessionsSuccess,
         ReadProviderStateRequest,
@@ -22,66 +14,6 @@ if TYPE_CHECKING:
         TransportOrdersRequest,
         TransportOrdersSuccess,
     )
-
-
-@runtime_checkable
-class DeclareCapabilitiesCapability(Protocol):
-    """Capability protocol for broker capability declaration operations."""
-
-    async def declare_capabilities(
-        self,
-        request: DeclareCapabilitiesRequest,
-    ) -> DeclareCapabilitiesSuccess | BrokerFailure:
-        """Declare provider profiles and their capability matrices.
-
-        Args:
-            request: Operation-discriminated capability declaration request.
-
-        Returns:
-            The declared provider profile or capability matrix on success,
-            otherwise a structured broker failure.
-        """
-        ...
-
-
-@runtime_checkable
-class ConfigureProvidersCapability(Protocol):
-    """Capability protocol for provider profile configuration operations."""
-
-    async def configure_providers(
-        self,
-        request: ConfigureProvidersRequest,
-    ) -> ConfigureProvidersSuccess | BrokerFailure:
-        """Configure provider profiles and validate their credentials.
-
-        Args:
-            request: Operation-discriminated provider configuration request.
-
-        Returns:
-            The configured provider profile on success, otherwise a
-            structured broker failure.
-        """
-        ...
-
-
-@runtime_checkable
-class IsolateEnvironmentsCapability(Protocol):
-    """Capability protocol for broker environment isolation operations."""
-
-    async def isolate_environments(
-        self,
-        request: IsolateEnvironmentsRequest,
-    ) -> IsolateEnvironmentsSuccess | BrokerFailure:
-        """Declare, verify, and resolve isolated broker environments.
-
-        Args:
-            request: Operation-discriminated environment isolation request.
-
-        Returns:
-            The declared or verified broker environment on success,
-            otherwise a structured broker failure.
-        """
-        ...
 
 
 @runtime_checkable
@@ -145,20 +77,35 @@ class TransportOrdersCapability(Protocol):
 
 
 @runtime_checkable
-class CertifyAdaptersCapability(Protocol):
-    """Capability protocol for adapter conformance and release operations."""
+class ProviderBackend(Protocol):
+    """Typed provider-backend port implemented by each provider feature.
 
-    async def certify_adapters(
+    One mounted provider (MetaTrader, cTrader, Binance, Dukascopy, or
+    Yahoo) exposes exactly this protocol through its
+    ``broker.provider.<name>@1`` capability. The gateway dispatches one
+    explicitly addressed request to one mounted backend; absence fails
+    capability-unavailable and there is no ranking, selection, failover,
+    or retry across providers, and no business authorization,
+    reconciliation, or idempotency policy lives here.
+    """
+
+    async def manage_sessions(
         self,
-        request: CertifyAdaptersRequest,
-    ) -> CertifyAdaptersSuccess | BrokerFailure:
-        """Run conformance and issue adapter and write certifications.
+        request: ManageSessionsRequest,
+    ) -> ManageSessionsSuccess | BrokerFailure:
+        """Handle one explicitly addressed provider session operation."""
+        ...
 
-        Args:
-            request: Operation-discriminated adapter certification request.
+    async def read_provider_state(
+        self,
+        request: ReadProviderStateRequest,
+    ) -> ReadProviderStateSuccess | BrokerFailure:
+        """Read genuine provider truth for one explicitly addressed read."""
+        ...
 
-        Returns:
-            The adapter certification or write certification on success,
-            otherwise a structured broker failure.
-        """
+    async def transport_orders(
+        self,
+        request: TransportOrdersRequest,
+    ) -> TransportOrdersSuccess | BrokerFailure:
+        """Transport one upstream-authorized provider order operation."""
         ...

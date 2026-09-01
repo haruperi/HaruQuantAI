@@ -5,17 +5,15 @@ from typing import Literal
 from app.contracts.common.models import ProblemDetails, Uuid7, WireModel
 
 # Closed broker failure-code union from the ratified v1 operation rules; the
-# eleven codes are shared by every broker capability.
+# nine codes are shared by every broker capability.
 type BrokerFailureCode = Literal[
     "BROKER_VALIDATION_FAILED",
     "BROKER_PROFILE_UNSUPPORTED",
     "BROKER_ENVIRONMENT_MISMATCH",
     "BROKER_SESSION_NOT_READY",
-    "BROKER_CAPABILITY_NOT_DECLARED",
     "BROKER_OPERATION_REJECTED",
     "BROKER_OUTCOME_UNKNOWN",
     "BROKER_PAGINATION_INVALID",
-    "BROKER_CERTIFICATION_REQUIRED",
     "CREDENTIALS_MISSING",
     "CAPABILITY_UNAVAILABLE",
 ]

@@ -19,45 +19,7 @@ export interface BrokerAccountSnapshot {
   provider_time?: string | null;  // default: null
   schema_version?: 1;  // default: 1
 }
-export interface BrokerAdapterCertification {
-  certification_id: string;
-  profile_version_id: string;
-  capability_id: string;
-  certification_version: number;
-  api_version_range: NonEmptyStr;
-  adapter_build_hash: string;
-  approval_principal_id: string;
-  issued_at: string;
-  expiry_rule: NonEmptyStr;
-  fixture_hashes?: string[];  // default: []
-  sandbox_execution_evidence?: JsonObject;
-  rejection_fixtures?: string[];  // default: []
-  duplicate_idempotency_fixtures?: string[];  // default: []
-  disconnect_unknown_fixtures?: string[];  // default: []
-  schema_version?: 1;  // default: 1
-}
-export interface BrokerCapabilityDeclaration {
-  capability_id: string;
-  is_implemented: boolean;
-  is_available: boolean;
-  is_permitted: boolean;
-  is_verified: boolean;
-  is_release_approved: boolean;
-  execution_model: ExecutionModel;
-}
-export interface BrokerCapabilityMatrix {
-  matrix_id: string;
-  profile_version_id: string;
-  capabilities?: BrokerCapabilityDeclaration[];  // default: []
-  schema_version?: 1;  // default: 1
-}
 export type BrokerConnectionState = "DISCONNECTED" | "CONNECTING" | "READY" | "DEGRADED" | "CLOSING" | "FAILED";
-export interface BrokerEnvironment {
-  environment: BrokerEnvironmentKind;
-  idempotency_namespace: NonEmptyStr;
-  isolation_realm: NonEmptyStr;
-  schema_version?: 1;  // default: 1
-}
 export type BrokerEnvironmentKind = "LIVE" | "DEMO" | "TESTNET" | "SANDBOX" | "SIMULATION";
 export interface BrokerFailure {
   request_id: string;
@@ -66,7 +28,7 @@ export interface BrokerFailure {
   outcome?: "FAILURE";  // default: "FAILURE"
   schema_version?: 1;  // default: 1
 }
-export type BrokerFailureCode = "BROKER_VALIDATION_FAILED" | "BROKER_PROFILE_UNSUPPORTED" | "BROKER_ENVIRONMENT_MISMATCH" | "BROKER_SESSION_NOT_READY" | "BROKER_CAPABILITY_NOT_DECLARED" | "BROKER_OPERATION_REJECTED" | "BROKER_OUTCOME_UNKNOWN" | "BROKER_PAGINATION_INVALID" | "BROKER_CERTIFICATION_REQUIRED" | "CREDENTIALS_MISSING" | "CAPABILITY_UNAVAILABLE";
+export type BrokerFailureCode = "BROKER_VALIDATION_FAILED" | "BROKER_PROFILE_UNSUPPORTED" | "BROKER_ENVIRONMENT_MISMATCH" | "BROKER_SESSION_NOT_READY" | "BROKER_OPERATION_REJECTED" | "BROKER_OUTCOME_UNKNOWN" | "BROKER_PAGINATION_INVALID" | "CREDENTIALS_MISSING" | "CAPABILITY_UNAVAILABLE";
 export interface BrokerHistoryPage {
   page_id: string;
   requested_count: number;
@@ -188,80 +150,6 @@ export interface BrokerTradingState {
   orders?: ProviderRecord[];  // default: []
   deals?: ProviderRecord[];  // default: []
   duplicate_or_contradictory?: NonEmptyStr[];  // default: []
-  schema_version?: 1;  // default: 1
-}
-export interface BrokerWriteCertification {
-  certification_id: string;
-  profile_version_id: string;
-  capability_id: string;
-  is_write_released: true;
-  authenticated_execution_evidence: JsonObject;
-  permission_verification: JsonObject;
-  owner_approval_principal_id: string;
-  approved_at: string;
-  schema_version?: 1;  // default: 1
-}
-export interface CertifyAdaptersRequest {
-  request_id: string;
-  capability_snapshot_id: string;
-  operation: "RUN_CONFORMANCE" | "CERTIFY_VERSION" | "CERTIFY_WRITE";
-  profile_version_id?: string | null;  // default: null
-  certification?: BrokerAdapterCertification | null;  // default: null
-  write_certification?: BrokerWriteCertification | null;  // default: null
-  schema_version?: 1;  // default: 1
-}
-export interface CertifyAdaptersSuccess {
-  request_id: string;
-  certification?: BrokerAdapterCertification | null;  // default: null
-  write_certification?: BrokerWriteCertification | null;  // default: null
-  outcome?: "SUCCESS";  // default: "SUCCESS"
-  result_version?: 1;  // default: 1
-  schema_version?: 1;  // default: 1
-}
-export interface ConfigureProvidersRequest {
-  request_id: string;
-  capability_snapshot_id: string;
-  operation: "CONFIGURE" | "VALIDATE_CREDENTIALS";
-  profile?: BrokerProviderProfile | null;  // default: null
-  profile_id?: string | null;  // default: null
-  schema_version?: 1;  // default: 1
-}
-export interface ConfigureProvidersSuccess {
-  request_id: string;
-  profile?: BrokerProviderProfile | null;  // default: null
-  outcome?: "SUCCESS";  // default: "SUCCESS"
-  result_version?: 1;  // default: 1
-  schema_version?: 1;  // default: 1
-}
-export interface DeclareCapabilitiesRequest {
-  request_id: string;
-  capability_snapshot_id: string;
-  operation: "DECLARE_PROFILE" | "DECLARE_MATRIX";
-  profile?: BrokerProviderProfile | null;  // default: null
-  matrix?: BrokerCapabilityMatrix | null;  // default: null
-  schema_version?: 1;  // default: 1
-}
-export interface DeclareCapabilitiesSuccess {
-  request_id: string;
-  profile?: BrokerProviderProfile | null;  // default: null
-  matrix?: BrokerCapabilityMatrix | null;  // default: null
-  outcome?: "SUCCESS";  // default: "SUCCESS"
-  result_version?: 1;  // default: 1
-  schema_version?: 1;  // default: 1
-}
-export type ExecutionModel = "READ_ONLY" | "WRITE" | "EVENT_STREAM";
-export interface IsolateEnvironmentsRequest {
-  request_id: string;
-  capability_snapshot_id: string;
-  operation: "DECLARE_ENVIRONMENT" | "VERIFY_ISOLATION" | "RESOLVE_AUTHORITY";
-  environment?: BrokerEnvironment | null;  // default: null
-  schema_version?: 1;  // default: 1
-}
-export interface IsolateEnvironmentsSuccess {
-  request_id: string;
-  environment?: BrokerEnvironment | null;  // default: null
-  outcome?: "SUCCESS";  // default: "SUCCESS"
-  result_version?: 1;  // default: 1
   schema_version?: 1;  // default: 1
 }
 export interface ManageSessionsRequest {
