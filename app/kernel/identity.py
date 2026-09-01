@@ -97,6 +97,15 @@ def generate_id(prefix: str) -> str:
     return f"{prefix}-{uuid.uuid4()}"
 
 
+def generate_uuid7() -> str:
+    """Generate a canonical lowercase UUIDv7 wire identifier.
+
+    Returns:
+        A standards-compliant UUIDv7 string suitable for ``Uuid7`` contracts.
+    """
+    return str(uuid.uuid7())
+
+
 def validate_id(value: str, *, expected_prefix: str | None = None) -> str:
     """Validate a canonical generated or stable identifier.
 
