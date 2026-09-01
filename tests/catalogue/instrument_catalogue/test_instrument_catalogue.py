@@ -106,6 +106,8 @@ async def test_cat_define_instruments(tmp_path: Path) -> None:
     assert len(result.instruments) == 1
     assert result.instruments[0].symbol == "EURUSD"
     assert result.instruments[0].version == 1
+    assert result.instruments[0].order_constraints.quantity_step == "0.01"
+    assert result.instruments[0].effective_from == "2026-01-01T00:00:00.000000Z"
     assert len(events_received) == 1
     assert events_received[0].instrument.instrument_id == _INST_ID_1
 

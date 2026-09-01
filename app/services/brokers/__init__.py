@@ -156,20 +156,6 @@ if typing.TYPE_CHECKING:
         classify_broker_event,
         normalize_broker_event_envelope,
     )
-    from app.services.brokers.instrument_profiles.mappings import (
-        close_broker_symbol_mapping,
-        disable_broker_symbol_mapping,
-        register_broker_symbol_mapping,
-    )
-    from app.services.brokers.instrument_profiles.profiles import (
-        build_instrument_venue_profile,
-        parse_instrument_venue_profile,
-    )
-    from app.services.brokers.instrument_profiles.symbols import (
-        resolve_broker_canonical_symbol,
-        resolve_broker_provider_symbol,
-        resolve_broker_provider_symbol_as_of,
-    )
     from app.services.brokers.metatrader.health import (
         record_metatrader_health_checkpoint,
     )
@@ -300,10 +286,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers.canonical_contracts.public",
         "build_broker_value",
     ),
-    "build_instrument_venue_profile": (
-        "app.services.brokers.instrument_profiles.profiles",
-        "build_instrument_venue_profile",
-    ),
     "build_provider_specification_snapshot": (
         "app.services.brokers.specifications.public",
         "build_provider_specification_snapshot",
@@ -337,10 +319,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers._shared.public",
         "close_broker_position",
     ),
-    "close_broker_symbol_mapping": (
-        "app.services.brokers.instrument_profiles.mappings",
-        "close_broker_symbol_mapping",
-    ),
     "collect_broker_calculation_fixture": (
         "app.services.brokers.conformance.public",
         "collect_broker_calculation_fixture",
@@ -365,10 +343,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
     "create_simulation_broker_adapter": (
         "app.services.brokers.simulation.public",
         "create_simulation_broker_adapter",
-    ),
-    "disable_broker_symbol_mapping": (
-        "app.services.brokers.instrument_profiles.mappings",
-        "disable_broker_symbol_mapping",
     ),
     "disconnect_broker": ("app.services.brokers._shared.public", "disconnect_broker"),
     "dump_broker_calculation_fixture": (
@@ -631,10 +605,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers.reconciliation.public",
         "parse_broker_route_plan",
     ),
-    "parse_instrument_venue_profile": (
-        "app.services.brokers.instrument_profiles.profiles",
-        "parse_instrument_venue_profile",
-    ),
     "parse_provider_specification_snapshot": (
         "app.services.brokers.specifications.public",
         "parse_provider_specification_snapshot",
@@ -682,10 +652,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers.environment_guards.permissions",
         "register_broker_environment_permission",
     ),
-    "register_broker_symbol_mapping": (
-        "app.services.brokers.instrument_profiles.mappings",
-        "register_broker_symbol_mapping",
-    ),
     "release_metatrader_snapshot_symbols": (
         "app.services.brokers.metatrader.snapshot_gateway",
         "release_metatrader_snapshot_symbols",
@@ -693,18 +659,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
     "replace_broker_order": (
         "app.services.brokers._shared.public",
         "replace_broker_order",
-    ),
-    "resolve_broker_canonical_symbol": (
-        "app.services.brokers.instrument_profiles.symbols",
-        "resolve_broker_canonical_symbol",
-    ),
-    "resolve_broker_provider_symbol": (
-        "app.services.brokers.instrument_profiles.symbols",
-        "resolve_broker_provider_symbol",
-    ),
-    "resolve_broker_provider_symbol_as_of": (
-        "app.services.brokers.instrument_profiles.symbols",
-        "resolve_broker_provider_symbol_as_of",
     ),
     "resolve_provider_connection_config": (
         "app.services.brokers._shared.connections",
@@ -823,7 +777,6 @@ __all__ = (
     "build_broker_route_plan",
     "build_broker_unknown_result",
     "build_broker_value",
-    "build_instrument_venue_profile",
     "build_provider_specification_snapshot",
     "build_simulation_mutation_envelope",
     "build_simulation_read_envelope",
@@ -833,7 +786,6 @@ __all__ = (
     "check_broker_order",
     "classify_broker_event",
     "close_broker_position",
-    "close_broker_symbol_mapping",
     "collect_broker_calculation_fixture",
     "connect_broker",
     "create_broker_adapter",
@@ -841,7 +793,6 @@ __all__ = (
     "create_connected_broker",
     "create_fake_broker_adapter",
     "create_simulation_broker_adapter",
-    "disable_broker_symbol_mapping",
     "disconnect_broker",
     "dump_broker_calculation_fixture",
     "dump_provider_specification_snapshot",
@@ -914,7 +865,6 @@ __all__ = (
     "parse_broker_health",
     "parse_broker_reconciliation_snapshot",
     "parse_broker_route_plan",
-    "parse_instrument_venue_profile",
     "parse_provider_specification_snapshot",
     "ping_broker",
     "place_broker_order",
@@ -929,12 +879,8 @@ __all__ = (
     "reduce_broker_position",
     "refresh_broker_session",
     "register_broker_environment_permission",
-    "register_broker_symbol_mapping",
     "release_metatrader_snapshot_symbols",
     "replace_broker_order",
-    "resolve_broker_canonical_symbol",
-    "resolve_broker_provider_symbol",
-    "resolve_broker_provider_symbol_as_of",
     "resolve_provider_connection_config",
     "run_broker_adapter_conformance",
     "run_broker_migrations",

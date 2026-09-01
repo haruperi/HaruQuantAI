@@ -41,6 +41,9 @@ dependencies = [
 haruquantai = "app.main:run"
 
 [project.entry-points."haruquantai.features"]
+catalogue-instrument-catalogue = "app.services.catalogue.instrument_catalogue.feature:feature"
+catalogue-provider-mapping = "app.services.catalogue.provider_mapping.feature:feature"
+catalogue-session-calendar = "app.services.catalogue.session_calendar.feature:feature"
 
 # ============================================================================
 # Ruff Configuration (Formatting, Linting, Import Sorting, Security, Complexity)

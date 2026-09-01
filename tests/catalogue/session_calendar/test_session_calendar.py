@@ -119,6 +119,8 @@ async def test_cat_define_market_calendars_upsert_and_event() -> None:
     res = await fr_cat_define_market_calendars(service, req)
     assert isinstance(res, DefineSessionsSuccess)
     assert res.calendar is not None
+    assert res.calendar.timezone == "America/New_York"
+    assert res.calendar is not None
     assert res.calendar.calendar_id == _CAL_ID
     assert res.calendar.version == 1
 

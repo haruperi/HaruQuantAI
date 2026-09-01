@@ -17,13 +17,11 @@ from app.services.brokers import (
     build_broker_health,
     build_broker_reconciliation_snapshot,
     build_broker_route_plan,
-    build_instrument_venue_profile,
     parse_broker_account_snapshot,
     parse_broker_failover_decision,
     parse_broker_health,
     parse_broker_reconciliation_snapshot,
     parse_broker_route_plan,
-    parse_instrument_venue_profile,
 )
 
 _NOW = datetime(2026, 8, 7, 12, 0, 0, tzinfo=UTC)
@@ -39,34 +37,6 @@ def _round_trip_through_json(mapping: dict[str, object]) -> dict[str, object]:
         The deserialized mapping.
     """
     return json.loads(json.dumps(mapping))
-
-
-def test_instrument_venue_profile_survives_json_transport() -> None:
-    """InstrumentVenueProfile v1 round-trips through JSON."""
-    profile = build_instrument_venue_profile(
-        broker="mt5",
-        provider_symbol="EURUSD",
-        canonical_symbol="EUR/USD",
-        asset_class="FX",
-        venue="mt5-demo",
-        tick_size="0.00001",
-        price_precision=5,
-        quantity_step="0.01",
-        contract_multiplier="100000",
-        currency="USD",
-        session_calendar={"mon_open": "00:00"},
-        order_types=("MARKET", "LIMIT"),
-        time_in_force=("GTC", "DAY"),
-        margin_eligible=True,
-        shortable=False,
-        settlement="T+2",
-        halt_state="OPEN",
-        lifecycle_eligibility="TRADEABLE",
-        source_timestamp=_NOW,
-    )
-    parsed = parse_instrument_venue_profile(_round_trip_through_json(profile))
-    assert parsed["contract_version"] == "v1"
-    assert parsed["integrity_hash"] == profile["integrity_hash"]
 
 
 def test_broker_health_survives_json_transport() -> None:
