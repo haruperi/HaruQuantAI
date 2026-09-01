@@ -2,6 +2,7 @@
 
 import re
 from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
@@ -31,6 +32,17 @@ type JsonValue = (
     bool | int | float | str | list[JsonValue] | dict[str, JsonValue] | None
 )
 type JsonObject = dict[str, JsonValue]
+
+
+class RiskLevel(StrEnum):
+    """Operation risk classification levels."""
+
+    NONE = "none"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
 
 # Closed core enum literals from Shared Contracts §4.3. Domain owners reference
 # these instead of redeclaring equivalent literal unions.
