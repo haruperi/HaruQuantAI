@@ -9,13 +9,7 @@ from __future__ import annotations
 
 from typing import Literal, Protocol, runtime_checkable
 
-from app.contracts.common.models import (
-    ContentHash,
-    JsonObject,
-    UtcTimestamp,
-    Uuid7,
-    WireModel,
-)
+from app.contracts.common.models import ContentHash, JsonObject, Uuid7, WireModel
 from app.contracts.data.models import Bar, Tick
 from app.kernel.capability import CapabilityKey
 
@@ -93,13 +87,8 @@ class DataSeriesStoreCapability(Protocol):
         """Pin versions that are referenced by an immutable run binding."""
         ...
 
-    async def collect_unpinned(
-        self,
-        *,
-        limit: int,
-        older_than: UtcTimestamp | None = None,
-    ) -> tuple[Uuid7, ...]:
-        """Delete a bounded set of unpinned versions older than the cutoff."""
+    async def collect_unpinned(self, *, limit: int) -> tuple[Uuid7, ...]:
+        """Delete and return a bounded set of unpinned version identifiers."""
         ...
 
 
