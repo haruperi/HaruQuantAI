@@ -149,7 +149,7 @@ is current-state evidence only; none is ratified as final Broker ownership.
 | `metatrader/` | ADAPT | Independent `FEAT-BRK-CONNECT_METATRADER` provider feature. |
 | `ctrader/` | ADAPT | Independent `FEAT-BRK-CONNECT_CTRADER` provider feature. |
 | `binance/` | ADAPT | Independent `FEAT-BRK-CONNECT_BINANCE` provider feature. |
-| `dukascopy/` | ADAPT | Independent `FEAT-BRK-CONNECT_DUKASCOPY` provider feature. |
+| `dukascopy/` | ADAPT | Implemented by Child 1.06 as independent `FEAT-BRK-CONNECT_DUKASCOPY` provider feature providing `broker.provider.dukascopy@1`. |
 | `yahoo/` | ADAPT | Implemented by Child 1.05 as independent `FEAT-BRK-CONNECT_YAHOO` provider feature providing `broker.provider.yahoo@1`. |
 | `__init__.py` | REPLACE | Empty or docstring-only package initializer after consumer cutover. |
 | `provider_gateway/` | CREATE | Implemented by Child 1.04 as `FEAT-BRK-DISPATCH_PROVIDERS` providing `broker.manage-sessions@1`, `broker.read-provider-state@1`, and `broker.transport-orders@1`. |

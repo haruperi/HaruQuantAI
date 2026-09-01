@@ -1,10 +1,12 @@
 """Dukascopy web-chart tick to canonical DTO mapping."""
 
+from __future__ import annotations
+
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from app.services.brokers.canonical_contracts import BrokerBar, BrokerTick
-from app.services.brokers.canonical_contracts.protocols import _ProviderResponseError
+from app.services.brokers.dukascopy.transport import _ProviderResponseError
 
 _TICK_FIELD_COUNT = 5
 
@@ -165,3 +167,9 @@ def _aggregate_bars(
         )
         for opening, prices in sorted(buckets.items())
     )
+
+
+__all__: list[str] = [
+    "_aggregate_bars",
+    "_map_ticks",
+]

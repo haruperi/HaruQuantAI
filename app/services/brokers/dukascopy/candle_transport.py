@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-# ruff: noqa: S310 - URL is constructed from a fixed HTTPS provider base.
+# ruff: noqa: ANN401, S310 - URL is constructed from a fixed HTTPS provider base.
 import asyncio
 import hashlib
 import json
+import logging
 import math
 import time
 import urllib.parse
@@ -13,23 +14,20 @@ import urllib.request
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
-from app.composition.logging import get_logger
-from app.services.brokers._shared.circuit_breaker import (
-    _TransportCircuitBreaker,
-)
 from app.services.brokers.canonical_contracts.protocols import (
     _CircuitOpenError,
     _ProviderResponseError,
 )
 from app.services.brokers.dukascopy.candle_mapping import _provider_interval
 from app.services.brokers.dukascopy.instruments import _web_symbol
+from app.services.brokers.dukascopy.transport import _DukascopyCircuitBreaker
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts import BrokerConnectionConfig
+    from app.services.brokers.dukascopy.config import DukascopyConfig
 
 _PAGE_LIMIT = 5_000
 _RETRY_BASE_SECONDS = 0.25
@@ -54,7 +52,7 @@ class _DukascopyCandleTransport:
 
     def __init__(
         self,
-        config: BrokerConnectionConfig,
+        config: DukascopyConfig | Any,
         latency_sink: Callable[[float], None] | None = None,
         waiter: Callable[[float], Awaitable[None]] | None = None,
     ) -> None:
@@ -68,10 +66,13 @@ class _DukascopyCandleTransport:
         self._config = config
         self._latency_sink = latency_sink
         self._waiter = waiter or asyncio.sleep
-        self._circuit = _TransportCircuitBreaker(
+        self._circuit = _DukascopyCircuitBreaker(
             failure_threshold=config.circuit_failure_threshold,
             recovery_timeout_sec=config.circuit_recovery_timeout_sec,
             half_open_max_calls=config.circuit_half_open_max_calls,
+        )
+        self._max_reconnect_attempts = getattr(
+            config, "transport_reconnect_max_attempts", 3
         )
 
     @staticmethod
@@ -170,7 +171,7 @@ class _DukascopyCandleTransport:
             }
         )
         url = f"{self._BASE_URL}?{query}"
-        attempts = self._config.transport_reconnect_max_attempts + 1
+        attempts = self._max_reconnect_attempts + 1
         for attempt in range(1, attempts + 1):
             blocked = await self._circuit.before_call()
             if blocked is not None:
@@ -213,25 +214,15 @@ class _DukascopyCandleTransport:
                 OSError,
                 UnicodeError,
                 _ProviderResponseError,
-            ) as error:
-                from app.services.brokers.canonical_contracts import BrokerErrorCode
-
-                await self._circuit.record_failure(
-                    BrokerErrorCode.BROKER_PROVIDER_ERROR
-                )
+            ):
+                await self._circuit.record_failure()
                 final = attempt == attempts
-                logger.bind(
-                    broker=self._config.broker_id.value,
-                    environment=self._config.environment.value,
-                    symbol=symbol,
-                    interval=interval,
-                    cursor=cursor,
-                    attempt=attempt,
-                    max_attempts=attempts,
-                    result="error",
-                    provider_code=BrokerErrorCode.BROKER_PROVIDER_ERROR.value,
-                    exception_type=type(error).__name__,
-                ).warning("Dukascopy candle page transport call failed")
+                logger.warning(
+                    "Dukascopy candle page transport call failed for %s, attempt %d/%d",
+                    symbol,
+                    attempt,
+                    attempts,
+                )
                 if final:
                     raise
                 delay = min(
@@ -244,16 +235,11 @@ class _DukascopyCandleTransport:
                 if self._latency_sink is not None:
                     self._latency_sink((time.perf_counter() - started) * 1000.0)
             await self._circuit.record_success()
-            logger.bind(
-                broker=self._config.broker_id.value,
-                environment=self._config.environment.value,
-                symbol=symbol,
-                interval=interval,
-                cursor=cursor,
-                attempt=attempt,
-                result="success",
-                returned_count=len(rows),
-            ).info("Dukascopy candle page transport call completed")
+            logger.info(
+                "Dukascopy candle page transport call completed for %s returned %d",
+                symbol,
+                len(rows),
+            )
             return rows
         raise AssertionError("Dukascopy candle retry loop exhausted")
 
@@ -391,4 +377,7 @@ class _DukascopyCandleTransport:
         )
 
 
-__all__: list[str] = []
+__all__: list[str] = [
+    "_CandleBatch",
+    "_DukascopyCandleTransport",
+]

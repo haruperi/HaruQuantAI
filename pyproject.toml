@@ -41,6 +41,7 @@ dependencies = [
 haruquantai = "app.main:run"
 
 [project.entry-points."haruquantai.features"]
+brokers-dukascopy = "app.services.brokers.dukascopy.feature:feature"
 brokers-provider-gateway = "app.services.brokers.provider_gateway.feature:feature"
 brokers-yahoo = "app.services.brokers.yahoo.feature:feature"
 catalogue-instrument-catalogue = "app.services.catalogue.instrument_catalogue.feature:feature"
