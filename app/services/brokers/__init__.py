@@ -127,12 +127,6 @@ if typing.TYPE_CHECKING:
         enforce_no_blind_resubmission,
         is_broker_unknown_result,
     )
-    from app.services.brokers.capabilities.dashboard import (
-        get_broker_dashboard_snapshot,
-    )
-    from app.services.brokers.capabilities.matrix import (
-        get_broker_capability_catalogue,
-    )
     from app.services.brokers.conformance.public import (
         build_broker_calculation_fixture,
         collect_broker_calculation_fixture,
@@ -381,10 +375,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers._shared.public",
         "get_broker_balances",
     ),
-    "get_broker_capability_catalogue": (
-        "app.services.brokers.capabilities.matrix",
-        "get_broker_capability_catalogue",
-    ),
     "get_broker_capability_id": (
         "app.services.brokers.canonical_contracts.public",
         "get_broker_capability_id",
@@ -412,10 +402,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
     "get_broker_connection_status": (
         "app.services.brokers._shared.public",
         "get_broker_connection_status",
-    ),
-    "get_broker_dashboard_snapshot": (
-        "app.services.brokers.capabilities.dashboard",
-        "get_broker_dashboard_snapshot",
     ),
     "get_broker_deal": ("app.services.brokers._shared.public", "get_broker_deal"),
     "get_broker_environment": (
@@ -803,7 +789,6 @@ __all__ = (
     "get_broker_adapter_schema_id",
     "get_broker_asset_info",
     "get_broker_balances",
-    "get_broker_capability_catalogue",
     "get_broker_capability_id",
     "get_broker_commission_estimate",
     "get_broker_connection_account_reference",
@@ -811,7 +796,6 @@ __all__ = (
     "get_broker_connection_events",
     "get_broker_connection_id",
     "get_broker_connection_status",
-    "get_broker_dashboard_snapshot",
     "get_broker_deal",
     "get_broker_environment",
     "get_broker_environment_permission",

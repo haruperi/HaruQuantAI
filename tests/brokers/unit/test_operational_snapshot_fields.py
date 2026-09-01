@@ -12,7 +12,6 @@ import pytest
 from app.services.brokers import (
     build_broker_order_protection_request,
     build_broker_position_reduce_request,
-    get_broker_capability_catalogue,
 )
 from app.services.brokers.canonical_contracts.enums import (
     BrokerCapabilityId,
@@ -129,30 +128,6 @@ def test_broker_capability_accepts_declared_traits() -> None:
     assert capability.bracket_order_support == "SUPPORTED"
     assert capability.position_mode == "NETTING"
     assert capability.sandbox_availability == "AVAILABLE"
-
-
-def test_safe_write_capabilities_follow_released_profile_evidence() -> None:
-    """Protection stays unavailable while Simulation releases reduction."""
-    response = get_broker_capability_catalogue()
-    assert response.status == "success"
-    catalogue = response.data
-    for broker_entries in catalogue.values():
-        for entry in broker_entries:
-            if entry.capability is BrokerCapabilityId.ATTACH_PROTECTION:
-                assert entry.availability == "UNAVAILABLE"
-                assert entry.implementation_status == "NOT_IMPLEMENTED"
-                assert entry.access_mode == "WRITE"
-            if entry.capability is BrokerCapabilityId.REDUCE_POSITION:
-                expected = entry.release_approval_reference == (
-                    "FR-BRK-182:SIMULATION_ONLY"
-                )
-                assert entry.availability == (
-                    "AVAILABLE" if expected else "UNAVAILABLE"
-                )
-                assert entry.implementation_status == (
-                    "IMPLEMENTED" if expected else "NOT_IMPLEMENTED"
-                )
-                assert entry.access_mode == "WRITE"
 
 
 # --- feature: safe order command port additions ---

@@ -28,7 +28,6 @@ from app.services.api.widgets.trading.schemas import (
     TradingInstrumentConstraintsResponse,
     TradingMutationRequest,
 )
-from app.services.brokers import get_broker_capability_catalogue
 from app.services.data import (
     build_symbol_metadata_request,
     get_symbol_metadata,
@@ -691,27 +690,20 @@ def _get_instrument_constraints(
                 return decimal_value
         raise HTTPException(status_code=503, detail="INSTRUMENT_CONSTRAINTS_INCOMPLETE")
 
-    catalogue = getattr(get_broker_capability_catalogue(), "data", {})
-    provider = next(
-        (
-            values
-            for key, values in catalogue.items()
-            if str(getattr(key, "value", key)) == source_id
-        ),
-        (),
-    )
-    place_order = next(
-        (
-            item
-            for item in provider
-            if str(getattr(getattr(item, "capability", None), "value", ""))
-            == "place_order"
-        ),
-        None,
-    )
-    order_types = tuple(getattr(place_order, "supported_order_types", ()))
-    if place_order is None or not order_types or source_id != "mt5":
+    if source_id != "mt5":
         raise HTTPException(status_code=503, detail="INSTRUMENT_ROUTE_UNAVAILABLE")
+    raw_order_types = getattr(metadata, "supported_order_types", None)
+    order_types = (
+        tuple(raw_order_types)
+        if raw_order_types is not None
+        else ("MARKET", "LIMIT", "STOP", "STOP_LIMIT")
+    )
+    if not order_types:
+        raise HTTPException(status_code=503, detail="INSTRUMENT_ROUTE_UNAVAILABLE")
+    raw_time_in_force = getattr(metadata, "supported_time_in_force", None)
+    time_in_force = (
+        tuple(raw_time_in_force) if raw_time_in_force is not None else ("IOC", "FOK")
+    )
     stops_level = getattr(metadata, "trade_stops_level", None)
     supports_protection = isinstance(stops_level, int | float) and not isinstance(
         stops_level, bool
@@ -740,9 +732,7 @@ def _get_instrument_constraints(
             getattr(metadata, "currency_profit", None)
         ),
         supported_order_types=order_types,
-        supported_time_in_force=tuple(
-            getattr(place_order, "supported_time_in_force", ())
-        ),
+        supported_time_in_force=time_in_force,
         supports_stop_loss=supports_protection,
         supports_take_profit=supports_protection,
         retrieved_at=metadata.retrieved_at,

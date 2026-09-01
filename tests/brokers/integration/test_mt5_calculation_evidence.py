@@ -10,7 +10,6 @@ from pathlib import Path
 import pytest
 from app.services.brokers import (
     build_broker_value,
-    get_broker_capability_catalogue,
     get_broker_environment,
     get_broker_value_field,
 )
@@ -105,13 +104,6 @@ def test_mt5_check_rejects_missing_projection_when_identity_is_bound() -> None:
 
 def test_operations_are_not_reregistered_and_default_suite_cannot_collect() -> None:
     """The delta changes evidence only and default conformance stays offline."""
-    catalogue = get_broker_capability_catalogue().data
-    assert catalogue is not None
-    for entries in catalogue.values():
-        names = [entry.capability.value for entry in entries]
-        assert names.count("check_order") == 1
-        assert names.count("calculate_margin") == 1
-        assert names.count("calculate_profit") == 1
     suite = Path("app/services/brokers/conformance/suite.py")
     tree = ast.parse(suite.read_text(encoding="utf-8"))
     calls = {

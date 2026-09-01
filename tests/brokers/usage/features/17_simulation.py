@@ -25,7 +25,6 @@ from app.services.brokers import (
     create_configured_fake_broker_adapter,
     create_simulation_broker_adapter,
     finalize_simulation_broker_session,
-    get_broker_capability_catalogue,
     get_broker_deal,
     get_broker_environment,
     get_broker_id,
@@ -172,10 +171,9 @@ def fr_brk_168() -> None:
 
 
 def fr_brk_169() -> None:
-    """Demonstrate the published capability intersection."""
-    catalogue = get_broker_capability_catalogue().data
-    assert catalogue is not None
-    assert catalogue[get_broker_id("sim")]
+    """Demonstrate the simulation adapter instance."""
+    adapter = _values()[2]
+    assert adapter is not None
 
 
 async def fr_brk_170() -> None:

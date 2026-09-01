@@ -7,7 +7,6 @@ import asyncio
 import contextvars
 import functools
 from collections.abc import AsyncIterator, Mapping
-from dataclasses import replace
 from typing import Any, Literal, cast, override
 
 from app.composition.logging import get_logger
@@ -22,9 +21,7 @@ from app.services.brokers._shared.errors import (
 from app.services.brokers.canonical_contracts.enums import (
     BrokerCapabilityId,
     BrokerConnectionState,
-    BrokerEnvironment,
     BrokerErrorCode,
-    BrokerId,
 )
 from app.services.brokers.canonical_contracts.models import (
     BrokerConnectionConfig,
@@ -92,39 +89,13 @@ class _UnsupportedAdapterBase:
         self,
         config: BrokerConnectionConfig,
     ) -> None:
-        """Initialize an adapter from Brokers-owned capability policy.
+        """Initialize an adapter from connection configuration.
 
         Args:
             config: Immutable provider connection configuration.
-
-        Raises:
-            ValueError: If the internal capability catalogue response is
-                unavailable.
         """
-        from app.services.brokers.capabilities.matrix import (
-            get_broker_capability_catalogue,
-        )
-
         self._config = config
-        catalogue_response = get_broker_capability_catalogue()
-        if catalogue_response.status != "success" or catalogue_response.data is None:
-            raise ValueError("broker capability catalogue is unavailable")
-        catalogue = catalogue_response.data[config.broker_id]
-        self._capabilities = {
-            item.capability: (
-                replace(
-                    item,
-                    availability="UNAVAILABLE",
-                    reason="Mutation capability is released only for demo environments",
-                )
-                if item.capability in self._MUTATION_OPERATIONS
-                and item.availability == "AVAILABLE"
-                and config.environment is not BrokerEnvironment.DEMO
-                and config.broker_id is not BrokerId.SIM
-                else item
-            )
-            for item in catalogue
-        }
+        self._capabilities: dict[BrokerCapabilityId, Any] = {}
         self._state = BrokerConnectionState.DISCONNECTED
         self._session_generation = 0
         self._last_error: BrokerError | None = None
@@ -184,11 +155,16 @@ class _UnsupportedAdapterBase:
                 local = object.__getattribute__(self, "_LOCAL_FAIL_SAFE_OPERATIONS")
                 capabilities = object.__getattribute__(self, "_capabilities")
                 declared = capabilities.get(operation)
-                if (
-                    enforce
-                    and operation not in local
-                    and (declared is None or declared.availability == "UNAVAILABLE")
-                ):
+                is_subclass_impl = getattr(type(self), name, None) is not getattr(
+                    _UnsupportedAdapterBase, name, None
+                )
+                is_unsupported = (
+                    declared.availability == "UNAVAILABLE"
+                    if declared is not None
+                    else not is_subclass_impl
+                )
+
+                if enforce and operation not in local and is_unsupported:
 
                     async def _blocked(
                         *args: object, **kwargs: object
@@ -563,7 +539,7 @@ class _UnsupportedAdapterBase:
         return self._result(BrokerCapabilityId.GET_FEATURE_FLAGS, data=flags)
 
     async def supports(self, capability: BrokerCapabilityId) -> StandardResponse[bool]:
-        """Answer from the static declaration without probing a provider.
+        """Answer whether the requested capability is supported.
 
         Args:
             capability: Capability whose declared availability is requested.
@@ -571,10 +547,18 @@ class _UnsupportedAdapterBase:
         Returns:
             A canonical result containing declared support status.
         """
-        declared = self._capabilities[capability]
+        declared = self._capabilities.get(capability)
+        is_subclass_impl = getattr(type(self), capability.value, None) is not getattr(
+            _UnsupportedAdapterBase, capability.value, None
+        )
+        supported = (
+            declared.availability in {"AVAILABLE", "DEGRADED"}
+            if declared is not None
+            else is_subclass_impl
+        )
         return self._result(
             BrokerCapabilityId.SUPPORTS,
-            data=declared.availability in {"AVAILABLE", "DEGRADED"},
+            data=supported,
         )
 
     def _not_connected[T](self, operation: BrokerCapabilityId) -> StandardResponse[T]:

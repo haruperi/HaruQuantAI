@@ -8,8 +8,6 @@ from app.services.brokers import (
     build_provider_specification_snapshot,
     create_configured_fake_broker_adapter,
     dump_provider_specification_snapshot,
-    get_broker_capability_catalogue,
-    get_broker_value_field,
     verify_provider_specification_snapshot,
 )
 from pydantic import SecretStr
@@ -95,19 +93,6 @@ def _snapshot() -> object:
         observed_at=datetime(2026, 8, 20, tzinfo=UTC),
         account_info=_ACCOUNT_INFO,
     )
-
-
-def test_capability_declared_released_and_implemented() -> None:
-    """The new operation stays deterministic-unavailable for other providers."""
-    catalogue = get_broker_capability_catalogue()
-    assert get_broker_value_field(catalogue, "status") == "success"
-    data = get_broker_value_field(catalogue, "data")
-    ctrader = {
-        get_broker_value_field(entry, "capability"): entry for entry in data["ctrader"]
-    }
-    entry = ctrader["get_provider_specification"]
-    assert get_broker_value_field(entry, "implementation_status") == "NOT_IMPLEMENTED"
-    assert get_broker_value_field(entry, "availability") == "UNAVAILABLE"
 
 
 def test_conformance_fake_serves_snapshot_fixture() -> None:

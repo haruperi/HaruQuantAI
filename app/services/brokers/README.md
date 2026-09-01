@@ -135,7 +135,7 @@ is current-state evidence only; none is ratified as final Broker ownership.
 | Current path | Disposition | Final owner or destination |
 | --- | --- | --- |
 | `instrument_profiles/` | MOVE + DELETE | Catalogue instruments and provider mappings; only current provider-observed technical facts remain in provider features. |
-| `capabilities/` | DISSOLVE + DELETE | Kernel/Composition mounted-capability truth plus provider-local technical descriptors. |
+| `capabilities/` | DISSOLVE + DELETE | Retired by Child 1.10; implementation derived from manifests, mounted Kernel capabilities, and composition. |
 | `environment_guards/` | SPLIT + DELETE | Workspace/Composition admission/configuration, Trading/Risk mutation authority, and provider-local endpoint/account verification. |
 | `events/` | SPLIT + DELETE | `app/contracts/broker` payloads, provider mapping/publication, Kernel EventBus, and consumer-owned checkpoints. |
 | `reconciliation/` | SPLIT + DELETE | Provider-local same-provider recovery, Data source selection/fallback, and Trading business reconciliation. |
@@ -527,7 +527,6 @@ The tree below defines the final layout. The following table is the sole normati
 
 | Status    | Feature                                                   | Owning module              | Public API and contracts                                                      | Requirements                               | Usage evidence                                             |
 | --------- | --------------------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------- |
-| Completed | `FEAT-BRK-01` Adapter Capability Matrix | `capabilities/` | `get_broker_capability_catalogue`; socket-free `get_broker_dashboard_snapshot` | `FR-BRK-010`, `FR-BRK-011`, `FR-BRK-103`, `FR-BRK-133` | `tests/brokers/usage/features/01_capabilities.py` |
 | Completed | `FEAT-BRK-02` MetaTrader Direct Broker Channel | `metatrader/` | Direct health, snapshots, streams, calculations, commands, revisioned snapshot-symbol demand, Depth-of-Market reads, and explicit v2 order-policy mapping through `build_broker_order_request_v2` | MetaTrader requirements in Sections 4.3 and 4.10; `FR-BRK-152`–`FR-BRK-161`, `FR-BRK-164`–`FR-BRK-166` | `tests/brokers/usage/features/02_metatrader.py` |
 | Completed | `FEAT-BRK-03` cTrader Direct Broker Channel | `ctrader/` | Direct health, snapshots, streams, calculations, and commands | cTrader requirements in Sections 4.4 and 4.10 | `tests/brokers/usage/features/03_ctrader.py` |
 | Completed | `FEAT-BRK-04` Binance Direct Broker Channel | `binance/` | Direct health, snapshots, streams, and explicit command exclusions | Binance requirements in Sections 4.5 and 4.10 | `tests/brokers/usage/features/04_binance.py` |
@@ -540,7 +539,7 @@ The tree below defines the final layout. The following table is the sole normati
 | Completed | `FEAT-BRK-17` Simulation Broker Channel | `simulation/` | Exact `sim`/`simulation` factory, socket-free authority injection, canonical lifecycle/finalization, clock-safe authoritative reads, provider-shaped mutations, bounded deal/transaction history, and capability intersection | `FR-BRK-167`–`FR-BRK-172`, `FR-BRK-174`–`189`, `FR-BRK-194`–`196` | `tests/brokers/usage/features/17_simulation.py` |
 | Completed | `FEAT-BRK-18` Provider Specification Snapshots | `specifications/` | `build_provider_specification_snapshot`, `parse_provider_specification_snapshot`, `dump_provider_specification_snapshot`, `get_provider_specification_snapshot_field`, `verify_provider_specification_snapshot`, `get_broker_provider_specification` | `FR-BRK-159`–`FR-BRK-163` | `tests/brokers/usage/features/18_specifications.py` |
 
-Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **twelve** completed features, `FEAT-BRK-01` through `FEAT-BRK-10`, `FEAT-BRK-17`, and `FEAT-BRK-18`. `FEAT-BRK-00` moved to Catalogue in Task 1.02; IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels, Events, Reconciliation, and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
+Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **eleven** completed features, `FEAT-BRK-02` through `FEAT-BRK-10`, `FEAT-BRK-17`, and `FEAT-BRK-18`. `FEAT-BRK-00` moved to Catalogue in Task 1.02; `FEAT-BRK-01` was retired in Task 1.10; IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels, Events, Reconciliation, and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
 
 #### Explicit order-policy v2 requirements
 
@@ -561,7 +560,7 @@ before transport because the verified snapshot vocabulary does not admit it.
 | --- | --- | --- | --- |
 | Completed | `FR-BRK-167` Brokers shall register stable `sim` and `simulation` identities. | `get_broker_id`, `get_broker_environment` | `app/services/brokers/canonical_contracts/enums.py`; `tests/brokers/unit/simulation/test_simulation_isolation.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_167()` |
 | Completed | `FR-BRK-168` The factory shall admit only the exact simulation identity/environment pair with an injected authority. | `create_simulation_broker_adapter` | `app/services/brokers/_shared/factory.py`; `tests/brokers/integration/test_simulation_factory.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_168()` |
-| Completed | `FR-BRK-169` Brokers shall publish an exhaustive, fail-closed simulation capability intersection. | `get_broker_capability_catalogue` | `app/services/brokers/capabilities/matrix.py`; `tests/brokers/integration/test_simulation_conformance.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_169()` |
+| Completed | `FR-BRK-169` Brokers shall publish an exhaustive, fail-closed simulation capability intersection. | `create_simulation_broker_adapter` | `app/services/brokers/simulation/adapter.py`; `tests/brokers/integration/test_simulation_conformance.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_169()` |
 | Completed | `FR-BRK-170` The simulation channel shall mirror connect, disconnect, reconnect, ping/status, ordered events, and run finalization while blocking session-required behavior when disconnected. | canonical lifecycle functions; `finalize_simulation_broker_session` | `app/services/brokers/simulation/adapter.py`; `tests/brokers/unit/simulation/test_simulation_lifecycle.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_170()` |
 | Completed | `FR-BRK-171` The simulation channel shall open no socket, require no credentials, and import no Simulation symbol. | `create_simulation_broker_adapter` | `app/services/brokers/simulation/adapter.py`; `tests/brokers/unit/simulation/test_simulation_isolation.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_171()` |
 | Completed | `FR-BRK-172` Brokers shall own a structural authority protocol with canonical adapter signatures and run finalization, while owning no matching or accounting. | `SimulationAuthorityPort` (private contract) | `app/services/brokers/simulation/contracts.py`; `tests/brokers/integration/test_simulation_factory.py`; `tests/brokers/usage/features/17_simulation.py::fr_brk_172()` |
@@ -1612,22 +1611,9 @@ evidence remains in `tests/brokers/unit/test_models.py` and `test_protocols.py`.
 
 ---
 
-### 4.8 `capabilities/` — Adapter Capability Matrix
+### 4.8 [RETIRED] `capabilities/` — Adapter Capability Matrix (Retired in Child 1.10)
 
-**Purpose:** Declare the complete immutable adapter and route capability matrix from one source. Adapter construction and provider connection composition belong to `_shared/`.
-
-**Module flow:**
-
-```text
-BrokerId + BrokerConnectionConfig
-  → factory.create_broker_adapter()
-  → lazy provider factory import
-  → independent disconnected BrokerAdapter
-
-the static declaration table in capabilities/matrix.py
-  → matrix.get_broker_capability_catalogue()
-  → complete operation and route traits
-```
+**Purpose:** Retired by Child 1.10. Implementation is derived from provider manifests, mounted Kernel capabilities, and Composition provider selection. The static matrix, `get_broker_capability_catalogue`, and `get_broker_dashboard_snapshot` were dissolved and removed.
 
 ### Files
 
