@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, override
 
@@ -22,6 +23,8 @@ from app.services.brokers.yahoo.transport import _YahooTransport
 
 if TYPE_CHECKING:
     from app.services.brokers.canonical_contracts.responses import StandardResponse
+
+logger = logging.getLogger(__name__)
 
 
 class YahooBrokerAdapter(_UnsupportedAdapterBase):

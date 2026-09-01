@@ -1,13 +1,19 @@
 """Yahoo channel table to canonical historical-bar mapping."""
 
 # ruff: noqa: ANN401 - table rows are a transitive public interface.
+from __future__ import annotations
+
 import re
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+from app.contracts.broker.models import BrokerHistoryPage, ProviderRecord
 from app.services.brokers.canonical_contracts import BrokerBar, BrokerPage
 from app.services.brokers.canonical_contracts.protocols import _ProviderResponseError
+
+if TYPE_CHECKING:
+    from app.contracts.common.models import JsonObject
 
 _INTERVAL_PATTERN = re.compile(r"\A(\d+)(mo|wk|d|h|m)\Z")
 _CANONICAL_INTERVALS = {
@@ -116,6 +122,9 @@ def _map_history(
         values = {name: row[name] for name in ("Open", "High", "Low", "Close")}
         if any(value is None for value in values.values()):
             raise _ProviderResponseError("malformed Yahoo OHLC response")
+        trade_vol = (
+            Decimal(str(row["Volume"])) if row.get("Volume") is not None else None
+        )
         bars.append(
             BrokerBar(
                 symbol=symbol,
@@ -130,11 +139,7 @@ def _map_history(
                 requested_timeframe=requested_timeframe or timeframe,
                 price_unit="provider_quote_currency",
                 quantity_unit="provider_volume",
-                trade_volume=(
-                    Decimal(str(row["Volume"]))
-                    if row.get("Volume") is not None
-                    else None
-                ),
+                trade_volume=trade_vol,
             )
         )
     return BrokerPage(
@@ -142,4 +147,73 @@ def _map_history(
         limit=limit,
         truncated=len(rows) > limit,
         provider_metadata={"provider": "yahoo", "research_only": True},
+    )
+
+
+def map_history_page(
+    table: Any,
+    *,
+    symbol: str,
+    timeframe: str,
+    limit: int,
+    page_id: str,
+    retrieved_at: str,
+    requested_timeframe: str | None = None,
+) -> BrokerHistoryPage:
+    """Map provider table into a ratified BrokerHistoryPage wire model.
+
+    Args:
+        table: Provider history table.
+        symbol: Exact provider symbol.
+        timeframe: Provider timeframe interval.
+        limit: Max requested items.
+        page_id: UUID7 string for the history page.
+        retrieved_at: UTC timestamp string.
+        requested_timeframe: Optional caller requested timeframe.
+
+    Returns:
+        Validated BrokerHistoryPage.
+    """
+    page = _map_history(
+        table,
+        symbol=symbol,
+        timeframe=timeframe,
+        limit=limit,
+        requested_timeframe=requested_timeframe,
+    )
+    records: list[ProviderRecord] = []
+    for bar in page.items:
+        vol_str = str(bar.trade_volume) if bar.trade_volume is not None else None
+        record_data: JsonObject = {
+            "symbol": bar.symbol,
+            "opening_timestamp": bar.opening_timestamp.isoformat(),
+            "closing_timestamp": bar.closing_timestamp.isoformat(),
+            "open": str(bar.open),
+            "high": str(bar.high),
+            "low": str(bar.low),
+            "close": str(bar.close),
+            "provider_timeframe": bar.provider_timeframe,
+            "requested_timeframe": bar.requested_timeframe,
+            "trade_volume": vol_str,
+            "is_closed": bar.is_closed,
+            "provenance": {
+                "provider": "yahoo",
+                "research_only": True,
+            },
+        }
+        records.append(
+            ProviderRecord(
+                provider_id="yahoo",
+                record=record_data,
+            )
+        )
+
+    return BrokerHistoryPage(
+        page_id=page_id,
+        requested_count=limit,
+        returned_count=len(records),
+        is_truncated=page.truncated,
+        retrieved_at=retrieved_at,
+        provider_cursor=None,
+        records=tuple(records),
     )
