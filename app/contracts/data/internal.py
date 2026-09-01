@@ -9,7 +9,13 @@ from __future__ import annotations
 
 from typing import Literal, Protocol, runtime_checkable
 
-from app.contracts.common.models import ContentHash, JsonObject, Uuid7, WireModel
+from app.contracts.common.models import (
+    ContentHash,
+    JsonObject,
+    Timeframe,
+    Uuid7,
+    WireModel,
+)
 from app.contracts.data.models import Bar, Tick
 from app.kernel.capability import CapabilityKey
 
@@ -23,6 +29,7 @@ class StoredSeriesSnapshot(WireModel):
     kind: StoredSeriesKind
     content_hash: ContentHash
     row_count: int
+    timeframe: Timeframe | None = None
     pinned: bool = False
     schema_version: Literal[1] = 1
 
@@ -47,9 +54,10 @@ class DataSeriesStoreCapability(Protocol):
         bars: tuple[Bar, ...],
         *,
         content_hash: ContentHash,
+        timeframe: Timeframe,
         kind: StoredSeriesKind = "BARS",
     ) -> StoredSeriesSnapshot:
-        """Persist one immutable bar/scenario version."""
+        """Persist one immutable bar/scenario version with source timeframe."""
         ...
 
     async def put_opaque(
