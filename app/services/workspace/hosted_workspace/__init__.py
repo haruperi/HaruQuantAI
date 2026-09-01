@@ -1,0 +1,1 @@
+"""Hosted workspace feature package."""

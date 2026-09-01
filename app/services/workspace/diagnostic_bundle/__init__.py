@@ -1,0 +1,1 @@
+"""Diagnostic bundle feature package."""
