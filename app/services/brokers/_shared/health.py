@@ -87,3 +87,15 @@ def _record_health_checkpoint(
         ),
         request_id=request_id,
     )
+
+
+def record_yahoo_health_checkpoint(**evidence: object) -> object:
+    """Record one redacted Yahoo health checkpoint for legacy facade support.
+
+    Args:
+        **evidence: Required checkpoint fields.
+
+    Returns:
+        Data-owned transaction response.
+    """
+    return _record_health_checkpoint("yahoo", **evidence)  # type: ignore[arg-type]

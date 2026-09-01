@@ -18,6 +18,7 @@ if typing.TYPE_CHECKING:
         create_broker_adapter,
         get_registered_brokers,
     )
+    from app.services.brokers._shared.health import record_yahoo_health_checkpoint
     from app.services.brokers._shared.public import (
         attach_broker_protection,
         build_broker_order_protection_request,
@@ -193,7 +194,6 @@ if typing.TYPE_CHECKING:
         parse_provider_specification_snapshot,
         verify_provider_specification_snapshot,
     )
-    from app.services.brokers.yahoo.health import record_yahoo_health_checkpoint
 
 # Public export name to the module and attribute that owns it. Resolved on
 # first access so importing this boundary never loads every feature.
@@ -637,7 +637,7 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "record_metatrader_health_checkpoint",
     ),
     "record_yahoo_health_checkpoint": (
-        "app.services.brokers.yahoo.health",
+        "app.services.brokers._shared.health",
         "record_yahoo_health_checkpoint",
     ),
     "reduce_broker_position": (
