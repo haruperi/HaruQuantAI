@@ -152,7 +152,7 @@ is current-state evidence only; none is ratified as final Broker ownership.
 | `dukascopy/` | ADAPT | Independent `FEAT-BRK-CONNECT_DUKASCOPY` provider feature. |
 | `yahoo/` | ADAPT | Independent `FEAT-BRK-CONNECT_YAHOO` provider feature. |
 | `__init__.py` | REPLACE | Empty or docstring-only package initializer after consumer cutover. |
-| `provider_gateway/` | CREATE | Child 1.04 creates `FEAT-BRK-DISPATCH_PROVIDERS`; an empty untracked local directory is not implementation evidence. |
+| `provider_gateway/` | CREATE | Implemented by Child 1.04 as `FEAT-BRK-DISPATCH_PROVIDERS` providing `broker.manage-sessions@1`, `broker.read-provider-state@1`, and `broker.transport-orders@1`. |
 
 ### Legacy behavior disposition ledger
 
