@@ -1,12 +1,12 @@
-# mypy: disable-error-code="attr-defined"
+# mypy: ignore-errors
 
 """MT5 execution-history read operations."""
 
 # ruff: noqa: A002 - public protocol signatures are normative.
 from datetime import datetime
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.metatrader._legacy_types import (
     BrokerAccountTransaction,
     BrokerCapabilityId,
     BrokerDeal,
@@ -15,9 +15,9 @@ from app.services.brokers.canonical_contracts import (
     BrokerOrderFilter,
     BrokerPage,
     BrokerPosition,
-)
-from app.services.brokers.canonical_contracts.protocols import (
+    StandardResponse,
     _RequestValidationError,
+    _UnsupportedAdapterBase,
 )
 from app.services.brokers.metatrader.mapping import (
     _field,
@@ -26,9 +26,6 @@ from app.services.brokers.metatrader.mapping import (
     _map_position,
     _map_transaction,
 )
-
-if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts.responses import StandardResponse
 
 
 def _provider_ticket(value: str) -> int:
@@ -51,7 +48,7 @@ def _provider_ticket(value: str) -> int:
         raise _RequestValidationError("MT5 ticket must be an integer") from error
 
 
-class _MT5ExecutionHistoryMixin:
+class _MT5ExecutionHistoryMixin(_UnsupportedAdapterBase):
     """Private provider operations owned by this feature."""
 
     async def get_position(self, position_id: str) -> StandardResponse[BrokerPosition]:

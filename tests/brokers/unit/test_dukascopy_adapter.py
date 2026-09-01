@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.dukascopy._legacy_types import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,

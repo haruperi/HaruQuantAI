@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import numpy as np
 import pytest
-from app.services.brokers.canonical_contracts import BrokerErrorCode
+from app.services.brokers.metatrader._legacy_types import BrokerErrorCode
 from app.services.brokers.metatrader.mapping import (
     _map_account,
     _map_bar,

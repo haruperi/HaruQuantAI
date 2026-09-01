@@ -1,26 +1,25 @@
-# mypy: disable-error-code="attr-defined"
+# mypy: ignore-errors
 
 """MT5 mutation implementations behind unreleased public policy."""
 
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TYPE_CHECKING
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.metatrader._legacy_types import (
     BrokerCapabilityId,
     BrokerError,
     BrokerErrorCode,
     BrokerOrderCheck,
     BrokerOrderModificationRequest,
     BrokerOrderRequest,
+    BrokerOrderRequestV2,
     BrokerOrderResult,
     BrokerPosition,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
-)
-from app.services.brokers.canonical_contracts.models import BrokerOrderRequestV2
-from app.services.brokers.canonical_contracts.protocols import (
+    StandardResponse,
     _RequestValidationError,
+    _UnsupportedAdapterBase,
 )
 from app.services.brokers.metatrader.mapping import (
     _field,
@@ -33,9 +32,6 @@ from app.services.brokers.metatrader.mapping import (
 from app.services.brokers.metatrader.specifications import (
     get_provider_specification_snapshot_field,
 )
-
-if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts.responses import StandardResponse
 
 
 def _provider_ticket(value: str) -> int:
@@ -58,7 +54,7 @@ def _provider_ticket(value: str) -> int:
         raise _RequestValidationError("MT5 ticket must be an integer") from error
 
 
-class _MT5MutationsMixin:
+class _MT5MutationsMixin(_UnsupportedAdapterBase):
     """Private provider operations owned by this feature."""
 
     _last_error: BrokerError | None

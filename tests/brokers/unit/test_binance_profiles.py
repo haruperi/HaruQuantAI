@@ -1,7 +1,7 @@
 """Binance immutable profile declaration tests."""
 
+from app.services.brokers.binance._legacy_types import BrokerEnvironment, BrokerId
 from app.services.brokers.binance.profiles import _BINANCE_PROFILES
-from app.services.brokers.canonical_contracts import BrokerEnvironment, BrokerId
 
 
 def test_every_registered_binance_profile_is_declared() -> None:

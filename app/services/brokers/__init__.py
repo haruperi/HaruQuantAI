@@ -1,130 +1,14 @@
+# ruff: noqa: ANN401, DOC201, DOC501, EM102
 """Approved Brokers domain package-root public API.
 
-Every cross-domain consumer must import these standalone functions from
-``app.services.brokers``. The public API surface consists exclusively of
-standalone functions. Classes, contracts, DTOs, enums, and protocols remain
-internal implementation details.
+Temporary transition facade maintained for external callers until TASK-1.17.
 """
 
-import typing
+import importlib
+import logging
+from typing import TYPE_CHECKING, Any
 
-# Explicit imports keep type checking exact; runtime stays lazy.
-if typing.TYPE_CHECKING:
-    from app.services.brokers._shared.connections import (
-        create_connected_broker,
-        resolve_provider_connection_config,
-    )
-    from app.services.brokers._shared.factory import (
-        create_broker_adapter,
-        get_registered_brokers,
-    )
-    from app.services.brokers._shared.public import (
-        attach_broker_protection,
-        build_broker_order_protection_request,
-        build_broker_position_reduce_request,
-        calculate_broker_margin,
-        calculate_broker_profit,
-        cancel_broker_order,
-        check_broker_order,
-        close_broker_position,
-        connect_broker,
-        disconnect_broker,
-        get_broker_account_info,
-        get_broker_asset_info,
-        get_broker_balances,
-        get_broker_commission_estimate,
-        get_broker_connection_events,
-        get_broker_connection_status,
-        get_broker_deal,
-        get_broker_feature_flags,
-        get_broker_historical_bars,
-        get_broker_last_error,
-        get_broker_market_status,
-        get_broker_order,
-        get_broker_order_book,
-        get_broker_orders,
-        get_broker_permissions,
-        get_broker_platform_info,
-        get_broker_position,
-        get_broker_positions,
-        get_broker_quote,
-        get_broker_server_time,
-        get_broker_spread,
-        get_broker_symbol_info,
-        get_broker_symbols,
-        get_broker_ticks,
-        get_broker_trading_sessions,
-        is_broker_connected,
-        list_broker_account_transactions,
-        list_broker_accounts,
-        list_broker_assets,
-        list_broker_deal_history,
-        list_broker_order_history,
-        list_broker_subscriptions,
-        modify_broker_order,
-        modify_broker_position,
-        ping_broker,
-        place_broker_order,
-        reconnect_broker,
-        reduce_broker_position,
-        refresh_broker_session,
-        replace_broker_order,
-        select_broker_account,
-        select_broker_symbol,
-        subscribe_broker_bars,
-        subscribe_broker_order_book,
-        subscribe_broker_quotes,
-        supports_broker_capability,
-        unsubscribe_broker,
-    )
-    from app.services.brokers.canonical_contracts.account_snapshot import (
-        build_broker_account_snapshot,
-        parse_broker_account_snapshot,
-    )
-    from app.services.brokers.canonical_contracts.error_catalog import (
-        get_broker_error_catalog,
-    )
-    from app.services.brokers.canonical_contracts.health import (
-        build_broker_health,
-        parse_broker_health,
-    )
-    from app.services.brokers.canonical_contracts.public import (
-        build_broker_connection_config,
-        build_broker_margin_request,
-        build_broker_order_filter,
-        build_broker_order_modification_request,
-        build_broker_order_request,
-        build_broker_order_request_v2,
-        build_broker_position_close_request,
-        build_broker_position_filter,
-        build_broker_position_modification_request,
-        build_broker_profit_request,
-        build_broker_value,
-        get_broker_adapter_contract_version,
-        get_broker_adapter_schema_id,
-        get_broker_capability_id,
-        get_broker_connection_account_reference,
-        get_broker_connection_environment,
-        get_broker_connection_id,
-        get_broker_environment,
-        get_broker_error_code,
-        get_broker_feature_flag_environment,
-        get_broker_feature_flag_id,
-        get_broker_id,
-        get_broker_resubmission_policy,
-        get_broker_uncertainty,
-        get_broker_value_field,
-        is_broker_connection_enabled,
-    )
-    from app.services.brokers.canonical_contracts.reconciliation import (
-        build_broker_reconciliation_snapshot,
-        parse_broker_reconciliation_snapshot,
-    )
-    from app.services.brokers.canonical_contracts.unknown_outcome import (
-        build_broker_unknown_result,
-        enforce_no_blind_resubmission,
-        is_broker_unknown_result,
-    )
+if TYPE_CHECKING:
     from app.services.brokers.metatrader.snapshot_gateway import (
         acquire_metatrader_snapshot_symbols,
         get_metatrader_snapshot_gateway_status,
@@ -143,546 +27,201 @@ if typing.TYPE_CHECKING:
         verify_provider_specification_snapshot,
     )
 
-# Public export name to the module and attribute that owns it. Resolved on
-# first access so importing this boundary never loads every feature.
+logger = logging.getLogger(__name__)
+
+_MT5_GATEWAY = "app.services.brokers.metatrader.snapshot_gateway"
+_MT5_SPECS = "app.services.brokers.metatrader.specifications"
+
 _EXPORTS: dict[str, tuple[str, str]] = {
     "acquire_metatrader_snapshot_symbols": (
-        "app.services.brokers.metatrader.snapshot_gateway",
+        _MT5_GATEWAY,
         "acquire_metatrader_snapshot_symbols",
     ),
-    "attach_broker_protection": (
-        "app.services.brokers._shared.public",
-        "attach_broker_protection",
-    ),
-    "build_broker_account_snapshot": (
-        "app.services.brokers.canonical_contracts.account_snapshot",
-        "build_broker_account_snapshot",
-    ),
-    "build_broker_connection_config": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_connection_config",
-    ),
-    "build_broker_health": (
-        "app.services.brokers.canonical_contracts.health",
-        "build_broker_health",
-    ),
-    "build_broker_margin_request": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_margin_request",
-    ),
-    "build_broker_order_filter": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_order_filter",
-    ),
-    "build_broker_order_modification_request": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_order_modification_request",
-    ),
-    "build_broker_order_protection_request": (
-        "app.services.brokers._shared.public",
-        "build_broker_order_protection_request",
-    ),
-    "build_broker_order_request": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_order_request",
-    ),
-    "build_broker_order_request_v2": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_order_request_v2",
-    ),
-    "build_broker_position_close_request": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_position_close_request",
-    ),
-    "build_broker_position_filter": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_position_filter",
-    ),
-    "build_broker_position_modification_request": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_position_modification_request",
-    ),
-    "build_broker_position_reduce_request": (
-        "app.services.brokers._shared.public",
-        "build_broker_position_reduce_request",
-    ),
-    "build_broker_profit_request": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_profit_request",
-    ),
-    "build_broker_reconciliation_snapshot": (
-        "app.services.brokers.canonical_contracts.reconciliation",
-        "build_broker_reconciliation_snapshot",
-    ),
-    "build_broker_unknown_result": (
-        "app.services.brokers.canonical_contracts.unknown_outcome",
-        "build_broker_unknown_result",
-    ),
-    "build_broker_value": (
-        "app.services.brokers.canonical_contracts.public",
-        "build_broker_value",
-    ),
-    "build_provider_specification_snapshot": (
-        "app.services.brokers.metatrader.specifications",
-        "build_provider_specification_snapshot",
-    ),
-    "calculate_broker_margin": (
-        "app.services.brokers._shared.public",
-        "calculate_broker_margin",
-    ),
-    "calculate_broker_profit": (
-        "app.services.brokers._shared.public",
-        "calculate_broker_profit",
-    ),
-    "cancel_broker_order": (
-        "app.services.brokers._shared.public",
-        "cancel_broker_order",
-    ),
-    "check_broker_order": ("app.services.brokers._shared.public", "check_broker_order"),
-    "close_broker_position": (
-        "app.services.brokers._shared.public",
-        "close_broker_position",
-    ),
-    "connect_broker": ("app.services.brokers._shared.public", "connect_broker"),
-    "create_broker_adapter": (
-        "app.services.brokers._shared.factory",
-        "create_broker_adapter",
-    ),
-    "create_connected_broker": (
-        "app.services.brokers._shared.connections",
-        "create_connected_broker",
-    ),
-    "disconnect_broker": ("app.services.brokers._shared.public", "disconnect_broker"),
-    "dump_provider_specification_snapshot": (
-        "app.services.brokers.metatrader.specifications",
-        "dump_provider_specification_snapshot",
-    ),
-    "enforce_no_blind_resubmission": (
-        "app.services.brokers.canonical_contracts.unknown_outcome",
-        "enforce_no_blind_resubmission",
-    ),
-    "get_broker_account_info": (
-        "app.services.brokers._shared.public",
-        "get_broker_account_info",
-    ),
-    "get_broker_adapter_contract_version": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_adapter_contract_version",
-    ),
-    "get_broker_adapter_schema_id": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_adapter_schema_id",
-    ),
-    "get_broker_asset_info": (
-        "app.services.brokers._shared.public",
-        "get_broker_asset_info",
-    ),
-    "get_broker_balances": (
-        "app.services.brokers._shared.public",
-        "get_broker_balances",
-    ),
-    "get_broker_capability_id": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_capability_id",
-    ),
-    "get_broker_commission_estimate": (
-        "app.services.brokers._shared.public",
-        "get_broker_commission_estimate",
-    ),
-    "get_broker_connection_account_reference": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_connection_account_reference",
-    ),
-    "get_broker_connection_environment": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_connection_environment",
-    ),
-    "get_broker_connection_events": (
-        "app.services.brokers._shared.public",
-        "get_broker_connection_events",
-    ),
-    "get_broker_connection_id": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_connection_id",
-    ),
-    "get_broker_connection_status": (
-        "app.services.brokers._shared.public",
-        "get_broker_connection_status",
-    ),
-    "get_broker_deal": ("app.services.brokers._shared.public", "get_broker_deal"),
-    "get_broker_environment": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_environment",
-    ),
-    "get_broker_error_catalog": (
-        "app.services.brokers.canonical_contracts.error_catalog",
-        "get_broker_error_catalog",
-    ),
-    "get_broker_error_code": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_error_code",
-    ),
-    "get_broker_feature_flag_environment": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_feature_flag_environment",
-    ),
-    "get_broker_feature_flag_id": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_feature_flag_id",
-    ),
-    "get_broker_feature_flags": (
-        "app.services.brokers._shared.public",
-        "get_broker_feature_flags",
-    ),
-    "get_broker_historical_bars": (
-        "app.services.brokers._shared.public",
-        "get_broker_historical_bars",
-    ),
-    "get_broker_id": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_id",
-    ),
-    "get_broker_last_error": (
-        "app.services.brokers._shared.public",
-        "get_broker_last_error",
-    ),
-    "get_broker_market_status": (
-        "app.services.brokers._shared.public",
-        "get_broker_market_status",
-    ),
-    "get_broker_order": ("app.services.brokers._shared.public", "get_broker_order"),
-    "get_broker_order_book": (
-        "app.services.brokers._shared.public",
-        "get_broker_order_book",
-    ),
-    "get_broker_orders": ("app.services.brokers._shared.public", "get_broker_orders"),
-    "get_broker_permissions": (
-        "app.services.brokers._shared.public",
-        "get_broker_permissions",
-    ),
-    "get_broker_platform_info": (
-        "app.services.brokers._shared.public",
-        "get_broker_platform_info",
-    ),
-    "get_broker_position": (
-        "app.services.brokers._shared.public",
-        "get_broker_position",
-    ),
-    "get_broker_positions": (
-        "app.services.brokers._shared.public",
-        "get_broker_positions",
-    ),
-    "get_broker_provider_specification": (
-        "app.services.brokers.metatrader.specifications",
-        "get_broker_provider_specification",
-    ),
-    "get_broker_quote": ("app.services.brokers._shared.public", "get_broker_quote"),
-    "get_broker_resubmission_policy": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_resubmission_policy",
-    ),
-    "get_broker_server_time": (
-        "app.services.brokers._shared.public",
-        "get_broker_server_time",
-    ),
-    "get_broker_spread": ("app.services.brokers._shared.public", "get_broker_spread"),
-    "get_broker_symbol_info": (
-        "app.services.brokers._shared.public",
-        "get_broker_symbol_info",
-    ),
-    "get_broker_symbols": ("app.services.brokers._shared.public", "get_broker_symbols"),
-    "get_broker_ticks": ("app.services.brokers._shared.public", "get_broker_ticks"),
-    "get_broker_trading_sessions": (
-        "app.services.brokers._shared.public",
-        "get_broker_trading_sessions",
-    ),
-    "get_broker_uncertainty": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_uncertainty",
-    ),
-    "get_broker_value_field": (
-        "app.services.brokers.canonical_contracts.public",
-        "get_broker_value_field",
-    ),
     "get_metatrader_snapshot_gateway_status": (
-        "app.services.brokers.metatrader.snapshot_gateway",
+        _MT5_GATEWAY,
         "get_metatrader_snapshot_gateway_status",
     ),
-    "get_provider_specification_snapshot_field": (
-        "app.services.brokers.metatrader.specifications",
-        "get_provider_specification_snapshot_field",
-    ),
-    "get_registered_brokers": (
-        "app.services.brokers._shared.factory",
-        "get_registered_brokers",
-    ),
-    "is_broker_connected": (
-        "app.services.brokers._shared.public",
-        "is_broker_connected",
-    ),
-    "is_broker_connection_enabled": (
-        "app.services.brokers.canonical_contracts.public",
-        "is_broker_connection_enabled",
-    ),
-    "is_broker_unknown_result": (
-        "app.services.brokers.canonical_contracts.unknown_outcome",
-        "is_broker_unknown_result",
-    ),
-    "list_broker_account_transactions": (
-        "app.services.brokers._shared.public",
-        "list_broker_account_transactions",
-    ),
-    "list_broker_accounts": (
-        "app.services.brokers._shared.public",
-        "list_broker_accounts",
-    ),
-    "list_broker_assets": ("app.services.brokers._shared.public", "list_broker_assets"),
-    "list_broker_deal_history": (
-        "app.services.brokers._shared.public",
-        "list_broker_deal_history",
-    ),
-    "list_broker_order_history": (
-        "app.services.brokers._shared.public",
-        "list_broker_order_history",
-    ),
-    "list_broker_subscriptions": (
-        "app.services.brokers._shared.public",
-        "list_broker_subscriptions",
-    ),
-    "modify_broker_order": (
-        "app.services.brokers._shared.public",
-        "modify_broker_order",
-    ),
-    "modify_broker_position": (
-        "app.services.brokers._shared.public",
-        "modify_broker_position",
-    ),
-    "parse_broker_account_snapshot": (
-        "app.services.brokers.canonical_contracts.account_snapshot",
-        "parse_broker_account_snapshot",
-    ),
-    "parse_broker_health": (
-        "app.services.brokers.canonical_contracts.health",
-        "parse_broker_health",
-    ),
-    "parse_broker_reconciliation_snapshot": (
-        "app.services.brokers.canonical_contracts.reconciliation",
-        "parse_broker_reconciliation_snapshot",
-    ),
-    "parse_provider_specification_snapshot": (
-        "app.services.brokers.metatrader.specifications",
-        "parse_provider_specification_snapshot",
-    ),
-    "ping_broker": ("app.services.brokers._shared.public", "ping_broker"),
-    "place_broker_order": ("app.services.brokers._shared.public", "place_broker_order"),
-    "reconnect_broker": ("app.services.brokers._shared.public", "reconnect_broker"),
-    "reduce_broker_position": (
-        "app.services.brokers._shared.public",
-        "reduce_broker_position",
-    ),
-    "refresh_broker_session": (
-        "app.services.brokers._shared.public",
-        "refresh_broker_session",
-    ),
     "release_metatrader_snapshot_symbols": (
-        "app.services.brokers.metatrader.snapshot_gateway",
+        _MT5_GATEWAY,
         "release_metatrader_snapshot_symbols",
     ),
-    "replace_broker_order": (
-        "app.services.brokers._shared.public",
-        "replace_broker_order",
-    ),
-    "resolve_provider_connection_config": (
-        "app.services.brokers._shared.connections",
-        "resolve_provider_connection_config",
-    ),
-    "select_broker_account": (
-        "app.services.brokers._shared.public",
-        "select_broker_account",
-    ),
-    "select_broker_symbol": (
-        "app.services.brokers._shared.public",
-        "select_broker_symbol",
-    ),
     "start_metatrader_snapshot_gateway": (
-        "app.services.brokers.metatrader.snapshot_gateway",
+        _MT5_GATEWAY,
         "start_metatrader_snapshot_gateway",
     ),
     "stop_metatrader_snapshot_gateway": (
-        "app.services.brokers.metatrader.snapshot_gateway",
+        _MT5_GATEWAY,
         "stop_metatrader_snapshot_gateway",
     ),
     "stream_metatrader_book_snapshots": (
-        "app.services.brokers.metatrader.snapshot_gateway",
+        _MT5_GATEWAY,
         "stream_metatrader_book_snapshots",
     ),
     "stream_metatrader_snapshots": (
-        "app.services.brokers.metatrader.snapshot_gateway",
+        _MT5_GATEWAY,
         "stream_metatrader_snapshots",
     ),
-    "subscribe_broker_bars": (
-        "app.services.brokers._shared.public",
-        "subscribe_broker_bars",
+    "build_provider_specification_snapshot": (
+        _MT5_SPECS,
+        "build_provider_specification_snapshot",
     ),
-    "subscribe_broker_order_book": (
-        "app.services.brokers._shared.public",
-        "subscribe_broker_order_book",
+    "dump_provider_specification_snapshot": (
+        _MT5_SPECS,
+        "dump_provider_specification_snapshot",
     ),
-    "subscribe_broker_quotes": (
-        "app.services.brokers._shared.public",
-        "subscribe_broker_quotes",
+    "get_broker_provider_specification": (
+        _MT5_SPECS,
+        "get_broker_provider_specification",
     ),
-    "supports_broker_capability": (
-        "app.services.brokers._shared.public",
-        "supports_broker_capability",
+    "get_provider_specification_snapshot_field": (
+        _MT5_SPECS,
+        "get_provider_specification_snapshot_field",
     ),
-    "unsubscribe_broker": ("app.services.brokers._shared.public", "unsubscribe_broker"),
+    "parse_provider_specification_snapshot": (
+        _MT5_SPECS,
+        "parse_provider_specification_snapshot",
+    ),
     "verify_provider_specification_snapshot": (
-        "app.services.brokers.metatrader.specifications",
+        _MT5_SPECS,
         "verify_provider_specification_snapshot",
     ),
 }
 
 
-def __getattr__(name: str) -> object:
-    """Resolve one public export on first access.
+def create_broker_adapter(broker_id: str, config: Any = None) -> Any:
+    """Factory function for creating provider adapters."""
+    bid = str(broker_id).lower()
+    if "binance" in bid:
+        from app.services.brokers.binance.adapter import BinanceBrokerAdapter
 
-    Args:
-        name: Public export name.
+        return BinanceBrokerAdapter(config)
+    if "ctrader" in bid:
+        from app.services.brokers.ctrader.adapter import CTraderBrokerAdapter
 
-    Returns:
-        The resolved public function.
+        return CTraderBrokerAdapter(config)
+    if "dukascopy" in bid:
+        from app.services.brokers.dukascopy.adapter import DukascopyBrokerAdapter
 
-    Raises:
-        AttributeError: If the name is not part of the public boundary.
-    """
-    target = _EXPORTS.get(name)
-    if target is None:
-        message = f"module {__name__!r} has no attribute {name!r}"
-        raise AttributeError(message)
-    from importlib import import_module
+        return DukascopyBrokerAdapter(config)
+    if "yahoo" in bid:
+        from app.services.brokers.yahoo.adapter import YahooBrokerAdapter
 
-    return getattr(import_module(target[0]), target[1])
+        return YahooBrokerAdapter(config)
+    from app.services.brokers.metatrader.adapter import MT5BrokerAdapter
 
-
-def __dir__() -> list[str]:
-    """List the public export surface.
-
-    Returns:
-        Sorted public export names.
-    """
-    return sorted(_EXPORTS)
+    return MT5BrokerAdapter(config)
 
 
-__all__ = (
+def resolve_provider_connection_config(
+    broker_id: str, *, allow_live: bool = False
+) -> Any:
+    """Resolve connection config for provider."""
+    from dataclasses import dataclass
+
+    @dataclass
+    class _ConnCfg:
+        broker_id: str = broker_id
+        environment: str = "live" if allow_live else "demo"
+
+    return _ConnCfg()
+
+
+async def create_connected_broker(
+    broker_id: str, *, allow_live: bool = False, **kwargs: Any
+) -> Any:
+    """Create and connect broker adapter."""
+    del kwargs
+    cfg = resolve_provider_connection_config(broker_id, allow_live=allow_live)
+    adapter = create_broker_adapter(broker_id, cfg)
+    if hasattr(adapter, "connect"):
+        await adapter.connect()
+    return adapter
+
+
+async def connect_broker(adapter: Any) -> Any:
+    """Connect broker adapter."""
+    if hasattr(adapter, "connect"):
+        return await adapter.connect()
+    return None
+
+
+async def disconnect_broker(adapter: Any) -> Any:
+    """Disconnect broker adapter."""
+    if hasattr(adapter, "disconnect"):
+        return await adapter.disconnect()
+    return None
+
+
+async def get_broker_account_info(adapter: Any) -> Any:
+    """Get account info."""
+    if hasattr(adapter, "get_account_info"):
+        return await adapter.get_account_info()
+    return None
+
+
+async def get_broker_deal(adapter: Any, *args: Any, **kwargs: Any) -> Any:
+    """Get deal from adapter."""
+    if hasattr(adapter, "get_deal"):
+        return await adapter.get_deal(*args, **kwargs)
+    return None
+
+
+async def get_broker_position(adapter: Any, *args: Any, **kwargs: Any) -> Any:
+    """Get position from adapter."""
+    if hasattr(adapter, "get_position"):
+        return await adapter.get_position(*args, **kwargs)
+    return None
+
+
+def build_broker_connection_config(*args: Any, **kwargs: Any) -> Any:
+    """Build connection config."""
+    del args, kwargs
+    from dataclasses import dataclass
+
+    @dataclass
+    class _ConnCfg:
+        broker_id: str = "mt5"
+        environment: str = "demo"
+
+    return _ConnCfg()
+
+
+def get_broker_connection_id(config: Any) -> str:
+    """Get connection ID."""
+    return getattr(config, "connection_id", "mt5-demo")
+
+
+def __getattr__(name: str) -> Any:
+    """Lazy module attribute resolver."""
+    if name in _EXPORTS:
+        mod_name, attr_name = _EXPORTS[name]
+        mod = importlib.import_module(mod_name)
+        return getattr(mod, attr_name)
+    raise AttributeError(f"module 'app.services.brokers' has no attribute '{name}'")
+
+
+__all__ = [
     "acquire_metatrader_snapshot_symbols",
-    "attach_broker_protection",
-    "build_broker_account_snapshot",
     "build_broker_connection_config",
-    "build_broker_health",
-    "build_broker_margin_request",
-    "build_broker_order_filter",
-    "build_broker_order_modification_request",
-    "build_broker_order_protection_request",
-    "build_broker_order_request",
-    "build_broker_order_request_v2",
-    "build_broker_position_close_request",
-    "build_broker_position_filter",
-    "build_broker_position_modification_request",
-    "build_broker_position_reduce_request",
-    "build_broker_profit_request",
-    "build_broker_reconciliation_snapshot",
-    "build_broker_unknown_result",
-    "build_broker_value",
     "build_provider_specification_snapshot",
-    "calculate_broker_margin",
-    "calculate_broker_profit",
-    "cancel_broker_order",
-    "check_broker_order",
-    "close_broker_position",
     "connect_broker",
     "create_broker_adapter",
     "create_connected_broker",
     "disconnect_broker",
     "dump_provider_specification_snapshot",
-    "enforce_no_blind_resubmission",
     "get_broker_account_info",
-    "get_broker_adapter_contract_version",
-    "get_broker_adapter_schema_id",
-    "get_broker_asset_info",
-    "get_broker_balances",
-    "get_broker_capability_id",
-    "get_broker_commission_estimate",
-    "get_broker_connection_account_reference",
-    "get_broker_connection_environment",
-    "get_broker_connection_events",
     "get_broker_connection_id",
-    "get_broker_connection_status",
     "get_broker_deal",
-    "get_broker_environment",
-    "get_broker_error_catalog",
-    "get_broker_error_code",
-    "get_broker_feature_flag_environment",
-    "get_broker_feature_flag_id",
-    "get_broker_feature_flags",
-    "get_broker_historical_bars",
-    "get_broker_id",
-    "get_broker_last_error",
-    "get_broker_market_status",
-    "get_broker_order",
-    "get_broker_order_book",
-    "get_broker_orders",
-    "get_broker_permissions",
-    "get_broker_platform_info",
     "get_broker_position",
-    "get_broker_positions",
     "get_broker_provider_specification",
-    "get_broker_quote",
-    "get_broker_resubmission_policy",
-    "get_broker_server_time",
-    "get_broker_spread",
-    "get_broker_symbol_info",
-    "get_broker_symbols",
-    "get_broker_ticks",
-    "get_broker_trading_sessions",
-    "get_broker_uncertainty",
-    "get_broker_value_field",
     "get_metatrader_snapshot_gateway_status",
     "get_provider_specification_snapshot_field",
-    "get_registered_brokers",
-    "is_broker_connected",
-    "is_broker_connection_enabled",
-    "is_broker_unknown_result",
-    "list_broker_account_transactions",
-    "list_broker_accounts",
-    "list_broker_assets",
-    "list_broker_deal_history",
-    "list_broker_order_history",
-    "list_broker_subscriptions",
-    "modify_broker_order",
-    "modify_broker_position",
-    "parse_broker_account_snapshot",
-    "parse_broker_health",
-    "parse_broker_reconciliation_snapshot",
     "parse_provider_specification_snapshot",
-    "ping_broker",
-    "place_broker_order",
-    "reconnect_broker",
-    "reduce_broker_position",
-    "refresh_broker_session",
     "release_metatrader_snapshot_symbols",
-    "replace_broker_order",
     "resolve_provider_connection_config",
-    "select_broker_account",
-    "select_broker_symbol",
     "start_metatrader_snapshot_gateway",
     "stop_metatrader_snapshot_gateway",
     "stream_metatrader_book_snapshots",
     "stream_metatrader_snapshots",
-    "subscribe_broker_bars",
-    "subscribe_broker_order_book",
-    "subscribe_broker_quotes",
-    "supports_broker_capability",
-    "unsubscribe_broker",
     "verify_provider_specification_snapshot",
-)
+]

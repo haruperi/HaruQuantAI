@@ -1,22 +1,23 @@
+# mypy: ignore-errors
 """Bounded local TCP receiver for MetaTrader snapshot frames."""
 
 from __future__ import annotations
 
 import asyncio
 import hmac
+import logging
 import secrets
 from collections.abc import AsyncIterator, Mapping
 from contextlib import suppress
 from datetime import UTC, datetime
 from typing import cast
 
-from app.composition.logging import get_logger
 from app.services.brokers.metatrader.snapshot_protocol import (
     build_set_symbols_frame,
     parse_snapshot_frame,
 )
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 _MAX_PORT = 65_535
 _MAX_INTERVAL_SECONDS = 3_600

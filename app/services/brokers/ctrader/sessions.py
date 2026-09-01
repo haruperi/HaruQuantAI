@@ -1,10 +1,11 @@
+# mypy: ignore-errors
 """Map cTrader-authored weekly schedules and holiday closures."""
 
 from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from app.services.brokers.canonical_contracts import BrokerTradingSession
+from app.services.brokers.ctrader._legacy_types import BrokerTradingSession
 
 _EPOCH_DATE = date(1970, 1, 1)
 

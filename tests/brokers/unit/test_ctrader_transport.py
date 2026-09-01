@@ -3,7 +3,7 @@
 import asyncio
 
 import pytest
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,

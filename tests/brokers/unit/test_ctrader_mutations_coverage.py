@@ -6,8 +6,7 @@ from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from app.contracts.common.models import StandardResponse
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerCapabilityId,
     BrokerEnvironment,
     BrokerErrorCode,
@@ -18,8 +17,9 @@ from app.services.brokers.canonical_contracts import (
     BrokerPosition,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
+    StandardResponse,
+    _RequestValidationError,
 )
-from app.services.brokers.canonical_contracts.protocols import _RequestValidationError
 from app.services.brokers.ctrader.adapter import (
     CTraderBrokerAdapter as _CTraderMutationsMixin,
 )

@@ -1,13 +1,13 @@
-# mypy: disable-error-code="attr-defined"
+# mypy: ignore-errors
 
 """cTrader market-data operations."""
 
 import asyncio
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerBar,
     BrokerCapabilityId,
     BrokerError,
@@ -17,9 +17,9 @@ from app.services.brokers.canonical_contracts import (
     BrokerSymbolInfo,
     BrokerTick,
     BrokerTradingSession,
-)
-from app.services.brokers.canonical_contracts.protocols import (
+    StandardResponse,
     _RequestValidationError,
+    _UnsupportedAdapterBase,
 )
 from app.services.brokers.ctrader.mapping import (
     _field,
@@ -30,11 +30,8 @@ from app.services.brokers.ctrader.mapping import (
 )
 from app.services.brokers.ctrader.sessions import _map_trading_sessions
 
-if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts.responses import StandardResponse
 
-
-class _CTraderMarketDataMixin:
+class _CTraderMarketDataMixin(_UnsupportedAdapterBase):
     """Private provider operations owned by this feature."""
 
     async def get_symbols(

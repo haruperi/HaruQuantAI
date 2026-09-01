@@ -5,17 +5,15 @@ import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from app.services.brokers._shared.circuit_breaker import _CircuitState
-from app.services.brokers.binance.transport import _BinanceTransport
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.binance._legacy_types import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,
-)
-from app.services.brokers.canonical_contracts.protocols import (
     _CircuitOpenError,
+    _CircuitState,
     _RateLimitedError,
 )
+from app.services.brokers.binance.transport import _BinanceTransport
 from pydantic import SecretStr
 
 

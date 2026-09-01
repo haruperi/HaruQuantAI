@@ -145,8 +145,8 @@ packages was retired in Task 1.15. Brokers is strictly stateless in memory.
 | `specifications/` | MERGE + DELETE | Current observations in provider truth; retained point-in-time history in its authoritative historical owner. |
 | `persistence/` | DELETE | Retired by Child 1.15; durable state and CRUD statements removed from Brokers. |
 | `migrations/` | DELETE | Retired by Child 1.15; schema definitions and migration manifest removed from Brokers. |
-| `canonical_contracts/` | MOVE/SPLIT + DELETE | Public cross-boundary types in `app/contracts/broker/`; provider-private helpers in provider features. |
-| `_shared/` | SPLIT + DELETE | Provider-local implementation, provider gateway, public contracts, or Kernel/Composition; no renamed horizontal replacement. |
+| `canonical_contracts/` | MOVE/SPLIT + DELETE | Retired by Child 1.16: Public cross-boundary types in `app/contracts/broker/`; provider-private helpers in provider features. |
+| `_shared/` | SPLIT + DELETE | Retired by Child 1.16: Provider-local implementation, provider gateway, public contracts, or Kernel/Composition; no renamed horizontal replacement. |
 | `metatrader/` | ADAPT | Implemented by Child 1.09 as independent `FEAT-BRK-CONNECT_METATRADER` provider feature providing `broker.provider.metatrader@1`. |
 | `ctrader/` | ADAPT | Implemented by Child 1.08 as independent `FEAT-BRK-CONNECT_CTRADER` provider feature providing `broker.provider.ctrader@1`. |
 | `binance/` | ADAPT | Implemented by Child 1.07 as independent `FEAT-BRK-CONNECT_BINANCE` provider feature providing `broker.provider.binance@1`. |

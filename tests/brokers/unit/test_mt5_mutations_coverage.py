@@ -6,8 +6,7 @@ from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from app.contracts.common.models import StandardResponse
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.metatrader._legacy_types import (
     BrokerCapabilityId,
     BrokerEnvironment,
     BrokerId,
@@ -15,8 +14,9 @@ from app.services.brokers.canonical_contracts import (
     BrokerOrderRequest,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
+    StandardResponse,
+    _RequestValidationError,
 )
-from app.services.brokers.canonical_contracts.protocols import _RequestValidationError
 from app.services.brokers.metatrader.adapter import (
     MT5BrokerAdapter as _MT5MutationsMixin,
 )

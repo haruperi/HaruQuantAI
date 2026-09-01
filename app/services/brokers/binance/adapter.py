@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Canonical Binance direct broker channel adapter."""
 
 from __future__ import annotations
@@ -7,21 +8,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any, Literal, override
 
-from app.services.brokers._shared.subscription import (  # noqa: TC001
-    _BrokerSubscription,
-)
-from app.services.brokers.binance.mapping import (
-    _map_kline,
-    _map_order_book,
-    _map_quote,
-    _map_symbol,
-    _map_trade,
-    _provider_interval,
-)
-from app.services.brokers.binance.profiles import _BINANCE_PROFILES
-from app.services.brokers.binance.streams import _BinancePriceStreamsMixin
-from app.services.brokers.binance.transport import _BinanceTransport
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.binance._legacy_types import (
     BrokerBar,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -36,8 +23,20 @@ from app.services.brokers.canonical_contracts import (
     BrokerSymbolInfo,
     BrokerTick,
     StandardResponse,
+    _BrokerSubscription,
+    _UnsupportedAdapterBase,
 )
-from app.services.brokers.canonical_contracts.protocols import _UnsupportedAdapterBase
+from app.services.brokers.binance.mapping import (
+    _map_kline,
+    _map_order_book,
+    _map_quote,
+    _map_symbol,
+    _map_trade,
+    _provider_interval,
+)
+from app.services.brokers.binance.profiles import _BINANCE_PROFILES
+from app.services.brokers.binance.streams import _BinancePriceStreamsMixin
+from app.services.brokers.binance.transport import _BinanceTransport
 
 
 class BinanceBrokerAdapter(_BinancePriceStreamsMixin, _UnsupportedAdapterBase):

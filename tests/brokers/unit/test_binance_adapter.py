@@ -6,8 +6,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pytest
-from app.services.brokers.binance.adapter import BinanceBrokerAdapter
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.binance._legacy_types import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -15,6 +14,7 @@ from app.services.brokers.canonical_contracts import (
     BrokerErrorCode,
     BrokerId,
 )
+from app.services.brokers.binance.adapter import BinanceBrokerAdapter
 from pydantic import SecretStr
 
 

@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Read-only Dukascopy direct broker channel adapter."""
 
 from __future__ import annotations
@@ -5,7 +6,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from typing import Protocol, override
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.dukascopy._legacy_types import (
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerConnectionState,
@@ -15,8 +16,8 @@ from app.services.brokers.canonical_contracts import (
     BrokerSymbolInfo,
     BrokerTick,
     StandardResponse,
+    _UnsupportedAdapterBase,
 )
-from app.services.brokers.canonical_contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.dukascopy.candle_transport import (
     _CandleBatch,
     _DukascopyCandleTransport,

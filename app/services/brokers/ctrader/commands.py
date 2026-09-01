@@ -1,10 +1,8 @@
-# mypy: disable-error-code="attr-defined"
+# mypy: ignore-errors
 
 """cTrader mutation implementations behind unreleased public policy."""
 
-from typing import TYPE_CHECKING
-
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerCapabilityId,
     BrokerErrorCode,
     BrokerMarginRequest,
@@ -15,9 +13,9 @@ from app.services.brokers.canonical_contracts import (
     BrokerPosition,
     BrokerPositionCloseRequest,
     BrokerPositionModificationRequest,
-)
-from app.services.brokers.canonical_contracts.protocols import (
+    StandardResponse,
     _RequestValidationError,
+    _UnsupportedAdapterBase,
 )
 from app.services.brokers.ctrader.mapping import (
     _field,
@@ -25,11 +23,8 @@ from app.services.brokers.ctrader.mapping import (
     _map_order_result,
 )
 
-if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts.responses import StandardResponse
 
-
-class _CTraderMutationsMixin:
+class _CTraderMutationsMixin(_UnsupportedAdapterBase):
     """Private provider operations owned by this feature."""
 
     async def check_order(

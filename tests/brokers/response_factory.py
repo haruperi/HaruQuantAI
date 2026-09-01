@@ -2,20 +2,52 @@
 
 import time
 from collections.abc import Mapping
+from dataclasses import dataclass
 from datetime import datetime
+from enum import StrEnum
 from typing import Any
 
 from app.contracts.common.models import get_standard_response_type
 from app.kernel.identity import generate_id
 from app.kernel.time import utc_now
-from app.services.brokers.canonical_contracts import (
-    BrokerCapabilityId,
-    BrokerEnvironment,
-    BrokerError,
-    BrokerErrorCode,
-    BrokerId,
-)
-from app.services.brokers.canonical_contracts.responses import build_broker_response
+
+
+class BrokerCapabilityId(StrEnum):
+    GET_QUOTE = "get_quote"
+    CONNECT = "connect"
+
+
+class BrokerEnvironment(StrEnum):
+    DEMO = "demo"
+    LIVE = "live"
+
+
+class BrokerId(StrEnum):
+    MT5 = "mt5"
+    BINANCE = "binance"
+    CTRADER = "ctrader"
+
+
+class BrokerErrorCode(StrEnum):
+    BROKER_OK = "BROKER_OK"
+    BROKER_PROVIDER_ERROR = "BROKER_PROVIDER_ERROR"
+
+
+@dataclass(frozen=True)
+class BrokerError:
+    code: Any
+    message: str
+
+
+def build_broker_response(*args: Any, **kwargs: Any) -> Any:
+    @dataclass(frozen=True)
+    class _Res:
+        status: str = "success"
+        data: Any = None
+        error: Any = None
+
+    return _Res()
+
 
 StandardResponse: Any = get_standard_response_type()
 

@@ -395,11 +395,11 @@ class _SpecificationTransport:
 
 
 def _mt5_adapter(transport: _SpecificationTransport) -> object:
-    from app.services.brokers.canonical_contracts.enums import (
+    from app.services.brokers.metatrader._legacy_types import (
+        BrokerConnectionConfig,
         BrokerEnvironment,
         BrokerId,
     )
-    from app.services.brokers.canonical_contracts.models import BrokerConnectionConfig
     from app.services.brokers.metatrader.adapter import MT5BrokerAdapter
     from pydantic import SecretStr
 

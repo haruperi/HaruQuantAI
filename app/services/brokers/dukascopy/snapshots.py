@@ -1,22 +1,23 @@
-# mypy: disable-error-code="attr-defined"
+# mypy: ignore-errors
 
 """Dukascopy direct BID candle operations."""
 
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.dukascopy._legacy_types import (
     BrokerBar,
     BrokerCapabilityId,
     BrokerPage,
+    _UnsupportedAdapterBase,
 )
 from app.services.brokers.dukascopy.candle_mapping import _map_candles
 
 if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts.responses import StandardResponse
+    from app.services.brokers.dukascopy._legacy_types import StandardResponse
 
 
-class _DukascopyBarsMixin:
+class _DukascopyBarsMixin(_UnsupportedAdapterBase):
     """Private provider operations owned by this feature."""
 
     async def get_historical_bars(

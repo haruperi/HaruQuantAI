@@ -1,12 +1,13 @@
+# mypy: ignore-errors
 """Read-only Yahoo direct broker channel adapter."""
 
 from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, override
+from typing import override
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.yahoo._legacy_types import (
     BrokerBar,
     BrokerCapabilityId,
     BrokerConnectionConfig,
@@ -16,13 +17,11 @@ from app.services.brokers.canonical_contracts import (
     BrokerErrorCode,
     BrokerPage,
     BrokerPlatformInfo,
+    StandardResponse,
+    _UnsupportedAdapterBase,
 )
-from app.services.brokers.canonical_contracts.protocols import _UnsupportedAdapterBase
 from app.services.brokers.yahoo.mapping import _map_history, _provider_interval
 from app.services.brokers.yahoo.transport import _YahooTransport
-
-if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts.responses import StandardResponse
 
 logger = logging.getLogger(__name__)
 

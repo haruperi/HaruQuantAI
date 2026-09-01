@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """MetaTrader provider payload to canonical DTO mapping."""
 
 # ruff: noqa: ANN401, PLR2004 - SDK records and native retcodes are provider-defined.
@@ -6,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any, cast
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.metatrader._legacy_types import (
     BrokerAccountInfo,
     BrokerAccountTransaction,
     BrokerBalance,

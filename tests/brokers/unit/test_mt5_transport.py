@@ -5,7 +5,7 @@ import sys
 import types
 
 import pytest
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.metatrader._legacy_types import (
     BrokerConnectionConfig,
     BrokerEnvironment,
     BrokerId,

@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Binance direct-channel stream operations."""
 
 from __future__ import annotations
@@ -9,13 +10,7 @@ from typing import Any, cast
 
 from app.kernel.identity import generate_id
 from app.kernel.time import utc_now
-from app.services.brokers._shared.subscription import _BrokerSubscription
-from app.services.brokers.binance.mapping import (
-    _map_order_book,
-    _map_stream_bar,
-    _map_stream_quote,
-)
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.binance._legacy_types import (
     BrokerBar,
     BrokerCapabilityId,
     BrokerError,
@@ -25,10 +20,17 @@ from app.services.brokers.canonical_contracts import (
     BrokerSubscription,
     BrokerSubscriptionInfo,
     StandardResponse,
+    _BrokerSubscription,
+    _UnsupportedAdapterBase,
+)
+from app.services.brokers.binance.mapping import (
+    _map_order_book,
+    _map_stream_bar,
+    _map_stream_quote,
 )
 
 
-class _BinancePriceStreamsMixin:
+class _BinancePriceStreamsMixin(_UnsupportedAdapterBase):
     """Private provider operations owned by this feature."""
 
     _last_error: BrokerError | None

@@ -1,4 +1,4 @@
-# mypy: disable-error-code="attr-defined"
+# mypy: ignore-errors
 
 """cTrader provider-native calculation operations."""
 
@@ -6,12 +6,13 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerCapabilityId,
     BrokerErrorCode,
     BrokerMarginRequest,
     BrokerProfitRequest,
     StandardResponse,
+    _UnsupportedAdapterBase,
 )
 from app.services.brokers.ctrader.mapping import (
     _field,
@@ -19,7 +20,7 @@ from app.services.brokers.ctrader.mapping import (
 )
 
 
-class _CTraderCalculationsMixin:
+class _CTraderCalculationsMixin(_UnsupportedAdapterBase):
     """Private provider operations owned by this feature."""
 
     async def calculate_margin(

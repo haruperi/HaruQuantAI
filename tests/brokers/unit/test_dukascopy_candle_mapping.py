@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.brokers.canonical_contracts.protocols import _ProviderResponseError
+from app.services.brokers.dukascopy._legacy_types import _ProviderResponseError
 from app.services.brokers.dukascopy.candle_mapping import (
     _map_candles,
     _provider_interval,

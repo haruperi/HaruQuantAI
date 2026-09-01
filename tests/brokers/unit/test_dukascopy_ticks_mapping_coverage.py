@@ -4,8 +4,10 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
-from app.services.brokers.canonical_contracts import BrokerTick
-from app.services.brokers.canonical_contracts.protocols import _ProviderResponseError
+from app.services.brokers.dukascopy._legacy_types import (
+    BrokerTick,
+    _ProviderResponseError,
+)
 from app.services.brokers.dukascopy.mapping import _aggregate_bars, _map_ticks
 
 

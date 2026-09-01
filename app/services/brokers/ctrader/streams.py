@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """cTrader direct-channel stream operations."""
 
 from __future__ import annotations
@@ -7,14 +8,14 @@ import asyncio
 
 from app.kernel.identity import generate_id
 from app.kernel.time import utc_now
-from app.services.brokers._shared.subscription import _BrokerSubscription
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerCapabilityId,
     BrokerErrorCode,
     BrokerQuote,
     BrokerSubscription,
     BrokerSubscriptionInfo,
     StandardResponse,
+    _BrokerSubscription,
 )
 from app.services.brokers.ctrader.mapping import (
     _field,

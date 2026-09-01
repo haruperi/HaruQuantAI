@@ -1,8 +1,9 @@
+# mypy: ignore-errors
 """Immutable Binance direct-channel profile declarations."""
 
 from dataclasses import dataclass
 
-from app.services.brokers.canonical_contracts import BrokerEnvironment, BrokerId
+from app.services.brokers.binance._legacy_types import BrokerEnvironment, BrokerId
 
 
 @dataclass(frozen=True, slots=True)

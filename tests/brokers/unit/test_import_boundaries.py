@@ -6,61 +6,11 @@ import sys
 from pathlib import Path
 
 
-def test_contract_exports_are_exact() -> None:
-    """The contract package exposes only the documented public boundary."""
-    contracts = importlib.import_module("app.services.brokers.canonical_contracts")
-    expected_exports = {
-        "BROKER_ERROR_CATALOG",
-        "AccountProvider",
-        "BrokerAccountInfo",
-        "BrokerAccountTransaction",
-        "BrokerAdapter",
-        "BrokerAssetInfo",
-        "BrokerBalance",
-        "BrokerBar",
-        "BrokerCapability",
-        "BrokerCapabilityId",
-        "BrokerConnectionConfig",
-        "BrokerConnectionEvent",
-        "BrokerConnectionState",
-        "BrokerConnectionStatus",
-        "BrokerDeal",
-        "BrokerEnvironment",
-        "BrokerError",
-        "BrokerErrorCode",
-        "BrokerFeatureFlags",
-        "BrokerFeeEstimate",
-        "BrokerId",
-        "BrokerMarginRequest",
-        "BrokerMarketStatus",
-        "BrokerOrder",
-        "BrokerOrderBook",
-        "BrokerOrderCheck",
-        "BrokerOrderFilter",
-        "BrokerOrderModificationRequest",
-        "BrokerOrderRequest",
-        "BrokerOrderResult",
-        "BrokerPage",
-        "BrokerPermissions",
-        "BrokerPlatformInfo",
-        "BrokerPosition",
-        "BrokerPositionCloseRequest",
-        "BrokerPositionFilter",
-        "BrokerPositionModificationRequest",
-        "BrokerProfitRequest",
-        "BrokerQuote",
-        "BrokerServerTime",
-        "BrokerSubscription",
-        "BrokerSubscriptionInfo",
-        "BrokerSymbolInfo",
-        "BrokerTick",
-        "BrokerTradingSession",
-        "CalculationProvider",
-        "MarketDataProvider",
-        "StandardResponse",
-        "TradeExecutionProvider",
-    }
-    assert set(contracts.__all__) == expected_exports
+def test_legacy_shared_and_contract_packages_are_absent() -> None:
+    """Verify physical absence of _shared and canonical_contracts packages."""
+    brokers_root = Path("app/services/brokers")
+    assert not (brokers_root / "_shared").exists()
+    assert not (brokers_root / "canonical_contracts").exists()
 
 
 def test_root_exports_are_function_only() -> None:
@@ -110,10 +60,9 @@ def test_instrument_identity_surface_is_retired() -> None:
     assert not (Path("app/services/brokers") / "capabilities").exists()
 
 
-def test_runtime_package_is_private() -> None:
-    """Runtime initialization exposes no implementation symbol."""
-    runtime = importlib.import_module("app.services.brokers._shared")
-    assert getattr(runtime, "__all__", []) == []
+def test_runtime_package_is_absent() -> None:
+    """Verify physical absence of _shared runtime package."""
+    assert not Path("app/services/brokers/_shared").exists()
 
 
 def test_conformance_feature_is_retired_from_production() -> None:

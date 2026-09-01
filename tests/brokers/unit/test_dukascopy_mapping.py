@@ -3,7 +3,7 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from app.services.brokers.canonical_contracts.protocols import _ProviderResponseError
+from app.services.brokers.dukascopy._legacy_types import _ProviderResponseError
 from app.services.brokers.dukascopy.mapping import _map_ticks
 
 _START = datetime(2026, 1, 5, 12, tzinfo=UTC)

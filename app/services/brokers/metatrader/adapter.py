@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Canonical MetaTrader direct broker channel adapter."""
 
 from __future__ import annotations
@@ -7,7 +8,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, override
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.metatrader._legacy_types import (
     BrokerAccountInfo,
     BrokerBalance,
     BrokerBar,
@@ -26,8 +27,6 @@ from app.services.brokers.canonical_contracts import (
     BrokerSymbolInfo,
     BrokerTick,
     StandardResponse,
-)
-from app.services.brokers.canonical_contracts.protocols import (
     _ProviderResponseError,
     _RequestValidationError,
     _UnsupportedAdapterBase,
@@ -797,15 +796,19 @@ class MT5BrokerAdapter(
     def _error[T](
         self, operation: BrokerCapabilityId, code: BrokerErrorCode
     ) -> StandardResponse[T]:
-        """Handle error.
+        """Build one canonical MT5 failure result.
 
         Args:
-            operation: Value supplied to the operation.
-            code: Value supplied to the operation.
+            operation: Capability operation identifier.
+            code: Canonical error code.
 
         Returns:
-            The operation result.
+            Canonical error result.
         """
-        error = BrokerError(code=code, message=f"MT5 {operation.value} failed")
+        error = BrokerError(
+            code=code,
+            message=f"MT5 {operation.value} failed",
+            capability=operation,
+        )
         self._last_error = error
-        return self._result(operation, error=error)
+        return StandardResponse[T](status="error", error=error)

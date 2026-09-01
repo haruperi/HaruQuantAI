@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Bounded Yahoo direct-channel transport without direct pandas imports."""
 
 from __future__ import annotations

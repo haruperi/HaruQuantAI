@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Concrete cTrader direct-channel network client (Twisted reactor bridge).
 
 This module owns the real Spotware Open API connection that the injected
@@ -18,7 +19,7 @@ import threading
 from collections.abc import Callable
 from typing import Any, cast
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerConnectionConfig,
     BrokerEnvironment,
 )

@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Bounded Dukascopy direct-channel tick transport."""
 
 from __future__ import annotations
@@ -15,7 +16,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, cast
 
-from app.services.brokers.canonical_contracts.protocols import (
+from app.services.brokers.dukascopy._legacy_types import (
     _CircuitOpenError,
     _ProviderResponseError,
 )

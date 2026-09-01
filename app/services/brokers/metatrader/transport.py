@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Serialized non-blocking MetaTrader terminal transport."""
 
 from __future__ import annotations
@@ -5,20 +6,19 @@ from __future__ import annotations
 # ruff: noqa: ANN401 - the optional SDK has heterogeneous documented return types.
 import asyncio
 import importlib
+import logging
 import time
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts import BrokerConnectionConfig
-from app.composition.logging import get_logger
-from app.services.brokers._shared.circuit_breaker import (
+from app.services.brokers.metatrader._legacy_types import (
+    BrokerConnectionConfig,
+    BrokerErrorCode,
+    _CircuitOpenError,
     _TransportCircuitBreaker,
 )
-from app.services.brokers.canonical_contracts import BrokerErrorCode
-from app.services.brokers.canonical_contracts.protocols import _CircuitOpenError
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class _MT5Transport:

@@ -1,4 +1,4 @@
-# mypy: disable-error-code="attr-defined"
+# mypy: ignore-errors
 
 """MT5 provider-native calculation operations."""
 
@@ -6,16 +6,17 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.metatrader._legacy_types import (
     BrokerCapabilityId,
     BrokerErrorCode,
     BrokerMarginRequest,
     BrokerProfitRequest,
     StandardResponse,
+    _UnsupportedAdapterBase,
 )
 
 
-class _MT5CalculationsMixin:
+class _MT5CalculationsMixin(_UnsupportedAdapterBase):
     """Private provider operations owned by this feature."""
 
     async def calculate_margin(

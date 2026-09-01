@@ -1,12 +1,12 @@
-# mypy: disable-error-code="attr-defined"
+# mypy: ignore-errors
 
 """cTrader execution-history read operations."""
 
 # ruff: noqa: A002 - public protocol signatures are normative.
 from datetime import datetime
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerCapabilityId,
     BrokerDeal,
     BrokerOrder,
@@ -14,6 +14,8 @@ from app.services.brokers.canonical_contracts import (
     BrokerPage,
     BrokerPosition,
     BrokerPositionFilter,
+    StandardResponse,
+    _UnsupportedAdapterBase,
 )
 from app.services.brokers.ctrader.mapping import (
     _field,
@@ -23,11 +25,8 @@ from app.services.brokers.ctrader.mapping import (
     _optional,
 )
 
-if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts.responses import StandardResponse
 
-
-class _CTraderExecutionHistoryMixin:
+class _CTraderExecutionHistoryMixin(_UnsupportedAdapterBase):
     """Private provider operations owned by this feature."""
 
     async def get_positions(

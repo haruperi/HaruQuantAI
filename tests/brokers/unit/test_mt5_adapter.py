@@ -7,10 +7,11 @@ from typing import Any
 
 import numpy as np
 import pytest
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.metatrader._legacy_types import (
     BrokerCapability,
     BrokerCapabilityId,
     BrokerConnectionConfig,
+    BrokerConnectionState,
     BrokerEnvironment,
     BrokerErrorCode,
     BrokerId,
@@ -949,7 +950,6 @@ def test_adapter_ping_unsupported_if_terminal_none() -> None:
 
     transport = _NoTerminalTransport()
     adapter = MT5BrokerAdapter(_config(), transport=transport)
-    from app.services.brokers.canonical_contracts import BrokerConnectionState
 
     async def exercise() -> None:
         await adapter.connect()

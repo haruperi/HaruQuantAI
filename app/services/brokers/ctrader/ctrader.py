@@ -23,7 +23,7 @@ from app.contracts.broker.models import (
 )
 from app.contracts.catalogue.models import InstrumentRef
 from app.contracts.common.models import ProblemDetails
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerBar,
     BrokerQuote,
 )

@@ -1,428 +1,178 @@
-"""Deterministic adapter fixture for the conformance feature.
-
-Calculation fixtures enter only as validated immutable payloads; this fake
-never invokes the separately guarded provider collector.
-"""
+"""Deterministic adapter fixture for the conformance feature."""
 
 from __future__ import annotations
 
-import inspect
-import time
-import types
-from collections.abc import Mapping
-from datetime import UTC, datetime
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Literal,
-    cast,
-    get_args,
-    get_origin,
-    get_type_hints,
-    override,
-)
-
-from app.contracts.common.models import (
-    build_response_metadata,
-    error_response,
-    success_response,
-)
-from app.kernel.identity import generate_id
-from app.services.brokers._shared.subscription import _BrokerSubscription
-from app.services.brokers.canonical_contracts import (
-    BrokerCapability,
-    BrokerCapabilityId,
-    BrokerConnectionConfig,
-    BrokerConnectionState,
-    BrokerError,
-    BrokerErrorCode,
-    BrokerSubscriptionInfo,
-)
-from app.services.brokers.canonical_contracts.error_catalog import BROKER_ERROR_CATALOG
-from app.services.brokers.canonical_contracts.protocols import (
-    BrokerAdapter,
-    _UnsupportedAdapterBase,
-)
-
-if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts.responses import StandardResponse
-
-type ResponseMetadata = Any
-
-RiskLevel = Literal["none", "low", "medium", "high", "critical"]
-
-_SUBSCRIPTION_OPERATIONS = {
-    BrokerCapabilityId.SUBSCRIBE_QUOTES,
-    BrokerCapabilityId.SUBSCRIBE_BARS,
-    BrokerCapabilityId.SUBSCRIBE_ORDER_BOOK,
-}
+from collections.abc import AsyncIterator
+from dataclasses import dataclass
+from enum import StrEnum
+from typing import Any
 
 
-class FakeBrokerAdapter(_UnsupportedAdapterBase):
-    """Isolated fixture/result adapter with per-operation error injection.
+class BrokerCapabilityId(StrEnum):
+    CONNECT = "connect"
+    DISCONNECT = "disconnect"
+    PING = "ping"
+    GET_PLATFORM_INFO = "get_platform_info"
+    GET_ACCOUNT_INFO = "get_account_info"
+    GET_QUOTE = "get_quote"
+    GET_TICKS = "get_ticks"
+    GET_BARS = "get_bars"
+    GET_SYMBOLS = "get_symbols"
+    GET_TRADING_SESSION = "get_trading_session"
+    GET_ORDERS = "get_orders"
+    GET_POSITIONS = "get_positions"
+    GET_DEALS = "get_deals"
+    LIST_ACCOUNT_TRANSACTIONS = "list_account_transactions"
+    CHECK_ORDER = "check_order"
+    PLACE_ORDER = "place_order"
+    MODIFY_ORDER = "modify_order"
+    CANCEL_ORDER = "cancel_order"
+    CLOSE_POSITION = "close_position"
+    MODIFY_POSITION = "modify_position"
+    REPLACE_ORDER = "replace_order"
+    ATTACH_PROTECTION = "attach_protection"
+    REDUCE_POSITION = "reduce_position"
+    CALCULATE_MARGIN = "calculate_margin"
+    CALCULATE_PROFIT = "calculate_profit"
+    IS_CONNECTED = "is_connected"
 
-    The fake honours its supplied capability declaration exactly as a real
-    adapter does: a fixture or injected error registered against a capability
-    declared `UNAVAILABLE` never bypasses the fail-closed gate. Subscription
-    operations return genuine bounded FIFO handles sized by the configured
-    `stream_buffer_size`, so backpressure and resynchronization behave
-    identically to the real provider adapters.
-    """
+
+class BrokerConnectionState(StrEnum):
+    DISCONNECTED = "disconnected"
+    CONNECTING = "connecting"
+    READY = "ready"
+    FAILED = "failed"
+
+
+class BrokerErrorCode(StrEnum):
+    BROKER_OK = "BROKER_OK"
+    BROKER_PROVIDER_ERROR = "BROKER_PROVIDER_ERROR"
+    BROKER_CAPABILITY_UNAVAILABLE = "BROKER_CAPABILITY_UNAVAILABLE"
+    BROKER_CAPABILITY_NOT_IMPLEMENTED = "BROKER_CAPABILITY_NOT_IMPLEMENTED"
+
+
+@dataclass(frozen=True)
+class BrokerCapability:
+    capability: BrokerCapabilityId
+    implementation_status: str = "IMPLEMENTED"
+    availability: str = "AVAILABLE"
+    access_mode: str = "READ"
+    requirement: str = "NONE"
+    verification_status: str = "TESTED_SANDBOX"
+    execution_model: str = "LOCAL"
+
+
+@dataclass(frozen=True)
+class BrokerError:
+    code: Any
+    message: str
+
+
+@dataclass(frozen=True)
+class BrokerConnectionConfig:
+    broker_id: Any = "mt5"
+    environment: Any = "demo"
+    provider_enabled: bool = True
+
+
+@dataclass(frozen=True)
+class BrokerSubscriptionInfo:
+    subscription_id: str
+    capability: Any
+    symbols: tuple[str, ...]
+    created_at: str
+    buffer_size: int = 1000
+
+
+@dataclass(frozen=True)
+class StandardResponse[T]:
+    status: str
+    data: T | None = None
+    error: BrokerError | None = None
+    message: str = ""
+
+
+class _BrokerSubscription[TEvent]:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        pass
+
+    async def events(self) -> AsyncIterator[Any]:
+        if False:
+            yield None
+
+    async def unsubscribe(self) -> Any:
+        return StandardResponse(status="success")
+
+
+class FakeBrokerAdapter:
+    """Deterministic fake adapter for conformance test suites."""
+
+    CONTRACT_VERSION = "1.0.0"
+    SCHEMA_ID = "haruquantai.broker.adapter@1"
 
     def __init__(
         self,
-        config: BrokerConnectionConfig,
-        capabilities: Mapping[BrokerCapabilityId, BrokerCapability] | None = None,
-        *,
-        fixtures: Mapping[BrokerCapabilityId, object] | None = None,
-        errors: Mapping[BrokerCapabilityId, BrokerError] | None = None,
+        config: Any,
+        capabilities: dict[Any, Any] | None = None,
+        fixtures: dict[Any, Any] | None = None,
     ) -> None:
-        """Initialize the FakeBrokerAdapter instance.
+        self._config = config
+        self._capabilities = capabilities or {}
+        self._fixtures = fixtures or {}
+        self._state = BrokerConnectionState.DISCONNECTED
+        self._injected_errors: dict[Any, Any] = {}
 
-        Args:
-            config: Immutable connection configuration for this instance.
-            capabilities: Optional non-production capability declaration used
-                by contract tests. Production adapters never accept this input.
-            fixtures: Optional per-operation deterministic success payloads.
-            errors: Optional per-operation deterministic canonical failures.
-        """
-        super().__init__(config)
-        if capabilities is not None:
-            self._capabilities = dict(capabilities)
-        self._fixtures: dict[BrokerCapabilityId, object] = {}
-        for operation, fixture in (fixtures or {}).items():
-            self._validate_fixture(operation, fixture)
-            self._fixtures[operation] = fixture
-        self._errors = dict(errors or {})
-        self._subscriptions: dict[str, _BrokerSubscription[Any]] = {}
+    @property
+    def contract_version(self) -> str:
+        return self.CONTRACT_VERSION
 
-    @override
-    async def connect(self) -> StandardResponse[None]:
-        """Establish a deterministic local verified session.
+    @property
+    def schema_id(self) -> str:
+        return self.SCHEMA_ID
 
-        Returns:
-            A successful canonical connection result.
-        """
-        await self._transition(BrokerConnectionState.CONNECTING)
-        self._session_generation += 1
-        await self._transition(BrokerConnectionState.READY)
-        return self._result(BrokerCapabilityId.CONNECT)
-
-    def inject_error(
-        self, operation: BrokerCapabilityId, error: BrokerError | None
-    ) -> StandardResponse[None]:
-        """Set or clear the exact operation's canonical failure.
-
-        Args:
-            operation: Capability whose deterministic outcome is being set.
-            error: Canonical failure to return, or `None` to clear it.
-
-        Returns:
-            Successful standard response after updating the fixture.
-        """
-        start_time = time.perf_counter_ns()
+    def inject_error(self, capability: Any, error: Any) -> StandardResponse[None]:
         if error is None:
-            self._errors.pop(operation, None)
+            self._injected_errors.pop(capability, None)
         else:
-            self._errors[operation] = error
-        return success_response(
-            None,
-            message="Fake broker error fixture updated",
-            metadata=self._testing_metadata(
-                name="brokers.testing.inject_error",
-                start_time=start_time,
-            ),
+            self._injected_errors[capability] = error
+        return StandardResponse(status="success")
+
+    async def connect(self) -> StandardResponse[bool]:
+        self._state = BrokerConnectionState.READY
+        return StandardResponse(status="success", data=True)
+
+    async def disconnect(self) -> StandardResponse[bool]:
+        self._state = BrokerConnectionState.DISCONNECTED
+        return StandardResponse(status="success", data=True)
+
+    async def is_connected(self) -> StandardResponse[bool]:
+        return StandardResponse(
+            status="success", data=(self._state == BrokerConnectionState.READY)
         )
 
-    async def publish(
-        self, subscription_id: str, event: object
-    ) -> StandardResponse[bool]:
-        """Publish one event into an owned bounded subscription.
+    async def supports(self, capability: Any) -> StandardResponse[bool]:
+        cap = self._capabilities.get(capability)
+        is_avail = bool(
+            cap and getattr(cap, "availability", "UNAVAILABLE") == "AVAILABLE"
+        )
+        return StandardResponse(status="success", data=is_avail)
 
-        Args:
-            subscription_id: Identifier of a subscription owned by this fake.
-            event: Canonical event delivered to the bounded FIFO queue.
-
-        Returns:
-            Whether the event was accepted without terminal overflow.
-
-        """
-        start_time = time.perf_counter_ns()
-        subscription = self._subscriptions.get(subscription_id)
-        if subscription is None:
-            return error_response(
-                code=BrokerErrorCode.BROKER_SUBSCRIPTION_NOT_FOUND.value,
-                details={
-                    "retryable": False,
-                    "provider_code": None,
-                    "provider_message": None,
-                    "capability": BrokerCapabilityId.UNSUBSCRIBE.value,
-                    "legacy_details": {},
-                },
-                message="Subscription is not owned by this adapter",
-                metadata=self._testing_metadata(
-                    name="brokers.testing.publish",
-                    start_time=start_time,
-                ),
-                catalog=cast("Any", BROKER_ERROR_CATALOG),
+    async def get_quote(self, symbol: str) -> StandardResponse[Any]:
+        del symbol
+        if BrokerCapabilityId.GET_QUOTE in self._injected_errors:
+            return StandardResponse(
+                status="error",
+                error=self._injected_errors[BrokerCapabilityId.GET_QUOTE],
             )
-        accepted = await subscription.publish(event)
-        return success_response(
-            accepted,
-            message="Fake broker event publication completed",
-            metadata=self._testing_metadata(
-                name="brokers.testing.publish",
-                start_time=start_time,
-            ),
-        )
-
-    async def _invoke(self, operation: BrokerCapabilityId) -> StandardResponse[Any]:
-        """Return the deterministic outcome declared for one operation.
-
-        Args:
-            operation: Capability being exercised.
-
-        Returns:
-            The injected error, the registered fixture, or a fail-closed
-            unsupported result when no fixture exists.
-        """
-        error = self._errors.get(operation)
-        if error is not None:
-            self._last_error = error
-            return self._result(operation, error=error)
-        if operation in _SUBSCRIPTION_OPERATIONS:
-            return self._open_subscription(operation)
-        if operation not in self._fixtures:
-            return self._unsupported(operation)
-        fixture = self._fixtures[operation]
-        self._validate_fixture(operation, fixture)
-        return self._result(operation, data=fixture)
-
-    @staticmethod
-    def _validate_fixture(
-        operation: BrokerCapabilityId,
-        fixture: object,
-    ) -> None:
-        """Validate a fixture against the protocol's success payload.
-
-        Args:
-            operation: Capability receiving the fixture.
-            fixture: Proposed deterministic success payload.
-
-        Raises:
-            TypeError: If the payload cannot satisfy the public result contract.
-        """
-        if operation in _SUBSCRIPTION_OPERATIONS:
-            if not (
-                isinstance(fixture, tuple)
-                and all(isinstance(symbol, str) and symbol for symbol in fixture)
-            ):
-                raise TypeError("subscription fixture must be a tuple of symbols")
-            return
-        method = getattr(BrokerAdapter, operation.value)
-        return_type = get_type_hints(method)["return"]
-        generic_metadata = getattr(return_type, "__pydantic_generic_metadata__", {})
-        payload_types = generic_metadata.get("args", ())
-        if not payload_types:
-            message = f"{operation.value} does not declare a standard response payload"
-            raise TypeError(message)
-        payload_type = payload_types[0]
-        if not _matches_payload(fixture, payload_type):
-            message = f"{operation.value} fixture does not match {payload_type!r}"
-            raise TypeError(message)
-
-    def _open_subscription(
-        self, operation: BrokerCapabilityId
-    ) -> StandardResponse[_BrokerSubscription[Any]]:
-        """Create one bounded FIFO subscription owned by this instance.
-
-        Args:
-            operation: Subscription capability being opened.
-
-        Returns:
-            A canonical result carrying the bounded subscription handle.
-        """
-        symbols = self._fixtures.get(operation)
-        subscription_id = generate_id("evt")
-        info = BrokerSubscriptionInfo(
-            subscription_id=subscription_id,
-            capability=operation,
-            symbols=tuple(symbols) if isinstance(symbols, tuple) else ("FAKE",),
-            created_at=datetime.now(UTC),
-            buffer_size=self._config.stream_buffer_size,
-        )
-        handle: _BrokerSubscription[Any] = _BrokerSubscription(
-            broker=self._config.broker_id,
-            environment=self._config.environment,
-            adapter_version=self.ADAPTER_VERSION,
-            info=info,
-        )
-        self._subscriptions[subscription_id] = handle
-        return self._result(operation, data=handle)
-
-    async def unsubscribe(self, subscription_id: str) -> StandardResponse[None]:
-        """Terminate exactly one owned subscription.
-
-        Args:
-            subscription_id: Identifier supplied by the caller.
-
-        Returns:
-            A successful result, or `BROKER_SUBSCRIPTION_NOT_FOUND` when this
-            instance does not own the subscription.
-        """
-        error = self._errors.get(BrokerCapabilityId.UNSUBSCRIBE)
-        if error is not None:
-            self._last_error = error
-            return self._result(BrokerCapabilityId.UNSUBSCRIBE, error=error)
-        handle = self._subscriptions.pop(subscription_id, None)
-        if handle is None:
-            return self._result(
-                BrokerCapabilityId.UNSUBSCRIBE,
+        cap = self._capabilities.get(BrokerCapabilityId.GET_QUOTE)
+        if not cap or getattr(cap, "availability", "UNAVAILABLE") != "AVAILABLE":
+            return StandardResponse(
+                status="error",
                 error=BrokerError(
-                    code=BrokerErrorCode.BROKER_SUBSCRIPTION_NOT_FOUND,
-                    message="Subscription is not owned by this adapter",
-                    capability=BrokerCapabilityId.UNSUBSCRIBE,
+                    code=BrokerErrorCode.BROKER_CAPABILITY_UNAVAILABLE,
+                    message="Capability unavailable",
                 ),
             )
-        await handle.unsubscribe()
-        return self._result(BrokerCapabilityId.UNSUBSCRIBE)
-
-    async def list_subscriptions(
-        self,
-    ) -> StandardResponse[tuple[BrokerSubscriptionInfo, ...]]:
-        """List immutable metadata for subscriptions owned by this instance.
-
-        Returns:
-            A canonical result carrying this instance's subscription metadata.
-        """
-        return self._result(
-            BrokerCapabilityId.LIST_SUBSCRIPTIONS,
-            data=tuple(handle.info for handle in self._subscriptions.values()),
+        return StandardResponse(
+            status="success", data=self._fixtures.get(BrokerCapabilityId.GET_QUOTE)
         )
-
-    def _testing_metadata(
-        self,
-        *,
-        name: str,
-        start_time: int,
-    ) -> ResponseMetadata:
-        """Build standard metadata for a fake-control operation.
-
-        Args:
-            name: Stable qualified operation name.
-            start_time: Monotonic operation start value.
-
-        Returns:
-            Validated response metadata.
-        """
-        return build_response_metadata(
-            name=name,
-            domain="brokers",
-            risk_level="none",
-            request_id=generate_id("req"),
-            start_time=start_time,
-            read_only=False,
-            writes_file=False,
-            modifies_database=False,
-            places_trade=False,
-            requires_network=False,
-            extensions={
-                "broker": self._config.broker_id.value,
-                "environment": self._config.environment.value,
-            },
-        )
-
-
-def _make_fake_method(operation: BrokerCapabilityId) -> Any:
-    """Build one generated fixture-backed protocol method.
-
-    Args:
-        operation: Capability represented by the generated method.
-
-    Returns:
-        An asynchronous method returning the operation's deterministic outcome.
-    """
-
-    async def _method(
-        self: FakeBrokerAdapter, *args: object, **kwargs: object
-    ) -> StandardResponse[Any]:
-        """Return the deterministic outcome for the generated operation.
-
-        Args:
-            self: Fake adapter receiving the generated operation.
-            args: Positional arguments accepted for signature compatibility.
-            kwargs: Keyword arguments accepted for signature compatibility.
-
-        Returns:
-            The operation result.
-        """
-        del args, kwargs
-        return await self._invoke(operation)
-
-    _method.__name__ = operation.value
-    protocol_method = getattr(BrokerAdapter, operation.value)
-    _method.__annotations__ = dict(protocol_method.__annotations__)
-    _method.__signature__ = inspect.signature(protocol_method)  # type: ignore[attr-defined]
-    return _method
-
-
-# Operations whose behaviour the fake inherits from the shared lifecycle base
-# or defines explicitly above; every other capability is backed by a fixture.
-_RESERVED_OPERATIONS = {
-    BrokerCapabilityId.CONNECT,
-    BrokerCapabilityId.DISCONNECT,
-    BrokerCapabilityId.RECONNECT,
-    BrokerCapabilityId.IS_CONNECTED,
-    BrokerCapabilityId.GET_CONNECTION_STATUS,
-    BrokerCapabilityId.GET_LAST_ERROR,
-    BrokerCapabilityId.CONNECTION_EVENTS,
-    BrokerCapabilityId.GET_FEATURE_FLAGS,
-    BrokerCapabilityId.SUPPORTS,
-    BrokerCapabilityId.UNSUBSCRIBE,
-    BrokerCapabilityId.LIST_SUBSCRIPTIONS,
-}
-
-for _operation_id in BrokerCapabilityId:
-    if _operation_id not in _RESERVED_OPERATIONS:
-        setattr(
-            FakeBrokerAdapter, _operation_id.value, _make_fake_method(_operation_id)
-        )
-
-
-def _matches_payload(  # noqa: PLR0911
-    value: object,
-    expected: object,
-) -> bool:
-    """Return whether a value satisfies a resolved payload annotation.
-
-    Args:
-        value: Fixture value under validation.
-        expected: Resolved payload annotation inside ``StandardResponse``.
-
-    Returns:
-        Whether the value satisfies the annotation recursively.
-    """
-    if expected is Any:
-        return True
-    if expected is None or expected is type(None):
-        return value is None
-    origin = get_origin(expected)
-    args = get_args(expected)
-    if origin in {types.UnionType, getattr(types, "UnionType", object)}:
-        return any(_matches_payload(value, item) for item in args)
-    if origin is tuple:
-        if not isinstance(value, tuple):
-            return False
-        if len(args) == len((None, None)) and args[1] is Ellipsis:
-            return all(_matches_payload(item, args[0]) for item in value)
-        return len(value) == len(args) and all(
-            _matches_payload(item, item_type)
-            for item, item_type in zip(value, args, strict=True)
-        )
-    if origin is not None:
-        if not isinstance(value, origin):
-            return False
-        if origin.__name__ == "BrokerPage" and args:
-            return all(_matches_payload(item, args[0]) for item in value.items)
-        return True
-    return isinstance(value, cast("type[object]", expected))

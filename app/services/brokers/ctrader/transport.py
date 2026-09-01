@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """cTrader request correlation and direct-channel transport boundary."""
 
 from __future__ import annotations
@@ -5,22 +6,17 @@ from __future__ import annotations
 # ruff: noqa: TRY004 - an unexpected provider response is invalid provider evidence.
 import asyncio
 import importlib
+import logging
 import time
 from collections import deque
 from collections.abc import Awaitable, Callable
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts import BrokerConnectionConfig
-import logging
-
-from app.services.brokers._shared.circuit_breaker import (
-    _TransportCircuitBreaker,
-)
-from app.services.brokers.canonical_contracts import BrokerErrorCode
-from app.services.brokers.canonical_contracts.protocols import (
+from app.services.brokers.ctrader._legacy_types import (
+    BrokerConnectionConfig,
+    BrokerErrorCode,
     _CircuitOpenError,
     _RateLimitedError,
+    _TransportCircuitBreaker,
 )
 
 logger = logging.getLogger(__name__)

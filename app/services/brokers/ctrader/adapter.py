@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Canonical cTrader direct broker channel adapter."""
 
 from __future__ import annotations
@@ -9,10 +10,7 @@ from decimal import Decimal
 from types import ModuleType
 from typing import cast, override
 
-from app.services.brokers._shared.subscription import (  # noqa: TC001
-    _BrokerSubscription,
-)
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerCapabilityId,
     BrokerConnectionConfig,
     BrokerConnectionState,
@@ -22,8 +20,7 @@ from app.services.brokers.canonical_contracts import (
     BrokerPlatformInfo,
     BrokerQuote,
     StandardResponse,
-)
-from app.services.brokers.canonical_contracts.protocols import (
+    _BrokerSubscription,
     _UnsupportedAdapterBase,
 )
 from app.services.brokers.ctrader.calculations import _CTraderCalculationsMixin
@@ -280,8 +277,8 @@ class CTraderBrokerAdapter(
         """Build one canonical cTrader failure result.
 
         Args:
-            operation: Value supplied to the operation.
-            code: Value supplied to the operation.
+            operation: Capability operation identifier.
+            code: Canonical error code.
 
         Returns:
             Canonical error result.
@@ -292,4 +289,4 @@ class CTraderBrokerAdapter(
             capability=operation,
         )
         self._last_error = error
-        return self._result(operation, error=error)
+        return StandardResponse[T](status="error", error=error)

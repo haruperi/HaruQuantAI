@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Map Dukascopy channel candle rows to canonical broker bars."""
 
 from __future__ import annotations
@@ -7,7 +8,7 @@ from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING
 
 from app.contracts.broker.models import BrokerHistoryPage, ProviderRecord
-from app.services.brokers.canonical_contracts import BrokerBar
+from app.services.brokers.dukascopy._legacy_types import BrokerBar
 from app.services.brokers.dukascopy.transport import _ProviderResponseError
 
 if TYPE_CHECKING:

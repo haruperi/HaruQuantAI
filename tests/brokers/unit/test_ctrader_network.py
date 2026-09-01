@@ -1,7 +1,7 @@
 """cTrader lifecycle-response validation tests."""
 
 import pytest
-from app.services.brokers.canonical_contracts import BrokerEnvironment
+from app.services.brokers.ctrader._legacy_types import BrokerEnvironment
 from app.services.brokers.ctrader.network import (
     _expect_response,
     _validate_account_environment,

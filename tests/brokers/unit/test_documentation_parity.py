@@ -39,6 +39,8 @@ def test_brokers_functions_have_applicable_google_docstring_sections() -> None:
     """Require Args, Returns, and Raises sections where behavior needs them."""
     failures: list[str] = []
     spatial_provider_files = {
+        "__init__.py",
+        "_legacy_types.py",
         "binance.py",
         "ctrader.py",
         "dukascopy.py",

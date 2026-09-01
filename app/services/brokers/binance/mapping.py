@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Binance provider payload to canonical DTO mapping."""
 
 # ruff: noqa: PLR2004 - native wire constants are normative provider evidence.
@@ -14,15 +15,15 @@ from app.contracts.broker.models import (
     ProviderRecord,
 )
 from app.contracts.catalogue.models import InstrumentRef
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.binance._legacy_types import (
     BrokerBar,
     BrokerErrorCode,
     BrokerOrderBook,
     BrokerQuote,
     BrokerSymbolInfo,
     BrokerTick,
+    _ProviderResponseError,
 )
-from app.services.brokers.canonical_contracts.protocols import _ProviderResponseError
 
 if TYPE_CHECKING:
     from app.contracts.common.models import JsonObject

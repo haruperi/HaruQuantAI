@@ -9,8 +9,11 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from app.contracts.broker.models import BrokerHistoryPage, ProviderRecord
-from app.services.brokers.canonical_contracts import BrokerBar, BrokerPage
-from app.services.brokers.canonical_contracts.protocols import _ProviderResponseError
+from app.services.brokers.yahoo._legacy_types import (
+    BrokerBar,
+    BrokerPage,
+    _ProviderResponseError,
+)
 
 if TYPE_CHECKING:
     from app.contracts.common.models import JsonObject

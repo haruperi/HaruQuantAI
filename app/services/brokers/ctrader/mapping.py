@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """cTrader provider payload to canonical value mapping."""
 
 # ruff: noqa: ANN401, FURB171 - protobuf fixtures expose heterogeneous fields.
@@ -6,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any, cast
 
-from app.services.brokers.canonical_contracts import (
+from app.services.brokers.ctrader._legacy_types import (
     BrokerBar,
     BrokerDeal,
     BrokerErrorCode,

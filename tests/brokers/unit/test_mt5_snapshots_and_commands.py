@@ -61,7 +61,7 @@ def test_mt5_commands_provider_ticket() -> None:
     """Verify _provider_ticket parses integer tickets and rejects non-integers."""
     assert _provider_ticket("123456") == 123456
 
-    from app.services.brokers.canonical_contracts.protocols import (
+    from app.services.brokers.metatrader._legacy_types import (
         _RequestValidationError,
     )
 

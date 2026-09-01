@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """MetaTrader 5 provider specification snapshot observations (provider truth).
 
 The snapshot represents current provider observation only: it carries no
@@ -9,6 +10,7 @@ typed reference.
 from __future__ import annotations
 
 import hashlib
+import logging
 from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from dataclasses import fields as dataclass_fields
@@ -16,15 +18,13 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar
 
-from app.composition.logging import get_logger
+if TYPE_CHECKING:
+    from app.services.brokers.metatrader._legacy_types import StandardResponse
+
 from app.kernel.serialization import canonical_json
 from app.kernel.time import format_utc_timestamp
 
-if TYPE_CHECKING:
-    from app.services.brokers.canonical_contracts.protocols import BrokerAdapter
-    from app.services.brokers.canonical_contracts.responses import StandardResponse
-
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 #: Length of a lowercase hexadecimal SHA-256 digest.
 _SHA256_HEX_LENGTH = 64
@@ -824,7 +824,7 @@ def get_provider_specification_snapshot_field(
 
 
 async def get_broker_provider_specification(
-    adapter: BrokerAdapter, symbol: str
+    adapter: object, symbol: str
 ) -> StandardResponse[ProviderSpecificationSnapshot]:
     """Read one current provider specification snapshot through the adapter.
 

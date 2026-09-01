@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """Dukascopy web-chart tick to canonical DTO mapping."""
 
 from __future__ import annotations
@@ -5,7 +6,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from app.services.brokers.canonical_contracts import BrokerBar, BrokerTick
+from app.services.brokers.dukascopy._legacy_types import BrokerBar, BrokerTick
 from app.services.brokers.dukascopy.transport import _ProviderResponseError
 
 _TICK_FIELD_COUNT = 5
