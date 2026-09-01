@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import re
+import secrets
+import time
 import uuid
 
 from app.kernel.errors import ValidationError
@@ -34,6 +36,9 @@ SUPPORTED_STABLE_PREFIXES = frozenset({"id"})
 _STABLE_HEX = re.compile(r"[0-9a-f]{64}\Z")
 _MAX_IDENTITY_MATERIAL_BYTES = 4_096
 _UUID4_VERSION = 4
+_UUID7_TIMESTAMP_BITS = 48
+_UUID7_RANDOM_A_BITS = 12
+_UUID7_RANDOM_B_BITS = 62
 
 
 def _validate_trace_prefix(prefix: str) -> None:
@@ -95,6 +100,29 @@ def generate_id(prefix: str) -> str:
     """
     _validate_trace_prefix(prefix)
     return f"{prefix}-{uuid.uuid4()}"
+
+
+def generate_uuid7() -> str:
+    """Generate a canonical lowercase RFC 9562 UUIDv7 string.
+
+    UUIDv7 is used by public wire contracts whose identifiers must remain
+    sortable by creation time without exposing a domain-specific prefix. The
+    implementation uses the current Unix epoch millisecond in the high 48 bits,
+    the RFC version/variant bits, and cryptographically strong random tail bits.
+
+    Returns:
+        Canonical lowercase UUIDv7 text.
+    """
+    timestamp_ms = time.time_ns() // 1_000_000
+    timestamp_mask = (1 << _UUID7_TIMESTAMP_BITS) - 1
+    random_a = secrets.randbits(_UUID7_RANDOM_A_BITS)
+    random_b = secrets.randbits(_UUID7_RANDOM_B_BITS)
+    value = (timestamp_ms & timestamp_mask) << 80
+    value |= 0x7 << 76
+    value |= random_a << 64
+    value |= 0b10 << 62
+    value |= random_b
+    return str(uuid.UUID(int=value))
 
 
 def validate_id(value: str, *, expected_prefix: str | None = None) -> str:
