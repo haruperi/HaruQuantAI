@@ -13,15 +13,6 @@ from app.services.data import (
 
 logger = get_logger(__name__)
 
-_SELECT_PERMISSION = """
-SELECT allow_read, allow_mutation
-FROM broker_environment_permissions
-WHERE provider_code = ? AND account_ref_digest = ? AND environment = ?
-  AND enabled = 1 AND effective_from <= ?
-  AND (effective_to IS NULL OR effective_to > ?)
-ORDER BY effective_from DESC
-""".strip()
-
 _SELECT_ROUTE_RECOVERY = """
 SELECT provider_code, account_ref_digest, environment, recovery_cursor,
        uncertainty, updated_at
@@ -59,34 +50,6 @@ def _execute(
             ),
             request_id=request_id,
         )
-    )
-
-
-def read_environment_permission(
-    provider_code: str,
-    account_ref_digest: str,
-    environment: str,
-    as_of: str,
-    *,
-    request_id: str,
-) -> object:
-    """Read the current explicit environment/account permission.
-
-    Args:
-        provider_code: Exact provider identity.
-        account_ref_digest: Redacted account-reference digest.
-        environment: Exact provider environment.
-        as_of: Permission evaluation timestamp.
-        request_id: Caller trace identity.
-
-    Returns:
-        Data-owned result carrying at most one permission row.
-    """
-    return _execute(
-        _SELECT_PERMISSION,
-        (provider_code, account_ref_digest, environment, as_of, as_of),
-        request_id=request_id,
-        max_rows=1,
     )
 
 

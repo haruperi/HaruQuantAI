@@ -139,10 +139,6 @@ if typing.TYPE_CHECKING:
     )
     from app.services.brokers.ctrader.health import record_ctrader_health_checkpoint
     from app.services.brokers.dukascopy.health import record_dukascopy_health_checkpoint
-    from app.services.brokers.environment_guards.permissions import (
-        get_broker_environment_permission,
-        register_broker_environment_permission,
-    )
     from app.services.brokers.events.checkpoints import (
         get_broker_event_checkpoint,
         record_broker_event_checkpoint,
@@ -408,10 +404,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers.canonical_contracts.public",
         "get_broker_environment",
     ),
-    "get_broker_environment_permission": (
-        "app.services.brokers.environment_guards.permissions",
-        "get_broker_environment_permission",
-    ),
     "get_broker_error_catalog": (
         "app.services.brokers.canonical_contracts.error_catalog",
         "get_broker_error_catalog",
@@ -634,10 +626,6 @@ _EXPORTS: dict[str, tuple[str, str]] = {
         "app.services.brokers._shared.public",
         "refresh_broker_session",
     ),
-    "register_broker_environment_permission": (
-        "app.services.brokers.environment_guards.permissions",
-        "register_broker_environment_permission",
-    ),
     "release_metatrader_snapshot_symbols": (
         "app.services.brokers.metatrader.snapshot_gateway",
         "release_metatrader_snapshot_symbols",
@@ -798,7 +786,6 @@ __all__ = (
     "get_broker_connection_status",
     "get_broker_deal",
     "get_broker_environment",
-    "get_broker_environment_permission",
     "get_broker_error_catalog",
     "get_broker_error_code",
     "get_broker_event_checkpoint",
@@ -862,7 +849,6 @@ __all__ = (
     "record_yahoo_health_checkpoint",
     "reduce_broker_position",
     "refresh_broker_session",
-    "register_broker_environment_permission",
     "release_metatrader_snapshot_symbols",
     "replace_broker_order",
     "resolve_provider_connection_config",
