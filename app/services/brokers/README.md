@@ -106,9 +106,9 @@ coordination artifacts.
 
 ### Physical and dependency inventory
 
-- The tracked production package has 17 top-level implementation packages:
+- The tracked production package has 16 top-level implementation packages:
   `_shared`, `binance`, `canonical_contracts`, `capabilities`, `conformance`,
-  `ctrader`, `dukascopy`, `environment_guards`, `events`,
+  `ctrader`, `dukascopy`, `events`,
   `instrument_profiles`, `metatrader`, `migrations`, `persistence`,
   `reconciliation`, `simulation`, `specifications`, and `yahoo`.
 - `app/contracts/broker/` contains `__init__.py`, `capabilities.py`, `errors.py`,
@@ -125,10 +125,11 @@ coordination artifacts.
 - Broker tests and usage evidence are concentrated under `tests/brokers`, with
   additional Data, Trading, Simulator, system, and legacy consumers.
 
-The legacy Broker migration manifest defines five tables:
-`broker_symbol_map`, `broker_health_history`, `broker_route_recovery`,
-`broker_environment_permissions`, and `broker_event_checkpoints`. Their presence
-is current-state evidence only; none is ratified as final Broker ownership.
+The legacy Broker migration manifest defined five tables; `broker_symbol_map`
+was retired in Task 1.02 and `broker_environment_permissions` was retired in Task
+1.11, leaving three temporary operational tables:
+`broker_health_history`, `broker_route_recovery`, and `broker_event_checkpoints`.
+Their presence is current-state evidence only; none is ratified as final Broker ownership.
 
 ### Legacy package disposition ledger
 
@@ -136,7 +137,7 @@ is current-state evidence only; none is ratified as final Broker ownership.
 | --- | --- | --- |
 | `instrument_profiles/` | MOVE + DELETE | Catalogue instruments and provider mappings; only current provider-observed technical facts remain in provider features. |
 | `capabilities/` | DISSOLVE + DELETE | Retired by Child 1.10; implementation derived from manifests, mounted Kernel capabilities, and composition. |
-| `environment_guards/` | SPLIT + DELETE | Workspace/Composition admission/configuration, Trading/Risk mutation authority, and provider-local endpoint/account verification. |
+| `environment_guards/` | SPLIT + DELETE | Retired by Child 1.11: Workspace/Composition owns admission/configuration, Trading/Risk owns mutation authority, and provider features own endpoint verification. |
 | `events/` | SPLIT + DELETE | `app/contracts/broker` payloads, provider mapping/publication, Kernel EventBus, and consumer-owned checkpoints. |
 | `reconciliation/` | SPLIT + DELETE | Provider-local same-provider recovery, Data source selection/fallback, and Trading business reconciliation. |
 | `simulation/` | MOVE + DELETE | `simulator.simulate-orders@1` plus Trading SIM/DEMO/LIVE route selection. |
@@ -264,7 +265,7 @@ The completed operation groups and requirement anchors are:
 
 | Operation group                                                                                                                                                                                                                                                                                                 | Requirement anchor                                                                | Affected providers                               | Register entry                   |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------ | -------------------------------- |
-| Single-target mutations (`check_order`, `place_order`, `modify_order`, `cancel_order`, `modify_position`, `close_position`)                                                                                                                                                                         | `CAP-BRK-010`; `FR-BRK-033`–`038`, `FR-BRK-091`–`097`                 | MT5, cTrader                                     | `FEAT-BRK-07`, `FEAT-BRK-08` |
+| Single-target mutations (`check_order`, `place_order`, `modify_order`, `cancel_order`, `modify_position`, `close_position`)                                                                                                                                                                         | `CAP-BRK-010`; `FR-BRK-033`–`038`, `FR-BRK-091`–`097`                 | MT5, cTrader                                     | `FEAT-BRK-07`                  |
 | Order, deal, and transaction history reads. MT5:`get_positions`, `get_position`, `get_orders`, `get_order`, `list_order_history`, `list_deal_history`, `get_deal`, `list_account_transactions`. cTrader: `get_positions`, `get_orders`, `list_order_history`, `list_deal_history` only. | `CAP-BRK-009`; `FR-BRK-027`–`032`, `FR-BRK-083`–`090`                 | MT5, cTrader                                     | `FEAT-BRK-09`                  |
 | Balances and permissions reads (`get_balances`, `get_permissions`, `get_last_error`)                                                                                                                                                                                                                      | `CAP-BRK-008`; `FR-BRK-012`, `FR-BRK-014`–`018`, `FR-BRK-073`–`082` | MT5 only; peers return deterministic unsupported | `FEAT-BRK-02`                  |
 | Provider-native calculations (`calculate_margin`, `calculate_profit`)                                                                                                                                                                                                                                       | `CAP-BRK-011`; `FR-BRK-039`–`041`, `FR-BRK-098`–`100`                 | MT5, cTrader                                     | `FEAT-BRK-10`                  |
@@ -403,7 +404,7 @@ concrete DTO/event schema ID). Consumers never parse `schema_id` for compatibili
 
 ### Persisted state
 
-Brokers temporarily owns four durable operational tables: `broker_health_history`, `broker_route_recovery`, `broker_environment_permissions`, and `broker_event_checkpoints`. It persists no instrument identity, credential, reusable market-data payload, or invented order/fill/position state. `migrations/` retains immutable schema history plus guarded retirement, while `persistence/` exposes only the four operational-table statements. The migration manifest runs through Data's verified ledger, checksum, write-lock, and transaction boundary. Live session and SDK state remains bounded, in memory, adapter-instance scoped, and is discarded at disconnect.
+Brokers temporarily owns three durable operational tables: `broker_health_history`, `broker_route_recovery`, and `broker_event_checkpoints`. It persists no instrument identity, credential, reusable market-data payload, or invented order/fill/position state. `migrations/` retains immutable schema history plus guarded retirement, while `persistence/` exposes only the three operational-table statements. The migration manifest runs through Data's verified ledger, checksum, write-lock, and transaction boundary. Live session and SDK state remains bounded, in memory, adapter-instance scoped, and is discarded at disconnect.
 
 ### Sim, demo, and live parity boundaries
 
@@ -533,13 +534,12 @@ The tree below defines the final layout. The following table is the sole normati
 | Completed | `FEAT-BRK-05` Dukascopy Direct Broker Channel | `dukascopy/` | Direct health, tick/bar snapshots, and explicit command exclusions | Dukascopy requirements in Sections 4.6 and 4.10 | `tests/brokers/usage/features/05_dukascopy.py` |
 | Completed | `FEAT-BRK-06` Yahoo Direct Broker Channel | `yahoo/` | Direct health, historical snapshots, and explicit command exclusions | Yahoo requirements in Sections 4.7 and 4.10 | `tests/brokers/usage/features/06_yahoo.py` |
 | Completed | `FEAT-BRK-07` Authoritative Reads and Route Discipline | `reconciliation/` | Route plans, read/recovery fallback, unknown-outcome reconciliation, and recovery cursors | `FR-BRK-136`–`FR-BRK-138`, `FR-BRK-149` | `tests/brokers/usage/features/07_reconciliation.py` |
-| Completed | `FEAT-BRK-08` Simulation and Live Isolation | `environment_guards/` | Default-deny provider/account/environment permissions | `FR-BRK-139`, `FR-BRK-150` | `tests/brokers/usage/features/08_environment_guards.py` |
 | Completed | `FEAT-BRK-09` Broker Event Normalization | `events/` | Ordered, deduplicated event envelopes and source checkpoints | `FR-BRK-151` | `tests/brokers/usage/features/09_events.py` |
 | Completed | `FEAT-BRK-10` Adapter Contract Test Kit | `conformance/` | Reusable provider-disabled conformance suite, deterministic adapter fixture, and guarded checksummed calculation evidence | `FR-BRK-109`, `FR-BRK-190`–`FR-BRK-193` | `tests/brokers/usage/features/10_conformance.py` |
 | Completed | `FEAT-BRK-17` Simulation Broker Channel | `simulation/` | Exact `sim`/`simulation` factory, socket-free authority injection, canonical lifecycle/finalization, clock-safe authoritative reads, provider-shaped mutations, bounded deal/transaction history, and capability intersection | `FR-BRK-167`–`FR-BRK-172`, `FR-BRK-174`–`189`, `FR-BRK-194`–`196` | `tests/brokers/usage/features/17_simulation.py` |
 | Completed | `FEAT-BRK-18` Provider Specification Snapshots | `specifications/` | `build_provider_specification_snapshot`, `parse_provider_specification_snapshot`, `dump_provider_specification_snapshot`, `get_provider_specification_snapshot_field`, `verify_provider_specification_snapshot`, `get_broker_provider_specification` | `FR-BRK-159`–`FR-BRK-163` | `tests/brokers/usage/features/18_specifications.py` |
 
-Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **eleven** completed features, `FEAT-BRK-02` through `FEAT-BRK-10`, `FEAT-BRK-17`, and `FEAT-BRK-18`. `FEAT-BRK-00` moved to Catalogue in Task 1.02; `FEAT-BRK-01` was retired in Task 1.10; IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels, Events, Reconciliation, and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
+Each registered feature owns exactly one production folder and exactly one numbered standalone usage program. Provider facade classes compose private focused files; unreleased writes remain unreachable through public release policy. The registry holds **ten** completed features, `FEAT-BRK-02` through `FEAT-BRK-07`, `FEAT-BRK-09`, `FEAT-BRK-10`, `FEAT-BRK-17`, and `FEAT-BRK-18`. `FEAT-BRK-00` moved to Catalogue in Task 1.02; `FEAT-BRK-01` was retired in Task 1.10; `FEAT-BRK-08` was split and retired in Task 1.11; IDs `FEAT-BRK-11` through `FEAT-BRK-16` are retired from current-state registration after their behavior moved into provider channels, Events, Reconciliation, and Conformance. `canonical_contracts/` and `_shared/` are documented non-feature support and own no independent feature behavior.
 
 #### Explicit order-policy v2 requirements
 
@@ -2202,12 +2202,11 @@ and verifies the complete manifest through Data's migration ledger.
 | --- | --- | --- |
 | `broker_health_history` | Provider `health.py` through `_shared/health.py` | Append-only redacted health, latency, maintenance, and route-readiness evidence |
 | `broker_route_recovery` | `reconciliation/checkpoints.py` | Authoritative route reference, recovery cursor, and uncertainty state |
-| `broker_environment_permissions` | `environment_guards/permissions.py` | Default-deny provider/account-digest/environment read and mutation permissions |
 | `broker_event_checkpoints` | `events/checkpoints.py` | Accepted source cursor, optional provider sequence, and event digest |
 
 The exact columns and constraints are immutable in
 `migrations/definitions.py`; runtime CRUD statements are confined to the
-five-file `persistence/` support package. No current table stores instrument identity,
+four-file `persistence/` support package. No current table stores instrument identity,
 credentials, raw
 provider payloads, or invented account/order/fill/position state.
 
@@ -2218,6 +2217,16 @@ history. There is no current Broker symbol-map CRUD surface. Catalogue's provide
 mapping contract is the authoritative destination; the retirement step deliberately
 does not guess how legacy plain-text IDs correspond to Catalogue UUID identities.
 
+#### Retired Broker environment permissions
+
+The exact SQL and checksum of `002_broker_channel_state_v1` (which included
+`broker_environment_permissions`) remain immutable migration history. Additive
+migration `004_retire_broker_environment_permissions` drops that legacy table
+only after a strict zero-row guard succeeds. A non-empty table fails and rolls
+back unchanged; runtime profile admission lives in Workspace/Composition
+(`workspace.configure-runtime@1`), while live mutation authorization lives
+upstream in Trading/Risk (`tests/trading/unit/live/test_gates.py`).
+
 #### Migration and production-reachability requirements
 
 | Status | ID | Requirement | Implementation | Test |
@@ -2227,7 +2236,7 @@ does not guess how legacy plain-text IDs correspond to Catalogue UUID identities
 | Moved | `FR-BRK-141`–`FR-BRK-147` | Canonical instruments, effective-dated provider mapping, and sessions are Catalogue-owned; Brokers accepts exact provider-native symbols only. | Catalogue feature capabilities; Data adapter boundary | `tests/catalogue/`; `tests/data/unit/test_broker_adapter_coverage.py`; `tests/brokers/integration/test_symbol_map_retirement.py` |
 | Completed | `FR-BRK-148` | Persist redacted provider health history without storing credentials, full account references, raw payloads, or treating health as authorization. | Provider `health.py`; `_shared/health.py`; `broker_health_history` | `tests/brokers/unit/test_broker_channel_state.py` |
 | Completed | `FR-BRK-149` | Atomically create or advance an authoritative route reference and recovery cursor without enabling duplicate submission or silent write fallback. | `reconciliation/checkpoints.py`; `broker_route_recovery` | `tests/brokers/unit/test_broker_channel_state.py` |
-| Completed | `FR-BRK-150` | Persist default-deny provider/account/environment permissions and reject direct live mutation admission; Trading remains the live-capital authority. | `environment_guards/permissions.py`; `broker_environment_permissions` | `tests/brokers/unit/test_broker_channel_state.py`; `tests/trading/unit/live/test_gates.py` |
+| Split | `FR-BRK-150` | Runtime/profile admission and configuration moved to Workspace/Composition; mutation authorization kept in Trading/Risk; endpoint verification provider-local; `broker_environment_permissions` retired. | `app/contracts/workspace/`; Trading execution gates; provider features | `tests/trading/unit/live/test_gates.py`; `tests/brokers/integration/test_environment_permissions_retirement.py` |
 | Completed | `FR-BRK-151` | Atomically advance source cursors and event digests only for accepted provider events; missing provider sequence remains explicit rather than invented. | `events/checkpoints.py`; `broker_event_checkpoints` | `tests/brokers/unit/test_broker_channel_state.py` |
 | Completed | `FR-BRK-152` | Maintain a reference-counted union of active MT5 snapshot symbol demands, bounded to 200 exact unique provider symbols. | `acquire_metatrader_snapshot_symbols`; `release_metatrader_snapshot_symbols` | `tests/brokers/unit/test_metatrader_snapshot_gateway.py` |
 | Completed | `FR-BRK-153` | Send revisioned complete symbol sets over the authenticated EA connection and admit snapshots only for the latest acknowledged revision. | `metatrader/snapshot_gateway.py`; `metatrader/snapshot_protocol.py` | `tests/brokers/unit/test_metatrader_snapshot_gateway.py`; `tests/brokers/unit/test_metatrader_snapshot_protocol.py` |
@@ -2289,7 +2298,7 @@ by UI/API through its completed persisted settings and credential composition bo
 | Completed | `NFR-BRK-011` | Independence   | Brokers shall compile/test independently of Data, Trading, Risk, Strategy, Indicators, Simulation, Analytics, Optimization, Research, and UI/API.                                                                                                                                                     | Dependency audit                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Completed | `NFR-BRK-012` | Testing | Every FR shall have runnable usage evidence and unit coverage; every active workflow shall have one directly executable, stage-labelled workflow program; each provider shall pass the shared contract suite and every domain file shall maintain at least 80% coverage. | Twelve standalone programs cover the current feature registry; ten workflow programs cover the active workflow registry. Provider-backed programs use genuine enabled non-production sessions, close caller-owned resources, and never transmit a broker mutation. |
 | Completed | `NFR-BRK-013` | Dependencies   | Provider library versions shall match`pyproject.toml`; directly imported transitive packages must be pinned before implementation.                                                                                                                                                                  | Dependency manifest audit — confirmed against`pyproject.toml`, including the explicit `twisted==24.3.0` pin required by the direct import in `ctrader/network.py`. The exact-version pin matches the constraint `ctrader-open-api==0.9.2` already imposes.                                                                                                                                                                                               |
-| Completed | `NFR-BRK-014` | Persistence | Brokers shall own no database connections, instrument identity persistence, credential persistence, reusable market/account cache, business snapshot, or order store. Its four temporary operational tables are `broker_health_history`, `broker_route_recovery`, `broker_environment_permissions`, and `broker_event_checkpoints`; Brokers owns their immutable migration manifest and CRUD statements and executes them exclusively through Data's migration and transaction infrastructure. | Schema, persistence, reachability, and runtime side-effect tests. |
+| Completed | `NFR-BRK-014` | Persistence | Brokers shall own no database connections, instrument identity persistence, credential persistence, reusable market/account cache, business snapshot, or order store. Its three temporary operational tables are `broker_health_history`, `broker_route_recovery`, and `broker_event_checkpoints`; Brokers owns their immutable migration manifest and CRUD statements and executes them exclusively through Data's migration and transaction infrastructure. | Schema, persistence, reachability, and runtime side-effect tests. |
 | Completed | `NFR-BRK-015` | Provider scope | Dukascopy and Yahoo shall be declared research-only and unavailable to production/live workflows; their provider results shall carry explicit provenance for Data.                                                                                                                                    | Capability and consumer-boundary tests                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ---
@@ -2377,9 +2386,8 @@ uv run pytest tests/brokers/integration
 COVERAGE_CORE=pytrace uv run coverage run --branch --source=app.services.brokers -m pytest tests/brokers --no-cov -q
 uv run coverage report --include="app/services/brokers/*" --fail-under=80
 
-# Run each NN_*.py file under tests/brokers/usage directly.
-python tests/brokers/usage/features/01_capabilities.py
-python tests/brokers/usage/features/08_environment_guards.py
+# Run homogeneous full-domain usage program directly:
+python tests/brokers/usage/features/features.py
 ```
 
 During implementation, run only the targeted test file for the changed code before the broader domain verification commands.

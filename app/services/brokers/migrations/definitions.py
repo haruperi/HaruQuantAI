@@ -25,7 +25,7 @@ from app.services.data import (
 
 logger = get_logger(__name__)
 
-BROKER_SCHEMA_VERSION = "v3"
+BROKER_SCHEMA_VERSION = "v4"
 
 _BROKER_SCHEMA_STATEMENTS = (
     """
@@ -134,6 +134,20 @@ _BROKER_SYMBOL_MAP_RETIREMENT_STATEMENTS = (
     "DROP TABLE broker_symbol_map_retirement_guard",
 )
 
+_BROKER_ENVIRONMENT_PERMISSIONS_RETIREMENT_STATEMENTS = (
+    """
+    CREATE TEMP TABLE broker_environment_permissions_retirement_guard (
+        row_count INTEGER NOT NULL CHECK (row_count = 0)
+    ) STRICT
+    """.strip(),
+    """
+    INSERT INTO broker_environment_permissions_retirement_guard (row_count)
+    SELECT COUNT(*) FROM broker_environment_permissions
+    """.strip(),
+    "DROP TABLE broker_environment_permissions",
+    "DROP TABLE broker_environment_permissions_retirement_guard",
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Brokers schema statements.
@@ -167,6 +181,14 @@ BROKER_MIGRATIONS: tuple[Any, ...] = (
         migration_id="003_retire_broker_symbol_map",
         checksum=_migration_checksum(_BROKER_SYMBOL_MAP_RETIREMENT_STATEMENTS),
         statements=_BROKER_SYMBOL_MAP_RETIREMENT_STATEMENTS,
+    ),
+    build_migration_step(
+        domain="brokers",
+        migration_id="004_retire_broker_environment_permissions",
+        checksum=_migration_checksum(
+            _BROKER_ENVIRONMENT_PERMISSIONS_RETIREMENT_STATEMENTS
+        ),
+        statements=_BROKER_ENVIRONMENT_PERMISSIONS_RETIREMENT_STATEMENTS,
     ),
 )
 

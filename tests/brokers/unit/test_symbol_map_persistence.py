@@ -50,9 +50,7 @@ def _capture_executor(
 def test_remaining_persistence_exports_exclude_symbol_identity() -> None:
     """Expose only temporary operational state operations."""
     assert persistence.__all__ == [
-        "create_environment_permission_record",
         "create_health_record",
-        "read_environment_permission",
         "read_event_checkpoint",
         "read_route_recovery",
         "upsert_event_checkpoint_record",
@@ -82,18 +80,26 @@ def test_remaining_create_read_update_operations_are_bounded(
 
 
 def test_manifest_preserves_history_and_adds_guarded_retirement() -> None:
-    """Keep immutable steps 001/002 and append retirement step 003."""
+    """Keep immutable steps 001/002 and append retirement steps 003/004."""
     migrations = get_broker_migrations()
     assert migrations == BROKER_MIGRATIONS
     assert [step.migration_id for step in migrations] == [
         "001_broker_symbol_map_v1",
         "002_broker_channel_state_v1",
         "003_retire_broker_symbol_map",
+        "004_retire_broker_environment_permissions",
     ]
-    assert BROKER_SCHEMA_VERSION == "v3"
-    retirement = migrations[2]
-    assert any("CHECK (row_count = 0)" in sql for sql in retirement.statements)
-    assert "DROP TABLE broker_symbol_map" in retirement.statements
+    assert BROKER_SCHEMA_VERSION == "v4"
+    retirement_symbol = migrations[2]
+    assert any("CHECK (row_count = 0)" in sql for sql in retirement_symbol.statements)
+    assert "DROP TABLE broker_symbol_map" in retirement_symbol.statements
+    retirement_permissions = migrations[3]
+    assert any(
+        "CHECK (row_count = 0)" in sql for sql in retirement_permissions.statements
+    )
+    assert (
+        "DROP TABLE broker_environment_permissions" in retirement_permissions.statements
+    )
 
 
 def test_run_broker_migrations_delegates_complete_manifest(

@@ -21,14 +21,6 @@ INSERT INTO broker_health_history (
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """.strip()
 
-_INSERT_PERMISSION = """
-INSERT INTO broker_environment_permissions (
-    permission_id, provider_code, account_ref_digest, environment,
-    allow_read, allow_mutation, enabled, effective_from, effective_to,
-    request_id, updated_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-""".strip()
-
 
 def _execute(
     statement: str, parameters: tuple[Any, ...], *, request_id: str, max_rows: int
@@ -68,19 +60,3 @@ def create_health_record(parameters: tuple[Any, ...], *, request_id: str) -> obj
     """
     logger.info("Recording one redacted broker health checkpoint")
     return _execute(_INSERT_HEALTH, parameters, request_id=request_id, max_rows=1)
-
-
-def create_environment_permission_record(
-    parameters: tuple[Any, ...], *, request_id: str
-) -> object:
-    """Persist one default-deny environment/account permission record.
-
-    Args:
-        parameters: Ordered permission column values.
-        request_id: Caller trace identity.
-
-    Returns:
-        Data-owned transaction result.
-    """
-    logger.info("Recording one broker environment permission")
-    return _execute(_INSERT_PERMISSION, parameters, request_id=request_id, max_rows=1)

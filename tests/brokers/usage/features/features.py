@@ -9,7 +9,7 @@ realistic end-to-end domain pipeline using genuine non-production broker adapter
 5. Market Data Reads (FEAT-BRK-06, FEAT-BRK-09, FEAT-BRK-12 & FEAT-BRK-13)
 6. Margin & Profit Calculations (FEAT-BRK-10)
 7. Streaming Subscriptions (FEAT-BRK-11)
-8. Order Mutation Validation & Controlled Session Teardown (FEAT-BRK-07 & FEAT-BRK-08)
+8. Order Mutation Validation & Controlled Session Teardown (FEAT-BRK-07)
 """
 
 from __future__ import annotations
@@ -242,7 +242,7 @@ async def _run_stage_7_subscriptions(adapter: Any) -> None:
 async def _run_stage_8_mutations_and_teardown(adapter: Any) -> None:
     _print_stage(
         8,
-        "Order Mutations & Teardown (FEAT-BRK-07 & FEAT-BRK-08)",
+        "Order Mutations & Teardown (FEAT-BRK-07)",
         "Validate single-target order request and perform controlled adapter disconnect.",
     )
     order_req = build_broker_order_request(
