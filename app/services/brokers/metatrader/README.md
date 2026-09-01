@@ -1,24 +1,22 @@
-# FEAT-BRK-02 MetaTrader Direct Broker Channel
+# FEAT-BRK-CONNECT_METATRADER — MetaTrader Provider
 
-This folder is the sole production owner of this focused Brokers feature. Current status is `Partial` until the validation gates in the package README complete. Public API, contracts, requirements, and usage evidence are registered only in `app/services/brokers/README.md`.
+Own one removable MetaTrader terminal/account integration. The feature verifies the
+configured provider environment/account at the session boundary, performs genuine
+provider reads, and transports already-authorized orders. It does not resolve
+instrument aliases, select providers, authorize risk, or reconcile business outcomes.
 
-Live market presentation uses `snapshot_protocol.py` and
-`snapshot_gateway.py`: one MQL5 EA exchanges revisioned symbol-demand commands,
-acknowledgments, and one-second multi-symbol snapshots over a persistent local
-TCP connection. Active Data consumers define a bounded 200-symbol union; the
-gateway restores it after reconnect, accepts snapshots only for the latest
-acknowledged revision, and retains a 30-second grace only for partial demand
-changes. Final-consumer release immediately sends an empty complete set; the EA
-then performs no quote reads or snapshot publication, retaining only a bounded
-idle heartbeat on the authenticated control connection until non-empty demand
-is acknowledged. The official MT5 Python
-package remains the request/response control and history channel and is not a
-live-stream producer.
+## Provides
 
-API composition supplies the listener's database-backed connection settings
-and decrypted authentication token. Brokers validates the EA declaration and
-keeps the token in memory only; it never persists or exposes credential values.
+`broker.provider.mt5@1` (internal Broker gateway).
 
-`InpSymbols` is bootstrap-only. After authentication, protocol v2 commands are
-the runtime authority. Public demand operations are exposed only through
-`app.services.brokers`; no UI or API module communicates with the EA directly.
+## Configuration
+
+`profile_id`, `profile_version_id`, `profile_version`, `account_ref`, explicit
+`environment` (`LIVE` or `DEMO`), process-local resolved `credentials`, optional
+`probe_symbol`, and bounded connection/request timeouts. There is no default to live.
+
+## Removal
+
+Unmounting the feature disconnects the owned terminal through `FeatureContext`
+teardown. Removing this package removes MT5 behavior without changing the dispatcher
+or another provider feature.

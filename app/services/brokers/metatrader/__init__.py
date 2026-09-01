@@ -1,3 +1,1 @@
-"""Internal MetaTrader direct broker channel."""
-
-__all__: list[str] = []
+"""MetaTrader external-provider feature."""
