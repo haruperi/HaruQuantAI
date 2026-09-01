@@ -25,7 +25,6 @@ from app.services.api.composition.runtime_settings import (
 )
 from app.services.api.identity import IdentityError
 from app.services.brokers import (
-    run_broker_migrations,
     start_metatrader_snapshot_gateway,
     stop_metatrader_snapshot_gateway,
 )
@@ -44,7 +43,7 @@ logger = get_logger(__name__)
 
 # Optional-capability migrations resolve tolerantly. An absent capability
 # supplies no migration and is reported degraded; required domain migrations
-# (api, brokers, indicators, simulator, trading) stay fatal per AGENTS.md
+# (api, indicators, simulator, trading) stay fatal per AGENTS.md
 # section 3.
 _OPTIONAL_MIGRATIONS: tuple[tuple[str, str, str, str], ...] = (
     (
@@ -192,13 +191,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0912,
         if indicators_result.status != "success" or indicators_result.data is None:
             app.state.api_ready = False
             raise StartupError("INDICATORS_STORAGE_INITIALIZATION_FAILED")
-        brokers_result = cast(
-            "_MigrationResponse",
-            run_broker_migrations(generate_id("req")),
-        )
-        if brokers_result.status != "success" or brokers_result.data is None:
-            app.state.api_ready = False
-            raise StartupError("BROKERS_STORAGE_INITIALIZATION_FAILED")
         snapshot_gateway_started = False
         try:
             gateway_config = build_runtime_mt5_snapshot_gateway_config(
