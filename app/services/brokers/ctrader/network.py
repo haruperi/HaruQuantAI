@@ -13,17 +13,17 @@ this module performs no side effect and pulls in no optional dependency.
 
 # ruff: noqa: ANN401 - dynamic cTrader SDK types; long SDK import / type-ignore lines.
 import asyncio
+import logging
 import threading
 from collections.abc import Callable
 from typing import Any, cast
 
-from app.composition.logging import get_logger
 from app.services.brokers.canonical_contracts import (
     BrokerConnectionConfig,
     BrokerEnvironment,
 )
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 _reactor_lock = threading.Lock()
 _reactor_running = False
@@ -131,9 +131,7 @@ def _ensure_reactor_thread() -> None:  # pragma: no cover - requires Twisted + n
             )
             thread.start()
         _reactor_running = True
-        logger.bind(component="ctrader_reactor").info(
-            "Shared cTrader Twisted reactor started"
-        )
+        logger.info("Shared cTrader Twisted reactor started")
 
 
 class _CTraderNetworkClient:
@@ -189,11 +187,7 @@ class _CTraderNetworkClient:
             if self._config.environment == BrokerEnvironment.LIVE
             else EndPoints.PROTOBUF_DEMO_HOST
         )
-        logger.bind(
-            broker=self._config.broker_id.value,
-            environment=self._config.environment.value,
-            host=host,
-        ).info("Connecting cTrader network client")
+        logger.info("Connecting cTrader network client")
 
         connected: asyncio.Future[bool] = self._loop.create_future()
 
@@ -263,11 +257,7 @@ class _CTraderNetworkClient:
             raise
 
         self._connected = True
-        logger.bind(
-            broker=self._config.broker_id.value,
-            environment=self._config.environment.value,
-            result="success",
-        ).info("cTrader session authenticated")
+        logger.info("cTrader session authenticated")
         return True
 
     async def _authenticate(self, protobuf: Any) -> None:
@@ -396,10 +386,7 @@ class _CTraderNetworkClient:
             typed_reactor = cast("Any", reactor)
 
             typed_reactor.callFromThread(client.stopService)
-            logger.bind(
-                broker=self._config.broker_id.value,
-                environment=self._config.environment.value,
-            ).info("cTrader network client session released")
+            logger.info("cTrader network client session released")
 
     async def _request(self, message: Any) -> Any:  # pragma: no cover - live only
         """Bridge one reactor-thread send Deferred to an awaitable future.

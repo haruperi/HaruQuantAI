@@ -1,3 +1,1 @@
-"""Internal cTrader direct broker channel."""
-
-__all__: list[str] = []
+"""FEAT-BRK-CONNECT_CTRADER cTrader direct broker channel feature."""

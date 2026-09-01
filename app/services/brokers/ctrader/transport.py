@@ -12,7 +12,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.services.brokers.canonical_contracts import BrokerConnectionConfig
-from app.composition.logging import get_logger
+import logging
+
 from app.services.brokers._shared.circuit_breaker import (
     _TransportCircuitBreaker,
 )
@@ -22,7 +23,7 @@ from app.services.brokers.canonical_contracts.protocols import (
     _RateLimitedError,
 )
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 type _Sender = Callable[[object], Awaitable[object]]
 type _EventHandler = Callable[[object], None]
@@ -86,18 +87,10 @@ class _CTraderTransport:
         """
         importlib.import_module("ctrader_open_api")
         if self._sender is None:
-            logger.bind(
-                broker=self._config.broker_id.value,
-                environment=self._config.environment.value,
-                result="error",
-            ).warning("cTrader transport has no session sender; failing closed")
+            logger.warning("cTrader transport has no session sender; failing closed")
             return False
         self._connected = True
-        logger.bind(
-            broker=self._config.broker_id.value,
-            environment=self._config.environment.value,
-            result="success",
-        ).info("cTrader transport session established")
+        logger.info("cTrader transport session established")
         return True
 
     async def send(
@@ -213,7 +206,4 @@ class _CTraderTransport:
     async def close(self) -> None:
         """Release the owned session state."""
         self._connected = False
-        logger.bind(
-            broker=self._config.broker_id.value,
-            environment=self._config.environment.value,
-        ).info("cTrader transport session released")
+        logger.info("cTrader transport session released")
