@@ -41,6 +41,7 @@ dependencies = [
 haruquantai = "app.main:run"
 
 [project.entry-points."haruquantai.features"]
+brokers-provider-gateway = "app.services.brokers.provider_gateway.feature:feature"
 catalogue-instrument-catalogue = "app.services.catalogue.instrument_catalogue.feature:feature"
 catalogue-provider-mapping = "app.services.catalogue.provider_mapping.feature:feature"
 catalogue-session-calendar = "app.services.catalogue.session_calendar.feature:feature"
