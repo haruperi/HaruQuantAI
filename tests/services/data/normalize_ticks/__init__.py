@@ -1,0 +1,1 @@
+"""Normalize-ticks feature tests."""
