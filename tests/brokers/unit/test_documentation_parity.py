@@ -16,12 +16,12 @@ def test_brokers_readme_has_one_reconciled_completed_registry() -> None:
         readme,
     )
     assert [feature_id for feature_id, _, _ in rows] == [
-        *(f"FEAT-BRK-{index:02d}" for index in range(11)),
+        *(f"FEAT-BRK-{index:02d}" for index in range(1, 11)),
         "FEAT-BRK-17",
         "FEAT-BRK-18",
     ]
-    assert len({folder for _, folder, _ in rows}) == 13
-    assert len({usage for _, _, usage in rows}) == 13
+    assert len({folder for _, folder, _ in rows}) == 12
+    assert len({usage for _, _, usage in rows}) == 12
     for _, folder, usage in rows:
         assert (Path("app/services/brokers") / folder).is_dir()
         assert Path(usage).is_file()

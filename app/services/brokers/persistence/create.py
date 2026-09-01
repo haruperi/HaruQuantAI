@@ -1,4 +1,4 @@
-"""Create operations for Brokers-owned symbol mappings."""
+"""Create operations for temporary Brokers-owned operational records."""
 
 from __future__ import annotations
 
@@ -12,14 +12,6 @@ from app.services.data import (
 )
 
 logger = get_logger(__name__)
-
-_INSERT_SYMBOL_MAP = """
-INSERT INTO broker_symbol_map (
-    map_id, provider_code, symbol_id, provider_symbol, contract_size_decimal,
-    digits_override, enabled, effective_from, effective_to,
-    request_id, correlation_id, created_at, updated_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-""".strip()
 
 _INSERT_HEALTH = """
 INSERT INTO broker_health_history (
@@ -62,25 +54,6 @@ def _execute(
             request_id=request_id,
         )
     )
-
-
-def create_symbol_map_record(parameters: tuple[Any, ...], *, request_id: str) -> object:
-    """Register one provider-to-canonical symbol mapping.
-
-    Mappings are bitemporal. A broker that renames an instrument produces a new
-    row with a later ``effective_from``; the prior row is closed rather than
-    edited, so a backtest over an earlier period still resolves the instrument
-    it actually traded.
-
-    Args:
-        parameters: Ordered ``broker_symbol_map`` column values.
-        request_id: Caller trace identity.
-
-    Returns:
-        Data-owned transaction result.
-    """
-    logger.info("Registering one Brokers symbol mapping")
-    return _execute(_INSERT_SYMBOL_MAP, parameters, request_id=request_id, max_rows=1)
 
 
 def create_health_record(parameters: tuple[Any, ...], *, request_id: str) -> object:

@@ -89,6 +89,24 @@ def test_root_exports_and_lazy_imports_are_exact() -> None:
         sys.modules.update(stored)
 
 
+def test_instrument_identity_surface_is_retired() -> None:
+    """Brokers exposes no canonical profile or provider-symbol administration."""
+    brokers = importlib.import_module("app.services.brokers")
+    retired = {
+        "build_instrument_venue_profile",
+        "parse_instrument_venue_profile",
+        "register_broker_symbol_mapping",
+        "close_broker_symbol_mapping",
+        "disable_broker_symbol_mapping",
+        "resolve_broker_canonical_symbol",
+        "resolve_broker_provider_symbol",
+        "resolve_broker_provider_symbol_as_of",
+    }
+    assert retired.isdisjoint(brokers.__all__)
+    assert all(not hasattr(brokers, name) for name in retired)
+    assert not (Path("app/services/brokers") / "instrument_profiles").exists()
+
+
 def test_runtime_package_is_private() -> None:
     """Runtime initialization exposes no implementation symbol."""
     runtime = importlib.import_module("app.services.brokers._shared")

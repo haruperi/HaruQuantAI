@@ -1,10 +1,10 @@
 """Homogeneous full-domain usage program for app.services.brokers.
 
-Ties all Brokers features (FEAT-BRK-00 through FEAT-BRK-15) into one sequential,
+Ties the surviving legacy Brokers features into one sequential,
 realistic end-to-end domain pipeline using genuine non-production broker adapters:
 1. Registry & Capability Discovery (FEAT-BRK-01)
 2. Adapter Construction & Connection Configuration (FEAT-BRK-14)
-3. Session Lifecycle & Health Verification (FEAT-BRK-00, FEAT-BRK-02 & FEAT-BRK-15)
+3. Session Lifecycle & Health Verification (FEAT-BRK-02 & FEAT-BRK-15)
 4. Account State, Balances & Permissions (FEAT-BRK-02 & FEAT-BRK-05)
 5. Market Data Reads (FEAT-BRK-06, FEAT-BRK-09, FEAT-BRK-12 & FEAT-BRK-13)
 6. Margin & Profit Calculations (FEAT-BRK-10)
@@ -103,7 +103,7 @@ def _run_stage_2_adapter_creation() -> Any:
 async def _run_stage_3_session(adapter: Any) -> None:
     _print_stage(
         3,
-        "Session Lifecycle & Health (FEAT-BRK-00, FEAT-BRK-02 & FEAT-BRK-15)",
+        "Session Lifecycle & Health (FEAT-BRK-02 & FEAT-BRK-15)",
         "Connect adapter, verify connection state, check capability support, and ping health.",
     )
     conn_result = await connect_broker(adapter)
@@ -291,9 +291,7 @@ async def _async_main() -> None:
     """Run all pipeline stages in sequential operational order."""
     print("=" * 88)
     print("BROKERS DOMAIN: FULL HOMOGENEOUS END-TO-END PIPELINE EXAMPLE")
-    print(
-        "Ties FEAT-BRK-00 through FEAT-BRK-15 sequentially in realistic runtime order."
-    )
+    print("Ties the surviving legacy Brokers features in realistic runtime order.")
     print("=" * 88)
 
     _run_stage_1_registry()

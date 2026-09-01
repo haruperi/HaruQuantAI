@@ -25,7 +25,7 @@ from app.services.data import (
 
 logger = get_logger(__name__)
 
-BROKER_SCHEMA_VERSION = "v2"
+BROKER_SCHEMA_VERSION = "v3"
 
 _BROKER_SCHEMA_STATEMENTS = (
     """
@@ -120,6 +120,20 @@ _BROKER_CHANNEL_STATE_STATEMENTS = (
     """.strip(),
 )
 
+_BROKER_SYMBOL_MAP_RETIREMENT_STATEMENTS = (
+    """
+    CREATE TEMP TABLE broker_symbol_map_retirement_guard (
+        row_count INTEGER NOT NULL CHECK (row_count = 0)
+    ) STRICT
+    """.strip(),
+    """
+    INSERT INTO broker_symbol_map_retirement_guard (row_count)
+    SELECT COUNT(*) FROM broker_symbol_map
+    """.strip(),
+    "DROP TABLE broker_symbol_map",
+    "DROP TABLE broker_symbol_map_retirement_guard",
+)
+
 
 def _migration_checksum(statements: tuple[str, ...]) -> str:
     """Return a stable checksum for ordered Brokers schema statements.
@@ -147,6 +161,12 @@ BROKER_MIGRATIONS: tuple[Any, ...] = (
         migration_id="002_broker_channel_state_v1",
         checksum=_migration_checksum(_BROKER_CHANNEL_STATE_STATEMENTS),
         statements=_BROKER_CHANNEL_STATE_STATEMENTS,
+    ),
+    build_migration_step(
+        domain="brokers",
+        migration_id="003_retire_broker_symbol_map",
+        checksum=_migration_checksum(_BROKER_SYMBOL_MAP_RETIREMENT_STATEMENTS),
+        statements=_BROKER_SYMBOL_MAP_RETIREMENT_STATEMENTS,
     ),
 )
 

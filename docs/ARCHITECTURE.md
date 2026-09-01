@@ -643,7 +643,8 @@ Canonical capability identity uses only the owning package's `FEAT-*` registry.
 Cross-domain integration never creates a second feature namespace and never transfers
 business authority:
 
-- Data owns canonical market, timing, replay, and evidence transport facts.
+- Catalogue owns canonical market identity and provider mappings; Data owns market
+  observations, timing, replay, and evidence transport facts.
 - Indicators owns deterministic measurements; Risk owns policy interpretation.
 - Strategy proposes; Risk authorizes; Trading executes; Brokers transports.
 - Portfolio owns accounting state; Simulator owns simulated execution and replay state.
@@ -771,9 +772,9 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
   acquisition.
 - Data market-data acquisition belongs in `app.services.data.market_data`; normalized
   cross-domain evidence (market context, FX, account state) belongs in
-  `app.services.data.evidence`; canonical/friendly identity, provider-symbol mapping,
-  and source readiness/licence/promotion policy belong in
-  `app.services.data.sources`.
+  `app.services.data.evidence`; canonical/friendly identity and effective-dated
+  provider-symbol mapping belong to Catalogue, while source
+  readiness/licence/promotion policy belongs in `app.services.data.sources`.
 - Real-time market acquisition and subscription semantics belong in
   `app.services.data.market_events`. MT5 snapshot consumers acquire and release exact
   symbol demand through the Brokers package-root boundary. Brokers owns the bounded
@@ -781,7 +782,8 @@ Registered domain contracts keep `contract_version` separate from namespaced `sc
   publishes only the latest acknowledged complete set. An acknowledged empty union
   pauses EA quote reads and snapshot payloads immediately while a bounded heartbeat
   retains the control connection; non-empty acknowledged demand resumes publication.
-  Data owns canonical mapping,
+  Catalogue owns canonical/provider mapping and Data consumes it before acquisition;
+  Data owns
   freshness, filtering, sequencing, explicit gap/backpressure failure, and consumer
   cleanup. Live bar polling remains unsupported; genuine historical bars bootstrap
   charts. Chart snapshot ticks are ephemeral intrabar presentation: Bid may extend
@@ -1118,7 +1120,7 @@ declare a foreign key into a domain that transitively depends on it.
    │                           │                           │
 ┌──▼──────────┐         ┌──────▼──────┐            ┌───────▼──────┐
 │ 2. Brokers  │────────▶│  3. Data    │◀───────────│  14. UI-API  │
-│ symbol map  │  feeds  │  catalog    │            │ auth / RBAC  │
+│ provider IO │  feeds  │ acquisition │            │ auth / RBAC  │
 └──┬──────────┘         └──────┬──────┘            └───────┬──────┘
    │                           │                           │
    │                    ┌──────▼───────┐                   │
@@ -1342,7 +1344,7 @@ Every domain that accepts user-defined configuration exposes exactly one
 
 | Table | Column | Holds |
 |---|---|---|
-| `broker_symbol_map` | — | Brokers holds no JSON payload; execution tuning lives in typed settings |
+| Catalogue provider mappings | — | Catalogue owns typed effective-dated identity; Brokers holds no symbol-map payload |
 | `data_datasets` | `arrow_schema_json` | Parquet column names, Arrow types, nullability |
 | `strategy_configs` | `inputs_json` | Strategy parameters |
 | `risk_policies` | `rules_json` | Limit rule tree |
@@ -2279,7 +2281,7 @@ all 71.** Sequence by whether the owning domain has a real gap:
 | — | ~~`indicator_*` (3)~~ | **Retired** | Migration `002_remove_unused_indicator_support_schema` removed the empty support-only schema; Indicators is stateless and owns no target or live tables |
 | — | ~~`analytics_*` (6)~~ | **Retired** | Empty derived tables had no production operation outside persistence; migration `002_retire_unused_analytics_derived_store` drops them transactionally and blocks if any row exists |
 | 4 | Trading execution and closed-ledger tables | **Built; reconciled** | Orders remain an event projection and positions contain complete closed trades only. Migrations `003_execution_lifecycle` and `004_order_lifecycle_states` provide reachable append-only transition/fill/protection/ownership evidence and the complete order lifecycle. |
-| 5 | `broker_symbol_map` (1) | **Built; reconciled (Phase 4E)** | Bitemporal reference data. The other four `broker_*` tables are **withdrawn**. `run_broker_migrations` is invoked during API startup and delegates ledger verification, checksum validation, write locking, and transactional execution to Data. `FEAT-BRK-00` (`instrument_profiles/`) owns current, reverse, and as-of identity reads; Registry owns mapping administration. Package-root functions preserve the sole external boundary. |
+| 5 | Historical `broker_symbol_map` | **Retired by Task 1.02** | Immutable migration `001_broker_symbol_map_v1` remains checksum history; guarded `003_retire_broker_symbol_map` drops only an empty legacy table. Catalogue owns instrument identity, effective-dated provider mappings, and sessions. |
 | 6 | Everything else | Deferred | Defer until a feature needs it |
 
 ### Tier C — rebuild, blocked (13 tables)
@@ -2312,7 +2314,7 @@ migration; the other twelve are not.
 | Add `data_write_locks` | Required by `AGENTS.md` §5 | Added from `locking.py` |
 | Add `request_id` / `correlation_id` where they belong | Live convention | Applied to **21** tables, not all 81 — admitted only where a row records a decision, side-effecting mutation, external interaction, or audit event |
 | Reconcile `data_partition_files` with `StorageManifest` | Reuse the live contract's fields | 5 fields adopted (`format`, `normalization_version`, `source_revision`, `provenance_json`, `request_id`); 3 rejected as duplicates |
-| **D10 split** | Brokers vs Analytics persistence | Historical decision superseded: `broker_symbol_map` retained; empty `analytics_*` store retired by migration `002` |
+| **D10 split** | Brokers vs Analytics persistence | Historical decision superseded again by Task 1.02: Catalogue owns provider mappings and guarded Broker migration `003` retires only an empty legacy symbol table; empty `analytics_*` store was retired by migration `002` |
 
 Model size after Phase 1: **86 tables** (was 90).
 
@@ -2327,7 +2329,7 @@ Analytics support schemas were retired empty.
 | 4B | Historical schema retired | `indicator_*` support tables were introduced by migration `001_indicator_schema_v1` and retired empty by immutable migration `002_remove_unused_indicator_support_schema` |
 | 4C | Historical schema retired | `analytics_*` tables were introduced by step `001` and retired empty by guarded step `002`; persistence feature/requirements withdrawn from the current registry |
 | 4D | Shipped; reconciled | Trading event/order materialisation, an insert-only closed-position ledger, and migrations `003`–`004` lifecycle evidence tables with production CRUD reachability |
-| 4E | Shipped; reconciled | `broker_symbol_map` (1) is owned by the Brokers support manifest, applied before API readiness, and reachable through validated package-root operations. `FEAT-BRK-00` owns instrument/venue profile evidence plus identity reads (`FR-BRK-142`–`144`, `147`); Registry owns mapping administration (`FR-BRK-141`, `145`–`146`). |
+| 4E | Historical; superseded by Task 1.02 | The immutable Broker migration remains ledger evidence, but Catalogue now owns instrument definitions, effective-dated provider mappings, and sessions. Broker profile/map operations were removed and guarded migration `003` retires an empty legacy table. |
 
 `trading_events` remains the write model. `trading_orders` is written atomically with
 events; `trading_positions` accepts only validated complete closed-trade evidence.

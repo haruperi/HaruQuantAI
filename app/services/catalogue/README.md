@@ -1,8 +1,8 @@
 # Catalogue
 
 > **Package:** `app/services/catalogue/`
-> **Status:** `Missing`
-> **Last updated:** `2026-08-23`
+> **Status:** `Partial — identity, provider mapping, and sessions complete`
+> **Last updated:** `2026-09-01`
 > **Domain ID:** `D-CAT`
 
 > This README is the domain package's **single source of truth** for domain boundaries, composable feature capabilities, architecture invariants, implementation sequence, progress, usage examples, and tests.
@@ -25,6 +25,13 @@ Feature-level automated tests live at `tests/services/catalogue/<feature>/`. Usa
 ### Purpose
 
 The Catalogue domain delivers instruments, broker mappings, sessions, calendars, universes, trading constraints, costs, and currency topology. Its public feature capabilities are registered and remain independent of package-import order. Removing the domain produces the degradation defined below rather than preventing the shared substrate or unrelated domains from starting.
+
+Task 1.02 makes the three completed features the authoritative destination for
+the former Broker instrument-profile and symbol-map behavior. They are registered
+as `catalogue.catalog-instruments@1`, `catalogue.map-providers@1`, and
+`catalogue.define-sessions@1`. Provider mappings preserve the exact configured
+`provider_symbol`; Data resolves that value before a Broker call and Brokers
+receives it unchanged.
 
 ### Owns
 

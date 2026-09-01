@@ -168,6 +168,57 @@ async def test_fetch_async_empty_result() -> None:
 
 
 @pytest.mark.anyio
+async def test_fetch_forwards_exact_provider_native_symbol() -> None:
+    """Pass the Catalogue-selected provider symbol into Brokers unchanged."""
+    adapter = MagicMock()
+    bar = MagicMock()
+    bar.trade_volume = Decimal(10)
+    bar.tick_volume = None
+    bar.opening_timestamp = _PAST
+    bar.closing_timestamp = _NOW
+    bar.open = Decimal("1.1")
+    bar.high = Decimal("1.2")
+    bar.low = Decimal("1.0")
+    bar.close = Decimal("1.15")
+    bar.price_unit = "USD"
+    bar.quantity_unit = "lots"
+    bar.spread = Decimal("0.0001")
+    bar.spread_unit = "price"
+
+    result = MagicMock()
+    result.error = None
+    result.data.items = [bar]
+    result.metadata.extensions = {
+        "adapter_version": "v1",
+        "timestamp": "2026-07-01T12:00:00.000000Z",
+    }
+    adapter.get_historical_bars = AsyncMock(return_value=result)
+    source = ExternalMarketDataSource("mt5", adapter)
+    request = SourceReadRequest(
+        source_id="mt5",
+        provider_symbol="EURUSD.r",
+        data_kind="bars",
+        timeframe="M1",
+        start=_PAST,
+        end=_NOW,
+        limit=100,
+        request_id=_REQ_ID,
+    )
+
+    batch = await source._fetch_async(request)
+
+    adapter.get_historical_bars.assert_awaited_once_with(
+        symbol="EURUSD.r",
+        timeframe="M1",
+        start=_PAST,
+        end=_NOW,
+        limit=100,
+    )
+    assert batch.provider_symbol == "EURUSD.r"
+    assert batch.records[0]["source_symbol"] == "EURUSD.r"
+
+
+@pytest.mark.anyio
 async def test_fetch_async_spreads_missing_precision() -> None:
     """
     Test _fetch_async spreads raising MISSING_ASSET_METADATA when precision is None.

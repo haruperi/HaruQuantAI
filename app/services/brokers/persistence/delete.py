@@ -1,9 +1,7 @@
-"""Delete operations for Brokers-owned records.
+"""Delete operations for temporary Brokers-owned operational records.
 
-Brokers deletes nothing. Symbol mappings are bitemporal reference data: a
-mapping that no longer applies is closed with an ``effective_to`` or disabled,
-never removed. Deleting one would make a historical bar unresolvable and change
-what a past backtest appears to have traded.
+Brokers currently exposes no record-deletion operation. Later ownership Tasks
+retire or relocate the remaining operational state with explicit evidence.
 
 This module exists to satisfy the uniform persistence layout and exports
 nothing.

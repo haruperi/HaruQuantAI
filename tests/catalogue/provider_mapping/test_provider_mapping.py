@@ -225,6 +225,7 @@ async def test_cat_map_provider_identities(tmp_path: Path) -> None:
     )
     assert isinstance(res_h1, MapProvidersSuccess)
     assert res_h1.mappings[0].mapping_id == _MAPPING_A_ID
+    assert res_h1.mappings[0].provider_symbol == "EUR_USD"
 
     # Point-in-time query in H2
     res_h2 = await fr_cat_map_provider_identities(
@@ -240,6 +241,7 @@ async def test_cat_map_provider_identities(tmp_path: Path) -> None:
     )
     assert isinstance(res_h2, MapProvidersSuccess)
     assert res_h2.mappings[0].mapping_id == _MAPPING_B_ID
+    assert res_h2.mappings[0].provider_symbol == "EUR_USD"
 
     # Query before start of intervals returns not found
     res_before = await fr_cat_map_provider_identities(
