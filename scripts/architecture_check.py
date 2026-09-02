@@ -45,7 +45,7 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             return
 
         active_roots = {"kernel", "composition", "contracts"}
-        active_services = {"workspace", "catalogue", "plugins"}
+        active_services = {"workspace", "catalogue", "plugins", "brokers"}
         min_service_parts = 3
         is_active = (len(self.app_parts) > 1 and self.app_parts[1] in active_roots) or (
             len(self.app_parts) >= min_service_parts
@@ -89,7 +89,7 @@ class ArchitecturalVisitor(ast.NodeVisitor):
     def visit_Call(self, node: ast.Call) -> None:
         """Check forbidden function and method calls."""
         # Rule 2: asyncio.create_task() only allowed inside app/kernel/
-        active_migrated_domains = {"workspace", "catalogue", "plugins"}
+        active_migrated_domains = {"workspace", "catalogue", "plugins", "brokers"}
         min_service_parts = 3
         is_active_service = (
             self._is_service
@@ -169,7 +169,12 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             srv_idx = self.app_parts.index("services")
             if len(self.app_parts) > srv_idx + FEATURE_OFFSET:
                 source_domain = self.app_parts[srv_idx + DOMAIN_OFFSET]
-                active_migrated_domains = {"workspace", "catalogue", "plugins"}
+                active_migrated_domains = {
+                    "workspace",
+                    "catalogue",
+                    "plugins",
+                    "brokers",
+                }
                 if source_domain in active_migrated_domains:
                     source_feature = self.app_parts[srv_idx + FEATURE_OFFSET]
                     target_parts = target_module.split(".")

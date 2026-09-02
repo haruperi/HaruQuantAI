@@ -6,11 +6,17 @@ from app.kernel.capability import CapabilityKey
 
 if TYPE_CHECKING:
     from app.contracts.broker.ports import (
+        BrokerResolverCapability,
         ManageSessionsCapability,
         ProviderBackend,
         ReadProviderStateCapability,
         TransportOrdersCapability,
     )
+
+BROKER_RESOLVER_CAPABILITY: CapabilityKey[BrokerResolverCapability] = CapabilityKey(
+    name="broker.resolver",
+    major=1,
+)
 
 MANAGE_SESSIONS_CAPABILITY: CapabilityKey[ManageSessionsCapability] = CapabilityKey(
     name="broker.manage-sessions",

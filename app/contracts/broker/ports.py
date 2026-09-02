@@ -357,3 +357,12 @@ class ProviderBackend(Protocol):
     ) -> TransportOrdersSuccess | BrokerFailure:
         """Transport one upstream-authorized provider order operation."""
         ...
+
+
+@runtime_checkable
+class BrokerResolverCapability(Protocol):
+    """Capability protocol for resolving active broker module."""
+
+    def get_broker_module(self) -> dict[str, Any]:
+        """Resolve and return active broker module configuration."""
+        ...
