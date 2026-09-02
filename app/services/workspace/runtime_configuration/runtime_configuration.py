@@ -67,8 +67,8 @@ import shutil
 import socket
 import sqlite3
 import sys
-import tempfile
 import zoneinfo
+from collections.abc import Mapping
 from dataclasses import asdict
 from pathlib import Path
 
@@ -90,6 +90,23 @@ from app.contracts.workspace.models import (
     WorkspaceRef,
     WorkspaceSettings,
     WorkspaceSettingsVersion,
+)
+from app.services.workspace.runtime_configuration._persistence import (
+    CENTRAL_SCHEMA_SQL,
+    DEFAULT_CENTRAL_DB_PATH,
+    DEFAULT_PERMISSIONS_SEEDS,
+    DEFAULT_SETTINGS_SEEDS,
+    DEFAULT_USERS_SEEDS,
+    get_all_settings,
+    get_category_settings,
+    get_setting,
+    get_setting_record,
+    get_settings_history,
+    init_central_database,
+    list_settings_records,
+    reset_setting_to_default,
+    set_setting,
+    set_settings,
 )
 from app.services.workspace.runtime_configuration.config import (
     RuntimeConfigurationConfig,
@@ -737,231 +754,188 @@ class RuntimeConfigurationService:
         """
         return fr_ws_publish_runtime_support()
 
+    def init_central_database(self, db_path: Path | str | None = None) -> Path:
+        """Initialize the central application SQLite database with all tables and seeds.
+
+        Args:
+            db_path: Optional custom path; defaults to data/database/haruquantai.db.
+
+        Returns:
+            Resolved Path to the initialized database.
+        """
+        return init_central_database(db_path)
+
+    def get_setting(
+        self,
+        key: str,
+        default: object = None,
+        db_path: Path | str | None = None,
+    ) -> object:
+        """Retrieve a typed setting value from the central database.
+
+        Args:
+            key: Unique setting key identifier.
+            default: Fallback value when key is absent.
+            db_path: Optional custom database path.
+
+        Returns:
+            Properly cast typed value (str, int, float, bool, or json object).
+        """
+        return get_setting(key, default=default, db_path=db_path)
+
+    def set_setting(
+        self,
+        key: str,
+        value: object,
+        changed_by: str = "system",
+        db_path: Path | str | None = None,
+    ) -> None:
+        """Update or insert a typed setting and record an audit entry.
+
+        Args:
+            key: Unique setting key identifier.
+            value: Setting value to validate and store.
+            changed_by: Identifier of the user or subsystem performing the update.
+            db_path: Optional custom database path.
+        """
+        set_setting(key, value, changed_by=changed_by, db_path=db_path)
+
+    def set_settings(
+        self,
+        items: Mapping[str, object],
+        changed_by: str = "system",
+        db_path: Path | str | None = None,
+    ) -> None:
+        """Batch update multiple settings in a single atomic transaction.
+
+        Args:
+            items: Mapping of key to new setting values.
+            changed_by: Identifier of the updater.
+            db_path: Optional custom database path.
+        """
+        set_settings(items, changed_by=changed_by, db_path=db_path)
+
+    def get_category_settings(
+        self,
+        category: str,
+        db_path: Path | str | None = None,
+    ) -> dict[str, object]:
+        """Return all key-value pairs belonging to a category.
+
+        Args:
+            category: Category name (e.g. 'system', 'trading', 'ai', 'broker').
+            db_path: Optional custom database path.
+
+        Returns:
+            Dictionary of key -> typed value for the category.
+        """
+        return get_category_settings(category, db_path=db_path)
+
+    def get_all_settings(self, db_path: Path | str | None = None) -> dict[str, object]:
+        """Return all settings as a flat key-value dictionary.
+
+        Args:
+            db_path: Optional custom database path.
+
+        Returns:
+            Dictionary of key -> typed value across all categories.
+        """
+        return get_all_settings(db_path=db_path)
+
+    def reset_setting_to_default(
+        self,
+        key: str,
+        changed_by: str = "system",
+        db_path: Path | str | None = None,
+    ) -> None:
+        """Reset a setting back to its configured default_value.
+
+        Args:
+            key: Unique setting key.
+            changed_by: Identifier of the actor resetting the setting.
+            db_path: Optional custom database path.
+        """
+        reset_setting_to_default(key, changed_by=changed_by, db_path=db_path)
+
+    def get_setting_record(
+        self, key: str, db_path: Path | str | None = None
+    ) -> dict[str, object] | None:
+        """Retrieve full setting metadata record by key.
+
+        Args:
+            key: Unique setting key identifier.
+            db_path: Optional custom database path.
+
+        Returns:
+            Dictionary with full row metadata or None if missing.
+        """
+        return get_setting_record(key, db_path=db_path)
+
+    def list_settings_records(
+        self, category: str | None = None, db_path: Path | str | None = None
+    ) -> list[dict[str, object]]:
+        """List setting metadata records, optionally filtered by category.
+
+        Args:
+            category: Optional category filter.
+            db_path: Optional custom database path.
+
+        Returns:
+            List of setting records dictionaries.
+        """
+        return list_settings_records(category=category, db_path=db_path)
+
+    def get_settings_history(
+        self,
+        key: str | None = None,
+        limit: int = 100,
+        db_path: Path | str | None = None,
+    ) -> list[dict[str, object]]:
+        """Retrieve audit history entries for settings.
+
+        Args:
+            key: Optional specific key to filter history for.
+            limit: Maximum history rows to return.
+            db_path: Optional custom database path.
+
+        Returns:
+            List of audit log dictionaries in reverse chronological order.
+        """
+        return get_settings_history(key=key, limit=limit, db_path=db_path)
+
 
 # ============================================================================
-# Executable usage demonstration harness
+# Re-exported Central Settings Persistence & Public Interface
 # ============================================================================
 
-
-def _create_fixture_workspace(root: Path) -> None:
-    """Create a minimal initialized workspace for the usage harness.
-
-    The harness must stay import-pure toward other features, so it creates
-    only the two database tables this feature consumes.
-
-    Args:
-        root: Workspace root directory to create.
-    """
-    for sub in ("metadata", "artifacts/objects", "staging", "logs", "cache"):
-        (root / sub).mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(root / "metadata" / "workspace.db"))
-    try:
-        conn.executescript(
-            """
-            CREATE TABLE IF NOT EXISTS workspace (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                updated_at TEXT NOT NULL,
-                row_version INTEGER NOT NULL DEFAULT 1
-            );
-            CREATE TABLE IF NOT EXISTS workspace_setting_versions (
-                id TEXT PRIMARY KEY,
-                workspace_id TEXT NOT NULL,
-                version INTEGER NOT NULL,
-                settings_json TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                row_version INTEGER NOT NULL DEFAULT 1,
-                UNIQUE(workspace_id, version)
-            );
-            INSERT INTO workspace (id, name, created_at, updated_at)
-            VALUES ('usage-harness', 'Usage Harness', '2026-01-01T00:00:00Z',
-                    '2026-01-01T00:00:00Z');
-            """
-        )
-        conn.commit()
-    finally:
-        conn.close()
-
-
-def _valid_settings() -> WorkspaceSettings:
-    """Return a known-valid settings payload for harness scenarios."""
-    return WorkspaceSettings(
-        timezone="UTC",
-        locale="en-US",
-        worker_count=4,
-        worker_memory_mb=2048,
-        max_artifact_size_mb=2048,
-        max_total_artifact_gb=50,
-    )
-
-
-def _run_configure_workspace_scenario(
-    service: RuntimeConfigurationService, ws_root: Path
-) -> None:
-    """Run the FR-WS-CONFIGURE_WORKSPACE usage scenario.
-
-    Raises:
-        RuntimeError: If any scenario expectation fails.
-    """
-    print("Scenario 1: FR-WS-CONFIGURE_WORKSPACE")
-    first = service.configure_workspace(ws_root, _valid_settings())
-    print(f"  Persisted settings version: {first.version}")
-    if first.version != 1:
-        msg = "expected first settings version to be 1"
-        raise RuntimeError(msg)
-    invalid = WorkspaceSettings(
-        timezone="Not/AZone",
-        locale="en US",
-        worker_count=0,
-        worker_memory_mb=-1,
-        max_artifact_size_mb=10,
-        max_total_artifact_gb=10,
-        artifacts_dir="../escape",
-    )
-    try:
-        service.configure_workspace(ws_root, invalid)
-    except SettingsValidationError as exc:
-        print(f"  Invalid payload rejected with {len(exc.field_errors)} field errors")
-        latest = service.get_workspace_settings(ws_root)
-        if latest is None or latest.version != 1:
-            msg = "invalid payload must not increment the settings version"
-            raise RuntimeError(msg) from exc
-    else:
-        msg = "expected SettingsValidationError for invalid payload"
-        raise RuntimeError(msg)
-    print("  [OK] FR-WS-CONFIGURE_WORKSPACE passed.\n")
-
-
-def _run_storage_guards_scenario(
-    service: RuntimeConfigurationService, ws_root: Path
-) -> None:
-    """Run the FR-WS-ENFORCE_STORAGE_GUARDS usage scenario.
-
-    Raises:
-        RuntimeError: If any scenario expectation fails.
-    """
-    print("Scenario 2: FR-WS-ENFORCE_STORAGE_GUARDS")
-    admitted = service.enforce_storage_guards(
-        ws_root,
-        job_kind=JobKind.BACKTEST,
-        projected_artifact_mb=10.0,
-        limits=StorageGuardLimits(
-            min_free_space_mb=1,
-            max_artifact_size_mb=4096,
-        ),
-    )
-    print(
-        f"  Backtest admitted: {admitted.admitted} "
-        f"(required {admitted.required_mb:.1f} MiB / "
-        f"available {admitted.available_mb:.1f} MiB)"
-    )
-    if not admitted.admitted:
-        msg = "expected small backtest to be admitted"
-        raise RuntimeError(msg)
-    rejected = service.enforce_storage_guards(
-        ws_root,
-        job_kind=JobKind.DATA_IMPORT,
-        projected_artifact_mb=50.0,
-        limits=StorageGuardLimits(
-            min_free_space_mb=1,
-            max_artifact_size_mb=10,
-        ),
-    )
-    print(f"  Oversized import rejected: {rejected.reason}")
-    if rejected.admitted or "ARTIFACT_SIZE_LIMIT" not in rejected.reason:
-        msg = "expected over-limit import to be rejected with size reason"
-        raise RuntimeError(msg)
-    print("  [OK] FR-WS-ENFORCE_STORAGE_GUARDS passed.\n")
-
-
-def _run_server_runtime_scenario(
-    service: RuntimeConfigurationService,
-) -> None:
-    """Run the FR-WS-CONFIGURE_SERVER_RUNTIME usage scenario.
-
-    Raises:
-        RuntimeError: If any scenario expectation fails.
-    """
-    print("Scenario 3: FR-WS-CONFIGURE_SERVER_RUNTIME")
-    probe_port = 48765
-    valid = service.configure_server_runtime(
-        ServerRuntimeSettings(port=probe_port, headless=True)
-    )
-    print(
-        f"  Headless loopback runtime valid: {valid.valid} "
-        f"(port available: {valid.port_available})"
-    )
-    if not valid.valid or not valid.port_available:
-        msg = f"expected valid loopback runtime: {valid.errors}"
-        raise RuntimeError(msg)
-    bad = service.configure_server_runtime(
-        ServerRuntimeSettings(
-            port=70000,
-            bind_address="10.0.0.5",
-            allow_non_loopback=False,
-        )
-    )
-    print(f"  Invalid runtime rejected with {len(bad.errors)} errors")
-    min_expected_errors = 2
-    if bad.valid or len(bad.errors) < min_expected_errors:
-        msg = "expected port and non-loopback opt-in errors"
-        raise RuntimeError(msg)
-    occupied = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        occupied.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        occupied.bind(("127.0.0.1", probe_port))
-        occupied.listen(1)
-        unavailable = service.configure_server_runtime(
-            ServerRuntimeSettings(port=probe_port)
-        )
-    finally:
-        occupied.close()
-    print(f"  Occupied port available: {unavailable.port_available}")
-    if unavailable.valid or unavailable.port_available:
-        msg = "expected occupied port to fail before launch"
-        raise RuntimeError(msg)
-    print("  [OK] FR-WS-CONFIGURE_SERVER_RUNTIME passed.\n")
-
-
-def _run_support_profile_scenario(
-    service: RuntimeConfigurationService, ws_root: Path
-) -> None:
-    """Run the FR-WS-PUBLISH_RUNTIME_SUPPORT usage scenario.
-
-    Raises:
-        RuntimeError: If any scenario expectation fails.
-    """
-    print("Scenario 4: FR-WS-PUBLISH_RUNTIME_SUPPORT")
-    profile = service.publish_runtime_support()
-    print(
-        f"  Profile v{profile.profile_version}: "
-        f"os={profile.os_families} arch={profile.architectures}"
-    )
-    if profile.profile_version != SUPPORT_PROFILE_VERSION:
-        msg = "expected current support profile version"
-        raise RuntimeError(msg)
-    report = fr_ws_evaluate_runtime_resources(profile, workspace_root=ws_root)
-    for warning in report.warnings:
-        print(f"  below-recommended: {warning}")
-    print("  [OK] FR-WS-PUBLISH_RUNTIME_SUPPORT passed.\n")
-
-
-def _run_usage_scenarios() -> None:
-    """Execute all four functional requirement usage scenarios."""
-    print("Executing Runtime Configuration (__main__) usage scenarios...\n")
-    service = RuntimeConfigurationService()
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        ws_root = Path(temp_dir) / "harness_workspace"
-        _create_fixture_workspace(ws_root)
-        _run_configure_workspace_scenario(service, ws_root)
-        _run_storage_guards_scenario(service, ws_root)
-        _run_server_runtime_scenario(service)
-        _run_support_profile_scenario(service, ws_root)
-
-    print("[SUCCESS] All 4 Runtime Configuration usage scenarios passed!")
+__all__ = (
+    "CENTRAL_SCHEMA_SQL",
+    "DEFAULT_CENTRAL_DB_PATH",
+    "DEFAULT_PERMISSIONS_SEEDS",
+    "DEFAULT_SETTINGS_SEEDS",
+    "DEFAULT_USERS_SEEDS",
+    "RuntimeConfigurationService",
+    "fr_ws_configure_server_runtime",
+    "fr_ws_configure_workspace",
+    "fr_ws_enforce_storage_guards",
+    "fr_ws_evaluate_runtime_resources",
+    "fr_ws_publish_runtime_support",
+    "get_all_settings",
+    "get_category_settings",
+    "get_setting",
+    "get_setting_record",
+    "get_settings_history",
+    "init_central_database",
+    "list_settings_records",
+    "reset_setting_to_default",
+    "set_setting",
+    "set_settings",
+)
 
 
 if __name__ == "__main__":
-    _run_usage_scenarios()
+    from app.services.workspace.runtime_configuration._usage import (
+        run_usage_scenarios,
+    )
+
+    run_usage_scenarios()
