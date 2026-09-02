@@ -366,3 +366,50 @@ class BrokerResolverCapability(Protocol):
     def get_broker_module(self) -> dict[str, Any]:
         """Resolve and return active broker module configuration."""
         ...
+
+
+@runtime_checkable
+class BrokerOperationsCapability(Protocol):
+    """Capability protocol for standard broker-neutral operations."""
+
+    def connect(
+        self,
+        account_id: str | int | None = None,
+        server: str | None = None,
+        password: str | None = None,
+        timeout: int = 30,
+    ) -> dict[str, Any]:
+        """Connect to the broker environment."""
+        ...
+
+    def disconnect(self) -> bool:
+        """Disconnect from the broker environment."""
+        ...
+
+    def is_connected(self) -> bool:
+        """Check if connected to the broker."""
+        ...
+
+    def get_account_info(self) -> dict[str, Any]:
+        """Retrieve active account properties and balances."""
+        ...
+
+    def get_symbol_info(self, symbol: str) -> dict[str, Any]:
+        """Retrieve symbol metadata."""
+        ...
+
+    def get_quote(self, symbol: str) -> dict[str, Any]:
+        """Retrieve current bid/ask quote for symbol."""
+        ...
+
+    def get_orders(self, symbol: str | None = None) -> list[dict[str, Any]]:
+        """List active and pending orders."""
+        ...
+
+    def get_positions(self, symbol: str | None = None) -> list[dict[str, Any]]:
+        """List open trading positions."""
+        ...
+
+    def place_order(self, request: dict[str, Any]) -> dict[str, Any]:
+        """Submit a new trade order."""
+        ...
