@@ -66,6 +66,7 @@ class ProviderMappingFeature:
             or getattr(context, "event_bus", None),
         )
         context.provide(MAP_PROVIDERS_CAPABILITY, self._service)
+        context.register_callback(self._service.close)
 
 
 def feature() -> ProviderMappingFeature:

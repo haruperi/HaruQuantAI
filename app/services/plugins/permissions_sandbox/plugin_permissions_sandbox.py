@@ -1,4 +1,38 @@
-"""Primary service for manifest-narrowed plugin sandbox execution."""
+"""Plugin Permissions and Sandbox domain logic and capability implementation.
+
+Purpose:
+    Enforce manifest-narrowed permission grants, apply OS process limits,
+    execute untrusted plugin code in isolated subprocess workers, and sanitize
+    outputs with deterministic secret redaction.
+
+Key capabilities:
+    * Evaluate and grant manifest-narrowed permission sets without disclosing
+      secret values.
+    * Apply OS process containment (Windows Job Objects / POSIX resource limits)
+      to workers.
+    * Execute plugin handlers across length-prefixed IPC channels with strict
+      timeout enforcement.
+    * Redact sensitive credentials and environment tokens from plugin execution
+      outputs.
+    * Provide async sandbox_permissions implementing
+      SandboxPermissionsCapability.
+
+Python API usage:
+    from app.services.plugins.permissions_sandbox.plugin_permissions_sandbox import (
+        PluginPermissionsSandboxService,
+    )
+    from app.contracts.plugins.models import (
+        SandboxPermissionsRequest,
+    )
+
+    service = PluginPermissionsSandboxService()
+    grant_res = await service.sandbox_permissions(grant_request)
+    exec_res = await service.sandbox_permissions(execute_request)
+
+CLI usage:
+    uv run python -m \
+        app.services.plugins.permissions_sandbox.plugin_permissions_sandbox
+"""
 
 from __future__ import annotations
 

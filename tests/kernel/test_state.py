@@ -2,7 +2,12 @@
 
 import pytest
 from app.kernel.feature import FeatureSpec
-from app.kernel.state import RetentionPolicy, StateDeclaration
+from app.kernel.state import (
+    RetentionPolicy,
+    StateDeclaration,
+    attempt_transition,
+    build_transition_table,
+)
 
 
 def test_state_declaration_valid() -> None:
@@ -49,3 +54,29 @@ def test_feature_spec_with_state() -> None:
     spec.validate()
     assert spec.state is not None
     assert spec.state.namespace == "risk.limits"
+
+
+def test_transition_table_and_attempts() -> None:
+    """Test transition table construction and attempt_transition execution."""
+    transitions = [
+        ("CREATED", "START", "RUNNING"),
+        ("RUNNING", "PAUSE", "PAUSED"),
+        ("PAUSED", "RESUME", "RUNNING"),
+        ("RUNNING", "STOP", "STOPPED"),
+    ]
+    table = build_transition_table(transitions)
+    assert table[("CREATED", "START")] == "RUNNING"
+
+    # Successful transitions
+    ok, next_state = attempt_transition("CREATED", "START", table)
+    assert ok is True
+    assert next_state == "RUNNING"
+
+    ok, next_state = attempt_transition("RUNNING", "STOP", table)
+    assert ok is True
+    assert next_state == "STOPPED"
+
+    # Invalid transitions stay in current state
+    ok, next_state = attempt_transition("STOPPED", "RESUME", table)
+    assert ok is False
+    assert next_state == "STOPPED"

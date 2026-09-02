@@ -115,7 +115,8 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
-# Environments
+# Environments & local development
+.dev/
 .env
 .venv
 env/
@@ -130,6 +131,8 @@ venv.bak/
 .ropeproject
 /site
 .mypy_cache/
+.ruff_cache/
+.uv-cache/
 .dmypy.json
 dmypy.json
 .pyre/

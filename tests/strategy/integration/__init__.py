@@ -1,1 +1,0 @@
-"""Strategy workflow integration tests."""

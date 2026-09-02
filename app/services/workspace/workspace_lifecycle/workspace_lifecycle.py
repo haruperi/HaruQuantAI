@@ -1,11 +1,48 @@
-"""Workspace Lifecycle primary domain logic and usage harness.
+"""Workspace Lifecycle domain logic and capability implementation.
 
-Implements FEAT-WS-MANAGE_WORKSPACES:
-- FR-WS-INITIALIZE_WORKSPACE: Atomic workspace initialization
-- FR-WS-MIGRATE_WORKSPACE_SCHEMA: Transactional database schema migrations
-- FR-WS-FENCE_WORKSPACE_WRITERS: Writer fencing and diagnostic access
-- FR-WS-RECOVER_WORKSPACE_STATE: Startup recovery of staged artifacts
-- FR-WS-BACKUP_WORKSPACE: Consistent backup snapshots and verified restore
+Purpose:
+    Provide atomic workspace initialization, schema migrations, writer fencing,
+    staged artifact recovery, and consistent backup snapshots with verified restore.
+
+Key capabilities:
+    * Atomically initialize workspace directory structure and SQLite metadata
+      database in WAL mode.
+    * Perform ordered, transactional schema migrations and record migration
+      history.
+    * Enforce single-writer fencing using process leases and support read-only
+      diagnostic access.
+    * Recover staged artifacts and reconcile workspace state after unclean
+      termination or crash.
+    * Create consistent checksummed backup archives and restore workspaces to
+      target locations.
+
+Python API usage:
+    from pathlib import Path
+    from app.services.workspace.workspace_lifecycle.workspace_lifecycle import (
+        WorkspaceLifecycleService,
+    )
+    from app.contracts.workspace.models import WorkspaceRestorePlan
+
+    service = WorkspaceLifecycleService()
+    ws_ref = service.initialize_workspace(
+        Path("/path/to/workspace"),
+        name="My Workspace",
+    )
+    version = service.migrate_workspace_schema(ws_ref)
+    fence = service.fence_workspace_writers(ws_ref)
+    summary = service.recover_workspace_state(ws_ref)
+    manifest = service.backup_workspace(ws_ref, Path("/path/to/backups"))
+    service.release_writer_fence(fence, ws_ref)
+    manifest_path = Path("/path/to/backups") / manifest.backup_id / "manifest.json"
+    restored_ref = service.restore_workspace(
+        WorkspaceRestorePlan(
+            backup_manifest_path=manifest_path,
+            target_path=Path("/path/to/restored"),
+        )
+    )
+
+CLI usage:
+    uv run python -m app.services.workspace.workspace_lifecycle.workspace_lifecycle
 """
 
 from __future__ import annotations

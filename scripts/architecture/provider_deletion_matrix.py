@@ -22,6 +22,7 @@ from app.kernel.discovery import discover_manifests
 from tests.removability.harness import run_in_fresh_process
 
 _EXCLUDE_PATTERNS = (
+    ".dev",
     ".git",
     "node_modules",
     ".next",

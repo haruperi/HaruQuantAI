@@ -68,6 +68,7 @@ NON_FEATURE_DIRS = frozenset(
 # Directories never worth walking (vendored, generated, or cache).
 SKIP_DIRS = frozenset(
     {
+        ".dev",
         ".git",
         ".venv",
         ".next",

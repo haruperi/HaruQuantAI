@@ -1,7 +1,51 @@
-"""Instrument Catalogue service implementation and functional behaviors."""
+"""Instrument Catalogue domain logic and capability implementation.
+
+Purpose:
+    Define, version, query, and protect canonical trading instruments, order
+    constraints, and tick/lot specifications across financial asset classes.
+
+Key capabilities:
+    * Define canonical instruments with asset class, base/quote currencies, and
+      tick sizing.
+    * Maintain immutable, time-bounded instrument versions with effective
+      intervals.
+    * Enforce order constraints including min/max quantities, steps, and
+      supported order types.
+    * Protect referenced instrument versions against deletion or mutating
+      removal.
+    * Publish typed domain events upon instrument version creation and deletion.
+    * Provide async catalog_instruments implementing
+      CatalogInstrumentsCapability.
+
+Python API usage:
+    from app.services.catalogue.instrument_catalogue.instrument_catalogue import (
+        InstrumentCatalogueService,
+    )
+    from app.contracts.catalogue.models import (
+        CatalogInstrumentsRequest,
+        InstrumentRef,
+    )
+
+    service = InstrumentCatalogueService()
+    result = await service.catalog_instruments(
+        CatalogInstrumentsRequest(
+            request_id="018f0000-0000-7000-8000-000000000001",
+            capability_snapshot_id="018f0000-0000-7000-8000-000000000002",
+            operation="GET",
+            instrument_ref=InstrumentRef(
+                instrument_id="018f0000-0000-7000-8000-000000000003"
+            ),
+        )
+    )
+
+CLI usage:
+    uv run python -m \
+        app.services.catalogue.instrument_catalogue.instrument_catalogue
+"""
 
 from __future__ import annotations
 
+import contextlib
 import json
 import sqlite3
 from typing import TYPE_CHECKING, override
@@ -48,10 +92,17 @@ class InstrumentCatalogueService(CatalogInstrumentsCapability):
         self._config = config or InstrumentCatalogueConfig()
         self._event_bus = event_bus
         self._mem_uri: str | None = None
-        self._mem_conn: sqlite3.Connection | None = None
-        if self._config.database_path is None:
+        if self._config.database_path is not None:
+            self._conn = sqlite3.connect(
+                str(self._config.database_path), check_same_thread=False
+            )
+        else:
             self._mem_uri = f"file:mem_{id(self)}?mode=memory&cache=shared"
-            self._mem_conn = sqlite3.connect(self._mem_uri, uri=True)
+            self._conn = sqlite3.connect(
+                self._mem_uri, uri=True, check_same_thread=False
+            )
+        self._conn.row_factory = sqlite3.Row
+        self._conn.execute("PRAGMA foreign_keys = ON")
         self._init_db()
 
     def _get_connection(self) -> sqlite3.Connection:
@@ -60,13 +111,17 @@ class InstrumentCatalogueService(CatalogInstrumentsCapability):
         Returns:
             Configured SQLite database connection.
         """
-        if self._config.database_path is not None:
-            conn = sqlite3.connect(str(self._config.database_path))
-        else:
-            conn = sqlite3.connect(self._mem_uri or ":memory:", uri=True)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON")
-        return conn
+        return self._conn
+
+    def close(self) -> None:
+        """Close the underlying SQLite connection."""
+        if hasattr(self, "_conn") and self._conn is not None:
+            with contextlib.suppress(sqlite3.Error):
+                self._conn.close()
+
+    def __del__(self) -> None:
+        """Ensure SQLite connection is closed on garbage collection."""
+        self.close()
 
     def _init_db(self) -> None:
         """Initialize database schema if auto_migrate is enabled."""

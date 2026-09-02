@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
 import signal
 import subprocess
@@ -113,6 +114,11 @@ class ProcessLimits:
                 process.kill()
         except ProcessLookupError:
             pass
+        finally:
+            for pipe in (process.stdin, process.stdout, process.stderr):
+                if pipe is not None:
+                    with contextlib.suppress(Exception):
+                        pipe.close()
 
     def close(self) -> None:
         """Close an unconsumed Windows Job Object handle."""

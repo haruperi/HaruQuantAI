@@ -1,8 +1,41 @@
-"""Transactional lifecycle operations for retained plugin packages.
+"""Plugin Lifecycle domain logic and capability implementation.
 
-The module owns the ``plugins``, ``plugin_versions``, and
-``plugin_activations`` SQLite tables declared by ``plugins.lifecycle``. It
-does not execute plugin code or own sandbox lifecycle observations.
+Purpose:
+    Manage transactional installation, activation, upgrade, disablement,
+    and removal of plugin versions and receipts across isolated workspace scopes.
+
+Key capabilities:
+    * Install validated plugin package receipts and retain immutable version
+      records.
+    * Enable and disable plugin versions per workspace with atomic state
+      transitions.
+    * Execute transactional upgrades with rollback protection on installation
+      failure.
+    * Remove plugin activations and metadata upon plugin package withdrawal.
+    * Provide async manage_lifecycle implementing ManageLifecycleCapability.
+
+Python API usage:
+    from app.services.plugins.lifecycle.plugin_lifecycle import (
+        PluginLifecycleService,
+    )
+    from app.contracts.plugins.models import (
+        ManageLifecycleRequest,
+    )
+
+    service = PluginLifecycleService()
+    result = await service.manage_lifecycle(
+        ManageLifecycleRequest(
+            request_id="018f0000-0000-7000-8000-000000000001",
+            capability_snapshot_id="018f0000-0000-7000-8000-000000000002",
+            operation="INSTALL",
+            plugin_id="com.example.indicator",
+            workspace_id="018f0000-0000-7000-8000-000000000003",
+            receipt=receipt,
+        )
+    )
+
+CLI usage:
+    uv run python -m app.services.plugins.lifecycle.plugin_lifecycle
 """
 
 from __future__ import annotations

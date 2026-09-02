@@ -102,14 +102,16 @@
       "type": "object"
     },
     "BrokerConnectionState": {
+      "description": "Provider connection lifecycle states.",
       "enum": [
         "DISCONNECTED",
         "CONNECTING",
         "READY",
+        "FAILED",
         "DEGRADED",
-        "CLOSING",
-        "FAILED"
+        "CLOSING"
       ],
+      "title": "BrokerConnectionState",
       "type": "string"
     },
     "BrokerEnvironmentKind": {

@@ -1,10 +1,58 @@
-"""Runtime Configuration primary domain logic and usage harness.
+"""Runtime Configuration domain logic and capability implementation.
 
-Implements FEAT-WS-CONFIGURE_RUNTIME:
-- FR-WS-CONFIGURE_WORKSPACE: versioned, validated workspace settings
-- FR-WS-ENFORCE_STORAGE_GUARDS: free-space and artifact-size job admission
-- FR-WS-CONFIGURE_SERVER_RUNTIME: launcher/server runtime validation
-- FR-WS-PUBLISH_RUNTIME_SUPPORT: versioned runtime support profile
+Purpose:
+    Manage validated, versioned workspace settings, enforce storage guards and
+    admission policies for jobs, validate server/launcher runtime configurations,
+    and publish runtime support profiles.
+
+Key capabilities:
+    * Validate and persist immutable, versioned workspace settings and
+      directory configurations.
+    * Enforce disk free-space and projected artifact limits before admitting
+      compute jobs.
+    * Validate launcher and server runtime network/memory settings and probe
+      port availability.
+    * Publish versioned platform runtime support profiles, dependencies, and
+      capability matrix.
+
+Python API usage:
+    from pathlib import Path
+    from app.services.workspace.runtime_configuration.runtime_configuration import (
+        RuntimeConfigurationService,
+    )
+    from app.contracts.workspace.models import (
+        JobKind,
+        ServerRuntimeSettings,
+        WorkspaceSettings,
+    )
+
+    service = RuntimeConfigurationService()
+    settings_ver = service.configure_workspace(
+        Path("/path/to/workspace"),
+        WorkspaceSettings(
+            timezone="UTC",
+            locale="en_US",
+            worker_count=4,
+            worker_memory_mb=1024,
+            max_artifact_size_mb=2048,
+            max_total_artifact_gb=50,
+        ),
+    )
+    decision = service.enforce_storage_guards(
+        Path("/path/to/workspace"),
+        job_kind=JobKind.SIMULATION,
+        projected_artifact_mb=256.0,
+    )
+    validation = service.configure_server_runtime(
+        ServerRuntimeSettings(
+            port=8080,
+            bind_address="127.0.0.1",
+        )
+    )
+    profile = service.publish_runtime_support()
+
+CLI usage:
+    uv run python -m app.services.workspace.runtime_configuration.runtime_configuration
 """
 
 from __future__ import annotations

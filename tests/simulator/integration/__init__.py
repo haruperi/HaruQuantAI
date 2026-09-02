@@ -1,1 +1,0 @@
-"""Simulation integration tests."""

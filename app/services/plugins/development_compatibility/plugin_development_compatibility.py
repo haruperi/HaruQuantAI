@@ -1,8 +1,44 @@
-"""Plugin conformance validation and compatibility policy provider.
+"""Plugin Development and Compatibility domain logic and capability implementation.
 
-This feature validates already-supplied plugin ZIP packages through public
-capabilities and maintains one in-memory global API compatibility declaration.
-It does not execute plugin payloads, persist policy, or expose permission values.
+Purpose:
+    Validate plugin ZIP packages, check manifest schemas and file structures,
+    capture and sanitize validation logs, and maintain versioned plugin API
+    compatibility declarations.
+
+Key capabilities:
+    * Validate plugin ZIP archive structure, manifest contents, and contribution
+      types.
+    * Capture validation logs with deterministic secret redaction and severity
+      counts.
+    * Publish global plugin API compatibility definitions with semver range rules.
+    * Check plugin versions against declared API compatibility ranges and verdicts.
+    * Provide async maintain_compatibility implementing
+      MaintainCompatibilityCapability.
+
+Python API usage:
+    from pathlib import Path
+    from app.services.plugins.development_compatibility import (
+        plugin_development_compatibility as dev_compat,
+    )
+    from app.contracts.plugins.models import (
+        MaintainCompatibilityRequest,
+    )
+
+    service = dev_compat.DevelopmentCompatibilityService()
+    report = service.validate_package(Path("/path/to/plugin.zip"))
+    result = await service.maintain_compatibility(
+        MaintainCompatibilityRequest(
+            request_id="018f0000-0000-7000-8000-000000000001",
+            capability_snapshot_id="018f0000-0000-7000-8000-000000000002",
+            operation="CHECK",
+            plugin_id="com.example.indicator",
+            version="1.2.0",
+        )
+    )
+
+CLI usage:
+    uv run python -m \
+        app.services.plugins.development_compatibility.plugin_development_compatibility
 """
 
 from __future__ import annotations

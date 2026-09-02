@@ -1,1 +1,0 @@
-"""System integration verification package."""

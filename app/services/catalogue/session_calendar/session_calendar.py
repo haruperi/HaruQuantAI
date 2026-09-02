@@ -1,7 +1,47 @@
-"""Sessions and Calendars service implementation and functional behaviors."""
+"""Sessions and Calendars domain logic and capability implementation.
+
+Purpose:
+    Define market calendars, trading holidays, early closes, and multi-interval
+    trading sessions, and preview effective tradable intervals across timezones.
+
+Key capabilities:
+    * Define market calendar versions with timezone, holiday dates, and early
+      closes.
+    * Define weekly trading session schedules with multiple non-overlapping
+      intervals.
+    * Configure end-of-day rollover policies (session close or UTC midnight).
+    * Preview and generate chronological effective tradable intervals across
+      date ranges.
+    * Publish typed domain events upon session and calendar modifications.
+    * Provide async define_sessions implementing DefineSessionsCapability.
+
+Python API usage:
+    from app.services.catalogue.session_calendar.session_calendar import (
+        SessionCalendarService,
+    )
+    from app.contracts.catalogue.models import (
+        DefineSessionsRequest,
+    )
+
+    service = SessionCalendarService()
+    result = await service.define_sessions(
+        DefineSessionsRequest(
+            request_id="018f0000-0000-7000-8000-000000000001",
+            capability_snapshot_id="018f0000-0000-7000-8000-000000000002",
+            operation="PREVIEW",
+            session_id="018f0000-0000-7000-8000-000000000003",
+            from_at="2026-10-26T00:00:00.000000Z",
+            to_at="2026-11-07T00:00:00.000000Z",
+        )
+    )
+
+CLI usage:
+    uv run python -m app.services.catalogue.session_calendar.session_calendar
+"""
 
 from __future__ import annotations
 
+import contextlib
 import sqlite3
 from datetime import UTC, date, datetime, time, timedelta, timezone, tzinfo
 from typing import TYPE_CHECKING, override
@@ -193,10 +233,17 @@ class SessionCalendarService(DefineSessionsCapability):
         self._config = config or SessionCalendarConfig()
         self._event_bus = event_bus
         self._mem_uri: str | None = None
-        self._mem_conn: sqlite3.Connection | None = None
-        if self._config.database_path is None:
+        if self._config.database_path is not None:
+            self._conn = sqlite3.connect(
+                str(self._config.database_path), check_same_thread=False
+            )
+        else:
             self._mem_uri = f"file:mem_{id(self)}?mode=memory&cache=shared"
-            self._mem_conn = sqlite3.connect(self._mem_uri, uri=True)
+            self._conn = sqlite3.connect(
+                self._mem_uri, uri=True, check_same_thread=False
+            )
+        self._conn.row_factory = sqlite3.Row
+        self._conn.execute("PRAGMA foreign_keys = ON")
         self._init_db()
 
     def _get_connection(self) -> sqlite3.Connection:
@@ -205,13 +252,17 @@ class SessionCalendarService(DefineSessionsCapability):
         Returns:
             Configured SQLite database connection.
         """
-        if self._config.database_path is not None:
-            conn = sqlite3.connect(str(self._config.database_path))
-        else:
-            conn = sqlite3.connect(self._mem_uri or ":memory:", uri=True)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON")
-        return conn
+        return self._conn
+
+    def close(self) -> None:
+        """Close the underlying SQLite connection."""
+        if hasattr(self, "_conn") and self._conn is not None:
+            with contextlib.suppress(sqlite3.Error):
+                self._conn.close()
+
+    def __del__(self) -> None:
+        """Ensure SQLite connection is closed on garbage collection."""
+        self.close()
 
     def _init_db(self) -> None:
         """Initialize database schema if auto_migrate is enabled."""

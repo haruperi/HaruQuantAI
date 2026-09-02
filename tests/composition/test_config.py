@@ -5,10 +5,15 @@ from pathlib import Path
 import pytest
 from app.composition.config import (
     AppConfig,
+    AppSettings,
+    BrokerProviderSettings,
     ConfigurationError,
     InvalidProfileError,
+    load_broker_provider_settings,
     load_config_from_file,
     load_config_from_toml_string,
+    load_profile_document,
+    load_settings,
 )
 
 SAMPLE_TOML = """
@@ -254,3 +259,43 @@ def test_logging_section_validation_errors() -> None:
             backup_count = -1
             """
         )
+
+
+def test_load_settings_and_overrides() -> None:
+    """Verify load_settings handles dictionary inputs and overrides."""
+    settings = load_settings(
+        values={"environment": "staging", "runtime_profile": "live"},
+        overrides={"runtime_profile": "simulation"},
+    )
+    assert isinstance(settings, AppSettings)
+    assert settings.environment == "staging"
+    assert settings.runtime_profile == "simulation"
+
+
+def test_load_broker_provider_settings() -> None:
+    """Verify load_broker_provider_settings correctly parses bool and secret fields."""
+    raw = {
+        "mt5_enabled": "true",
+        "mt5_login": 123456,
+        "mt5_password": "mypassword",  # pragma: allowlist secret
+        "binance_enabled": 1,
+        "binance_testnet": "false",
+        "binance_api_secret": "mysecret",  # pragma: allowlist secret
+    }
+    broker_settings = load_broker_provider_settings(raw)
+    assert isinstance(broker_settings, BrokerProviderSettings)
+    assert broker_settings.mt5_enabled is True
+    assert broker_settings.mt5_login == 123456
+    assert broker_settings.binance_enabled is True
+    assert broker_settings.binance_testnet is False
+
+
+def test_load_profile_document(tmp_path: Path) -> None:
+    """Verify load_profile_document loads valid file and handles missing/none path."""
+    assert load_profile_document(None) == {}
+    assert load_profile_document(tmp_path / "nonexistent.toml") == {}
+
+    doc_file = tmp_path / "profile.toml"
+    doc_file.write_text("[profile]\nname = 'demo'", encoding="utf-8")
+    loaded = load_profile_document(doc_file)
+    assert loaded == {"profile": {"name": "demo"}}

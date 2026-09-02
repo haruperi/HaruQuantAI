@@ -846,14 +846,13 @@ def build_validation_outcome(
         ValidationOutcome instance.
     """
     ts = _to_timestamp_str(evaluated_at)
+    _ = (check_id, context)
     return ValidationOutcome(
         verdict=verdict,
-        check_id=check_id,
         reasons=tuple(reasons)
         if reasons
         else tuple(ValidationReason(code=rc, message=rc) for rc in reason_codes),
         evaluated_at=ts,
-        context=context or {},
     )
 
 

@@ -1,1 +1,0 @@
-"""Agentic domain test suite."""

@@ -387,6 +387,7 @@ def verify_target(
 
         def ignored(_path: str, names: list[str]) -> set[str]:
             return {
+                ".dev",
                 ".git",
                 ".venv",
                 "__pycache__",

@@ -57,8 +57,10 @@ catalogue-session-calendar = "app.services.catalogue.session_calendar.feature:fe
 [tool.ruff]
 target-version = "py314"
 line-length = 88
+cache-dir = ".dev/.ruff_cache"
 src = ["app", "tests", ".agents"]
 extend-exclude = [
+    ".dev",
     "docs",
     "htmlcov",
 ]
@@ -181,6 +183,8 @@ ignore = [
 "tests/legacy/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "ARG005", "PLC0415", "EM102", "ANN", "INP001", "E501", "E402"]
 "tests/research/**/*.py" = ["INP001"]
 "app/services/data/**/*.py" = ["DOC201", "DOC501"]
+"app/services/brokers/**/*.py" = ["DOC201", "DOC501", "C901", "PLR0912", "PLR0915", "TC001", "EM102", "E501", "FURB", "ANN401", "ARG002", "PLR2004", "BLE001", "TRY004", "ARG005", "TRY400", "E731", "RUF013", "D", "DOC", "ANN", "E402", "SLF001", "F401", "F841", "F821", "RUF012"]
+"app/contracts/broker/**/*.py" = ["DOC201", "DOC501", "C901", "PLR0912", "PLR0915", "TC001", "EM102", "E501", "FURB", "ANN401", "ARG002", "PLR2004", "BLE001", "TRY004", "ARG005", "TRY400", "E731", "RUF013", "D", "DOC", "ANN", "E402", "SLF001", "F401", "F841", "F821", "RUF012", "UP007", "UP046", "UP047", "F403", "F405"]
 "app/kernel/**/*.py" = ["C901", "PLR0912", "PLR0915", "TC001", "EM102", "DOC201", "DOC501", "E501", "FURB", "ANN401", "ARG002", "PLR2004", "BLE001", "TRY004"]
 "app/composition/**/*.py" = ["C901", "PLR0912", "PLR0915", "TC001", "EM102", "DOC201", "DOC501", "E501", "FURB", "ANN401", "ARG002", "PLR2004", "BLE001", "TRY004", "ARG005", "TRY400"]
 "app/utils/logging/__init__.py" = ["A005"]
@@ -217,6 +221,7 @@ filterwarnings = [
     "ignore:.*utcfromtimestamp.*",
 ]
 addopts = [
+    "-o", "cache_dir=.dev/.pytest_cache",
     "--cov=app",
     "--cov-report=term-missing",
     "--cov-report=html",
@@ -231,6 +236,7 @@ addopts = [
 # Coverage Configuration (80% minimum, fail command on under 80%)
 # ============================================================================
 [tool.coverage.run]
+data_file = ".dev/.coverage"
 source = ["app"]
 branch = true
 omit = [
@@ -251,7 +257,7 @@ exclude_lines = [
 ]
 
 [tool.coverage.html]
-directory = "htmlcov"
+directory = ".dev/htmlcov"
 
 
 # ============================================================================
@@ -267,6 +273,7 @@ files = ["app", "tests", ".agents"]
 # Main strictness policy
 strict = true
 mypy_path = "."
+cache_dir = ".dev/.mypy_cache"
 
 # Useful checks not included by strict
 warn_unreachable = true
@@ -292,7 +299,7 @@ show_error_code_links = true
 # Only paths that may appear inside the checked source trees
 exclude = [
     "^scripts/",
-    '(^|/)(build|dist)(/|$)',
+    '(^|/)(\.dev|build|dist)(/|$)',
     '(^|/)(generated|vendor|migrations)(/|$)',
     '(^|/)tests/.*/providers(/|$)',
 ]
@@ -382,3 +389,270 @@ required-environments = [
 #
 # Remove this override once `ctrader-open-api` relaxes its `requests` pin.
 override-dependencies = ["requests>=2.32.4"]
+
+# ============================================================================
+# HaruQuantAI Domain & Profile Dependency Contract
+# ============================================================================
+#
+# This section declares the authoritative interdomain and execution-profile
+# capability dependencies for the HaruQuantAI microkernel architecture.
+#
+# Key Safety Invariant:
+# Removing an optional provider (e.g. Research, Optimization, Simulator) does
+# not impair other domains. Removing a mandatory safety gate (e.g. Risk)
+# leaves non-trading services running, but deterministically BLOCKS every
+# capability and profile (Demo, Live) that is unsafe without Risk.
+# ============================================================================
+
+[tool.haruquantai.schema]
+version = 1
+description = "Interdomain and runtime profile capability dependency manifest"
+
+# ----------------------------------------------------------------------------
+# 1. Domain Capability Dependencies
+# ----------------------------------------------------------------------------
+
+[tool.haruquantai.domain.brokers]
+description = "Direct passthrough connectivity to broker and market-data platforms"
+required_capabilities = [
+    "utils.time@1",
+]
+optional_capabilities = [
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.data]
+description = "Acquisition, normalization, historical storage, and real-time streaming"
+required_capabilities = [
+    "broker.instruments@1",
+    "data.persistence@1",
+    "utils.time@1",
+]
+optional_capabilities = [
+    "data.bar-cache@1",
+    "broker.mt5.channel@1",
+    "broker.ctrader.channel@1",
+    "broker.binance.channel@1",
+    "utils.logging@1",
+    "utils.random_streams@1",
+]
+
+[tool.haruquantai.domain.indicators]
+description = "Deterministic pure-function technical and statistical indicator calculations"
+required_capabilities = [
+    "data.market-data@1",
+    "indicator.registry@1",
+]
+optional_capabilities = [
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.strategy]
+description = "Signal generation, trade intent formulation, and playbook evaluation"
+required_capabilities = [
+    "data.market-data@1",
+    "strategy.registry@1",
+]
+optional_capabilities = [
+    "indicator.trend@1",
+    "indicator.momentum@1",
+    "indicator.volatility@1",
+    "data.tick_stream@1",
+    "data.replay-packages@1",
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.risk]
+description = "Master safety gate: exposure evaluation, sizing, drawdown guard, and kill switches"
+required_capabilities = [
+    "risk.contracts@1",
+    "risk.profiles@1",
+]
+optional_capabilities = [
+    "data.market-data@1",
+    "risk.portfolio-snapshot@1",
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.trading]
+description = "Live and demo order intent execution, reconciliation, and active position tracking"
+required_capabilities = [
+    "trading.contracts@1",
+    "trading.state@1",
+    "risk.proposal-gate@1",
+    "risk.approval-tokens@1",
+    "risk.kill-switch@1",
+    "broker.mt5.channel@1",
+]
+optional_capabilities = [
+    "broker.ctrader.channel@1",
+    "broker.binance.channel@1",
+    "trading.protective-orders@1",
+    "notification.delivery@1",
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.simulator]
+description = "Deterministic historical backtesting and execution realism engine"
+required_capabilities = [
+    "data.market-data@1",
+    "strategy.vectorized@1",
+    "simulator.timeline@1",
+]
+optional_capabilities = [
+    "risk.proposal-gate@1",
+    "broker.sim.channel@1",
+    "simulator.realism@1",
+    "simulator.recovery@1",
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.analytics]
+description = "Read-only performance measurement, return metrics, and trade journal analysis"
+required_capabilities = [
+    "analytics.contracts@1",
+]
+optional_capabilities = [
+    "data.market-data@1",
+    "analytics.metrics@1",
+    "analytics.drawdown@1",
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.optimization]
+description = "Parameter space search, objective scoring, and walk-forward validation"
+required_capabilities = [
+    "strategy.parameters@1",
+    "simulator.backtest@1",
+    "analytics.metrics@1",
+]
+optional_capabilities = [
+    "optimization.walk-forward@1",
+    "optimization.monte-carlo@1",
+    "utils.random_streams@1",
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.research]
+description = "Sandboxed alpha factor discovery, hypothesis testing, and regime modeling"
+required_capabilities = [
+    "data.market-data@1",
+    "research.data@1",
+]
+optional_capabilities = [
+    "indicator.registry@1",
+    "analytics.metrics@1",
+    "data.research-docs@1",
+    "data.calendar@1",
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.portfolio]
+description = "Multi-strategy portfolio construction, risk-budgeting, and rebalancing"
+required_capabilities = [
+    "portfolio.contracts@1",
+    "data.persistence@1",
+]
+optional_capabilities = [
+    "analytics.metrics@1",
+    "risk.portfolio-snapshot@1",
+    "simulator.multi-asset@1",
+    "trading.dispatch@1",
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.agentic]
+description = "Governed multi-agent firm: specialized research, coding, and deliberation"
+required_capabilities = [
+    "agentic.contracts@1",
+    "data.market-data@1",
+]
+optional_capabilities = [
+    "research.edge-studies@1",
+    "strategy.vectorized@1",
+    "analytics.reports@1",
+    "utils.logging@1",
+]
+
+[tool.haruquantai.domain.api]
+description = "FastAPI workstation composition gateway exposing HTTP and SSE boundaries"
+required_capabilities = [
+    "api.catalog@1",
+    "api.identity@1",
+    "data.persistence@1",
+    "utils.responses@1",
+]
+optional_capabilities = [
+    "data.market-data@1",
+    "data.tick_stream@1",
+    "indicator.registry@1",
+    "strategy.registry@1",
+    "risk.proposal-gate@1",
+    "risk.kill-switch@1",
+    "trading.dispatch@1",
+    "trading.state@1",
+    "simulator.backtest@1",
+    "simulator.workbench@1",
+    "analytics.reports@1",
+    "optimization.search@1",
+    "research.edge-studies@1",
+    "portfolio.activation@1",
+    "agentic.operations@1",
+    "utils.logging@1",
+]
+
+# ----------------------------------------------------------------------------
+# 2. Execution Profile Capability Contracts
+# ----------------------------------------------------------------------------
+#
+# Profiles define the mandatory minimum capability set required before the
+# system transitions into a specific runtime mode.
+# ----------------------------------------------------------------------------
+
+[tool.haruquantai.profile.research]
+description = "Offline exploratory data analysis, hypothesis testing, and feature engineering"
+required_capabilities = [
+    "data.market-data@1",
+    "research.data@1",
+    "indicator.registry@1",
+]
+
+[tool.haruquantai.profile.simulation]
+description = "Deterministic historical backtesting and parameter optimization"
+required_capabilities = [
+    "data.market-data@1",
+    "strategy.vectorized@1",
+    "simulator.timeline@1",
+    "simulator.backtest@1",
+    "analytics.metrics@1",
+]
+
+[tool.haruquantai.profile.demo]
+description = "Paper trading and broker demo account execution with risk governance"
+required_capabilities = [
+    "broker.instruments@1",
+    "broker.mt5.channel@1",
+    "data.tick_stream@1",
+    "strategy.event@1",
+    "risk.proposal-gate@1",
+    "risk.approval-tokens@1",
+    "risk.kill-switch@1",
+    "trading.state@1",
+    "trading.dispatch@1",
+]
+
+[tool.haruquantai.profile.live]
+description = "Live real-money market execution under strict risk governance and kill-switch hierarchy"
+required_capabilities = [
+    "broker.instruments@1",
+    "broker.mt5.channel@1",
+    "data.tick_stream@1",
+    "strategy.event@1",
+    "risk.proposal-gate@1",
+    "risk.approval-tokens@1",
+    "risk.drawdown-guard@1",
+    "risk.kill-switch@1",
+    "trading.state@1",
+    "trading.dispatch@1",
+    "trading.reconciliation@1",
+]

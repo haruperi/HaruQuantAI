@@ -68,6 +68,7 @@ class InstrumentCatalogueFeature:
             or getattr(context, "event_bus", None),
         )
         context.provide(CATALOG_INSTRUMENTS_CAPABILITY, self._service)
+        context.register_callback(self._service.close)
 
 
 def feature() -> InstrumentCatalogueFeature:

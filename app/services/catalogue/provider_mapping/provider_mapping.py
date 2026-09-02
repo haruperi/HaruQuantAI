@@ -1,7 +1,52 @@
-"""Provider and Broker Mapping service implementation and functional behaviors."""
+"""Provider and Broker Mapping domain logic and capability implementation.
+
+Purpose:
+    Map external broker and data provider symbols, identifiers, and feed tickers
+    to canonical instruments with time-bounded validity and overlap protection.
+
+Key capabilities:
+    * Register and manage broker-specific symbol mappings with effective
+      half-open intervals.
+    * Map external provider identifiers to canonical instruments preserving raw
+      symbols.
+    * Resolve canonical instrument identity and version for provider symbols
+      as of a timestamp.
+    * Enforce non-overlapping mapping interval constraints across
+      provider/broker pairs.
+    * Publish typed domain events upon mapping creation, update, and deletion.
+    * Provide async map_providers implementing MapProvidersCapability.
+
+Python API usage:
+    from app.services.catalogue.provider_mapping.provider_mapping import (
+        ProviderMappingService,
+    )
+    from app.contracts.catalogue.models import (
+        MapProvidersRequest,
+        ProviderRef,
+    )
+
+    service = ProviderMappingService()
+    result = await service.map_providers(
+        MapProvidersRequest(
+            request_id="018f0000-0000-7000-8000-000000000001",
+            capability_snapshot_id="018f0000-0000-7000-8000-000000000002",
+            operation="RESOLVE",
+            provider=ProviderRef(
+                provider_id="018f0000-0000-7000-8000-000000000003",
+                provider_name="FeedA",
+            ),
+            provider_symbol="EURUSD.raw",
+            as_of="2026-06-01T00:00:00.000000Z",
+        )
+    )
+
+CLI usage:
+    uv run python -m app.services.catalogue.provider_mapping.provider_mapping
+"""
 
 from __future__ import annotations
 
+import contextlib
 import json
 import sqlite3
 from typing import TYPE_CHECKING, override
@@ -67,10 +112,17 @@ class ProviderMappingService(MapProvidersCapability):
         self._config = config or ProviderMappingConfig()
         self._event_bus = event_bus
         self._mem_uri: str | None = None
-        self._mem_conn: sqlite3.Connection | None = None
-        if self._config.database_path is None:
+        if self._config.database_path is not None:
+            self._conn = sqlite3.connect(
+                str(self._config.database_path), check_same_thread=False
+            )
+        else:
             self._mem_uri = f"file:mem_map_{id(self)}?mode=memory&cache=shared"
-            self._mem_conn = sqlite3.connect(self._mem_uri, uri=True)
+            self._conn = sqlite3.connect(
+                self._mem_uri, uri=True, check_same_thread=False
+            )
+        self._conn.row_factory = sqlite3.Row
+        self._conn.execute("PRAGMA foreign_keys = ON")
         self._init_db()
 
     def _get_connection(self) -> sqlite3.Connection:
@@ -79,13 +131,17 @@ class ProviderMappingService(MapProvidersCapability):
         Returns:
             Configured SQLite database connection.
         """
-        if self._config.database_path is not None:
-            conn = sqlite3.connect(str(self._config.database_path))
-        else:
-            conn = sqlite3.connect(self._mem_uri or ":memory:", uri=True)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON")
-        return conn
+        return self._conn
+
+    def close(self) -> None:
+        """Close the underlying SQLite connection."""
+        if hasattr(self, "_conn") and self._conn is not None:
+            with contextlib.suppress(sqlite3.Error):
+                self._conn.close()
+
+    def __del__(self) -> None:
+        """Ensure SQLite connection is closed on garbage collection."""
+        self.close()
 
     def _init_db(self) -> None:
         """Initialize database schema if auto_migrate is enabled."""

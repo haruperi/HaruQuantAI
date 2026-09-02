@@ -19,7 +19,7 @@ export interface BrokerAccountSnapshot {
   provider_time?: string | null;  // default: null
   schema_version?: 1;  // default: 1
 }
-export type BrokerConnectionState = "DISCONNECTED" | "CONNECTING" | "READY" | "DEGRADED" | "CLOSING" | "FAILED";
+export type BrokerConnectionState = "DISCONNECTED" | "CONNECTING" | "READY" | "FAILED" | "DEGRADED" | "CLOSING";
 export type BrokerEnvironmentKind = "LIVE" | "DEMO" | "TESTNET" | "SANDBOX" | "SIMULATION";
 export interface BrokerFailure {
   request_id: string;

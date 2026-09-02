@@ -66,6 +66,7 @@ class SessionCalendarFeature:
             or getattr(context, "event_bus", None),
         )
         context.provide(DEFINE_SESSIONS_CAPABILITY, self._service)
+        context.register_callback(self._service.close)
 
 
 def feature() -> SessionCalendarFeature:

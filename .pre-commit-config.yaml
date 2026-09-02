@@ -46,7 +46,8 @@ repos:
       - id: detect-secrets
         args:
           - "--baseline"
-          - ".secrets.baseline"
+          - ".github/.secrets.baseline"
+        exclude: \.secrets\.baseline$
         stages: [pre-commit]
 
   # Project development tools

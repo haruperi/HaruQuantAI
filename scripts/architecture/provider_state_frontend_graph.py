@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 EXCLUDE_DIRS = {
+    ".dev",
     ".git",
     ".venv",
     "node_modules",

@@ -1,1 +1,0 @@
-"""Internal Operator API feature."""
