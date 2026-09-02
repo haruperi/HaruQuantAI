@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 from unittest.mock import MagicMock
 
-import app.services.brokers.metatrader._terminal_info as term_mod
+import app.services.brokers.metatrader.client as client_mod
 import pytest
 from app.contracts.broker.capabilities import (
     BROKER_OPERATIONS_CAPABILITY,
@@ -77,10 +77,10 @@ async def test_mount_stages_provider_and_scope_withdraws_it(
     tmp_path: Any, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Verify mounting stages capabilities and scope close withdraws them."""
-    monkeypatch.setattr(term_mod.mt5, "initialize", lambda **kw: True)
-    monkeypatch.setattr(
-        term_mod.mt5, "terminal_info", lambda: MagicMock(connected=True)
-    )
+    mock_mt5 = MagicMock()
+    mock_mt5.initialize.return_value = True
+    mock_mt5.terminal_info.return_value = MagicMock(connected=True)
+    monkeypatch.setattr(client_mod, "mt5", mock_mt5)
 
     feature_instance = feature()
     assert isinstance(feature_instance, MetaTraderFeature)

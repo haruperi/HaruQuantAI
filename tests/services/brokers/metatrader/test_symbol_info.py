@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import app.services.brokers.metatrader._symbol_info as sym_mod
 import pytest
 from app.services.brokers.metatrader._symbol_info import (
     get_historical_bars,
@@ -20,10 +19,11 @@ from app.services.brokers.metatrader._symbol_info import (
     subscribe_ticks,
     unsubscribe,
 )
+from app.services.brokers.metatrader.client import MetaTraderClient
 
 
-def test_symbols_and_quotes_success(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Verify symbols, info, and quote retrieval."""
+def test_symbols_and_quotes_success() -> None:
+    """Verify symbols, info, and quote retrieval via client instance."""
     sym1 = MagicMock()
     sym1.name = "EURUSD"
     sym2 = MagicMock()
@@ -42,80 +42,88 @@ def test_symbols_and_quotes_success(monkeypatch: pytest.MonkeyPatch) -> None:
     mock_tick.ask = 1.08512
     mock_tick.time = 1788375000.0
 
-    monkeypatch.setattr(sym_mod.mt5, "symbols_get", lambda: (sym1, sym2))
-    monkeypatch.setattr(
-        sym_mod.mt5, "symbol_info", lambda s: mock_info if s == "EURUSD" else None
+    mock_mt5 = MagicMock()
+    mock_mt5.symbols_get.return_value = (sym1, sym2)
+    mock_mt5.symbol_info.side_effect = lambda s: mock_info if s == "EURUSD" else None
+    mock_mt5.symbol_info_tick.side_effect = lambda s: (
+        mock_tick if s == "EURUSD" else None
     )
-    monkeypatch.setattr(
-        sym_mod.mt5, "symbol_info_tick", lambda s: mock_tick if s == "EURUSD" else None
-    )
-    monkeypatch.setattr(sym_mod.mt5, "symbol_select", lambda s, e: s == "EURUSD")
+    mock_mt5.symbol_select.side_effect = lambda s, e: s == "EURUSD"
+    mock_mt5.last_error.return_value = (-1, "Not found")
 
-    symbols = get_symbols()
+    client = MetaTraderClient(mt5_module=mock_mt5)
+
+    symbols = get_symbols(client=client)
     assert symbols == ["EURUSD", "GBPUSD"]
 
-    info = get_symbol_info("EURUSD")
+    info = get_symbol_info("EURUSD", client=client)
     assert info["name"] == "EURUSD"
 
-    monkeypatch.setattr(sym_mod.mt5, "last_error", lambda: (-1, "Not found"))
     with pytest.raises(ValueError, match="Symbol 'INVALID' not found in MetaTrader 5"):
-        get_symbol_info("INVALID")
+        get_symbol_info("INVALID", client=client)
 
-    assert select_symbol("EURUSD", True) is True
+    assert select_symbol("EURUSD", True, client=client) is True
 
-    quote = get_quote("EURUSD")
+    quote = get_quote("EURUSD", client=client)
     assert quote["bid"] == 1.08500
     assert quote["ask"] == 1.08512
     assert quote["spread"] == pytest.approx(0.00012, rel=1e-3)
 
-    assert get_spread("EURUSD") == pytest.approx(0.00012, rel=1e-3)
+    assert get_spread("EURUSD", client=client) == pytest.approx(0.00012, rel=1e-3)
 
 
-def test_ticks_and_bars_success(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Verify tick data and historical bar queries."""
+def test_ticks_and_bars_success() -> None:
+    """Verify tick data and historical bar queries via client instance."""
     mock_ticks = [(1788375000, 1.08500, 1.08512, 0.0, 1.0)]
     mock_rates = [(1788375000, 1.08450, 1.08550, 1.08420, 1.08500, 100.0, 0, 0)]
 
-    monkeypatch.setattr(sym_mod.mt5, "copy_ticks_from", lambda s, t, c, f: mock_ticks)
-    monkeypatch.setattr(
-        sym_mod.mt5, "copy_rates_from_pos", lambda s, tf, p, c: mock_rates
-    )
+    mock_mt5 = MagicMock()
+    mock_mt5.copy_ticks_from.return_value = mock_ticks
+    mock_mt5.copy_rates_from_pos.return_value = mock_rates
 
-    ticks = get_ticks("EURUSD", count=1)
+    client = MetaTraderClient(mt5_module=mock_mt5)
+
+    ticks = get_ticks("EURUSD", count=1, client=client)
     assert len(ticks) == 1
     assert ticks[0]["bid"] == 1.08500
 
-    bars = get_historical_bars("EURUSD", timeframe="1m", count=1)
+    bars = get_historical_bars("EURUSD", timeframe="1m", count=1, client=client)
     assert len(bars) == 1
     assert bars[0]["open"] == 1.08450
 
 
-def test_symbols_failure_raises_error(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_symbols_failure_raises_error() -> None:
     """Verify symbols query failure raises RuntimeError."""
-    monkeypatch.setattr(sym_mod.mt5, "symbols_get", lambda: None)
-    monkeypatch.setattr(
-        sym_mod.mt5, "last_error", lambda: (-10004, "No IPC connection")
-    )
+    mock_mt5 = MagicMock()
+    mock_mt5.symbols_get.return_value = None
+    mock_mt5.last_error.return_value = (-10004, "No IPC connection")
+
+    client = MetaTraderClient(mt5_module=mock_mt5)
 
     with pytest.raises(
         RuntimeError, match=r"Failed to retrieve symbols from MetaTrader 5"
     ):
-        get_symbols()
+        get_symbols(client=client)
 
 
 def test_subscriptions() -> None:
-    """Verify subscribing and unsubscribing."""
-    sub_q = subscribe_quotes(["EURUSD"])
+    """Verify subscribing and unsubscribing via client instance."""
+    mock_mt5 = MagicMock()
+    mock_mt5.symbol_select.return_value = True
+
+    client = MetaTraderClient(mt5_module=mock_mt5)
+
+    sub_q = subscribe_quotes(["EURUSD"], client=client)
     assert sub_q.startswith("mt5_sub_quotes_")
 
-    sub_t = subscribe_ticks(["EURUSD"])
+    sub_t = subscribe_ticks(["EURUSD"], client=client)
     assert sub_t.startswith("mt5_sub_ticks_")
 
-    sub_b = subscribe_bars(["EURUSD"], "1m")
+    sub_b = subscribe_bars(["EURUSD"], "1m", client=client)
     assert sub_b.startswith("mt5_sub_bars_")
 
-    subs = list_subscriptions()
+    subs = list_subscriptions(client=client)
     assert len(subs) >= 3
 
-    assert unsubscribe(sub_q) is True
-    assert unsubscribe("nonexistent_sub") is False
+    assert unsubscribe(sub_q, client=client) is True
+    assert unsubscribe("nonexistent_sub", client=client) is False

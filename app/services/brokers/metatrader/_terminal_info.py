@@ -2,18 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any
-
-try:
-    import MetaTrader5 as mt5  # noqa: N813
-
-    _MT5_AVAILABLE = True
-except ImportError:
-    mt5 = None  # type: ignore[assignment]
-    _MT5_AVAILABLE = False
+from typing import TYPE_CHECKING, Any
 
 from app.services.brokers.metatrader._persistence import get_mt5_credentials
 from app.services.brokers.metatrader.config import MetaTraderConfig
+
+if TYPE_CHECKING:
+    from app.services.brokers.metatrader.client import MetaTraderClient
 
 _terminal_state: dict[str, Any] = {
     "connected": False,
@@ -24,6 +19,15 @@ _terminal_state: dict[str, Any] = {
 }
 
 
+def _resolve_client(client: MetaTraderClient | Any | None = None) -> Any:
+    """Resolve the provided client instance or fall back to the active default."""
+    if client is not None:
+        return client
+    from app.services.brokers.metatrader.client import get_default_client
+
+    return get_default_client()
+
+
 def connect(
     path: str | None = None,
     login: int | str | None = None,
@@ -32,6 +36,7 @@ def connect(
     timeout: int = 30,
     portable: bool = False,
     config: MetaTraderConfig | None = None,
+    client: MetaTraderClient | Any | None = None,
 ) -> dict[str, Any]:
     """Connect and initialize MetaTrader 5 terminal with database or explicit credentials.
 
@@ -43,6 +48,7 @@ def connect(
         timeout: Connection timeout in seconds.
         portable: Whether to launch terminal in portable mode.
         config: Optional MetaTraderConfig instance.
+        client: Optional MetaTraderClient instance.
 
     Returns:
         Connection summary dictionary on success.
@@ -50,21 +56,22 @@ def connect(
     Raises:
         RuntimeError: If MetaTrader5 package is unavailable or terminal initialization fails.
     """
-    if not _MT5_AVAILABLE or mt5 is None:
+    client_inst = _resolve_client(client)
+    mt5 = getattr(client_inst, "mt5", client_inst)
+    if mt5 is None or not getattr(client_inst, "is_available", lambda: True)():
         msg = "MetaTrader5 Python package is not installed or available in the environment."
         raise RuntimeError(msg)
 
-    db_creds = get_mt5_credentials(config.database_path if config else None)
+    cfg = config or getattr(client_inst, "config", None)
+    db_creds = get_mt5_credentials(cfg.database_path if cfg else None)
 
     final_path = (
-        path or (config.terminal_path if config else None) or db_creds["terminal_path"]
+        path or (cfg.terminal_path if cfg else None) or db_creds["terminal_path"]
     )
-    final_login = login or (config.login if config else None) or db_creds["login"]
-    final_pwd = (
-        password or (config.password if config else None) or db_creds["password"]
-    )
-    final_server = server or (config.server if config else None) or db_creds["server"]
-    final_timeout = timeout or (config.timeout if config else 30)
+    final_login = login or (cfg.login if cfg else None) or db_creds["login"]
+    final_pwd = password or (cfg.password if cfg else None) or db_creds["password"]
+    final_server = server or (cfg.server if cfg else None) or db_creds["server"]
+    final_timeout = timeout or (cfg.timeout if cfg else 30)
 
     login_int = int(final_login) if final_login and str(final_login).isdigit() else None
 
@@ -84,16 +91,25 @@ def connect(
     initialized = mt5.initialize(**init_kwargs)
     if not initialized:
         err = mt5.last_error()
+        client_inst.state["connected"] = False
+        client_inst.state["last_error"] = err
         _terminal_state["connected"] = False
         _terminal_state["last_error"] = err
         msg = f"Failed to initialize MetaTrader 5 terminal: [{err[0]}] {err[1]}"
         raise RuntimeError(msg)
+
+    client_inst.state["connected"] = True
+    client_inst.state["login"] = login_int
+    client_inst.state["server"] = final_server
+    client_inst.state["terminal_path"] = final_path
+    client_inst.state["last_error"] = (0, "Success")
 
     _terminal_state["connected"] = True
     _terminal_state["login"] = login_int
     _terminal_state["server"] = final_server
     _terminal_state["terminal_path"] = final_path
     _terminal_state["last_error"] = (0, "Success")
+
     return {
         "status": "connected",
         "connected": True,
@@ -103,20 +119,29 @@ def connect(
     }
 
 
-def disconnect() -> bool:
+def disconnect(client: MetaTraderClient | Any | None = None) -> bool:
     """Disconnect and shut down MetaTrader 5 terminal connection.
+
+    Args:
+        client: Optional MetaTraderClient instance.
 
     Returns:
         True if successfully disconnected.
     """
-    if _MT5_AVAILABLE and mt5 is not None:
+    client_inst = _resolve_client(client)
+    mt5 = getattr(client_inst, "mt5", client_inst)
+    if mt5 is not None and hasattr(mt5, "shutdown"):
         mt5.shutdown()
+    client_inst.state["connected"] = False
     _terminal_state["connected"] = False
     return True
 
 
-def ping() -> float:
+def ping(client: MetaTraderClient | Any | None = None) -> float:
     """Retrieve connection ping in milliseconds.
+
+    Args:
+        client: Optional MetaTraderClient instance.
 
     Returns:
         Ping in milliseconds.
@@ -124,15 +149,21 @@ def ping() -> float:
     Raises:
         RuntimeError: If terminal is not connected.
     """
-    if not is_connected():
+    client_inst = _resolve_client(client)
+    if not is_connected(client=client_inst):
         msg = "MetaTrader 5 terminal is not connected."
         raise RuntimeError(msg)
 
-    t_info = mt5.terminal_info() if (_MT5_AVAILABLE and mt5 is not None) else None
+    mt5 = getattr(client_inst, "mt5", client_inst)
+    t_info = (
+        mt5.terminal_info()
+        if (mt5 is not None and hasattr(mt5, "terminal_info"))
+        else None
+    )
     if t_info is None:
         err = (
             mt5.last_error()
-            if (_MT5_AVAILABLE and mt5 is not None)
+            if (mt5 is not None and hasattr(mt5, "last_error"))
             else (-1, "Unavailable")
         )
         msg = f"Failed to retrieve ping from terminal_info: [{err[0]}] {err[1]}"
@@ -140,35 +171,56 @@ def ping() -> float:
     return float(getattr(t_info, "ping_last", 0)) / 1000.0
 
 
-def is_connected() -> bool:
+def is_connected(client: MetaTraderClient | Any | None = None) -> bool:
     """Check if MetaTrader 5 terminal is connected.
+
+    Args:
+        client: Optional MetaTraderClient instance.
 
     Returns:
         True if connected, False otherwise.
     """
-    if _MT5_AVAILABLE and mt5 is not None and _terminal_state["connected"]:
+    client_inst = _resolve_client(client)
+    mt5 = getattr(client_inst, "mt5", client_inst)
+    if (
+        mt5 is not None
+        and hasattr(mt5, "terminal_info")
+        and client_inst.state.get("connected", False)
+    ):
         t_info = mt5.terminal_info()
         return bool(t_info.connected) if t_info is not None else False
     return False
 
 
-def get_connection_status() -> dict[str, Any]:
+def get_connection_status(
+    client: MetaTraderClient | Any | None = None,
+) -> dict[str, Any]:
     """Retrieve current connection status details.
+
+    Args:
+        client: Optional MetaTraderClient instance.
 
     Returns:
         Dictionary with connection status metadata.
     """
+    client_inst = _resolve_client(client)
+    connected = is_connected(client=client_inst)
     return {
-        "connected": is_connected(),
-        "login": _terminal_state["login"],
-        "server": _terminal_state["server"],
-        "ping_ms": ping() if is_connected() else 0.0,
-        "last_error": _terminal_state["last_error"],
+        "connected": connected,
+        "login": client_inst.state.get("login"),
+        "server": client_inst.state.get("server"),
+        "ping_ms": ping(client=client_inst) if connected else 0.0,
+        "last_error": client_inst.state.get("last_error", (0, "Success")),
     }
 
 
-def get_platform_info() -> dict[str, Any]:
+def get_platform_info(
+    client: MetaTraderClient | Any | None = None,
+) -> dict[str, Any]:
     """Retrieve MetaTrader 5 platform version and build.
+
+    Args:
+        client: Optional MetaTraderClient instance.
 
     Returns:
         Dictionary describing platform version and build.
@@ -176,7 +228,9 @@ def get_platform_info() -> dict[str, Any]:
     Raises:
         RuntimeError: If version query fails.
     """
-    if not _MT5_AVAILABLE or mt5 is None:
+    client_inst = _resolve_client(client)
+    mt5 = getattr(client_inst, "mt5", client_inst)
+    if mt5 is None or not getattr(client_inst, "is_available", lambda: True)():
         msg = "MetaTrader5 package is not available."
         raise RuntimeError(msg)
 
@@ -194,8 +248,13 @@ def get_platform_info() -> dict[str, Any]:
     }
 
 
-def get_terminal_info() -> dict[str, Any]:
+def get_terminal_info(
+    client: MetaTraderClient | Any | None = None,
+) -> dict[str, Any]:
     """Retrieve detailed terminal environment properties.
+
+    Args:
+        client: Optional MetaTraderClient instance.
 
     Returns:
         Dictionary of terminal environment settings.
@@ -203,7 +262,9 @@ def get_terminal_info() -> dict[str, Any]:
     Raises:
         RuntimeError: If terminal info query fails.
     """
-    if not _MT5_AVAILABLE or mt5 is None:
+    client_inst = _resolve_client(client)
+    mt5 = getattr(client_inst, "mt5", client_inst)
+    if mt5 is None or not getattr(client_inst, "is_available", lambda: True)():
         msg = "MetaTrader5 package is not available."
         raise RuntimeError(msg)
 
@@ -234,12 +295,19 @@ def get_provider_specification() -> dict[str, Any]:
     }
 
 
-def get_last_error() -> tuple[int, str]:
+def get_last_error(
+    client: MetaTraderClient | Any | None = None,
+) -> tuple[int, str]:
     """Retrieve last MetaTrader 5 error code and description.
+
+    Args:
+        client: Optional MetaTraderClient instance.
 
     Returns:
         Tuple of (error_code, description).
     """
-    if _MT5_AVAILABLE and mt5 is not None:
+    client_inst = _resolve_client(client)
+    mt5 = getattr(client_inst, "mt5", client_inst)
+    if mt5 is not None and hasattr(mt5, "last_error"):
         return mt5.last_error()
-    return _terminal_state["last_error"]
+    return client_inst.state.get("last_error", (0, "Success"))

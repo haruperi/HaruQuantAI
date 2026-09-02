@@ -4,17 +4,17 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import app.services.brokers.metatrader._order_info as order_mod
 import pytest
 from app.services.brokers.metatrader._order_info import (
     check_order,
     get_order,
     get_orders,
 )
+from app.services.brokers.metatrader.client import MetaTraderClient
 
 
-def test_get_orders_and_check_success(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Verify active orders retrieval and pre-trade checks."""
+def test_get_orders_and_check_success() -> None:
+    """Verify active orders retrieval and pre-trade checks via client instance."""
     mock_order = MagicMock()
     mock_order.ticket = 101
     mock_order._asdict.return_value = {
@@ -32,30 +32,34 @@ def test_get_orders_and_check_success(monkeypatch: pytest.MonkeyPatch) -> None:
         "margin_free": 53375.40,
     }
 
-    monkeypatch.setattr(order_mod.mt5, "orders_get", lambda **kw: (mock_order,))
-    monkeypatch.setattr(order_mod.mt5, "order_check", lambda req: mock_check)
+    mock_mt5 = MagicMock()
+    mock_mt5.orders_get.return_value = (mock_order,)
+    mock_mt5.order_check.return_value = mock_check
 
-    orders = get_orders()
+    client = MetaTraderClient(mt5_module=mock_mt5)
+
+    orders = get_orders(client=client)
     assert len(orders) == 1
     assert orders[0]["ticket"] == 101
 
-    order = get_order(101)
+    order = get_order(101, client=client)
     assert order is not None
     assert order["ticket"] == 101
 
-    chk = check_order({"symbol": "EURUSD", "volume": 0.1, "type": 0})
+    chk = check_order({"symbol": "EURUSD", "volume": 0.1, "type": 0}, client=client)
     assert chk["retcode"] == 0
     assert chk["margin"] == 100.0
 
 
-def test_get_orders_failure_raises_error(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_get_orders_failure_raises_error() -> None:
     """Verify orders query failure raises RuntimeError."""
-    monkeypatch.setattr(order_mod.mt5, "orders_get", lambda **kw: None)
-    monkeypatch.setattr(
-        order_mod.mt5, "last_error", lambda: (-10004, "No IPC connection")
-    )
+    mock_mt5 = MagicMock()
+    mock_mt5.orders_get.return_value = None
+    mock_mt5.last_error.return_value = (-10004, "No IPC connection")
+
+    client = MetaTraderClient(mt5_module=mock_mt5)
 
     with pytest.raises(
         RuntimeError, match=r"Failed to retrieve orders from MetaTrader 5"
     ):
-        get_orders()
+        get_orders(client=client)

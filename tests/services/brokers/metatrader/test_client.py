@@ -4,14 +4,10 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import app.services.brokers.metatrader._account_info as acc_mod
-import app.services.brokers.metatrader._order_info as order_mod
-import app.services.brokers.metatrader._positions_info as pos_mod
-import app.services.brokers.metatrader._symbol_info as sym_mod
-import app.services.brokers.metatrader._terminal_info as term_mod
-import app.services.brokers.metatrader._trade as trade_mod
+import app.services.brokers.metatrader.client as client_mod
 import pytest
 from app.services.brokers.metatrader.client import (
+    MetaTraderClient,
     MetaTraderService,
     fr_brk_metatrader,
 )
@@ -58,23 +54,27 @@ def _setup_mt5_mocks(monkeypatch: pytest.MonkeyPatch) -> None:
     mock_trade_res.order = 100501
     mock_trade_res._asdict.return_value = {"retcode": 10009, "order": 100501}
 
-    for mod in (term_mod, acc_mod, sym_mod, order_mod, pos_mod, trade_mod):
-        monkeypatch.setattr(mod.mt5, "initialize", lambda **kw: True)
-        monkeypatch.setattr(mod.mt5, "terminal_info", lambda: mock_terminal)
-        monkeypatch.setattr(mod.mt5, "version", lambda: (500, 6140, "2026-08-21"))
-        monkeypatch.setattr(mod.mt5, "account_info", lambda: mock_acc)
-        monkeypatch.setattr(mod.mt5, "symbols_get", lambda: (sym,))
-        monkeypatch.setattr(mod.mt5, "symbol_info", lambda s: mock_info)
-        monkeypatch.setattr(mod.mt5, "symbol_info_tick", lambda s: mock_tick)
-        monkeypatch.setattr(mod.mt5, "symbol_select", lambda s, e: True)
-        monkeypatch.setattr(mod.mt5, "orders_get", lambda **kw: (mock_order,))
-        monkeypatch.setattr(mod.mt5, "positions_get", lambda **kw: (mock_pos,))
-        monkeypatch.setattr(mod.mt5, "order_send", lambda req: mock_trade_res)
+    mock_mt5 = MagicMock()
+    mock_mt5.initialize.return_value = True
+    mock_mt5.terminal_info.return_value = mock_terminal
+    mock_mt5.version.return_value = (500, 6140, "2026-08-21")
+    mock_mt5.account_info.return_value = mock_acc
+    mock_mt5.symbols_get.return_value = (sym,)
+    mock_mt5.symbol_info.return_value = mock_info
+    mock_mt5.symbol_info_tick.return_value = mock_tick
+    mock_mt5.symbol_select.return_value = True
+    mock_mt5.orders_get.return_value = (mock_order,)
+    mock_mt5.positions_get.return_value = (mock_pos,)
+    mock_mt5.order_send.return_value = mock_trade_res
+
+    monkeypatch.setattr(client_mod, "mt5", mock_mt5)
+    default_client = MetaTraderClient(mt5_module=mock_mt5)
+    client_mod.set_default_client(default_client)
 
 
 def test_service_class_and_fr_report() -> None:
     """Verify MetaTraderService class implements required capability protocol."""
-    service = MetaTraderService()
+    service = MetaTraderService(client=client_mod.get_default_client())
     conn_res = service.connect()
     assert conn_res["status"] == "connected"
     assert service.is_connected() is True
@@ -97,8 +97,24 @@ def test_service_class_and_fr_report() -> None:
     trade = service.place_order({"symbol": "EURUSD", "volume": 0.1})
     assert trade["retcode"] == 10009
 
-    report = fr_brk_metatrader()
+    report = fr_brk_metatrader(client=client_mod.get_default_client())
     assert report["platform"] == "mt5"
     assert report["symbols"] == 1
 
     assert service.disconnect() is True
+
+
+def test_client_instance_isolation() -> None:
+    """Verify that multiple MetaTraderClient instances maintain independent state."""
+    mock_mt5_a = MagicMock()
+    mock_mt5_b = MagicMock()
+    mock_mt5_a.initialize.return_value = True
+    mock_mt5_b.initialize.return_value = True
+
+    client_a = MetaTraderClient(mt5_module=mock_mt5_a)
+    client_b = MetaTraderClient(mt5_module=mock_mt5_b)
+
+    client_a.connect(login=11111)
+    assert client_a.state["login"] == 11111
+    assert client_b.state["login"] is None
+    assert client_b.is_connected() is False
