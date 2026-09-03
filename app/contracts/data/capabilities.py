@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from app.kernel.capability import CapabilityKey
 
 if TYPE_CHECKING:
+    from app.contracts.data.market_data_store import MarketDataStoreCapability
     from app.contracts.data.ports import (
         AggregateBarsCapability,
         AlignSeriesCapability,
@@ -94,4 +95,9 @@ STREAM_MARKET_EVENTS_CAPABILITY: CapabilityKey[StreamMarketEventsCapability] = (
         name="data.stream-market-events",
         major=1,
     )
+)
+
+MARKET_DATA_STORE_CAPABILITY: CapabilityKey[MarketDataStoreCapability] = CapabilityKey(
+    name="data.market-data-store",
+    major=1,
 )

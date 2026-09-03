@@ -35,6 +35,8 @@ dependencies = [
     "tqdm>=4.70.0",
     "httpx>=0.28.1",
     "openai>=3.3.1",
+    "duckdb>=1.0.0",
+    "polars>=1.0.0",
 ]
 
 [project.scripts]
@@ -58,6 +60,7 @@ data-economic-news-evidence = "app.services.data.economic_news_evidence.feature:
 data-external-indicator-series = "app.services.data.external_indicator_series.feature:feature"
 data-external-series-alignment = "app.services.data.external_series_alignment.feature:feature"
 data-historical-data-ingestion = "app.services.data.historical_data_ingestion.feature:feature"
+data-market-data-store = "app.services.data.market_data_store.feature:feature"
 data-profile-source-preparation = "app.services.data.profile_source_preparation.feature:feature"
 data-quantdata-manager-source = "app.services.data.quantdata_manager_source.feature:feature"
 data-realtime-market-events = "app.services.data.realtime_market_events.feature:feature"
@@ -343,6 +346,8 @@ module = "scripts.*"
 check_untyped_defs = false
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
+[[tool.mypy.overrides]]
+module = "app.services.data.market_data_store.*"
 disallow_untyped_calls = false
 
 [[tool.mypy.overrides]]
@@ -365,9 +370,14 @@ module = [
     "twisted.*",
     "numba",
     "numba.*",
-    "service_identity"
+    "service_identity",
+    "pyarrow",
+    "pyarrow.*",
+    "duckdb",
+    "duckdb.*",
 ]
 ignore_missing_imports = true
+disallow_untyped_calls = false
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]
