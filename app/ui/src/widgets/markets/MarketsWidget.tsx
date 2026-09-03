@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
 import { useWorkspaceStore } from '../workspaces';
-import { apiClients, unwrapData, type MarketRow, type Watchlist } from '@/clients';
+import { ApiClientError, apiClients, unwrapData, type MarketRow, type Watchlist } from '@/clients';
 import { MoreVertical, LineChart, AlignJustify } from 'lucide-react';
 
 import { CmeProgressBar } from '../../components/common/CmeProgressBar';
@@ -77,19 +77,28 @@ const STREAM_SETTLING_SECONDS = 10;
 
 type SortKey = 'Symbol' | 'Change' | 'Volatility' | 'ADR' | 'Range';
 
+/** Widget status includes the explicit gateway-unavailable state (D-UI §4.8). */
+type MarketsStatus = 'loading' | 'settling' | 'ready' | 'error' | 'unavailable';
+
 interface MarketsWidgetProps {
   /** Production defaults to 10 seconds; tests may inject a shorter clock. */
   streamSettlingMs?: number;
+  /** Directory page size (bounded by the owning feature configuration). */
+  pageSize?: number;
+  /** Maximum directory pages fetched per load (bounded anti-walk cap). */
+  maxPages?: number;
 }
 
 export const MarketsWidget: React.FC<MarketsWidgetProps> = ({
   streamSettlingMs = STREAM_SETTLING_SECONDS * 1_000,
+  pageSize = MARKETS_PAGE_SIZE,
+  maxPages = MARKETS_MAX_PAGES,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Forex');
   const [sortBy, setSortBy] = useState<SortKey>('Symbol');
   const [activeMenuSymbol, setActiveMenuSymbol] = useState<string | null>(null);
   const [directory, setDirectory] = useState<DisplayRow[]>([]);
-  const [status, setStatus] = useState<'loading' | 'settling' | 'ready' | 'error'>('loading');
+  const [status, setStatus] = useState<MarketsStatus>('loading');
   const [settlingSeconds, setSettlingSeconds] = useState(STREAM_SETTLING_SECONDS);
   const [isDocumentVisible, setIsDocumentVisible] = useState(
     () => document.visibilityState === 'visible'
@@ -212,24 +221,24 @@ export const MarketsWidget: React.FC<MarketsWidgetProps> = ({
           if (!cancelled) setStatus('settling');
         } else {
           let cursor: string | undefined;
-          for (let page = 0; page < MARKETS_MAX_PAGES; page++) {
-            const startPct = Math.round((page / MARKETS_MAX_PAGES) * 100);
+          for (let page = 0; page < maxPages; page++) {
+            const startPct = Math.round((page / maxPages) * 100);
             setLoadProgress({
               value: Math.max(startPct, 15),
               max: 100,
-              label: `Loading market directory (Page ${page + 1} of ${MARKETS_MAX_PAGES})…`,
+              label: `Loading market directory (Page ${page + 1} of ${maxPages})…`,
             });
 
-            const response = await apiClients.data.markets({ limit: MARKETS_PAGE_SIZE, cursor, includeTechnicals: true });
+            const response = await apiClients.data.markets({ limit: pageSize, cursor, includeTechnicals: true });
             if (cancelled) return;
             const directoryPage = unwrapData(response);
             setDirectory((current) => [...current, ...directoryPage.rows.map(toDisplayRow)]);
 
-            const endPct = Math.round(((page + 1) / MARKETS_MAX_PAGES) * 100);
+            const endPct = Math.round(((page + 1) / maxPages) * 100);
             setLoadProgress({
               value: endPct,
               max: 100,
-              label: `Loaded Page ${page + 1} of ${MARKETS_MAX_PAGES} (${endPct}%)`,
+              label: `Loaded Page ${page + 1} of ${maxPages} (${endPct}%)`,
             });
 
             if (!directoryPage.next_cursor) {
@@ -240,10 +249,15 @@ export const MarketsWidget: React.FC<MarketsWidgetProps> = ({
           }
           if (!cancelled) setStatus('settling');
         }
-      } catch {
+      } catch (cause) {
         if (cancelled) return;
-        setErrorMsg('Unable to load the market directory.');
-        setStatus('error');
+        if (cause instanceof ApiClientError && cause.status === 503) {
+          setErrorMsg('The market catalogue gateway is unavailable.');
+          setStatus('unavailable');
+        } else {
+          setErrorMsg('Unable to load the market directory.');
+          setStatus('error');
+        }
       }
     };
 
@@ -251,7 +265,7 @@ export const MarketsWidget: React.FC<MarketsWidgetProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [watchlistsLoaded, activeWatchlistId, activeWatchlist]);
+  }, [watchlistsLoaded, activeWatchlistId, activeWatchlist, pageSize, maxPages]);
 
   const snapshotSymbols = directory.map((row) => row.symbol).sort().join(',');
 
@@ -491,6 +505,11 @@ export const MarketsWidget: React.FC<MarketsWidgetProps> = ({
         {status === 'error' && (
           <div role="alert" style={{ padding: '8px 24px', textAlign: 'center', color: 'var(--financial-negative, #ff4975)' }}>
             {errorMsg}
+          </div>
+        )}
+        {status === 'unavailable' && (
+          <div role="alert" style={{ padding: '8px 24px', textAlign: 'center', color: 'var(--financial-negative, #ff4975)' }}>
+            {errorMsg} No market data is shown until the catalogue gateway returns.
           </div>
         )}
         {status === 'ready' && sortedProducts.length === 0 && (

@@ -9,7 +9,7 @@
  */
 import React from 'react';
 
-import { MarketsWidget } from '../../widgets/markets';
+import { MarketsFeature } from '../../widgets/markets';
 import { MarketTicksFeature } from '../../widgets/market-ticks';
 import { WatchlistWidget } from '../../widgets/watchlists';
 import { ChartWidget } from '../../widgets/chart';
@@ -38,7 +38,7 @@ import type { Widget } from '../../widgets/workspaces';
 export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
   switch (widget.type) {
     case 'markets':
-      return <MarketsWidget />;
+      return <MarketsFeature />;
     case 'marketTicks':
       return <MarketTicksFeature />;
     case 'watchlist':

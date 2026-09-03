@@ -2,6 +2,36 @@
 
 ## [Unreleased]
 
+### Migrate Markets to the full D-UI feature shape
+
+`FEAT-UI-02` is the second widget migrated to the D-UI model (Phase 6
+continues on the Market Ticks reference): typed `manifest.ts`, strict
+`config.ts`, and a `feature.tsx` lifecycle adapter, while
+`MarketsWidget.tsx` keeps focused presentation. The widget now renders an
+explicit `unavailable` state when the catalogue gateway answers 503 —
+distinct from the transient load error — and its directory page size,
+page cap, and settling window are configuration-owned instead of module
+constants. `WidgetContentHost` renders the feature adapter, and its
+silent unknown-type fallback is untouched.
+
+#### Added (4)
+
+- Added `manifest.ts` declaring `FEAT-UI-02`, required
+  `interfaces.observe-market-catalogue@1`, optional
+  `interfaces.observe-market-data@1`, placement/dimensions, the optional
+  SSE enrichment subscription, effects, accessibility, and removal
+  semantics.
+- Added strict `config.ts` (pageSize 1..200, maxPages 1..10,
+  settling 1..60s, persisted-state schema version) where unknown fields
+  throw and partial input overlays documented defaults.
+- Added `feature.tsx` owning the configuration lifecycle and the
+  explicit invalid-configuration response; `MarketsWidget` accepts
+  configuration-derived props.
+- Added feature/manifest/config tests (39 markets tests total) covering
+  configuration application, catalogue-503 unavailable, transient
+  errors, invalid-config rejection without transport activity, and
+  workspace-host registration.
+
 ### Expose the market catalogue browse boundary
 
 `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE` opens Phase 6 with the backend
