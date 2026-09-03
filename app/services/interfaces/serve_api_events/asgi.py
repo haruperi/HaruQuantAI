@@ -35,12 +35,18 @@ from typing import TYPE_CHECKING
 from urllib.parse import parse_qs
 from uuid import uuid4, uuid7
 
-from app.contracts.interfaces.capabilities import OBSERVE_MARKET_DATA_CAPABILITY
+from app.contracts.catalogue.capabilities import CATALOG_INSTRUMENTS_CAPABILITY
+from app.contracts.interfaces.capabilities import (
+    OBSERVE_MARKET_CATALOGUE_CAPABILITY,
+    OBSERVE_MARKET_DATA_CAPABILITY,
+)
 from app.contracts.interfaces.models import (
     ApiError,
     ApiMetadata,
     ApiResponse,
     MarketTickSnapshot,
+    ObserveMarketCatalogueRequest,
+    ObserveMarketCatalogueSuccess,
     ObserveMarketDataEventSubscription,
     ObserveMarketDataRequest,
     ObserveMarketDataSuccess,
@@ -53,6 +59,7 @@ if TYPE_CHECKING:
 
     from app.contracts.interfaces.errors import InterfaceFailure
     from app.contracts.interfaces.ports import ObserveMarketDataCapability
+    from app.kernel.capability import CapabilityKey
     from app.kernel.registry import ServiceRegistry
 
 type Scope = MutableMapping[str, Any]
@@ -63,6 +70,7 @@ type AsgiApp = Callable[[Scope, Receive, Send], Awaitable[None]]
 
 _TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 _MAX_SYMBOLS = 200
+_MAX_CATALOGUE_PAGE_SIZE = 500
 _UUID7_PATTERN = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 )
@@ -71,6 +79,9 @@ _SNAPSHOT_ROUTE = "/api/v1/market/ticks"
 _STREAM_ROUTE = "/api/v1/market/ticks/stream"
 _ALIAS_STREAM_ROUTE = "/api/v1/data/snapshot-stream"
 _STREAM_ROUTES = frozenset({_STREAM_ROUTE, _ALIAS_STREAM_ROUTE})
+_CATALOGUE_ROUTES = ("/api/v1/market/catalogue", "/api/v1/data/markets")
+_CATALOGUE_OPERATION = "api.market.catalogue"
+_PROVIDER_CATALOGUE_SOURCE_ID = CATALOG_INSTRUMENTS_CAPABILITY.identifier
 
 
 def _utc_now() -> str:
@@ -347,18 +358,22 @@ def _snapshot_of(
     return result.snapshot
 
 
-async def _resolve_gateway(
+async def _resolve_gateway[CapT](
     registry: ServiceRegistry,
+    capability: CapabilityKey[CapT],
+    unavailable_detail: str,
     route: str,
     operation: str,
     request_id: str,
     trace_id: str | None,
     send: Send,
-) -> ObserveMarketDataCapability | None:
-    """Resolve the observation gateway or serve the unavailable failure.
+) -> CapT | None:
+    """Resolve one gateway capability or serve the unavailable failure.
 
     Args:
         registry: Live composition service registry.
+        capability: Capability key of the required gateway.
+        unavailable_detail: Failure detail naming the capability.
         route: Served route path.
         operation: Canonical operation name.
         request_id: Mirrored or generated request identifier.
@@ -368,7 +383,7 @@ async def _resolve_gateway(
     Returns:
         Active gateway, or None after serving the failure envelope.
     """
-    gateway = registry.resolve(OBSERVE_MARKET_DATA_CAPABILITY)
+    gateway = registry.resolve(capability)
     if gateway is not None:
         return gateway
     await _send_json(
@@ -380,7 +395,7 @@ async def _resolve_gateway(
             operation,
             HTTPStatus.SERVICE_UNAVAILABLE,
             "CAPABILITY_UNAVAILABLE",
-            "The market observation capability has no active provider.",
+            unavailable_detail,
             trace_id,
         ),
     )
@@ -450,7 +465,14 @@ async def _serve_snapshot(
     if symbols is None:
         return
     gateway = await _resolve_gateway(
-        registry, _SNAPSHOT_ROUTE, operation, request_id, trace_id, send
+        registry,
+        OBSERVE_MARKET_DATA_CAPABILITY,
+        "The market observation capability has no active provider.",
+        _SNAPSHOT_ROUTE,
+        operation,
+        request_id,
+        trace_id,
+        send,
     )
     if gateway is None:
         return
@@ -576,7 +598,14 @@ async def _serve_stream(
     if symbols is None:
         return
     gateway = await _resolve_gateway(
-        registry, route, operation, request_id, trace_id, send
+        registry,
+        OBSERVE_MARKET_DATA_CAPABILITY,
+        "The market observation capability has no active provider.",
+        route,
+        operation,
+        request_id,
+        trace_id,
+        send,
     )
     if gateway is None:
         return
@@ -631,6 +660,107 @@ async def _serve_stream(
             await send({"type": "http.response.body", "body": b"", "more_body": False})
 
 
+async def _serve_catalogue(
+    registry: ServiceRegistry,
+    scope: Scope,
+    _receive: Receive,
+    send: Send,
+) -> None:
+    """Serve one market catalogue browse request.
+
+    Args:
+        registry: Live composition service registry.
+        scope: ASGI connection scope.
+        _receive: Unused for GET catalogue requests.
+        send: ASGI send callable.
+    """
+    request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
+    trace_id = _header(scope, "x-trace-id")
+    route = str(scope.get("path", _CATALOGUE_ROUTES[0]))
+    query = parse_qs(scope.get("query_string", b"").decode("latin-1"))
+    raw_limit = query.get("limit", [""])[0]
+    try:
+        page_size = int(raw_limit) if raw_limit else 100
+    except ValueError:
+        page_size = -1
+    if not 1 <= page_size <= _MAX_CATALOGUE_PAGE_SIZE:
+        await _send_json(
+            send,
+            HTTPStatus.BAD_REQUEST,
+            _error_response(
+                request_id,
+                route,
+                _CATALOGUE_OPERATION,
+                HTTPStatus.BAD_REQUEST,
+                "VALIDATION_ERROR",
+                "limit must be an integer between 1 and 500.",
+                trace_id,
+            ),
+        )
+        return
+    page_cursor = query.get("cursor", [None])[0]
+    gateway = await _resolve_gateway(
+        registry,
+        OBSERVE_MARKET_CATALOGUE_CAPABILITY,
+        "The market catalogue capability has no active provider.",
+        route,
+        _CATALOGUE_OPERATION,
+        request_id,
+        trace_id,
+        send,
+    )
+    if gateway is None:
+        return
+    request = ObserveMarketCatalogueRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="LIST",
+        page_size=page_size,
+        page_cursor=page_cursor,
+    )
+    result = await gateway.observe_market_catalogue(request)
+    if not isinstance(result, ObserveMarketCatalogueSuccess):
+        failure = result
+        await _send_json(
+            send,
+            HTTPStatus.SERVICE_UNAVAILABLE,
+            _error_response(
+                request_id,
+                route,
+                _CATALOGUE_OPERATION,
+                HTTPStatus.SERVICE_UNAVAILABLE,
+                failure.code,
+                failure.problem.detail,
+                trace_id,
+            ),
+        )
+        return
+    data: dict[str, Any] = {
+        "source_id": _PROVIDER_CATALOGUE_SOURCE_ID,
+        "rows": [entry.model_dump(mode="json") for entry in result.entries],
+        "limit": page_size,
+        "next_cursor": result.next_cursor,
+        "revision": result.revision,
+        "generated_at": result.generated_at,
+        "request_id": result.request_id,
+    }
+    envelope = ApiResponse(
+        status="success",
+        message=HTTPStatus.OK.phrase,
+        data=data,
+        metadata=_metadata(
+            request_id,
+            route,
+            _CATALOGUE_OPERATION,
+            "read",
+            False,
+            None,
+            trace_id,
+        ),
+    )
+    await _send_json(send, HTTPStatus.OK, envelope)
+
+
 async def _lifespan(receive: Receive, send: Send) -> None:
     """Answer the ASGI lifespan protocol without owning feature state.
 
@@ -675,6 +805,8 @@ async def _dispatch(
         )
     elif path == _SNAPSHOT_ROUTE:
         await _serve_snapshot(registry, scope, receive, send)
+    elif path in _CATALOGUE_ROUTES:
+        await _serve_catalogue(registry, scope, receive, send)
     elif path in _STREAM_ROUTES:
         await _serve_stream(registry, scope, receive, send)
     else:

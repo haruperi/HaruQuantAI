@@ -182,6 +182,25 @@ export interface InterfaceFailure {
 export type InterfaceFailureCode = "INTERFACE_VALIDATION_FAILED" | "VERSION_CONFLICT" | "IDEMPOTENCY_CONFLICT" | "EVENT_CURSOR_EXPIRED" | "JOB_NOT_FOUND" | "DURABLE_JOB_NOT_FOUND" | "ARTIFACT_ACCESS_DENIED" | "API_INCOMPATIBLE" | "UPGRADE_REQUIRED" | "CAPABILITY_UNAVAILABLE";
 export type KillSwitchScopeKind = "GLOBAL" | "ENVIRONMENT" | "BROKER_ACCOUNT" | "PORTFOLIO" | "STRATEGY" | "SYMBOL";
 export type KillSwitchSignalState = "ACTIVE" | "CLEARED" | "UNKNOWN";
+export interface MarketCatalogueEntry {
+  symbol: NonEmptyStr;
+  name: NonEmptyStr;
+  asset_class: NonEmptyStr;
+  source_id: NonEmptyStr;
+  digits?: number | null;  // default: null
+  last?: number | null;  // default: null
+  bid?: number | null;  // default: null
+  ask?: number | null;  // default: null
+  spread?: number | null;  // default: null
+  volume?: number | null;  // default: null
+  open?: number | null;  // default: null
+  high?: number | null;  // default: null
+  low?: number | null;  // default: null
+  close?: number | null;  // default: null
+  change?: number | null;  // default: null
+  change_percent?: number | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
 export type MarketStatus = "OPEN" | "CLOSED" | "UNKNOWN";
 export interface MarketTickQuote {
   symbol: NonEmptyStr;
@@ -206,6 +225,24 @@ export interface McpOperation {
   schema_version?: 1;  // default: 1
 }
 export type McpOperationName = "LIST_PROJECTS" | "LIST_DATABANKS" | "LIST_STRATEGIES" | "GET_STRATEGY_STATISTICS" | "RUN_PROJECT" | "STOP_PROJECT";
+export interface ObserveMarketCatalogueRequest {
+  request_id: string;
+  capability_snapshot_id: string;
+  operation: "LIST";
+  page_size?: number;  // default: 100
+  page_cursor?: string | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
+export interface ObserveMarketCatalogueSuccess {
+  outcome?: "SUCCESS";  // default: "SUCCESS"
+  request_id: string;
+  result_version?: 1;  // default: 1
+  entries?: MarketCatalogueEntry[];  // default: []
+  next_cursor?: string | null;  // default: null
+  revision: NonEmptyStr;
+  generated_at: string;
+  schema_version?: 1;  // default: 1
+}
 export interface ObserveMarketDataEventSubscription {
   symbols?: NonEmptyStr[];  // default: []
   resume_event_id?: string | null;  // default: null

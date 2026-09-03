@@ -1971,6 +1971,184 @@
       "title": "KillSwitchState",
       "type": "object"
     },
+    "MarketCatalogueEntry": {
+      "additionalProperties": false,
+      "description": "Wire-native market catalogue row projection (record R23).\n\nOne projected catalogue row: identity and precision fields come from\nthe owning catalogue; live price fields are reserved for enrichment\nand are never populated with invented values by this projection.",
+      "properties": {
+        "ask": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ask"
+        },
+        "asset_class": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "bid": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bid"
+        },
+        "change": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Change"
+        },
+        "change_percent": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Change Percent"
+        },
+        "close": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Close"
+        },
+        "digits": {
+          "anyOf": [
+            {
+              "maximum": 18,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Digits"
+        },
+        "high": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "High"
+        },
+        "last": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last"
+        },
+        "low": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Low"
+        },
+        "name": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "open": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Open"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "spread": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Spread"
+        },
+        "symbol": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "volume": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Volume"
+        }
+      },
+      "required": [
+        "symbol",
+        "name",
+        "asset_class",
+        "source_id"
+      ],
+      "title": "MarketCatalogueEntry",
+      "type": "object"
+    },
     "MarketStatus": {
       "enum": [
         "OPEN",
@@ -2143,6 +2321,123 @@
     "NonNegativeInt": {
       "minimum": 0,
       "type": "integer"
+    },
+    "ObserveMarketCatalogueRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated market catalogue browse request.\n\nLIST accepts an optional continuation cursor and bounded page size.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "const": "LIST",
+          "title": "Operation",
+          "type": "string"
+        },
+        "page_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Cursor"
+        },
+        "page_size": {
+          "default": 100,
+          "maximum": 500,
+          "minimum": 1,
+          "title": "Page Size",
+          "type": "integer"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ObserveMarketCatalogueRequest",
+      "type": "object"
+    },
+    "ObserveMarketCatalogueSuccess": {
+      "additionalProperties": false,
+      "description": "Successful market catalogue browse result.\n\n``revision`` identifies the catalogue state the page was projected\nfrom and ``generated_at`` records the projection instant.",
+      "properties": {
+        "entries": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MarketCatalogueEntry"
+          },
+          "title": "Entries",
+          "type": "array"
+        },
+        "generated_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Next Cursor"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "revision": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "revision",
+        "generated_at"
+      ],
+      "title": "ObserveMarketCatalogueSuccess",
+      "type": "object"
     },
     "ObserveMarketDataEventSubscription": {
       "additionalProperties": false,
@@ -5386,6 +5681,9 @@
     "EventReplayBatch": {
       "$ref": "#/$defs/EventReplayBatch"
     },
+    "MarketCatalogueEntry": {
+      "$ref": "#/$defs/MarketCatalogueEntry"
+    },
     "MarketTickQuote": {
       "$ref": "#/$defs/MarketTickQuote"
     },
@@ -5394,6 +5692,12 @@
     },
     "McpOperation": {
       "$ref": "#/$defs/McpOperation"
+    },
+    "ObserveMarketCatalogueRequest": {
+      "$ref": "#/$defs/ObserveMarketCatalogueRequest"
+    },
+    "ObserveMarketCatalogueSuccess": {
+      "$ref": "#/$defs/ObserveMarketCatalogueSuccess"
     },
     "ObserveMarketDataEventSubscription": {
       "$ref": "#/$defs/ObserveMarketDataEventSubscription"

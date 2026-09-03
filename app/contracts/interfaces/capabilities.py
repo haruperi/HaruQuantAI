@@ -9,6 +9,7 @@ if TYPE_CHECKING:
         AdministerCapabilitiesCapability,
         AutomateCommandsCapability,
         EditProjectsCapability,
+        ObserveMarketCatalogueCapability,
         ObserveMarketDataCapability,
         OperatePortfoliosCapability,
         OperateResearchCapability,
@@ -24,6 +25,13 @@ SERVE_API_EVENTS_CAPABILITY: CapabilityKey[ServeApiEventsCapability] = Capabilit
 OBSERVE_MARKET_DATA_CAPABILITY: CapabilityKey[ObserveMarketDataCapability] = (
     CapabilityKey(
         name="interfaces.observe-market-data",
+        major=1,
+    )
+)
+
+OBSERVE_MARKET_CATALOGUE_CAPABILITY: CapabilityKey[ObserveMarketCatalogueCapability] = (
+    CapabilityKey(
+        name="interfaces.observe-market-catalogue",
         major=1,
     )
 )

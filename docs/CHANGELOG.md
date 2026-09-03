@@ -2,6 +2,40 @@
 
 ## [Unreleased]
 
+### Expose the market catalogue browse boundary
+
+`FEAT-IFACE-OBSERVE_MARKET_CATALOGUE` opens Phase 6 with the backend
+half of the Markets widget slice: it projects the Catalogue-owned
+instrument catalogue (`catalogue.catalog-instruments@1`) into bounded
+browse pages served at `GET /api/v1/data/markets` (the adopted alias the
+typed client already calls) and `GET /api/v1/market/catalogue`
+(canonical). Rows carry identity, asset class, and precision from the
+catalogue; live price fields are served as explicit nulls because the
+catalogue owns no market prices, and technical overlays stay absent.
+
+#### Added (6)
+
+- Added the `interfaces.observe-market-catalogue@1` capability with the
+  `ObserveMarketCatalogueCapability` protocol and three public wire
+  records (`MarketCatalogueEntry`, `ObserveMarketCatalogueRequest`,
+  `ObserveMarketCatalogueSuccess`); regenerated wire schemas and
+  generated TypeScript contracts (interfaces family now 28 records / 9
+  bundles).
+- Added the `observe_market_catalogue` feature package (`manifest.py`,
+  `config.py`, `gateway.py`, `feature.py`) with page-size clamping and
+  one bounded usage harness.
+- Added gateway and lifecycle tests: page projection, cursor flow,
+  page-size clamping, provider-failure mapping, disposal, mount
+  blocking, rollback, and withdrawal semantics.
+- Generalized the ASGI capability resolver to any capability key and
+  served the two catalogue routes with the frozen
+  `MarketDirectory`-shaped payload, uniform validation envelopes, and
+  the stable 503 `CAPABILITY_UNAVAILABLE` translation.
+- Added ASGI tests for both routes: adopted directory shape, invalid
+  limit rejection, and fail-closed absence.
+- Registered the `interfaces-observe-market-catalogue` entry point and
+  updated the domain and services registries.
+
 ### Prove Market Ticks end-to-end spatiotemporal removal
 
 The Market Ticks vertical slice now carries the full Phase 5 removal

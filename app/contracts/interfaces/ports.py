@@ -28,6 +28,8 @@ if TYPE_CHECKING:
         EditProjectsSuccess,
         EventReplayBatch,
         InterfaceEventEnvelope,
+        ObserveMarketCatalogueRequest,
+        ObserveMarketCatalogueSuccess,
         ObserveMarketDataEventSubscription,
         ObserveMarketDataRequest,
         ObserveMarketDataSuccess,
@@ -398,6 +400,26 @@ class ObserveMarketDataCapability(Protocol):
             An asynchronous iterator of market observation events wrapped
             in the common domain event envelope with ordered replay and
             resync semantics.
+        """
+        ...
+
+
+@runtime_checkable
+class ObserveMarketCatalogueCapability(Protocol):
+    """Protocol for the market catalogue browsing gateway."""
+
+    async def observe_market_catalogue(
+        self,
+        request: ObserveMarketCatalogueRequest,
+    ) -> ObserveMarketCatalogueSuccess | InterfaceFailure:
+        """Resolve and expose bounded market catalogue pages.
+
+        Args:
+            request: Operation-discriminated catalogue browse request.
+
+        Returns:
+            The projected catalogue page on success, otherwise a
+            structured interface failure.
         """
         ...
 

@@ -1330,6 +1330,64 @@ class ApiResponse(WireModel):
     schema_version: Literal[1] = 1
 
 
+class MarketCatalogueEntry(WireModel):
+    """Wire-native market catalogue row projection (record R23).
+
+    One projected catalogue row: identity and precision fields come from
+    the owning catalogue; live price fields are reserved for enrichment
+    and are never populated with invented values by this projection.
+    """
+
+    symbol: NonEmptyStr
+    name: NonEmptyStr
+    asset_class: NonEmptyStr
+    source_id: NonEmptyStr
+    digits: int | None = Field(default=None, ge=0, le=18)
+    last: float | None = None
+    bid: float | None = None
+    ask: float | None = None
+    spread: float | None = None
+    volume: float | None = None
+    open: float | None = None
+    high: float | None = None
+    low: float | None = None
+    close: float | None = None
+    change: float | None = None
+    change_percent: float | None = None
+    schema_version: Literal[1] = 1
+
+
+class ObserveMarketCatalogueRequest(WireModel):
+    """Operation-discriminated market catalogue browse request.
+
+    LIST accepts an optional continuation cursor and bounded page size.
+    """
+
+    request_id: Uuid7
+    capability_snapshot_id: Uuid7
+    operation: Literal["LIST"]
+    page_size: int = Field(default=100, ge=1, le=500)
+    page_cursor: str | None = None
+    schema_version: Literal[1] = 1
+
+
+class ObserveMarketCatalogueSuccess(WireModel):
+    """Successful market catalogue browse result.
+
+    ``revision`` identifies the catalogue state the page was projected
+    from and ``generated_at`` records the projection instant.
+    """
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    entries: tuple[MarketCatalogueEntry, ...] = ()
+    next_cursor: str | None = None
+    revision: NonEmptyStr
+    generated_at: UtcTimestamp
+    schema_version: Literal[1] = 1
+
+
 # Wire projections register under their inventory names (``<Record>`` ->
 # ``<Record>Wire``); wire-native and request/success records register
 # directly. Nested components (``AutomationCommandDescriptor``,
@@ -1361,6 +1419,9 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
     "ApiMetadata": ApiMetadata,
     "ApiError": ApiError,
     "ApiResponse": ApiResponse,
+    "MarketCatalogueEntry": MarketCatalogueEntry,
+    "ObserveMarketCatalogueRequest": ObserveMarketCatalogueRequest,
+    "ObserveMarketCatalogueSuccess": ObserveMarketCatalogueSuccess,
     "OperateResearchRequest": OperateResearchRequest,
     "OperateResearchSuccess": OperateResearchSuccess,
     "EditProjectsRequest": EditProjectsRequest,

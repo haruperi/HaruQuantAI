@@ -231,9 +231,9 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 ### 4.10 `app/contracts/interfaces/`
 
-**Public records:** `ApiVersion`, `ConcurrencyToken`, `EventCursor`, `EventReplayBatch`, `AsyncJobRef`, `ArtifactDownloadRequest`, `BulkRequestToken`, `AutomationCommand`, `AutomationSchema`, `McpOperation`, `ResearchPreview`, `ProjectGraphProjection`, `PortfolioBuilderProjection`, `CapabilityAdministrationProjection`, `TradingActionPreview`, `TradingReadinessProjection`, `MarketTickQuote`, `MarketTickSnapshot`, `ObserveMarketDataRequest`, `ObserveMarketDataSuccess`, `ObserveMarketDataEventSubscription`, `StreamEvent`, `ApiMetadata`, `ApiError`, and `ApiResponse`.
+**Public records:** `ApiVersion`, `ConcurrencyToken`, `EventCursor`, `EventReplayBatch`, `AsyncJobRef`, `ArtifactDownloadRequest`, `BulkRequestToken`, `AutomationCommand`, `AutomationSchema`, `McpOperation`, `ResearchPreview`, `ProjectGraphProjection`, `PortfolioBuilderProjection`, `CapabilityAdministrationProjection`, `TradingActionPreview`, `TradingReadinessProjection`, `MarketTickQuote`, `MarketTickSnapshot`, `ObserveMarketDataRequest`, `ObserveMarketDataSuccess`, `ObserveMarketDataEventSubscription`, `StreamEvent`, `ApiMetadata`, `ApiError`, `ApiResponse`, `MarketCatalogueEntry`, `ObserveMarketCatalogueRequest`, and `ObserveMarketCatalogueSuccess`.
 
-**Capability bundles (8):** `ServeApiEventsCapability`, `ObserveMarketDataCapability`, `AutomateCommandsCapability`, `OperateResearchCapability`, `EditProjectsCapability`, `OperatePortfoliosCapability`, `AdministerCapabilitiesCapability`, and `OperateTradingCapability`.
+**Capability bundles (9):** `ServeApiEventsCapability`, `ObserveMarketDataCapability`, `ObserveMarketCatalogueCapability`, `AutomateCommandsCapability`, `OperateResearchCapability`, `EditProjectsCapability`, `OperatePortfoliosCapability`, `AdministerCapabilitiesCapability`, and `OperateTradingCapability`.
 
 ### 4.11 `app/contracts/ui/`
 

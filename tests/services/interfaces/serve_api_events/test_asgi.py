@@ -12,13 +12,29 @@ from uuid import uuid7
 import httpx
 import pytest
 import pytest_asyncio
-from app.contracts.interfaces.capabilities import OBSERVE_MARKET_DATA_CAPABILITY
+from app.contracts.catalogue.capabilities import CATALOG_INSTRUMENTS_CAPABILITY
+from app.contracts.interfaces.capabilities import (
+    OBSERVE_MARKET_CATALOGUE_CAPABILITY,
+    OBSERVE_MARKET_DATA_CAPABILITY,
+)
 from app.kernel.registry import ServiceRegistry
 from app.kernel.scope import FeatureScope
+from app.services.interfaces.observe_market_catalogue.config import (
+    ObserveMarketCatalogueConfig,
+)
+from app.services.interfaces.observe_market_catalogue.gateway import (
+    MarketCatalogueGateway,
+)
 from app.services.interfaces.observe_market_data.config import ObserveMarketDataConfig
 from app.services.interfaces.observe_market_data.gateway import MarketDataGateway
 from app.services.interfaces.serve_api_events.asgi import create_api_asgi_app
 
+from tests.services.interfaces.observe_market_catalogue.fakes import (
+    FakeCatalogueProvider,
+)
+from tests.services.interfaces.observe_market_catalogue.fakes import (
+    make_instrument as make_catalogue_instrument,
+)
 from tests.services.interfaces.observe_market_data.fakes import (
     QueuedStreamProvider,
     make_event,
@@ -395,3 +411,85 @@ async def test_lifespan_protocol_is_answered(
     await app({"type": "lifespan"}, receive, send)
     assert messages[0] == {"type": "lifespan.startup.complete"}
     assert messages[1] == {"type": "lifespan.shutdown.complete"}
+
+
+def _catalogue_registry() -> ServiceRegistry:
+    """Build a registry with a mounted catalogue gateway."""
+    provider = FakeCatalogueProvider(
+        {
+            "": (
+                make_catalogue_instrument("EURUSD", "Euro vs US Dollar"),
+                make_catalogue_instrument("GBPUSD", "British Pound vs US Dollar"),
+            )
+        }
+    )
+    gateway = MarketCatalogueGateway(
+        provider,
+        ObserveMarketCatalogueConfig(default_page_size=2, max_page_size=2),
+    )
+    registry = ServiceRegistry()
+    registry.register(
+        CATALOG_INSTRUMENTS_CAPABILITY,
+        provider,
+        owner_id="FEAT-CATALOGUE-INSTRUMENT_CATALOGUE",
+        scope=FeatureScope(owner_id="FEAT-CATALOGUE-INSTRUMENT_CATALOGUE"),
+    )
+    registry.register(
+        OBSERVE_MARKET_CATALOGUE_CAPABILITY,
+        gateway,
+        owner_id="FEAT-IFACE-OBSERVE_MARKET_CATALOGUE",
+        scope=FeatureScope(owner_id="FEAT-IFACE-OBSERVE_MARKET_CATALOGUE"),
+    )
+    return registry
+
+
+@pytest.mark.asyncio
+async def test_catalogue_route_serves_adopted_directory_shape() -> None:
+    """Verify both catalogue routes serve the frozen directory contract."""
+    registry = _catalogue_registry()
+    async with _client(registry) as client:
+        for path in ("/api/v1/data/markets", "/api/v1/market/catalogue"):
+            response = await client.get(
+                path,
+                params={"limit": 2},
+                headers={"X-Request-Id": "req-catalogue-1"},
+            )
+            assert response.status_code == 200
+            payload = response.json()
+            assert payload["status"] == "success"
+            assert payload["metadata"]["request_id"] == "req-catalogue-1"
+            data = payload["data"]
+            assert data["source_id"] == "catalogue.catalog-instruments@1"
+            assert data["limit"] == 2
+            assert data["revision"]
+            assert data["generated_at"]
+            assert data["request_id"]
+            assert data["next_cursor"] == "-page2"
+            assert [row["symbol"] for row in data["rows"]] == ["EURUSD", "GBPUSD"]
+            row = data["rows"][0]
+            assert row["name"] == "Euro vs US Dollar"
+            assert row["asset_class"] == "FOREX"
+            assert row["digits"] == 5
+            assert row["bid"] is None
+            assert row["ask"] is None
+            assert "volatility" not in row
+
+
+@pytest.mark.asyncio
+async def test_catalogue_route_rejects_invalid_limit() -> None:
+    """Verify out-of-bound limits fail with the validation envelope."""
+    registry = _catalogue_registry()
+    async with _client(registry) as client:
+        response = await client.get("/api/v1/data/markets", params={"limit": 0})
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+
+
+@pytest.mark.asyncio
+async def test_catalogue_route_fails_closed_without_capability() -> None:
+    """Verify absent catalogue capability serves the stable failure."""
+    registry = ServiceRegistry()
+    async with _client(registry) as client:
+        response = await client.get("/api/v1/data/markets")
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "CAPABILITY_UNAVAILABLE"
