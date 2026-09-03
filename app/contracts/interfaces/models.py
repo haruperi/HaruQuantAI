@@ -1153,6 +1153,183 @@ class OperateTradingEventSubscription(WireModel):
     schema_version: Literal[1] = 1
 
 
+class MarketTickQuote(WireModel):
+    """Wire-native observed quote projection (record R17).
+
+    One symbol-associated bid/ask observation projected from the owning
+    market-event provider; the gateway adds no invented quotes.
+    """
+
+    symbol: NonEmptyStr
+    timestamp: UtcTimestamp
+    bid: DecimalValue
+    ask: DecimalValue
+    schema_version: Literal[1] = 1
+
+
+class MarketTickSnapshot(WireModel):
+    """Wire-native market tick snapshot projection (record R18).
+
+    ``sequence`` is the last applied provider event sequence so consumers
+    detect gaps; ``stale`` requires an explicit ``stale_reason`` and never
+    fabricates freshness.
+    """
+
+    sequence: int = Field(ge=0)
+    source_id: NonEmptyStr
+    occurred_at: UtcTimestamp
+    stale: bool = False
+    stale_reason: str | None = None
+    gap: int = Field(default=0, ge=0)
+    quotes: tuple[MarketTickQuote, ...] = ()
+    schema_version: Literal[1] = 1
+
+    @model_validator(mode="after")
+    def validate_stale_reason(self) -> MarketTickSnapshot:
+        """Require an explicit reason whenever the snapshot is stale.
+
+        Returns:
+            The validated snapshot.
+
+        Raises:
+            ValueError: ``stale`` is set without a ``stale_reason``.
+        """
+        if self.stale and not self.stale_reason:
+            raise ValueError("stale_reason is required when stale is true")
+        return self
+
+
+class ObserveMarketDataRequest(WireModel):
+    """Operation-discriminated market observation gateway request.
+
+    SNAPSHOT carries an optional bounded symbol filter; an empty filter
+    projects every buffered symbol.
+    """
+
+    request_id: Uuid7
+    capability_snapshot_id: Uuid7
+    operation: Literal["SNAPSHOT"]
+    symbols: tuple[NonEmptyStr, ...] = Field(default=(), max_length=200)
+    schema_version: Literal[1] = 1
+
+
+class ObserveMarketDataSuccess(WireModel):
+    """Successful market observation gateway operation result."""
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    snapshot: MarketTickSnapshot | None = None
+    schema_version: Literal[1] = 1
+
+
+class ObserveMarketDataEventSubscription(WireModel):
+    """Owner-required market observation event stream subscription.
+
+    The subscription is the delivery companion of
+    ``interfaces.observe-market-data@1``: ``resume_event_id`` reconnects
+    after interruption with ordered replay/resync semantics, the bounded
+    symbol filter selects observed instruments, and ``replay_limit`` bounds
+    buffered replay.
+    """
+
+    symbols: tuple[NonEmptyStr, ...] = Field(default=(), max_length=200)
+    resume_event_id: Uuid7 | None = None
+    replay_limit: int = Field(default=0, ge=0, le=10000)
+    schema_version: Literal[1] = 1
+
+
+type StreamEventTypeValue = Literal["heartbeat", "payload", "error"]
+type SideEffectValue = Literal["none", "read", "write", "governed_write", "stream"]
+
+
+class StreamEvent(WireModel):
+    """Wire-native ordered SSE stream frame (record R19).
+
+    The v1 frame envelope observed by the typed UI stream transport:
+    monotonic ``sequence``, validated ``event_type``, and an optional
+    ``cursor`` for reconnect resume; a terminal ``error`` frame never
+    carries a payload.
+    """
+
+    sequence: int = Field(ge=0)
+    request_id: NonEmptyStr
+    trace_id: str | None = None
+    route: NonEmptyStr
+    event_type: StreamEventTypeValue
+    timestamp: UtcTimestamp
+    payload: JsonObject | None = None
+    error: JsonObject | None = None
+    cursor: str | None = None
+    schema_version: Literal[1] = 1
+
+
+class ApiMetadata(WireModel):
+    """Wire-native response metadata envelope (record R20).
+
+    The v1 metadata observed by the typed UI transport; ``stale`` carries
+    an explicit ``stale_reason`` exactly as the frozen client mirror
+    validates.
+    """
+
+    contract_version: Literal["v1"] = "v1"
+    schema_id: Literal["api.metadata.v1"] = "api.metadata.v1"
+    request_id: NonEmptyStr
+    route: NonEmptyStr
+    operation: NonEmptyStr
+    trace_id: str | None = None
+    side_effect: SideEffectValue = "read"
+    duration_ms: float | None = None
+    timestamp: UtcTimestamp
+    stale: bool = False
+    stale_reason: str | None = None
+    next_cursor: str | None = None
+    page_size: int | None = Field(default=None, ge=0, le=200)
+    idempotency_replayed: bool = False
+    schema_version: Literal[1] = 1
+
+    @model_validator(mode="after")
+    def validate_stale_reason(self) -> ApiMetadata:
+        """Require an explicit reason whenever the response is stale.
+
+        Returns:
+            The validated metadata envelope.
+
+        Raises:
+            ValueError: ``stale`` is set without a ``stale_reason``.
+        """
+        if self.stale and not self.stale_reason:
+            raise ValueError("stale_reason is required when stale is true")
+        return self
+
+
+class ApiError(WireModel):
+    """Wire-native structured error payload (record R21)."""
+
+    code: Annotated[str, StringConstraints(pattern=r"^[A-Z][A-Z0-9_]*$")]
+    message: NonEmptyStr
+    details: JsonObject = Field(default_factory=dict)
+    request_id: str | None = None
+    trace_id: str | None = None
+    retryable: bool = False
+    schema_version: Literal[1] = 1
+
+
+class ApiResponse(WireModel):
+    """Wire-native five-field HTTP response envelope (record R22).
+
+    Exactly one of ``data`` (success) or ``error`` (failure) is present;
+    ``metadata`` always describes the served request.
+    """
+
+    status: Literal["success", "error"]
+    message: NonEmptyStr
+    data: JsonObject | None = None
+    error: ApiError | None = None
+    metadata: ApiMetadata
+    schema_version: Literal[1] = 1
+
+
 # Wire projections register under their inventory names (``<Record>`` ->
 # ``<Record>Wire``); wire-native and request/success records register
 # directly. Nested components (``AutomationCommandDescriptor``,
@@ -1175,6 +1352,15 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
     "CapabilityAdministrationProjection": CapabilityAdministrationProjection,
     "TradingActionPreview": TradingActionPreview,
     "TradingReadinessProjection": TradingReadinessProjection,
+    "MarketTickQuote": MarketTickQuote,
+    "MarketTickSnapshot": MarketTickSnapshot,
+    "ObserveMarketDataRequest": ObserveMarketDataRequest,
+    "ObserveMarketDataSuccess": ObserveMarketDataSuccess,
+    "ObserveMarketDataEventSubscription": ObserveMarketDataEventSubscription,
+    "StreamEvent": StreamEvent,
+    "ApiMetadata": ApiMetadata,
+    "ApiError": ApiError,
+    "ApiResponse": ApiResponse,
     "OperateResearchRequest": OperateResearchRequest,
     "OperateResearchSuccess": OperateResearchSuccess,
     "EditProjectsRequest": EditProjectsRequest,

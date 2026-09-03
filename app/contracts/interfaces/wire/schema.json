@@ -134,6 +134,241 @@
       "title": "AlignmentPolicy",
       "type": "object"
     },
+    "ApiError": {
+      "additionalProperties": false,
+      "description": "Wire-native structured error payload (record R21).",
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "details": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "message": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Id"
+        },
+        "retryable": {
+          "default": false,
+          "title": "Retryable",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "trace_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trace Id"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "ApiError",
+      "type": "object"
+    },
+    "ApiMetadata": {
+      "additionalProperties": false,
+      "description": "Wire-native response metadata envelope (record R20).\n\nThe v1 metadata observed by the typed UI transport; ``stale`` carries\nan explicit ``stale_reason`` exactly as the frozen client mirror\nvalidates.",
+      "properties": {
+        "contract_version": {
+          "const": "v1",
+          "default": "v1",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "duration_ms": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Ms"
+        },
+        "idempotency_replayed": {
+          "default": false,
+          "title": "Idempotency Replayed",
+          "type": "boolean"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Next Cursor"
+        },
+        "operation": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "page_size": {
+          "anyOf": [
+            {
+              "maximum": 200,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Size"
+        },
+        "request_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "route": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_id": {
+          "const": "api.metadata.v1",
+          "default": "api.metadata.v1",
+          "title": "Schema Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "side_effect": {
+          "$ref": "#/$defs/SideEffectValue",
+          "default": "read"
+        },
+        "stale": {
+          "default": false,
+          "title": "Stale",
+          "type": "boolean"
+        },
+        "stale_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stale Reason"
+        },
+        "timestamp": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "trace_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trace Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "route",
+        "operation",
+        "timestamp"
+      ],
+      "title": "ApiMetadata",
+      "type": "object"
+    },
+    "ApiResponse": {
+      "additionalProperties": false,
+      "description": "Wire-native five-field HTTP response envelope (record R22).\n\nExactly one of ``data`` (success) or ``error`` (failure) is present;\n``metadata`` always describes the served request.",
+      "properties": {
+        "data": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ApiError"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "message": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "metadata": {
+          "$ref": "#/$defs/ApiMetadata"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "error"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "message",
+        "metadata"
+      ],
+      "title": "ApiResponse",
+      "type": "object"
+    },
     "ApiVersion": {
       "additionalProperties": false,
       "description": "Wire projection of the served API semantic version (record R1).",
@@ -1744,6 +1979,107 @@
       ],
       "type": "string"
     },
+    "MarketTickQuote": {
+      "additionalProperties": false,
+      "description": "Wire-native observed quote projection (record R17).\n\nOne symbol-associated bid/ask observation projected from the owning\nmarket-event provider; the gateway adds no invented quotes.",
+      "properties": {
+        "ask": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Ask",
+          "type": "string"
+        },
+        "bid": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Bid",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "symbol": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "timestamp": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "symbol",
+        "timestamp",
+        "bid",
+        "ask"
+      ],
+      "title": "MarketTickQuote",
+      "type": "object"
+    },
+    "MarketTickSnapshot": {
+      "additionalProperties": false,
+      "description": "Wire-native market tick snapshot projection (record R18).\n\n``sequence`` is the last applied provider event sequence so consumers\ndetect gaps; ``stale`` requires an explicit ``stale_reason`` and never\nfabricates freshness.",
+      "properties": {
+        "gap": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Gap",
+          "type": "integer"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "quotes": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MarketTickQuote"
+          },
+          "title": "Quotes",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "source_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "stale": {
+          "default": false,
+          "title": "Stale",
+          "type": "boolean"
+        },
+        "stale_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stale Reason"
+        }
+      },
+      "required": [
+        "sequence",
+        "source_id",
+        "occurred_at"
+      ],
+      "title": "MarketTickSnapshot",
+      "type": "object"
+    },
     "McpOperation": {
       "additionalProperties": false,
       "description": "Wire-native MCP tool invocation (record R10).\n\nMCP enforces identical validation, authorization, idempotency, and\naudit as direct API; no raw paths, database access, compilers, or\nplugin credentials cross the adapter.",
@@ -1807,6 +2143,137 @@
     "NonNegativeInt": {
       "minimum": 0,
       "type": "integer"
+    },
+    "ObserveMarketDataEventSubscription": {
+      "additionalProperties": false,
+      "description": "Owner-required market observation event stream subscription.\n\nThe subscription is the delivery companion of\n``interfaces.observe-market-data@1``: ``resume_event_id`` reconnects\nafter interruption with ordered replay/resync semantics, the bounded\nsymbol filter selects observed instruments, and ``replay_limit`` bounds\nbuffered replay.",
+      "properties": {
+        "replay_limit": {
+          "default": 0,
+          "maximum": 10000,
+          "minimum": 0,
+          "title": "Replay Limit",
+          "type": "integer"
+        },
+        "resume_event_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resume Event Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "symbols": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "maxItems": 200,
+          "title": "Symbols",
+          "type": "array"
+        }
+      },
+      "title": "ObserveMarketDataEventSubscription",
+      "type": "object"
+    },
+    "ObserveMarketDataRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated market observation gateway request.\n\nSNAPSHOT carries an optional bounded symbol filter; an empty filter\nprojects every buffered symbol.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "const": "SNAPSHOT",
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "symbols": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "maxItems": 200,
+          "title": "Symbols",
+          "type": "array"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "ObserveMarketDataRequest",
+      "type": "object"
+    },
+    "ObserveMarketDataSuccess": {
+      "additionalProperties": false,
+      "description": "Successful market observation gateway operation result.",
+      "properties": {
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MarketTickSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ObserveMarketDataSuccess",
+      "type": "object"
     },
     "OperatePortfoliosRequest": {
       "additionalProperties": false,
@@ -4016,6 +4483,110 @@
       ],
       "type": "string"
     },
+    "SideEffectValue": {
+      "enum": [
+        "none",
+        "read",
+        "write",
+        "governed_write",
+        "stream"
+      ],
+      "type": "string"
+    },
+    "StreamEvent": {
+      "additionalProperties": false,
+      "description": "Wire-native ordered SSE stream frame (record R19).\n\nThe v1 frame envelope observed by the typed UI stream transport:\nmonotonic ``sequence``, validated ``event_type``, and an optional\n``cursor`` for reconnect resume; a terminal ``error`` frame never\ncarries a payload.",
+      "properties": {
+        "cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cursor"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "event_type": {
+          "$ref": "#/$defs/StreamEventTypeValue"
+        },
+        "payload": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonObject"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "request_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "route": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "timestamp": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "trace_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trace Id"
+        }
+      },
+      "required": [
+        "sequence",
+        "request_id",
+        "route",
+        "event_type",
+        "timestamp"
+      ],
+      "title": "StreamEvent",
+      "type": "object"
+    },
+    "StreamEventTypeValue": {
+      "enum": [
+        "heartbeat",
+        "payload",
+        "error"
+      ],
+      "type": "string"
+    },
     "TaskContract": {
       "additionalProperties": false,
       "description": "Declared execution contract for one task type.",
@@ -4770,6 +5341,15 @@
     "AdministerCapabilitiesSuccess": {
       "$ref": "#/$defs/AdministerCapabilitiesSuccess"
     },
+    "ApiError": {
+      "$ref": "#/$defs/ApiError"
+    },
+    "ApiMetadata": {
+      "$ref": "#/$defs/ApiMetadata"
+    },
+    "ApiResponse": {
+      "$ref": "#/$defs/ApiResponse"
+    },
     "ApiVersion": {
       "$ref": "#/$defs/ApiVersion"
     },
@@ -4806,8 +5386,23 @@
     "EventReplayBatch": {
       "$ref": "#/$defs/EventReplayBatch"
     },
+    "MarketTickQuote": {
+      "$ref": "#/$defs/MarketTickQuote"
+    },
+    "MarketTickSnapshot": {
+      "$ref": "#/$defs/MarketTickSnapshot"
+    },
     "McpOperation": {
       "$ref": "#/$defs/McpOperation"
+    },
+    "ObserveMarketDataEventSubscription": {
+      "$ref": "#/$defs/ObserveMarketDataEventSubscription"
+    },
+    "ObserveMarketDataRequest": {
+      "$ref": "#/$defs/ObserveMarketDataRequest"
+    },
+    "ObserveMarketDataSuccess": {
+      "$ref": "#/$defs/ObserveMarketDataSuccess"
     },
     "OperatePortfoliosRequest": {
       "$ref": "#/$defs/OperatePortfoliosRequest"
@@ -4838,6 +5433,9 @@
     },
     "ResearchPreview": {
       "$ref": "#/$defs/ResearchPreview"
+    },
+    "StreamEvent": {
+      "$ref": "#/$defs/StreamEvent"
     },
     "TradingActionPreview": {
       "$ref": "#/$defs/TradingActionPreview"

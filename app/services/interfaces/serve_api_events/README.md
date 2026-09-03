@@ -57,6 +57,14 @@ Unknown keys are rejected with `ValueError`.
   events; repeated disposal is safe.
 - Starts no sockets, listeners, background tasks, or servers, and performs
   no I/O at import time.
+- Owns the raw-ASGI mounting surface (`asgi.py`,
+  `create_api_asgi_app(registry)`): it serves `GET /api/v1/market/ticks`
+  (JSON snapshot envelope) and `GET /api/v1/market/ticks/stream` plus the
+  adopted alias `GET /api/v1/data/snapshot-stream` (SSE `StreamEvent`
+  frames), resolving `interfaces.observe-market-data@1` per request and
+  translating absence to the stable `CAPABILITY_UNAVAILABLE` envelope.
+  `uv run haruquantai` composes the runtime and serves this adapter;
+  request-scoped racing tasks are released in the handler's teardown.
 
 ## Persistent State
 

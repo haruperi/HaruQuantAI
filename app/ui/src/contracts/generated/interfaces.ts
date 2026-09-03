@@ -24,6 +24,40 @@ export interface AdministerCapabilitiesSuccess {
   projection?: CapabilityAdministrationProjection | null;  // default: null
   schema_version?: 1;  // default: 1
 }
+export interface ApiError {
+  code: string;
+  message: NonEmptyStr;
+  details?: JsonObject;
+  request_id?: string | null;  // default: null
+  trace_id?: string | null;  // default: null
+  retryable?: boolean;  // default: false
+  schema_version?: 1;  // default: 1
+}
+export interface ApiMetadata {
+  contract_version?: "v1";  // default: "v1"
+  schema_id?: "api.metadata.v1";  // default: "api.metadata.v1"
+  request_id: NonEmptyStr;
+  route: NonEmptyStr;
+  operation: NonEmptyStr;
+  trace_id?: string | null;  // default: null
+  side_effect?: SideEffectValue;  // default: "read"
+  duration_ms?: number | null;  // default: null
+  timestamp: string;
+  stale?: boolean;  // default: false
+  stale_reason?: string | null;  // default: null
+  next_cursor?: string | null;  // default: null
+  page_size?: number | null;  // default: null
+  idempotency_replayed?: boolean;  // default: false
+  schema_version?: 1;  // default: 1
+}
+export interface ApiResponse {
+  status: "success" | "error";
+  message: NonEmptyStr;
+  data?: JsonObject | null;  // default: null
+  error?: ApiError | null;  // default: null
+  metadata: ApiMetadata;
+  schema_version?: 1;  // default: 1
+}
 export interface ApiVersion {
   major?: number;  // default: 1
   minor?: number;  // default: 0
@@ -149,12 +183,49 @@ export type InterfaceFailureCode = "INTERFACE_VALIDATION_FAILED" | "VERSION_CONF
 export type KillSwitchScopeKind = "GLOBAL" | "ENVIRONMENT" | "BROKER_ACCOUNT" | "PORTFOLIO" | "STRATEGY" | "SYMBOL";
 export type KillSwitchSignalState = "ACTIVE" | "CLEARED" | "UNKNOWN";
 export type MarketStatus = "OPEN" | "CLOSED" | "UNKNOWN";
+export interface MarketTickQuote {
+  symbol: NonEmptyStr;
+  timestamp: string;
+  bid: string;
+  ask: string;
+  schema_version?: 1;  // default: 1
+}
+export interface MarketTickSnapshot {
+  sequence: number;
+  source_id: NonEmptyStr;
+  occurred_at: string;
+  stale?: boolean;  // default: false
+  stale_reason?: string | null;  // default: null
+  gap?: number;  // default: 0
+  quotes?: MarketTickQuote[];  // default: []
+  schema_version?: 1;  // default: 1
+}
 export interface McpOperation {
   operation: McpOperationName;
   arguments?: JsonObject;
   schema_version?: 1;  // default: 1
 }
 export type McpOperationName = "LIST_PROJECTS" | "LIST_DATABANKS" | "LIST_STRATEGIES" | "GET_STRATEGY_STATISTICS" | "RUN_PROJECT" | "STOP_PROJECT";
+export interface ObserveMarketDataEventSubscription {
+  symbols?: NonEmptyStr[];  // default: []
+  resume_event_id?: string | null;  // default: null
+  replay_limit?: number;  // default: 0
+  schema_version?: 1;  // default: 1
+}
+export interface ObserveMarketDataRequest {
+  request_id: string;
+  capability_snapshot_id: string;
+  operation: "SNAPSHOT";
+  symbols?: NonEmptyStr[];  // default: []
+  schema_version?: 1;  // default: 1
+}
+export interface ObserveMarketDataSuccess {
+  outcome?: "SUCCESS";  // default: "SUCCESS"
+  request_id: string;
+  result_version?: 1;  // default: 1
+  snapshot?: MarketTickSnapshot | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
 export interface OperatePortfoliosRequest {
   request_id: string;
   capability_snapshot_id: string;
@@ -258,6 +329,20 @@ export interface ResearchPreview {
 export type RiskEvidenceFreshness = "FRESH" | "STALE" | "MISSING";
 export type RiskEvidenceSourceOwner = "ACCOUNT" | "FX" | "MARKET" | "NEWS" | "SESSION" | "STRATEGY" | "BROKER" | "PORTFOLIO";
 export type RiskLimitState = "PASS" | "WARN" | "MISSING" | "FAIL" | "BLOCKED";
+export type SideEffectValue = "none" | "read" | "write" | "governed_write" | "stream";
+export interface StreamEvent {
+  sequence: number;
+  request_id: NonEmptyStr;
+  trace_id?: string | null;  // default: null
+  route: NonEmptyStr;
+  event_type: StreamEventTypeValue;
+  timestamp: string;
+  payload?: JsonObject | null;  // default: null
+  error?: JsonObject | null;  // default: null
+  cursor?: string | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
+export type StreamEventTypeValue = "heartbeat" | "payload" | "error";
 export type TradingActionKind = "ORDER" | "CANCEL" | "MODIFY" | "CLOSE" | "FLATTEN" | "HOLD" | "PROTECTION";
 export interface TradingActionPreview {
   preview_id: string;

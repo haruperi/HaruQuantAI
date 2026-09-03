@@ -10,7 +10,6 @@ import logging
 import sys
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
 
 import uvicorn
 
@@ -52,8 +51,8 @@ def build_parser() -> argparse.ArgumentParser:
         "--reload",
         dest="reload",
         action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Enable/disable server auto-reload",
+        default=False,
+        help="Auto-reload is not supported for the composed runtime (kept for compatibility)",  # noqa: E501
     )
     parser.add_argument(
         "--workers",
@@ -287,14 +286,14 @@ async def async_main(argv: Sequence[str] | None = None) -> int:  # noqa: C901, P
 def run(argv: Sequence[str] | None = None) -> None:
     """Synchronous project script entry point.
 
-    Launches the FastAPI API server by default, or executes the composition
-    diagnostics if --status is specified.
+    Composes the runtime and serves the D-IFACE ASGI boundary by default,
+    or executes the composition diagnostics if --status is specified.
 
     Args:
         argv: Optional explicit command-line argument sequence.
 
     Raises:
-        SystemExit: When --status diagnostics mode is executed.
+        SystemExit: With the serve or diagnostics exit code.
     """
     parser = build_parser()
     args = parser.parse_args(args=argv if argv is not None else sys.argv[1:])
@@ -302,17 +301,65 @@ def run(argv: Sequence[str] | None = None) -> None:
     if args.status:
         raise SystemExit(asyncio.run(async_main(argv)))
 
-    log_level = args.log_level.lower() if args.log_level else "info"
-    uvicorn_kwargs: dict[str, Any] = {
-        "host": args.host,
-        "port": args.port,
-        "reload": args.reload,
-        "log_level": log_level,
-    }
-    if not args.reload and args.workers > 1:
-        uvicorn_kwargs["workers"] = args.workers
+    raise SystemExit(asyncio.run(_serve(args)))
 
-    uvicorn.run("app.services.api.composition.application:app", **uvicorn_kwargs)
+
+async def _serve(args: argparse.Namespace) -> int:
+    """Compose the runtime and serve the D-IFACE boundary until shutdown.
+
+    Args:
+        args: Parsed CLI arguments.
+
+    Returns:
+        Process exit code.
+    """
+    from app.services.interfaces.serve_api_events.asgi import create_api_asgi_app
+
+    log_level = args.log_level.lower() if args.log_level else "info"
+    logging_handle = configure_logging(LoggingConfig(level=log_level.upper()))
+    engine: CompositionEngine | None = None
+    exit_code = 0
+    try:
+        if args.config is not None:
+            config_path = Path(args.config)
+            if not config_path.is_file():  # noqa: ASYNC240
+                print(f"[ERROR] Configuration file not found: {config_path}")
+                return 1
+            engine = CompositionEngine()
+            await engine.reconcile_with_config(load_config_from_file(config_path))
+        else:
+            engine = CompositionEngine()
+
+        if args.reload or args.workers > 1:
+            logger.warning(
+                "--reload/--workers are not supported for the composed "
+                "runtime; serving a single process."
+            )
+
+        config = uvicorn.Config(
+            create_api_asgi_app(engine.registry),
+            host=args.host,
+            port=args.port,
+            log_level=log_level,
+        )
+        server = uvicorn.Server(config)
+        logger.info(
+            "Serving D-IFACE boundary",
+            extra={
+                "event": "IFACE_SERVE_START",
+                "fields": {"host": args.host, "port": args.port},
+            },
+        )
+        await server.serve()
+    finally:
+        if engine is not None:
+            with contextlib.suppress(Exception):
+                await engine.shutdown()
+        cleanup_diagnostics = logging_handle.close()
+        if cleanup_diagnostics:
+            emit_cleanup_diagnostics(cleanup_diagnostics)
+            exit_code = 1
+    return exit_code
 
 
 if __name__ == "__main__":

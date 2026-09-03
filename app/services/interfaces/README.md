@@ -5,7 +5,8 @@
 > HaruQuantAI. Every HTTP, SSE, CLI, MCP, and automation surface is a
 > registered feature in this package that resolves business capabilities
 > through `FeatureContext` and never imports a business implementation.
-> **Status:** `In Progress` — 1 registered feature (`FEAT-IFACE-SERVE_API_EVENTS`).
+> **Status:** `In Progress` — 2 registered features
+> (`FEAT-IFACE-SERVE_API_EVENTS`, `FEAT-IFACE-OBSERVE_MARKET_DATA`).
 > **Last updated:** `2026-09-03`
 
 This README is the Interfaces domain's source of truth. The baseline
@@ -73,7 +74,7 @@ UI migration begins.
 | Status | Feature | Provides | Notes |
 | --- | --- | --- | --- |
 | Completed | `FEAT-IFACE-SERVE_API_EVENTS` | `interfaces.serve-api-events@1` | Transport foundation: versioning, OpenAPI, SSE buffer, idempotency, jobs, artifacts. |
-| Pending | `FEAT-IFACE-OBSERVE_MARKET_DATA` | *(contract pending, gap G1)* | Phase 3 Market Ticks vertical slice. |
+| Completed | `FEAT-IFACE-OBSERVE_MARKET_DATA` | `interfaces.observe-market-data@1` | Phase 3 Market Ticks vertical slice; requires `data.stream-market-events@1`. |
 | Pending | `FEAT-IFACE-OPERATE_TRADING` | `interfaces.operate-trading@1` | With the Phase 7 Trading migration. |
 | Pending | `FEAT-IFACE-OPERATE_RESEARCH` | `interfaces.operate-research@1` | With the Research workbench migration. |
 | Pending | `FEAT-IFACE-OPERATE_PORTFOLIOS` | `interfaces.operate-portfolios@1` | With the Portfolio migration. |
@@ -89,6 +90,7 @@ responsibility; one feature per route is explicitly rejected.
 | Capability key | Contract owner | Serving feature |
 | --- | --- | --- |
 | `interfaces.serve-api-events@1` | `app/contracts/interfaces/` | `FEAT-IFACE-SERVE_API_EVENTS` |
+| `interfaces.observe-market-data@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OBSERVE_MARKET_DATA` |
 | `interfaces.automate-commands@1` | `app/contracts/interfaces/` | `FEAT-IFACE-AUTOMATE_COMMANDS` (pending) |
 | `interfaces.operate-research@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_RESEARCH` (pending) |
 | `interfaces.edit-projects@1` | `app/contracts/interfaces/` | pending ratification (gap G5) |
@@ -110,7 +112,12 @@ produce uniform response envelopes, validate optimistic concurrency tokens,
 deduplicate idempotent mutations, translate capability absence to the
 stable `CAPABILITY_UNAVAILABLE` failure, and never embed a business
 workflow. Business data crosses the boundary only as public contract
-records.
+records. The current mounting surface (`serve_api_events/asgi.py`, served
+by `uv run haruquantai`) exposes `GET /api/v1/market/ticks` (JSON
+snapshot) and `GET /api/v1/market/ticks/stream` with the adopted alias
+`GET /api/v1/data/snapshot-stream` (SSE). Authentication/session
+enforcement is not yet active on the mounting surface; it is gap G2 and
+must be ratified before any governed write goes live.
 
 ## 5. SSE Responsibility
 

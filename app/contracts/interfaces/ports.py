@@ -28,6 +28,9 @@ if TYPE_CHECKING:
         EditProjectsSuccess,
         EventReplayBatch,
         InterfaceEventEnvelope,
+        ObserveMarketDataEventSubscription,
+        ObserveMarketDataRequest,
+        ObserveMarketDataSuccess,
         OpenApiManifest,
         OperatePortfoliosRequest,
         OperatePortfoliosSuccess,
@@ -357,6 +360,44 @@ class AutomateCommandsCapability(Protocol):
 
         Raises:
             DurableJobNotFoundError: If durable job is not registered.
+        """
+        ...
+
+
+@runtime_checkable
+class ObserveMarketDataCapability(Protocol):
+    """Protocol for the market data observation gateway."""
+
+    async def observe_market_data(
+        self,
+        request: ObserveMarketDataRequest,
+    ) -> ObserveMarketDataSuccess | InterfaceFailure:
+        """Resolve and expose market tick snapshot projections.
+
+        Args:
+            request: Operation-discriminated market observation request.
+
+        Returns:
+            The market tick snapshot projection on success, otherwise a
+            structured interface failure.
+        """
+        ...
+
+    def subscribe_observe_market_data_events(
+        self,
+        request: ObserveMarketDataEventSubscription,
+    ) -> AsyncIterator[DomainEvent]:
+        """Deliver market observation events as domain events.
+
+        Args:
+            request: Owner-required subscription selector carrying the
+                bounded symbol filter, resume position, and bounded replay
+                limit.
+
+        Returns:
+            An asynchronous iterator of market observation events wrapped
+            in the common domain event envelope with ordered replay and
+            resync semantics.
         """
         ...
 

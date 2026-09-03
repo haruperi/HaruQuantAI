@@ -2,6 +2,54 @@
 
 ## [Unreleased]
 
+### Add the Market Ticks D-IFACE vertical slice
+
+`FEAT-IFACE-OBSERVE_MARKET_DATA` is the first read-only vertical slice of
+the D-IFACE migration: it projects the Data-owned live market event
+stream (`data.stream-market-events@1`) into bounded market tick
+snapshots with source identity, monotonic sequence, gap counting, and
+honest staleness, plus resumable symbol-filtered observation event
+delivery. The gateway requires the Data stream capability, never imports
+a Data or broker implementation, and degrades truthfully on provider
+loss while the provider itself stays untouched. The slice is served on
+the wire: JSON snapshot envelopes at `GET /api/v1/market/ticks` and SSE
+`StreamEvent` frames at `GET /api/v1/market/ticks/stream` with the
+adopted alias `GET /api/v1/data/snapshot-stream`.
+
+#### Added (9)
+
+- Added the `interfaces.observe-market-data@1` capability with the
+  `ObserveMarketDataCapability` protocol and five public wire records
+  (`MarketTickQuote`, `MarketTickSnapshot`, `ObserveMarketDataRequest`,
+  `ObserveMarketDataSuccess`, `ObserveMarketDataEventSubscription`);
+  regenerated wire schemas and generated TypeScript contracts.
+- Added the `observe_market_data` feature package (`manifest.py`,
+  `config.py`, `gateway.py`, `feature.py`) with a supervised consumer
+  task, strict configuration parsing, and one bounded usage harness.
+- Added gateway tests covering snapshot projection, sequence/gap/source
+  identity, staleness (fresh, aged, degraded, pre-first-event), symbol
+  filters, provider loss/failure, disposal, subscription filtering,
+  resume passthrough, and client disconnect.
+- Added feature lifecycle tests proving mount blocking on missing
+  providers, rollback on invalid configuration, exact disposal, and that
+  unrelated Interfaces features stay active across removal.
+- Ratified the observed v1 wire envelopes as interfaces public records
+  (`StreamEvent`, `ApiMetadata`, `ApiError`, `ApiResponse`), closing the
+  Phase 0 envelope-ownership gap G4 for the served surface.
+- Added the raw-ASGI mounting surface (`serve_api_events/asgi.py`) that
+  serves the snapshot JSON route, both SSE stream routes, uniform error
+  envelopes (404/405/400), and the stable 503
+  `CAPABILITY_UNAVAILABLE` translation with per-request capability
+  resolution and exact subscription release on client disconnect.
+- Added ASGI boundary tests over httpx's ASGI transport and raw-ASGI
+  disconnect/lifespan drivers.
+- Rewired the `haruquantai` launcher: the default invocation now composes
+  the runtime and serves the D-IFACE adapter (the previous default served
+  the deleted gateway import string and crashed); `--status` diagnostics
+  are unchanged and `--reload/--workers` are ignored with a warning.
+- Registered the `interfaces-observe-market-data` entry point and
+  updated the domain and services registries.
+
 ### Add the D-IFACE interfaces domain and API/event transport foundation
 
 The external boundary is re-established as composable D-IFACE features under
