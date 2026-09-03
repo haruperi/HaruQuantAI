@@ -41,7 +41,7 @@ Mount stages the `broker.resolver@1` capability provider into the feature scope.
 
 ## Functional Requirements
 
-- `FR-BRK-RESOLVE_BROKER`: Resolve and return active broker module configuration dictionary containing `id`, `name`, `platform`, `desc`, `active`, and `timezone` from runtime settings and database state.
+- `FR-BRK-RESOLVE_BROKER`: Resolve and return active broker module configuration dictionary containing `id`, `name`, `platform`, `desc`, `active`, and `timezone` from runtime settings and database state (`get_broker_module()`), and instantiate the ready-to-use client instance implementing `BrokerOperationsCapability` (`get_broker_client()`).
 - Manage and initialize `broker` table with SQLite schema and default seeds via internal `_persistence.py`.
 
 ## Failure Behavior

@@ -9,6 +9,7 @@ from app.services.brokers.resolve.config import ResolveConfig
 from app.services.brokers.resolve.router import (
     ResolveService,
     fr_brk_resolve_broker,
+    get_broker_client,
     get_broker_module,
     init_broker_table,
     list_brokers,
@@ -99,3 +100,61 @@ def test_resolve_service(test_db: Path) -> None:
     active = service.get_broker_module()
     assert active["name"] == "MetaTrader 5"
     assert active["platform"] == "mt5"
+
+    client = service.get_broker_client()
+    assert client is not None
+    assert client.is_available() is True
+
+
+def test_get_broker_client_active_and_switch(test_db: Path) -> None:
+    """Verify get_broker_client returns active broker client and tracks DB switches."""
+    from app.services.brokers.binance.client import BinanceClient
+    from app.services.brokers.metatrader.client import MT5Client
+
+    # Default active broker is mt5
+    client = get_broker_client(db_path=test_db)
+    assert isinstance(client, MT5Client)
+
+    # Switch active broker to binance
+    set_active_broker("binance", db_path=test_db)
+    binance_client = get_broker_client(db_path=test_db)
+    assert isinstance(binance_client, BinanceClient)
+
+
+def test_get_broker_client_explicit_platforms() -> None:
+    """Verify get_broker_client resolves each platform when specified explicitly."""
+    from app.services.brokers.binance.client import BinanceClient
+    from app.services.brokers.ctrader.client import CTraderClient
+    from app.services.brokers.dukascopy.client import DukascopyClient
+    from app.services.brokers.metatrader.client import MT5Client
+    from app.services.brokers.yahoo.client import YahooService
+
+    assert isinstance(get_broker_client("mt5"), MT5Client)
+    assert isinstance(get_broker_client("metatrader 5"), MT5Client)
+    assert isinstance(get_broker_client("binance"), BinanceClient)
+    assert isinstance(get_broker_client("ctrader"), CTraderClient)
+    assert isinstance(get_broker_client("dukascopy"), DukascopyClient)
+    assert isinstance(get_broker_client("yahoo"), YahooService)
+
+
+def test_get_broker_client_polymorphic_execution() -> None:
+    """Verify polymorphic execution across multiple broker clients."""
+    for platform in ("binance", "ctrader", "dukascopy"):
+        client = get_broker_client(platform)
+        assert client.is_available() is True
+        assert client.is_connected() is False
+
+        # All implement identical standard signatures
+        syms = client.get_symbols()
+        assert syms.status == "success"
+        assert len(syms.data) > 0
+
+        num_syms = client.get_num_of_symbols()
+        assert num_syms.status == "success"
+        assert num_syms.data > 0
+
+
+def test_get_broker_client_unsupported() -> None:
+    """Verify ValueError is raised for an unsupported broker platform."""
+    with pytest.raises(ValueError, match="Unsupported broker platform"):
+        get_broker_client("unknown_crypto_exchange_xyz")

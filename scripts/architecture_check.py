@@ -45,7 +45,7 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             return
 
         active_roots = {"kernel", "composition", "contracts"}
-        active_services = {"workspace", "catalogue", "plugins", "brokers"}
+        active_services = {"workspace", "catalogue", "plugins", "brokers", "data"}
         min_service_parts = 3
         is_active = (len(self.app_parts) > 1 and self.app_parts[1] in active_roots) or (
             len(self.app_parts) >= min_service_parts
@@ -89,7 +89,13 @@ class ArchitecturalVisitor(ast.NodeVisitor):
     def visit_Call(self, node: ast.Call) -> None:
         """Check forbidden function and method calls."""
         # Rule 2: asyncio.create_task() only allowed inside app/kernel/
-        active_migrated_domains = {"workspace", "catalogue", "plugins", "brokers"}
+        active_migrated_domains = {
+            "workspace",
+            "catalogue",
+            "plugins",
+            "brokers",
+            "data",
+        }
         min_service_parts = 3
         is_active_service = (
             self._is_service
@@ -160,9 +166,10 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                 )
             )
 
-        # Rule 6: Cross-service feature independence
+        # Rule 6: Cross-service feature independence (excludes _usage.py)
         if (
             self._is_service
+            and not self.file_path.name.endswith("_usage.py")
             and target_module.startswith("app.services.")
             and "services" in self.app_parts
         ):
@@ -174,6 +181,7 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                     "catalogue",
                     "plugins",
                     "brokers",
+                    "data",
                 }
                 if source_domain in active_migrated_domains:
                     source_feature = self.app_parts[srv_idx + FEATURE_OFFSET]

@@ -26,6 +26,7 @@ from app.contracts.common.models import (
     Uuid7,
     WireModel,
 )
+from app.contracts.common.response import StandardResponse
 
 # Constrained local string alias reused across broker records.
 type NonEmptyStr = Annotated[str, StringConstraints(min_length=1)]
@@ -638,24 +639,63 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
 
 import asyncio
 from collections.abc import AsyncIterator, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from datetime import datetime
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Self, TypeVar
 
 T = TypeVar("T")
 
 
-@dataclass
-class StandardResponse(Generic[T]):
-    """Standard operation response envelope across all broker operations."""
+class DictLikeModelMixin:
+    """Provides dictionary-like interface to dataclasses for contract interoperability."""
 
-    status: str = "success"
-    data: T | None = None
-    error: Any = None
-    message: str = ""
-    operation: str = ""
-    metadata: dict[str, Any] = field(default_factory=dict)
-    execution_time_ms: float = 0.0
+    def __getitem__(self, key: str) -> Any:
+        if hasattr(self, key):
+            return getattr(self, key)
+        details = getattr(self, "details", None)
+        if isinstance(details, dict) and key in details:
+            return details[key]
+        raise KeyError(key)
+
+    def __contains__(self, key: object) -> bool:
+        if not isinstance(key, str):
+            return False
+        if hasattr(self, key):
+            return True
+        details = getattr(self, "details", None)
+        return isinstance(details, dict) and key in details
+
+    def get(self, key: str, default: Any = None) -> Any:
+        if hasattr(self, key):
+            return getattr(self, key)
+        details = getattr(self, "details", None)
+        if isinstance(details, dict):
+            return details.get(key, default)
+        return default
+
+    def keys(self) -> list[str]:
+        k = [f.name for f in fields(self)]
+        details = getattr(self, "details", None)
+        if isinstance(details, dict):
+            k.extend([dk for dk in details if dk not in k])
+        return k
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert model to dictionary representation."""
+        from dataclasses import asdict
+
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls: type[Self], data: Any) -> Self:
+        """Construct instance from raw dictionary or namedtuple."""
+        raw = data._asdict() if hasattr(data, "_asdict") else dict(data)
+        known = {f.name for f in fields(cls) if f.name != "details"}
+        init_kwargs = {k: raw[k] for k in known if k in raw}
+        extra = {k: v for k, v in raw.items() if k not in known}
+        if "details" in [f.name for f in fields(cls)]:
+            init_kwargs["details"] = extra
+        return cls(**init_kwargs)
 
 
 @dataclass
@@ -691,7 +731,7 @@ class BrokerConnectionConfig:
 
 
 @dataclass
-class BrokerTerminalInfo:
+class BrokerTerminalInfo(DictLikeModelMixin):
     """Properties of the broker terminal/platform environment (CTerminalInfo)."""
 
     build: int = 0
@@ -840,7 +880,7 @@ class BrokerBalance:
 
 
 @dataclass
-class BrokerAccountInfo:
+class BrokerAccountInfo(DictLikeModelMixin):
     """Account properties and financial state (CAccountInfo)."""
 
     login: int | str = ""
@@ -871,7 +911,7 @@ class BrokerAccountInfo:
 
 
 @dataclass
-class BrokerSymbolInfo:
+class BrokerSymbolInfo(DictLikeModelMixin):
     """Symbol specifications and trading parameters (CSymbolInfo)."""
 
     symbol: str = "EURUSD"

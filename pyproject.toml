@@ -50,6 +50,20 @@ brokers-yahoo = "app.services.brokers.yahoo.feature:feature"
 catalogue-instrument-catalogue = "app.services.catalogue.instrument_catalogue.feature:feature"
 catalogue-provider-mapping = "app.services.catalogue.provider_mapping.feature:feature"
 catalogue-session-calendar = "app.services.catalogue.session_calendar.feature:feature"
+data-bar-aggregation = "app.services.data.bar_aggregation.feature:feature"
+data-connector-synchronization = "app.services.data.connector_synchronization.feature:feature"
+data-data-inspection-retention = "app.services.data.data_inspection_retention.feature:feature"
+data-data-quality-resolution = "app.services.data.data_quality_resolution.feature:feature"
+data-economic-news-evidence = "app.services.data.economic_news_evidence.feature:feature"
+data-external-indicator-series = "app.services.data.external_indicator_series.feature:feature"
+data-external-series-alignment = "app.services.data.external_series_alignment.feature:feature"
+data-historical-data-ingestion = "app.services.data.historical_data_ingestion.feature:feature"
+data-profile-source-preparation = "app.services.data.profile_source_preparation.feature:feature"
+data-quantdata-manager-source = "app.services.data.quantdata_manager_source.feature:feature"
+data-realtime-market-events = "app.services.data.realtime_market_events.feature:feature"
+data-run-data-binding = "app.services.data.run_data_binding.feature:feature"
+data-synthetic-scenario-series = "app.services.data.synthetic_scenario_series.feature:feature"
+data-tick-normalization = "app.services.data.tick_normalization.feature:feature"
 
 # ============================================================================
 # Ruff Configuration (Formatting, Linting, Import Sorting, Security, Complexity)
@@ -183,6 +197,7 @@ ignore = [
 "tests/legacy/*.py" = ["N999", "S101", "S105", "S106", "S107", "PLR2004", "SLF001", "D", "DOC", "ARG001", "ARG005", "PLC0415", "EM102", "ANN", "INP001", "E501", "E402"]
 "tests/research/**/*.py" = ["INP001"]
 "app/services/data/**/*.py" = ["DOC201", "DOC501"]
+"app/services/data/**/_usage.py" = ["S101", "PT018", "TC001", "TC002", "TC003", "E501"]
 "app/services/brokers/**/*.py" = ["DOC201", "DOC501", "C901", "PLR0912", "PLR0915", "TC001", "EM102", "E501", "FURB", "ANN401", "ARG002", "PLR2004", "BLE001", "TRY004", "ARG005", "TRY400", "E731", "RUF013", "D", "DOC", "ANN", "E402", "SLF001", "F401", "F841", "F821", "RUF012"]
 "app/contracts/broker/**/*.py" = ["DOC201", "DOC501", "C901", "PLR0912", "PLR0915", "TC001", "EM102", "E501", "FURB", "ANN401", "ARG002", "PLR2004", "BLE001", "TRY004", "ARG005", "TRY400", "E731", "RUF013", "D", "DOC", "ANN", "E402", "SLF001", "F401", "F841", "F821", "RUF012", "UP007", "UP046", "UP047", "F403", "F405"]
 "app/kernel/**/*.py" = ["C901", "PLR0912", "PLR0915", "TC001", "EM102", "DOC201", "DOC501", "E501", "FURB", "ANN401", "ARG002", "PLR2004", "BLE001", "TRY004"]
@@ -367,6 +382,7 @@ dev = [
     "mypy>=2.1.0",
     "pre-commit>=4.6.0",
     "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
     "pytest-mock>=3.15.1",
     "pytest-xdist>=3.8.0",

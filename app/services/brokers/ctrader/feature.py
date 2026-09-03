@@ -8,7 +8,7 @@ from app.contracts.broker.capabilities import (
     BROKER_OPERATIONS_CAPABILITY,
     PROVIDER_CTRADER_CAPABILITY,
 )
-from app.services.brokers.ctrader.client import CTraderService
+from app.services.brokers.ctrader.client import CTraderClient
 from app.services.brokers.ctrader.config import CTraderConfig
 from app.services.brokers.ctrader.manifest import SPEC
 
@@ -22,11 +22,16 @@ class CTraderFeature:
 
     def __init__(self, spec: FeatureSpec = SPEC) -> None:
         self.spec = spec
-        self._service: CTraderService | None = None
+        self._client: CTraderClient | None = None
 
     @property
-    def service(self) -> CTraderService | None:
-        return self._service
+    def client(self) -> CTraderClient | None:
+        return self._client
+
+    @property
+    def service(self) -> CTraderClient | None:
+        """Compatibility accessor for mounted client."""
+        return self._client
 
     async def mount(self, context: FeatureContext, config: object) -> None:
         raw_config = config if isinstance(config, dict) else {}
@@ -34,9 +39,9 @@ class CTraderFeature:
             config if isinstance(config, CTraderConfig) else CTraderConfig(**raw_config)
         )
 
-        self._service = CTraderService(config=parsed_config)
-        context.provide(BROKER_OPERATIONS_CAPABILITY, self._service)
-        context.provide(PROVIDER_CTRADER_CAPABILITY, self._service)
+        self._client = CTraderClient(config=parsed_config)
+        context.provide(BROKER_OPERATIONS_CAPABILITY, self._client)
+        context.provide(PROVIDER_CTRADER_CAPABILITY, self._client)
 
 
 def feature() -> CTraderFeature:

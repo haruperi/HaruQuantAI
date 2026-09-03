@@ -82,6 +82,10 @@ async def test_mount_stages_provider_and_scope_withdraws_it(tmp_path: Any) -> No
     active = resolved.get_broker_module()
     assert active["name"] == "MetaTrader 5"
 
+    client = resolved.get_broker_client()
+    assert client is not None
+    assert client.is_available() is True
+
     await scope.close()
     assert registry.resolve(BROKER_RESOLVER_CAPABILITY) is None
 

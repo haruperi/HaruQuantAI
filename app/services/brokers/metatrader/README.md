@@ -47,11 +47,11 @@ Mount initializes the MetaTrader 5 client service and provides `broker.provider.
 
 ## Functional Requirements
 
-- `FR 1: Live MT5 Connection & Operations Mirror` (`client.py`): Mirrors all standard broker operational functions (terminal info, account info, market data, orders, deals, positions, trade execution) with real `MetaTrader5` library integration and automatic database credentials resolution.
+- `FR 1: Direct MT5 Connection & Operations Mirror` (`client.py`): Provides direct MT5 operational functions (`get_terminal_info`, `get_account_info`, `get_symbol_info`, `get_position_info`, `get_order_info`, `get_history_order_info`, `get_history_deal_info`, `trade`) with real `MetaTrader5` library integration and automatic database credentials resolution, returning pure MT5 objects wrapped in `StandardResponse` envelopes without business logic.
 
 ## Failure Behavior
 
-Terminal initialization errors and network failures are captured via `mt5.last_error()` and returned as structured failure dictionaries without unhandled process termination.
+Terminal initialization errors and MT5 call failures are captured via `mt5.last_error()` and returned as `StandardResponse` failure envelopes with `status="error"` and structured error codes without unhandled process termination.
 
 ## Removal Behavior
 

@@ -8,7 +8,7 @@ from app.contracts.broker.capabilities import (
     BROKER_OPERATIONS_CAPABILITY,
     PROVIDER_METATRADER_CAPABILITY,
 )
-from app.services.brokers.metatrader.client import MetaTraderService
+from app.services.brokers.metatrader.client import MT5Client
 from app.services.brokers.metatrader.config import MetaTraderConfig
 from app.services.brokers.metatrader.manifest import SPEC
 
@@ -27,16 +27,25 @@ class MetaTraderFeature:
             spec: Feature specification declaring capabilities and state.
         """
         self.spec = spec
-        self._service: MetaTraderService | None = None
+        self._client: MT5Client | None = None
 
     @property
-    def service(self) -> MetaTraderService | None:
-        """Return the underlying MetaTrader service instance.
+    def client(self) -> MT5Client | None:
+        """Return the underlying MetaTrader client instance.
 
         Returns:
-            The MetaTraderService instance, or None if unmounted.
+            The MT5Client instance, or None if unmounted.
         """
-        return self._service
+        return self._client
+
+    @property
+    def service(self) -> MT5Client | None:
+        """Return the client instance under service alias for backward compatibility.
+
+        Returns:
+            The MT5Client instance, or None if unmounted.
+        """
+        return self._client
 
     async def mount(self, context: FeatureContext, config: object) -> None:
         """Mount the feature and provide the MetaTrader capabilities.
@@ -52,9 +61,9 @@ class MetaTraderFeature:
             else MetaTraderConfig.from_dict(raw_config)
         )
 
-        self._service = MetaTraderService(config=parsed_config)
-        context.provide(BROKER_OPERATIONS_CAPABILITY, self._service)
-        context.provide(PROVIDER_METATRADER_CAPABILITY, self._service)
+        self._client = MT5Client(config=parsed_config)
+        context.provide(BROKER_OPERATIONS_CAPABILITY, self._client)
+        context.provide(PROVIDER_METATRADER_CAPABILITY, self._client)
 
 
 def feature() -> MetaTraderFeature:

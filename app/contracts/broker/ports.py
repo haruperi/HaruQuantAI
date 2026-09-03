@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
+from app.contracts.common.response import StandardResponse
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import datetime
@@ -37,7 +39,6 @@ if TYPE_CHECKING:
         ManageSessionsSuccess,
         ReadProviderStateRequest,
         ReadProviderStateSuccess,
-        StandardResponse,
         TransportOrdersRequest,
         TransportOrdersSuccess,
     )
@@ -367,6 +368,14 @@ class BrokerResolverCapability(Protocol):
         """Resolve and return active broker module configuration."""
         ...
 
+    def get_broker_client(
+        self,
+        platform_or_name: str | None = None,
+        **config_kwargs: Any,
+    ) -> BrokerOperationsCapability:
+        """Resolve and instantiate the active or requested broker client."""
+        ...
+
 
 @runtime_checkable
 class BrokerOperationsCapability(Protocol):
@@ -378,11 +387,11 @@ class BrokerOperationsCapability(Protocol):
         server: str | None = None,
         password: str | None = None,
         timeout: int = 30,
-    ) -> dict[str, Any]:
+    ) -> dict[str, Any] | StandardResponse[Any]:
         """Connect to the broker environment."""
         ...
 
-    def disconnect(self) -> bool:
+    def disconnect(self) -> bool | StandardResponse[Any]:
         """Disconnect from the broker environment."""
         ...
 
@@ -390,15 +399,63 @@ class BrokerOperationsCapability(Protocol):
         """Check if connected to the broker."""
         ...
 
-    def get_account_info(self) -> dict[str, Any]:
+    def get_account_info(self) -> dict[str, Any] | StandardResponse[Any]:
         """Retrieve active account properties and balances."""
         ...
 
-    def get_symbol_info(self, symbol: str) -> dict[str, Any]:
+    def get_symbol_info(self, symbol: str) -> dict[str, Any] | StandardResponse[Any]:
         """Retrieve symbol metadata."""
         ...
 
-    def get_quote(self, symbol: str) -> dict[str, Any]:
+    def get_terminal_info(self) -> dict[str, Any] | StandardResponse[Any]:
+        """Retrieve terminal properties and environment state."""
+        ...
+
+    def get_order_info(
+        self,
+        symbol: str | None = None,
+        ticket: int | None = None,
+        group: str | None = None,
+    ) -> dict[str, Any] | list[dict[str, Any]] | StandardResponse[Any]:
+        """Retrieve active and pending orders."""
+        ...
+
+    def get_position_info(
+        self,
+        symbol: str | None = None,
+        ticket: int | None = None,
+        group: str | None = None,
+    ) -> dict[str, Any] | list[dict[str, Any]] | StandardResponse[Any]:
+        """Retrieve open positions."""
+        ...
+
+    def get_history_order_info(
+        self,
+        symbol: str | None = None,
+        ticket: int | None = None,
+        group: str | None = None,
+        date_from: Any = None,
+        date_to: Any = None,
+    ) -> dict[str, Any] | list[dict[str, Any]] | StandardResponse[Any]:
+        """Retrieve historical orders."""
+        ...
+
+    def get_history_deal_info(
+        self,
+        symbol: str | None = None,
+        ticket: int | None = None,
+        group: str | None = None,
+        date_from: Any = None,
+        date_to: Any = None,
+    ) -> dict[str, Any] | list[dict[str, Any]] | StandardResponse[Any]:
+        """Retrieve historical deals."""
+        ...
+
+    def trade(self, request: dict[str, Any]) -> dict[str, Any] | StandardResponse[Any]:
+        """Submit a trade order."""
+        ...
+
+    def get_quote(self, symbol: str) -> dict[str, Any] | StandardResponse[Any]:
         """Retrieve current bid/ask quote for symbol."""
         ...
 
@@ -410,6 +467,8 @@ class BrokerOperationsCapability(Protocol):
         """List open trading positions."""
         ...
 
-    def place_order(self, request: dict[str, Any]) -> dict[str, Any]:
+    def place_order(
+        self, request: dict[str, Any]
+    ) -> dict[str, Any] | StandardResponse[Any]:
         """Submit a new trade order."""
         ...

@@ -8,7 +8,7 @@ from app.contracts.broker.capabilities import (
     BROKER_OPERATIONS_CAPABILITY,
     PROVIDER_DUKASCOPY_CAPABILITY,
 )
-from app.services.brokers.dukascopy.client import DukascopyService
+from app.services.brokers.dukascopy.client import DukascopyClient
 from app.services.brokers.dukascopy.config import DukascopyConfig
 from app.services.brokers.dukascopy.manifest import SPEC
 
@@ -22,11 +22,16 @@ class DukascopyFeature:
 
     def __init__(self, spec: FeatureSpec = SPEC) -> None:
         self.spec = spec
-        self._service: DukascopyService | None = None
+        self._client: DukascopyClient | None = None
 
     @property
-    def service(self) -> DukascopyService | None:
-        return self._service
+    def client(self) -> DukascopyClient | None:
+        return self._client
+
+    @property
+    def service(self) -> DukascopyClient | None:
+        """Compatibility accessor for mounted client."""
+        return self._client
 
     async def mount(self, context: FeatureContext, config: object) -> None:
         raw_config = config if isinstance(config, dict) else {}
@@ -36,9 +41,9 @@ class DukascopyFeature:
             else DukascopyConfig(**raw_config)
         )
 
-        self._service = DukascopyService(config=parsed_config)
-        context.provide(BROKER_OPERATIONS_CAPABILITY, self._service)
-        context.provide(PROVIDER_DUKASCOPY_CAPABILITY, self._service)
+        self._client = DukascopyClient(config=parsed_config)
+        context.provide(BROKER_OPERATIONS_CAPABILITY, self._client)
+        context.provide(PROVIDER_DUKASCOPY_CAPABILITY, self._client)
 
 
 def feature() -> DukascopyFeature:

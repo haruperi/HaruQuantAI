@@ -8,7 +8,7 @@ from app.contracts.broker.capabilities import (
     BROKER_OPERATIONS_CAPABILITY,
     PROVIDER_BINANCE_CAPABILITY,
 )
-from app.services.brokers.binance.client import BinanceService
+from app.services.brokers.binance.client import BinanceClient
 from app.services.brokers.binance.config import BinanceConfig
 from app.services.brokers.binance.manifest import SPEC
 
@@ -22,11 +22,16 @@ class BinanceFeature:
 
     def __init__(self, spec: FeatureSpec = SPEC) -> None:
         self.spec = spec
-        self._service: BinanceService | None = None
+        self._client: BinanceClient | None = None
 
     @property
-    def service(self) -> BinanceService | None:
-        return self._service
+    def client(self) -> BinanceClient | None:
+        return self._client
+
+    @property
+    def service(self) -> BinanceClient | None:
+        """Compatibility accessor for mounted client."""
+        return self._client
 
     async def mount(self, context: FeatureContext, config: object) -> None:
         raw_config = config if isinstance(config, dict) else {}
@@ -34,9 +39,9 @@ class BinanceFeature:
             config if isinstance(config, BinanceConfig) else BinanceConfig(**raw_config)
         )
 
-        self._service = BinanceService(config=parsed_config)
-        context.provide(BROKER_OPERATIONS_CAPABILITY, self._service)
-        context.provide(PROVIDER_BINANCE_CAPABILITY, self._service)
+        self._client = BinanceClient(config=parsed_config)
+        context.provide(BROKER_OPERATIONS_CAPABILITY, self._client)
+        context.provide(PROVIDER_BINANCE_CAPABILITY, self._client)
 
 
 def feature() -> BinanceFeature:

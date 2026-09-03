@@ -251,7 +251,7 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 **Public records:** `BrokerProviderProfile`, `BrokerSessionRef`, `BrokerSessionState`, `BrokerSessionReadiness`, `BrokerAccountSnapshot`, `BrokerTradingState`, `BrokerMarketState`, `ProviderEvent`, `BrokerOperationRequest`, `BrokerOperationReceipt`, `BrokerOperationOutcome`, `ProviderCorrelation`, and `BrokerHistoryPage`.
 
-**Capability bundles (8):** `ManageSessionsCapability`, `ReadProviderStateCapability`, `TransportOrdersCapability`, plus one `ProviderBackend` binding each for `broker.provider.metatrader@1`, `broker.provider.ctrader@1`, `broker.provider.binance@1`, `broker.provider.dukascopy@1`, and `broker.provider.yahoo@1`.
+**Capability bundles (10):** `BrokerResolverCapability`, `BrokerOperationsCapability`, `ManageSessionsCapability`, `ReadProviderStateCapability`, `TransportOrdersCapability`, plus one `ProviderBackend` binding each for `broker.provider.metatrader@1`, `broker.provider.ctrader@1`, `broker.provider.binance@1`, `broker.provider.dukascopy@1`, and `broker.provider.yahoo@1`.
 
 ### 4.14 `app/contracts/risk/`
 
