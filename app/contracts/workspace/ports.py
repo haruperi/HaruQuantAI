@@ -16,6 +16,8 @@ if TYPE_CHECKING:
         HostWorkspacesSuccess,
         JobKind,
         LocalSession,
+        ManageWatchlistsRequest,
+        ManageWatchlistsSuccess,
         RuntimeSupportProfile,
         ServerRuntimeSettings,
         ServerRuntimeValidation,
@@ -412,5 +414,25 @@ class HostWorkspacesCapability(Protocol):
             The isolation context or authorization decision (where ``DENY``
             is a typed success outcome) on success, otherwise a structured
             workspace failure.
+        """
+        ...
+
+
+@runtime_checkable
+class ManageWatchlistsCapability(Protocol):
+    """Capability protocol for account watchlist operations."""
+
+    async def manage_watchlists(
+        self,
+        request: ManageWatchlistsRequest,
+    ) -> ManageWatchlistsSuccess | WorkspaceFailure:
+        """List, create, update, and delete account-owned watchlists.
+
+        Args:
+            request: Operation-discriminated watchlist request.
+
+        Returns:
+            The watchlist page, mutation result, or deletion flag on
+            success, otherwise a structured workspace failure.
         """
         ...

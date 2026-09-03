@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
@@ -1632,6 +1633,190 @@ class HostWorkspacesSuccess(WireModel):
 # ``ServerRuntimeSettingsWire``, ``ServerRuntimeValidationWire``,
 # ``BackupFileRecordWire``, ``ArtifactChunk``) are inline record parts, not
 # registered public records.
+
+
+class WatchlistItemRecord(WireModel):
+    """One watched symbol inside an account watchlist.
+
+    ``source_id`` names the provider-facing directory source; ``sort_order``
+    is the caller's stable display order.
+    """
+
+    source_id: NonEmptyStr
+    symbol: NonEmptyStr
+    sort_order: int = Field(ge=0)
+    asset_class: str = ""
+    schema_version: Literal[1] = 1
+
+
+class WatchlistRecord(WireModel):
+    """One account-owned named, ordered collection of watched symbols."""
+
+    watchlist_id: Uuid7
+    account_id: NonEmptyStr
+    name: Name1To160
+    is_default: bool = False
+    sort_order: int = Field(default=0, ge=0)
+    items: tuple[WatchlistItemRecord, ...] = ()
+    created_at: UtcTimestamp
+    updated_at: UtcTimestamp
+    schema_version: Literal[1] = 1
+
+
+class ManageWatchlistsRequest(WireModel):
+    """Operation-discriminated account watchlist request.
+
+    LIST requires no operation fields; CREATE requires ``name``; UPDATE
+    requires ``watchlist_id`` plus any of ``name``/``symbols``/
+    ``is_default``/``sort_order``; DELETE requires ``watchlist_id``.
+    """
+
+    request_id: Uuid7
+    capability_snapshot_id: Uuid7
+    account_id: NonEmptyStr
+    operation: Literal["LIST", "CREATE", "UPDATE", "DELETE"]
+    watchlist_id: Uuid7 | None = None
+    name: Name1To160 | None = None
+    symbols: tuple[NonEmptyStr, ...] = Field(default=(), max_length=500)
+    is_default: bool | None = None
+    sort_order: int | None = Field(default=None, ge=0)
+    schema_version: Literal[1] = 1
+
+    @model_validator(mode="after")
+    def validate_operation_shape(self) -> ManageWatchlistsRequest:
+        """Validate that request fields match the selected operation.
+
+        Returns:
+            The validated request.
+
+        Raises:
+            ValueError: Required fields are missing or forbidden fields
+                are set for the selected operation.
+        """
+        _validate_watchlists_operation(self)
+        return self
+
+
+def _forbid(request: ManageWatchlistsRequest, field_name: str) -> None:
+    """Reject one forbidden operation field.
+
+    Args:
+        request: Request under validation.
+        field_name: Field that must be absent.
+
+    Raises:
+        ValueError: The field is set for the selected operation.
+    """
+    if getattr(request, field_name) is not None:
+        message = f"{request.operation} forbids {field_name}"
+        raise ValueError(message)
+
+
+def _validate_list(request: ManageWatchlistsRequest) -> None:
+    """Enforce the LIST request shape.
+
+    Args:
+        request: Request under validation.
+
+    Raises:
+        ValueError: A forbidden field is set.
+    """
+    for field_name in ("watchlist_id", "name", "is_default", "sort_order"):
+        _forbid(request, field_name)
+    if request.symbols:
+        raise ValueError("LIST forbids symbols")
+
+
+def _validate_create(request: ManageWatchlistsRequest) -> None:
+    """Enforce the CREATE request shape.
+
+    Args:
+        request: Request under validation.
+
+    Raises:
+        ValueError: The name is missing or the id is set.
+    """
+    if request.name is None:
+        raise ValueError("CREATE requires name")
+    _forbid(request, "watchlist_id")
+
+
+def _validate_delete(request: ManageWatchlistsRequest) -> None:
+    """Enforce the DELETE request shape.
+
+    Args:
+        request: Request under validation.
+
+    Raises:
+        ValueError: The id is missing or a mutable field is set.
+    """
+    if request.watchlist_id is None:
+        raise ValueError("DELETE requires watchlist_id")
+    for field_name in ("name", "is_default", "sort_order"):
+        _forbid(request, field_name)
+    if request.symbols:
+        raise ValueError("DELETE forbids symbols")
+
+
+def _validate_update(request: ManageWatchlistsRequest) -> None:
+    """Enforce the UPDATE request shape.
+
+    Args:
+        request: Request under validation.
+
+    Raises:
+        ValueError: The id is missing or no field is present.
+    """
+    if request.watchlist_id is None:
+        raise ValueError("UPDATE requires watchlist_id")
+    if (
+        request.name is None
+        and not request.symbols
+        and request.is_default is None
+        and request.sort_order is None
+    ):
+        raise ValueError("UPDATE requires at least one field")
+
+
+_OPERATION_VALIDATORS: dict[str, Callable[[ManageWatchlistsRequest], None]] = {
+    "LIST": _validate_list,
+    "CREATE": _validate_create,
+    "UPDATE": _validate_update,
+    "DELETE": _validate_delete,
+}
+
+
+def _validate_watchlists_operation(request: ManageWatchlistsRequest) -> None:
+    """Enforce per-operation request shapes.
+
+    Args:
+        request: Request under validation.
+
+    Raises:
+        ValueError: Required fields are missing or forbidden fields are
+            set for the selected operation.
+    """
+    validator = _OPERATION_VALIDATORS.get(request.operation)
+    if validator is not None:
+        validator(request)
+
+
+class ManageWatchlistsSuccess(WireModel):
+    """Successful account watchlist operation result.
+
+    ``watchlists`` is returned for LIST, ``watchlist`` for CREATE and
+    UPDATE, and ``deleted`` for DELETE.
+    """
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    watchlists: tuple[WatchlistRecord, ...] = ()
+    watchlist: WatchlistRecord | None = None
+    deleted: bool = False
+    schema_version: Literal[1] = 1
+
+
 WIRE_MODELS: dict[str, type[WireModel]] = {
     "WorkspaceRef": WorkspaceRefWire,
     "WorkspaceVersion": WorkspaceVersionWire,
@@ -1660,4 +1845,8 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
     "DistributeWorkersSuccess": DistributeWorkersSuccess,
     "HostWorkspacesRequest": HostWorkspacesRequest,
     "HostWorkspacesSuccess": HostWorkspacesSuccess,
+    "WatchlistItemRecord": WatchlistItemRecord,
+    "WatchlistRecord": WatchlistRecord,
+    "ManageWatchlistsRequest": ManageWatchlistsRequest,
+    "ManageWatchlistsSuccess": ManageWatchlistsSuccess,
 }

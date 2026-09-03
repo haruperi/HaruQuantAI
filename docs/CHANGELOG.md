@@ -2,6 +2,52 @@
 
 ## [Unreleased]
 
+### Expose the account watchlist boundary
+
+Phase 6's heaviest slice closes gap G6: account watchlists now have a
+backend owner and a served CRUD boundary, built on a standalone `users`
+table (identity gap G2 remains open) plus the legacy-compatible
+`api_watchlists` and `watchlist_items` STRICT tables. `FEAT-WS-MANAGE_WATCHLISTS`
+owns the durable store with the exactly-one-default-per-account
+invariant, unique (account, name), curated default seeding on first
+read, and default-protection on delete/demote.
+`FEAT-IFACE-OPERATE_WATCHLISTS` translates the ratified gateway contract
+onto it and the ASGI mounting surface serves the frozen routes the typed
+client already calls: `GET/POST /api/v1/watchlists` and
+`PATCH/DELETE /api/v1/watchlists/{id}`.
+
+#### Added (7)
+
+- Added the `workspace.manage-watchlists@1` capability with
+  `ManageWatchlistsCapability` and four workspace public records
+  (`WatchlistItemRecord`, `WatchlistRecord`, `ManageWatchlistsRequest`,
+  `ManageWatchlistsSuccess`); workspace family now 27 records / 7
+  bundles.
+- Added the `interfaces.operate-watchlists@1` capability with
+  `OperateWatchlistsCapability` and two interfaces public records
+  (`OperateWatchlistsRequest`, `OperateWatchlistsSuccess`); interfaces
+  family now 30 records / 10 bundles; regenerated schemas and generated
+  TypeScript.
+- Added `FEAT-WS-MANAGE_WATCHLISTS`: SQLite persistence (standalone
+  `users`, `api_watchlists`, `watchlist_items`), strict configuration,
+  RETAIN state declaration, runtime-validated README, usage harness,
+  and CRUD invariant tests (seeding, uniqueness, exactly-one-default,
+  default guards, item replacement, account isolation).
+- Added `FEAT-IFACE-OPERATE_WATCHLISTS`: the watchlist gateway with
+  workspace-failure mapping, strict configuration, runtime-validated
+  README, and a dedicated `_usage.py` demonstration composing the real
+  store (the documented usage-module exception to the feature-import
+  boundary).
+- Widened `ApiResponse.data` to also carry lists of mappings for
+  collection routes (additive; regenerated).
+- Served the watchlist CRUD routes on the ASGI mounting surface with
+  the frozen client payload shapes, bounded JSON bodies, uniform
+  validation envelopes (400/404/409), and the stable 503
+  `CAPABILITY_UNAVAILABLE` translation.
+- Added ASGI watchlist tests: the full CRUD matrix against the frozen
+  shapes, fail-closed absence, and the removal matrix proving the
+  store survives gateway withdrawal.
+
 ### Migrate Markets to the full D-UI feature shape
 
 `FEAT-UI-02` is the second widget migrated to the D-UI model (Phase 6

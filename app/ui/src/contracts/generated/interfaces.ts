@@ -8,7 +8,7 @@ import type { CorrelationMatrix, PortfolioConstraintSet, PortfolioMember, Portfo
 import type { ResearchManifest } from "./research";
 import type { KillSwitchState, RiskDecision } from "./risk";
 import type { ExecutionAuthorityRef, TradePlan, TradingSession, TradingSessionRef } from "./trading";
-import type { HealthState, NonEmptyStr } from "./workspace";
+import type { HealthState, NonEmptyStr, WatchlistRecord } from "./workspace";
 
 export interface AdministerCapabilitiesRequest {
   request_id: string;
@@ -53,7 +53,7 @@ export interface ApiMetadata {
 export interface ApiResponse {
   status: "success" | "error";
   message: NonEmptyStr;
-  data?: JsonObject | null;  // default: null
+  data?: JsonObject | JsonObject[] | null;  // default: null
   error?: ApiError | null;  // default: null
   metadata: ApiMetadata;
   schema_version?: 1;  // default: 1
@@ -324,6 +324,26 @@ export interface OperateTradingSuccess {
   market?: BrokerMarketState | null;  // default: null
   operational_journal?: OperationalJournalArtifact | null;  // default: null
   qualification?: OperatorQualification | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
+export interface OperateWatchlistsRequest {
+  request_id: string;
+  capability_snapshot_id: string;
+  operation: "LIST" | "CREATE" | "UPDATE" | "DELETE";
+  watchlist_id?: string | null;  // default: null
+  name?: NonEmptyStr | null;  // default: null
+  symbols?: NonEmptyStr[];  // default: []
+  is_default?: boolean | null;  // default: null
+  sort_order?: number | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
+export interface OperateWatchlistsSuccess {
+  outcome?: "SUCCESS";  // default: "SUCCESS"
+  request_id: string;
+  result_version?: 1;  // default: 1
+  watchlists?: WatchlistRecord[];  // default: []
+  watchlist?: WatchlistRecord | null;  // default: null
+  deleted?: boolean;  // default: false
   schema_version?: 1;  // default: 1
 }
 export interface PortfolioBuilderProjection {

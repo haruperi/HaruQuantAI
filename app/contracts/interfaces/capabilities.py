@@ -14,6 +14,7 @@ if TYPE_CHECKING:
         OperatePortfoliosCapability,
         OperateResearchCapability,
         OperateTradingCapability,
+        OperateWatchlistsCapability,
         ServeApiEventsCapability,
     )
 
@@ -68,4 +69,11 @@ ADMINISTER_CAPABILITIES_CAPABILITY: CapabilityKey[AdministerCapabilitiesCapabili
 OPERATE_TRADING_CAPABILITY: CapabilityKey[OperateTradingCapability] = CapabilityKey(
     name="interfaces.operate-trading",
     major=1,
+)
+
+OPERATE_WATCHLISTS_CAPABILITY: CapabilityKey[OperateWatchlistsCapability] = (
+    CapabilityKey(
+        name="interfaces.operate-watchlists",
+        major=1,
+    )
 )

@@ -119,6 +119,27 @@ export interface LocalSession {
   schema_version?: 1;  // default: 1
 }
 export type LogLevel = "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL";
+export interface ManageWatchlistsRequest {
+  request_id: string;
+  capability_snapshot_id: string;
+  account_id: NonEmptyStr;
+  operation: "LIST" | "CREATE" | "UPDATE" | "DELETE";
+  watchlist_id?: string | null;  // default: null
+  name?: Name1To160 | null;  // default: null
+  symbols?: NonEmptyStr[];  // default: []
+  is_default?: boolean | null;  // default: null
+  sort_order?: number | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
+export interface ManageWatchlistsSuccess {
+  outcome?: "SUCCESS";  // default: "SUCCESS"
+  request_id: string;
+  result_version?: 1;  // default: 1
+  watchlists?: WatchlistRecord[];  // default: []
+  watchlist?: WatchlistRecord | null;  // default: null
+  deleted?: boolean;  // default: false
+  schema_version?: 1;  // default: 1
+}
 export type Name1To160 = string;
 export type NonEmptyStr = string;
 export type NonNegativeInt = number;
@@ -186,6 +207,24 @@ export interface SystemReadiness {
 }
 export type UppercaseToken = string;
 export type UriStr = string;
+export interface WatchlistItemRecord {
+  source_id: NonEmptyStr;
+  symbol: NonEmptyStr;
+  sort_order: number;
+  asset_class?: string;  // default: ""
+  schema_version?: 1;  // default: 1
+}
+export interface WatchlistRecord {
+  watchlist_id: string;
+  account_id: NonEmptyStr;
+  name: Name1To160;
+  is_default?: boolean;  // default: false
+  sort_order?: number;  // default: 0
+  items?: WatchlistItemRecord[];  // default: []
+  created_at: string;
+  updated_at: string;
+  schema_version?: 1;  // default: 1
+}
 export interface WorkerCapabilityDescriptor {
   capabilities: string[];
   build_hash: string;

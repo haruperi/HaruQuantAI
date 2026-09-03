@@ -175,9 +175,9 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 **Status:** `ManageWorkspacesCapability`, `ConfigureRuntimeCapability`, `SecureLocalAccessCapability`, and `BuildDiagnosticsCapability` implemented; remaining domain capability surfaces planned.
 
-**Public records:** `WorkspaceRef`, `WorkspaceVersion`, `WorkspaceConfiguration`, `RuntimeConfiguration`, `StorageGuardPolicy`, `WorkspaceWriterLease`, `WorkspaceWriterFence`, `WorkspaceBackupManifest`, `WorkspaceRestorePlan`, `SecretRef`, `PrincipalRef`, `LocalSession`, `SystemHealth`, `SystemReadiness`, `DiagnosticBundleRef`, `DiagnosticBundleManifest`, `WorkerCapabilityDescriptor`, `WorkerRegistration`, `WorkerLease`, `WorkerTaskEnvelope`, `ArtifactManifest`, `HostedWorkspaceContext`, and `WorkspaceAuthorizationDecision`.
+**Public records:** `WorkspaceRef`, `WorkspaceVersion`, `WorkspaceConfiguration`, `RuntimeConfiguration`, `StorageGuardPolicy`, `WorkspaceWriterLease`, `WorkspaceWriterFence`, `WorkspaceBackupManifest`, `WorkspaceRestorePlan`, `SecretRef`, `PrincipalRef`, `LocalSession`, `SystemHealth`, `SystemReadiness`, `DiagnosticBundleRef`, `DiagnosticBundleManifest`, `WorkerCapabilityDescriptor`, `WorkerRegistration`, `WorkerLease`, `WorkerTaskEnvelope`, `ArtifactManifest`, `HostedWorkspaceContext`, `WorkspaceAuthorizationDecision`, `WatchlistItemRecord`, `WatchlistRecord`, `ManageWatchlistsRequest`, and `ManageWatchlistsSuccess`.
 
-**Capability bundles (6):** `ManageWorkspacesCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability` (implemented), `DistributeWorkersCapability`, and `HostWorkspacesCapability`.
+**Capability bundles (7):** `ManageWorkspacesCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability` (implemented), `DistributeWorkersCapability`, `HostWorkspacesCapability`, and `ManageWatchlistsCapability`.
 
 ### 4.2 `app/contracts/catalogue/`
 
@@ -231,9 +231,9 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 ### 4.10 `app/contracts/interfaces/`
 
-**Public records:** `ApiVersion`, `ConcurrencyToken`, `EventCursor`, `EventReplayBatch`, `AsyncJobRef`, `ArtifactDownloadRequest`, `BulkRequestToken`, `AutomationCommand`, `AutomationSchema`, `McpOperation`, `ResearchPreview`, `ProjectGraphProjection`, `PortfolioBuilderProjection`, `CapabilityAdministrationProjection`, `TradingActionPreview`, `TradingReadinessProjection`, `MarketTickQuote`, `MarketTickSnapshot`, `ObserveMarketDataRequest`, `ObserveMarketDataSuccess`, `ObserveMarketDataEventSubscription`, `StreamEvent`, `ApiMetadata`, `ApiError`, `ApiResponse`, `MarketCatalogueEntry`, `ObserveMarketCatalogueRequest`, and `ObserveMarketCatalogueSuccess`.
+**Public records:** `ApiVersion`, `ConcurrencyToken`, `EventCursor`, `EventReplayBatch`, `AsyncJobRef`, `ArtifactDownloadRequest`, `BulkRequestToken`, `AutomationCommand`, `AutomationSchema`, `McpOperation`, `ResearchPreview`, `ProjectGraphProjection`, `PortfolioBuilderProjection`, `CapabilityAdministrationProjection`, `TradingActionPreview`, `TradingReadinessProjection`, `MarketTickQuote`, `MarketTickSnapshot`, `ObserveMarketDataRequest`, `ObserveMarketDataSuccess`, `ObserveMarketDataEventSubscription`, `StreamEvent`, `ApiMetadata`, `ApiError`, `ApiResponse`, `MarketCatalogueEntry`, `ObserveMarketCatalogueRequest`, `ObserveMarketCatalogueSuccess`, `OperateWatchlistsRequest`, and `OperateWatchlistsSuccess`.
 
-**Capability bundles (9):** `ServeApiEventsCapability`, `ObserveMarketDataCapability`, `ObserveMarketCatalogueCapability`, `AutomateCommandsCapability`, `OperateResearchCapability`, `EditProjectsCapability`, `OperatePortfoliosCapability`, `AdministerCapabilitiesCapability`, and `OperateTradingCapability`.
+**Capability bundles (10):** `ServeApiEventsCapability`, `ObserveMarketDataCapability`, `ObserveMarketCatalogueCapability`, `OperateWatchlistsCapability`, `AutomateCommandsCapability`, `OperateResearchCapability`, `EditProjectsCapability`, `OperatePortfoliosCapability`, `AdministerCapabilitiesCapability`, and `OperateTradingCapability`.
 
 ### 4.11 `app/contracts/ui/`
 

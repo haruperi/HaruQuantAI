@@ -41,6 +41,8 @@ if TYPE_CHECKING:
         OperateTradingEventSubscription,
         OperateTradingRequest,
         OperateTradingSuccess,
+        OperateWatchlistsRequest,
+        OperateWatchlistsSuccess,
     )
 
 
@@ -546,5 +548,25 @@ class OperateTradingCapability(Protocol):
             An asynchronous iterator of trading operations events wrapped
             in the common domain event envelope with ordered replay and
             resync semantics.
+        """
+        ...
+
+
+@runtime_checkable
+class OperateWatchlistsCapability(Protocol):
+    """Protocol for the account watchlist gateway."""
+
+    async def operate_watchlists(
+        self,
+        request: OperateWatchlistsRequest,
+    ) -> OperateWatchlistsSuccess | InterfaceFailure:
+        """Resolve and expose account watchlist operations.
+
+        Args:
+            request: Operation-discriminated watchlist gateway request.
+
+        Returns:
+            The watchlist projection or mutation result on success,
+            otherwise a structured interface failure.
         """
         ...

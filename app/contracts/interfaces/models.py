@@ -54,6 +54,9 @@ from app.contracts.trading.models import (  # noqa: TC001
     TradingSession,
     TradingSessionRef,
 )
+from app.contracts.workspace.models import (  # noqa: TC001
+    WatchlistRecord,
+)
 
 
 class MutationStatus(StrEnum):
@@ -1319,12 +1322,13 @@ class ApiResponse(WireModel):
     """Wire-native five-field HTTP response envelope (record R22).
 
     Exactly one of ``data`` (success) or ``error`` (failure) is present;
-    ``metadata`` always describes the served request.
+    ``metadata`` always describes the served request. ``data`` carries a
+    mapping, or a list of mappings for collection routes.
     """
 
     status: Literal["success", "error"]
     message: NonEmptyStr
-    data: JsonObject | None = None
+    data: JsonObject | list[JsonObject] | None = None
     error: ApiError | None = None
     metadata: ApiMetadata
     schema_version: Literal[1] = 1
@@ -1388,6 +1392,37 @@ class ObserveMarketCatalogueSuccess(WireModel):
     schema_version: Literal[1] = 1
 
 
+class OperateWatchlistsRequest(WireModel):
+    """Operation-discriminated watchlist gateway request (record R24).
+
+    LIST requires no operation fields; CREATE requires ``name``; UPDATE
+    requires ``watchlist_id`` plus any mutable field; DELETE requires
+    ``watchlist_id``.
+    """
+
+    request_id: Uuid7
+    capability_snapshot_id: Uuid7
+    operation: Literal["LIST", "CREATE", "UPDATE", "DELETE"]
+    watchlist_id: Uuid7 | None = None
+    name: NonEmptyStr | None = None
+    symbols: tuple[NonEmptyStr, ...] = Field(default=(), max_length=500)
+    is_default: bool | None = None
+    sort_order: int | None = Field(default=None, ge=0)
+    schema_version: Literal[1] = 1
+
+
+class OperateWatchlistsSuccess(WireModel):
+    """Successful watchlist gateway operation result (record R25)."""
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    watchlists: tuple[WatchlistRecord, ...] = ()
+    watchlist: WatchlistRecord | None = None
+    deleted: bool = False
+    schema_version: Literal[1] = 1
+
+
 # Wire projections register under their inventory names (``<Record>`` ->
 # ``<Record>Wire``); wire-native and request/success records register
 # directly. Nested components (``AutomationCommandDescriptor``,
@@ -1422,6 +1457,8 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
     "MarketCatalogueEntry": MarketCatalogueEntry,
     "ObserveMarketCatalogueRequest": ObserveMarketCatalogueRequest,
     "ObserveMarketCatalogueSuccess": ObserveMarketCatalogueSuccess,
+    "OperateWatchlistsRequest": OperateWatchlistsRequest,
+    "OperateWatchlistsSuccess": OperateWatchlistsSuccess,
     "OperateResearchRequest": OperateResearchRequest,
     "OperateResearchSuccess": OperateResearchSuccess,
     "EditProjectsRequest": EditProjectsRequest,

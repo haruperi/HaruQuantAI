@@ -10,6 +10,7 @@ if TYPE_CHECKING:
         ConfigureRuntimeCapability,
         DistributeWorkersCapability,
         HostWorkspacesCapability,
+        ManageWatchlistsCapability,
         ManageWorkspacesCapability,
         SecureLocalAccessCapability,
     )
@@ -45,5 +46,10 @@ DISTRIBUTE_WORKERS_CAPABILITY: CapabilityKey[DistributeWorkersCapability] = (
 
 HOST_WORKSPACES_CAPABILITY: CapabilityKey[HostWorkspacesCapability] = CapabilityKey(
     name="workspace.host-workspaces",
+    major=1,
+)
+
+MANAGE_WATCHLISTS_CAPABILITY: CapabilityKey[ManageWatchlistsCapability] = CapabilityKey(
+    name="workspace.manage-watchlists",
     major=1,
 )

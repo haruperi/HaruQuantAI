@@ -45,7 +45,7 @@ CAPABILITY_OWNERS: tuple[str, ...] = OWNERS[1:]
 
 # Expected "**Public records:**" list lengths per README sections 4.1-4.15.
 EXPECTED_RECORD_COUNTS: dict[str, int] = {
-    "workspace": 23,
+    "workspace": 27,
     "catalogue": 18,
     "data": 27,
     "strategy": 26,
@@ -54,7 +54,7 @@ EXPECTED_RECORD_COUNTS: dict[str, int] = {
     "research": 27,
     "portfolio": 18,
     "orchestration": 25,
-    "interfaces": 28,
+    "interfaces": 30,
     "ui": 37,
     "plugins": 13,
     "broker": 13,
@@ -64,7 +64,7 @@ EXPECTED_RECORD_COUNTS: dict[str, int] = {
 
 # Expected "**Capability bundles (N):**" counts per README sections 4.1-4.15.
 EXPECTED_CAPABILITY_COUNTS: dict[str, int] = {
-    "workspace": 6,
+    "workspace": 7,
     "catalogue": 7,
     "data": 14,
     "strategy": 13,
@@ -73,7 +73,7 @@ EXPECTED_CAPABILITY_COUNTS: dict[str, int] = {
     "research": 13,
     "portfolio": 8,
     "orchestration": 7,
-    "interfaces": 9,
+    "interfaces": 10,
     "ui": 17,
     "plugins": 7,
     "broker": 10,

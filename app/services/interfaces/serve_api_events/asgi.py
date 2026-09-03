@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import json
 import re
 from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import dataclass
@@ -39,6 +40,7 @@ from app.contracts.catalogue.capabilities import CATALOG_INSTRUMENTS_CAPABILITY
 from app.contracts.interfaces.capabilities import (
     OBSERVE_MARKET_CATALOGUE_CAPABILITY,
     OBSERVE_MARKET_DATA_CAPABILITY,
+    OPERATE_WATCHLISTS_CAPABILITY,
 )
 from app.contracts.interfaces.models import (
     ApiError,
@@ -50,6 +52,8 @@ from app.contracts.interfaces.models import (
     ObserveMarketDataEventSubscription,
     ObserveMarketDataRequest,
     ObserveMarketDataSuccess,
+    OperateWatchlistsRequest,
+    OperateWatchlistsSuccess,
     StreamEvent,
 )
 
@@ -57,6 +61,7 @@ if TYPE_CHECKING:
     from collections.abc import MutableMapping
     from typing import Any
 
+    from app.contracts.common.models import JsonValue
     from app.contracts.interfaces.errors import InterfaceFailure
     from app.contracts.interfaces.ports import ObserveMarketDataCapability
     from app.kernel.capability import CapabilityKey
@@ -81,6 +86,9 @@ _ALIAS_STREAM_ROUTE = "/api/v1/data/snapshot-stream"
 _STREAM_ROUTES = frozenset({_STREAM_ROUTE, _ALIAS_STREAM_ROUTE})
 _CATALOGUE_ROUTES = ("/api/v1/market/catalogue", "/api/v1/data/markets")
 _CATALOGUE_OPERATION = "api.market.catalogue"
+_WATCHLISTS_ROUTE = "/api/v1/watchlists"
+_WATCHLIST_OPERATION = "api.watchlists"
+_MAX_BODY_BYTES = 65_536
 _PROVIDER_CATALOGUE_SOURCE_ID = CATALOG_INSTRUMENTS_CAPABILITY.identifier
 
 
@@ -761,6 +769,269 @@ async def _serve_catalogue(
     await _send_json(send, HTTPStatus.OK, envelope)
 
 
+async def _read_json_body(receive: Receive) -> dict[str, Any] | None:
+    """Read one bounded JSON request body.
+
+    Args:
+        receive: ASGI receive callable.
+
+    Returns:
+        The parsed body mapping, {} for an empty body, or None when
+        malformed.
+    """
+    body = bytearray()
+    while True:
+        message = await receive()
+        if message.get("type") == "http.disconnect":
+            return None
+        chunk = message.get("body", b"")
+        if chunk:
+            body.extend(chunk)
+        if not message.get("more_body", False):
+            break
+    if not body:
+        return {}
+    if len(body) > _MAX_BODY_BYTES:
+        return None
+    try:
+        parsed = json.loads(body.decode("utf-8"))
+    except UnicodeDecodeError, ValueError:
+        return None
+    return parsed if isinstance(parsed, dict) else None
+
+
+def _watchlist_request(operation: str, **fields: object) -> OperateWatchlistsRequest:
+    """Build one watchlist gateway request.
+
+    Args:
+        operation: Gateway operation discriminator.
+        fields: Optional operation fields.
+
+    Returns:
+        Operation-discriminated gateway request.
+
+    Raises:
+        ValueError: If the composed request violates its contract.
+    """
+    return OperateWatchlistsRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation=operation,  # type: ignore[arg-type]
+        **fields,  # type: ignore[arg-type]
+    )
+
+
+async def _serve_watchlist_result(
+    result: object,
+    send: Send,
+    request_id: str,
+    route: str,
+    trace_id: str | None,
+    deleted_id: str | None = None,
+) -> None:
+    """Serve one watchlist gateway result or failure envelope.
+
+    Args:
+        result: Gateway operation result.
+        send: ASGI send callable.
+        request_id: Mirrored or generated request identifier.
+        route: Served route path.
+        trace_id: Optional mirrored trace identifier.
+        deleted_id: Watchlist id from the route for deletion results.
+    """
+    if not isinstance(result, OperateWatchlistsSuccess):
+        failure = result
+        status = HTTPStatus(failure.problem.status)  # type: ignore[attr-defined]
+        await _send_json(
+            send,
+            status,
+            _error_response(
+                request_id,
+                route,
+                _WATCHLIST_OPERATION,
+                status,
+                failure.code,  # type: ignore[attr-defined]
+                failure.problem.detail,  # type: ignore[attr-defined]
+                trace_id,
+            ),
+        )
+        return
+    data: dict[str, JsonValue] | list[dict[str, JsonValue]]
+    if result.deleted:
+        resolved_id = (
+            deleted_id
+            if deleted_id is not None
+            else (result.watchlist.watchlist_id if result.watchlist is not None else "")
+        )
+        data = {"watchlist_id": resolved_id, "deleted": True}
+    elif result.watchlist is not None:
+        data = result.watchlist.model_dump(mode="json")
+    else:
+        data = [entry.model_dump(mode="json") for entry in result.watchlists]
+    await _send_json(
+        send,
+        HTTPStatus.OK,
+        ApiResponse(
+            status="success",
+            message=HTTPStatus.OK.phrase,
+            data=data,
+            metadata=_metadata(
+                request_id, route, _WATCHLIST_OPERATION, "read", False, None, trace_id
+            ),
+        ),
+    )
+
+
+async def _serve_watchlists_collection(
+    registry: ServiceRegistry,
+    scope: Scope,
+    receive: Receive,
+    send: Send,
+) -> None:
+    """Serve the watchlists collection: GET list and POST create.
+
+    Args:
+        registry: Live composition service registry.
+        scope: ASGI connection scope.
+        receive: ASGI receive callable.
+        send: ASGI send callable.
+    """
+    request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
+    trace_id = _header(scope, "x-trace-id")
+    method = str(scope.get("method", "GET")).upper()
+    gateway = await _resolve_gateway(
+        registry,
+        OPERATE_WATCHLISTS_CAPABILITY,
+        "The watchlist capability has no active provider.",
+        _WATCHLISTS_ROUTE,
+        _WATCHLIST_OPERATION,
+        request_id,
+        trace_id,
+        send,
+    )
+    if gateway is None:
+        return
+    if method == "GET":
+        request = _watchlist_request("LIST")
+    else:
+        body = await _read_json_body(receive)
+        name = body.get("name") if body is not None else None
+        if not isinstance(name, str) or not name.strip():
+            await _send_error(
+                send,
+                HTTPStatus.BAD_REQUEST,
+                "VALIDATION_ERROR",
+                "The request body must carry a non-empty name.",
+                _WATCHLISTS_ROUTE,
+                _WATCHLIST_OPERATION,
+                trace_id,
+            )
+            return
+        try:
+            request = _watchlist_request("CREATE", name=name.strip())
+        except ValueError:
+            await _send_error(
+                send,
+                HTTPStatus.BAD_REQUEST,
+                "VALIDATION_ERROR",
+                "The create request violates the watchlist contract.",
+                _WATCHLISTS_ROUTE,
+                _WATCHLIST_OPERATION,
+                trace_id,
+            )
+            return
+    result = await gateway.operate_watchlists(request)
+    await _serve_watchlist_result(result, send, request_id, _WATCHLISTS_ROUTE, trace_id)
+
+
+async def _serve_watchlists_item(
+    registry: ServiceRegistry,
+    scope: Scope,
+    receive: Receive,
+    send: Send,
+) -> None:
+    """Serve one watchlist item: PATCH update and DELETE.
+
+    Args:
+        registry: Live composition service registry.
+        scope: ASGI connection scope.
+        receive: ASGI receive callable.
+        send: ASGI send callable.
+    """
+    path = str(scope.get("path", ""))
+    watchlist_id = path[len(_WATCHLISTS_ROUTE) + 1 :]
+    route = f"{_WATCHLISTS_ROUTE}/{watchlist_id}"
+    request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
+    trace_id = _header(scope, "x-trace-id")
+    method = str(scope.get("method", "")).upper()
+    if not _UUID7_PATTERN.match(watchlist_id):
+        await _send_error(
+            send,
+            HTTPStatus.BAD_REQUEST,
+            "VALIDATION_ERROR",
+            "The watchlist id is not a valid identifier.",
+            route,
+            _WATCHLIST_OPERATION,
+            trace_id,
+        )
+        return
+    gateway = await _resolve_gateway(
+        registry,
+        OPERATE_WATCHLISTS_CAPABILITY,
+        "The watchlist capability has no active provider.",
+        route,
+        _WATCHLIST_OPERATION,
+        request_id,
+        trace_id,
+        send,
+    )
+    if gateway is None:
+        return
+    if method == "DELETE":
+        request = _watchlist_request("DELETE", watchlist_id=watchlist_id)
+    else:
+        body = await _read_json_body(receive)
+        if body is None:
+            await _send_error(
+                send,
+                HTTPStatus.BAD_REQUEST,
+                "VALIDATION_ERROR",
+                "The request body must be a JSON object.",
+                route,
+                _WATCHLIST_OPERATION,
+                trace_id,
+            )
+            return
+        fields: dict[str, object] = {"watchlist_id": watchlist_id}
+        if "name" in body:
+            fields["name"] = body["name"]
+        if isinstance(body.get("symbols"), list):
+            fields["symbols"] = tuple(
+                symbol for symbol in body["symbols"] if isinstance(symbol, str)
+            )
+        if "is_default" in body:
+            fields["is_default"] = body["is_default"]
+        if "sort_order" in body:
+            fields["sort_order"] = body["sort_order"]
+        try:
+            request = _watchlist_request("UPDATE", **fields)
+        except ValueError:
+            await _send_error(
+                send,
+                HTTPStatus.BAD_REQUEST,
+                "VALIDATION_ERROR",
+                "The update request violates the watchlist contract.",
+                route,
+                _WATCHLIST_OPERATION,
+                trace_id,
+            )
+            return
+    result = await gateway.operate_watchlists(request)
+    await _serve_watchlist_result(
+        result, send, request_id, route, trace_id, deleted_id=watchlist_id
+    )
+
+
 async def _lifespan(receive: Receive, send: Send) -> None:
     """Answer the ASGI lifespan protocol without owning feature state.
 
@@ -793,6 +1064,12 @@ async def _dispatch(
     """
     path = str(scope.get("path", ""))
     method = str(scope.get("method", "GET")).upper()
+    if path == _WATCHLISTS_ROUTE and method in ("GET", "POST"):
+        await _serve_watchlists_collection(registry, scope, receive, send)
+        return
+    if path.startswith(_WATCHLISTS_ROUTE + "/") and method in ("PATCH", "DELETE"):
+        await _serve_watchlists_item(registry, scope, receive, send)
+        return
     if method != "GET":
         await _send_error(
             send,

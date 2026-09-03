@@ -34,6 +34,7 @@ The Workspace domain delivers workspace lifecycle, runtime configuration, local/
 - `FEAT-WS-BUILD_DIAGNOSTICS` — Diagnostics.
 - `FEAT-WS-DISTRIBUTE_WORKERS` — Distributed Worker Pool.
 - `FEAT-WS-HOST_WORKSPACES` — Hosted Workspace Boundary.
+- `FEAT-WS-MANAGE_WATCHLISTS` — Account Watchlist Store.
 
 ### Does not own
 

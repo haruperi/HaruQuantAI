@@ -22,7 +22,7 @@ The `app/services/` layer houses all backend domain capabilities of HaruQuantAI.
 |---|---|:---:|---:|---|
 | `Brokers` | [`app/services/brokers`](brokers/README.md) | **B** | 13 | Direct passthrough connections to external broker & market-data platforms |
 | `Data` | [`app/services/data`](data/README.md) | **B** | 15 | Acquisition, normalization, historical storage, and streaming feeds |
-| `Interfaces` | [`app/services/interfaces`](interfaces/README.md) | **B** | 3 | Capability-aware external HTTP/SSE/automation boundary features (D-IFACE) |
+| `Interfaces` | [`app/services/interfaces`](interfaces/README.md) | **B** | 4 | Capability-aware external HTTP/SSE/automation boundary features (D-IFACE) |
 | `Indicators` | [`app/services/indicators`](indicators/README.md) | **A** | 12 | Deterministic, pure-function technical and statistical indicator calculations |
 | `Strategy` | [`app/services/strategy`](strategy/README.md) | **B** | 20 | Signal generation, trade intent formulation, and playbook evaluation |
 | `Risk` | [`app/services/risk`](risk/README.md) | **C** | 17 | Master gate governance: exposure validation, drawdown guard, and kill switches |
@@ -71,6 +71,8 @@ The following table catalogues all **184 service features** across the 12 domain
 | **Interfaces** | `FEAT-IFACE-SERVE_API_EVENTS` API & Event Transport | `interfaces.serve-api-events@1` | `—` | `—` | API versioning, OpenAPI manifests, SSE replay cursors, idempotent mutations, async jobs, and artifact downloads become unavailable at the external boundary |
 | **Interfaces** | `FEAT-IFACE-OBSERVE_MARKET_DATA` Market Tick Observations | `interfaces.observe-market-data@1` | `data.stream-market-events@1` | `—` | Market tick snapshots and observation event delivery become unavailable; the Data stream provider itself remains active |
 | **Interfaces** | `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE` Market Catalogue Browse | `interfaces.observe-market-catalogue@1` | `catalogue.catalog-instruments@1` | `—` | Market catalogue browse pages become unavailable; the Catalogue domain itself remains active |
+| **Interfaces** | `FEAT-IFACE-OPERATE_WATCHLISTS` Watchlist Operations | `interfaces.operate-watchlists@1` | `workspace.manage-watchlists@1` | `—` | Watchlist CRUD becomes unavailable at the boundary; the Workspace watchlist store and its data remain active |
+| **Workspace** | `FEAT-WS-MANAGE_WATCHLISTS` Account Watchlist Store | `workspace.manage-watchlists@1` | `—` | `—` | Watchlist operations become unavailable; the standalone users/api_watchlists/watchlist_items tables remain (RETAIN) |
 | **Indicators** | `FEAT-INDI-01` Contracts & Discovery | `indicator.registry@1` | `—` | `utils.logging@1` | Indicator catalog registration and formula discovery become unavailable |
 | **Indicators** | `FEAT-INDI-02` Trend Indicators | `indicator.trend@1` | `data.market-data@1` | `—` | EMA, SMA, WMA, MACD, and Supertrend calculations become unavailable |
 | **Indicators** | `FEAT-INDI-03` Momentum Oscillators | `indicator.momentum@1` | `data.market-data@1` | `—` | RSI, Williams %R, and Stochastic oscillator calculations become unavailable |
@@ -312,7 +314,7 @@ The following table catalogues all **184 service features** across the 12 domain
 
 ### 4.13 Interfaces (`app/services/interfaces`)
 - **Removability Tier:** `B` (Swappable Provider)
-- **Feature Count:** 3 registered features
+- **Feature Count:** 4 registered features
 - **Core Mandate:** Capability-aware external boundary (D-IFACE) gateways exposing HTTP, SSE, CLI, and MCP surfaces over public contracts without owning business logic
 - **Detailed Registry:** See full specification in [`app/services/interfaces/README.md`](interfaces/README.md).
 

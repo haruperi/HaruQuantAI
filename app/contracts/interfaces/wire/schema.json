@@ -316,7 +316,7 @@
     },
     "ApiResponse": {
       "additionalProperties": false,
-      "description": "Wire-native five-field HTTP response envelope (record R22).\n\nExactly one of ``data`` (success) or ``error`` (failure) is present;\n``metadata`` always describes the served request.",
+      "description": "Wire-native five-field HTTP response envelope (record R22).\n\nExactly one of ``data`` (success) or ``error`` (failure) is present;\n``metadata`` always describes the served request. ``data`` carries a\nmapping, or a list of mappings for collection routes.",
       "properties": {
         "data": {
           "anyOf": [
@@ -324,10 +324,17 @@
               "$ref": "#/$defs/JsonObject"
             },
             {
+              "items": {
+                "$ref": "#/$defs/JsonObject"
+              },
+              "type": "array"
+            },
+            {
               "type": "null"
             }
           ],
-          "default": null
+          "default": null,
+          "title": "Data"
         },
         "error": {
           "anyOf": [
@@ -2314,6 +2321,11 @@
       "title": "Money",
       "type": "object"
     },
+    "Name1To160": {
+      "maxLength": 160,
+      "minLength": 1,
+      "type": "string"
+    },
     "NonEmptyStr": {
       "minLength": 1,
       "type": "string"
@@ -3057,6 +3069,161 @@
         "request_id"
       ],
       "title": "OperateTradingSuccess",
+      "type": "object"
+    },
+    "OperateWatchlistsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated watchlist gateway request (record R24).\n\nLIST requires no operation fields; CREATE requires ``name``; UPDATE\nrequires ``watchlist_id`` plus any mutable field; DELETE requires\n``watchlist_id``.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "is_default": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Is Default"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonEmptyStr"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "enum": [
+            "LIST",
+            "CREATE",
+            "UPDATE",
+            "DELETE"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sort_order": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sort Order"
+        },
+        "symbols": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/NonEmptyStr"
+          },
+          "maxItems": 500,
+          "title": "Symbols",
+          "type": "array"
+        },
+        "watchlist_id": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Watchlist Id"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "OperateWatchlistsRequest",
+      "type": "object"
+    },
+    "OperateWatchlistsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful watchlist gateway operation result (record R25).",
+      "properties": {
+        "deleted": {
+          "default": false,
+          "title": "Deleted",
+          "type": "boolean"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "watchlist": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WatchlistRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "watchlists": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/WatchlistRecord"
+          },
+          "title": "Watchlists",
+          "type": "array"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "OperateWatchlistsSuccess",
       "type": "object"
     },
     "OperationalJournalArtifact": {
@@ -5620,6 +5787,102 @@
       ],
       "title": "ValidationIssue",
       "type": "object"
+    },
+    "WatchlistItemRecord": {
+      "additionalProperties": false,
+      "description": "One watched symbol inside an account watchlist.\n\n``source_id`` names the provider-facing directory source; ``sort_order``\nis the caller's stable display order.",
+      "properties": {
+        "asset_class": {
+          "default": "",
+          "title": "Asset Class",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sort_order": {
+          "minimum": 0,
+          "title": "Sort Order",
+          "type": "integer"
+        },
+        "source_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "symbol": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "source_id",
+        "symbol",
+        "sort_order"
+      ],
+      "title": "WatchlistItemRecord",
+      "type": "object"
+    },
+    "WatchlistRecord": {
+      "additionalProperties": false,
+      "description": "One account-owned named, ordered collection of watched symbols.",
+      "properties": {
+        "account_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "is_default": {
+          "default": false,
+          "title": "Is Default",
+          "type": "boolean"
+        },
+        "items": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/WatchlistItemRecord"
+          },
+          "title": "Items",
+          "type": "array"
+        },
+        "name": {
+          "$ref": "#/$defs/Name1To160"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sort_order": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Sort Order",
+          "type": "integer"
+        },
+        "updated_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "watchlist_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Watchlist Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "watchlist_id",
+        "account_id",
+        "name",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "WatchlistRecord",
+      "type": "object"
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -5728,6 +5991,12 @@
     },
     "OperateTradingSuccess": {
       "$ref": "#/$defs/OperateTradingSuccess"
+    },
+    "OperateWatchlistsRequest": {
+      "$ref": "#/$defs/OperateWatchlistsRequest"
+    },
+    "OperateWatchlistsSuccess": {
+      "$ref": "#/$defs/OperateWatchlistsSuccess"
     },
     "PortfolioBuilderProjection": {
       "$ref": "#/$defs/PortfolioBuilderProjection"

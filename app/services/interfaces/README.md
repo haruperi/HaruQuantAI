@@ -5,9 +5,9 @@
 > HaruQuantAI. Every HTTP, SSE, CLI, MCP, and automation surface is a
 > registered feature in this package that resolves business capabilities
 > through `FeatureContext` and never imports a business implementation.
-> **Status:** `In Progress` — 3 registered features
+> **Status:** `In Progress` — 4 registered features
 > (`FEAT-IFACE-SERVE_API_EVENTS`, `FEAT-IFACE-OBSERVE_MARKET_DATA`,
-> `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE`).
+> `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE`, `FEAT-IFACE-OPERATE_WATCHLISTS`).
 > **Last updated:** `2026-09-03`
 
 This README is the Interfaces domain's source of truth. The baseline
@@ -77,6 +77,7 @@ UI migration begins.
 | Completed | `FEAT-IFACE-SERVE_API_EVENTS` | `interfaces.serve-api-events@1` | Transport foundation: versioning, OpenAPI, SSE buffer, idempotency, jobs, artifacts. |
 | Completed | `FEAT-IFACE-OBSERVE_MARKET_DATA` | `interfaces.observe-market-data@1` | Phase 3 Market Ticks vertical slice; requires `data.stream-market-events@1`. |
 | Completed | `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE` | `interfaces.observe-market-catalogue@1` | Phase 6 Markets slice backend; requires `catalogue.catalog-instruments@1`. |
+| Completed | `FEAT-IFACE-OPERATE_WATCHLISTS` | `interfaces.operate-watchlists@1` | Phase 6 Watchlists slice backend; requires `workspace.manage-watchlists@1`. |
 | Pending | `FEAT-IFACE-OPERATE_TRADING` | `interfaces.operate-trading@1` | With the Phase 7 Trading migration. |
 | Pending | `FEAT-IFACE-OPERATE_RESEARCH` | `interfaces.operate-research@1` | With the Research workbench migration. |
 | Pending | `FEAT-IFACE-OPERATE_PORTFOLIOS` | `interfaces.operate-portfolios@1` | With the Portfolio migration. |
@@ -94,6 +95,7 @@ responsibility; one feature per route is explicitly rejected.
 | `interfaces.serve-api-events@1` | `app/contracts/interfaces/` | `FEAT-IFACE-SERVE_API_EVENTS` |
 | `interfaces.observe-market-data@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OBSERVE_MARKET_DATA` |
 | `interfaces.observe-market-catalogue@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE` |
+| `interfaces.operate-watchlists@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_WATCHLISTS` |
 | `interfaces.automate-commands@1` | `app/contracts/interfaces/` | `FEAT-IFACE-AUTOMATE_COMMANDS` (pending) |
 | `interfaces.operate-research@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_RESEARCH` (pending) |
 | `interfaces.edit-projects@1` | `app/contracts/interfaces/` | pending ratification (gap G5) |
@@ -118,7 +120,9 @@ workflow. Business data crosses the boundary only as public contract
 records. The current mounting surface (`serve_api_events/asgi.py`, served
 by `uv run haruquantai`) exposes `GET /api/v1/market/ticks` (JSON
 snapshot) and `GET /api/v1/market/ticks/stream` with the adopted alias
-`GET /api/v1/data/snapshot-stream` (SSE). Authentication/session
+`GET /api/v1/data/snapshot-stream` (SSE), the watchlist CRUD routes
+(`GET/POST /api/v1/watchlists`, `PATCH/DELETE /api/v1/watchlists/{id}`).
+Authentication/session
 enforcement is not yet active on the mounting surface; it is gap G2 and
 must be ratified before any governed write goes live.
 
