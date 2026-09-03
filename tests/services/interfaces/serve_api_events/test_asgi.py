@@ -7,7 +7,7 @@ import json
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
-from uuid import uuid7
+from uuid import uuid4, uuid7
 
 import httpx
 import pytest
@@ -553,3 +553,71 @@ async def test_trading_route_fails_closed_without_capability() -> None:
         response = await client.get("/api/v1/trading/account-profile")
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "CAPABILITY_UNAVAILABLE"
+
+
+@pytest.mark.asyncio
+async def test_auth_routes_register_login_me_logout() -> None:
+    """Verify registration, login, identity recovery, and logout endpoints."""
+    registry = ServiceRegistry()
+    unique_user = f"user_{uuid4().hex[:8]}"
+    test_pwd = "StrongPassword123!"  # pragma: allowlist secret
+
+    async with _client(registry) as client:
+        # 1. Registration
+        reg_res = await client.post(
+            "/api/v1/auth/register",
+            json={"username": unique_user, "password": test_pwd},
+        )
+        assert reg_res.status_code == 201
+        reg_payload = reg_res.json()
+        assert reg_payload["status"] == "success"
+        assert reg_payload["data"]["username"] == unique_user
+        assert reg_payload["data"]["user_id"].startswith("usr_")
+        assert "hq_session" in reg_res.cookies
+
+        # 2. Duplicate registration fails
+        dup_res = await client.post(
+            "/api/v1/auth/register",
+            json={"username": unique_user, "password": test_pwd},
+        )
+        assert dup_res.status_code == 400
+        assert dup_res.json()["error"]["code"] == "REGISTRATION_FAILED"
+
+        # 3. Identity recovery with cookie
+        me_res = await client.get("/api/v1/auth/me")
+        assert me_res.status_code == 200
+        assert me_res.json()["data"]["username"] == unique_user
+
+        # 4. Identity recovery without cookie fails
+        client.cookies.clear()
+        unauthed_res = await client.get("/api/v1/auth/me")
+        assert unauthed_res.status_code == 401
+        assert unauthed_res.json()["error"]["code"] == "AUTHENTICATION_REQUIRED"
+
+        # 5. Login with invalid password fails
+        bad_login = await client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": unique_user,
+                "password": "wrongpassword",  # pragma: allowlist secret
+            },
+        )
+        assert bad_login.status_code == 401
+        assert bad_login.json()["error"]["code"] == "AUTHENTICATION_REQUIRED"
+
+        # 6. Login with valid password succeeds
+        good_login = await client.post(
+            "/api/v1/auth/login",
+            json={"username": unique_user, "password": test_pwd},
+        )
+        assert good_login.status_code == 200
+        assert good_login.json()["data"]["username"] == unique_user
+        assert "hq_session" in good_login.cookies
+
+        # 7. Logout revokes session
+        logout_res = await client.post("/api/v1/auth/logout")
+        assert logout_res.status_code == 200
+
+        # 8. Post-logout identity fails
+        post_logout_me = await client.get("/api/v1/auth/me")
+        assert post_logout_me.status_code == 401

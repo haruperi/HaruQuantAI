@@ -28,11 +28,11 @@ import asyncio
 import contextlib
 import json
 import re
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Final, Literal
 from urllib.parse import parse_qs
 from uuid import uuid4, uuid7
 
@@ -58,6 +58,12 @@ from app.contracts.interfaces.models import (
     OperateWatchlistsRequest,
     OperateWatchlistsSuccess,
     StreamEvent,
+)
+from app.services.interfaces.serve_api_events._auth_db import (
+    get_session_identity,
+    login_user,
+    logout_session,
+    register_user,
 )
 from app.services.interfaces.serve_api_events._settings_db import (
     get_credentials_status,
@@ -102,6 +108,11 @@ _SETTINGS_MANIFEST_ROUTE = "/api/v1/settings/manifest"
 _SETTINGS_CREDENTIALS_ROUTE = "/api/v1/settings/credentials"
 _SETTINGS_CREDENTIAL_PREFIX = "/api/v1/settings/credentials/"
 _TRADING_PREFIX = "/api/v1/trading"
+_AUTH_PREFIX = "/api/v1/auth"
+_AUTH_REGISTER_ROUTE = "/api/v1/auth/register"
+_AUTH_LOGIN_ROUTE = "/api/v1/auth/login"
+_AUTH_LOGOUT_ROUTE = "/api/v1/auth/logout"
+_AUTH_ME_ROUTE = "/api/v1/auth/me"
 _MAX_BODY_BYTES = 65_536
 _PROVIDER_CATALOGUE_SOURCE_ID = CATALOG_INSTRUMENTS_CAPABILITY.identifier
 
@@ -236,23 +247,32 @@ def _error_response(
     )
 
 
-async def _send_json(send: Send, status: HTTPStatus, envelope: ApiResponse) -> None:
+async def _send_json(
+    send: Send,
+    status: HTTPStatus,
+    envelope: ApiResponse,
+    extra_headers: Sequence[tuple[bytes, bytes]] | None = None,
+) -> None:
     """Emit one complete JSON response.
 
     Args:
         send: ASGI send callable.
         status: HTTP status code.
         envelope: Response envelope to serialize.
+        extra_headers: Optional additional response headers (e.g. cookies).
     """
     body = envelope.model_dump_json().encode("utf-8")
+    headers: list[tuple[bytes, bytes]] = [
+        (b"content-type", b"application/json"),
+        (b"content-length", str(len(body)).encode("ascii")),
+    ]
+    if extra_headers:
+        headers.extend(extra_headers)
     await send(
         {
             "type": "http.response.start",
             "status": status,
-            "headers": [
-                (b"content-type", b"application/json"),
-                (b"content-length", str(len(body)).encode("ascii")),
-            ],
+            "headers": headers,
         }
     )
     await send({"type": "http.response.body", "body": body})
@@ -1258,6 +1278,346 @@ async def _serve_trading(
     )
 
 
+_COOKIE_PAIR_LEN: Final = 2
+_SESSION_COOKIE_NAME: Final = "hq_session"
+_CSRF_COOKIE_NAME: Final = "hq_csrf"
+_AUTH_TTL_SECONDS: Final = 7 * 86400
+
+
+def _get_cookie(scope: Scope, name: str) -> str | None:
+    """Read a cookie value from the request scope headers.
+
+    Args:
+        scope: ASGI connection scope.
+        name: Name of the cookie.
+
+    Returns:
+        Cookie string value if found, None otherwise.
+    """
+    cookie_header = _header(scope, "cookie")
+    if not cookie_header:
+        return None
+    for item in cookie_header.split(";"):
+        parts = item.strip().split("=", maxsplit=1)
+        if len(parts) == _COOKIE_PAIR_LEN and parts[0].strip() == name:
+            return parts[1].strip()
+    return None
+
+
+def _build_auth_cookies(
+    session_token: str, csrf_token: str
+) -> list[tuple[bytes, bytes]]:
+    """Build Set-Cookie headers for session and CSRF credentials.
+
+    Args:
+        session_token: Opaque session token.
+        csrf_token: Opaque CSRF token.
+
+    Returns:
+        List of Set-Cookie header tuples.
+    """
+    return [
+        (
+            b"set-cookie",
+            (
+                f"hq_session={session_token}; Path=/; "
+                f"HttpOnly; SameSite=Lax; Max-Age={_AUTH_TTL_SECONDS}"
+            ).encode("latin-1"),
+        ),
+        (
+            b"set-cookie",
+            (
+                f"hq_csrf={csrf_token}; Path=/; "
+                f"SameSite=Lax; Max-Age={_AUTH_TTL_SECONDS}"
+            ).encode("latin-1"),
+        ),
+    ]
+
+
+def _build_logout_cookies() -> list[tuple[bytes, bytes]]:
+    """Build Set-Cookie headers to clear session and CSRF credentials.
+
+    Returns:
+        List of clearing Set-Cookie header tuples.
+    """
+    return [
+        (
+            b"set-cookie",
+            b"hq_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0",
+        ),
+        (
+            b"set-cookie",
+            b"hq_csrf=; Path=/; SameSite=Lax; Max-Age=0",
+        ),
+    ]
+
+
+async def _serve_auth_register(
+    receive: Receive,
+    send: Send,
+    path: str,
+    method: str,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve user registration."""
+    if method != "POST":
+        await _send_error(
+            send,
+            HTTPStatus.METHOD_NOT_ALLOWED,
+            "METHOD_NOT_ALLOWED",
+            "Register route requires POST",
+            path,
+            "api.auth.register",
+            trace_id,
+        )
+        return
+    body = await _read_json_body(receive)
+    username = str(body.get("username", "")).strip() if isinstance(body, dict) else ""
+    password = str(body.get("password", "")) if isinstance(body, dict) else ""
+    if not username or not password:
+        await _send_error(
+            send,
+            HTTPStatus.BAD_REQUEST,
+            "VALIDATION_ERROR",
+            "Username and password are required",
+            path,
+            "api.auth.register",
+            trace_id,
+        )
+        return
+    try:
+        user_data, session_token, csrf_token = register_user(username, password)
+    except ValueError as err:
+        await _send_error(
+            send,
+            HTTPStatus.BAD_REQUEST,
+            "REGISTRATION_FAILED",
+            str(err),
+            path,
+            "api.auth.register",
+            trace_id,
+        )
+        return
+    cookies = _build_auth_cookies(session_token, csrf_token)
+    await _send_json(
+        send,
+        HTTPStatus.CREATED,
+        ApiResponse(
+            status="success",
+            message=HTTPStatus.CREATED.phrase,
+            data=user_data,
+            metadata=_metadata(
+                request_id,
+                path,
+                "api.auth.register",
+                "write",
+                False,
+                None,
+                trace_id,
+            ),
+        ),
+        extra_headers=cookies,
+    )
+
+
+async def _serve_auth_login(
+    receive: Receive,
+    send: Send,
+    path: str,
+    method: str,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve user login."""
+    if method != "POST":
+        await _send_error(
+            send,
+            HTTPStatus.METHOD_NOT_ALLOWED,
+            "METHOD_NOT_ALLOWED",
+            "Login route requires POST",
+            path,
+            "api.auth.login",
+            trace_id,
+        )
+        return
+    body = await _read_json_body(receive)
+    username = str(body.get("username", "")).strip() if isinstance(body, dict) else ""
+    password = str(body.get("password", "")) if isinstance(body, dict) else ""
+    if not username or not password:
+        await _send_error(
+            send,
+            HTTPStatus.BAD_REQUEST,
+            "VALIDATION_ERROR",
+            "Username and password are required",
+            path,
+            "api.auth.login",
+            trace_id,
+        )
+        return
+    try:
+        user_data, session_token, csrf_token = login_user(username, password)
+    except ValueError as err:
+        await _send_error(
+            send,
+            HTTPStatus.UNAUTHORIZED,
+            "AUTHENTICATION_REQUIRED",
+            str(err),
+            path,
+            "api.auth.login",
+            trace_id,
+        )
+        return
+    cookies = _build_auth_cookies(session_token, csrf_token)
+    await _send_json(
+        send,
+        HTTPStatus.OK,
+        ApiResponse(
+            status="success",
+            message=HTTPStatus.OK.phrase,
+            data=user_data,
+            metadata=_metadata(
+                request_id,
+                path,
+                "api.auth.login",
+                "write",
+                False,
+                None,
+                trace_id,
+            ),
+        ),
+        extra_headers=cookies,
+    )
+
+
+async def _serve_auth_me(
+    scope: Scope,
+    send: Send,
+    path: str,
+    method: str,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve current identity recovery."""
+    if method != "GET":
+        await _send_error(
+            send,
+            HTTPStatus.METHOD_NOT_ALLOWED,
+            "METHOD_NOT_ALLOWED",
+            "Identity route requires GET",
+            path,
+            "api.auth.me",
+            trace_id,
+        )
+        return
+    session_token = _get_cookie(scope, _SESSION_COOKIE_NAME)
+    identity = get_session_identity(session_token)
+    if identity is None:
+        await _send_error(
+            send,
+            HTTPStatus.UNAUTHORIZED,
+            "AUTHENTICATION_REQUIRED",
+            "Authentication required",
+            path,
+            "api.auth.me",
+            trace_id,
+        )
+        return
+    await _send_json(
+        send,
+        HTTPStatus.OK,
+        ApiResponse(
+            status="success",
+            message=HTTPStatus.OK.phrase,
+            data=identity,
+            metadata=_metadata(
+                request_id,
+                path,
+                "api.auth.me",
+                "read",
+                False,
+                None,
+                trace_id,
+            ),
+        ),
+    )
+
+
+async def _serve_auth_logout(
+    scope: Scope,
+    send: Send,
+    path: str,
+    method: str,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve user logout."""
+    if method != "POST":
+        await _send_error(
+            send,
+            HTTPStatus.METHOD_NOT_ALLOWED,
+            "METHOD_NOT_ALLOWED",
+            "Logout route requires POST",
+            path,
+            "api.auth.logout",
+            trace_id,
+        )
+        return
+    session_token = _get_cookie(scope, _SESSION_COOKIE_NAME)
+    logout_session(session_token)
+    cookies = _build_logout_cookies()
+    await _send_json(
+        send,
+        HTTPStatus.OK,
+        ApiResponse(
+            status="success",
+            message=HTTPStatus.OK.phrase,
+            data=None,
+            metadata=_metadata(
+                request_id,
+                path,
+                "api.auth.logout",
+                "write",
+                False,
+                None,
+                trace_id,
+            ),
+        ),
+        extra_headers=cookies,
+    )
+
+
+async def _serve_auth(
+    scope: Scope,
+    receive: Receive,
+    send: Send,
+) -> None:
+    """Route authentication requests to their focused handlers."""
+    path = str(scope.get("path", ""))
+    method = str(scope.get("method", "GET")).upper()
+    request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
+    trace_id = _header(scope, "x-trace-id")
+
+    if path == _AUTH_REGISTER_ROUTE:
+        await _serve_auth_register(receive, send, path, method, request_id, trace_id)
+    elif path == _AUTH_LOGIN_ROUTE:
+        await _serve_auth_login(receive, send, path, method, request_id, trace_id)
+    elif path == _AUTH_ME_ROUTE:
+        await _serve_auth_me(scope, send, path, method, request_id, trace_id)
+    elif path == _AUTH_LOGOUT_ROUTE:
+        await _serve_auth_logout(scope, send, path, method, request_id, trace_id)
+    else:
+        await _send_error(
+            send,
+            HTTPStatus.NOT_FOUND,
+            "NOT_FOUND",
+            "The requested auth route is not registered.",
+            path,
+            "api.auth",
+            trace_id,
+        )
+
+
 async def _lifespan(receive: Receive, send: Send) -> None:
     """Answer the ASGI lifespan protocol without owning feature state.
 
@@ -1290,6 +1650,9 @@ async def _dispatch(
     """
     path = str(scope.get("path", ""))
     method = str(scope.get("method", "GET")).upper()
+    if path.startswith(_AUTH_PREFIX):
+        await _serve_auth(scope, receive, send)
+        return
     if path.startswith(_SETTINGS_ROUTE):
         await _serve_settings(scope, receive, send)
         return

@@ -40,6 +40,8 @@ declared capability has no active provider.
 - Translation of wire DTOs to and from public contract records.
 - Central database settings and credentials retrieval and updates backed
   by SQLite (`haruquantai.db`).
+- Central database authentication and sessions backed by SQLite (`users`
+  and `sessions` in `haruquantai.db`).
 
 ### Does not own
 
@@ -55,6 +57,7 @@ D-IFACE MAY:
     translate wire DTOs
     resolve capabilities
     normalize transport errors
+    manage auth and session transport
 
 D-IFACE MAY NOT:
     calculate indicators
@@ -68,16 +71,15 @@ D-IFACE MAY NOT:
 ### Authentication boundary
 
 Authentication, session, and CSRF enforcement are boundary transport
-concerns owned by Interfaces features, not business domains. The concrete
-identity/session design for the workstation boundary is gap G2 in the
-Phase 0 record and must be ratified here before the Phase 7 session/auth
-UI migration begins.
+concerns owned by Interfaces features (`FEAT-IFACE-SERVE_API_EVENTS`), backed
+by the authoritative SQLite `users` and `sessions` tables with `scrypt`
+password hashing and `hq_session` / `hq_csrf` cookie headers (`/api/v1/auth/*`).
 
 ## 2. Feature Registry
 
 | Status | Feature | Provides | Notes |
 | --- | --- | --- | --- |
-| Completed | `FEAT-IFACE-SERVE_API_EVENTS` | `interfaces.serve-api-events@1` | Transport foundation: versioning, OpenAPI, SSE buffer, idempotency, jobs, artifacts, settings DB. |
+| Completed | `FEAT-IFACE-SERVE_API_EVENTS` | `interfaces.serve-api-events@1` | Transport foundation: versioning, OpenAPI, SSE buffer, idempotency, jobs, artifacts, settings DB, and session/auth boundary. |
 | Completed | `FEAT-IFACE-OBSERVE_MARKET_DATA` | `interfaces.observe-market-data@1` | Phase 3 Market Ticks vertical slice; requires `data.stream-market-events@1`. |
 | Completed | `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE` | `interfaces.observe-market-catalogue@1` | Phase 6 Markets slice backend; requires `catalogue.catalog-instruments@1`. |
 | Completed | `FEAT-IFACE-OPERATE_WATCHLISTS` | `interfaces.operate-watchlists@1` | Phase 6 Watchlists slice backend; requires `workspace.manage-watchlists@1`. |
