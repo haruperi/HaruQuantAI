@@ -11,8 +11,12 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from app.kernel.effects import EffectScope
-from app.utils.notifications.providers.sms.plugin import create_provider
-from app.utils.notifications.sms import build_sms_notification_config
+from app.utils.notifications.providers.sms.plugin import (  # type: ignore[import-untyped]
+    create_provider,
+)
+from app.utils.notifications.sms import (  # type: ignore[import-untyped]
+    build_sms_notification_config,
+)
 
 
 def main() -> None:

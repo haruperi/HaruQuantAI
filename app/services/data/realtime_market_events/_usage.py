@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import asyncio
 
-from app.contracts.catalogue.models import InstrumentRef
+from app.contracts.catalogue.models import InstrumentRef, ProviderRef
 from app.contracts.common.models import JsonObject
 from app.contracts.data.models import (
     MarketEvent,
     MarketFeedState,
-    ProviderRef,
     StreamMarketEventsRequest,
     StreamMarketEventsSubscription,
     StreamMarketEventsSuccess,

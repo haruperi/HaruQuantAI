@@ -11,7 +11,6 @@ from app.contracts.data.errors import DataFailure
 from app.contracts.data.models import (
     DataConnectionRef,
     DataImportPlan,
-    DataImportReceipt,
     DataSeriesVersion,
     IngestHistoryRequest,
     IngestHistorySuccess,
@@ -39,7 +38,7 @@ def _generate_uuid7() -> Uuid7:
     return str(uuid.uuid7())
 
 
-async def example_csv_load_direct() -> DataImportReceipt:
+async def example_csv_load_direct() -> IngestHistorySuccess | DataFailure:
     """Load a manifest-verified CSV dataset directly."""
     service = HistoricalDataIngestionService()
     conn = data_register_data_connections(

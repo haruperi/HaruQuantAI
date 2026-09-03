@@ -705,12 +705,13 @@ def data_record_quantdata_lineage(
     file_mtime = (
         _format_utc_timestamp(stat.st_mtime) if stat else _format_utc_timestamp(0.0)
     )
+    file_size = stat.st_size if stat else 0
     lineage_entry = {
         "lineage_id": lineage_id,
         "spec_id": str(spec.spec_id),
         "source_root": allowed_root.as_posix(),
         "relative_path": relative_path,
-        "file_size": stat.st_size if stat else 0,
+        "file_size": file_size,
         "file_mtime": file_mtime,
         "content_hash": content_hash,
         "decoder_version": str(spec.decoder_version),
@@ -720,16 +721,16 @@ def data_record_quantdata_lineage(
     }
 
     service.persistence.record_lineage(
-        lineage_id=lineage_entry["lineage_id"],
-        spec_id=lineage_entry["spec_id"],
-        source_root=lineage_entry["source_root"],
-        relative_path=lineage_entry["relative_path"],
-        file_size=lineage_entry["file_size"],
-        file_mtime=lineage_entry["file_mtime"],
-        content_hash=lineage_entry["content_hash"],
-        decoder_version=lineage_entry["decoder_version"],
-        series_id=lineage_entry["series_id"],
-        series_version_id=lineage_entry["series_version_id"],
+        lineage_id=lineage_id,
+        spec_id=str(spec.spec_id),
+        source_root=allowed_root.as_posix(),
+        relative_path=relative_path,
+        file_size=file_size,
+        file_mtime=file_mtime,
+        content_hash=content_hash,
+        decoder_version=str(spec.decoder_version),
+        series_id=str(series_id),
+        series_version_id=str(series_version_id),
     )
 
     return lineage_entry

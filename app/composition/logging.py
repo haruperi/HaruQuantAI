@@ -21,7 +21,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Final, Self, cast, override
+from typing import Any, Final, Self, cast, override
 
 _OWNED_HANDLER_ATTR: Final[str] = "_haruquantai_owned"
 _HANDLER_GENERATION_ATTR: Final[str] = "_haruquantai_generation"
@@ -1465,7 +1465,7 @@ def log_info(target_or_message: object, *args: object, **kwargs: object) -> None
     """
     if isinstance(target_or_message, (logging.Logger, BoundLogger)):
         msg = str(args[0]) if args else ""
-        target_or_message.info(msg, *args[1:], **kwargs)
+        cast("Any", target_or_message).info(msg, *args[1:], **kwargs)
     else:
         logger.info(str(target_or_message), *args, **kwargs)
 
@@ -1480,7 +1480,7 @@ def log_warning(target_or_message: object, *args: object, **kwargs: object) -> N
     """
     if isinstance(target_or_message, (logging.Logger, BoundLogger)):
         msg = str(args[0]) if args else ""
-        target_or_message.warning(msg, *args[1:], **kwargs)
+        cast("Any", target_or_message).warning(msg, *args[1:], **kwargs)
     else:
         logger.warning(str(target_or_message), *args, **kwargs)
 
@@ -1495,7 +1495,7 @@ def log_error(target_or_message: object, *args: object, **kwargs: object) -> Non
     """
     if isinstance(target_or_message, (logging.Logger, BoundLogger)):
         msg = str(args[0]) if args else ""
-        target_or_message.error(msg, *args[1:], **kwargs)
+        cast("Any", target_or_message).error(msg, *args[1:], **kwargs)
     else:
         logger.error(str(target_or_message), *args, **kwargs)
 
@@ -1510,7 +1510,7 @@ def log_debug(target_or_message: object, *args: object, **kwargs: object) -> Non
     """
     if isinstance(target_or_message, (logging.Logger, BoundLogger)):
         msg = str(args[0]) if args else ""
-        target_or_message.debug(msg, *args[1:], **kwargs)
+        cast("Any", target_or_message).debug(msg, *args[1:], **kwargs)
     else:
         logger.debug(str(target_or_message), *args, **kwargs)
 
@@ -1525,7 +1525,7 @@ def log_exception(target_or_message: object, *args: object, **kwargs: object) ->
     """
     if isinstance(target_or_message, (logging.Logger, BoundLogger)):
         msg = str(args[0]) if args else ""
-        target_or_message.exception(msg, *args[1:], **kwargs)
+        cast("Any", target_or_message).exception(msg, *args[1:], **kwargs)
     else:
         logger.exception(str(target_or_message), *args, **kwargs)
 

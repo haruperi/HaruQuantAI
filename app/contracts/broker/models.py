@@ -641,7 +641,7 @@ import asyncio
 from collections.abc import AsyncIterator, Callable
 from dataclasses import dataclass, fields
 from datetime import datetime
-from typing import Any, Generic, Self, TypeVar
+from typing import Any, Generic, Self, TypeVar, cast
 
 T = TypeVar("T")
 
@@ -674,7 +674,7 @@ class DictLikeModelMixin:
         return default
 
     def keys(self) -> list[str]:
-        k = [f.name for f in fields(self)]
+        k = [f.name for f in fields(cast("Any", self))]
         details = getattr(self, "details", None)
         if isinstance(details, dict):
             k.extend([dk for dk in details if dk not in k])
@@ -684,16 +684,16 @@ class DictLikeModelMixin:
         """Convert model to dictionary representation."""
         from dataclasses import asdict
 
-        return asdict(self)
+        return asdict(cast("Any", self))
 
     @classmethod
     def from_dict(cls: type[Self], data: Any) -> Self:
         """Construct instance from raw dictionary or namedtuple."""
         raw = data._asdict() if hasattr(data, "_asdict") else dict(data)
-        known = {f.name for f in fields(cls) if f.name != "details"}
+        known = {f.name for f in fields(cast("Any", cls)) if f.name != "details"}
         init_kwargs = {k: raw[k] for k in known if k in raw}
         extra = {k: v for k, v in raw.items() if k not in known}
-        if "details" in [f.name for f in fields(cls)]:
+        if "details" in [f.name for f in fields(cast("Any", cls))]:
             init_kwargs["details"] = extra
         return cls(**init_kwargs)
 

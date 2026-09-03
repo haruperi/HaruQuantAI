@@ -6,24 +6,24 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.contracts.common.models import Uuid7
-    from app.contracts.data.models import ProfileSourceDeclaration
+    from app.contracts.data.models import VolumeProfileSource
 
 
 class ProfileSourcePersistence:
     """In-memory validated profile source declaration store."""
 
     def __init__(self) -> None:
-        self._sources: dict[Uuid7, ProfileSourceDeclaration] = {}
+        self._sources: dict[Uuid7, VolumeProfileSource] = {}
 
-    def save_source(self, source: ProfileSourceDeclaration) -> None:
+    def save_source(self, source: VolumeProfileSource) -> None:
         """Store a validated profile source declaration."""
         self._sources[source.data_version_id] = source
 
-    def get_source(self, data_version_id: Uuid7) -> ProfileSourceDeclaration | None:
+    def get_source(self, data_version_id: Uuid7) -> VolumeProfileSource | None:
         """Retrieve a profile source declaration by data version ID."""
         return self._sources.get(data_version_id)
 
-    def get_all_sources(self) -> list[ProfileSourceDeclaration]:
+    def get_all_sources(self) -> list[VolumeProfileSource]:
         """Return all stored profile source declarations."""
         return list(self._sources.values())
 

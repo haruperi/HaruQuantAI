@@ -7,7 +7,7 @@ import uuid
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, cast, override
 
 import pandas as pd
 
@@ -206,30 +206,39 @@ class CTraderClient(BrokerOperationsCapability):
         """Check if environment supports cTrader OpenAPI communication."""
         return True
 
+    @override
     def is_connected(self) -> bool:
         """Check if cTrader client is connected."""
         return bool(self.state.get("connected", False))
 
     def get_last_error(self) -> tuple[int, str]:
         """Return the last recorded error code and description."""
-        return self.state.get("last_error", (0, "Success"))
+        return cast("tuple[int, str]", self.state.get("last_error", (0, "Success")))
 
+    @override
     def connect(
         self,
+        account_id: str | int | None = None,
+        server: str | None = None,
+        password: str | None = None,
+        timeout: int = 30,
         client_id: str | None = None,
         client_secret: str | None = None,
         access_token: str | None = None,
-        account_id: str | None = None,
         live: bool = False,
-        timeout: int = 30,
         config: CTraderConfig | None = None,
+        **kwargs: Any,
     ) -> StandardResponse[Any]:
         """Connect to cTrader OpenAPI proxy."""
         cfg = config or self.config
         final_id = client_id or cfg.client_id
-        final_secret = client_secret or cfg.client_secret
+        final_secret = client_secret or password or cfg.client_secret
         final_token = access_token or cfg.access_token
-        final_account = account_id or cfg.account_id or "ctrader_demo_1001"
+        final_account = (
+            str(account_id)
+            if account_id is not None
+            else (cfg.account_id or "ctrader_demo_1001")
+        )
         final_live = live or cfg.live
 
         if not final_id or not final_secret or not final_token:
@@ -274,6 +283,7 @@ class CTraderClient(BrokerOperationsCapability):
             operation="connect",
         )
 
+    @override
     def disconnect(self) -> StandardResponse[Any]:
         """Disconnect from cTrader OpenAPI session."""
         logger.info("Disconnecting from cTrader OpenAPI.")
@@ -336,6 +346,7 @@ class CTraderClient(BrokerOperationsCapability):
             operation="get_provider_specification",
         )
 
+    @override
     def get_terminal_info(self) -> StandardResponse[BrokerTerminalInfo]:
         """Retrieve terminal environment properties."""
         info = {
@@ -358,6 +369,7 @@ class CTraderClient(BrokerOperationsCapability):
             operation="get_terminal_info",
         )
 
+    @override
     def get_account_info(self) -> StandardResponse[BrokerAccountInfo]:
         """Retrieve live cTrader account properties and balance."""
         if not self.is_connected():
@@ -426,6 +438,7 @@ class CTraderClient(BrokerOperationsCapability):
             operation="get_account_snapshot",
         )
 
+    @override
     def get_symbol_info(self, symbol: str) -> StandardResponse[BrokerSymbolInfo]:
         """Retrieve symbol specification from cTrader catalog."""
         sym = symbol.upper()
@@ -544,10 +557,11 @@ class CTraderClient(BrokerOperationsCapability):
             operation="get_symbol_tick",
         )
 
+    @override
     def get_quote(self, symbol: str) -> dict[str, Any]:
         """Compatibility helper returning quote dictionary."""
         tick = self.get_symbol_tick(symbol)
-        data = tick.data if tick.status == "success" else {}
+        data = tick.data if tick.status == "success" and tick.data is not None else {}
         bid = float(data.get("bid", 1.0850))
         ask = float(data.get("ask", 1.0851))
         return {
@@ -601,6 +615,7 @@ class CTraderClient(BrokerOperationsCapability):
             operation="unsubscribe_market_depth",
         )
 
+    @override
     def get_bars(
         self,
         symbol: str,
@@ -608,23 +623,24 @@ class CTraderClient(BrokerOperationsCapability):
         date_from: Any = None,
         date_to: Any = None,
         start_pos: int | None = None,
-        count: int = 100,
+        count: int | None = 100,
     ) -> StandardResponse[pd.DataFrame]:
         """Retrieve historical trendbar candlestick bars as a DataFrame."""
         sym = symbol.upper()
         now = time.time()
         interval_sec = 60
+        num_bars = count if count is not None else 100
         raw_data = [
             {
                 "symbol": sym,
-                "time": now - (count - i) * interval_sec,
+                "time": now - (num_bars - i) * interval_sec,
                 "open": 1.0850 + i * 0.0001,
                 "high": 1.0855 + i * 0.0001,
                 "low": 1.0845 + i * 0.0001,
                 "close": 1.0852 + i * 0.0001,
                 "volume": 25.0 + i,
             }
-            for i in range(count)
+            for i in range(num_bars)
         ]
         data = _format_bars_dataframe(raw_data)
         return StandardResponse(
@@ -636,6 +652,7 @@ class CTraderClient(BrokerOperationsCapability):
 
     get_historical_bars = get_bars
 
+    @override
     def get_ticks(
         self,
         symbol: str,
@@ -705,6 +722,7 @@ class CTraderClient(BrokerOperationsCapability):
         """List active stream subscriptions."""
         return list(self._subscriptions.values())
 
+    @override
     def get_position_info(
         self,
         symbol: str | None = None,
@@ -731,6 +749,7 @@ class CTraderClient(BrokerOperationsCapability):
         """Compatibility helper returning single position."""
         return None
 
+    @override
     def get_positions(self, symbol: str | None = None) -> list[dict[str, Any]]:
         """Compatibility helper returning positions list."""
         res = self.get_position_info(symbol=symbol)
@@ -753,6 +772,7 @@ class CTraderClient(BrokerOperationsCapability):
             operation="get_num_positions",
         )
 
+    @override
     def get_order_info(
         self,
         symbol: str | None = None,
@@ -779,6 +799,7 @@ class CTraderClient(BrokerOperationsCapability):
         """Compatibility helper returning single order."""
         return None
 
+    @override
     def get_orders(self, symbol: str | None = None) -> list[dict[str, Any]]:
         """Compatibility helper returning orders list."""
         res = self.get_order_info(symbol=symbol)
@@ -801,6 +822,7 @@ class CTraderClient(BrokerOperationsCapability):
             operation="get_num_orders",
         )
 
+    @override
     def get_history_order_info(
         self,
         symbol: str | None = None,
@@ -853,6 +875,7 @@ class CTraderClient(BrokerOperationsCapability):
             operation="get_num_history_orders",
         )
 
+    @override
     def get_history_deal_info(
         self,
         symbol: str | None = None,
@@ -978,6 +1001,7 @@ class CTraderClient(BrokerOperationsCapability):
             operation="check_order",
         )
 
+    @override
     def trade(self, request: dict[str, Any]) -> StandardResponse[Any]:
         """Submit a trade order via cTrader OpenAPI."""
         if not self.is_connected():
@@ -1006,6 +1030,7 @@ class CTraderClient(BrokerOperationsCapability):
             operation="trade",
         )
 
+    @override
     def place_order(self, request: dict[str, Any]) -> dict[str, Any]:
         """Compatibility helper returning raw order dict."""
         res = self.trade(request)

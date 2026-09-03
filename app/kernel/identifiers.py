@@ -6,7 +6,7 @@ import hashlib
 import re
 import uuid
 from dataclasses import dataclass
-from typing import Self
+from typing import Self, override
 
 from app.kernel.errors import ValidationError
 
@@ -77,6 +77,7 @@ class CapabilityId:
             raise ValueError(f"invalid capability id: {value!r}")
         return cls(domain=domain, capability=capability, major=int(int_part))
 
+    @override
     def __str__(self) -> str:
         """Return the canonical string representation."""
         return f"{self.domain}.{self.capability}.v{self.major}"
@@ -117,6 +118,7 @@ class ProviderId:
             raise ValueError(f"invalid provider id: {value!r}")
         return cls(domain=domain, capability=capability, implementation=implementation)
 
+    @override
     def __str__(self) -> str:
         """Return the canonical string representation."""
         return f"{self.domain}.{self.capability}.{self.implementation}"
@@ -153,6 +155,7 @@ class SemanticVersion:
                 raise ValueError(f"invalid semantic version: {value!r}")
         return cls(major=int(parts[0]), minor=int(parts[1]), patch=int(parts[2]))
 
+    @override
     def __str__(self) -> str:
         """Return the canonical string representation."""
         return f"{self.major}.{self.minor}.{self.patch}"

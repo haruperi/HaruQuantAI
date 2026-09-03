@@ -593,9 +593,7 @@ def get_standard_response_type() -> type[StandardResponse[Any]]:
 def create_auth_context(
     *,
     principal_id: str,
-    principal_type: Literal[
-        "USER", "SERVICE_ACCOUNT", "SYSTEM", "ANONYMOUS"
-    ] = "SERVICE_ACCOUNT",
+    principal_type: Literal["USER", "SERVICE_ACCOUNT"] = "SERVICE_ACCOUNT",
     roles: tuple[str, ...] = (),
     permissions: tuple[str, ...] = (),
     scopes: tuple[str, ...] = (),

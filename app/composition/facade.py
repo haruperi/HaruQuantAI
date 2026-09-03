@@ -33,17 +33,19 @@ def lease_capability(capability_id: CapabilityId | str) -> CapabilityLease:
     """
     cap_str = str(capability_id)
     if "rsi" in cap_str:
-        from app.services.indicators.momentum.rsi_default.plugin import create_provider
+        from app.services.indicators.momentum.rsi_default.plugin import (  # type: ignore[import-untyped]
+            create_provider,
+        )
 
         return CapabilityLease(
             instance=create_provider(
                 dependencies={},
                 config={},
-                scope=None,  # type: ignore[arg-type]
+                scope=None,
             )
         )
     if "williams" in cap_str:
-        from app.services.indicators.momentum.williams_r_default.plugin import (
+        from app.services.indicators.momentum.williams_r_default.plugin import (  # type: ignore[import-untyped]
             create_provider as create_williams_provider,
         )
 
@@ -51,7 +53,7 @@ def lease_capability(capability_id: CapabilityId | str) -> CapabilityLease:
             instance=create_williams_provider(
                 dependencies={},
                 config={},
-                scope=None,  # type: ignore[arg-type]
+                scope=None,
             )
         )
     raise CapabilityUnavailableError(f"Capability {capability_id} is unavailable.")

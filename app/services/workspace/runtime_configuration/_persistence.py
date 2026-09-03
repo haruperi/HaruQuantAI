@@ -7,6 +7,7 @@ import sqlite3
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any, cast
 
 DEFAULT_CENTRAL_DB_PATH = Path("data/database/haruquantai.db")
 
@@ -1492,9 +1493,9 @@ def _cast_to_db(value: object, value_type: str) -> str:
         else:
             res = "true" if bool(value) else "false"
     elif value_type == "int":
-        res = str(int(value))  # type: ignore[arg-type]
+        res = str(int(cast("Any", value)))
     elif value_type == "float":
-        res = str(float(value))  # type: ignore[arg-type]
+        res = str(float(cast("Any", value)))
     elif value_type == "json":
         if isinstance(value, str):
             json.loads(value)

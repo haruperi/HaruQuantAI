@@ -6,6 +6,9 @@ from __future__ import annotations
 import datetime as dt
 import json
 import os
+import re
+import shutil
+import subprocess
 import sys
 import threading
 import time
@@ -31,7 +34,24 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ide_transport import *
 from runtime_policy import RuntimePolicy, load_runtime_policy, scope_fingerprint
-from workflow_protocol import *
+from workflow_protocol import (
+    SCHEMA_VERSION,
+    OrchestratorError,
+    _ensure_pending_artifact_unchanged,
+    _git,
+    _git_ok,
+    _normalize_path_list,
+    _render_next_agent,
+    _transition_for,
+    capture_repository_snapshot,
+    compose_prompt,
+    compute_snapshot_delta,
+    parse_next_agent,
+    validate_next_agent,
+    validate_no_commits,
+    validate_role_branch,
+    validate_role_mutations,
+)
 
 # Phase 9: Concurrency protection
 _WORKFLOW_LOCK_FILE = ".agents/workflow.lock"
@@ -59,7 +79,10 @@ class WorkflowLock:
                 msvcrt.locking(self.lock_file.fileno(), msvcrt.LK_NBLCK, 1)
             elif _HAS_FCNTL:
                 # Unix: use fcntl
-                fcntl.flock(self.lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                cast("Any", fcntl).flock(
+                    self.lock_file.fileno(),
+                    cast("Any", fcntl).LOCK_EX | cast("Any", fcntl).LOCK_NB,
+                )
             else:
                 raise OrchestratorError(
                     "No supported operating-system file lock is available."
@@ -87,7 +110,9 @@ class WorkflowLock:
                     except OSError:
                         pass
                 elif _HAS_FCNTL:
-                    fcntl.flock(self.lock_file.fileno(), fcntl.LOCK_UN)
+                    cast("Any", fcntl).flock(
+                        self.lock_file.fileno(), cast("Any", fcntl).LOCK_UN
+                    )
 
                 self.lock_file.close()
                 self.lock_file = None

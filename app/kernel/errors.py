@@ -39,6 +39,8 @@ class ConfigurationError(HaruQuantError):
 class ValidationError(HaruQuantError):
     """Invalid shared-boundary value."""
 
+    details: Any = None
+
 
 class SecurityError(HaruQuantError):
     """Security policy or secret-resolution failure."""

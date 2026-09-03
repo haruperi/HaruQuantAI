@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from app.contracts.data.models import (
+    from app.contracts.data.models import RetentionPolicy
+    from app.services.data.data_inspection_retention.data_inspection_retention import (
         DatasetManifest,
-        RetentionPolicy,
         StorageArtifact,
     )
 

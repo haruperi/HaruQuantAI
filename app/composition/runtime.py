@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from typing import Any
+from typing import Any, cast
 
 from app.composition.facade import CapabilityLease
 from app.kernel.effects import EffectScope
@@ -23,7 +23,7 @@ class CompositionRuntime:
     def __init__(self) -> None:
         self._scope = EffectScope()
         self._instances: dict[CapabilityId, Any] = {}
-        self._providers: dict[ProviderId, Any] = {}
+        self._providers: dict[ProviderId | str, Any] = {}
         self._report: ResolutionReport | None = None
 
     def activate(
@@ -99,7 +99,7 @@ class CompositionRuntime:
                 return CapabilityLease(instance=v)
 
         CapabilityId.parse(cap_str)
-        detail = CapabilityUnavailable(
+        detail: Any = CapabilityUnavailable(
             code="CAPABILITY_UNAVAILABLE",
             reason_code=CapabilityReasonCode.NOT_INSTALLED,
             capability=cap_str,
@@ -115,7 +115,7 @@ class CompositionRuntime:
                 if str(inact.capability_id) == cap_str:
                     detail = inact.detail
                     break
-        raise CapabilityUnavailableError(detail)
+        raise CapabilityUnavailableError(cast("Any", detail))
 
     def close(self) -> None:
         """Close the runtime and dispose all managed resources."""

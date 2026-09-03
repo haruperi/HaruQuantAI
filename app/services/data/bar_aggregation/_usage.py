@@ -8,11 +8,11 @@ from decimal import Decimal
 from app.contracts.data.models import (
     AggregateBarsRequest,
     AggregateBarsSuccess,
+    AggregationSpec,
     Bar,
     Tick,
 )
 from app.services.data.bar_aggregation.bar_aggregation import (
-    AggregationSpec,
     BarAggregationService,
     _format_decimal,
     _generate_uuid7,
@@ -22,7 +22,7 @@ from app.services.data.bar_aggregation.bar_aggregation import (
 )
 
 
-def example_resampling(m1_bars: list[Bar] | None = None) -> list[Bar]:
+def example_resampling(m1_bars: list[Bar] | None = None) -> tuple[Bar, ...]:
     """Resample deterministic M1 bars to closed M5 bars using real market data."""
     bars = m1_bars
     if bars is None:

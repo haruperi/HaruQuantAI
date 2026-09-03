@@ -11,7 +11,7 @@ import uuid
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, override
+from typing import Any, cast, override
 
 import pandas as pd
 
@@ -201,26 +201,36 @@ class BinanceClient(BrokerOperationsCapability):
         """Check if environment supports Binance REST communication."""
         return True
 
+    @override
     def is_connected(self) -> bool:
         """Check if Binance client is connected."""
         return bool(self.state.get("connected", False))
 
     def get_last_error(self) -> tuple[int, str]:
         """Return the last recorded error code and description."""
-        return self.state.get("last_error", (0, "Success"))
+        return cast("tuple[int, str]", self.state.get("last_error", (0, "Success")))
 
+    @override
     def connect(
         self,
+        account_id: str | int | None = None,
+        server: str | None = None,
+        password: str | None = None,
+        timeout: int = 30,
         api_key: str | None = None,
         api_secret: str | None = None,
         testnet: bool = False,
-        timeout: int = 30,
         config: BinanceConfig | None = None,
+        **kwargs: Any,
     ) -> StandardResponse[Any]:
         """Connect to Binance REST/WebSocket API."""
         cfg = config or self.config
-        final_key = api_key or cfg.api_key
-        final_secret = api_secret or cfg.api_secret
+        final_key = (
+            api_key
+            or (str(account_id) if account_id is not None else None)
+            or cfg.api_key
+        )
+        final_secret = api_secret or password or cfg.api_secret
         final_testnet = testnet or cfg.testnet
 
         base_url = (
@@ -265,6 +275,7 @@ class BinanceClient(BrokerOperationsCapability):
             operation="connect",
         )
 
+    @override
     def disconnect(self) -> StandardResponse[Any]:
         """Disconnect from Binance API session."""
         logger.info("Disconnecting from Binance API.")
@@ -342,6 +353,7 @@ class BinanceClient(BrokerOperationsCapability):
             operation="get_provider_specification",
         )
 
+    @override
     def get_terminal_info(self) -> StandardResponse[BrokerTerminalInfo]:
         """Retrieve terminal environment properties."""
         info = {
@@ -366,6 +378,7 @@ class BinanceClient(BrokerOperationsCapability):
             operation="get_terminal_info",
         )
 
+    @override
     def get_account_info(self) -> StandardResponse[BrokerAccountInfo]:
         """Retrieve live Binance account configuration and balances."""
         if not self.is_connected():
@@ -452,6 +465,7 @@ class BinanceClient(BrokerOperationsCapability):
             operation="get_account_snapshot",
         )
 
+    @override
     def get_symbol_info(self, symbol: str) -> StandardResponse[BrokerSymbolInfo]:
         """Retrieve symbol specification from Binance catalog."""
         sym = symbol.upper()
@@ -561,10 +575,11 @@ class BinanceClient(BrokerOperationsCapability):
             operation="get_symbol_tick",
         )
 
+    @override
     def get_quote(self, symbol: str) -> dict[str, Any]:
         """Compatibility helper returning quote dictionary."""
         tick = self.get_symbol_tick(symbol)
-        data = tick.data if tick.status == "success" else {}
+        data = tick.data if tick.status == "success" and tick.data is not None else {}
         bid = float(data.get("bid", 65000.0))
         ask = float(data.get("ask", 65001.0))
         return {
@@ -618,6 +633,7 @@ class BinanceClient(BrokerOperationsCapability):
             operation="unsubscribe_market_depth",
         )
 
+    @override
     def get_bars(
         self,
         symbol: str,
@@ -625,23 +641,24 @@ class BinanceClient(BrokerOperationsCapability):
         date_from: Any = None,
         date_to: Any = None,
         start_pos: int | None = None,
-        count: int = 100,
+        count: int | None = 100,
     ) -> StandardResponse[pd.DataFrame]:
         """Retrieve Kline candlestick bars as a DataFrame."""
         sym = symbol.upper()
         now = time.time()
         interval_sec = 60
+        num_bars = count if count is not None else 100
         raw_data = [
             {
                 "symbol": sym,
-                "time": now - (count - i) * interval_sec,
+                "time": now - (num_bars - i) * interval_sec,
                 "open": 65000.0 + i * 2,
                 "high": 65010.0 + i * 2,
                 "low": 64990.0 + i * 2,
                 "close": 65005.0 + i * 2,
                 "volume": 15.0 + i,
             }
-            for i in range(count)
+            for i in range(num_bars)
         ]
         data = _format_bars_dataframe(raw_data)
         return StandardResponse(
@@ -653,6 +670,7 @@ class BinanceClient(BrokerOperationsCapability):
 
     get_historical_bars = get_bars
 
+    @override
     def get_ticks(
         self,
         symbol: str,
@@ -722,6 +740,7 @@ class BinanceClient(BrokerOperationsCapability):
         """List active stream subscriptions."""
         return list(self._subscriptions.values())
 
+    @override
     def get_position_info(
         self,
         symbol: str | None = None,
@@ -749,6 +768,7 @@ class BinanceClient(BrokerOperationsCapability):
         res = self.get_position_info(ticket=position_id)
         return None
 
+    @override
     def get_positions(self, symbol: str | None = None) -> list[dict[str, Any]]:
         """Compatibility helper returning positions list."""
         res = self.get_position_info(symbol=symbol)
@@ -771,6 +791,7 @@ class BinanceClient(BrokerOperationsCapability):
             operation="get_num_positions",
         )
 
+    @override
     def get_order_info(
         self,
         symbol: str | None = None,
@@ -797,6 +818,7 @@ class BinanceClient(BrokerOperationsCapability):
         """Compatibility helper returning single order."""
         return None
 
+    @override
     def get_orders(self, symbol: str | None = None) -> list[dict[str, Any]]:
         """Compatibility helper returning orders list."""
         res = self.get_order_info(symbol=symbol)
@@ -819,6 +841,7 @@ class BinanceClient(BrokerOperationsCapability):
             operation="get_num_orders",
         )
 
+    @override
     def get_history_order_info(
         self,
         symbol: str | None = None,
@@ -871,6 +894,7 @@ class BinanceClient(BrokerOperationsCapability):
             operation="get_num_history_orders",
         )
 
+    @override
     def get_history_deal_info(
         self,
         symbol: str | None = None,
@@ -934,7 +958,8 @@ class BinanceClient(BrokerOperationsCapability):
     ) -> StandardResponse[float]:
         """Calculate required margin."""
         if isinstance(action, dict):
-            vol = float(action.get("volume", action.get("quantity", 1.0)))
+            raw_vol = action.get("volume", action.get("quantity", 1.0))
+            vol = float(raw_vol) if raw_vol is not None else 1.0
             p = float(action.get("price", 65000.0))
             lev = float(action.get("leverage", 20.0))
         else:
@@ -960,7 +985,8 @@ class BinanceClient(BrokerOperationsCapability):
     ) -> StandardResponse[float]:
         """Calculate estimated profit."""
         if isinstance(action, dict):
-            vol = float(action.get("volume", action.get("quantity", 1.0)))
+            raw_vol = action.get("volume", action.get("quantity", 1.0))
+            vol = float(raw_vol) if raw_vol is not None else 1.0
             p_open = float(action.get("price_open", 65000.0))
             p_close = float(action.get("price_close", 66000.0))
         else:
@@ -996,6 +1022,7 @@ class BinanceClient(BrokerOperationsCapability):
             operation="check_order",
         )
 
+    @override
     def trade(self, request: dict[str, Any]) -> StandardResponse[Any]:
         """Submit a new order to Binance."""
         if not self.is_connected():
@@ -1023,6 +1050,7 @@ class BinanceClient(BrokerOperationsCapability):
             operation="trade",
         )
 
+    @override
     def place_order(self, request: dict[str, Any]) -> dict[str, Any]:
         """Compatibility helper returning raw order dict."""
         res = self.trade(request)

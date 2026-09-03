@@ -479,6 +479,7 @@ class MT5Client(BrokerOperationsCapability):
             operation="disconnect",
         )
 
+    @override
     def get_terminal_info(self) -> StandardResponse[BrokerTerminalInfo]:
         """Retrieve detailed terminal environment properties."""
         if self.mt5 is None or not self.is_available():
@@ -813,6 +814,7 @@ class MT5Client(BrokerOperationsCapability):
             operation="unsubscribe_market_depth",
         )
 
+    @override
     def get_bars(
         self,
         symbol: str,
@@ -883,6 +885,7 @@ class MT5Client(BrokerOperationsCapability):
     # Convenience alias
     get_historical_bars = get_bars
 
+    @override
     def get_ticks(
         self,
         symbol: str,
@@ -939,6 +942,7 @@ class MT5Client(BrokerOperationsCapability):
             operation="get_ticks",
         )
 
+    @override
     def get_position_info(
         self,
         symbol: str | None = None,
@@ -1026,6 +1030,7 @@ class MT5Client(BrokerOperationsCapability):
             operation="get_num_positions",
         )
 
+    @override
     def get_order_info(
         self,
         symbol: str | None = None,
@@ -1113,6 +1118,7 @@ class MT5Client(BrokerOperationsCapability):
             operation="get_num_orders",
         )
 
+    @override
     def get_history_order_info(
         self,
         symbol: str | None = None,
@@ -1225,6 +1231,7 @@ class MT5Client(BrokerOperationsCapability):
             operation="get_num_history_orders",
         )
 
+    @override
     def get_history_deal_info(
         self,
         symbol: str | None = None,
@@ -1462,6 +1469,7 @@ class MT5Client(BrokerOperationsCapability):
             operation="check_order",
         )
 
+    @override
     def trade(self, request: dict[str, Any]) -> StandardResponse[Any]:
         """Submit trade request to MT5 via order_send.
 
@@ -1533,6 +1541,57 @@ class MT5Client(BrokerOperationsCapability):
             else {"code": retcode, "message": comment or retcode_desc},
             operation="trade",
         )
+
+    @override
+    def get_quote(self, symbol: str) -> dict[str, Any]:
+        """Compatibility helper returning quote dictionary."""
+        tick = self.get_symbol_tick(symbol)
+        data = tick.data if tick.status == "success" and tick.data is not None else {}
+        bid = float(
+            data.get("bid", 1.0850)
+            if isinstance(data, dict)
+            else getattr(data, "bid", 1.0850)
+        )
+        ask = float(
+            data.get("ask", 1.0851)
+            if isinstance(data, dict)
+            else getattr(data, "ask", 1.0851)
+        )
+        return {
+            "symbol": symbol.upper(),
+            "bid": bid,
+            "ask": ask,
+            "spread": round(ask - bid, 5),
+            "time": time.time(),
+        }
+
+    @override
+    def get_orders(self, symbol: str | None = None) -> list[dict[str, Any]]:
+        """Compatibility helper returning orders list."""
+        res = self.get_order_info(symbol=symbol)
+        return (
+            [o.to_dict() if hasattr(o, "to_dict") else dict(o) for o in res.data]
+            if res.status == "success" and isinstance(res.data, list)
+            else []
+        )
+
+    @override
+    def get_positions(self, symbol: str | None = None) -> list[dict[str, Any]]:
+        """Compatibility helper returning positions list."""
+        res = self.get_position_info(symbol=symbol)
+        return (
+            [p.to_dict() if hasattr(p, "to_dict") else dict(p) for p in res.data]
+            if res.status == "success" and isinstance(res.data, list)
+            else []
+        )
+
+    @override
+    def place_order(self, request: dict[str, Any]) -> dict[str, Any]:
+        """Compatibility helper returning raw order dict."""
+        res = self.trade(request)
+        if res.status != "success":
+            raise RuntimeError(res.message)
+        return res.data if isinstance(res.data, dict) else {}
 
 
 def _run_usage_example() -> None:

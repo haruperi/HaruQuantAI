@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any
-
+from app.contracts.data.models import AlignedSeries
 from app.services.data.external_series_alignment.external_series_alignment import (
+    AlignedPoint,
     SeriesPoint,
     data_align_external_series,
     data_define_alignment_policy,
@@ -77,7 +77,9 @@ def main() -> None:
     print("\nDATA SUCCESS: FEAT-DATA-ALIGN_SERIES scenarios verified.")
 
 
-def example_multitimeframe_alignment() -> tuple[Any, list[Any]]:
+def example_multitimeframe_alignment() -> tuple[
+    AlignedSeries, tuple[AlignedPoint, ...]
+]:
     """Align multi-timeframe datasets backward without lookahead."""
     policy = data_define_alignment_policy(
         direction="LAST_KNOWN",

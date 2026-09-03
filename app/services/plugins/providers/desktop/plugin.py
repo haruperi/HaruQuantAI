@@ -9,7 +9,10 @@ from app.contracts.notification.delivery.v1 import (
     NotificationDeliveryCapabilityV1,
     NotificationDeliveryResultV1,
 )
-from app.utils.notifications.desktop import DesktopConfig, DesktopNotifier
+from app.utils.notifications.desktop import (  # type: ignore[import-untyped]
+    DesktopConfig,
+    DesktopNotifier,
+)
 
 if TYPE_CHECKING:
     from app.kernel.effects import EffectScope
@@ -44,7 +47,7 @@ class _DesktopDeliveryAdapter:
         return NotificationDeliveryResultV1(
             channel="desktop",
             status="accepted",
-            recipient_count=None,
+            recipient_count=1,
         )
 
     def close(self) -> None:

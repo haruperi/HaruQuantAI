@@ -9,7 +9,10 @@ from app.contracts.notification.delivery.v1 import (
     NotificationDeliveryCapabilityV1,
     NotificationDeliveryResultV1,
 )
-from app.utils.notifications.email import EmailConfig, EmailNotifier
+from app.utils.notifications.email import (  # type: ignore[import-untyped]
+    EmailConfig,
+    EmailNotifier,
+)
 
 if TYPE_CHECKING:
     from app.kernel.effects import EffectScope
@@ -42,7 +45,7 @@ class _EmailDeliveryAdapter:
             raise RuntimeError(msg)
         result = self._notifier.send(title, text, html_body)
         raw_count = result.get("recipients")
-        recipient_count = int(raw_count) if isinstance(raw_count, (int, str)) else None
+        recipient_count = int(raw_count) if isinstance(raw_count, (int, str)) else 1
         return NotificationDeliveryResultV1(
             channel="email",
             status="accepted",

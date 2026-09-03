@@ -34,7 +34,7 @@ CLI usage:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast, override
 
 from app.contracts.broker.ports import (
     BrokerOperationsCapability,
@@ -169,9 +169,9 @@ def get_broker_client(
         config_mod = importlib.import_module(config_mod_path)
         config_cls = getattr(config_mod, config_cls_name)
         cfg = config_cls(**config_kwargs)
-        return client_cls(config=cfg)
+        return cast("BrokerOperationsCapability", client_cls(config=cfg))
 
-    return client_cls()
+    return cast("BrokerOperationsCapability", client_cls())
 
 
 def list_brokers(db_path: Path | str | None = None) -> list[dict[str, Any]]:
@@ -264,6 +264,7 @@ class ResolveService(BrokerResolverCapability):
         """
         self.config = config or ResolveConfig()
 
+    @override
     def get_broker_module(self) -> dict[str, Any]:
         """Resolve and return active broker module configuration.
 
@@ -272,6 +273,7 @@ class ResolveService(BrokerResolverCapability):
         """
         return fr_brk_resolve_broker(self.config)
 
+    @override
     def get_broker_client(
         self,
         platform_or_name: str | None = None,
@@ -286,7 +288,7 @@ class ResolveService(BrokerResolverCapability):
         Returns:
             Instantiated client implementing BrokerOperationsCapability.
         """
-        db_path = self.config.database_path if self.config is not None else None
+        db_path = self.config.database_path
         return get_broker_client(
             platform_or_name=platform_or_name,
             db_path=db_path,

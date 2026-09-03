@@ -289,7 +289,7 @@ files = ["app", "tests", ".agents"]
 
 # Main strictness policy
 strict = true
-mypy_path = "."
+mypy_path = [".", ".agents"]
 cache_dir = ".dev/.mypy_cache"
 
 # Useful checks not included by strict

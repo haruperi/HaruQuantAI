@@ -256,7 +256,7 @@ class SessionCalendarService(DefineSessionsCapability):
 
     def close(self) -> None:
         """Close the underlying SQLite connection."""
-        if hasattr(self, "_conn") and self._conn is not None:
+        if hasattr(self, "_conn"):
             with contextlib.suppress(sqlite3.Error):
                 self._conn.close()
 

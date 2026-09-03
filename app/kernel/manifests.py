@@ -45,7 +45,7 @@ class EffectClass(StrEnum):
 class ProvidedCapability:
     """Capability provided by a manifest."""
 
-    capability_id: str
+    capability_id: CapabilityId | str
     contract_version: str | Any = "1.0.0"
     schema_id: str = "kernel.capability.v1"
     cardinality: str | Cardinality = "exactly_one"
@@ -55,7 +55,7 @@ class ProvidedCapability:
 class RequiredCapability:
     """Capability required by a manifest."""
 
-    capability_id: str
+    capability_id: CapabilityId | str
     contract_version: str | Any = "1.0.0"
     schema_id: str = "kernel.capability.v1"
     optional: bool = False
@@ -65,7 +65,7 @@ class RequiredCapability:
 class ProviderManifest:
     """Immutable parsed provider manifest."""
 
-    id: str = ""
+    id: ProviderId | str = ""
     version: str | Any = "1.0.0"
     entry_point: str = ""
     provides: tuple[ProvidedCapability, ...] = ()
@@ -85,15 +85,15 @@ class ProviderManifest:
     downgrade_policy: str | None = None
     uninstall_retention: str | None = None
     purge_requires_authorization: bool = False
-    provider_id: str = ""
+    provider_id: ProviderId | str = ""
     provider_version: Any = None
 
     def __post_init__(self) -> None:
         """Normalize provider identity and version aliases."""
         if self.provider_id and not self.id:
-            object.__setattr__(self, "id", str(self.provider_id))
+            object.__setattr__(self, "id", self.provider_id)
         elif self.id and not self.provider_id:
-            object.__setattr__(self, "provider_id", str(self.id))
+            object.__setattr__(self, "provider_id", self.id)
         if self.provider_version and not self.version:
             object.__setattr__(self, "version", str(self.provider_version))
         elif self.version and not self.provider_version:

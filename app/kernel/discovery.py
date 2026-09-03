@@ -43,13 +43,14 @@ def discover_manifests(root: str | Path) -> tuple[DiscoveredProvider, ...]:
             log_debug("Skipping invalid manifest at %s: %s", manifest_path, err)
             continue
 
-        if manifest.id in seen_ids:
+        m_id = str(manifest.id)
+        if m_id in seen_ids:
             # duplicate provider id detected
             pass
-        seen_ids[manifest.id] = manifest_path
+        seen_ids[m_id] = manifest_path
         discovered.append(
             DiscoveredProvider(manifest_path=manifest_path, manifest=manifest)
         )
 
-    discovered.sort(key=lambda dp: (dp.manifest.id, str(dp.manifest_path)))
+    discovered.sort(key=lambda dp: (str(dp.manifest.id), str(dp.manifest_path)))
     return tuple(discovered)

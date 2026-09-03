@@ -10,9 +10,9 @@ from typing import TYPE_CHECKING, cast
 if TYPE_CHECKING:
     from app.contracts.common.models import Uuid7
     from app.contracts.data.models import (
+        DataConnectionRef,
         DataImportReceipt,
         DataSeriesVersion,
-        RegisteredDataConnection,
     )
     from app.services.data.historical_data_ingestion.config import (
         HistoricalDataIngestionConfig,
@@ -141,7 +141,7 @@ class HistoricalDataPersistence:
                 return cast("bytes", row["raw_data"])
         return None
 
-    def save_connection(self, conn_model: RegisteredDataConnection) -> None:
+    def save_connection(self, conn_model: DataConnectionRef) -> None:
         """Persist a registered data connection."""
         with self.get_connection() as conn:
             conn.execute(
@@ -199,12 +199,12 @@ class HistoricalDataPersistence:
                 (
                     version.series_id,
                     version.version,
-                    version.instrument_id,
+                    version.instrument.instrument_id,
                     version.instrument_version_id,
                     version.timeframe,
                     version.tick_type,
                     version.timezone,
-                    version.precision.model_dump_json(),
+                    str(version.precision),
                     version.coverage.model_dump_json(),
                     version.row_count,
                     version.source_artifact_id,

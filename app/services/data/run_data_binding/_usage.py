@@ -27,7 +27,7 @@ async def main() -> None:
         series_version_ids=(s1, s2),
         precision="SELECTED_TIMEFRAME",
     )
-    assert binding.binding_id is not None
+    assert bool(binding.binding_id)
     print(f"Bound manifest {run_id} -> binding_id {binding.binding_id}")
     print(f"Series versions bound: {binding.series_version_ids}")
     print(f"Validated at: {binding.validated_at}")
