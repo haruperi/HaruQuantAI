@@ -249,6 +249,11 @@ Shared failure envelope: `InterfaceFailure` with the closed 10-code
   capability as declared-but-unimplemented (permitted by
   `app/contracts/README.md`: "Defined contracts do not imply that every
   owning runtime feature is implemented").
+- **G7 — Bars-read capability.** Chart's `GET /api/v1/data/bars`
+  surface has no public Data capability today: `DataSeriesVersion`
+  records carry coverage metadata only and bars live behind artifact
+  ids; `aggregate-bars` derives, not reads. The Chart slice needs a
+  Data-domain bars-read capability decision before its D-IFACE gateway.
 - **G6 — Watchlists/settings/operator/metrics/health ownership.** No
   surviving domain owns these former-API surfaces; each vertical slice that
   needs one must first record the owning capability decision.

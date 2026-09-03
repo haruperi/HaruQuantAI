@@ -11,3 +11,4 @@ export type {
   MarketHoursWidgetConfig,
   MarketHoursWidgetProps,
 } from './contracts';
+export { MarketHoursFeature, MARKET_HOURS_MANIFEST } from './feature';

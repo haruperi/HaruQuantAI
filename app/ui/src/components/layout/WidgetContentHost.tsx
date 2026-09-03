@@ -13,7 +13,7 @@ import { MarketsFeature } from '../../widgets/markets';
 import { MarketTicksFeature } from '../../widgets/market-ticks';
 import { WatchlistsFeature } from '../../widgets/watchlists';
 import { ChartWidget } from '../../widgets/chart';
-import { OptionsGridWidget } from '../../widgets/instrument-panels';
+import { InstrumentPanelsFeature } from '../../widgets/instrument-panels';
 import { PriceLadderWidget } from '../../widgets/price-ladder';
 import { TradePlanWidget } from '../../widgets/planning';
 import { ChallengesWidget, EducationWidget } from '../../widgets/training-ux';
@@ -30,8 +30,8 @@ import { RiskView } from '../workflow/risk';
 import { TradingWidget } from '../../widgets/trading';
 import { SessionRegistryWidget } from '../../widgets/session-registry';
 import { IndicatorWorkspace } from '../workflow/indicators';
-import { NewsWidget } from '../../widgets/news';
-import { MarketHoursWidget } from '../../widgets/market-hours';
+import { NewsFeature } from '../../widgets/news';
+import { MarketHoursFeature } from '../../widgets/market-hours';
 import { AnalyticsWorkspace } from '../../widgets/analytics';
 import type { Widget } from '../../widgets/workspaces';
 
@@ -48,7 +48,7 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
     case 'priceLadder':
       return <PriceLadderWidget symbol={widget.symbol} accountId={widget.accountId} />;
     case 'optionsGrid':
-      return <OptionsGridWidget symbol={widget.symbol || 'ESU5'} />;
+      return <InstrumentPanelsFeature symbol={widget.symbol || 'ESU5'} />;
     case 'positions':
       return <PositionsWidget />;
     case 'tradeLog':
@@ -84,9 +84,9 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
     case 'indicators':
       return <IndicatorWorkspace />;
     case 'news':
-      return <NewsWidget />;
+      return <NewsFeature />;
     case 'market-hours':
-      return <MarketHoursWidget />;
+      return <MarketHoursFeature />;
     case 'analytics':
       return <AnalyticsWorkspace runId={widget.runId} />;
     default: {

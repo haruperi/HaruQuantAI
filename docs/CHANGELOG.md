@@ -2,6 +2,30 @@
 
 ## [Unreleased]
 
+### Migrate the remaining read-only widgets to the D-UI model
+
+News (`FEAT-UI-29`), Market Hours (`FEAT-UI-30`), and Instrument Panels
+(`FEAT-UI-19`) — all backend-free presentation widgets — now carry the
+D-UI artifacts: typed manifests, the strict configuration surface (News
+gains a strict Zod config; the other two keep their established typed
+configurations), and feature lifecycle adapters wired through
+`WidgetContentHost`. The Chart migration is deferred with a recorded
+gap (G7): no public Data capability reads bars today
+(`DataSeriesVersion` carries metadata only), so the Chart slice needs a
+Data-domain bars-read capability decision first.
+
+#### Added (4)
+
+- Added FEAT-UI-29 artifacts: `NEWS_MANIFEST`, strict `config.ts`
+  (default language, header flag, persisted-state schema version),
+  `NewsFeature` lifecycle adapter, and manifest/config/feature tests.
+- Added FEAT-UI-30 artifacts: `MARKET_HOURS_MANIFEST` and the
+  `MarketHoursFeature` adapter over the established typed configuration.
+- Added FEAT-UI-19 artifacts: `INSTRUMENT_PANELS_MANIFEST` and the
+  `InstrumentPanelsFeature` adapter forwarding the instrument symbol.
+- Recorded gap G7 (bars-read capability) in the Phase 0 reconciliation
+  record, blocking the Chart slice on a Data-domain decision.
+
 ### Migrate Watchlists to the full D-UI feature shape
 
 `FEAT-UI-03` is the third widget migrated to the D-UI model: typed
