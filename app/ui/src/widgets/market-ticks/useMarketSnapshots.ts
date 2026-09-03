@@ -69,6 +69,7 @@ export function useMarketSnapshots(
   const [status, setStatus] = useState<SnapshotStatus>("connecting");
   const [error, setError] = useState<string | null>(null);
   const retryRef = useRef(0);
+  const lastSequenceRef = useRef(0);
   const [isDocumentVisible, setIsDocumentVisible] = useState(
     () => document.visibilityState === "visible",
   );
@@ -112,13 +113,32 @@ export function useMarketSnapshots(
         [...streamSymbols],
         {
           signal: activeController.signal,
+          // Reconnects ask to resume after the last observed sequence so
+          // the transport can replay or the client can count the jump.
+          resumeAfter: lastSequenceRef.current > 0
+            ? lastSequenceRef.current
+            : undefined,
         },
       )) {
         if (stopped) return;
         const mapped = mapSnapshotEvent(event);
         if (!mapped) continue;
+        // Client-side gap detection: a forward jump in the envelope
+        // sequence that the payload's own gap count does not already
+        // account for is surfaced honestly, never interpolated.
+        const previous = lastSequenceRef.current;
+        let view = mapped;
+        if (previous > 0 && mapped.sequence > previous + 1) {
+          view = {
+            ...mapped,
+            gap: mapped.gap + (mapped.sequence - previous - 1),
+          };
+        }
+        if (mapped.sequence > previous) {
+          lastSequenceRef.current = mapped.sequence;
+        }
         retryRef.current = 0;
-        setSnapshot(mapped);
+        setSnapshot(view);
         setStatus("connected");
         setError(null);
       }

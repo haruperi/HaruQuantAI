@@ -2,6 +2,41 @@
 
 ## [Unreleased]
 
+### Prove Market Ticks end-to-end spatiotemporal removal
+
+The Market Ticks vertical slice now carries the full Phase 5 removal
+proof. Spatially, the widget is added, removed, serialized, and restored
+through the workspace store, and an unregistered contribution renders an
+explicit missing-widget state — replacing the silent Markets-widget
+fallback in `WidgetContentHost` that previously masked removed widgets.
+Temporally, the client preserves source identity and sequence order,
+counts transport sequence jumps as gaps without interpolating, reconnects
+with a resume cursor at the last observed sequence, and applies no update
+after disposal. Backend removal is proven end-to-end over ASGI: removing
+the observation gateway feature serves the stable
+`CAPABILITY_UNAVAILABLE` failure on its routes while the transport
+foundation stays active and the Data provider is fully released and
+unaffected. The canonical `verify_feature_removal.py` script was run and
+fails only on the pre-existing repository mypy baseline (identically for
+shipped features); the in-process matrix test carries the semantic
+evidence.
+
+#### Added (4)
+
+- Added the explicit missing-widget state to `WidgetContentHost`
+  (role=status) for persisted widget types without a registered
+  contribution, instead of silently substituting `MarketsWidget`.
+- Added `temporal.test.tsx` proving source identity, sequence ordering,
+  client-side gap counting, reconnect resume cursor, served staleness
+  passthrough, and no-update-after-disposal.
+- Added `spatial.test.tsx` proving workspace add/remove, strict
+  serialization round-trip, and explicit missing-widget handling.
+- Added the backend removal matrix test
+  (`test_removal_integration.py`) over the live ASGI boundary:
+  200-with-quotes before removal, 503 `CAPABILITY_UNAVAILABLE` after,
+  transport foundation still active, Data provider released and
+  unaffected.
+
 ### Migrate Market Ticks to the full D-UI feature shape
 
 `FEAT-UI-25` is the first widget migrated to the D-UI model of the

@@ -89,7 +89,23 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
       return <MarketHoursWidget />;
     case 'analytics':
       return <AnalyticsWorkspace runId={widget.runId} />;
-    default:
-      return <MarketsWidget />;
+    default: {
+      // The switch is statically exhaustive over WidgetType; reaching
+      // here means the persisted widget type has no registered
+      // contribution in this build (e.g. the owning widget feature was
+      // physically removed). The workspace says so explicitly instead of
+      // silently substituting another widget.
+      const missingType: string = (widget as { type: string }).type;
+      return (
+        <section role="status" aria-label={`Missing widget: ${widget.title}`}>
+          <h2>{widget.title}</h2>
+          <p>
+            Widget unavailable: the &quot;{missingType}&quot; contribution is
+            not registered in this build. Remove this panel or restore the
+            owning widget feature.
+          </p>
+        </section>
+      );
+    }
   }
 };
