@@ -1,9 +1,9 @@
 # UI
 
 > **Package:** `app/ui/`
-> **Status:** `In Progress` — 26 registered UI features; 17 `Completed`, 8 `Pending`,
-> and 1 `Partial` requirement coverage or focused-folder ownership.
-> **Last updated:** `2026-08-18`
+> **Status:** `In Progress` — 31 registered UI features (`FEAT-UI-07` withdrawn);
+> 23 `Completed` and 8 `Pending` requirement coverage or focused-folder ownership.
+> **Last updated:** `2026-09-03`
 
 > This README is the package's **single source of truth** for requirements, final
 > structure, implementation sequence, progress, verification evidence, and tests.
@@ -36,7 +36,11 @@ actions without becoming a business, policy, persistence, or broker authority.
 
 ### Shared contracts
 
-Contract names, versions, and owners match `docs/PROJECT.md` and the API registry.
+Contract names, versions, and owners match `docs/PROJECT.md` and the Interfaces
+(D-IFACE) contract family in `app/contracts/interfaces/`. The former monolithic
+API registry was deleted with `app/services/api` and is not restored; the
+boundary reconciliation is recorded in
+`docs/dev/iface-ui-migration/phase-0-baseline-reconciliation.md`.
 
 **Owned by this domain** — UI-only view and interaction contracts:
 
@@ -54,15 +58,21 @@ truth:
 
 | Contract                                                                           | Version             | Owner                              | Used for                                   |
 | ---------------------------------------------------------------------------------- | ------------------- | ---------------------------------- | ------------------------------------------ |
-| `ApiResponse`, `ApiError`, `ApiMetadata`, `StreamEvent`, `RouteContract` | `v1`              | API                                | Typed HTTP and stream transport.           |
-| `GovernedRequestContext`, `PageContext`                                        | `v1`              | API                                | Bounded route and governed-action context. |
-| Registered domain response DTOs                                                    | Registered versions | Owning service domains through API | Truthful workflow and widget presentation. |
+| `ApiResponse`, `ApiError`, `ApiMetadata`, `StreamEvent`, `RouteContract` | `v1`              | Interfaces (D-IFACE), planned      | Typed HTTP and stream transport.           |
+| `GovernedRequestContext`, `PageContext`                                        | `v1`              | Interfaces (D-IFACE), planned      | Bounded route and governed-action context. |
+| Registered domain response DTOs                                                    | Registered versions | Owning service domains through D-IFACE gateways | Truthful workflow and widget presentation. |
+
+The `v1` envelope family above is the frozen contract the typed clients observe
+today; the schemas in `src/clients/contracts.ts` remain its drift-checked mirror.
+Record ownership formally moves from the deleted API domain to the Interfaces
+domain when the `FEAT-IFACE-SERVE_API_EVENTS` transport feature lands,
+preserving the observed semantics.
 
 ### Persisted state
 
 UI owns no durable state and no migration manifest. Browser `sessionStorage` and
-component/store state are non-authoritative display state; the API remains the source
-of session and domain truth.
+component/store state are non-authoritative display state; the backend boundary
+remains the source of session and domain truth.
 
 ### Architectural Paradigm: Spatiotemporal Composability ("Everything is a Plugin")
 
@@ -133,7 +143,8 @@ flowchart TD
 
 ## 2. Final Package Structure
 
-The tree records the target focused ownership of all registered UI features.
+The tree records the target focused ownership of all registered UI features,
+following the D-UI shape in `docs/dev/feature_implementation_pipeline.md` §4.8.
 Entries marked *(target)* are registered destinations whose code has not yet moved.
 
 ```text
@@ -142,40 +153,54 @@ app/ui/
 ├── package.json
 └── src/
     ├── widgets/workspaces/              # FEAT-UI-01
-    ├── features/markets/                 # FEAT-UI-02
-    ├── features/watchlists/              # FEAT-UI-03
-    ├── features/chart/                   # FEAT-UI-04
-    ├── features/price-ladder/            # FEAT-UI-05
-    ├── features/trading/                 # FEAT-UI-06
-    ├── features/trade-log/               # FEAT-UI-08 (target)
-    ├── features/positions/               # FEAT-UI-09 (target)
-    ├── features/trade-plan/              # FEAT-UI-10 (target)
-    ├── features/education/               # FEAT-UI-11 (target)
-    ├── features/challenges/              # FEAT-UI-12 (target)
-    ├── features/system-settings/         # FEAT-UI-13 (target)
-    ├── clients/                          # FEAT-UI-14
-    ├── context/                          # FEAT-UI-15
-    ├── components/layout/                # FEAT-UI-16
-    ├── app/                              # FEAT-UI-17  framework routes
-    ├── components/workflow/              # FEAT-UI-18
-    ├── features/instrument-panels/       # FEAT-UI-19
-    ├── features/planning/                # FEAT-UI-20
-    ├── features/workflow-pages/          # FEAT-UI-21
-    ├── features/emergency-ux/            # FEAT-UI-22
-    ├── features/human-factors/           # FEAT-UI-23
-    ├── features/training-ux/             # FEAT-UI-24
-    ├── features/market-ticks/            # FEAT-UI-25
-    ├── features/session-registry/        # FEAT-UI-26
-    ├── features/simulator/               # FEAT-UI-27
-    ├── features/research/                # FEAT-UI-28
-    ├── features/news/                    # FEAT-UI-29
-    ├── features/market-hours/            # FEAT-UI-30
-    ├── features/simulation-workbench/    # FEAT-UI-31
-    ├── features/analytics-workbench/     # FEAT-UI-32
-    ├── types/                            # support: shared types
-    ├── utils/                            # support: shared helpers
-    └── mock/                             # support: test-only fixtures
+    ├── widgets/markets/                 # FEAT-UI-02
+    ├── widgets/watchlists/              # FEAT-UI-03
+    ├── widgets/chart/                   # FEAT-UI-04
+    ├── widgets/price-ladder/            # FEAT-UI-05
+    ├── widgets/trading/                 # FEAT-UI-06
+    ├── widgets/trade-log/               # FEAT-UI-08 (target)
+    ├── widgets/positions/               # FEAT-UI-09 (target)
+    ├── widgets/trade-plan/              # FEAT-UI-10 (target)
+    ├── widgets/education/               # FEAT-UI-11 (target)
+    ├── widgets/challenges/              # FEAT-UI-12 (target)
+    ├── widgets/system-settings/         # FEAT-UI-13
+    ├── widgets/instrument-panels/       # FEAT-UI-19
+    ├── widgets/planning/                # FEAT-UI-20
+    ├── widgets/workflow-pages/          # FEAT-UI-21
+    ├── widgets/emergency-ux/            # FEAT-UI-22
+    ├── widgets/human-factors/           # FEAT-UI-23
+    ├── widgets/training-ux/             # FEAT-UI-24
+    ├── widgets/market-ticks/            # FEAT-UI-25
+    ├── widgets/session-registry/        # FEAT-UI-26
+    ├── widgets/simulator/               # FEAT-UI-27 and FEAT-UI-31
+    ├── widgets/research/                # FEAT-UI-28
+    ├── widgets/news/                    # FEAT-UI-29
+    ├── widgets/market-hours/            # FEAT-UI-30
+    ├── widgets/analytics/               # FEAT-UI-32
+    ├── clients/                         # FEAT-UI-14 support: typed transport
+    ├── context/                         # FEAT-UI-15 support: session/page/stream context
+    ├── components/layout/               # FEAT-UI-16 nonvisual shell feature
+    ├── app/                             # FEAT-UI-17 framework routes
+    ├── components/workflow/             # FEAT-UI-18 nonvisual workflow feature
+    ├── contracts/generated/             # support: generated wire types only
+    ├── runtime/                         # support: UI composition boundary
+    ├── workspaces/                      # support: workspace composition
+    ├── types/                           # support: shared types
+    ├── utils/                           # support: shared helpers
+    └── mock/                            # support: test-only fixtures
 ```
+
+### D-UI feature shape and identity
+
+Widget-owning features migrate to the D-UI shape defined by
+`docs/dev/feature_implementation_pipeline.md` §4.8: each
+`src/widgets/<widget_slug>/` gains `README.md`, `manifest.ts`, `config.ts`,
+`feature.tsx`, focused presentation modules, and a deliberate `index.ts`. The
+existing `FEAT-UI-*` numeric identities are permanent runtime/configuration
+identities and are kept; no feature-ID migration is approved, and `FEAT-UI-07`
+stays withdrawn. Nonvisual features (`FEAT-UI-14`–`FEAT-UI-18`) adopt the same
+identity, lifecycle, and removal rules through their owning migration phase,
+with support code confined to the documented support folders above.
 
 ### Feature Registry
 
@@ -218,9 +243,10 @@ app/ui/
 specified by `docs/dev/documentation.pdf`. `FEAT-UI-14`–`FEAT-UI-17` are the foundation
 that enables them. `FEAT-UI-18`–`FEAT-UI-24` are additive layers and own no primary widget.
 
-`FEAT-UI-02` consumes backend `FEAT-API-12` Markets orchestration and `FEAT-UI-03`
-consumes backend `FEAT-API-11` Account Watchlists. UI feature identity remains
-independent from the API's `FEAT-API-*` registry.
+`FEAT-UI-02` consumes Markets orchestration and `FEAT-UI-03` consumes Account
+Watchlists through focused Interfaces (D-IFACE) gateways; the former
+`FEAT-API-11/12` owners were deleted with `app/services/api`. UI feature
+identity remains independent from the backend feature registry.
 
 **Blocked features.** `FEAT-UI-11` and `FEAT-UI-12` have no owning backend domain;
 see Section 6. Listed-options and options-chain UI scope is withdrawn because the
