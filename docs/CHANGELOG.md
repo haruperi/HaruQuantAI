@@ -2,6 +2,34 @@
 
 ## [Unreleased]
 
+### Migrate Watchlists to the full D-UI feature shape
+
+`FEAT-UI-03` is the third widget migrated to the D-UI model: typed
+`manifest.ts`, strict `config.ts`, and a `feature.tsx` lifecycle adapter,
+while `WatchlistWidget.tsx` keeps focused presentation. The widget now
+renders an explicit `unavailable` state when the watchlist gateway answers
+503, and a latent race was fixed: a symbol-directory failure previously
+clobbered the primary list-failure message; the two errors are now
+separate and the universe error owns the alert only while the list itself
+loaded successfully.
+
+#### Added (4)
+
+- Added `manifest.ts` declaring `FEAT-UI-03`, required
+  `interfaces.operate-watchlists@1`, placement/dimensions, effects,
+  accessibility, and removal semantics (Markets degrades to the full
+  directory view when watchlists disappear).
+- Added strict `config.ts` (refresh window 5..600s, persisted-state
+  schema version) where unknown fields throw and partial input overlays
+  documented defaults.
+- Added `feature.tsx` owning the configuration lifecycle and the
+  explicit invalid-configuration response; `WidgetContentHost` renders
+  the feature adapter for the `watchlist` type.
+- Added feature/manifest/config tests (32 watchlists tests total)
+  covering gateway-present active, 503 unavailable, transient errors,
+  invalid-config rejection without transport activity, and
+  workspace-host registration.
+
 ### Expose the account watchlist boundary
 
 Phase 6's heaviest slice closes gap G6: account watchlists now have a

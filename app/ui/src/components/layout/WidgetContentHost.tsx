@@ -11,7 +11,7 @@ import React from 'react';
 
 import { MarketsFeature } from '../../widgets/markets';
 import { MarketTicksFeature } from '../../widgets/market-ticks';
-import { WatchlistWidget } from '../../widgets/watchlists';
+import { WatchlistsFeature } from '../../widgets/watchlists';
 import { ChartWidget } from '../../widgets/chart';
 import { OptionsGridWidget } from '../../widgets/instrument-panels';
 import { PriceLadderWidget } from '../../widgets/price-ladder';
@@ -42,7 +42,7 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
     case 'marketTicks':
       return <MarketTicksFeature />;
     case 'watchlist':
-      return <WatchlistWidget />;
+      return <WatchlistsFeature />;
     case 'chart':
       return <ChartWidget symbol={widget.symbol || 'EURUSD'} widgetId={widget.id} />;
     case 'priceLadder':

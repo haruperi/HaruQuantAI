@@ -32,6 +32,16 @@ vi.mock('../workspaces', () => ({
 }));
 
 vi.mock('@/clients', () => ({
+  ApiClientError: class ApiClientError extends Error {
+    public readonly status: number;
+    public readonly code: string;
+    public constructor(config: { message: string; status: number; code: string }) {
+      super(config.message);
+      this.name = 'ApiClientError';
+      this.status = config.status;
+      this.code = config.code;
+    }
+  },
   apiClients: {
     watchlists: {
       create: createMock,

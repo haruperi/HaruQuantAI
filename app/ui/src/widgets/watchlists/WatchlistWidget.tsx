@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useWorkspaceStore } from '../workspaces';
-import { apiClients, unwrapData, type Watchlist } from '@/clients';
+import { ApiClientError, apiClients, unwrapData, type Watchlist } from '@/clients';
 import {
   filterSymbols,
   loadSymbolUniverse,
@@ -24,12 +24,15 @@ import {
 
 type SortDirection = 'asc' | 'desc';
 
+/** Widget status includes the explicit gateway-unavailable state (D-UI §4.8). */
+type WatchlistStatus = 'loading' | 'ready' | 'error' | 'unavailable';
+
 export const WatchlistWidget: React.FC = () => {
   const { addWidgetToWorkspace } = useWorkspaceStore();
 
   const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [status, setStatus] = useState<WatchlistStatus>('loading');
   const [errorMsg, setErrorMsg] = useState('');
 
   const [creating, setCreating] = useState(false);
@@ -45,6 +48,7 @@ export const WatchlistWidget: React.FC = () => {
   const [universeStatus, setUniverseStatus] = useState<'loading' | 'ready' | 'error'>(
     'loading'
   );
+  const [universeErrorMsg, setUniverseErrorMsg] = useState('');
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [highlight, setHighlight] = useState(-1);
   const suggestionIdPrefix = useRef(`symbol-suggestion-${Math.random().toString(36).slice(2, 8)}`);
@@ -62,10 +66,15 @@ export const WatchlistWidget: React.FC = () => {
         setSelectedId(defaultList ? defaultList.watchlist_id : null);
         setStatus('ready');
       })
-      .catch(() => {
+      .catch((cause: unknown) => {
         if (cancelled) return;
-        setErrorMsg('Unable to load watchlists.');
-        setStatus('error');
+        if (cause instanceof ApiClientError && cause.status === 503) {
+          setErrorMsg('The watchlist gateway is unavailable.');
+          setStatus('unavailable');
+        } else {
+          setErrorMsg('Unable to load watchlists.');
+          setStatus('error');
+        }
       });
     return () => {
       cancelled = true;
@@ -83,7 +92,7 @@ export const WatchlistWidget: React.FC = () => {
       .catch(() => {
         if (cancelled) return;
         setUniverseStatus('error');
-        setErrorMsg('Symbol directory unavailable. Cannot verify instruments.');
+        setUniverseErrorMsg('Symbol directory unavailable. Cannot verify instruments.');
       });
     return () => {
       cancelled = true;
@@ -528,9 +537,11 @@ export const WatchlistWidget: React.FC = () => {
         </div>
       </div>
 
-      {errorMsg && (
+      {(errorMsg ||
+        (status === 'ready' && universeStatus === 'error' && universeErrorMsg)) && (
         <div role="alert" style={{ padding: '6px 16px', color: 'var(--financial-negative, #ff4975)', fontSize: '12px', backgroundColor: 'rgba(255, 73, 117, 0.1)', borderBottom: '1px solid rgba(255, 73, 117, 0.2)' }}>
-          {errorMsg}
+          {errorMsg ||
+            (status === 'ready' && universeStatus === 'error' ? universeErrorMsg : '')}
         </div>
       )}
       {/* Main Content Area */}
@@ -552,6 +563,11 @@ export const WatchlistWidget: React.FC = () => {
           {status === 'error' && (
             <div style={{ padding: '16px', textAlign: 'center', color: 'var(--financial-negative, #ff4975)', fontSize: '12px' }}>
               {errorMsg}
+            </div>
+          )}
+          {status === 'unavailable' && (
+            <div role="alert" style={{ padding: '16px', textAlign: 'center', color: 'var(--financial-negative, #ff4975)', fontSize: '12px' }}>
+              {errorMsg} No watchlists are shown until the gateway returns.
             </div>
           )}
           {status === 'ready' && watchlists.length === 0 && (
