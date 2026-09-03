@@ -493,3 +493,63 @@ async def test_catalogue_route_fails_closed_without_capability() -> None:
         response = await client.get("/api/v1/data/markets")
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "CAPABILITY_UNAVAILABLE"
+
+
+@pytest.mark.asyncio
+async def test_settings_routes_serve_from_database() -> None:
+    """Verify settings endpoints read and write to central SQLite database."""
+    registry = ServiceRegistry()
+    async with _client(registry) as client:
+        # GET /api/v1/settings
+        res = await client.get("/api/v1/settings")
+        assert res.status_code == 200
+        payload = res.json()
+        assert payload["status"] == "success"
+        assert "settings" in payload["data"]
+        assert payload["data"]["scope"] == "system"
+
+        # PUT /api/v1/settings
+        update_res = await client.put(
+            "/api/v1/settings",
+            json={"settings": {"system.app_name": "HaruQuantAI Test"}},
+        )
+        assert update_res.status_code == 200
+        assert (
+            update_res.json()["data"]["settings"]["system.app_name"]
+            == "HaruQuantAI Test"
+        )
+
+        # GET /api/v1/settings/manifest
+        manifest_res = await client.get("/api/v1/settings/manifest")
+        assert manifest_res.status_code == 200
+        manifest_payload = manifest_res.json()
+        assert len(manifest_payload["data"]) > 0
+
+        # GET /api/v1/settings/credentials
+        creds_res = await client.get("/api/v1/settings/credentials")
+        assert creds_res.status_code == 200
+        creds_payload = creds_res.json()
+        assert any(item["slot"] == "google" for item in creds_payload["data"])
+
+        # PUT /api/v1/settings/credentials/google
+        cred_update = await client.put(
+            "/api/v1/settings/credentials/google",
+            json={
+                "material": {
+                    "credentials.google_api_key": "test-key"  # pragma: allowlist secret
+                }
+            },
+        )
+        assert cred_update.status_code == 200
+        assert cred_update.json()["data"]["slot"] == "google"
+        assert cred_update.json()["data"]["configured"] is True
+
+
+@pytest.mark.asyncio
+async def test_trading_route_fails_closed_without_capability() -> None:
+    """Verify absent trading capability serves the stable CAPABILITY_UNAVAILABLE failure."""
+    registry = ServiceRegistry()
+    async with _client(registry) as client:
+        response = await client.get("/api/v1/trading/account-profile")
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "CAPABILITY_UNAVAILABLE"

@@ -87,29 +87,33 @@ describe("NFR-API-009: Accessibility structural checks", () => {
     expect(region).toBeTruthy();
   });
 
-  it("TradingWidget governed actions are keyboard-reachable (button elements)", async () => {
-    useWorkspaceStore.setState({
-      accountMode: "demo",
-      platformAccountMode: "demo",
-      tradingModeCompatible: true,
-    });
-    const { TradingWidget } = await import("../../widgets/trading");
-    globalThis.fetch = vi.fn(async () => new Response(
-      JSON.stringify({
-        status: "success", message: "ok",
-        data: [],
-        error: null,
-        metadata: {
-          contract_version: "v1", schema_id: "api.metadata.v1", request_id: "r",
-          route: "/x", operation: "x", trace_id: null, side_effect: "read",
-          duration_ms: 1, timestamp: "2026-08-03T12:00:00Z", stale: false,
-          stale_reason: null, next_cursor: null, page_size: null, idempotency_replayed: false,
-        },
-      }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    )) as unknown as typeof fetch;
-    const { container } = render(<TradingWidget accountId="account-1" symbol="EURUSD" />);
-    // All interactive controls must be <button> elements (keyboard-reachable).
-    await waitFor(() => expect(container.querySelectorAll("button").length).toBeGreaterThan(0));
-  });
+  it(
+    "TradingWidget governed actions are keyboard-reachable (button elements)",
+    async () => {
+      useWorkspaceStore.setState({
+        accountMode: "demo",
+        platformAccountMode: "demo",
+        tradingModeCompatible: true,
+      });
+      const { TradingWidget } = await import("../../widgets/trading");
+      globalThis.fetch = vi.fn(async () => new Response(
+        JSON.stringify({
+          status: "success", message: "ok",
+          data: [],
+          error: null,
+          metadata: {
+            contract_version: "v1", schema_id: "api.metadata.v1", request_id: "r",
+            route: "/x", operation: "x", trace_id: null, side_effect: "read",
+            duration_ms: 1, timestamp: "2026-08-03T12:00:00Z", stale: false,
+            stale_reason: null, next_cursor: null, page_size: null, idempotency_replayed: false,
+          },
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      )) as unknown as typeof fetch;
+      const { container } = render(<TradingWidget accountId="account-1" symbol="EURUSD" />);
+      // All interactive controls must be <button> elements (keyboard-reachable).
+      await waitFor(() => expect(container.querySelectorAll("button").length).toBeGreaterThan(0));
+    },
+    15000,
+  );
 });

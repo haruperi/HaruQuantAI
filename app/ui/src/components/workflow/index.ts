@@ -38,5 +38,5 @@ export type { PlaybackViewProps } from "./playback";
 export { WhatIfView } from "./whatIf";
 export type { WhatIfViewProps } from "./whatIf";
 
-export { PositionsWidget } from "./PositionsWidget";
-export { TradeLogWidget } from "./TradeLogWidget";
+export { PositionsWidget, PositionsFeature } from "../../widgets/positions";
+export { TradeLogWidget, TradeLogFeature } from "../../widgets/trade-log";

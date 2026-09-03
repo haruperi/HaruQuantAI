@@ -5,9 +5,10 @@
 > HaruQuantAI. Every HTTP, SSE, CLI, MCP, and automation surface is a
 > registered feature in this package that resolves business capabilities
 > through `FeatureContext` and never imports a business implementation.
-> **Status:** `In Progress` — 4 registered features
+> **Status:** `In Progress` — 5 registered features
 > (`FEAT-IFACE-SERVE_API_EVENTS`, `FEAT-IFACE-OBSERVE_MARKET_DATA`,
-> `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE`, `FEAT-IFACE-OPERATE_WATCHLISTS`).
+> `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE`, `FEAT-IFACE-OPERATE_WATCHLISTS`,
+> `FEAT-IFACE-OPERATE_TRADING`).
 > **Last updated:** `2026-09-03`
 
 This README is the Interfaces domain's source of truth. The baseline
@@ -37,6 +38,8 @@ declared capability has no active provider.
   references, and artifact download validation.
 - Presentation-neutral command delegation for CLI/MCP/automation callers.
 - Translation of wire DTOs to and from public contract records.
+- Central database settings and credentials retrieval and updates backed
+  by SQLite (`haruquantai.db`).
 
 ### Does not own
 
@@ -74,11 +77,11 @@ UI migration begins.
 
 | Status | Feature | Provides | Notes |
 | --- | --- | --- | --- |
-| Completed | `FEAT-IFACE-SERVE_API_EVENTS` | `interfaces.serve-api-events@1` | Transport foundation: versioning, OpenAPI, SSE buffer, idempotency, jobs, artifacts. |
+| Completed | `FEAT-IFACE-SERVE_API_EVENTS` | `interfaces.serve-api-events@1` | Transport foundation: versioning, OpenAPI, SSE buffer, idempotency, jobs, artifacts, settings DB. |
 | Completed | `FEAT-IFACE-OBSERVE_MARKET_DATA` | `interfaces.observe-market-data@1` | Phase 3 Market Ticks vertical slice; requires `data.stream-market-events@1`. |
 | Completed | `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE` | `interfaces.observe-market-catalogue@1` | Phase 6 Markets slice backend; requires `catalogue.catalog-instruments@1`. |
 | Completed | `FEAT-IFACE-OPERATE_WATCHLISTS` | `interfaces.operate-watchlists@1` | Phase 6 Watchlists slice backend; requires `workspace.manage-watchlists@1`. |
-| Pending | `FEAT-IFACE-OPERATE_TRADING` | `interfaces.operate-trading@1` | With the Phase 7 Trading migration. |
+| Completed | `FEAT-IFACE-OPERATE_TRADING` | `interfaces.operate-trading@1` | Phase 7 Governed Trading Gateway; resolves optional trading capabilities and fails closed. |
 | Pending | `FEAT-IFACE-OPERATE_RESEARCH` | `interfaces.operate-research@1` | With the Research workbench migration. |
 | Pending | `FEAT-IFACE-OPERATE_PORTFOLIOS` | `interfaces.operate-portfolios@1` | With the Portfolio migration. |
 | Pending | `FEAT-IFACE-ADMINISTER_CAPABILITIES` | `interfaces.administer-capabilities@1` | System surfaces after Phase 5. |
@@ -96,12 +99,12 @@ responsibility; one feature per route is explicitly rejected.
 | `interfaces.observe-market-data@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OBSERVE_MARKET_DATA` |
 | `interfaces.observe-market-catalogue@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE` |
 | `interfaces.operate-watchlists@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_WATCHLISTS` |
+| `interfaces.operate-trading@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_TRADING` |
 | `interfaces.automate-commands@1` | `app/contracts/interfaces/` | `FEAT-IFACE-AUTOMATE_COMMANDS` (pending) |
 | `interfaces.operate-research@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_RESEARCH` (pending) |
 | `interfaces.edit-projects@1` | `app/contracts/interfaces/` | pending ratification (gap G5) |
 | `interfaces.operate-portfolios@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_PORTFOLIOS` (pending) |
 | `interfaces.administer-capabilities@1` | `app/contracts/interfaces/` | `FEAT-IFACE-ADMINISTER_CAPABILITIES` (pending) |
-| `interfaces.operate-trading@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_TRADING` (pending) |
 
 Contract ownership stays in `app/contracts/interfaces/` (see
 `app/contracts/README.md` §4.10; machine-reconciled by

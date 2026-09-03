@@ -14,10 +14,11 @@ import { MarketTicksFeature } from '../../widgets/market-ticks';
 import { WatchlistsFeature } from '../../widgets/watchlists';
 import { ChartWidget } from '../../widgets/chart';
 import { InstrumentPanelsFeature } from '../../widgets/instrument-panels';
-import { PriceLadderWidget } from '../../widgets/price-ladder';
-import { TradePlanWidget } from '../../widgets/planning';
+import { PriceLadderFeature } from '../../widgets/price-ladder';
+import { TradePlanFeature } from '../../widgets/trade-plan';
 import { ChallengesWidget, EducationWidget } from '../../widgets/training-ux';
-import { PositionsWidget, TradeLogWidget } from '../workflow';
+import { PositionsFeature } from '../../widgets/positions';
+import { TradeLogFeature } from '../../widgets/trade-log';
 import { DashboardView } from '../workflow/dashboard';
 import { DataWorkspace } from '../workflow/data';
 import { StrategyWorkspace } from '../workflow/strategies';
@@ -27,7 +28,7 @@ import { PortfolioView } from '../workflow/portfolio';
 import { AgenticView } from '../workflow/agentic';
 import { SimulationHome } from '../../widgets/simulator';
 import { RiskView } from '../workflow/risk';
-import { TradingWidget } from '../../widgets/trading';
+import { TradingFeature } from '../../widgets/trading';
 import { SessionRegistryWidget } from '../../widgets/session-registry';
 import { IndicatorWorkspace } from '../workflow/indicators';
 import { NewsFeature } from '../../widgets/news';
@@ -46,15 +47,22 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
     case 'chart':
       return <ChartWidget symbol={widget.symbol || 'EURUSD'} widgetId={widget.id} />;
     case 'priceLadder':
-      return <PriceLadderWidget symbol={widget.symbol} accountId={widget.accountId} />;
+      return (
+        <PriceLadderFeature
+          config={{
+            defaultSymbol: widget.symbol || 'EURUSD',
+            accountId: widget.accountId,
+          }}
+        />
+      );
     case 'optionsGrid':
       return <InstrumentPanelsFeature symbol={widget.symbol || 'ESU5'} />;
     case 'positions':
-      return <PositionsWidget />;
+      return <PositionsFeature />;
     case 'tradeLog':
-      return <TradeLogWidget />;
+      return <TradeLogFeature />;
     case 'tradePlan':
-      return <TradePlanWidget />;
+      return <TradePlanFeature />;
     case 'education':
       return <EducationWidget />;
     case 'challenges':
@@ -78,7 +86,14 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
     case 'risk':
       return <RiskView />;
     case 'trading':
-      return <TradingWidget accountId={widget.accountId} symbol={widget.symbol} />;
+      return (
+        <TradingFeature
+          config={{
+            defaultSymbol: widget.symbol || 'EURUSD',
+            accountId: widget.accountId,
+          }}
+        />
+      );
     case 'sessions':
       return <SessionRegistryWidget />;
     case 'indicators':

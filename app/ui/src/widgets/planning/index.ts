@@ -1,3 +1,7 @@
 export { PlanningPanels } from "./components";
-export { TradePlanWidget } from "./TradePlanWidget";
 export type { WarningItem } from "./contracts";
+export {
+  TRADE_PLAN_MANIFEST,
+  TradePlanFeature,
+  TradePlanWidget,
+} from "../trade-plan";

@@ -32,7 +32,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from http import HTTPStatus
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 from urllib.parse import parse_qs
 from uuid import uuid4, uuid7
 
@@ -40,8 +40,10 @@ from app.contracts.catalogue.capabilities import CATALOG_INSTRUMENTS_CAPABILITY
 from app.contracts.interfaces.capabilities import (
     OBSERVE_MARKET_CATALOGUE_CAPABILITY,
     OBSERVE_MARKET_DATA_CAPABILITY,
+    OPERATE_TRADING_CAPABILITY,
     OPERATE_WATCHLISTS_CAPABILITY,
 )
+from app.contracts.interfaces.errors import InterfaceFailure
 from app.contracts.interfaces.models import (
     ApiError,
     ApiMetadata,
@@ -52,9 +54,17 @@ from app.contracts.interfaces.models import (
     ObserveMarketDataEventSubscription,
     ObserveMarketDataRequest,
     ObserveMarketDataSuccess,
+    OperateTradingRequest,
     OperateWatchlistsRequest,
     OperateWatchlistsSuccess,
     StreamEvent,
+)
+from app.services.interfaces.serve_api_events._settings_db import (
+    get_credentials_status,
+    get_settings_manifest,
+    get_system_settings,
+    update_credential_slot,
+    update_system_settings,
 )
 
 if TYPE_CHECKING:
@@ -62,7 +72,6 @@ if TYPE_CHECKING:
     from typing import Any
 
     from app.contracts.common.models import JsonValue
-    from app.contracts.interfaces.errors import InterfaceFailure
     from app.contracts.interfaces.ports import ObserveMarketDataCapability
     from app.kernel.capability import CapabilityKey
     from app.kernel.registry import ServiceRegistry
@@ -88,6 +97,11 @@ _CATALOGUE_ROUTES = ("/api/v1/market/catalogue", "/api/v1/data/markets")
 _CATALOGUE_OPERATION = "api.market.catalogue"
 _WATCHLISTS_ROUTE = "/api/v1/watchlists"
 _WATCHLIST_OPERATION = "api.watchlists"
+_SETTINGS_ROUTE = "/api/v1/settings"
+_SETTINGS_MANIFEST_ROUTE = "/api/v1/settings/manifest"
+_SETTINGS_CREDENTIALS_ROUTE = "/api/v1/settings/credentials"
+_SETTINGS_CREDENTIAL_PREFIX = "/api/v1/settings/credentials/"
+_TRADING_PREFIX = "/api/v1/trading"
 _MAX_BODY_BYTES = 65_536
 _PROVIDER_CATALOGUE_SOURCE_ID = CATALOG_INSTRUMENTS_CAPABILITY.identifier
 
@@ -1032,6 +1046,218 @@ async def _serve_watchlists_item(
     )
 
 
+async def _serve_settings(
+    scope: Scope,
+    receive: Receive,
+    send: Send,
+) -> None:
+    """Serve system and user settings backed by data/database/haruquantai.db."""
+    path = str(scope.get("path", ""))
+    method = str(scope.get("method", "GET")).upper()
+    request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
+    trace_id = _header(scope, "x-trace-id")
+
+    if path == _SETTINGS_ROUTE:
+        if method == "GET":
+            data = get_system_settings()
+            await _send_json(
+                send,
+                HTTPStatus.OK,
+                ApiResponse(
+                    status="success",
+                    message=HTTPStatus.OK.phrase,
+                    data=data,
+                    metadata=_metadata(
+                        request_id,
+                        path,
+                        "api.settings.read",
+                        "read",
+                        False,
+                        None,
+                        trace_id,
+                    ),
+                ),
+            )
+            return
+        if method == "PUT":
+            body = await _read_json_body(receive)
+            settings_delta = body.get("settings", {}) if isinstance(body, dict) else {}
+            data = update_system_settings(settings_delta)
+            await _send_json(
+                send,
+                HTTPStatus.OK,
+                ApiResponse(
+                    status="success",
+                    message=HTTPStatus.OK.phrase,
+                    data=data,
+                    metadata=_metadata(
+                        request_id,
+                        path,
+                        "api.settings.update",
+                        "write",
+                        False,
+                        None,
+                        trace_id,
+                    ),
+                ),
+            )
+            return
+    elif path == _SETTINGS_MANIFEST_ROUTE and method == "GET":
+        manifest_data = get_settings_manifest()
+        await _send_json(
+            send,
+            HTTPStatus.OK,
+            ApiResponse(
+                status="success",
+                message=HTTPStatus.OK.phrase,
+                data=manifest_data,
+                metadata=_metadata(
+                    request_id,
+                    path,
+                    "api.settings.manifest",
+                    "read",
+                    False,
+                    None,
+                    trace_id,
+                ),
+            ),
+        )
+        return
+    elif path == _SETTINGS_CREDENTIALS_ROUTE and method == "GET":
+        credentials_data = get_credentials_status()
+        await _send_json(
+            send,
+            HTTPStatus.OK,
+            ApiResponse(
+                status="success",
+                message=HTTPStatus.OK.phrase,
+                data=credentials_data,
+                metadata=_metadata(
+                    request_id,
+                    path,
+                    "api.settings.credentials.read",
+                    "read",
+                    False,
+                    None,
+                    trace_id,
+                ),
+            ),
+        )
+        return
+    elif path.startswith(_SETTINGS_CREDENTIAL_PREFIX) and method == "PUT":
+        slot = path[len(_SETTINGS_CREDENTIAL_PREFIX) :].strip()
+        body = await _read_json_body(receive)
+        material = body.get("material", {}) if isinstance(body, dict) else {}
+        updated_slot = update_credential_slot(slot, material)
+        await _send_json(
+            send,
+            HTTPStatus.OK,
+            ApiResponse(
+                status="success",
+                message=HTTPStatus.OK.phrase,
+                data=updated_slot,
+                metadata=_metadata(
+                    request_id,
+                    path,
+                    "api.settings.credentials.update",
+                    "write",
+                    False,
+                    None,
+                    trace_id,
+                ),
+            ),
+        )
+        return
+
+    await _send_error(
+        send,
+        HTTPStatus.METHOD_NOT_ALLOWED,
+        "METHOD_NOT_ALLOWED",
+        f"Method {method} is not supported on {path}.",
+        path,
+        "api.settings",
+        trace_id,
+    )
+
+
+async def _serve_trading(
+    registry: ServiceRegistry,
+    scope: Scope,
+    _receive: Receive,
+    send: Send,
+) -> None:
+    """Serve trading operations via OPERATE_TRADING_CAPABILITY."""
+    path = str(scope.get("path", ""))
+    method = str(scope.get("method", "GET")).upper()
+    request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
+    trace_id = _header(scope, "x-trace-id")
+
+    gateway = await _resolve_gateway(
+        registry,
+        OPERATE_TRADING_CAPABILITY,
+        "The trading operations capability has no active provider.",
+        path,
+        "api.trading",
+        request_id,
+        trace_id,
+        send,
+    )
+    if gateway is None:
+        return
+
+    operation: Literal[
+        "MANAGE_SESSION",
+        "READINESS",
+        "PREVIEW_ACTION",
+        "EMERGENCY",
+        "MARKET_DATA",
+        "OPERATOR_ANALYTICS",
+    ] = "READINESS"
+    if "session" in path:
+        operation = "MANAGE_SESSION"
+    elif "order" in path or "position" in path:
+        operation = "PREVIEW_ACTION"
+
+    request = OperateTradingRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation=operation,
+    )
+    result = await gateway.operate_trading(request)
+    if isinstance(result, InterfaceFailure):
+        await _send_error(
+            send,
+            HTTPStatus.SERVICE_UNAVAILABLE
+            if result.code == "CAPABILITY_UNAVAILABLE"
+            else HTTPStatus.BAD_REQUEST,
+            result.code,
+            result.problem.detail,
+            path,
+            "api.trading",
+            trace_id,
+        )
+        return
+
+    await _send_json(
+        send,
+        HTTPStatus.OK,
+        ApiResponse(
+            status="success",
+            message=HTTPStatus.OK.phrase,
+            data=result.model_dump(mode="json"),
+            metadata=_metadata(
+                request_id,
+                path,
+                "api.trading",
+                "read" if method == "GET" else "write",
+                False,
+                None,
+                trace_id,
+            ),
+        ),
+    )
+
+
 async def _lifespan(receive: Receive, send: Send) -> None:
     """Answer the ASGI lifespan protocol without owning feature state.
 
@@ -1064,6 +1290,12 @@ async def _dispatch(
     """
     path = str(scope.get("path", ""))
     method = str(scope.get("method", "GET")).upper()
+    if path.startswith(_SETTINGS_ROUTE):
+        await _serve_settings(scope, receive, send)
+        return
+    if path.startswith(_TRADING_PREFIX):
+        await _serve_trading(registry, scope, receive, send)
+        return
     if path == _WATCHLISTS_ROUTE and method in ("GET", "POST"):
         await _serve_watchlists_collection(registry, scope, receive, send)
         return
