@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { apiClients, unwrapData, type StreamEvent } from "../../clients";
+import { ApiClientError, apiClients, unwrapData, type StreamEvent } from "../../clients";
 
 export type SnapshotStatus =
   | "connecting"
@@ -24,6 +24,18 @@ interface MarketSnapshotState {
   readonly error: string | null;
 }
 
+/** Lifecycle options owned by the FEAT-UI-25 feature adapter. */
+export interface MarketSnapshotsOptions {
+  /** Explicit symbol set; empty/undefined derives from system settings. */
+  readonly symbols?: readonly string[];
+  /** First reconnect delay in milliseconds (exponential backoff base). */
+  readonly initialRetryMs?: number;
+  /** Reconnect backoff ceiling in milliseconds. */
+  readonly maxRetryMs?: number;
+  /** When false the widget performs no transport activity at all. */
+  readonly enabled?: boolean;
+}
+
 const INITIAL_RETRY_MS = 1_000;
 const MAX_RETRY_MS = 10_000;
 
@@ -42,8 +54,17 @@ function mapSnapshotEvent(event: StreamEvent): MarketSnapshotView | null {
   };
 }
 
-/** Consume configured MT5 snapshots through HaruQuantAI's authenticated SSE client. */
-export function useMarketSnapshots(): MarketSnapshotState {
+/**
+ * Consume configured MT5 snapshots through HaruQuantAI's authenticated
+ * SSE client. The FEAT-UI-25 feature adapter owns the lifecycle options;
+ * this hook owns presentation-safe reconnect and gap state only.
+ */
+export function useMarketSnapshots(
+  options: MarketSnapshotsOptions = {},
+): MarketSnapshotState {
+  const { symbols, enabled = true } = options;
+  const initialRetryMs = options.initialRetryMs ?? INITIAL_RETRY_MS;
+  const maxRetryMs = options.maxRetryMs ?? MAX_RETRY_MS;
   const [snapshot, setSnapshot] = useState<MarketSnapshotView | null>(null);
   const [status, setStatus] = useState<SnapshotStatus>("connecting");
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +82,10 @@ export function useMarketSnapshots(): MarketSnapshotState {
   }, []);
 
   useEffect(() => {
+    if (!enabled) {
+      setStatus("connecting");
+      return undefined;
+    }
     if (!isDocumentVisible) {
       setStatus("disconnected");
       return undefined;
@@ -69,44 +94,65 @@ export function useMarketSnapshots(): MarketSnapshotState {
     let controller: AbortController | null = null;
     let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
+    const resolveSymbols = async (): Promise<string[] | null> => {
+      if (symbols && symbols.length > 0) return [...symbols];
+      const settings = unwrapData(await apiClients.settings.readSystem());
+      const settingsSymbols = (settings.settings.MT5_SNAPSHOT_SYMBOLS ?? "")
+        .split(",")
+        .map((symbol) => symbol.trim())
+        .filter(Boolean);
+      return settingsSymbols.length > 0 ? settingsSymbols : null;
+    };
+
+    const consume = async (
+      activeController: AbortController,
+      streamSymbols: string[],
+    ): Promise<void> => {
+      for await (const event of apiClients.data.snapshotStream(
+        [...streamSymbols],
+        {
+          signal: activeController.signal,
+        },
+      )) {
+        if (stopped) return;
+        const mapped = mapSnapshotEvent(event);
+        if (!mapped) continue;
+        retryRef.current = 0;
+        setSnapshot(mapped);
+        setStatus("connected");
+        setError(null);
+      }
+    };
+
     const connect = async (): Promise<void> => {
       if (stopped) return;
       setStatus("connecting");
-      controller = new AbortController();
+      const activeController = new AbortController();
+      controller = activeController;
       try {
-        const settings = unwrapData(await apiClients.settings.readSystem());
-        const symbols = (settings.settings.MT5_SNAPSHOT_SYMBOLS ?? "")
-          .split(",")
-          .map((symbol) => symbol.trim())
-          .filter(Boolean);
-        if (symbols.length === 0) {
+        const streamSymbols = await resolveSymbols();
+        if (streamSymbols === null) {
           setStatus("unavailable");
           setError("MT5 snapshot symbols are not configured.");
           return;
         }
-
-        for await (const event of apiClients.data.snapshotStream(symbols, {
-          signal: controller.signal,
-        })) {
-          if (stopped) return;
-          const mapped = mapSnapshotEvent(event);
-          if (!mapped) continue;
-          retryRef.current = 0;
-          setSnapshot(mapped);
-          setStatus("connected");
-          setError(null);
-        }
+        await consume(activeController, streamSymbols);
         if (!stopped) setStatus("disconnected");
-      } catch {
-        if (stopped || controller.signal.aborted) return;
-        setStatus("disconnected");
-        setError("The MT5 snapshot stream is unavailable.");
+      } catch (cause) {
+        if (stopped || activeController.signal.aborted) return;
+        if (cause instanceof ApiClientError && cause.status === 503) {
+          setStatus("unavailable");
+          setError("The market ticks gateway is unavailable.");
+        } else {
+          setStatus("disconnected");
+          setError("The MT5 snapshot stream is unavailable.");
+        }
       }
 
       if (stopped) return;
       const delay = Math.min(
-        MAX_RETRY_MS,
-        INITIAL_RETRY_MS * 2 ** Math.min(retryRef.current, 4),
+        maxRetryMs,
+        initialRetryMs * 2 ** Math.min(retryRef.current, 4),
       );
       retryRef.current += 1;
       retryTimer = setTimeout(() => void connect(), delay);
@@ -118,7 +164,7 @@ export function useMarketSnapshots(): MarketSnapshotState {
       controller?.abort();
       if (retryTimer !== null) clearTimeout(retryTimer);
     };
-  }, [isDocumentVisible]);
+  }, [isDocumentVisible, symbols, initialRetryMs, maxRetryMs, enabled]);
 
   return { snapshot, status, error };
 }

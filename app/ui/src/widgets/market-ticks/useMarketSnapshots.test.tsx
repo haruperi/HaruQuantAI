@@ -1,6 +1,8 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ApiClientError } from "../../clients";
+
 import { useMarketSnapshots } from "./useMarketSnapshots";
 
 const { readSystemMock, snapshotStreamMock } = vi.hoisted(() => ({
@@ -9,6 +11,18 @@ const { readSystemMock, snapshotStreamMock } = vi.hoisted(() => ({
 }));
 
 vi.mock("../../clients", () => ({
+  ApiClientError: class ApiClientError extends Error {
+    public constructor(
+      config: { message: string; status: number; code: string },
+    ) {
+      super(config.message);
+      this.name = "ApiClientError";
+      this.status = config.status;
+      this.code = config.code;
+    }
+    public readonly status: number;
+    public readonly code: string;
+  },
   apiClients: {
     settings: { readSystem: readSystemMock },
     data: { snapshotStream: snapshotStreamMock },
@@ -100,5 +114,66 @@ describe("useMarketSnapshots — FR-UI-186/187/190", () => {
     });
     act(() => document.dispatchEvent(new Event("visibilitychange")));
     await waitFor(() => expect(snapshotStreamMock).toHaveBeenCalledTimes(2));
+  });
+
+  it("uses configured symbols without reading system settings", async () => {
+    snapshotStreamMock.mockImplementation(async function* () {
+      yield {
+        sequence: 1,
+        payload: {
+          source_id: "demo",
+          gap: 0,
+          stale: false,
+          quotes: [],
+        },
+      };
+      await new Promise(() => {});
+    });
+
+    const { result, unmount } = renderHook(() =>
+      useMarketSnapshots({ symbols: ["EURUSD"] }),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe("connected"));
+    expect(readSystemMock).not.toHaveBeenCalled();
+    expect(snapshotStreamMock).toHaveBeenCalledWith(
+      ["EURUSD"],
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
+    unmount();
+  });
+
+  it("reports the explicit unavailable state on a 503 gateway absence", async () => {
+    readSystemMock.mockResolvedValue({
+      data: { settings: { MT5_SNAPSHOT_SYMBOLS: "EURUSD" } },
+    });
+    snapshotStreamMock.mockImplementation(() => {
+      throw new ApiClientError({
+        message: "HTTP 503 opening stream",
+        status: 503,
+        code: "UPSTREAM_UNAVAILABLE",
+      });
+    });
+
+    const { result, unmount } = renderHook(() =>
+      useMarketSnapshots({ initialRetryMs: 60_000, maxRetryMs: 60_000 }),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe("unavailable"));
+    expect(result.current.error).toBe(
+      "The market ticks gateway is unavailable.",
+    );
+    unmount();
+  });
+
+  it("performs no transport activity while disabled", async () => {
+    const { result, unmount } = renderHook(() =>
+      useMarketSnapshots({ enabled: false }),
+    );
+
+    expect(result.current.status).toBe("connecting");
+    expect(readSystemMock).not.toHaveBeenCalled();
+    expect(snapshotStreamMock).not.toHaveBeenCalled();
+    unmount();
   });
 });

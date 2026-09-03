@@ -10,7 +10,7 @@
 import React from 'react';
 
 import { MarketsWidget } from '../../widgets/markets';
-import { MarketTicksTableWidget } from '../../widgets/market-ticks';
+import { MarketTicksFeature } from '../../widgets/market-ticks';
 import { WatchlistWidget } from '../../widgets/watchlists';
 import { ChartWidget } from '../../widgets/chart';
 import { OptionsGridWidget } from '../../widgets/instrument-panels';
@@ -40,7 +40,7 @@ export const WidgetContentHost: React.FC<{ widget: Widget }> = ({ widget }) => {
     case 'markets':
       return <MarketsWidget />;
     case 'marketTicks':
-      return <MarketTicksTableWidget />;
+      return <MarketTicksFeature />;
     case 'watchlist':
       return <WatchlistWidget />;
     case 'chart':

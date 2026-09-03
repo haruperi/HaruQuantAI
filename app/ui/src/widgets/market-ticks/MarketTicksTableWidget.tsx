@@ -3,7 +3,15 @@
 import { useMemo } from "react";
 
 import styles from "./market-ticks.module.css";
-import { useMarketSnapshots } from "./useMarketSnapshots";
+import type { MarketSnapshotView, SnapshotStatus } from "./useMarketSnapshots";
+
+/** Presentation props owned by the FEAT-UI-25 feature adapter. */
+export interface MarketTicksPresentationProps {
+  readonly snapshot: MarketSnapshotView | null;
+  readonly status: SnapshotStatus;
+  readonly error: string | null;
+  readonly staleRowAfterSeconds: number;
+}
 
 function formatAge(ageMs: number): string {
   if (ageMs < 0) return `${Math.abs(ageMs)} ms future`;
@@ -11,36 +19,49 @@ function formatAge(ageMs: number): string {
   return `${(ageMs / 1_000).toFixed(1)} s`;
 }
 
-function formatPrice(value: unknown, digits: number): string {
-  if (value === null || value === undefined) return "—";
-  const numeric = Number(value);
-  return Number.isFinite(numeric) ? numeric.toFixed(digits) : "—";
+/** Render one wire value exactly as served; never invent a price. */
+function formatWireValue(value: unknown): string {
+  return typeof value === "string" && value.length > 0 ? value : "—";
 }
 
-function formatSpreadPoints(value: unknown, digits: number): string {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric) || numeric <= 0) return "0";
-  return String(Math.round(numeric * 10 ** digits));
+/** Decimal places of one wire price string. */
+function decimalScale(value: unknown): number {
+  if (typeof value !== "string") return 0;
+  const match = /\.(\d+)$/.exec(value);
+  return match === null ? 0 : match[1].length;
 }
 
-/** Like-for-like diagnostic view of the one-second MT5 snapshot stream. */
-export function MarketTicksTableWidget(): React.JSX.Element {
-  const { snapshot, status, error } = useMarketSnapshots();
+/** Spread derived arithmetically from the served bid/ask pair. */
+function formatSpread(bid: unknown, ask: unknown): string {
+  if (typeof bid !== "string" || typeof ask !== "string") return "—";
+  const bidNumber = Number(bid);
+  const askNumber = Number(ask);
+  if (!Number.isFinite(bidNumber) || !Number.isFinite(askNumber)) return "—";
+  return (askNumber - bidNumber).toFixed(
+    Math.max(decimalScale(bid), decimalScale(ask)),
+  );
+}
+
+/** Focused presentation of the latest market tick observations. */
+export function MarketTicksTableWidget({
+  snapshot,
+  status,
+  error,
+  staleRowAfterSeconds,
+}: MarketTicksPresentationProps): React.JSX.Element {
   const rows = useMemo(
     () =>
       (snapshot?.quotes ?? []).map((quote) => {
-        const timestamp = String(quote.time ?? "");
+        const timestamp = String(quote.timestamp ?? "");
         const tickTime = new Date(timestamp);
         const ageMs = Number.isNaN(tickTime.getTime())
           ? 0
           : Date.now() - tickTime.getTime();
         return {
           symbol: String(quote.symbol ?? ""),
-          digits: Number(quote.digits ?? 5),
           bid: quote.bid,
           ask: quote.ask,
-          spread: quote.spread,
-          last: quote.last,
+          spread: formatSpread(quote.bid, quote.ask),
           tickTime,
           ageMs,
         };
@@ -79,22 +100,23 @@ export function MarketTicksTableWidget(): React.JSX.Element {
           <thead>
             <tr>
               <th>Source</th><th>Symbol</th><th>Bid</th><th>Ask</th>
-              <th>Spread (pts)</th><th>Last</th><th>Broker tick time</th>
+              <th>Spread</th><th>Broker tick time</th>
               <th>Age</th><th>Status</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => {
               const future = row.ageMs < 0;
-              const stale = snapshot?.stale === true || row.ageMs > 5_000;
+              const stale =
+                snapshot?.stale === true ||
+                row.ageMs > staleRowAfterSeconds * 1_000;
               return (
                 <tr key={`${snapshot?.sourceId}:${row.symbol}`}>
                   <td>{snapshot?.sourceId}</td>
                   <td className={styles.symbol}>{row.symbol}</td>
-                  <td className={styles.number}>{formatPrice(row.bid, row.digits)}</td>
-                  <td className={styles.number}>{formatPrice(row.ask, row.digits)}</td>
-                  <td className={styles.number}>{formatSpreadPoints(row.spread, row.digits)}</td>
-                  <td className={styles.number}>{formatPrice(row.last, row.digits)}</td>
+                  <td className={styles.number}>{formatWireValue(row.bid)}</td>
+                  <td className={styles.number}>{formatWireValue(row.ask)}</td>
+                  <td className={styles.number}>{row.spread}</td>
                   <td><time dateTime={row.tickTime.toISOString()}>{row.tickTime.toLocaleTimeString()}</time></td>
                   <td>{formatAge(row.ageMs)}</td>
                   <td>
@@ -106,7 +128,7 @@ export function MarketTicksTableWidget(): React.JSX.Element {
               );
             })}
             {rows.length === 0 ? (
-              <tr><td className={styles.empty} colSpan={9}>No MT5 snapshots received yet. Start or attach the EA.</td></tr>
+              <tr><td className={styles.empty} colSpan={8}>No MT5 snapshots received yet. Start or attach the EA.</td></tr>
             ) : null}
           </tbody>
         </table>

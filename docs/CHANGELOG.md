@@ -2,6 +2,38 @@
 
 ## [Unreleased]
 
+### Migrate Market Ticks to the full D-UI feature shape
+
+`FEAT-UI-25` is the first widget migrated to the D-UI model of the
+feature pipeline (§4.8): it now carries a typed `manifest.ts`, strict
+`config.ts`, and a `feature.tsx` lifecycle adapter, while
+`MarketTicksTableWidget.tsx` remains focused presentation with no
+transport. The presentation renders the ratified observation wire values
+(symbol, timestamp, bid, ask) exactly as served, derives spread
+arithmetically, and reports stale rows from the configured threshold.
+An absent gateway (HTTP 503) now renders an explicit `unavailable`
+state — distinct from transient disconnection — and recovers
+automatically when the gateway returns; invalid widget configuration is
+rejected loudly instead of partially applied.
+
+#### Added (5)
+
+- Added the shared typed `WidgetManifest` contracts in
+  `src/types/widget-manifest.ts` (support types only; no registry).
+- Added `manifest.ts` declaring `FEAT-UI-25`, required
+  `interfaces.observe-market-data@1`, optional
+  `data.stream-market-events@1`, placement/dimensions, the adopted SSE
+  subscription, effects, accessibility, and removal semantics.
+- Added strict `config.ts` (symbol set, freshness thresholds, reconnect
+  bounds, persisted-state schema version) where unknown fields throw.
+- Added `feature.tsx` owning configuration lifecycle, subscription
+  start/cancel/exact disposal, and the availability response;
+  `WidgetContentHost` now renders the feature adapter.
+- Added manifest/config/feature tests (31 widget tests total) covering
+  active, unavailable (503 and unconfigured), recovery, invalid-config,
+  unmount disposal, hidden-document suspension, and workspace-host
+  registration.
+
 ### Add the Market Ticks D-IFACE vertical slice
 
 `FEAT-IFACE-OBSERVE_MARKET_DATA` is the first read-only vertical slice of
