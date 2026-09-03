@@ -2,6 +2,33 @@
 
 ## [Unreleased]
 
+### Add the D-IFACE interfaces domain and API/event transport foundation
+
+The external boundary is re-established as composable D-IFACE features under
+`app/services/interfaces/` instead of restoring the deleted monolithic
+gateway. The first feature, `FEAT-IFACE-SERVE_API_EVENTS`, implements the
+ratified `interfaces.serve-api-events@1` capability: API version
+negotiation, OpenAPI manifest projection, compatibility and deprecation
+reporting, optimistic concurrency validation, idempotent mutation
+deduplication, asynchronous job references, artifact download validation,
+and the bounded SSE event buffer with replay cursors and retention expiry.
+
+#### Added (5)
+
+- Added the `interfaces` service domain package with its owning README
+  (purpose, MAY/MAY NOT boundary, feature registry, capability map,
+  HTTP/SSE responsibilities, dependency direction, removal semantics).
+- Added the `serve_api_events` feature package (`manifest.py`, `config.py`,
+  `http.py`, `sse.py`, `transport.py`, `feature.py`) with strict
+  configuration parsing and one bounded executable usage harness.
+- Added capability-absence translation to the stable
+  `CAPABILITY_UNAVAILABLE` `InterfaceFailure` result with no mutation.
+- Added feature-local config/manifest/feature/http/sse tests plus
+  capability-withdrawal and structural architecture tests for the domain.
+- Registered the `interfaces-serve-api-events` entry point and extended
+  `scripts/architecture_check.py` active-domain rules to `interfaces`
+  (init purity, managed tasks, feature independence).
+
 ### Add the QuantDataManager source feature and sync refresh
 
 FEAT-DATA-15 reads QuantDataManager `.dat` history directly with a Numba

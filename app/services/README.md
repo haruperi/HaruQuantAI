@@ -22,6 +22,7 @@ The `app/services/` layer houses all backend domain capabilities of HaruQuantAI.
 |---|---|:---:|---:|---|
 | `Brokers` | [`app/services/brokers`](brokers/README.md) | **B** | 13 | Direct passthrough connections to external broker & market-data platforms |
 | `Data` | [`app/services/data`](data/README.md) | **B** | 15 | Acquisition, normalization, historical storage, and streaming feeds |
+| `Interfaces` | [`app/services/interfaces`](interfaces/README.md) | **B** | 1 | Capability-aware external HTTP/SSE/automation boundary features (D-IFACE) |
 | `Indicators` | [`app/services/indicators`](indicators/README.md) | **A** | 12 | Deterministic, pure-function technical and statistical indicator calculations |
 | `Strategy` | [`app/services/strategy`](strategy/README.md) | **B** | 20 | Signal generation, trade intent formulation, and playbook evaluation |
 | `Risk` | [`app/services/risk`](risk/README.md) | **C** | 17 | Master gate governance: exposure validation, drawdown guard, and kill switches |
@@ -67,6 +68,7 @@ The following table catalogues all **184 service features** across the 12 domain
 | **Data** | `FEAT-DATA-13` Runtime Stores & Migration | `data.persistence@1` | `utils.settings@1` | `utils.logging@1` | Shared SQLite database infrastructure and migration engine become unavailable |
 | **Data** | `FEAT-DATA-14` Replay Packages | `data.replay-packages@1` | `data.storage@1` | `—` | Deterministic historical market replay packages become unavailable |
 | **Data** | `FEAT-DATA-15` Market Calendar & Hours | `data.calendar@1` | `utils.time@1` | `—` | Exchange trading session, holiday calendar, and market hour checks fail closed |
+| **Interfaces** | `FEAT-IFACE-SERVE_API_EVENTS` API & Event Transport | `interfaces.serve-api-events@1` | `—` | `—` | API versioning, OpenAPI manifests, SSE replay cursors, idempotent mutations, async jobs, and artifact downloads become unavailable at the external boundary |
 | **Indicators** | `FEAT-INDI-01` Contracts & Discovery | `indicator.registry@1` | `—` | `utils.logging@1` | Indicator catalog registration and formula discovery become unavailable |
 | **Indicators** | `FEAT-INDI-02` Trend Indicators | `indicator.trend@1` | `data.market-data@1` | `—` | EMA, SMA, WMA, MACD, and Supertrend calculations become unavailable |
 | **Indicators** | `FEAT-INDI-03` Momentum Oscillators | `indicator.momentum@1` | `data.market-data@1` | `—` | RSI, Williams %R, and Stochastic oscillator calculations become unavailable |
@@ -299,6 +301,18 @@ The following table catalogues all **184 service features** across the 12 domain
 - **Feature Count:** 28 registered features
 - **Core Mandate:** FastAPI composition gateway exposing authenticated HTTP and SSE boundaries
 - **Detailed Registry:** See full specification in [`app/services/api/README.md`](api/README.md).
+
+> **Superseded:** the `app/services/api` package was deleted (commit `4fef8b61`).
+> Its rows remain only as historical registry evidence; the current external
+> boundary is the Interfaces (D-IFACE) domain in §4.13, and the remaining stale
+> rows in this README are tracked for reconciliation in
+> `docs/dev/iface-ui-migration/phase-0-baseline-reconciliation.md`.
+
+### 4.13 Interfaces (`app/services/interfaces`)
+- **Removability Tier:** `B` (Swappable Provider)
+- **Feature Count:** 1 registered feature
+- **Core Mandate:** Capability-aware external boundary (D-IFACE) gateways exposing HTTP, SSE, CLI, and MCP surfaces over public contracts without owning business logic
+- **Detailed Registry:** See full specification in [`app/services/interfaces/README.md`](interfaces/README.md).
 
 ---
 

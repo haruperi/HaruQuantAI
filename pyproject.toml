@@ -64,6 +64,7 @@ data-realtime-market-events = "app.services.data.realtime_market_events.feature:
 data-run-data-binding = "app.services.data.run_data_binding.feature:feature"
 data-synthetic-scenario-series = "app.services.data.synthetic_scenario_series.feature:feature"
 data-tick-normalization = "app.services.data.tick_normalization.feature:feature"
+interfaces-serve-api-events = "app.services.interfaces.serve_api_events.feature:feature"
 
 # ============================================================================
 # Ruff Configuration (Formatting, Linting, Import Sorting, Security, Complexity)

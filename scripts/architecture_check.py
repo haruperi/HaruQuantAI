@@ -45,7 +45,14 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             return
 
         active_roots = {"kernel", "composition", "contracts"}
-        active_services = {"workspace", "catalogue", "plugins", "brokers", "data"}
+        active_services = {
+            "workspace",
+            "catalogue",
+            "plugins",
+            "brokers",
+            "data",
+            "interfaces",
+        }
         min_service_parts = 3
         is_active = (len(self.app_parts) > 1 and self.app_parts[1] in active_roots) or (
             len(self.app_parts) >= min_service_parts
@@ -95,6 +102,7 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             "plugins",
             "brokers",
             "data",
+            "interfaces",
         }
         min_service_parts = 3
         is_active_service = (
@@ -182,6 +190,7 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                     "plugins",
                     "brokers",
                     "data",
+                    "interfaces",
                 }
                 if source_domain in active_migrated_domains:
                     source_feature = self.app_parts[srv_idx + FEATURE_OFFSET]
