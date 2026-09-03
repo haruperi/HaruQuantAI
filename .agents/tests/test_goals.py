@@ -161,27 +161,6 @@ def test_current_table_tracker_selects_pending_and_partial_rows(
     ]
 
 
-def test_repository_implementation_order_is_goal_parseable(
-    orc: ModuleType,
-) -> None:
-    goal = _load_goal_engine(orc)
-    tracker = orc.REPO_ROOT / "docs" / "dev" / "IMPLEMENTATION_ORDER.md"
-    entries = goal.parse_entries(tracker)
-
-    assert "P.001" in entries
-    assert "16.5" in entries
-
-    open_entries = [k for k, v in entries.items() if not goal.is_entry_complete(v)]
-    if open_entries:
-        selected = goal.resolve_goal_entries(_spec(selection_type="all_open"), entries)
-        assert all(entry_id in entries for entry_id in selected)
-        assert all(not entries[entry_id]["done"] for entry_id in selected)
-        assert "P.001" not in selected
-    else:
-        with pytest.raises(goal.OrchestratorError, match="zero executable child Tasks"):
-            goal.resolve_goal_entries(_spec(selection_type="all_open"), entries)
-
-
 def test_unknown_explicit_entry_fails_closed(orc: ModuleType, tmp_path: Path) -> None:
     goal = _load_goal_engine(orc)
     entries = goal.parse_entries(_tracker(tmp_path / "tracker.md"))

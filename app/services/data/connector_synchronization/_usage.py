@@ -437,7 +437,8 @@ async def _run_additional_provider_examples() -> None:
     res_caching = example_caching()
     print(f"  * example_caching: plan_id={res_caching.plan_id}")
     res_sched = await example_scheduler_create_status()
-    print(f"  * example_scheduler_create_status: plan_id={res_sched.plan.plan_id}")
+    sched_plan_id = res_sched.plan.plan_id if res_sched.plan else "none"
+    print(f"  * example_scheduler_create_status: plan_id={sched_plan_id}")
     res_sched_cycle = example_scheduler_start_stop()
     print(f"  * example_scheduler_start_stop: receipt_id={res_sched_cycle.receipt_id}")
 

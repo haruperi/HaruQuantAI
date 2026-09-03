@@ -238,7 +238,6 @@ Safe read/verification commands include `pwd`, `ls`, `cat`, `grep`, `git status`
 - `docs/ARCHITECTURE.md`: universal structural/runtime/database conventions.
 - `docs/PROJECT.md`: product/system scope, domain index, cross-domain relationships and NFRs.
 - `AGENTS.md`: shared contributor/workflow constitution.
-- `docs/dev/IMPLEMENTATION_ORDER.md`: delivery sequencing.
 - `docs/dev/feature_implementation_pipeline.md`: feature delivery architecture/checklist.
 - `docs/templates/prompt/`: complete canonical role-specific workflow contracts.
 - `.agents/GOALS.md`: deterministic Goal supervision and operating contract.

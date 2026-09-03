@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.contracts.common.models import Timeframe, Uuid7
-    from app.services.data.bar_aggregation.bar_aggregation import AggregationSpec
+    from app.contracts.data.models import AggregationSpec
 
 
 class BarAggregationPersistence:

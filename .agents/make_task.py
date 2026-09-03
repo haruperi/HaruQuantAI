@@ -253,8 +253,8 @@ def main() -> int:
     parser.add_argument("entry", nargs="?", help="entry id, e.g. 1.01 or 1.1")
     parser.add_argument(
         "--file",
-        default="docs/dev/IMPLEMENTATION_ORDER.md",
-        help="implementation tracker (default: docs/dev/IMPLEMENTATION_ORDER.md)",
+        default="tracker.md",
+        help="implementation tracker (default: tracker.md)",
     )
     parser.add_argument(
         "--out",

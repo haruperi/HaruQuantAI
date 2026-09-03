@@ -451,6 +451,29 @@ class BrokerOperationsCapability(Protocol):
         """Retrieve historical deals."""
         ...
 
+    def get_bars(
+        self,
+        symbol: str,
+        timeframe: Any = "1m",
+        date_from: Any = None,
+        date_to: Any = None,
+        start_pos: int | None = None,
+        count: int | None = None,
+    ) -> StandardResponse[Any]:
+        """Retrieve historical OHLCV bar rates."""
+        ...
+
+    def get_ticks(
+        self,
+        symbol: str,
+        date_from: Any = None,
+        date_to: Any = None,
+        count: int = 100,
+        flags: int = 0,
+    ) -> StandardResponse[Any]:
+        """Retrieve historical tick records."""
+        ...
+
     def trade(self, request: dict[str, Any]) -> dict[str, Any] | StandardResponse[Any]:
         """Submit a trade order."""
         ...

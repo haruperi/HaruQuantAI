@@ -6,7 +6,7 @@ goal_slug = "strategy-phase"
 goal_name = "Complete Strategy Phase"
 goal_request = "Complete every selected Strategy implementation entry through the normal HaruQuantAI Task workflow."
 child_additional_context = "For every child Task, read the phase coordination plan and update its matching status row with evidence."
-implementation_file = "docs/dev/IMPLEMENTATION_ORDER.md"
+implementation_file = "tracker.md"
 
 # Supported v1 selectors: "entries", "phase", "all_open".
 selection_type = "phase"

@@ -16,5 +16,5 @@ review_focus = "Pay particular attention to physical removability and UI contrac
 
 # Implementation tracker this task completes (optional). The Planner includes marking
 # this entry [x] with evidence among the approved changed paths.
-implementation_file = "docs/dev/IMPLEMENTATION_ORDER.md"
+implementation_file = "tracker.md"
 implementation_entry = "2.8"

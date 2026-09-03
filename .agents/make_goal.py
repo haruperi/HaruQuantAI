@@ -109,7 +109,7 @@ def main() -> int:
     selection.add_argument("--entries", nargs="+")
     selection.add_argument("--phase")
     selection.add_argument("--all-open", action="store_true")
-    parser.add_argument("--file", default="docs/dev/IMPLEMENTATION_ORDER.md")
+    parser.add_argument("--file", default="tracker.md")
     parser.add_argument("--out", default=str(AGENTS_DIR / "goal.toml"))
     parser.add_argument("--goal-id")
     parser.add_argument("--goal-slug")

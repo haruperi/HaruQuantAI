@@ -142,7 +142,7 @@ For a Goal whose children share a coordination plan:
 ```bash
 uv run .agents/make_goal.py \
   --entries 1.8 1.9 1.10 \
-  --file docs/dev/IMPLEMENTATION_ORDER.md \
+  --file tracker.md \
   --listed-order \
   --child-additional-context "Read docs/dev/UI_MIGRATION_PLAN.md; follow sections 6-8 and update the matching section 6 row and section 9 checkbox with evidence."
 ```
