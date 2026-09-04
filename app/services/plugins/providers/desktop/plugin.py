@@ -47,7 +47,7 @@ class _DesktopDeliveryAdapter:
         return NotificationDeliveryResultV1(
             channel="desktop",
             status="accepted",
-            recipient_count=1,
+            recipient_count=None,
         )
 
     def close(self) -> None:

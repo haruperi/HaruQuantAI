@@ -12,7 +12,7 @@ class NotificationDeliveryResultV1:
 
     channel: str
     status: str
-    recipient_count: int = 1
+    recipient_count: int | None = None
 
 
 class NotificationDeliveryCapabilityV1(Protocol):
