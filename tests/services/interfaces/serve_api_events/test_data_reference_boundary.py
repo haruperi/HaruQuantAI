@@ -103,7 +103,7 @@ async def test_data_reference_catalogue_routes(
     brokers_res = await client.get("/api/v1/data/brokers?limit=200")
     assert brokers_res.status_code == 200
     brokers = brokers_res.json()["data"]["brokers"]
-    assert len(brokers) == 9
+    assert len(brokers) == 5
     assert all("customized_instruments" in row for row in brokers)
 
     # Symbol discovery pages with an opaque cursor; the watchlist widget
@@ -181,7 +181,7 @@ async def test_data_reference_sync_and_item_routes(
     assert sync_res.status_code == 200
     summary = sync_res.json()["data"]
     assert summary["series_synced"] == 60
-    assert summary["brokers_synced"] == 9
+    assert summary["brokers_synced"] == 5
     assert summary["instruments_synced"] == 29
     # No live terminal participates; the report says so honestly.
     assert summary["mt5_available"] is False

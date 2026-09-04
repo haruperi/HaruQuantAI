@@ -1,6 +1,6 @@
 """Database-backed trading execution sessions and account profile for D-IFACE.
 
-Interacts with 'trading_sessions' and 'instruments' in haruquantai.db.
+Interacts with 'trading_profiles' and 'instruments' in haruquantai.db.
 """
 
 from __future__ import annotations
@@ -129,7 +129,7 @@ def list_execution_sessions(
     conn = _get_connection(db_path)
     try:
         cur = conn.cursor()
-        sql = "SELECT * FROM trading_sessions WHERE archived_at IS NULL"
+        sql = "SELECT * FROM trading_profiles WHERE archived_at IS NULL"
         params: list[Any] = []
         if principal_id:
             sql += " AND (principal_id = ? OR principal_id = 'usr_haruquantai')"
@@ -148,7 +148,7 @@ def list_execution_sessions(
             pid = principal_id or "usr_haruquantai"
             cur.execute(
                 """
-                INSERT INTO trading_sessions (
+                INSERT INTO trading_profiles (
                     session_id, principal_id, environment_id, name, description,
                     mode, provider, provider_account_ref, credential_ref,
                     simulation_session_id, dataset_ref, dataset_revision,
@@ -281,13 +281,22 @@ def get_instrument_constraints(
         cur.execute(
             """
             SELECT
-                canonical_symbol, digits, tick_size_decimal, min_volume_decimal,
-                max_volume_decimal, volume_step_decimal, contract_size_decimal,
-                quote_currency
+                name AS canonical_symbol,
+                digits,
+                point,
+                spread,
+                trade_contract_size,
+                trade_tick_size,
+                trade_tick_value_profit,
+                trade_tick_value_loss,
+                volume_min,
+                volume_max,
+                volume_step,
+                currency_profit
             FROM instruments
-            WHERE canonical_symbol = ? OR symbol_id = ?
+            WHERE name = ?
             """,
-            (symbol, symbol),
+            (symbol,),
         )
         row = cur.fetchone()
         if row is None:
@@ -321,13 +330,14 @@ def get_instrument_constraints(
             }
 
         digits = int(row["digits"]) if row["digits"] is not None else 5
-        point = 10 ** (-digits)
+        point = float(row["point"]) if row["point"] is not None else 10 ** (-digits)
         pip_size = point * 10.0 if digits in (3, 5) else point
         contract_size = (
-            float(row["contract_size_decimal"])
-            if row["contract_size_decimal"]
+            float(row["trade_contract_size"])
+            if row["trade_contract_size"]
             else _DEFAULT_BALANCE
         )
+        tick_size = float(row["trade_tick_size"]) if row["trade_tick_size"] else point
 
         return {
             "contract_version": "v1",
@@ -335,17 +345,25 @@ def get_instrument_constraints(
             "symbol": str(row["canonical_symbol"]),
             "source_id": "mt5",
             "quantity_unit": "lots",
-            "min_quantity": str(row["min_volume_decimal"] or "0.01"),
-            "max_quantity": str(row["max_volume_decimal"] or "100.0"),
-            "quantity_step": str(row["volume_step_decimal"] or "0.01"),
-            "price_tick": str(row["tick_size_decimal"] or point),
+            "min_quantity": str(row["volume_min"] or "0.01"),
+            "max_quantity": str(row["volume_max"] or "100.0"),
+            "quantity_step": str(row["volume_step"] or "0.01"),
+            "price_tick": str(tick_size),
             "digits": digits,
             "pip_size": pip_size,
-            "trade_tick_size": float(row["tick_size_decimal"] or point),
-            "trade_tick_value_profit": 1.0,
-            "trade_tick_value_loss": 1.0,
+            "trade_tick_size": tick_size,
+            "trade_tick_value_profit": (
+                float(row["trade_tick_value_profit"])
+                if row["trade_tick_value_profit"] is not None
+                else 1.0
+            ),
+            "trade_tick_value_loss": (
+                float(row["trade_tick_value_loss"])
+                if row["trade_tick_value_loss"] is not None
+                else 1.0
+            ),
             "trade_contract_size": contract_size,
-            "profit_currency": str(row["quote_currency"] or "USD"),
+            "profit_currency": str(row["currency_profit"] or "USD"),
             "supported_order_types": ["MARKET", "LIMIT", "STOP", "STOP_LIMIT"],
             "supported_time_in_force": ["IOC", "FOK"],
             "supports_stop_loss": True,
@@ -378,7 +396,7 @@ def set_default_session(
     try:
         cur = conn.cursor()
         cur.execute(
-            "SELECT mode, principal_id FROM trading_sessions WHERE session_id = ?",
+            "SELECT mode, principal_id FROM trading_profiles WHERE session_id = ?",
             (session_id,),
         )
         row = cur.fetchone()
@@ -391,7 +409,7 @@ def set_default_session(
 
         cur.execute(
             """
-            UPDATE trading_sessions
+            UPDATE trading_profiles
             SET is_default = 0, updated_at = ?
             WHERE mode = ? AND principal_id = ?
             """,
@@ -399,7 +417,7 @@ def set_default_session(
         )
         cur.execute(
             """
-            UPDATE trading_sessions
+            UPDATE trading_profiles
             SET is_default = 1, updated_at = ?
             WHERE session_id = ?
             """,
@@ -408,7 +426,7 @@ def set_default_session(
         conn.commit()
 
         cur.execute(
-            "SELECT * FROM trading_sessions WHERE session_id = ?",
+            "SELECT * FROM trading_profiles WHERE session_id = ?",
             (session_id,),
         )
         return _row_to_session_dict(cur.fetchone())
@@ -438,7 +456,7 @@ def start_session(
         now = _utc_now_iso()
         cur.execute(
             """
-            UPDATE trading_sessions
+            UPDATE trading_profiles
             SET lifecycle_state = 'running', is_active = 1,
                 started_at = ?, updated_at = ?
             WHERE session_id = ?
@@ -447,7 +465,7 @@ def start_session(
         )
         conn.commit()
         cur.execute(
-            "SELECT * FROM trading_sessions WHERE session_id = ?",
+            "SELECT * FROM trading_profiles WHERE session_id = ?",
             (session_id,),
         )
         row = cur.fetchone()
@@ -480,7 +498,7 @@ def stop_session(
         now = _utc_now_iso()
         cur.execute(
             """
-            UPDATE trading_sessions
+            UPDATE trading_profiles
             SET lifecycle_state = 'stopped', is_active = 0,
                 stopped_at = ?, updated_at = ?
             WHERE session_id = ?
@@ -489,7 +507,7 @@ def stop_session(
         )
         conn.commit()
         cur.execute(
-            "SELECT * FROM trading_sessions WHERE session_id = ?",
+            "SELECT * FROM trading_profiles WHERE session_id = ?",
             (session_id,),
         )
         row = cur.fetchone()

@@ -44,7 +44,7 @@ def temp_db(tmp_path: Path) -> Path:
     )
     cur.execute(
         """
-        CREATE TABLE sessions (
+        CREATE TABLE user_sessions (
             session_digest TEXT PRIMARY KEY,
             user_id TEXT NOT NULL,
             csrf_digest TEXT NOT NULL,

@@ -66,29 +66,29 @@ def list_market_directory(
         cur = conn.cursor()
         sql = """
             SELECT
-                canonical_symbol AS symbol,
-                coalesce(description, canonical_symbol) AS name,
-                asset_class,
+                name AS symbol,
+                coalesce(description, name) AS name,
+                coalesce(nullif(category, ''), path, 'Forex') AS asset_class,
                 digits,
-                default_spread AS spread
+                spread
             FROM instruments
         """
         params: list[Any] = []
         conditions: list[str] = []
 
         if query and query.strip():
-            conditions.append("(canonical_symbol LIKE ? OR description LIKE ?)")
+            conditions.append("(name LIKE ? OR description LIKE ?)")
             q = f"%{query.strip()}%"
             params.extend([q, q])
 
         if cursor and cursor.strip():
-            conditions.append("canonical_symbol > ?")
+            conditions.append("name > ?")
             params.append(cursor.strip())
 
         if conditions:
             sql += " WHERE " + " AND ".join(conditions)
 
-        sql += " ORDER BY canonical_symbol LIMIT ?"
+        sql += " ORDER BY name LIMIT ?"
         params.append(limit + 1)
 
         cur.execute(sql, params)

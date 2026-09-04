@@ -3,8 +3,8 @@
 Serves the workstation's Data tab, symbol discovery, and chart bar history
 from the hydrated reference tables in data/database/haruquantai.db:
 
-* ``data_series`` - market-data series reference catalogue.
-* ``data_brokers`` - broker profiles with customized-instrument counts.
+* ``data`` - market-data series reference catalogue.
+* ``broker`` - broker profiles with customized-instrument counts.
 * ``instruments`` - instrument specifications.
 * ``data_bars`` - genuine broker-fetched bar history per (symbol, timeframe).
 
@@ -144,11 +144,11 @@ def list_market_series(
     try:
         rows = conn.execute(
             """
-            SELECT series_id, symbol, instrument, filename, broker_id, usymbol,
+            SELECT id, symbol, instrument, filename, broker_id, usymbol,
                    timeframe, timezone, date_from, date_to, row_count, decimals,
                    source, data_type, show, remove_weekends
-            FROM data_series
-            ORDER BY series_id
+            FROM data
+            ORDER BY id
             LIMIT ?
             """,
             (_clamp_limit(limit),),
@@ -164,7 +164,8 @@ def list_market_series(
             )
             series.append(
                 {
-                    "series_id": int(row["series_id"]),
+                    "id": int(row["id"]),
+                    "series_id": int(row["id"]),
                     "symbol": str(row["symbol"]),
                     "instrument": row["instrument"],
                     "document": row["filename"],
@@ -196,10 +197,8 @@ def _broker_name_by_id(conn: sqlite3.Connection) -> dict[int, str]:
         Mapping of broker id to profile display name.
     """
     return {
-        int(row["broker_id"]): str(row["name"])
-        for row in conn.execute(
-            "SELECT broker_id, name FROM data_brokers WHERE broker_id IS NOT NULL"
-        )
+        int(row["id"]): str(row["name"])
+        for row in conn.execute("SELECT id, name FROM broker WHERE id IS NOT NULL")
     }
 
 
@@ -218,37 +217,32 @@ def list_instruments(
     """
     conn = _get_connection(db_path)
     try:
-        names = _broker_name_by_id(conn)
         rows = conn.execute(
             """
-            SELECT symbol_id, description, broker_id, point_value,
-                   contract_size_decimal, tick_size, default_spread,
-                   default_slippage, asset_class, order_size_multiplier,
-                   order_size_step
+            SELECT name, description, point,
+                   trade_contract_size, trade_tick_size, spread,
+                   path, volume_min, volume_step
             FROM instruments
-            ORDER BY symbol_id
+            ORDER BY name
             LIMIT ?
             """,
             (_clamp_limit(limit),),
         ).fetchall()
         instruments: list[dict[str, Any]] = []
         for row in rows:
-            broker_id = _optional_int(row["broker_id"])
             instruments.append(
                 {
-                    "instrument": str(row["symbol_id"]),
+                    "instrument": str(row["name"]),
                     "description": row["description"],
-                    "broker_profile": names.get(broker_id) if broker_id else None,
-                    "point_value": _optional_float(row["point_value"]),
-                    "contract_size": row["contract_size_decimal"],
-                    "tick_size": _optional_float(row["tick_size"]),
-                    "default_spread": _optional_float(row["default_spread"]),
-                    "default_slippage": _optional_float(row["default_slippage"]),
-                    "data_type": row["asset_class"],
-                    "order_size_multiplier": _optional_float(
-                        row["order_size_multiplier"]
-                    ),
-                    "order_size_step": _optional_float(row["order_size_step"]),
+                    "broker_profile": None,
+                    "point_value": _optional_float(row["point"]),
+                    "contract_size": str(row["trade_contract_size"]),
+                    "tick_size": _optional_float(row["trade_tick_size"]),
+                    "default_spread": _optional_float(row["spread"]),
+                    "default_slippage": 0.0,
+                    "data_type": row["path"],
+                    "order_size_multiplier": _optional_float(row["volume_min"]),
+                    "order_size_step": _optional_float(row["volume_step"]),
                 }
             )
         return {"instruments": instruments}
@@ -273,11 +267,12 @@ def list_brokers(
     try:
         rows = conn.execute(
             """
-            SELECT b.broker_id, b.name, b.description, b.postfix, b.mt_timezone,
-                   (SELECT count(*) FROM instruments i
-                    WHERE i.broker_id = b.broker_id) AS customized
-            FROM data_brokers b
-            ORDER BY b.broker_id
+            SELECT b.id AS broker_id, b.name,
+                   COALESCE(b.desc, '') AS description,
+                   COALESCE(b.timezone, 'UTC') AS timezone,
+                   0 AS customized
+            FROM broker b
+            ORDER BY b.id
             LIMIT ?
             """,
             (_clamp_limit(limit),),
@@ -289,8 +284,8 @@ def list_brokers(
                     "broker_id": _optional_int(row["broker_id"]),
                     "name": row["name"],
                     "description": row["description"],
-                    "postfix": row["postfix"],
-                    "timezone": row["mt_timezone"],
+                    "postfix": "",
+                    "timezone": row["timezone"],
                     "customized_instruments": int(row["customized"]),
                 }
             )
@@ -323,18 +318,18 @@ def list_symbols(
     page_size = _clamp_limit(limit)
     conn = _get_connection(db_path)
     try:
-        sql = "SELECT canonical_symbol FROM instruments"
+        sql = "SELECT name AS canonical_symbol FROM instruments"
         conditions: list[str] = []
         params: list[Any] = []
         if query and query.strip():
-            conditions.append("canonical_symbol LIKE ?")
+            conditions.append("name LIKE ?")
             params.append(f"%{query.strip()}%")
         if cursor and cursor.strip():
-            conditions.append("canonical_symbol > ?")
+            conditions.append("name > ?")
             params.append(cursor.strip())
         if conditions:
             sql += " WHERE " + " AND ".join(conditions)
-        sql += " ORDER BY canonical_symbol LIMIT ?"
+        sql += " ORDER BY name LIMIT ?"
         params.append(page_size + 1)
         rows = conn.execute(sql, params).fetchall()
         has_more = len(rows) > page_size
@@ -379,9 +374,8 @@ def list_quotes(
         for symbol in symbols:
             row = conn.execute(
                 """
-                SELECT canonical_symbol, description, asset_class, digits,
-                       default_spread
-                FROM instruments WHERE canonical_symbol = ?
+                SELECT name, description, path, digits, spread
+                FROM instruments WHERE name = ?
                 """,
                 (symbol,),
             ).fetchone()
@@ -389,15 +383,15 @@ def list_quotes(
                 continue
             rows.append(
                 {
-                    "symbol": str(row["canonical_symbol"]),
-                    "name": str(row["description"] or row["canonical_symbol"]),
-                    "asset_class": str(row["asset_class"]),
+                    "symbol": str(row["name"]),
+                    "name": str(row["description"] or row["name"]),
+                    "asset_class": str(row["path"] or "Forex"),
                     "source_id": source_id,
                     "digits": _optional_int(row["digits"]),
                     "last": None,
                     "bid": None,
                     "ask": None,
-                    "spread": _optional_float(row["default_spread"]),
+                    "spread": _optional_float(row["spread"]),
                     "volume": None,
                     "open": None,
                     "high": None,
@@ -568,12 +562,8 @@ def sync_reference(db_path: Path | str | None = None) -> dict[str, Any]:
     """
     conn = _get_connection(db_path)
     try:
-        series_synced = int(
-            conn.execute("SELECT count(*) FROM data_series").fetchone()[0]
-        )
-        brokers_synced = int(
-            conn.execute("SELECT count(*) FROM data_brokers").fetchone()[0]
-        )
+        series_synced = int(conn.execute("SELECT count(*) FROM data").fetchone()[0])
+        brokers_synced = int(conn.execute("SELECT count(*) FROM broker").fetchone()[0])
         instruments_synced = int(
             conn.execute("SELECT count(*) FROM instruments").fetchone()[0]
         )
@@ -591,13 +581,17 @@ def sync_reference(db_path: Path | str | None = None) -> dict[str, Any]:
 _INSTRUMENT_COLUMNS: Final[tuple[str, ...]] = (
     "description",
     "point_value",
+    "point",
     "tick_size",
-    "tick_step",
+    "trade_tick_size",
+    "contract_size",
+    "trade_contract_size",
     "default_spread",
-    "default_slippage",
-    "min_distance",
+    "spread",
     "order_size_multiplier",
+    "volume_min",
     "order_size_step",
+    "volume_step",
 )
 
 
@@ -612,11 +606,10 @@ def _instrument_spec_row(conn: sqlite3.Connection, instrument: str) -> sqlite3.R
     """
     row: sqlite3.Row | None = conn.execute(
         """
-        SELECT symbol_id, description, broker_id, point_value,
-               contract_size_decimal, tick_size, tick_step, default_spread,
-               default_slippage, data_type, order_size_multiplier,
-               order_size_step, min_distance, swap
-        FROM instruments WHERE symbol_id = ?
+        SELECT name, description, point, trade_contract_size,
+               trade_tick_size, spread, path, volume_min, volume_step,
+               swap_long, swap_short, currency_base, currency_profit, digits
+        FROM instruments WHERE name = ?
         """,
         (instrument,),
     ).fetchone()
@@ -627,30 +620,28 @@ def _instrument_spec_row(conn: sqlite3.Connection, instrument: str) -> sqlite3.R
 
 
 def _instrument_spec_projection(
-    conn: sqlite3.Connection, row: sqlite3.Row
+    _conn: sqlite3.Connection, row: sqlite3.Row
 ) -> dict[str, Any]:
     """Project one instrument row into the InstrumentSpec contract shape.
 
     Returns:
         Payload conforming to the InstrumentSpec contract.
     """
-    names = _broker_name_by_id(conn)
-    broker_id = _optional_int(row["broker_id"])
     return {
-        "instrument": str(row["symbol_id"]),
+        "instrument": str(row["name"]),
         "description": row["description"],
-        "broker_profile": names.get(broker_id) if broker_id else None,
-        "point_value": _optional_float(row["point_value"]),
-        "contract_size": row["contract_size_decimal"],
-        "tick_size": _optional_float(row["tick_size"]),
-        "tick_step": _optional_float(row["tick_step"]),
-        "default_spread": _optional_float(row["default_spread"]),
-        "default_slippage": _optional_float(row["default_slippage"]),
-        "data_type": _optional_int(row["data_type"]),
-        "order_size_multiplier": _optional_float(row["order_size_multiplier"]),
-        "order_size_step": _optional_float(row["order_size_step"]),
-        "min_distance": _optional_float(row["min_distance"]),
-        "swap": row["swap"],
+        "broker_profile": None,
+        "point_value": _optional_float(row["point"]),
+        "contract_size": str(row["trade_contract_size"]),
+        "tick_size": _optional_float(row["trade_tick_size"]),
+        "tick_step": _optional_float(row["trade_tick_size"]),
+        "default_spread": _optional_float(row["spread"]),
+        "default_slippage": 0.0,
+        "data_type": row["path"],
+        "order_size_multiplier": _optional_float(row["volume_min"]),
+        "order_size_step": _optional_float(row["volume_step"]),
+        "min_distance": 0.0,
+        "swap": str(row["swap_long"]) if row["swap_long"] is not None else None,
     }
 
 
@@ -678,7 +669,12 @@ def get_instrument_spec(
 
 
 def _parameterized_update(
-    table: str, updates: dict[str, object], key_column: str, key: object
+    table: str,
+    updates: dict[str, object],
+    key_column: str,
+    key: object,
+    *,
+    with_updated_at: bool = True,
 ) -> tuple[str, tuple[object, ...]]:
     """Build one parameterized UPDATE statement from a column whitelist.
 
@@ -690,6 +686,7 @@ def _parameterized_update(
         updates: Whitelisted column-to-value updates.
         key_column: Key column for the WHERE clause.
         key: Key value for the WHERE clause.
+        with_updated_at: Whether to update updated_at timestamp.
 
     Returns:
         SQL string and bound parameter tuple.
@@ -697,11 +694,17 @@ def _parameterized_update(
     assignments = ", ".join(f"{column} = ?" for column in updates)
     # Table, column, and key names are module-owned compile-time constants;
     # every request-derived value binds through a parameter placeholder.
+    if with_updated_at:
+        sql = (
+            f"UPDATE {table} SET {assignments}, updated_at = ? "  # noqa: S608
+            f"WHERE {key_column} = ?"
+        )
+        return sql, (*updates.values(), _utc_now_iso(), key)
     sql = (
-        f"UPDATE {table} SET {assignments}, updated_at = ? "  # noqa: S608
+        f"UPDATE {table} SET {assignments} "  # noqa: S608
         f"WHERE {key_column} = ?"
     )
-    return sql, (*updates.values(), _utc_now_iso(), key)
+    return sql, (*updates.values(), key)
 
 
 def _apply_instrument_fields(
@@ -709,12 +712,27 @@ def _apply_instrument_fields(
 ) -> None:
     """Apply optional spec fields from one update body to an instrument row."""
     updates: dict[str, object] = {}
-    for column in _INSTRUMENT_COLUMNS:
-        if column in body and body[column] is not None:
-            updates[column] = body[column]
+    field_mapping = {
+        "description": "description",
+        "default_spread": "spread",
+        "spread": "spread",
+        "point_value": "point",
+        "point": "point",
+        "tick_size": "trade_tick_size",
+        "trade_tick_size": "trade_tick_size",
+        "contract_size": "trade_contract_size",
+        "trade_contract_size": "trade_contract_size",
+        "order_size_multiplier": "volume_min",
+        "volume_min": "volume_min",
+        "order_size_step": "volume_step",
+        "volume_step": "volume_step",
+    }
+    for field, col in field_mapping.items():
+        if field in body and body[field] is not None:
+            updates[col] = body[field]
     if updates:
         sql, params = _parameterized_update(
-            "instruments", updates, "symbol_id", instrument
+            "instruments", updates, "name", instrument, with_updated_at=False
         )
         conn.execute(sql, params)
 
@@ -746,7 +764,7 @@ def update_market_series(
     try:
         with conn:
             existing = conn.execute(
-                "SELECT 1 FROM data_series WHERE series_id = ?", (series_id,)
+                "SELECT 1 FROM data WHERE id = ?", (series_id,)
             ).fetchone()
             if existing is None:
                 missing = f"SERIES_NOT_FOUND: {series_id}"
@@ -772,15 +790,14 @@ def update_market_series(
                 if value is not None
             }
             sql, params = _parameterized_update(
-                "data_series", updates, "series_id", series_id
+                "data", updates, "id", series_id, with_updated_at=True
             )
             conn.execute(sql, params)
             description = body.get("description")
             if description is not None:
                 conn.execute(
-                    "UPDATE instruments SET description = ?, updated_at = ? "
-                    "WHERE symbol_id = ?",
-                    (description, _utc_now_iso(), instrument),
+                    "UPDATE instruments SET description = ? WHERE name = ?",
+                    (description, instrument),
                 )
             _apply_instrument_fields(conn, instrument, body)
     finally:

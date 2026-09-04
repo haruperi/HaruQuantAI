@@ -1,7 +1,7 @@
 """Database hydration and schema initialization for D-IFACE.
 
 Ensures that 'watchlist', 'watchlist_items', 'instruments', 'trading_sessions',
-'data_series', 'data_brokers', and 'data_bars' tables exist in
+'data', and 'data_bars' tables exist in
 data/database/haruquantai.db and are seeded with initial data from
 data/database/haruquant-dev.db when available.
 
@@ -50,8 +50,8 @@ _INSTRUMENTS_INSERT: Final[str] = (
     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?"
     ")"
 )
-_SESSIONS_INSERT: Final[str] = (
-    "INSERT OR IGNORE INTO trading_sessions VALUES ("
+_PROFILES_INSERT: Final[str] = (
+    "INSERT OR IGNORE INTO trading_profiles VALUES ("
     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?"
     ")"
@@ -96,47 +96,109 @@ def _create_tables(prod_cur: sqlite3.Cursor) -> None:
     prod_cur.execute(
         """
         CREATE TABLE IF NOT EXISTS instruments (
-            symbol_id TEXT PRIMARY KEY,
-            canonical_symbol TEXT NOT NULL UNIQUE,
-            asset_class TEXT NOT NULL,
-            base_currency TEXT NOT NULL,
-            quote_currency TEXT NOT NULL,
-            digits INTEGER NOT NULL,
-            tick_size_decimal TEXT NOT NULL,
-            min_volume_decimal TEXT NOT NULL,
-            max_volume_decimal TEXT NOT NULL,
-            volume_step_decimal TEXT NOT NULL,
-            contract_size_decimal TEXT NOT NULL DEFAULT '1',
-            spec_json TEXT NOT NULL DEFAULT '{}',
-            state TEXT NOT NULL,
-            request_id TEXT NOT NULL DEFAULT '',
-            correlation_id TEXT NOT NULL DEFAULT '',
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL,
-            deleted_at TEXT,
-            description TEXT,
-            point_value REAL,
-            tick_size REAL,
-            tick_step REAL,
-            default_spread REAL DEFAULT 0,
-            commissions TEXT,
-            data_type INTEGER,
-            exchange TEXT,
-            country TEXT,
-            sector TEXT,
-            default_slippage REAL DEFAULT 0,
-            swap TEXT DEFAULT NULL,
-            order_size_multiplier REAL DEFAULT 1,
-            order_size_step REAL DEFAULT 0,
-            broker_id INTEGER DEFAULT -1,
-            min_distance REAL DEFAULT 0.0
+            name VARCHAR(64) PRIMARY KEY,
+            description VARCHAR(255),
+            path VARCHAR(255),
+            category VARCHAR(64),
+            exchange VARCHAR(64),
+            bank VARCHAR(64),
+            isin VARCHAR(32),
+            basis VARCHAR(64),
+            formula VARCHAR(255),
+            page VARCHAR(255),
+            currency_base VARCHAR(16),
+            currency_profit VARCHAR(16),
+            currency_margin VARCHAR(16),
+            custom BOOLEAN DEFAULT FALSE,
+            chart_mode INTEGER,
+            select_mode BOOLEAN,
+            visible BOOLEAN,
+            time BIGINT,
+            digits INTEGER,
+            point DOUBLE PRECISION,
+            spread INTEGER,
+            spread_float BOOLEAN,
+            ticks_bookdepth INTEGER,
+            bid DOUBLE PRECISION,
+            bidhigh DOUBLE PRECISION,
+            bidlow DOUBLE PRECISION,
+            ask DOUBLE PRECISION,
+            askhigh DOUBLE PRECISION,
+            asklow DOUBLE PRECISION,
+            last DOUBLE PRECISION,
+            lasthigh DOUBLE PRECISION,
+            lastlow DOUBLE PRECISION,
+            volume BIGINT,
+            volumehigh BIGINT,
+            volumelow BIGINT,
+            volume_real DOUBLE PRECISION,
+            volumehigh_real DOUBLE PRECISION,
+            volumelow_real DOUBLE PRECISION,
+            trade_calc_mode INTEGER,
+            trade_mode INTEGER,
+            trade_exemode INTEGER,
+            trade_stops_level INTEGER,
+            trade_freeze_level INTEGER,
+            trade_contract_size DOUBLE PRECISION,
+            trade_tick_size DOUBLE PRECISION,
+            trade_tick_value DOUBLE PRECISION,
+            trade_tick_value_profit DOUBLE PRECISION,
+            trade_tick_value_loss DOUBLE PRECISION,
+            trade_accrued_interest DOUBLE PRECISION,
+            trade_face_value DOUBLE PRECISION,
+            trade_liquidity_rate DOUBLE PRECISION,
+            volume_min DOUBLE PRECISION,
+            volume_max DOUBLE PRECISION,
+            volume_step DOUBLE PRECISION,
+            volume_limit DOUBLE PRECISION,
+            order_mode INTEGER,
+            order_gtc_mode INTEGER,
+            filling_mode INTEGER,
+            expiration_mode INTEGER,
+            start_time BIGINT,
+            expiration_time BIGINT,
+            swap_mode INTEGER,
+            swap_rollover3days INTEGER,
+            swap_long DOUBLE PRECISION,
+            swap_short DOUBLE PRECISION,
+            margin_initial DOUBLE PRECISION,
+            margin_maintenance DOUBLE PRECISION,
+            margin_hedged DOUBLE PRECISION,
+            margin_hedged_use_leg BOOLEAN,
+            session_deals INTEGER,
+            session_buy_orders INTEGER,
+            session_sell_orders INTEGER,
+            session_volume DOUBLE PRECISION,
+            session_turnover DOUBLE PRECISION,
+            session_interest DOUBLE PRECISION,
+            session_buy_orders_volume DOUBLE PRECISION,
+            session_sell_orders_volume DOUBLE PRECISION,
+            session_open DOUBLE PRECISION,
+            session_close DOUBLE PRECISION,
+            session_aw DOUBLE PRECISION,
+            session_price_settlement DOUBLE PRECISION,
+            session_price_limit_min DOUBLE PRECISION,
+            session_price_limit_max DOUBLE PRECISION,
+            option_mode INTEGER,
+            option_right INTEGER,
+            option_strike DOUBLE PRECISION,
+            price_change DOUBLE PRECISION,
+            price_volatility DOUBLE PRECISION,
+            price_theoretical DOUBLE PRECISION,
+            price_sensitivity DOUBLE PRECISION,
+            price_greeks_delta DOUBLE PRECISION,
+            price_greeks_theta DOUBLE PRECISION,
+            price_greeks_gamma DOUBLE PRECISION,
+            price_greeks_vega DOUBLE PRECISION,
+            price_greeks_rho DOUBLE PRECISION,
+            price_greeks_omega DOUBLE PRECISION
         )
         """
     )
 
     prod_cur.execute(
         """
-        CREATE TABLE IF NOT EXISTS trading_sessions (
+        CREATE TABLE IF NOT EXISTS trading_profiles (
             session_id TEXT PRIMARY KEY,
             principal_id TEXT NOT NULL,
             environment_id TEXT NOT NULL,
@@ -175,8 +237,41 @@ def _create_tables(prod_cur: sqlite3.Cursor) -> None:
 
     prod_cur.execute(
         """
-        CREATE TABLE IF NOT EXISTS data_series (
-            series_id INTEGER PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS user_sessions (
+            session_digest TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            csrf_digest TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            revoked_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+        )
+        """
+    )
+
+    prod_cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS market_sessions (
+            name VARCHAR(64) PRIMARY KEY,
+            display_name VARCHAR(128) NOT NULL,
+            asset_class VARCHAR(32) NOT NULL,
+            timezone VARCHAR(64) NOT NULL,
+            open_time TIME NOT NULL,
+            close_time TIME NOT NULL,
+            days_open VARCHAR(32) NOT NULL DEFAULT 'Mon-Fri',
+            break_start TIME,
+            break_end TIME,
+            is_24_7 BOOLEAN DEFAULT FALSE,
+            is_active BOOLEAN DEFAULT TRUE,
+            description VARCHAR(255)
+        )
+        """
+    )
+
+    prod_cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS data (
+            id INTEGER PRIMARY KEY,
             source_data_id INTEGER,
             connection TEXT,
             symbol TEXT NOT NULL,
@@ -197,23 +292,6 @@ def _create_tables(prod_cur: sqlite3.Cursor) -> None:
             show INTEGER,
             basket_id INTEGER,
             broker_id INTEGER,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-        )
-        """
-    )
-
-    prod_cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS data_brokers (
-            broker_id INTEGER PRIMARY KEY,
-            provider_id TEXT NOT NULL,
-            name TEXT,
-            description TEXT,
-            postfix TEXT,
-            mt_timezone TEXT,
-            mt_use INTEGER DEFAULT 1,
-            is_system INTEGER DEFAULT 1,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         )
@@ -245,7 +323,7 @@ def _hydrate_series(prod_cur: sqlite3.Cursor, dev_cur: sqlite3.Cursor) -> int:
     Returns:
         Number of series rows hydrated.
     """
-    prod_cur.execute("SELECT count(*) FROM data_series")
+    prod_cur.execute("SELECT count(*) FROM data")
     if prod_cur.fetchone()[0] > 0:
         return 0
     rows = dev_cur.execute(
@@ -260,37 +338,9 @@ def _hydrate_series(prod_cur: sqlite3.Cursor, dev_cur: sqlite3.Cursor) -> int:
         """
     ).fetchall()
     prod_cur.executemany(
-        "INSERT OR IGNORE INTO data_series VALUES ("
+        "INSERT OR IGNORE INTO data VALUES ("
         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?"
         ")",
-        rows,
-    )
-    return len(rows)
-
-
-def _hydrate_brokers(prod_cur: sqlite3.Cursor, dev_cur: sqlite3.Cursor) -> int:
-    """Copy broker profiles from the dev database.
-
-    Args:
-        prod_cur: Cursor on the target production database.
-        dev_cur: Cursor on the reference development database.
-
-    Returns:
-        Number of broker rows hydrated.
-    """
-    prod_cur.execute("SELECT count(*) FROM data_brokers")
-    if prod_cur.fetchone()[0] > 0:
-        return 0
-    rows = dev_cur.execute(
-        """
-        SELECT
-            broker_id, provider_id, name, description, postfix, mt_timezone,
-            mt_use, is_system, created_at, updated_at
-        FROM data_brokers
-        """
-    ).fetchall()
-    prod_cur.executemany(
-        "INSERT OR IGNORE INTO data_brokers VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         rows,
     )
     return len(rows)
@@ -399,23 +449,21 @@ def _seed_from_dev(prod_cur: sqlite3.Cursor, dev_cur: sqlite3.Cursor) -> None:
             len(items),
         )
 
-    # Seed trading sessions
-    prod_cur.execute("SELECT count(*) FROM trading_sessions")
+    # Seed trading profiles
+    prod_cur.execute("SELECT count(*) FROM trading_profiles")
     if prod_cur.fetchone()[0] == 0:
         sessions = dev_cur.execute("SELECT * FROM trading_sessions").fetchall()
         if sessions and len(sessions[0]) == _SESSIONS_COLS:
-            prod_cur.executemany(_SESSIONS_INSERT, sessions)
-            logger.info("Seeded %d sessions from reference DB", len(sessions))
+            prod_cur.executemany(_PROFILES_INSERT, sessions)
+            logger.info("Seeded %d profiles from reference DB", len(sessions))
 
-    # Seed the Data reference catalogue (series, brokers, cached bars).
+    # Seed the Data reference catalogue (series, cached bars).
     series_count = _hydrate_series(prod_cur, dev_cur)
-    brokers_count = _hydrate_brokers(prod_cur, dev_cur)
     bars_count = _hydrate_bars(prod_cur, dev_cur)
-    if series_count or brokers_count or bars_count:
+    if series_count or bars_count:
         logger.info(
-            "Seeded Data reference: %d series, %d brokers, %d bar histories",
+            "Seeded Data reference: %d series, %d bar histories",
             series_count,
-            brokers_count,
             bars_count,
         )
 

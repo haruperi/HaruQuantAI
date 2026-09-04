@@ -1,7 +1,7 @@
 """Database-backed authentication and session persistence for D-IFACE.
 
 Interacts directly with the SQLite database at data/database/haruquantai.db
-using the 'users' and 'sessions' tables.
+using the 'users' and 'user_sessions' tables.
 """
 
 from __future__ import annotations
@@ -203,7 +203,7 @@ def register_user(
 
         cur.execute(
             """
-            INSERT INTO sessions (
+            INSERT INTO user_sessions (
                 session_digest, user_id, csrf_digest, created_at, expires_at
             ) VALUES (?, ?, ?, ?, ?)
             """,
@@ -285,7 +285,7 @@ def login_user(
 
         cur.execute(
             """
-            INSERT INTO sessions (
+            INSERT INTO user_sessions (
                 session_digest, user_id, csrf_digest, created_at, expires_at
             ) VALUES (?, ?, ?, ?, ?)
             """,
@@ -344,7 +344,7 @@ def get_session_identity(
                 s.expires_at,
                 s.revoked_at,
                 u.active
-            FROM sessions s
+            FROM user_sessions s
             JOIN users u ON s.user_id = u.user_id
             WHERE s.session_digest = ?
             """,
@@ -393,7 +393,7 @@ def logout_session(
         cur = conn.cursor()
         cur.execute(
             """
-            UPDATE sessions
+            UPDATE user_sessions
             SET revoked_at = ?
             WHERE session_digest = ? AND revoked_at IS NULL
             """,
