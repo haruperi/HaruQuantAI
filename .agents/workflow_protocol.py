@@ -75,6 +75,16 @@ PROTECTED_SENTINELS = {
         "HANDOFF : ACCEPTED",
         "explicit no-fast-forward merge",
     ),
+    "QUICK_FIX_PLANNER": (
+        "Act as the **HaruQuantAI Quick-Fix Principal Software Architect and Implementation Planner**",
+        "This prompt defines your complete **Quick-Fix Planner-specific role contract**.",
+        "HANDOFF : QUICK_FIX_PENDING_APPROVAL",
+    ),
+    "QUICK_FIX_EXECUTOR": (
+        "Act as the **HaruQuantAI Quick-Fix Senior Software Implementation Engineer**",
+        "This prompt defines your complete **Quick-Fix Executor-specific role contract**.",
+        "HANDOFF : QUICK_FIX_COMPLETE",
+    ),
 }
 
 
@@ -231,6 +241,8 @@ def assemble_config(repo_override: str | None = None) -> dict[str, Any]:
         "executor": repo / "docs/templates/prompt/executor.md",
         "reviewer": repo / "docs/templates/prompt/reviewer.md",
         "reviewer_closeout": repo / "docs/templates/prompt/reviewer-closeout.md",
+        "quick_fix_planner": repo / "docs/templates/prompt/quick-fix-planner.md",
+        "quick_fix_executor": repo / "docs/templates/prompt/quick-fix-executor.md",
         "default": repo / "docs/templates/prompt/default.md",
     }
     roles: dict[str, dict[str, Any]] = {}
@@ -362,6 +374,10 @@ def parse_next_agent(path: Path) -> NextAgentArtifact:
 
 
 def _template_key(target_role: str, template_path: str) -> str:
+    if template_path.endswith("quick-fix-planner.md"):
+        return "QUICK_FIX_PLANNER"
+    if template_path.endswith("quick-fix-executor.md"):
+        return "QUICK_FIX_EXECUTOR"
     if target_role == "REVIEWER" and template_path.endswith("reviewer-closeout.md"):
         return "REVIEWER_CLOSEOUT"
     return target_role
@@ -391,10 +407,10 @@ def validate_next_agent(
             raise OrchestratorError(
                 f"next-agent metadata {key}={meta.get(key)!r}; expected {value!r}."
             )
-    if (
-        expected_source.upper() == "PLANNER"
-        and expected_handoff.upper() == "PENDING_APPROVAL"
-    ):
+    if expected_source.upper() == "PLANNER" and expected_handoff.upper() in {
+        "PENDING_APPROVAL",
+        "QUICK_FIX_PENDING_APPROVAL",
+    }:
         raw_paths = meta.get("allowed_write_paths")
         if not isinstance(raw_paths, list):
             raise OrchestratorError(

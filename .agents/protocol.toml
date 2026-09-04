@@ -13,6 +13,7 @@ delegate = "dedicated-inspectable-app-agent-per-role"
 delegate-headless = "dedicated-native-cli-session-per-role"
 delegate-multi = "dedicated-multi-vendor-native-cli-session-per-role"
 manual = "dedicated-role-chat"
+quick-fix = "same-current-ide-chat-direct-main"
 
 [session_continuity]
 scope = "workflow-run"
@@ -28,6 +29,48 @@ source_role = "ORCHESTRATOR"
 handoff = "TASK_ACTIVATED"
 target_role = "PLANNER"
 target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
+source_role = "ORCHESTRATOR"
+handoff = "QUICK_FIX_ACTIVATED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/quick-fix-planner.md"
+
+[[transitions]]
+source_role = "PLANNER"
+handoff = "QUICK_FIX_PENDING_APPROVAL"
+target_role = "EXECUTOR"
+gate = "APPROVED: EXECUTE"
+target_template = "docs/templates/prompt/quick-fix-executor.md"
+
+[[transitions]]
+source_role = "EXECUTOR"
+handoff = "QUICK_FIX_COMPLETE"
+target_role = "NONE"
+
+[[transitions]]
+source_role = "PLANNER"
+handoff = "QUICK_FIX_BLOCKED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/quick-fix-planner.md"
+
+[[transitions]]
+source_role = "EXECUTOR"
+handoff = "QUICK_FIX_BLOCKED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/quick-fix-planner.md"
+
+[[transitions]]
+source_role = "ORCHESTRATOR"
+handoff = "QUICK_FIX_OWNER_REJECTED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/quick-fix-planner.md"
+
+[[transitions]]
+source_role = "ORCHESTRATOR"
+handoff = "QUICK_FIX_BLOCKER_RESOLVED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/quick-fix-planner.md"
 
 [[transitions]]
 source_role = "PLANNER"

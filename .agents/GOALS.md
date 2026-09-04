@@ -201,4 +201,8 @@ uv run .agents/orchestrator.py goal-cancel --reason "..."
 
 Modes change transport only; Goal and Task semantics remain identical.
 
+`quick-fix` is not a Goal mode. Goal activation fails closed while it is
+selected because Quick-Fix omits the branch, independent review, Task commit,
+and no-ff merge required for Goal children.
+
 The schema-v3 runtime-policy and frozen Goal scope fingerprints are recorded at activation and checked before progress. Unattended headless children may receive one fresh `codex/gpt-5.6-sol/high` recovery generation for exactly one additional correction iteration. If that generation fails, the child reaches `MAX_ITERATIONS` and the Goal blocks; the next independently started Goal/Task always begins with its configured normal identities.

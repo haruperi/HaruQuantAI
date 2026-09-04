@@ -179,6 +179,16 @@ def test_zero_child_goal_fails_closed(orc: ModuleType, tmp_path: Path) -> None:
         )
 
 
+def test_quick_fix_mode_rejects_goal_activation(
+    orc: ModuleType, tmp_path: Path
+) -> None:
+    goal = _load_goal_engine(orc)
+    _tracker(tmp_path / "tracker.md")
+    cfg = {"repo": tmp_path, "mode": "quick-fix"}
+    with pytest.raises(goal.OrchestratorError, match="cannot activate"):
+        goal.create_goal_state(cfg, _spec())
+
+
 def test_goal_scope_is_frozen_at_activation(orc: ModuleType, tmp_path: Path) -> None:
     goal = _load_goal_engine(orc)
     tracker = _tracker(tmp_path / "tracker.md")

@@ -23,6 +23,7 @@ MODES = (
     ("delegate-headless", "One CLI vendor with a dedicated conversation per role"),
     ("delegate-multi", "Independently configured CLI conversation per role"),
     ("manual", "Prepare validated artifacts for operator-managed role chats"),
+    ("quick-fix", "Current IDE chat plans and implements a bounded fix on main"),
 )
 VENDORS = ("zai", "codex", "agy", "cline")
 MODELS: dict[str, tuple[str, ...]] = {
@@ -146,13 +147,17 @@ def main() -> int:
         tuple(f"{name} — {description}" for name, description in MODES),
     )
     mode = mode_display.split(" — ", maxsplit=1)[0]
-    approval_policy = _pick(
-        "Approval policy",
-        (
-            "interactive — require exact owner messages at each gate",
-            "unattended — use frozen run preauthorization",
-        ),
-    ).split(" — ", maxsplit=1)[0]
+    approval_policy = "interactive"
+    if mode != "quick-fix":
+        approval_policy = _pick(
+            "Approval policy",
+            (
+                "interactive — require exact owner messages at each gate",
+                "unattended — use frozen run preauthorization",
+            ),
+        ).split(" — ", maxsplit=1)[0]
+    else:
+        print("Quick-Fix requires the exact interactive APPROVED: EXECUTE gate.")
     maximum_text = _ask("Maximum normal iterations [5]: ") or "5"
     maximum = int(maximum_text)
     if maximum < 1:

@@ -34,6 +34,11 @@ ORCHESTRATOR READY / TASK NONE
 
 ## 3. Goal lifecycle
 
+Quick-Fix is the explicit exception: it stays on clean `main`, uses dedicated
+same-chat Planner/Executor prompts, requires exact interactive
+`APPROVED: EXECUTE`, then archives evidence without review, branch, commit, or
+merge. It cannot activate a Goal.
+
 A Goal wraps the Task lifecycle; it does not duplicate it:
 
 ```text

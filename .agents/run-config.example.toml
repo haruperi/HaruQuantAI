@@ -1,5 +1,6 @@
 # HaruQuantAI runtime-only workflow policy. Copy to .agents/run-config.toml.
 schema_version = 3
+# Use "quick-fix" for the interactive Planner -> Executor direct-main workflow.
 mode = "solo-headless"
 approval_policy = "interactive"
 max_iterations = 5

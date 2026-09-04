@@ -2,7 +2,7 @@
 
 # Agent Workflow — Complete Operational Procedures
 
-HaruQuantAI has one atomic Planner → Executor → Reviewer Task workflow and one deterministic Goal supervisor above it. All six transport modes share the same Task/Goal semantics; only transport changes.
+HaruQuantAI has one atomic Planner → Executor → Reviewer Task workflow and one deterministic Goal supervisor above it. Six normal transport modes share those semantics. `quick-fix` is the explicit shortened exception.
 
 A Task run owns one logical Planner, Executor and Reviewer continuity boundary. IDE `solo` carries those role contexts sequentially in the same child Task chat; the other modes reuse their same-role agent/session/chat within the Task. For a `solo` Goal, every next child starts in a fresh physical IDE chat as well as fresh role continuity.
 
@@ -13,7 +13,13 @@ APPROVED: EXECUTE
 APPROVED: COMMIT
 ```
 
-Schema-v3 `.agents/run-config.toml` selects the transport and either `approval_policy = "interactive"` or `"unattended"`. Every mode supports unattended operation: the protocol gates are satisfied from frozen `RUN_PREAUTHORIZATION` only for enabled permissions, while the selected IDE, headless, or manual role transport remains unchanged. The controller records policy/scope hashes and never fabricates a human message. Execute, local commit, and local merge must each be explicitly permitted. Push, external/live actions, destructive operations, and scope expansion remain unauthorized. Automatic Sol/high recovery-session generation is available only in headless modes.
+Schema-v3 `.agents/run-config.toml` selects the transport and either `approval_policy = "interactive"` or `"unattended"`. Every normal mode supports unattended operation: the protocol gates are satisfied from frozen `RUN_PREAUTHORIZATION` only for enabled permissions, while the selected IDE, headless, or manual role transport remains unchanged. The controller records policy/scope hashes and never fabricates a human message. Execute, local commit, and local merge must each be explicitly permitted. Push, external/live actions, destructive operations, and scope expansion remain unauthorized. Automatic Sol/high recovery-session generation is available only in headless modes.
+
+Quick-Fix forces interactive policy. It stays in the current IDE chat on clean
+`main`, performs a dedicated Planner dry run, waits for exact
+`APPROVED: EXECUTE`, and runs a dedicated Executor. It has no Reviewer, commit
+gate, branch, merge, Goal child, or automatic rollback. On success its evidence
+is archived and its approved diff remains uncommitted on `main`.
 
 `CONTINUE: REVIEWER` and `CONTINUE: GOAL` are transport/resume phrases only and grant no authority.
 

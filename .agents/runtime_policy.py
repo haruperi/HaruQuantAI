@@ -21,10 +21,11 @@ SUPPORTED_MODES = frozenset(
         "delegate-headless",
         "delegate-multi",
         "manual",
+        "quick-fix",
     }
 )
 HEADLESS_MODES = frozenset({"solo-headless", "delegate-headless", "delegate-multi"})
-IDE_MODES = frozenset({"solo", "delegate"})
+IDE_MODES = frozenset({"solo", "delegate", "quick-fix"})
 SCHEMA_V2_MODE_MAP = {
     "solo": "solo-headless",
     "delegate": "delegate-headless",
@@ -276,6 +277,8 @@ def _parse_versioned(raw: dict[str, Any], schema_version: int) -> RuntimePolicy:
     effective_mode = SCHEMA_V2_MODE_MAP[mode] if schema_version == 2 else mode
     if approval_policy not in SUPPORTED_APPROVAL_POLICIES:
         raise RuntimePolicyError(f"Unsupported approval policy {approval_policy!r}.")
+    if effective_mode == "quick-fix" and approval_policy != "interactive":
+        raise RuntimePolicyError("Quick-Fix mode requires interactive approval.")
     if not isinstance(max_iterations, int) or isinstance(max_iterations, bool):
         raise RuntimePolicyError("max_iterations must be an integer.")
     if max_iterations < 1:
