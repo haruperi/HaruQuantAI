@@ -1,7 +1,7 @@
 # Agentic Rebuild — Phase 0 Readiness
 
-> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)  
-> **Authority:** `app/services/agentic/README.md` and current owner-domain contracts  
+> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)
+> **Authority:** `app/services/agentic/README.md` and current owner-domain contracts
 > **Baseline:** `068d8af0e5b4dfb8dece8e988e2960f41afdc75e`
 
 ## 6. Phase 0 — Contract, Ownership, Provider, and Donor Readiness

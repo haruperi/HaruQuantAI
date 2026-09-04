@@ -1,7 +1,7 @@
 # Agentic Rebuild — Phase 6 Sandbox Fallback and Outcome Calibration
 
-> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)  
-> **Prerequisite:** evaluated model/tool/workflow foundation; JSON DSL for sandbox fallback; outcome owner contracts for calibration  
+> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)
+> **Prerequisite:** evaluated model/tool/workflow foundation; JSON DSL for sandbox fallback; outcome owner contracts for calibration
 > **Authority:** `app/services/agentic/README.md` and ratified Plugins/Workspace/receiver contracts
 
 ## Purpose
@@ -12,11 +12,11 @@ Add two optional capabilities after the safer core is operational: a staging-onl
 
 ## AGT-6.19 — `FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`
 
-**Provides:** `agentic.sandbox-artifacts@1`  
-**Requires:** mandate, operations, roles, model inference, tool governance, workflows, strategy-spec composition, and a real ratified sandbox/isolation/staging capability.  
-**State:** feature-local metadata namespace using the Phase-0-supported retention enum; staged/ephemeral bytes follow explicit TTL/cleanup, never an invented `RETAIN_METADATA` enum.  
-**Primary module:** `sandbox_artifact_authoring.py`.  
-**Role:** `sandbox_code_author`.  
+**Provides:** `agentic.sandbox-artifacts@1`
+**Requires:** mandate, operations, roles, model inference, tool governance, workflows, strategy-spec composition, and a real ratified sandbox/isolation/staging capability.
+**State:** feature-local metadata namespace using the Phase-0-supported retention enum; staged/ephemeral bytes follow explicit TTL/cleanup, never an invented `RETAIN_METADATA` enum.
+**Primary module:** `sandbox_artifact_authoring.py`.
+**Role:** `sandbox_code_author`.
 **Operations:** `AUTHOR`, `INSPECT`, `CLEANUP`.
 
 **Donor evidence to normalize**
@@ -74,7 +74,7 @@ tests/services/agentic/author_sandbox_artifacts/**
 - state migration/restart/TTL/retained metadata according to ratified policy;
 - role hash/eligibility/disposal, replacement, churn, and physical deletion.
 
-**Usage:** `uv run python -m app.services.agentic.author_sandbox_artifacts.sandbox_artifact_authoring` using a deterministic fake sandbox that performs no host mutation outside a temporary test directory.  
+**Usage:** `uv run python -m app.services.agentic.author_sandbox_artifacts.sandbox_artifact_authoring` using a deterministic fake sandbox that performs no host mutation outside a temporary test directory.
 **Commit:** `feat(agentic): implement sandboxed source artifact fallback`
 
 **Removal:** stop intake, revoke leases, cancel sandboxes, unregister the role, clean eligible ephemeral/staged resources, retain only policy-approved metadata/audit, and never remove receiver-owned artifacts.
@@ -83,11 +83,11 @@ tests/services/agentic/author_sandbox_artifacts/**
 
 ## AGT-6.20 — `FEAT-AGT-CALIBRATE_OUTCOMES`
 
-**Provides:** `agentic.outcome-calibration@1`  
-**Requires:** mandate, operations, profile evaluation, claims, ratified persistence/clock, and exact receiver-owned matured outcome capabilities.  
-**Optional:** workflow/role/topology and cost evidence.  
-**State:** `agentic.outcome_calibration`, schema v1, `RETAIN`.  
-**Primary module:** `outcome_calibration.py`.  
+**Provides:** `agentic.outcome-calibration@1`
+**Requires:** mandate, operations, profile evaluation, claims, ratified persistence/clock, and exact receiver-owned matured outcome capabilities.
+**Optional:** workflow/role/topology and cost evidence.
+**State:** `agentic.outcome_calibration`, schema v1, `RETAIN`.
+**Primary module:** `outcome_calibration.py`.
 **Operations:** `CALIBRATE_FORECAST`, `CALIBRATE_RECOMMENDATION`, `INSPECT`.
 
 **Donor evidence to normalize**
@@ -139,7 +139,7 @@ tests/services/agentic/calibrate_outcomes/**
 - migration/restart/correction/export/retention;
 - missing receiver/profile evidence, cancellation, replacement, churn, retained-state removal, physical deletion.
 
-**Usage:** `uv run python -m app.services.agentic.calibrate_outcomes.outcome_calibration`  
+**Usage:** `uv run python -m app.services.agentic.calibrate_outcomes.outcome_calibration`
 **Commit:** `feat(agentic): implement post-horizon outcome calibration`
 
 **Removal:** stop new scoring/change candidates, preserve committed calibration history, and never fabricate neutral performance for missing outcomes.

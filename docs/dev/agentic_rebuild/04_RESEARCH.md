@@ -1,7 +1,7 @@
 # Agentic Rebuild — Phase 4 Governed Research
 
-> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)  
-> **Prerequisite:** workflow/operations foundation and canonical claims/synthesis  
+> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)
+> **Prerequisite:** workflow/operations foundation and canonical claims/synthesis
 > **Authority:** current Research, Simulation, Optimization, and Agentic owner specifications
 
 ## Purpose
@@ -12,10 +12,10 @@ Create campaign-level anti-overfitting governance and convert supported claim gr
 
 ## AGT-4.14 — `FEAT-AGT-GOVERN_RESEARCH_SEARCH`
 
-**Provides:** `agentic.research-search@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.workflows@1`, ratified persistence/clock/digest and receiver holdout/campaign contracts.  
-**State:** `agentic.research_search`, schema v1, `RETAIN`.  
-**Primary module:** `research_search_governance.py`.  
+**Provides:** `agentic.research-search@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.workflows@1`, ratified persistence/clock/digest and receiver holdout/campaign contracts.
+**State:** `agentic.research_search`, schema v1, `RETAIN`.
+**Primary module:** `research_search_governance.py`.
 **Operations:** `REGISTER_CAMPAIGN`, `REGISTER_FAMILY`, `REGISTER_VARIANT`, `RECORD_ATTEMPT`, `RESERVE_HOLDOUT`, `CLOSE_CAMPAIGN`, `INSPECT`.
 
 **Donor evidence to normalize**
@@ -70,7 +70,7 @@ tests/services/agentic/govern_research_search/**
 - removal preserves scarcity and cannot reset consumed budget;
 - churn, replacement, and physical deletion.
 
-**Usage:** `uv run python -m app.services.agentic.govern_research_search.research_search_governance`  
+**Usage:** `uv run python -m app.services.agentic.govern_research_search.research_search_governance`
 **Commit:** `feat(agentic): implement research campaign and search governance`
 
 **Removal:** refuse new governed trials/holdouts, preserve all campaign/attempt/receipt history, and never free consumed scarcity by feature removal.
@@ -79,12 +79,12 @@ tests/services/agentic/govern_research_search/**
 
 ## AGT-4.15 — `FEAT-AGT-DESIGN_RESEARCH`
 
-**Provides:** `agentic.research-design@1`  
-**Requires:** mandate, operations, roles, model inference, context, claims, research search; exact Research/Simulation/Optimization candidate-validation contracts.  
-**Optional:** deliberation, synthesis, governed tools.  
-**State:** none.  
-**Primary module:** `research_design.py`.  
-**Roles:** `hypothesis_designer`, `experiment_designer`, `bounded_search_designer`.  
+**Provides:** `agentic.research-design@1`
+**Requires:** mandate, operations, roles, model inference, context, claims, research search; exact Research/Simulation/Optimization candidate-validation contracts.
+**Optional:** deliberation, synthesis, governed tools.
+**State:** none.
+**Primary module:** `research_design.py`.
+**Roles:** `hypothesis_designer`, `experiment_designer`, `bounded_search_designer`.
 **Operations:** `DESIGN_HYPOTHESIS`, `DESIGN_EXPERIMENT`, `DESIGN_SEARCH`.
 
 **Donor evidence to normalize**
@@ -137,7 +137,7 @@ tests/services/agentic/design_research/**
 - prompt/manifest mutation, role eligibility, exact disposal;
 - capability loss, cancellation, replacement, churn, and physical removal.
 
-**Usage:** `uv run python -m app.services.agentic.design_research.research_design`  
+**Usage:** `uv run python -m app.services.agentic.design_research.research_design`
 **Commit:** `feat(agentic): implement falsifiable research design`
 
 **Removal:** cancel design work and unregister the three roles; preserve campaign history and any receiver-owned run/result records.

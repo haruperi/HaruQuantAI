@@ -40,6 +40,7 @@ from app.contracts.catalogue.capabilities import CATALOG_INSTRUMENTS_CAPABILITY
 from app.contracts.interfaces.capabilities import (
     OBSERVE_MARKET_CATALOGUE_CAPABILITY,
     OBSERVE_MARKET_DATA_CAPABILITY,
+    OBSERVE_MARKET_REFERENCE_CAPABILITY,
     OPERATE_IDENTITY_CAPABILITY,
     OPERATE_SETTINGS_CAPABILITY,
     OPERATE_TRADING_CAPABILITY,
@@ -56,6 +57,8 @@ from app.contracts.interfaces.models import (
     ObserveMarketDataEventSubscription,
     ObserveMarketDataRequest,
     ObserveMarketDataSuccess,
+    ObserveMarketReferenceRequest,
+    ObserveMarketReferenceSuccess,
     OperateIdentityRequest,
     OperateSettingsRequest,
     OperateTradingRequest,
@@ -64,23 +67,17 @@ from app.contracts.interfaces.models import (
     StreamEvent,
 )
 from app.contracts.trading.models import ManageExecutionSessionsRequest
-from app.services.interfaces.serve_api_events import (
-    _data_reference_db,
-    _db_hydration,
-    _markets_db,
-)
-from app.services.interfaces.serve_api_events._data_reference_db import (
-    BarsUnavailableError,
-    ReferenceNotFoundError,
-)
+from app.services.interfaces.serve_api_events import _db_hydration
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping
     from typing import Any
 
     from app.contracts.common.models import JsonObject, JsonValue
+    from app.contracts.interfaces.models import ObserveMarketReferenceOperation
     from app.contracts.interfaces.ports import (
         ObserveMarketDataCapability,
+        ObserveMarketReferenceCapability,
         OperateSettingsCapability,
         OperateTradingCapability,
     )
@@ -875,14 +872,22 @@ async def _serve_catalogue(
         entry.model_dump(mode="json") for entry in result.entries
     ]
     if not rows:
-        market_query = query.get("query", [None])[0]
-        db_data = _markets_db.list_market_directory(
-            query=market_query,
-            cursor=page_cursor,
-            limit=page_size,
-            request_id=request_id,
-        )
-        rows = db_data["rows"]
+        ref_gw = registry.resolve(OBSERVE_MARKET_REFERENCE_CAPABILITY)
+        if ref_gw is not None:
+            market_query = query.get("query", [None])[0]
+            ref_resp = await ref_gw.observe_market_reference(
+                ObserveMarketReferenceRequest(
+                    request_id=str(uuid7()),
+                    operation="LIST_MARKET_DIRECTORY",
+                    query=market_query,
+                    cursor=page_cursor,
+                    limit=page_size,
+                )
+            )
+            if isinstance(ref_resp, ObserveMarketReferenceSuccess) and isinstance(
+                ref_resp.data, dict
+            ):
+                rows = cast("list[dict[str, Any]]", ref_resp.data.get("rows", []))
     data: dict[str, Any] = {
         "source_id": _PROVIDER_CATALOGUE_SOURCE_ID,
         "rows": rows,
@@ -1217,13 +1222,32 @@ async def _serve_data_json(
     )
 
 
+def _is_data_reference_path(path: str) -> bool:
+    """Return True if path matches a known Data reference endpoint."""
+    if path in (
+        _DATA_BARS_ROUTE,
+        _DATA_CAPABILITIES_ROUTE,
+        _DATA_SERIES_ROUTE,
+        _DATA_INSTRUMENTS_ROUTE,
+        _DATA_BROKERS_ROUTE,
+        _DATA_SYMBOLS_ROUTE,
+        _DATA_QUOTES_ROUTE,
+        _DATA_REFERENCE_SYNC_ROUTE,
+    ):
+        return True
+    if _DATA_SERIES_ID_PATTERN.match(path) is not None:
+        return True
+    return _DATA_INSTRUMENT_ID_PATTERN.match(path) is not None
+
+
 async def _serve_bars(
+    gateway: ObserveMarketReferenceCapability,
     scope: Scope,
     send: Send,
     request_id: str,
     trace_id: str | None,
 ) -> None:
-    """Serve one bounded bar history from the persisted reference store.
+    """Serve one bounded bar history from the market reference gateway.
 
     A symbol/timeframe pair with no stored history answers with an honest
     503 ``UPSTREAM_UNAVAILABLE``; the boundary never substitutes generated
@@ -1272,32 +1296,39 @@ async def _serve_bars(
     except ValueError:
         limit = _DEFAULT_BAR_COUNT
     limit = max(1, min(limit, _MAX_BAR_COUNT))
-    try:
-        payload = _data_reference_db.get_bars(
-            symbol,
-            timeframe,
-            limit=limit,
-            start=start,
-            end=end,
-            request_id=request_id,
-        )
-    except BarsUnavailableError as error:
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation="READ_BARS",
+        symbol=symbol,
+        timeframe=timeframe,
+        limit=limit,
+        start=start,
+        end=end,
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
         await _send_error(
             send,
-            HTTPStatus.SERVICE_UNAVAILABLE,
-            "UPSTREAM_UNAVAILABLE",
-            str(error),
+            _failure_http_status(result, HTTPStatus.SERVICE_UNAVAILABLE),
+            result.problem.code or "UPSTREAM_UNAVAILABLE",
+            result.problem.detail or "Bars unavailable",
             _DATA_BARS_ROUTE,
             "api.data.bars",
             trace_id,
         )
         return
     await _serve_data_json(
-        send, _DATA_BARS_ROUTE, "api.data.bars", payload, request_id, trace_id
+        send,
+        _DATA_BARS_ROUTE,
+        "api.data.bars",
+        cast("JsonObject | list[JsonObject]", result.data),
+        request_id,
+        trace_id,
     )
 
 
 async def _serve_data_series_item(
+    gateway: ObserveMarketReferenceCapability,
     receive: Receive,
     send: Send,
     series_id: int,
@@ -1317,25 +1348,19 @@ async def _serve_data_series_item(
             trace_id,
         )
         return
-    try:
-        payload = _data_reference_db.update_market_series(series_id, body)
-    except ValueError:
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation="UPDATE_SERIES",
+        series_id=series_id,
+        payload=body,
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
         await _send_error(
             send,
-            HTTPStatus.UNPROCESSABLE_CONTENT,
-            "VALIDATION_FAILED",
-            "Series symbol and instrument are required.",
-            _DATA_SERIES_ROUTE,
-            "api.data.series.update",
-            trace_id,
-        )
-        return
-    except ReferenceNotFoundError:
-        await _send_error(
-            send,
-            HTTPStatus.NOT_FOUND,
-            "SERIES_NOT_FOUND",
-            f"No series {series_id} exists in the reference catalogue.",
+            _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+            result.problem.code or "VALIDATION_FAILED",
+            result.problem.detail or "Series update failed",
             _DATA_SERIES_ROUTE,
             "api.data.series.update",
             trace_id,
@@ -1346,7 +1371,7 @@ async def _serve_data_series_item(
         send,
         route,
         "api.data.series.update",
-        payload,
+        cast("JsonObject | list[JsonObject]", result.data),
         request_id,
         trace_id,
         side_effect="write",
@@ -1354,6 +1379,7 @@ async def _serve_data_series_item(
 
 
 async def _serve_data_instrument_item(
+    gateway: ObserveMarketReferenceCapability,
     receive: Receive,
     send: Send,
     instrument: str,
@@ -1364,21 +1390,31 @@ async def _serve_data_instrument_item(
     """Serve one instrument specification read or governed edit."""
     route = f"{_DATA_INSTRUMENTS_ROUTE}/{instrument}"
     if method == "GET":
-        try:
-            payload = _data_reference_db.get_instrument_spec(instrument)
-        except ReferenceNotFoundError:
+        req = ObserveMarketReferenceRequest(
+            request_id=str(uuid7()),
+            operation="READ_INSTRUMENT",
+            instrument=instrument,
+        )
+        result = await gateway.observe_market_reference(req)
+        if isinstance(result, InterfaceFailure):
             await _send_error(
                 send,
-                HTTPStatus.NOT_FOUND,
-                "INSTRUMENT_NOT_FOUND",
-                f"No instrument {instrument} exists in the reference catalogue.",
+                _failure_http_status(result, HTTPStatus.NOT_FOUND),
+                result.problem.code or "INSTRUMENT_NOT_FOUND",
+                result.problem.detail
+                or f"No instrument {instrument} exists in the reference catalogue.",
                 route,
                 "api.data.instrument",
                 trace_id,
             )
             return
         await _serve_data_json(
-            send, route, "api.data.instrument", payload, request_id, trace_id
+            send,
+            route,
+            "api.data.instrument",
+            cast("JsonObject | list[JsonObject]", result.data),
+            request_id,
+            trace_id,
         )
         return
     body = await _read_json_body(receive)
@@ -1393,14 +1429,20 @@ async def _serve_data_instrument_item(
             trace_id,
         )
         return
-    try:
-        payload = _data_reference_db.update_instrument_spec(instrument, body)
-    except ReferenceNotFoundError:
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation="UPDATE_INSTRUMENT",
+        instrument=instrument,
+        payload=body,
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
         await _send_error(
             send,
-            HTTPStatus.NOT_FOUND,
-            "INSTRUMENT_NOT_FOUND",
-            f"No instrument {instrument} exists in the reference catalogue.",
+            _failure_http_status(result, HTTPStatus.NOT_FOUND),
+            result.problem.code or "INSTRUMENT_NOT_FOUND",
+            result.problem.detail
+            or f"No instrument {instrument} exists in the reference catalogue.",
             route,
             "api.data.instrument.update",
             trace_id,
@@ -1410,7 +1452,7 @@ async def _serve_data_instrument_item(
         send,
         route,
         "api.data.instrument.update",
-        payload,
+        cast("JsonObject | list[JsonObject]", result.data),
         request_id,
         trace_id,
         side_effect="write",
@@ -1448,7 +1490,9 @@ async def _serve_data_capability_routes(
 
 
 async def _serve_data_catalogue_read(
+    gateway: ObserveMarketReferenceCapability,
     path: str,
+    method: str,
     params: dict[str, str],
     send: Send,
     request_id: str,
@@ -1457,7 +1501,9 @@ async def _serve_data_catalogue_read(
     """Serve the static capability surface and reference catalogue reads.
 
     Args:
+        gateway: Active market reference gateway.
         path: Request path.
+        method: Uppercase request method.
         params: Flattened query parameters.
         send: ASGI send callable.
         request_id: Mirrored or generated request identifier.
@@ -1466,31 +1512,59 @@ async def _serve_data_catalogue_read(
     Returns:
         True when the route was handled.
     """
-    payload: JsonObject | list[JsonObject]
+    if method != "GET":
+        return False
+    op: ObserveMarketReferenceOperation
     if path == _DATA_CAPABILITIES_ROUTE:
-        payload = _data_reference_db.list_capabilities()
+        op = "LIST_CAPABILITIES"
         operation = "api.data.capabilities"
+        limit = None
     elif path == _DATA_SERIES_ROUTE:
-        payload = _data_reference_db.list_market_series(
-            limit=int(params.get("limit", "50"))
-        )
+        op = "LIST_SERIES"
         operation = "api.data.series"
+        limit = int(params.get("limit", "50"))
     elif path == _DATA_INSTRUMENTS_ROUTE:
-        payload = _data_reference_db.list_instruments(
-            limit=int(params.get("limit", "50"))
-        )
+        op = "LIST_INSTRUMENTS"
         operation = "api.data.instruments"
+        limit = int(params.get("limit", "50"))
     elif path == _DATA_BROKERS_ROUTE:
-        payload = _data_reference_db.list_brokers(limit=int(params.get("limit", "50")))
+        op = "LIST_BROKERS"
         operation = "api.data.brokers"
+        limit = int(params.get("limit", "50"))
     else:
         return False
-    await _serve_data_json(send, path, operation, payload, request_id, trace_id)
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation=op,
+        limit=limit,
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
+        await _send_error(
+            send,
+            _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+            result.problem.code or "OPERATION_FAILED",
+            result.problem.detail or "Operation failed",
+            path,
+            operation,
+            trace_id,
+        )
+        return True
+    await _serve_data_json(
+        send,
+        path,
+        operation,
+        cast("JsonObject | list[JsonObject]", result.data),
+        request_id,
+        trace_id,
+    )
     return True
 
 
 async def _serve_data_discovery_read(
+    gateway: ObserveMarketReferenceCapability,
     path: str,
+    method: str,
     params: dict[str, str],
     send: Send,
     request_id: str,
@@ -1499,7 +1573,9 @@ async def _serve_data_discovery_read(
     """Serve symbol discovery and explicit-symbol quote reads.
 
     Args:
+        gateway: Active market reference gateway.
         path: Request path.
+        method: Uppercase request method.
         params: Flattened query parameters.
         send: ASGI send callable.
         request_id: Mirrored or generated request identifier.
@@ -1508,37 +1584,76 @@ async def _serve_data_discovery_read(
     Returns:
         True when the route was handled.
     """
+    if method != "GET":
+        return False
     if path == _DATA_SYMBOLS_ROUTE:
-        payload = _data_reference_db.list_symbols(
+        req = ObserveMarketReferenceRequest(
+            request_id=str(uuid7()),
+            operation="DISCOVER_SYMBOLS",
             source_id=params.get("source_id", "mt5"),
             query=params.get("query"),
             cursor=params.get("cursor"),
             limit=int(params.get("limit", "50")),
-            request_id=request_id,
         )
+        result = await gateway.observe_market_reference(req)
+        if isinstance(result, InterfaceFailure):
+            await _send_error(
+                send,
+                _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+                result.problem.code or "OPERATION_FAILED",
+                result.problem.detail or "Operation failed",
+                path,
+                "api.data.symbols",
+                trace_id,
+            )
+            return True
         await _serve_data_json(
-            send, path, "api.data.symbols", payload, request_id, trace_id
+            send,
+            path,
+            "api.data.symbols",
+            cast("JsonObject | list[JsonObject]", result.data),
+            request_id,
+            trace_id,
         )
         return True
     if path == _DATA_QUOTES_ROUTE:
-        symbols = [
+        symbols = tuple(
             symbol.strip()
             for symbol in params.get("symbols", "").split(",")
             if symbol.strip()
-        ]
-        payload = _data_reference_db.list_quotes(
-            symbols,
-            source_id=params.get("source_id", "mt5"),
-            request_id=request_id,
         )
+        req = ObserveMarketReferenceRequest(
+            request_id=str(uuid7()),
+            operation="READ_QUOTES",
+            symbols=symbols,
+            source_id=params.get("source_id", "mt5"),
+        )
+        result = await gateway.observe_market_reference(req)
+        if isinstance(result, InterfaceFailure):
+            await _send_error(
+                send,
+                _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+                result.problem.code or "OPERATION_FAILED",
+                result.problem.detail or "Operation failed",
+                path,
+                "api.data.quotes",
+                trace_id,
+            )
+            return True
         await _serve_data_json(
-            send, path, "api.data.quotes", payload, request_id, trace_id
+            send,
+            path,
+            "api.data.quotes",
+            cast("JsonObject | list[JsonObject]", result.data),
+            request_id,
+            trace_id,
         )
         return True
     return False
 
 
 async def _serve_data_write_routes(
+    gateway: ObserveMarketReferenceCapability,
     receive: Receive,
     send: Send,
     path: str,
@@ -1549,6 +1664,7 @@ async def _serve_data_write_routes(
     """Serve the governed reference writes and item reads/edits.
 
     Args:
+        gateway: Active market reference gateway.
         receive: ASGI receive callable.
         send: ASGI send callable.
         path: Request path.
@@ -1560,12 +1676,27 @@ async def _serve_data_write_routes(
         True when the route was handled.
     """
     if path == _DATA_REFERENCE_SYNC_ROUTE and method == "POST":
-        payload = _data_reference_db.sync_reference()
+        req = ObserveMarketReferenceRequest(
+            request_id=str(uuid7()),
+            operation="SYNC_REFERENCE",
+        )
+        result = await gateway.observe_market_reference(req)
+        if isinstance(result, InterfaceFailure):
+            await _send_error(
+                send,
+                _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+                result.problem.code or "OPERATION_FAILED",
+                result.problem.detail or "Operation failed",
+                path,
+                "api.data.reference.sync",
+                trace_id,
+            )
+            return True
         await _serve_data_json(
             send,
             path,
             "api.data.reference.sync",
-            payload,
+            cast("JsonObject | list[JsonObject]", result.data),
             request_id,
             trace_id,
             side_effect="write",
@@ -1574,12 +1705,13 @@ async def _serve_data_write_routes(
     series_match = _DATA_SERIES_ID_PATTERN.match(path)
     if series_match is not None and method == "PATCH":
         await _serve_data_series_item(
-            receive, send, int(series_match.group(1)), request_id, trace_id
+            gateway, receive, send, int(series_match.group(1)), request_id, trace_id
         )
         return True
     instrument_match = _DATA_INSTRUMENT_ID_PATTERN.match(path)
     if instrument_match is not None and method in ("GET", "PATCH"):
         await _serve_data_instrument_item(
+            gateway,
             receive,
             send,
             instrument_match.group(1),
@@ -1601,7 +1733,7 @@ async def _serve_data(
 
     ``/api/v1/data/markets`` and the ``snapshot-stream`` alias keep their
     capability-gated catalogue/stream handlers; every other ``/data`` route
-    reads the hydrated reference store.
+    reads through the market reference gateway.
     """
     path = str(scope.get("path", ""))
     method = str(scope.get("method", "GET")).upper()
@@ -1613,25 +1745,84 @@ async def _serve_data(
         registry, scope, receive, send, path, method
     ):
         return
-    if path == _DATA_BARS_ROUTE and method == "GET":
-        await _serve_bars(scope, send, request_id, trace_id)
+
+    if not _is_data_reference_path(path):
+        await _send_error(
+            send,
+            HTTPStatus.NOT_FOUND,
+            "NOT_FOUND",
+            "The requested boundary route is not registered.",
+            path,
+            "api.data",
+            trace_id,
+        )
         return
-    if await _serve_data_catalogue_read(path, params, send, request_id, trace_id):
-        return
-    if await _serve_data_discovery_read(path, params, send, request_id, trace_id):
-        return
-    if await _serve_data_write_routes(
-        receive, send, path, method, request_id, trace_id
-    ):
-        return
-    await _send_error(
-        send,
-        HTTPStatus.NOT_FOUND,
-        "NOT_FOUND",
-        "The requested boundary route is not registered.",
+
+    gateway = await _resolve_gateway(
+        registry,
+        OBSERVE_MARKET_REFERENCE_CAPABILITY,
+        "The market reference capability has no active provider.",
         path,
         "api.data",
+        request_id,
         trace_id,
+        send,
+    )
+    if gateway is None:
+        return
+
+    handled = await _dispatch_data_reference(
+        gateway,
+        path,
+        method,
+        params,
+        scope,
+        receive,
+        send,
+        request_id,
+        trace_id,
+    )
+    if not handled:
+        await _send_error(
+            send,
+            HTTPStatus.NOT_FOUND,
+            "NOT_FOUND",
+            "The requested boundary route is not registered.",
+            path,
+            "api.data",
+            trace_id,
+        )
+
+
+async def _dispatch_data_reference(
+    gateway: ObserveMarketReferenceCapability,
+    path: str,
+    method: str,
+    params: dict[str, str],
+    scope: Scope,
+    receive: Receive,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> bool:
+    """Dispatch data reference route to appropriate handler.
+
+    Returns:
+        True if route was handled, False otherwise.
+    """
+    if path == _DATA_BARS_ROUTE and method == "GET":
+        await _serve_bars(gateway, scope, send, request_id, trace_id)
+        return True
+    if await _serve_data_catalogue_read(
+        gateway, path, method, params, send, request_id, trace_id
+    ):
+        return True
+    if await _serve_data_discovery_read(
+        gateway, path, method, params, send, request_id, trace_id
+    ):
+        return True
+    return await _serve_data_write_routes(
+        gateway, receive, send, path, method, request_id, trace_id
     )
 
 

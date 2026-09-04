@@ -1,7 +1,7 @@
 # Agentic Rebuild — Phase 1 Foundation
 
-> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)  
-> **Authority:** `app/services/agentic/README.md`, current owner-domain contracts, and `docs/dev/feature_implementation_pipeline.md`  
+> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)
+> **Authority:** `app/services/agentic/README.md`, current owner-domain contracts, and `docs/dev/feature_implementation_pipeline.md`
 > **Prerequisite:** `AGT-0.GATE`
 
 ## Purpose
@@ -62,10 +62,10 @@ uv run python scripts/architecture_check.py
 
 ## AGT-1.01 — `FEAT-AGT-ENFORCE_MANDATE`
 
-**Provides:** `agentic.mandate@1`  
-**Depends on:** `AGT-1.00`; Phase-0 Workspace/System settings, authenticated principal, clock, signature, and secret-reference decisions.  
-**State:** none.  
-**Primary module:** `mandate_enforcement.py`  
+**Provides:** `agentic.mandate@1`
+**Depends on:** `AGT-1.00`; Phase-0 Workspace/System settings, authenticated principal, clock, signature, and secret-reference decisions.
+**State:** none.
+**Primary module:** `mandate_enforcement.py`
 **Operations:** `VALIDATE`, `CHECK_SCOPE`, `INSPECT`.
 
 **Donor evidence to normalize**
@@ -125,10 +125,10 @@ fail_closed_on_expiry
 
 ## AGT-1.02 — `FEAT-AGT-OPERATE_RUNS`
 
-**Provides:** `agentic.operations@1`  
-**Requires:** `agentic.mandate@1`; ratified persistence/clock/redaction/ID operations.  
-**State:** `agentic.operations`, schema v1, `RETAIN`.  
-**Primary module:** `run_operations.py`  
+**Provides:** `agentic.operations@1`
+**Requires:** `agentic.mandate@1`; ratified persistence/clock/redaction/ID operations.
+**State:** `agentic.operations`, schema v1, `RETAIN`.
+**Primary module:** `run_operations.py`
 **Operations:** `RECORD`, `INSPECT_TRACE`, `REPORT_INCIDENT`, `VALIDATE_REPLAY`, `INSPECT_READINESS`, `EXPORT`.
 
 **Donor evidence to normalize**
@@ -191,10 +191,10 @@ replay_validation_only
 
 ## AGT-1.03 — `FEAT-AGT-REGISTER_ROLES`
 
-**Provides:** `agentic.roles@1`  
-**Requires:** `agentic.mandate@1`; exact Plugins contribution capability if Phase 0 retains external contribution support.  
-**State:** none.  
-**Primary module:** `role_registry.py`  
+**Provides:** `agentic.roles@1`
+**Requires:** `agentic.mandate@1`; exact Plugins contribution capability if Phase 0 retains external contribution support.
+**State:** none.
+**Primary module:** `role_registry.py`
 **Operations:** `REGISTER`, `UNREGISTER`, `RESOLVE`, `LIST`, `SET_ELIGIBILITY_REFERENCE`.
 
 **Donor evidence to normalize**
@@ -254,10 +254,10 @@ allow_external_role_contributions
 
 ## AGT-1.04 — `FEAT-AGT-GOVERN_TOOL_CALLS`
 
-**Provides:** `agentic.tool-governance@1`  
-**Requires:** `agentic.mandate@1`, `agentic.roles@1`, `agentic.operations@1`, ratified principal/clock/persistence.  
-**State:** `agentic.tool_governance`, schema v1, `RETAIN`.  
-**Primary module:** `tool_governance.py`  
+**Provides:** `agentic.tool-governance@1`
+**Requires:** `agentic.mandate@1`, `agentic.roles@1`, `agentic.operations@1`, ratified principal/clock/persistence.
+**State:** `agentic.tool_governance`, schema v1, `RETAIN`.
+**Primary module:** `tool_governance.py`
 **Operations:** `REGISTER_TOOL`, `REQUEST_LEASE`, `AUTHORIZE_INVOCATION`, `FILTER_RESULT`, `REVOKE_LEASE`, `REQUEST_HUMAN_ACTION`, `DECIDE_HUMAN_ACTION`.
 
 **Donor evidence to normalize**
@@ -322,11 +322,11 @@ allowed_read_side_effect_classes
 
 ## AGT-1.05 — `FEAT-AGT-INVOKE_MODELS`
 
-**Provides:** `agentic.model-inference@1`  
-**Requires:** `agentic.mandate@1`, `agentic.roles@1`, `agentic.operations@1`, exact provider-selection and secret-reference capabilities.  
-**Optional:** `agentic.tool-governance@1` only for profiles that expose custom tools.  
-**State:** none.  
-**Primary module:** `model_invocation.py`  
+**Provides:** `agentic.model-inference@1`
+**Requires:** `agentic.mandate@1`, `agentic.roles@1`, `agentic.operations@1`, exact provider-selection and secret-reference capabilities.
+**Optional:** `agentic.tool-governance@1` only for profiles that expose custom tools.
+**State:** none.
+**Primary module:** `model_invocation.py`
 **Operation:** `INVOKE`.
 
 **Donor evidence to normalize**

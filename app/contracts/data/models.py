@@ -1574,6 +1574,52 @@ class StreamMarketEventsSubscription(WireModel):
     schema_version: Literal[1] = 1
 
 
+type BrowseReferenceOperation = Literal[
+    "LIST_CAPABILITIES",
+    "LIST_SERIES",
+    "LIST_INSTRUMENTS",
+    "LIST_BROKERS",
+    "DISCOVER_SYMBOLS",
+    "READ_QUOTES",
+    "READ_BARS",
+    "SYNC_REFERENCE",
+    "READ_INSTRUMENT",
+    "UPDATE_INSTRUMENT",
+    "UPDATE_SERIES",
+    "LIST_MARKET_DIRECTORY",
+]
+
+
+class BrowseReferenceRequest(WireModel):
+    """Operation request for market-data reference browsing and edits."""
+
+    request_id: Uuid7
+    operation: BrowseReferenceOperation
+    limit: int | None = None
+    cursor: str | None = None
+    query: str | None = None
+    source_id: str | None = None
+    symbols: tuple[str, ...] = ()
+    symbol: str | None = None
+    timeframe: str | None = None
+    start: str | None = None
+    end: str | None = None
+    series_id: int | None = None
+    instrument: str | None = None
+    payload: JsonObject = Field(default_factory=dict)
+    schema_version: Literal[1] = 1
+
+
+class BrowseReferenceSuccess(WireModel):
+    """Successful result from browse reference operation."""
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    data: JsonValue = None
+    schema_version: Literal[1] = 1
+
+
 # TickType, DeduplicationPolicy, NewsImpact, ProfileSourceKind, and the
 # other PEP 695 ``type`` aliases are not classes, so they cannot be
 # registered in WIRE_MODELS.
@@ -1637,4 +1683,6 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
     "StreamMarketEventsRequest": StreamMarketEventsRequest,
     "StreamMarketEventsSuccess": StreamMarketEventsSuccess,
     "StreamMarketEventsSubscription": StreamMarketEventsSubscription,
+    "BrowseReferenceRequest": BrowseReferenceRequest,
+    "BrowseReferenceSuccess": BrowseReferenceSuccess,
 }

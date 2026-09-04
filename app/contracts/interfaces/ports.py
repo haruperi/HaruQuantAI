@@ -33,6 +33,8 @@ if TYPE_CHECKING:
         ObserveMarketDataEventSubscription,
         ObserveMarketDataRequest,
         ObserveMarketDataSuccess,
+        ObserveMarketReferenceRequest,
+        ObserveMarketReferenceSuccess,
         OpenApiManifest,
         OperateIdentityRequest,
         OperateIdentitySuccess,
@@ -629,5 +631,24 @@ class OperateSettingsCapability(Protocol):
 
         Returns:
             Settings operation success, or a structured interface failure.
+        """
+        ...
+
+
+@runtime_checkable
+class ObserveMarketReferenceCapability(Protocol):
+    """Protocol for the market reference and directory gateway."""
+
+    async def observe_market_reference(
+        self,
+        request: ObserveMarketReferenceRequest,
+    ) -> ObserveMarketReferenceSuccess | InterfaceFailure:
+        """Resolve and expose market series, instruments, brokers, and bars operations.
+
+        Args:
+            request: Operation-discriminated market reference gateway request.
+
+        Returns:
+            Market reference operation success, or a structured interface failure.
         """
         ...

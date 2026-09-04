@@ -1,12 +1,12 @@
 # Agentic Domain Rebuild Plan
 
-> **Target domain:** `D-AGT` — `app/services/agentic/`  
-> **Plan status:** `READY FOR OWNER REVIEW` — planning and sequencing only; production implementation remains unchecked  
-> **Authoritative product specification:** `app/services/agentic/README.md`  
-> **Implementation standard:** `docs/dev/feature_implementation_pipeline.md`  
-> **Current repository baseline:** `068d8af0e5b4dfb8dece8e988e2960f41afdc75e`  
-> **Pinned legacy donor candidate:** `d9c614f20939f76bc1d8020ea8837da29eb2a9da`  
-> **Commit that removed the legacy tree:** `4fef8b614cba073180d4dc9bedf5ec0dc19b956a`  
+> **Target domain:** `D-AGT` — `app/services/agentic/`
+> **Plan status:** `READY FOR OWNER REVIEW` — planning and sequencing only; production implementation remains unchecked
+> **Authoritative product specification:** `app/services/agentic/README.md`
+> **Implementation standard:** `docs/dev/feature_implementation_pipeline.md`
+> **Current repository baseline:** `068d8af0e5b4dfb8dece8e988e2960f41afdc75e`
+> **Pinned legacy donor candidate:** `d9c614f20939f76bc1d8020ea8837da29eb2a9da`
+> **Commit that removed the legacy tree:** `4fef8b614cba073180d4dc9bedf5ec0dc19b956a`
 > **Target:** 20 focused features, 22 built-in LLM role profiles, seven role families, and 12 governed workflows
 
 This plan converts the approved Agentic architecture into execution-grade Tasks. It is deliberately more prescriptive than an ordinary roadmap so a lower-intelligence Executor can implement one bounded feature without inventing architecture, authority, contracts, state, provider behavior, or cross-domain semantics.

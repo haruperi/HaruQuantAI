@@ -89,6 +89,31 @@ export interface BindRunDataSuccess {
   result_version?: 1;  // default: 1
   schema_version?: 1;  // default: 1
 }
+export type BrowseReferenceOperation = "LIST_CAPABILITIES" | "LIST_SERIES" | "LIST_INSTRUMENTS" | "LIST_BROKERS" | "DISCOVER_SYMBOLS" | "READ_QUOTES" | "READ_BARS" | "SYNC_REFERENCE" | "READ_INSTRUMENT" | "UPDATE_INSTRUMENT" | "UPDATE_SERIES" | "LIST_MARKET_DIRECTORY";
+export interface BrowseReferenceRequest {
+  request_id: string;
+  operation: BrowseReferenceOperation;
+  limit?: number | null;  // default: null
+  cursor?: string | null;  // default: null
+  query?: string | null;  // default: null
+  source_id?: string | null;  // default: null
+  symbols?: string[];  // default: []
+  symbol?: string | null;  // default: null
+  timeframe?: string | null;  // default: null
+  start?: string | null;  // default: null
+  end?: string | null;  // default: null
+  series_id?: number | null;  // default: null
+  instrument?: string | null;  // default: null
+  payload?: JsonObject;
+  schema_version?: 1;  // default: 1
+}
+export interface BrowseReferenceSuccess {
+  outcome?: "SUCCESS";  // default: "SUCCESS"
+  request_id: string;
+  result_version?: 1;  // default: 1
+  data?: JsonValue;  // default: null
+  schema_version?: 1;  // default: 1
+}
 export interface ConnectorProfile {
   profile_id: string;
   connector_kind: NonEmptyStr;

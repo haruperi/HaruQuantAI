@@ -16,6 +16,8 @@ if TYPE_CHECKING:
         AlignSeriesSuccess,
         BindRunDataRequest,
         BindRunDataSuccess,
+        BrowseReferenceRequest,
+        BrowseReferenceSuccess,
         GenerateScenariosRequest,
         GenerateScenariosSuccess,
         ImportIndicatorsRequest,
@@ -338,5 +340,25 @@ class StreamMarketEventsCapability(Protocol):
         Returns:
             An asynchronous iterator of normalized market events wrapped
             in the common domain event envelope.
+        """
+        ...
+
+
+@runtime_checkable
+class BrowseReferenceCapability(Protocol):
+    """Capability protocol for market-data reference browsing and edits."""
+
+    async def browse_reference(
+        self,
+        request: BrowseReferenceRequest,
+    ) -> BrowseReferenceSuccess | DataFailure:
+        """Browse market series, instruments, brokers, bars, and market directory.
+
+        Args:
+            request: Operation-discriminated reference browsing request.
+
+        Returns:
+            The requested reference projections, bars, or mutation result on success,
+            otherwise a structured data failure.
         """
         ...

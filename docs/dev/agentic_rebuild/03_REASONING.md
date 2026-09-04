@@ -1,7 +1,7 @@
 # Agentic Rebuild — Phase 3 Claims, Deliberation, and Synthesis
 
-> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)  
-> **Prerequisite:** Phase 2 workflows/context plus Phase 1 authority and invocation capabilities  
+> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)
+> **Prerequisite:** Phase 2 workflows/context plus Phase 1 authority and invocation capabilities
 > **Authority:** `app/services/agentic/README.md`
 
 ## Purpose
@@ -12,11 +12,11 @@ Replace transcript-first multi-agent reasoning with a canonical claim-and-eviden
 
 ## AGT-3.11 — `FEAT-AGT-MANAGE_CLAIMS`
 
-**Provides:** `agentic.claims@1`  
-**Requires:** mandate, operations, roles, model inference, workflows, context, and ratified persistence.  
-**Optional:** governed tools and outcome-calibration evidence.  
-**State:** `agentic.claims`, schema v1, `RETAIN`.  
-**Primary module:** `claim_graph.py`.  
+**Provides:** `agentic.claims@1`
+**Requires:** mandate, operations, roles, model inference, workflows, context, and ratified persistence.
+**Optional:** governed tools and outcome-calibration evidence.
+**State:** `agentic.claims`, schema v1, `RETAIN`.
+**Primary module:** `claim_graph.py`.
 **Roles:** `analytics_evidence_reviewer`, `fundamental_analyst`, `sentiment_analyst`, `technical_structure_analyst`, `quantitative_analyst`.
 
 **Donor evidence to normalize**
@@ -85,7 +85,7 @@ tests/services/agentic/manage_claims/**
 - provider/context/tool removal and graceful refusal;
 - churn, replacement, retained-state removal, and physical deletion.
 
-**Usage:** `uv run python -m app.services.agentic.manage_claims.claim_graph`  
+**Usage:** `uv run python -m app.services.agentic.manage_claims.claim_graph`
 **Commit:** `feat(agentic): implement claim-and-evidence graph`
 
 **Removal:** stop claim mutation and new analyst work, unregister the five roles, preserve committed graphs, and make claim-dependent workflows unready.
@@ -94,11 +94,11 @@ tests/services/agentic/manage_claims/**
 
 ## AGT-3.12 — `FEAT-AGT-DELIBERATE_RESEARCH`
 
-**Provides:** `agentic.deliberation@1`  
-**Requires:** mandate, roles, model inference, tool governance, workflows, claims, operations.  
-**Optional:** exact deterministic challenge/evaluation tools.  
-**State:** Phase 0 must resolve the README inconsistency; if durable, own a feature-local `agentic.deliberation` namespace, otherwise persist final records through the operations/workflow owner.  
-**Primary module:** `research_deliberation.py`.  
+**Provides:** `agentic.deliberation@1`
+**Requires:** mandate, roles, model inference, tool governance, workflows, claims, operations.
+**Optional:** exact deterministic challenge/evaluation tools.
+**State:** Phase 0 must resolve the README inconsistency; if durable, own a feature-local `agentic.deliberation` namespace, otherwise persist final records through the operations/workflow owner.
+**Primary module:** `research_deliberation.py`.
 **Roles:** `causality_challenger`, `leakage_challenger`, `robustness_challenger`, `risk_challenger`, `compliance_challenger`, `operations_security_challenger`.
 
 **Donor evidence to normalize**
@@ -148,7 +148,7 @@ tests/services/agentic/deliberate_research/**
 - restart/durable record if selected, or operations/workflow record parity if stateless;
 - role mutation/hash failure, exact disposal, replacement, and physical removal.
 
-**Usage:** `uv run python -m app.services.agentic.deliberate_research.research_deliberation`  
+**Usage:** `uv run python -m app.services.agentic.deliberate_research.research_deliberation`
 **Commit:** `feat(agentic): implement independent challenge and deliberation`
 
 **Removal:** preserve committed assessments/dissent, cancel or checkpoint active rounds, unregister challengers, and retain low-risk single-specialist workflows only where policy permits.
@@ -157,11 +157,11 @@ tests/services/agentic/deliberate_research/**
 
 ## AGT-3.13 — `FEAT-AGT-SYNTHESIZE_RESEARCH`
 
-**Provides:** `agentic.synthesis@1`  
-**Requires:** mandate, operations, roles, model inference, context, claims.  
-**Optional:** deliberation and profile evaluation.  
-**State:** none unless Phase 0 explicitly assigns durable synthesis records; normal persistence is through workflow/operations evidence.  
-**Primary module:** `research_synthesis.py`.  
+**Provides:** `agentic.synthesis@1`
+**Requires:** mandate, operations, roles, model inference, context, claims.
+**Optional:** deliberation and profile evaluation.
+**State:** none unless Phase 0 explicitly assigns durable synthesis records; normal persistence is through workflow/operations evidence.
+**Primary module:** `research_synthesis.py`.
 **Role:** `research_synthesizer`.
 
 **Donor evidence to normalize**
@@ -205,7 +205,7 @@ tests/services/agentic/synthesize_research/**
 - missing role/model/context/deliberation behavior;
 - cancellation, exact role disposal, replacement, and physical removal.
 
-**Usage:** `uv run python -m app.services.agentic.synthesize_research.research_synthesis`  
+**Usage:** `uv run python -m app.services.agentic.synthesize_research.research_synthesis`
 **Commit:** `feat(agentic): implement research synthesis`
 
 **Removal:** cancel synthesis and unregister the role while leaving claims, specialist results, deliberation records, and deterministic domains accessible.

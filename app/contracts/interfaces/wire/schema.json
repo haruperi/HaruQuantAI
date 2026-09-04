@@ -2720,6 +2720,218 @@
       "title": "ObserveMarketDataSuccess",
       "type": "object"
     },
+    "ObserveMarketReferenceOperation": {
+      "enum": [
+        "LIST_CAPABILITIES",
+        "LIST_SERIES",
+        "LIST_INSTRUMENTS",
+        "LIST_BROKERS",
+        "DISCOVER_SYMBOLS",
+        "READ_QUOTES",
+        "READ_BARS",
+        "SYNC_REFERENCE",
+        "READ_INSTRUMENT",
+        "UPDATE_INSTRUMENT",
+        "UPDATE_SERIES",
+        "LIST_MARKET_DIRECTORY"
+      ],
+      "type": "string"
+    },
+    "ObserveMarketReferenceRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated market reference gateway request.",
+      "properties": {
+        "cursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cursor"
+        },
+        "end": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End"
+        },
+        "instrument": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instrument"
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Limit"
+        },
+        "operation": {
+          "$ref": "#/$defs/ObserveMarketReferenceOperation"
+        },
+        "payload": {
+          "$ref": "#/$defs/JsonObject"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Query"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "series_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Id"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start"
+        },
+        "symbol": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Symbol"
+        },
+        "symbols": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Symbols",
+          "type": "array"
+        },
+        "timeframe": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timeframe"
+        }
+      },
+      "required": [
+        "request_id",
+        "operation"
+      ],
+      "title": "ObserveMarketReferenceRequest",
+      "type": "object"
+    },
+    "ObserveMarketReferenceSuccess": {
+      "additionalProperties": false,
+      "description": "Successful market reference gateway operation result.",
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/JsonValue",
+          "default": null
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "ObserveMarketReferenceSuccess",
+      "type": "object"
+    },
     "OperateIdentityRequest": {
       "additionalProperties": false,
       "description": "Operation-discriminated identity gateway request.\n\nREGISTER/LOGIN require ``username`` and ``password``; ME/LOGOUT\nrequire ``session_token``. The shape mirrors the Workspace\nmanage-accounts contract without its coordination fields.",
@@ -6530,6 +6742,12 @@
     },
     "ObserveMarketDataSuccess": {
       "$ref": "#/$defs/ObserveMarketDataSuccess"
+    },
+    "ObserveMarketReferenceRequest": {
+      "$ref": "#/$defs/ObserveMarketReferenceRequest"
+    },
+    "ObserveMarketReferenceSuccess": {
+      "$ref": "#/$defs/ObserveMarketReferenceSuccess"
     },
     "OperateIdentityRequest": {
       "$ref": "#/$defs/OperateIdentityRequest"

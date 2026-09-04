@@ -1,7 +1,7 @@
 # Agentic Rebuild — Phase 2 Runtime, Context, Memory, Evaluation, and Chat Bot
 
-> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)  
-> **Prerequisite:** Phase 1 capability foundation  
+> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)
+> **Prerequisite:** Phase 1 capability foundation
 > **Authority:** `app/services/agentic/README.md` and current owner-domain contracts
 
 ## Purpose
@@ -12,11 +12,11 @@ Deliver bounded durable workflow execution, point-in-time context, governed memo
 
 ## AGT-2.06 — `FEAT-AGT-RUN_WORKFLOWS`
 
-**Provides:** `agentic.workflows@1`  
-**Requires:** `agentic.mandate@1`, `agentic.roles@1`, `agentic.operations@1`, ratified persistence/worker-admission capability.  
-**Optional:** `agentic.tool-governance@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.memory@1`.  
-**State:** `agentic.workflows`, schema v1, `RETAIN`.  
-**Roles:** `research_planner`, `artifact_planner`.  
+**Provides:** `agentic.workflows@1`
+**Requires:** `agentic.mandate@1`, `agentic.roles@1`, `agentic.operations@1`, ratified persistence/worker-admission capability.
+**Optional:** `agentic.tool-governance@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.memory@1`.
+**State:** `agentic.workflows`, schema v1, `RETAIN`.
+**Roles:** `research_planner`, `artifact_planner`.
 **Primary module:** `workflow_runtime.py`.
 
 **Donor evidence**
@@ -66,16 +66,16 @@ tests/services/agentic/run_workflows/**
 - planner prompt/manifest integrity and authority-negative tests;
 - migration/reconstruction, drain, replacement, churn, retained-state removal, physical deletion.
 
-**Usage:** `uv run python -m app.services.agentic.run_workflows.workflow_runtime`  
+**Usage:** `uv run python -m app.services.agentic.run_workflows.workflow_runtime`
 **Commit:** `feat(agentic): implement durable workflow orchestration`
 
 ---
 
 ## AGT-2.07 — `FEAT-AGT-ASSEMBLE_CONTEXT`
 
-**Provides:** `agentic.context@1`  
-**Requires:** `agentic.mandate@1`, `agentic.tool-governance@1`, `agentic.operations@1`, exact read-only evidence capabilities.  
-**State:** none.  
+**Provides:** `agentic.context@1`
+**Requires:** `agentic.mandate@1`, `agentic.tool-governance@1`, `agentic.operations@1`, exact read-only evidence capabilities.
+**State:** none.
 **Primary module:** `context_assembly.py`.
 
 **Donor evidence**
@@ -119,16 +119,16 @@ tests/services/agentic/assemble_context/**
 - exact token/byte/item bounds;
 - required versus optional coverage, cancellation, replacement, and physical removal.
 
-**Usage:** `uv run python -m app.services.agentic.assemble_context.context_assembly`  
+**Usage:** `uv run python -m app.services.agentic.assemble_context.context_assembly`
 **Commit:** `feat(agentic): implement point-in-time context assembly`
 
 ---
 
 ## AGT-2.08 — `FEAT-AGT-MANAGE_MEMORY`
 
-**Provides:** `agentic.memory@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, ratified persistence/clock/redaction/retention capabilities.  
-**State:** `agentic.memory`, schema v1; use only Phase-0-supported retention enum plus feature-level TTL/purge policy.  
+**Provides:** `agentic.memory@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, ratified persistence/clock/redaction/retention capabilities.
+**State:** `agentic.memory`, schema v1; use only Phase-0-supported retention enum plus feature-level TTL/purge policy.
 **Primary module:** `memory_management.py`.
 
 **Donor evidence**
@@ -175,16 +175,16 @@ tests/services/agentic/manage_memory/**
 - TTL, purge, legal hold, export, restart/import;
 - stateless degradation, retained-state removal, and physical deletion.
 
-**Usage:** `uv run python -m app.services.agentic.manage_memory.memory_management`  
+**Usage:** `uv run python -m app.services.agentic.manage_memory.memory_management`
 **Commit:** `feat(agentic): implement governed memory`
 
 ---
 
 ## AGT-2.09 — `FEAT-AGT-EVALUATE_PROFILES`
 
-**Provides:** `agentic.profile-evaluation@1`  
-**Requires:** mandate, roles, operations, tools, model inference, workflows, and ratified evaluation persistence.  
-**State:** `agentic.profile_evaluation`, schema v1, `RETAIN`.  
+**Provides:** `agentic.profile-evaluation@1`
+**Requires:** mandate, roles, operations, tools, model inference, workflows, and ratified evaluation persistence.
+**State:** `agentic.profile_evaluation`, schema v1, `RETAIN`.
 **Primary module:** `profile_evaluation.py`.
 
 **Donor evidence**
@@ -228,18 +228,18 @@ tests/services/agentic/evaluate_profiles/**
 - bootstrap provider confinement;
 - migration/restart, role/provider removal, replacement, physical deletion.
 
-**Usage:** `uv run python -m app.services.agentic.evaluate_profiles.profile_evaluation`  
+**Usage:** `uv run python -m app.services.agentic.evaluate_profiles.profile_evaluation`
 **Commit:** `feat(agentic): implement profile and topology evaluation`
 
 ---
 
 ## AGT-2.10 — `FEAT-AGT-ASSIST_OPERATOR`
 
-**Provides:** `agentic.operator-assistance@1`  
-**Requires:** mandate, operations, roles, model inference, workflows; context is required by context-aware workflow policy and memory/tools are optional.  
-**External prerequisite:** Phase-0-ratified D-IFACE Chat Bot transport and workspace-context capability.  
-**State:** Phase 0 decides Agentic versus D-IFACE/Workspace session ownership; no implementation may guess.  
-**Role:** **Chat Bot**, ID `chat_bot`.  
+**Provides:** `agentic.operator-assistance@1`
+**Requires:** mandate, operations, roles, model inference, workflows; context is required by context-aware workflow policy and memory/tools are optional.
+**External prerequisite:** Phase-0-ratified D-IFACE Chat Bot transport and workspace-context capability.
+**State:** Phase 0 decides Agentic versus D-IFACE/Workspace session ownership; no implementation may guess.
+**Role:** **Chat Bot**, ID `chat_bot`.
 **Primary module:** `operator_assistance.py`.
 
 **Donor evidence**
@@ -288,7 +288,7 @@ tests/services/agentic/assist_operator/**
 - optional memory absent/arrival/removal and conversation TTL;
 - feature removal leaves UI/specialists usable through other interfaces.
 
-**Usage:** `uv run python -m app.services.agentic.assist_operator.operator_assistance`  
+**Usage:** `uv run python -m app.services.agentic.assist_operator.operator_assistance`
 **Commit:** `feat(agentic): implement website chat bot and specialist delegation`
 
 ---

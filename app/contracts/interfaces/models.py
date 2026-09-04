@@ -29,6 +29,7 @@ from app.contracts.common.models import (
     FeatureIdentifier,
     FeatureState,
     JsonObject,
+    JsonValue,
     TradingModeValue,
     TradingSessionStateValue,
     UtcTimestamp,
@@ -1503,6 +1504,52 @@ class OperateSettingsSuccess(WireModel):
     schema_version: Literal[1] = 1
 
 
+type ObserveMarketReferenceOperation = Literal[
+    "LIST_CAPABILITIES",
+    "LIST_SERIES",
+    "LIST_INSTRUMENTS",
+    "LIST_BROKERS",
+    "DISCOVER_SYMBOLS",
+    "READ_QUOTES",
+    "READ_BARS",
+    "SYNC_REFERENCE",
+    "READ_INSTRUMENT",
+    "UPDATE_INSTRUMENT",
+    "UPDATE_SERIES",
+    "LIST_MARKET_DIRECTORY",
+]
+
+
+class ObserveMarketReferenceRequest(WireModel):
+    """Operation-discriminated market reference gateway request."""
+
+    request_id: Uuid7
+    operation: ObserveMarketReferenceOperation
+    limit: int | None = None
+    cursor: str | None = None
+    query: str | None = None
+    source_id: str | None = None
+    symbols: tuple[str, ...] = ()
+    symbol: str | None = None
+    timeframe: str | None = None
+    start: str | None = None
+    end: str | None = None
+    series_id: int | None = None
+    instrument: str | None = None
+    payload: JsonObject = Field(default_factory=dict)
+    schema_version: Literal[1] = 1
+
+
+class ObserveMarketReferenceSuccess(WireModel):
+    """Successful market reference gateway operation result."""
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    data: JsonValue = None
+    schema_version: Literal[1] = 1
+
+
 WIRE_MODELS: dict[str, type[WireModel]] = {
     "ApiVersion": ApiVersionWire,
     "ConcurrencyToken": ConcurrencyTokenWire,
@@ -1549,4 +1596,6 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
     "OperateTradingRequest": OperateTradingRequest,
     "OperateTradingSuccess": OperateTradingSuccess,
     "OperateTradingEventSubscription": OperateTradingEventSubscription,
+    "ObserveMarketReferenceRequest": ObserveMarketReferenceRequest,
+    "ObserveMarketReferenceSuccess": ObserveMarketReferenceSuccess,
 }

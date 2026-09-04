@@ -231,3 +231,60 @@ async def mount_trading_stack(
         scope=gateway_scope,
     )
     return registry, store_scope, gateway_scope
+
+
+async def mount_data_reference_stack(
+    db_path: Path | str | None = None,
+    registry: ServiceRegistry | None = None,
+) -> tuple[
+    ServiceRegistry,
+    FeatureScope,
+    FeatureScope,
+]:
+    """Mount the browse reference store and market reference gateway capabilities into one registry.
+
+    Returns:
+        Registry, store scope, and gateway scope.
+    """
+    from app.contracts.data.capabilities import BROWSE_REFERENCE_CAPABILITY
+    from app.contracts.interfaces.capabilities import (
+        OBSERVE_MARKET_REFERENCE_CAPABILITY,
+    )
+    from app.services.data.browse_reference.browse_reference import (
+        BrowseReferenceService,
+    )
+    from app.services.data.browse_reference.config import BrowseReferenceConfig
+    from app.services.interfaces.observe_market_reference.config import (
+        ObserveMarketReferenceConfig,
+    )
+    from app.services.interfaces.observe_market_reference.gateway import (
+        MarketReferenceGateway,
+    )
+
+    if registry is None:
+        registry = ServiceRegistry()
+    config = (
+        BrowseReferenceConfig(database_path=str(db_path))
+        if db_path is not None
+        else BrowseReferenceConfig()
+    )
+    store = BrowseReferenceService(config)
+    store_scope = FeatureScope(owner_id="FEAT-DATA-BROWSE_REFERENCE")
+    registry.register(
+        BROWSE_REFERENCE_CAPABILITY,
+        store,
+        owner_id="FEAT-DATA-BROWSE_REFERENCE",
+        scope=store_scope,
+    )
+    gateway = MarketReferenceGateway(
+        config=ObserveMarketReferenceConfig(),
+        provider=store,
+    )
+    gateway_scope = FeatureScope(owner_id="FEAT-IFACE-OBSERVE_MARKET_REFERENCE")
+    registry.register(
+        OBSERVE_MARKET_REFERENCE_CAPABILITY,
+        gateway,
+        owner_id="FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
+        scope=gateway_scope,
+    )
+    return registry, store_scope, gateway_scope

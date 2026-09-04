@@ -20,13 +20,17 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
 
-from tests.services.interfaces.workspace_shared import mount_settings_stack
+from tests.services.interfaces.workspace_shared import (
+    mount_data_reference_stack,
+    mount_settings_stack,
+)
 
 
 @pytest_asyncio.fixture
 async def client() -> AsyncIterator[httpx.AsyncClient]:
-    """Build an ASGI test client with settings capability mounted."""
+    """Build an ASGI test client with settings and data reference capabilities mounted."""
     registry, _store_scope, _gw_scope = await mount_settings_stack()
+    await mount_data_reference_stack(registry=registry)
     transport = httpx.ASGITransport(app=create_api_asgi_app(registry))
     async with httpx.AsyncClient(
         transport=transport, base_url="http://boundary"
@@ -44,6 +48,21 @@ async def test_settings_unmounted_fails_closed() -> None:
         res = await bare_client.get("/api/v1/settings")
         assert res.status_code == 503
         assert res.json()["error"]["code"] == "CAPABILITY_UNAVAILABLE"
+
+
+@pytest.mark.asyncio
+async def test_data_reference_unmounted_fails_closed() -> None:
+    """Verify data reference routes return 503 when unmounted, and 404 for unknown routes."""
+    transport = httpx.ASGITransport(app=create_api_asgi_app(ServiceRegistry()))
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://boundary"
+    ) as bare_client:
+        res = await bare_client.get("/api/v1/data/capabilities")
+        assert res.status_code == 503
+        assert res.json()["error"]["code"] == "CAPABILITY_UNAVAILABLE"
+
+        unknown = await bare_client.get("/api/v1/data/not-a-route")
+        assert unknown.status_code == 404
 
 
 @pytest.mark.asyncio

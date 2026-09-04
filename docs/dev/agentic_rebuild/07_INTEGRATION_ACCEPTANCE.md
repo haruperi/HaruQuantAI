@@ -1,7 +1,7 @@
 # Agentic Rebuild — Phase 7 Integration and Acceptance
 
-> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)  
-> **Prerequisite:** the features required by each workflow  
+> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)
+> **Prerequisite:** the features required by each workflow
 > **Authority:** current Agentic, D-IFACE, UI, and receiver-domain specifications
 
 ## 9. Phase 7 — Vertical Slices, Companion Features, and Domain Completion

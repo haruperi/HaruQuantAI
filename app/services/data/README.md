@@ -74,6 +74,7 @@ Rows labelled `FEAT-* capability surface` describe planned semantic contract bun
 | Complete | `FEAT-DATA-TRACK_MARKET_NEWS` capability surface | `v1` | Research, Risk, Trading, Interfaces | Economic Calendar and News Evidence. |
 | Complete | `FEAT-DATA-STREAM_MARKET_EVENTS` capability surface | `v1` | Strategy, Risk, Trading, Interfaces | Real-Time Market Events. |
 | Implemented | `FEAT-DATA-IMPORT_QUANTDATA` capability surface | `v1` | Catalogue, Workspace | QuantDataManager Source. |
+| Implemented | `FEAT-DATA-BROWSE_REFERENCE` capability surface | `v1` | Interfaces, Workspace | Market Reference Browser. |
 
 **Cross-domain requirement references (not runtime dependencies)**
 

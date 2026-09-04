@@ -1,7 +1,7 @@
 # Agentic Rebuild — Phase 5 Decision Support
 
-> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)  
-> **Prerequisite:** canonical claims/synthesis and ratified receiver contracts  
+> **Parent plan:** [`docs/dev/AGENTIC_REBUILD_PLAN.md`](../AGENTIC_REBUILD_PLAN.md)
+> **Prerequisite:** canonical claims/synthesis and ratified receiver contracts
 > **Authority:** Strategy, Indicators, Portfolio, Risk, and Agentic owner specifications
 
 ## Purpose
@@ -12,12 +12,12 @@ Deliver three non-authoritative outputs: JSON Strategy/Indicator DSL candidates,
 
 ## AGT-5.16 — `FEAT-AGT-COMPOSE_STRATEGY_SPECS`
 
-**Provides:** `agentic.strategy-specs@1`  
-**Requires:** mandate, operations, roles, model inference, claims, synthesis, research-search lineage, and exact Strategy/Indicators DSL schema/validation capabilities.  
-**Optional:** context, governed tools, research-design candidate refs.  
-**State:** none.  
-**Primary module:** `strategy_spec_composition.py`.  
-**Role:** `strategy_dsl_author`.  
+**Provides:** `agentic.strategy-specs@1`
+**Requires:** mandate, operations, roles, model inference, claims, synthesis, research-search lineage, and exact Strategy/Indicators DSL schema/validation capabilities.
+**Optional:** context, governed tools, research-design candidate refs.
+**State:** none.
+**Primary module:** `strategy_spec_composition.py`.
+**Role:** `strategy_dsl_author`.
 **Operations:** `COMPOSE`, `VALIDATE_HANDOFF`.
 
 **Donor evidence to normalize**
@@ -65,7 +65,7 @@ tests/services/agentic/compose_strategy_specs/**
 - receiver rejection/acceptance truth and no false registration;
 - prompt/manifest integrity, role eligibility, cancellation, replacement, churn, and physical deletion.
 
-**Usage:** `uv run python -m app.services.agentic.compose_strategy_specs.strategy_spec_composition`  
+**Usage:** `uv run python -m app.services.agentic.compose_strategy_specs.strategy_spec_composition`
 **Commit:** `feat(agentic): implement json strategy and indicator dsl composition`
 
 **Removal:** stop new composition and unregister the role; receiver-owned schemas and accepted artifacts remain unaffected.
@@ -74,12 +74,12 @@ tests/services/agentic/compose_strategy_specs/**
 
 ## AGT-5.17 — `FEAT-AGT-ADVISE_PORTFOLIO`
 
-**Provides:** `agentic.portfolio-advisory@1`  
-**Requires:** mandate, operations, roles, model inference, context, claims, synthesis, and exact current Portfolio/Risk/Analytics/account-evidence capabilities.  
-**Optional:** governed tools and deliberation; challenge becomes required by configured task/materiality policy.  
-**State:** none; advice is retained only through workflow/operations evidence and expires strictly.  
-**Primary module:** `portfolio_advisory.py`.  
-**Role:** `portfolio_advisory_synthesizer`.  
+**Provides:** `agentic.portfolio-advisory@1`
+**Requires:** mandate, operations, roles, model inference, context, claims, synthesis, and exact current Portfolio/Risk/Analytics/account-evidence capabilities.
+**Optional:** governed tools and deliberation; challenge becomes required by configured task/materiality policy.
+**State:** none; advice is retained only through workflow/operations evidence and expires strictly.
+**Primary module:** `portfolio_advisory.py`.
+**Role:** `portfolio_advisory_synthesizer`.
 **Operation:** `ADVISE`.
 
 **Donor evidence to normalize**
@@ -125,7 +125,7 @@ tests/services/agentic/advise_portfolio/**
 - context/tool/deliberation/role/provider loss;
 - cancellation, replacement, churn, and physical removal.
 
-**Usage:** `uv run python -m app.services.agentic.advise_portfolio.portfolio_advisory`  
+**Usage:** `uv run python -m app.services.agentic.advise_portfolio.portfolio_advisory`
 **Commit:** `feat(agentic): implement portfolio and risk advisory`
 
 **Removal:** stop new advice and unregister the role; Portfolio and Risk continue normally, and prior advice expires while remaining only as audit/workflow evidence.
@@ -134,12 +134,12 @@ tests/services/agentic/advise_portfolio/**
 
 ## AGT-5.18 — `FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`
 
-**Provides:** `agentic.strategy-proposals@1`  
-**Requires:** mandate, operations, roles, model inference, context, claims, synthesis, exact Strategy proposal-intake capability; governed tool lease is required for submission.  
-**Optional:** research-design and strategy-spec candidate refs.  
-**State:** none; receiver and workflow/operations own durable receipts.  
-**Primary module:** `strategy_proposal_composition.py`.  
-**Role:** `strategy_proposal_synthesizer`.  
+**Provides:** `agentic.strategy-proposals@1`
+**Requires:** mandate, operations, roles, model inference, context, claims, synthesis, exact Strategy proposal-intake capability; governed tool lease is required for submission.
+**Optional:** research-design and strategy-spec candidate refs.
+**State:** none; receiver and workflow/operations own durable receipts.
+**Primary module:** `strategy_proposal_composition.py`.
+**Role:** `strategy_proposal_synthesizer`.
 **Operations:** `COMPOSE`, `SUBMIT`.
 
 **Donor evidence to normalize**
@@ -188,7 +188,7 @@ tests/services/agentic/compose_strategy_proposals/**
 - stale/dissent/unavailable refusal;
 - mid-handoff cancellation/removal, role disposal, replacement, churn, physical deletion.
 
-**Usage:** `uv run python -m app.services.agentic.compose_strategy_proposals.strategy_proposal_composition`  
+**Usage:** `uv run python -m app.services.agentic.compose_strategy_proposals.strategy_proposal_composition`
 **Commit:** `feat(agentic): implement strategy proposal composition and handoff`
 
 **Removal:** stop new proposals/handoffs and unregister the role; Strategy-owned requests/records and every downstream deterministic control remain unchanged.

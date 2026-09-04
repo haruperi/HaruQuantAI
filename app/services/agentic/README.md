@@ -1,11 +1,11 @@
 # Agentic
 
-> **Package:** `app/services/agentic/`  
-> **Domain ID:** `D-AGT`  
-> **Status:** `Missing` — authoritative target specification; no legacy implementation status carries forward  
-> **Last updated:** `2026-09-03`  
-> **Feature count:** `20` focused service features  
-> **Built-in LLM profiles:** `22` across `7` role families  
+> **Package:** `app/services/agentic/`
+> **Domain ID:** `D-AGT`
+> **Status:** `Missing` — authoritative target specification; no legacy implementation status carries forward
+> **Last updated:** `2026-09-03`
+> **Feature count:** `20` focused service features
+> **Built-in LLM profiles:** `22` across `7` role families
 > **Architecture decisions:** `ADR-AGT-001` and `ADR-AGT-001-A1`
 
 > This README is the Agentic domain package's **single source of truth** for domain boundaries, focused feature capabilities, semantic contract ownership, role contributions, workflows, state ownership, configuration, implementation sequence, deletion behavior, acceptance evidence, and current status. Update it before modifying or adding Agentic code.
@@ -475,12 +475,12 @@ All namespaces are declared with positive schema versions and explicit retention
 
 ### 8.1 `FEAT-AGT-ENFORCE_MANDATE` — Mandate Enforcement
 
-**Folder:** `app/services/agentic/enforce_mandate/`  
-**Provides:** `agentic.mandate@1`  
-**Requires:** approved System/Workspace clock, principal, runtime-profile, and signed-mandate-source capabilities (exact keys finalized against owner registries)  
-**Optional:** `agentic.operations@1` for audit publication  
-**Conflicts:** none  
-**State:** none  
+**Folder:** `app/services/agentic/enforce_mandate/`
+**Provides:** `agentic.mandate@1`
+**Requires:** approved System/Workspace clock, principal, runtime-profile, and signed-mandate-source capabilities (exact keys finalized against owner registries)
+**Optional:** `agentic.operations@1` for audit publication
+**Conflicts:** none
+**State:** none
 **Primary module:** `mandate_enforcement.py`
 
 **Files**
@@ -522,12 +522,12 @@ Contract/config unit tests, signature/integrity/expiry/scope negative tests, mou
 
 ### 8.2 `FEAT-AGT-OPERATE_RUNS` — Operations, Incidents, and Replay Validation
 
-**Folder:** `app/services/agentic/operate_runs/`  
-**Provides:** `agentic.operations@1`  
-**Requires:** Data persistence/audit execution, approved clock/ID/redaction capabilities  
-**Optional:** event publication  
-**Conflicts:** none  
-**State:** `agentic.operations`, schema v1, RETAIN  
+**Folder:** `app/services/agentic/operate_runs/`
+**Provides:** `agentic.operations@1`
+**Requires:** Data persistence/audit execution, approved clock/ID/redaction capabilities
+**Optional:** event publication
+**Conflicts:** none
+**State:** `agentic.operations`, schema v1, RETAIN
 **Primary module:** `run_operations.py`
 
 **Files**
@@ -576,12 +576,12 @@ Redaction, trace completeness, cost, incident containment, replay-side-effect, p
 
 ### 8.3 `FEAT-AGT-REGISTER_ROLES` — Role Contribution Registry
 
-**Folder:** `app/services/agentic/register_roles/`  
-**Provides:** `agentic.roles@1`  
-**Requires:** `agentic.mandate@1`, approved digest/schema capabilities  
-**Optional:** `agentic.operations@1`, event publication  
-**Conflicts:** none  
-**State:** none  
+**Folder:** `app/services/agentic/register_roles/`
+**Provides:** `agentic.roles@1`
+**Requires:** `agentic.mandate@1`, approved digest/schema capabilities
+**Optional:** `agentic.operations@1`, event publication
+**Conflicts:** none
+**State:** none
 **Primary module:** `role_registry.py`
 
 **Files**
@@ -625,12 +625,12 @@ Manifest/prompt integrity, duplicate/forbidden/wildcard cases, contribution repl
 
 ### 8.4 `FEAT-AGT-GOVERN_TOOL_CALLS` — Tool Governance and Human Actions
 
-**Folder:** `app/services/agentic/govern_tool_calls/`  
-**Provides:** `agentic.tool-governance@1`  
-**Requires:** `agentic.mandate@1`, `agentic.roles@1`, approved clock/principal/digest capabilities  
-**Optional:** `agentic.operations@1`, Data persistence, event publication  
-**Conflicts:** none  
-**State:** `agentic.tool_governance`, schema v1, RETAIN  
+**Folder:** `app/services/agentic/govern_tool_calls/`
+**Provides:** `agentic.tool-governance@1`
+**Requires:** `agentic.mandate@1`, `agentic.roles@1`, approved clock/principal/digest capabilities
+**Optional:** `agentic.operations@1`, Data persistence, event publication
+**Conflicts:** none
+**State:** `agentic.tool_governance`, schema v1, RETAIN
 **Primary module:** `tool_governance.py`
 
 **Files**
@@ -681,12 +681,12 @@ Authorization matrix, forged/replayed/expired/mutated approval, call-without-lea
 
 ### 8.5 `FEAT-AGT-INVOKE_MODELS` — Provider-Neutral Model Invocation
 
-**Folder:** `app/services/agentic/invoke_models/`  
-**Provides:** `agentic.model-inference@1`  
-**Requires:** `agentic.mandate@1`, `agentic.roles@1`, approved Workspace secret-reference resolution and clock capabilities  
-**Optional:** `agentic.operations@1`, `agentic.tool-governance@1`, event publication  
-**Conflicts:** explicit provider-feature conflicts only when two providers claim the same exclusive configured profile  
-**State:** none  
+**Folder:** `app/services/agentic/invoke_models/`
+**Provides:** `agentic.model-inference@1`
+**Requires:** `agentic.mandate@1`, `agentic.roles@1`, approved Workspace secret-reference resolution and clock capabilities
+**Optional:** `agentic.operations@1`, `agentic.tool-governance@1`, event publication
+**Conflicts:** explicit provider-feature conflicts only when two providers claim the same exclusive configured profile
+**State:** none
 **Primary module:** `model_invocation.py`
 
 **Files**
@@ -734,12 +734,12 @@ Floating/silent-substitution, profile/credential/redaction, schema/timeout/cost,
 
 ### 8.6 `FEAT-AGT-RUN_WORKFLOWS` — Durable Workflow Orchestration
 
-**Folder:** `app/services/agentic/run_workflows/`  
-**Provides:** `agentic.workflows@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, Data persistence, approved clock/ID capabilities  
-**Optional:** `agentic.model-inference@1`, `agentic.tool-governance@1`, `agentic.context@1`, event publication  
-**Conflicts:** none  
-**State:** `agentic.workflows`, schema v1, RETAIN  
+**Folder:** `app/services/agentic/run_workflows/`
+**Provides:** `agentic.workflows@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, Data persistence, approved clock/ID capabilities
+**Optional:** `agentic.model-inference@1`, `agentic.tool-governance@1`, `agentic.context@1`, event publication
+**Conflicts:** none
+**State:** `agentic.workflows`, schema v1, RETAIN
 **Primary module:** `workflow_runtime.py`
 
 **Files**
@@ -796,12 +796,12 @@ Idempotency/CAS, restart/resume, queue/backpressure, bounded loop/fanout/retry, 
 
 ### 8.7 `FEAT-AGT-ASSEMBLE_CONTEXT` — Point-in-Time Context Assembly
 
-**Folder:** `app/services/agentic/assemble_context/`  
-**Provides:** `agentic.context@1`  
-**Requires:** `agentic.mandate@1`, approved clock/redaction/digest capabilities, receiver evidence capability keys selected by configured workflow  
-**Optional:** `agentic.memory@1`, `agentic.operations@1`  
-**Conflicts:** none  
-**State:** none  
+**Folder:** `app/services/agentic/assemble_context/`
+**Provides:** `agentic.context@1`
+**Requires:** `agentic.mandate@1`, approved clock/redaction/digest capabilities, receiver evidence capability keys selected by configured workflow
+**Optional:** `agentic.memory@1`, `agentic.operations@1`
+**Conflicts:** none
+**State:** none
 **Primary module:** `context_assembly.py`
 
 **Files**
@@ -849,12 +849,12 @@ Point-in-time/lookahead, stale/revised/unlicensed/untrusted/duplicate/oversize, 
 
 ### 8.8 `FEAT-AGT-MANAGE_MEMORY` — Governed Memory
 
-**Folder:** `app/services/agentic/manage_memory/`  
-**Provides:** `agentic.memory@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/redaction/digest capabilities  
-**Optional:** event publication  
-**Conflicts:** none  
-**State:** `agentic.memory`, schema v1, RETAIN  
+**Folder:** `app/services/agentic/manage_memory/`
+**Provides:** `agentic.memory@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/redaction/digest capabilities
+**Optional:** event publication
+**Conflicts:** none
+**State:** `agentic.memory`, schema v1, RETAIN
 **Primary module:** `memory_management.py`
 
 **Files**
@@ -904,12 +904,12 @@ Class separation, promotion, approval, redaction-before-persist, scoped retrieva
 
 ### 8.9 `FEAT-AGT-EVALUATE_PROFILES` — Profile and Topology Evaluation
 
-**Folder:** `app/services/agentic/evaluate_profiles/`  
-**Provides:** `agentic.profile-evaluation@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/digest capabilities  
-**Optional:** `agentic.roles@1`, `agentic.model-inference@1`, `agentic.tool-governance@1`, event publication  
-**Conflicts:** none  
-**State:** `agentic.profile_evaluation`, schema v1, RETAIN  
+**Folder:** `app/services/agentic/evaluate_profiles/`
+**Provides:** `agentic.profile-evaluation@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/digest capabilities
+**Optional:** `agentic.roles@1`, `agentic.model-inference@1`, `agentic.tool-governance@1`, event publication
+**Conflicts:** none
+**State:** `agentic.profile_evaluation`, schema v1, RETAIN
 **Primary module:** `profile_evaluation.py`
 
 **Files**
@@ -958,12 +958,12 @@ Set completeness, grader calibration, self-grading negative, baseline/ablation a
 
 ### 8.10 `FEAT-AGT-ASSIST_OPERATOR` — Website Chat Bot and Specialist Delegation
 
-**Folder:** `app/services/agentic/assist_operator/`  
-**Provides:** `agentic.operator-assistance@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.workflows@1`, approved clock/principal capabilities  
-**Optional:** `agentic.memory@1`, `agentic.tool-governance@1`, D-IFACE event publication  
-**Conflicts:** none  
-**State:** `agentic.operator_conversations`, schema v1, DELETE  
+**Folder:** `app/services/agentic/assist_operator/`
+**Provides:** `agentic.operator-assistance@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.workflows@1`, approved clock/principal capabilities
+**Optional:** `agentic.memory@1`, `agentic.tool-governance@1`, D-IFACE event publication
+**Conflicts:** none
+**State:** `agentic.operator_conversations`, schema v1, DELETE
 **Primary module:** `operator_assistance.py`
 
 **Files**
@@ -1020,12 +1020,12 @@ Context validation/staleness/cross-user/redaction/size, direct-vs-specialist rou
 
 ### 8.11 `FEAT-AGT-MANAGE_CLAIMS` — Claim-and-Evidence Graph
 
-**Folder:** `app/services/agentic/manage_claims/`  
-**Provides:** `agentic.claims@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, Data persistence, approved clock/digest capabilities  
-**Optional:** `agentic.tool-governance@1`, event publication  
-**Conflicts:** none  
-**State:** `agentic.claims`, schema v1, RETAIN  
+**Folder:** `app/services/agentic/manage_claims/`
+**Provides:** `agentic.claims@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, Data persistence, approved clock/digest capabilities
+**Optional:** `agentic.tool-governance@1`, event publication
+**Conflicts:** none
+**State:** `agentic.claims`, schema v1, RETAIN
 **Primary module:** `claim_graph.py`
 
 **Files**
@@ -1085,12 +1085,12 @@ Claim type/status/prohibited promotion, graph relation/cycle, source expiry prop
 
 ### 8.12 `FEAT-AGT-DELIBERATE_RESEARCH` — Independent Challenge and Deliberation
 
-**Folder:** `app/services/agentic/deliberate_research/`  
-**Provides:** `agentic.deliberation@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.workflows@1`, `agentic.context@1`, `agentic.claims@1`, Data persistence  
-**Optional:** `agentic.tool-governance@1`, `agentic.profile-evaluation@1`, event publication  
-**Conflicts:** none  
-**State:** `agentic.deliberation`, schema v1, RETAIN  
+**Folder:** `app/services/agentic/deliberate_research/`
+**Provides:** `agentic.deliberation@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.workflows@1`, `agentic.context@1`, `agentic.claims@1`, Data persistence
+**Optional:** `agentic.tool-governance@1`, `agentic.profile-evaluation@1`, event publication
+**Conflicts:** none
+**State:** `agentic.deliberation`, schema v1, RETAIN
 **Primary module:** `research_deliberation.py`
 
 **Files**
@@ -1152,12 +1152,12 @@ Blind-first challenge, correlation warnings/distinct-family rule, challenge cove
 
 ### 8.13 `FEAT-AGT-SYNTHESIZE_RESEARCH` — Research Synthesis
 
-**Folder:** `app/services/agentic/synthesize_research/`  
-**Provides:** `agentic.synthesis@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.claims@1`  
-**Optional:** `agentic.deliberation@1`, `agentic.profile-evaluation@1`, event publication  
-**Conflicts:** none  
-**State:** none  
+**Folder:** `app/services/agentic/synthesize_research/`
+**Provides:** `agentic.synthesis@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.claims@1`
+**Optional:** `agentic.deliberation@1`, `agentic.profile-evaluation@1`, event publication
+**Conflicts:** none
+**State:** none
 **Primary module:** `research_synthesis.py`
 
 **Files**
@@ -1203,12 +1203,12 @@ Claim-binding/no invented refs, disposition/uncertainty/dissent, material-dissen
 
 ### 8.14 `FEAT-AGT-GOVERN_RESEARCH_SEARCH` — Research Campaign and Search Governance
 
-**Folder:** `app/services/agentic/govern_research_search/`  
-**Provides:** `agentic.research-search@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/digest capabilities  
-**Optional:** event publication, receiver dataset/holdout identity validation  
-**Conflicts:** none  
-**State:** `agentic.research_search`, schema v1, RETAIN  
+**Folder:** `app/services/agentic/govern_research_search/`
+**Provides:** `agentic.research-search@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/digest capabilities
+**Optional:** event publication, receiver dataset/holdout identity validation
+**Conflicts:** none
+**State:** `agentic.research_search`, schema v1, RETAIN
 **Primary module:** `research_search_governance.py`
 
 **Files**
@@ -1259,12 +1259,12 @@ Campaign/family/dataset identity, all-trial conservation, near-duplicate evasion
 
 ### 8.15 `FEAT-AGT-DESIGN_RESEARCH` — Falsifiable Research Design
 
-**Folder:** `app/services/agentic/design_research/`  
-**Provides:** `agentic.research-design@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.claims@1`, `agentic.research-search@1`  
-**Optional:** `agentic.deliberation@1`, `agentic.synthesis@1`, `agentic.tool-governance@1`, Research/Simulation/Optimization validation capability keys  
-**Conflicts:** none  
-**State:** none  
+**Folder:** `app/services/agentic/design_research/`
+**Provides:** `agentic.research-design@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.claims@1`, `agentic.research-search@1`
+**Optional:** `agentic.deliberation@1`, `agentic.synthesis@1`, `agentic.tool-governance@1`, Research/Simulation/Optimization validation capability keys
+**Conflicts:** none
+**State:** none
 **Primary module:** `research_design.py`
 
 **Files**
@@ -1315,12 +1315,12 @@ Hypothesis completeness/falsifiability, exact receiver schema/binding, experimen
 
 ### 8.16 `FEAT-AGT-COMPOSE_STRATEGY_SPECS` — JSON Strategy and Indicator DSL Composition
 
-**Folder:** `app/services/agentic/compose_strategy_specs/`  
-**Provides:** `agentic.strategy-specs@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, approved Strategy/Indicators DSL schema/validation capability keys  
-**Optional:** `agentic.tool-governance@1`, `agentic.claims@1`, `agentic.research-design@1`, event publication  
-**Conflicts:** none  
-**State:** none  
+**Folder:** `app/services/agentic/compose_strategy_specs/`
+**Provides:** `agentic.strategy-specs@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, approved Strategy/Indicators DSL schema/validation capability keys
+**Optional:** `agentic.tool-governance@1`, `agentic.claims@1`, `agentic.research-design@1`, event publication
+**Conflicts:** none
+**State:** none
 **Primary module:** `strategy_spec_composition.py`
 
 **Files**
@@ -1367,12 +1367,12 @@ Exact schema/version, deterministic validation/correction bounds, unsupported-ex
 
 ### 8.17 `FEAT-AGT-ADVISE_PORTFOLIO` — Portfolio and Risk Advisory
 
-**Folder:** `app/services/agentic/advise_portfolio/`  
-**Provides:** `agentic.portfolio-advisory@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, current Portfolio/Risk/Analytics/account evidence capability keys  
-**Optional:** `agentic.tool-governance@1`, `agentic.claims@1`, `agentic.deliberation@1`, event publication  
-**Conflicts:** none  
-**State:** none  
+**Folder:** `app/services/agentic/advise_portfolio/`
+**Provides:** `agentic.portfolio-advisory@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, current Portfolio/Risk/Analytics/account evidence capability keys
+**Optional:** `agentic.tool-governance@1`, `agentic.claims@1`, `agentic.deliberation@1`, event publication
+**Conflicts:** none
+**State:** none
 **Primary module:** `portfolio_advisory.py`
 
 **Files**
@@ -1419,12 +1419,12 @@ Freshness/scope/evidence, non-binding/prohibited fields, challenge set equality/
 
 ### 8.18 `FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS` — Strategy Proposal Composition and Handoff
 
-**Folder:** `app/services/agentic/compose_strategy_proposals/`  
-**Provides:** `agentic.strategy-proposals@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, Strategy proposal-intake capability  
-**Optional:** `agentic.tool-governance@1`, `agentic.claims@1`, `agentic.synthesis@1`, `agentic.research-design@1`, event publication  
-**Conflicts:** none  
-**State:** none  
+**Folder:** `app/services/agentic/compose_strategy_proposals/`
+**Provides:** `agentic.strategy-proposals@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, Strategy proposal-intake capability
+**Optional:** `agentic.tool-governance@1`, `agentic.claims@1`, `agentic.synthesis@1`, `agentic.research-design@1`, event publication
+**Conflicts:** none
+**State:** none
 **Primary module:** `strategy_proposal_composition.py`
 
 **Files**
@@ -1471,12 +1471,12 @@ Proposal completeness/prohibited fields, exact receiver mapping and no implement
 
 ### 8.19 `FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS` — Sandboxed Source Artifact Fallback
 
-**Folder:** `app/services/agentic/author_sandbox_artifacts/`  
-**Provides:** `agentic.sandbox-artifacts@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.tool-governance@1`, approved sandbox-leasing and Workspace secret-isolation capabilities  
-**Optional:** `agentic.workflows@1`, event publication  
-**Conflicts:** none  
-**State:** `agentic.sandbox_artifacts`, schema v1, DELETE  
+**Folder:** `app/services/agentic/author_sandbox_artifacts/`
+**Provides:** `agentic.sandbox-artifacts@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.tool-governance@1`, approved sandbox-leasing and Workspace secret-isolation capabilities
+**Optional:** `agentic.workflows@1`, event publication
+**Conflicts:** none
+**State:** `agentic.sandbox_artifacts`, schema v1, DELETE
 **Primary module:** `sandbox_artifact_authoring.py`
 
 **Files**
@@ -1530,12 +1530,12 @@ Lease attestation, credential/network/resource isolation, raw/resolved/symlink p
 
 ### 8.20 `FEAT-AGT-CALIBRATE_OUTCOMES` — Post-Horizon Outcome Calibration
 
-**Folder:** `app/services/agentic/calibrate_outcomes/`  
-**Provides:** `agentic.outcome-calibration@1`  
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/digest capabilities, receiver outcome/evaluation capabilities  
-**Optional:** `agentic.profile-evaluation@1`, event publication  
-**Conflicts:** none  
-**State:** `agentic.outcome_calibration`, schema v1, RETAIN  
+**Folder:** `app/services/agentic/calibrate_outcomes/`
+**Provides:** `agentic.outcome-calibration@1`
+**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/digest capabilities, receiver outcome/evaluation capabilities
+**Optional:** `agentic.profile-evaluation@1`, event publication
+**Conflicts:** none
+**State:** `agentic.outcome_calibration`, schema v1, RETAIN
 **Primary module:** `outcome_calibration.py`
 
 **Files**

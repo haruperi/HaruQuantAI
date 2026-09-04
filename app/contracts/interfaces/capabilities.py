@@ -11,6 +11,7 @@ if TYPE_CHECKING:
         EditProjectsCapability,
         ObserveMarketCatalogueCapability,
         ObserveMarketDataCapability,
+        ObserveMarketReferenceCapability,
         OperateIdentityCapability,
         OperatePortfoliosCapability,
         OperateResearchCapability,
@@ -88,4 +89,11 @@ OPERATE_IDENTITY_CAPABILITY: CapabilityKey[OperateIdentityCapability] = Capabili
 OPERATE_SETTINGS_CAPABILITY: CapabilityKey[OperateSettingsCapability] = CapabilityKey(
     name="interfaces.operate-settings",
     major=1,
+)
+
+OBSERVE_MARKET_REFERENCE_CAPABILITY: CapabilityKey[ObserveMarketReferenceCapability] = (
+    CapabilityKey(
+        name="interfaces.observe-market-reference",
+        major=1,
+    )
 )

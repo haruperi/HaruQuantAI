@@ -10,6 +10,7 @@ if TYPE_CHECKING:
         AggregateBarsCapability,
         AlignSeriesCapability,
         BindRunDataCapability,
+        BrowseReferenceCapability,
         GenerateScenariosCapability,
         ImportIndicatorsCapability,
         ImportQuantdataCapability,
@@ -99,5 +100,10 @@ STREAM_MARKET_EVENTS_CAPABILITY: CapabilityKey[StreamMarketEventsCapability] = (
 
 MARKET_DATA_STORE_CAPABILITY: CapabilityKey[MarketDataStoreCapability] = CapabilityKey(
     name="data.market-data-store",
+    major=1,
+)
+
+BROWSE_REFERENCE_CAPABILITY: CapabilityKey[BrowseReferenceCapability] = CapabilityKey(
+    name="data.browse-reference",
     major=1,
 )
