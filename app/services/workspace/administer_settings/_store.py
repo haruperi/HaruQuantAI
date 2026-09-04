@@ -1,9 +1,9 @@
-"""SQLite database helpers for system settings persistence in haruquantai.db.
+"""System settings store for the administer-settings capability.
 
-Serves the workstation's administrator settings surface using the boundary's
-authoritative manifest: fifty editable non-secret system-setting definitions
-(key, label, description, value kind, allowed values, bounds, activation)
-plus five write-only credential slots.
+Persists the workstation's administrator settings using the authoritative
+manifest: editable non-secret system-setting definitions (key, label,
+description, value kind, allowed values, bounds, activation) plus the
+write-only credential slots.
 
 Values are persisted in the ``settings`` table under dotted lowercase keys.
 The wire contract uses the legacy uppercase key names the workstation reads

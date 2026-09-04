@@ -1817,6 +1817,206 @@ class ManageWatchlistsSuccess(WireModel):
     schema_version: Literal[1] = 1
 
 
+class AccountRecord(WireModel):
+    """One workstation account's identity claims.
+
+    ``expires_at`` is the owning session's expiry; ``runtime_profile`` is
+    the account's execution profile selection.
+    """
+
+    user_id: NonEmptyStr
+    username: NonEmptyStr
+    expires_at: UtcTimestamp
+    runtime_profile: str = "research"
+    schema_version: Literal[1] = 1
+
+
+class ManageAccountsRequest(WireModel):
+    """Operation-discriminated account and session request.
+
+    REGISTER requires ``username`` and ``password``; LOGIN requires
+    ``username`` and ``password``; ME requires ``session_token``; LOGOUT
+    requires ``session_token``.
+    """
+
+    request_id: Uuid7
+    capability_snapshot_id: Uuid7
+    operation: Literal["REGISTER", "LOGIN", "ME", "LOGOUT"]
+    username: str | None = None
+    password: str | None = None
+    session_token: str | None = None
+    runtime_profile: str = "research"
+    schema_version: Literal[1] = 1
+
+    @model_validator(mode="after")
+    def validate_operation_shape(self) -> ManageAccountsRequest:
+        """Validate that request fields match the selected operation.
+
+        Returns:
+            The validated request.
+
+        Raises:
+            ValueError: Required fields are missing or forbidden fields
+                are set for the selected operation.
+        """
+        if self.operation in ("REGISTER", "LOGIN"):
+            if not self.username or not self.password:
+                message = f"{self.operation} requires username and password"
+                raise ValueError(message)
+            if self.session_token is not None:
+                message = f"{self.operation} forbids session_token"
+                raise ValueError(message)
+        else:
+            if not self.session_token:
+                message = f"{self.operation} requires session_token"
+                raise ValueError(message)
+            for field_name in ("username", "password"):
+                if getattr(self, field_name) is not None:
+                    message = f"{self.operation} forbids {field_name}"
+                    raise ValueError(message)
+        return self
+
+
+class ManageAccountsSuccess(WireModel):
+    """Successful account operation result.
+
+    ``user`` plus ``session_token``/``csrf_token`` are returned for
+    REGISTER and LOGIN (tokens travel once, to the cookie transport);
+    ``user`` alone is returned for ME; ``revoked`` is returned for LOGOUT.
+    """
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    user: AccountRecord | None = None
+    session_token: str = ""
+    csrf_token: str = ""
+    revoked: bool = False
+    schema_version: Literal[1] = 1
+
+
+class SystemSettingsRecord(WireModel):
+    """Versioned system settings projection under legacy wire keys."""
+
+    scope: Literal["system"] = "system"
+    subject_id: str = "system"
+    user_id: None = None
+    settings: dict[str, str]
+    version: int = Field(default=1, ge=0)
+    updated_at: UtcTimestamp
+    restart_required: bool = False
+    schema_version: Literal[1] = 1
+
+
+class SettingDefinition(WireModel):
+    """One editable non-secret system setting's manifest definition."""
+
+    key: NonEmptyStr
+    label: NonEmptyStr
+    description: str = ""
+    value_kind: Literal["string", "boolean", "decimal", "integer"] = "string"
+    allowed_values: tuple[str, ...] = ()
+    minimum: float | None = None
+    maximum: float | None = None
+    activation: Literal["hot", "restart_required"] = "restart_required"
+    schema_version: Literal[1] = 1
+
+
+class CredentialSlotStatus(WireModel):
+    """Write-only credential slot status without credential values."""
+
+    slot: NonEmptyStr
+    label: NonEmptyStr
+    fields: tuple[str, ...] = ()
+    activation: Literal["restart_required"] = "restart_required"
+    configured: bool = False
+    version: int = Field(default=1, ge=0)
+    updated_at: UtcTimestamp | None = None
+    schema_version: Literal[1] = 1
+
+
+class BridgeRuntimeSettings(WireModel):
+    """MT5 snapshot bridge listener runtime settings.
+
+    Values mirror the TickBridge EA's documented defaults; the auth token
+    is the shared secret the EA presents in its hello frame.
+    """
+
+    host: str = "127.0.0.1"
+    port: int = Field(default=9001, ge=1, le=65_535)
+    source_id: str = "mt5-terminal-1"
+    auth_token: str = ""
+    symbols: str = "EURUSD,GBPUSD,USDJPY,XAUUSD"
+    schema_version: Literal[1] = 1
+
+
+class AdministerSettingsRequest(WireModel):
+    """Operation-discriminated system settings request.
+
+    UPDATE_SYSTEM requires ``settings``; UPDATE_CREDENTIAL requires
+    ``slot`` and ``material``; every other operation takes no payload.
+    """
+
+    request_id: Uuid7
+    capability_snapshot_id: Uuid7
+    operation: Literal[
+        "READ_SYSTEM",
+        "UPDATE_SYSTEM",
+        "READ_MANIFEST",
+        "READ_CREDENTIALS",
+        "UPDATE_CREDENTIAL",
+        "READ_BRIDGE_RUNTIME",
+    ]
+    settings: dict[str, str] = Field(default_factory=dict)
+    slot: str | None = None
+    material: dict[str, str] = Field(default_factory=dict)
+    changed_by: str = "system"
+    schema_version: Literal[1] = 1
+
+    @model_validator(mode="after")
+    def validate_operation_shape(self) -> AdministerSettingsRequest:
+        """Validate that request fields match the selected operation.
+
+        Returns:
+            The validated request.
+
+        Raises:
+            ValueError: Required fields are missing or forbidden fields
+                are set for the selected operation.
+        """
+        if self.operation == "UPDATE_SYSTEM" and not self.settings:
+            message = "UPDATE_SYSTEM requires settings"
+            raise ValueError(message)
+        if self.operation == "UPDATE_CREDENTIAL":
+            if not self.slot:
+                message = "UPDATE_CREDENTIAL requires slot"
+                raise ValueError(message)
+            if not self.material:
+                message = "UPDATE_CREDENTIAL requires material"
+                raise ValueError(message)
+        return self
+
+
+class AdministerSettingsSuccess(WireModel):
+    """Successful system settings operation result.
+
+    ``system`` is returned for READ_SYSTEM and UPDATE_SYSTEM, ``manifest``
+    for READ_MANIFEST, ``credentials`` for READ_CREDENTIALS,
+    ``credential_updated`` for UPDATE_CREDENTIAL, and ``bridge`` for
+    READ_BRIDGE_RUNTIME.
+    """
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    system: SystemSettingsRecord | None = None
+    manifest: tuple[SettingDefinition, ...] = ()
+    credentials: tuple[CredentialSlotStatus, ...] = ()
+    credential_updated: bool = False
+    bridge: BridgeRuntimeSettings | None = None
+    schema_version: Literal[1] = 1
+
+
 WIRE_MODELS: dict[str, type[WireModel]] = {
     "WorkspaceRef": WorkspaceRefWire,
     "WorkspaceVersion": WorkspaceVersionWire,
@@ -1849,4 +2049,13 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
     "WatchlistRecord": WatchlistRecord,
     "ManageWatchlistsRequest": ManageWatchlistsRequest,
     "ManageWatchlistsSuccess": ManageWatchlistsSuccess,
+    "AccountRecord": AccountRecord,
+    "ManageAccountsRequest": ManageAccountsRequest,
+    "ManageAccountsSuccess": ManageAccountsSuccess,
+    "SystemSettingsRecord": SystemSettingsRecord,
+    "SettingDefinition": SettingDefinition,
+    "CredentialSlotStatus": CredentialSlotStatus,
+    "BridgeRuntimeSettings": BridgeRuntimeSettings,
+    "AdministerSettingsRequest": AdministerSettingsRequest,
+    "AdministerSettingsSuccess": AdministerSettingsSuccess,
 }

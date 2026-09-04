@@ -32,7 +32,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Final, Literal
+from typing import TYPE_CHECKING, Final, Literal, cast
 from urllib.parse import parse_qs
 from uuid import uuid4, uuid7
 
@@ -40,6 +40,8 @@ from app.contracts.catalogue.capabilities import CATALOG_INSTRUMENTS_CAPABILITY
 from app.contracts.interfaces.capabilities import (
     OBSERVE_MARKET_CATALOGUE_CAPABILITY,
     OBSERVE_MARKET_DATA_CAPABILITY,
+    OPERATE_IDENTITY_CAPABILITY,
+    OPERATE_SETTINGS_CAPABILITY,
     OPERATE_TRADING_CAPABILITY,
     OPERATE_WATCHLISTS_CAPABILITY,
 )
@@ -54,6 +56,8 @@ from app.contracts.interfaces.models import (
     ObserveMarketDataEventSubscription,
     ObserveMarketDataRequest,
     ObserveMarketDataSuccess,
+    OperateIdentityRequest,
+    OperateSettingsRequest,
     OperateTradingRequest,
     OperateWatchlistsRequest,
     OperateWatchlistsSuccess,
@@ -65,22 +69,9 @@ from app.services.interfaces.serve_api_events import (
     _markets_db,
     _trading_db,
 )
-from app.services.interfaces.serve_api_events._auth_db import (
-    get_session_identity,
-    login_user,
-    logout_session,
-    register_user,
-)
 from app.services.interfaces.serve_api_events._data_reference_db import (
     BarsUnavailableError,
     ReferenceNotFoundError,
-)
-from app.services.interfaces.serve_api_events._settings_db import (
-    get_credentials_status,
-    get_settings_manifest,
-    get_system_settings,
-    update_credential_slot,
-    update_system_settings,
 )
 
 if TYPE_CHECKING:
@@ -88,7 +79,10 @@ if TYPE_CHECKING:
     from typing import Any
 
     from app.contracts.common.models import JsonObject, JsonValue
-    from app.contracts.interfaces.ports import ObserveMarketDataCapability
+    from app.contracts.interfaces.ports import (
+        ObserveMarketDataCapability,
+        OperateSettingsCapability,
+    )
     from app.kernel.capability import CapabilityKey
     from app.kernel.registry import ServiceRegistry
 
@@ -197,10 +191,13 @@ def _get_cookie(scope: Scope, name: str) -> str | None:
     return None
 
 
-def _get_request_identity(scope: Scope) -> tuple[str, str]:
+async def _get_request_identity(
+    registry: ServiceRegistry, scope: Scope
+) -> tuple[str, str]:
     """Return (account_id, username) from active session or fallback default.
 
     Args:
+        registry: Live composition service registry.
         scope: ASGI connection scope.
 
     Returns:
@@ -208,12 +205,17 @@ def _get_request_identity(scope: Scope) -> tuple[str, str]:
     """
     token = _get_cookie(scope, _SESSION_COOKIE_NAME)
     if token:
-        ident = get_session_identity(token)
-        if ident:
-            return (
-                str(ident.get("user_id") or "usr_haruquantai"),
-                str(ident.get("username") or "haruquantai"),
+        gateway = registry.resolve(OPERATE_IDENTITY_CAPABILITY)
+        if gateway is not None:
+            op_request = OperateIdentityRequest(
+                request_id=str(uuid7()),
+                capability_snapshot_id=str(uuid7()),
+                operation="ME",
+                session_token=token,
             )
+            result = await gateway.operate_identity(op_request)
+            if not isinstance(result, InterfaceFailure) and result.user is not None:
+                return (result.user.user_id, result.user.username)
     return ("usr_haruquantai", "haruquantai")
 
 
@@ -381,6 +383,24 @@ async def _send_error(
         trace_id,
     )
     await _send_json(send, status, envelope)
+
+
+def _failure_http_status(
+    failure: InterfaceFailure, default: HTTPStatus = HTTPStatus.BAD_REQUEST
+) -> HTTPStatus:
+    """Resolve an HTTPStatus from an InterfaceFailure.
+
+    Args:
+        failure: Failure envelope to inspect.
+        default: Fallback status code when conversion fails.
+
+    Returns:
+        Mapped HTTPStatus instance.
+    """
+    try:
+        return HTTPStatus(failure.problem.status)
+    except ValueError, AttributeError:
+        return default
 
 
 async def _wait_disconnect(receive: Receive) -> None:
@@ -1614,75 +1634,46 @@ async def _serve_data(
     )
 
 
-async def _serve_settings(
-    scope: Scope,
+async def _serve_settings_system(
+    gateway: OperateSettingsCapability,
+    path: str,
+    method: str,
     receive: Receive,
     send: Send,
+    request_id: str,
+    trace_id: str | None,
 ) -> None:
-    """Serve system and user settings backed by data/database/haruquantai.db."""
-    path = str(scope.get("path", ""))
-    method = str(scope.get("method", "GET")).upper()
-    request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
-    trace_id = _header(scope, "x-trace-id")
-
-    if path == _SETTINGS_ROUTE:
-        if method == "GET":
-            data = get_system_settings()
-            await _send_json(
+    """Serve GET and PUT on the system settings endpoint."""
+    if method == "GET":
+        op_request = OperateSettingsRequest(
+            request_id=str(uuid7()),
+            capability_snapshot_id=str(uuid7()),
+            operation="READ_SYSTEM",
+        )
+        res = await gateway.administer_settings(op_request)
+        if isinstance(res, InterfaceFailure):
+            await _send_error(
                 send,
-                HTTPStatus.OK,
-                ApiResponse(
-                    status="success",
-                    message=HTTPStatus.OK.phrase,
-                    data=data,
-                    metadata=_metadata(
-                        request_id,
-                        path,
-                        "api.settings.read",
-                        "read",
-                        False,
-                        None,
-                        trace_id,
-                    ),
-                ),
+                _failure_http_status(res, HTTPStatus.BAD_REQUEST),
+                res.problem.code or "SETTINGS_READ_FAILED",
+                res.problem.detail or "Settings read failed",
+                path,
+                "api.settings.read",
+                trace_id,
             )
             return
-        if method == "PUT":
-            body = await _read_json_body(receive)
-            settings_delta = body.get("settings", {}) if isinstance(body, dict) else {}
-            data = update_system_settings(settings_delta)
-            await _send_json(
-                send,
-                HTTPStatus.OK,
-                ApiResponse(
-                    status="success",
-                    message=HTTPStatus.OK.phrase,
-                    data=data,
-                    metadata=_metadata(
-                        request_id,
-                        path,
-                        "api.settings.update",
-                        "write",
-                        False,
-                        None,
-                        trace_id,
-                    ),
-                ),
-            )
-            return
-    elif path == _SETTINGS_MANIFEST_ROUTE and method == "GET":
-        manifest_data = get_settings_manifest()
+        data = res.system.model_dump(mode="json") if res.system else {}
         await _send_json(
             send,
             HTTPStatus.OK,
             ApiResponse(
                 status="success",
                 message=HTTPStatus.OK.phrase,
-                data=manifest_data,
+                data=data,
                 metadata=_metadata(
                     request_id,
                     path,
-                    "api.settings.manifest",
+                    "api.settings.read",
                     "read",
                     False,
                     None,
@@ -1691,8 +1682,133 @@ async def _serve_settings(
             ),
         )
         return
-    elif path == _SETTINGS_CREDENTIALS_ROUTE and method == "GET":
-        credentials_data = get_credentials_status()
+    if method == "PUT":
+        body = await _read_json_body(receive)
+        settings_delta = body.get("settings", {}) if isinstance(body, dict) else {}
+        op_request = OperateSettingsRequest(
+            request_id=str(uuid7()),
+            capability_snapshot_id=str(uuid7()),
+            operation="UPDATE_SYSTEM",
+            settings={str(k): str(v) for k, v in settings_delta.items()},
+        )
+        res = await gateway.administer_settings(op_request)
+        if isinstance(res, InterfaceFailure):
+            await _send_error(
+                send,
+                _failure_http_status(res, HTTPStatus.BAD_REQUEST),
+                res.problem.code or "SETTINGS_UPDATE_FAILED",
+                res.problem.detail or "Settings update failed",
+                path,
+                "api.settings.update",
+                trace_id,
+            )
+            return
+        data = res.system.model_dump(mode="json") if res.system else {}
+        await _send_json(
+            send,
+            HTTPStatus.OK,
+            ApiResponse(
+                status="success",
+                message=HTTPStatus.OK.phrase,
+                data=data,
+                metadata=_metadata(
+                    request_id,
+                    path,
+                    "api.settings.update",
+                    "write",
+                    False,
+                    None,
+                    trace_id,
+                ),
+            ),
+        )
+        return
+    await _send_error(
+        send,
+        HTTPStatus.METHOD_NOT_ALLOWED,
+        "METHOD_NOT_ALLOWED",
+        f"Method {method} is not supported on {path}.",
+        path,
+        "api.settings.system",
+        trace_id,
+    )
+
+
+async def _serve_settings_manifest(
+    gateway: OperateSettingsCapability,
+    path: str,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve the system settings manifest definition list."""
+    op_request = OperateSettingsRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="READ_MANIFEST",
+    )
+    res = await gateway.administer_settings(op_request)
+    if isinstance(res, InterfaceFailure):
+        await _send_error(
+            send,
+            _failure_http_status(res, HTTPStatus.BAD_REQUEST),
+            res.problem.code or "SETTINGS_MANIFEST_FAILED",
+            res.problem.detail or "Settings manifest failed",
+            path,
+            "api.settings.manifest",
+            trace_id,
+        )
+        return
+    manifest_data = [item.model_dump(mode="json") for item in res.manifest]
+    await _send_json(
+        send,
+        HTTPStatus.OK,
+        ApiResponse(
+            status="success",
+            message=HTTPStatus.OK.phrase,
+            data=manifest_data,
+            metadata=_metadata(
+                request_id,
+                path,
+                "api.settings.manifest",
+                "read",
+                False,
+                None,
+                trace_id,
+            ),
+        ),
+    )
+
+
+async def _serve_settings_credentials(
+    gateway: OperateSettingsCapability,
+    path: str,
+    method: str,
+    receive: Receive,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve credential-slot reads and updates."""
+    if path == _SETTINGS_CREDENTIALS_ROUTE and method == "GET":
+        op_request = OperateSettingsRequest(
+            request_id=str(uuid7()),
+            capability_snapshot_id=str(uuid7()),
+            operation="READ_CREDENTIALS",
+        )
+        res = await gateway.administer_settings(op_request)
+        if isinstance(res, InterfaceFailure):
+            await _send_error(
+                send,
+                _failure_http_status(res, HTTPStatus.BAD_REQUEST),
+                res.problem.code or "SETTINGS_CREDENTIALS_FAILED",
+                res.problem.detail or "Settings credentials failed",
+                path,
+                "api.settings.credentials.read",
+                trace_id,
+            )
+            return
+        credentials_data = [item.model_dump(mode="json") for item in res.credentials]
         await _send_json(
             send,
             HTTPStatus.OK,
@@ -1712,11 +1828,33 @@ async def _serve_settings(
             ),
         )
         return
-    elif path.startswith(_SETTINGS_CREDENTIAL_PREFIX) and method == "PUT":
+    if path.startswith(_SETTINGS_CREDENTIAL_PREFIX) and method == "PUT":
         slot = path[len(_SETTINGS_CREDENTIAL_PREFIX) :].strip()
         body = await _read_json_body(receive)
         material = body.get("material", {}) if isinstance(body, dict) else {}
-        updated_slot = update_credential_slot(slot, material)
+        op_request = OperateSettingsRequest(
+            request_id=str(uuid7()),
+            capability_snapshot_id=str(uuid7()),
+            operation="UPDATE_CREDENTIAL",
+            slot=slot,
+            material={str(k): str(v) for k, v in material.items()},
+        )
+        res = await gateway.administer_settings(op_request)
+        if isinstance(res, InterfaceFailure):
+            await _send_error(
+                send,
+                _failure_http_status(res, HTTPStatus.BAD_REQUEST),
+                res.problem.code or "CREDENTIAL_UPDATE_FAILED",
+                res.problem.detail or "Credential update failed",
+                path,
+                "api.settings.credentials.update",
+                trace_id,
+            )
+            return
+        updated_slot = cast(
+            "dict[str, JsonValue]",
+            {"slot": slot, "configured": bool(res.credential_updated)},
+        )
         await _send_json(
             send,
             HTTPStatus.OK,
@@ -1736,16 +1874,62 @@ async def _serve_settings(
             ),
         )
         return
-
     await _send_error(
         send,
         HTTPStatus.METHOD_NOT_ALLOWED,
         "METHOD_NOT_ALLOWED",
         f"Method {method} is not supported on {path}.",
         path,
-        "api.settings",
+        "api.settings.credentials",
         trace_id,
     )
+
+
+async def _serve_settings(
+    registry: ServiceRegistry,
+    scope: Scope,
+    receive: Receive,
+    send: Send,
+) -> None:
+    """Serve system and user settings backed by the settings gateway."""
+    path = str(scope.get("path", ""))
+    method = str(scope.get("method", "GET")).upper()
+    request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
+    trace_id = _header(scope, "x-trace-id")
+
+    gateway = await _resolve_gateway(
+        registry,
+        OPERATE_SETTINGS_CAPABILITY,
+        "The settings capability has no active provider.",
+        path,
+        "api.settings",
+        request_id,
+        trace_id,
+        send,
+    )
+    if gateway is None:
+        return
+
+    if path == _SETTINGS_ROUTE:
+        await _serve_settings_system(
+            gateway, path, method, receive, send, request_id, trace_id
+        )
+    elif path == _SETTINGS_MANIFEST_ROUTE and method == "GET":
+        await _serve_settings_manifest(gateway, path, send, request_id, trace_id)
+    elif path.startswith(_SETTINGS_CREDENTIALS_ROUTE):
+        await _serve_settings_credentials(
+            gateway, path, method, receive, send, request_id, trace_id
+        )
+    else:
+        await _send_error(
+            send,
+            HTTPStatus.METHOD_NOT_ALLOWED,
+            "METHOD_NOT_ALLOWED",
+            f"Method {method} is not supported on {path}.",
+            path,
+            "api.settings",
+            trace_id,
+        )
 
 
 _TRADING_SUBPATH_ACTION_PARTS: Final = 2
@@ -1928,7 +2112,7 @@ async def _serve_trading(
     method = str(scope.get("method", "GET")).upper()
     request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
     trace_id = _header(scope, "x-trace-id")
-    principal_id, username = _get_request_identity(scope)
+    principal_id, username = await _get_request_identity(registry, scope)
 
     gateway = await _resolve_gateway(
         registry,
@@ -2071,6 +2255,7 @@ def _build_logout_cookies() -> list[tuple[bytes, bytes]]:
 
 
 async def _serve_auth_register(
+    registry: ServiceRegistry,
     receive: Receive,
     send: Send,
     path: str,
@@ -2104,20 +2289,50 @@ async def _serve_auth_register(
             trace_id,
         )
         return
-    try:
-        user_data, session_token, csrf_token = register_user(username, password)
-    except ValueError as err:
+
+    gateway = await _resolve_gateway(
+        registry,
+        OPERATE_IDENTITY_CAPABILITY,
+        "The identity capability has no active provider.",
+        path,
+        "api.auth.register",
+        request_id,
+        trace_id,
+        send,
+    )
+    if gateway is None:
+        return
+
+    op_request = OperateIdentityRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="REGISTER",
+        username=username,
+        password=password,
+    )
+    result = await gateway.operate_identity(op_request)
+    if isinstance(result, InterfaceFailure):
+        error_code = (
+            "REGISTRATION_FAILED"
+            if (
+                result.problem.code
+                in ("ACCOUNT_REGISTRATION_FAILED", "REGISTRATION_FAILED")
+            )
+            else (result.problem.code or "REGISTRATION_FAILED")
+        )
         await _send_error(
             send,
-            HTTPStatus.BAD_REQUEST,
-            "REGISTRATION_FAILED",
-            str(err),
+            _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+            error_code,
+            result.problem.detail or "Registration failed",
             path,
             "api.auth.register",
             trace_id,
         )
         return
-    cookies = _build_auth_cookies(session_token, csrf_token)
+
+    user_data = result.user.model_dump(mode="json") if result.user is not None else {}
+    cookies = _build_auth_cookies(result.session_token, result.csrf_token)
     await _send_json(
         send,
         HTTPStatus.CREATED,
@@ -2140,6 +2355,7 @@ async def _serve_auth_register(
 
 
 async def _serve_auth_login(
+    registry: ServiceRegistry,
     receive: Receive,
     send: Send,
     path: str,
@@ -2173,20 +2389,47 @@ async def _serve_auth_login(
             trace_id,
         )
         return
-    try:
-        user_data, session_token, csrf_token = login_user(username, password)
-    except ValueError as err:
+
+    gateway = await _resolve_gateway(
+        registry,
+        OPERATE_IDENTITY_CAPABILITY,
+        "The identity capability has no active provider.",
+        path,
+        "api.auth.login",
+        request_id,
+        trace_id,
+        send,
+    )
+    if gateway is None:
+        return
+
+    op_request = OperateIdentityRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="LOGIN",
+        username=username,
+        password=password,
+    )
+    result = await gateway.operate_identity(op_request)
+    if isinstance(result, InterfaceFailure):
+        error_code = (
+            "AUTHENTICATION_REQUIRED"
+            if result.problem.code == "ACCOUNT_AUTHENTICATION_FAILED"
+            else (result.problem.code or "AUTHENTICATION_FAILED")
+        )
         await _send_error(
             send,
-            HTTPStatus.UNAUTHORIZED,
-            "AUTHENTICATION_REQUIRED",
-            str(err),
+            _failure_http_status(result, HTTPStatus.UNAUTHORIZED),
+            error_code,
+            result.problem.detail or "Authentication failed",
             path,
             "api.auth.login",
             trace_id,
         )
         return
-    cookies = _build_auth_cookies(session_token, csrf_token)
+
+    user_data = result.user.model_dump(mode="json") if result.user is not None else {}
+    cookies = _build_auth_cookies(result.session_token, result.csrf_token)
     await _send_json(
         send,
         HTTPStatus.OK,
@@ -2209,6 +2452,7 @@ async def _serve_auth_login(
 
 
 async def _serve_auth_me(
+    registry: ServiceRegistry,
     scope: Scope,
     send: Send,
     path: str,
@@ -2229,7 +2473,51 @@ async def _serve_auth_me(
         )
         return
     session_token = _get_cookie(scope, _SESSION_COOKIE_NAME)
-    identity = get_session_identity(session_token)
+    if not session_token:
+        await _send_error(
+            send,
+            HTTPStatus.UNAUTHORIZED,
+            "AUTHENTICATION_REQUIRED",
+            "Authentication required",
+            path,
+            "api.auth.me",
+            trace_id,
+        )
+        return
+
+    gateway = await _resolve_gateway(
+        registry,
+        OPERATE_IDENTITY_CAPABILITY,
+        "The identity capability has no active provider.",
+        path,
+        "api.auth.me",
+        request_id,
+        trace_id,
+        send,
+    )
+    if gateway is None:
+        return
+
+    op_request = OperateIdentityRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="ME",
+        session_token=session_token,
+    )
+    result = await gateway.operate_identity(op_request)
+    if isinstance(result, InterfaceFailure):
+        await _send_error(
+            send,
+            HTTPStatus.UNAUTHORIZED,
+            "AUTHENTICATION_REQUIRED",
+            "Authentication required",
+            path,
+            "api.auth.me",
+            trace_id,
+        )
+        return
+
+    identity = result.user.model_dump(mode="json") if result.user is not None else None
     if identity is None:
         await _send_error(
             send,
@@ -2241,6 +2529,7 @@ async def _serve_auth_me(
             trace_id,
         )
         return
+
     await _send_json(
         send,
         HTTPStatus.OK,
@@ -2262,6 +2551,7 @@ async def _serve_auth_me(
 
 
 async def _serve_auth_logout(
+    registry: ServiceRegistry,
     scope: Scope,
     send: Send,
     path: str,
@@ -2281,8 +2571,30 @@ async def _serve_auth_logout(
             trace_id,
         )
         return
+
+    gateway = await _resolve_gateway(
+        registry,
+        OPERATE_IDENTITY_CAPABILITY,
+        "The identity capability has no active provider.",
+        path,
+        "api.auth.logout",
+        request_id,
+        trace_id,
+        send,
+    )
+    if gateway is None:
+        return
+
     session_token = _get_cookie(scope, _SESSION_COOKIE_NAME)
-    logout_session(session_token)
+    if session_token:
+        op_request = OperateIdentityRequest(
+            request_id=str(uuid7()),
+            capability_snapshot_id=str(uuid7()),
+            operation="LOGOUT",
+            session_token=session_token,
+        )
+        await gateway.operate_identity(op_request)
+
     cookies = _build_logout_cookies()
     await _send_json(
         send,
@@ -2306,6 +2618,7 @@ async def _serve_auth_logout(
 
 
 async def _serve_auth(
+    registry: ServiceRegistry,
     scope: Scope,
     receive: Receive,
     send: Send,
@@ -2317,13 +2630,19 @@ async def _serve_auth(
     trace_id = _header(scope, "x-trace-id")
 
     if path == _AUTH_REGISTER_ROUTE:
-        await _serve_auth_register(receive, send, path, method, request_id, trace_id)
+        await _serve_auth_register(
+            registry, receive, send, path, method, request_id, trace_id
+        )
     elif path == _AUTH_LOGIN_ROUTE:
-        await _serve_auth_login(receive, send, path, method, request_id, trace_id)
+        await _serve_auth_login(
+            registry, receive, send, path, method, request_id, trace_id
+        )
     elif path == _AUTH_ME_ROUTE:
-        await _serve_auth_me(scope, send, path, method, request_id, trace_id)
+        await _serve_auth_me(registry, scope, send, path, method, request_id, trace_id)
     elif path == _AUTH_LOGOUT_ROUTE:
-        await _serve_auth_logout(scope, send, path, method, request_id, trace_id)
+        await _serve_auth_logout(
+            registry, scope, send, path, method, request_id, trace_id
+        )
     else:
         await _send_error(
             send,
@@ -2400,10 +2719,10 @@ async def _dispatch(
     path = str(scope.get("path", ""))
     method = str(scope.get("method", "GET")).upper()
     if path.startswith(_AUTH_PREFIX):
-        await _serve_auth(scope, receive, send)
+        await _serve_auth(registry, scope, receive, send)
         return
     if path.startswith(_SETTINGS_ROUTE):
-        await _serve_settings(scope, receive, send)
+        await _serve_settings(registry, scope, receive, send)
         return
     if path.startswith(_TRADING_PREFIX):
         await _serve_trading(registry, scope, receive, send)

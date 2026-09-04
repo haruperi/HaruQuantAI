@@ -12,6 +12,7 @@ __pycache__/
 .tmp_pytest_runtime/
 .tmp_pytest_*/
 .claude/
+.zcode/
 tests/_tmp_pytest/
 tests/_tmp_pytest_run/
 pytest-cache-files-*/

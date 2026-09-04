@@ -34,10 +34,14 @@ if TYPE_CHECKING:
         ObserveMarketDataRequest,
         ObserveMarketDataSuccess,
         OpenApiManifest,
+        OperateIdentityRequest,
+        OperateIdentitySuccess,
         OperatePortfoliosRequest,
         OperatePortfoliosSuccess,
         OperateResearchRequest,
         OperateResearchSuccess,
+        OperateSettingsRequest,
+        OperateSettingsSuccess,
         OperateTradingEventSubscription,
         OperateTradingRequest,
         OperateTradingSuccess,
@@ -568,5 +572,43 @@ class OperateWatchlistsCapability(Protocol):
         Returns:
             The watchlist projection or mutation result on success,
             otherwise a structured interface failure.
+        """
+        ...
+
+
+@runtime_checkable
+class OperateIdentityCapability(Protocol):
+    """Protocol for the account identity gateway."""
+
+    async def operate_identity(
+        self,
+        request: OperateIdentityRequest,
+    ) -> OperateIdentitySuccess | InterfaceFailure:
+        """Resolve and expose account register/login/session operations.
+
+        Args:
+            request: Operation-discriminated identity gateway request.
+
+        Returns:
+            Identity operation success, or a structured interface failure.
+        """
+        ...
+
+
+@runtime_checkable
+class OperateSettingsCapability(Protocol):
+    """Protocol for the system settings gateway."""
+
+    async def administer_settings(
+        self,
+        request: OperateSettingsRequest,
+    ) -> OperateSettingsSuccess | InterfaceFailure:
+        """Resolve and expose system settings administration operations.
+
+        Args:
+            request: Operation-discriminated settings gateway request.
+
+        Returns:
+            Settings operation success, or a structured interface failure.
         """
         ...

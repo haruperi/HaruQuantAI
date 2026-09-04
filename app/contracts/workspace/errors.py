@@ -267,6 +267,9 @@ class DiagnosticBundleError(WorkspaceError):
 
 
 # Closed workspace failure-code union from the ratified v1 operation rules.
+# ACCOUNT_REGISTRATION_FAILED covers username/password policy violations and
+# duplicate registrations; ACCOUNT_AUTHENTICATION_FAILED covers login,
+# session-validation, and revocation denials.
 type WorkspaceFailureCode = Literal[
     "WORKSPACE_VALIDATION_FAILED",
     "WORKSPACE_NOT_FOUND",
@@ -279,6 +282,8 @@ type WorkspaceFailureCode = Literal[
     "TRANSFER_INVALID",
     "TRANSFER_INCOMPLETE",
     "ISOLATION_CONFLICT",
+    "ACCOUNT_REGISTRATION_FAILED",
+    "ACCOUNT_AUTHENTICATION_FAILED",
     "CAPABILITY_UNAVAILABLE",
 ]
 

@@ -2,6 +2,34 @@
 
 import type { ProblemDetails, ResultState } from "./common";
 
+export interface AccountRecord {
+  user_id: NonEmptyStr;
+  username: NonEmptyStr;
+  expires_at: string;
+  runtime_profile?: string;  // default: "research"
+  schema_version?: 1;  // default: 1
+}
+export interface AdministerSettingsRequest {
+  request_id: string;
+  capability_snapshot_id: string;
+  operation: "READ_SYSTEM" | "UPDATE_SYSTEM" | "READ_MANIFEST" | "READ_CREDENTIALS" | "UPDATE_CREDENTIAL" | "READ_BRIDGE_RUNTIME";
+  settings?: { [key: string]: string };
+  slot?: string | null;  // default: null
+  material?: { [key: string]: string };
+  changed_by?: string;  // default: "system"
+  schema_version?: 1;  // default: 1
+}
+export interface AdministerSettingsSuccess {
+  outcome?: "SUCCESS";  // default: "SUCCESS"
+  request_id: string;
+  result_version?: 1;  // default: 1
+  system?: SystemSettingsRecord | null;  // default: null
+  manifest?: SettingDefinition[];  // default: []
+  credentials?: CredentialSlotStatus[];  // default: []
+  credential_updated?: boolean;  // default: false
+  bridge?: BridgeRuntimeSettings | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
 export interface ArtifactChunk {
   index: number;
   offset_bytes: number;
@@ -29,6 +57,24 @@ export interface BackupFileRecordWire {
   size_bytes: number;
 }
 export type Bcp47LanguageTag = string;
+export interface BridgeRuntimeSettings {
+  host?: string;  // default: "127.0.0.1"
+  port?: number;  // default: 9001
+  source_id?: string;  // default: "mt5-terminal-1"
+  auth_token?: string;  // default: ""
+  symbols?: string;  // default: "EURUSD,GBPUSD,USDJPY,XAUUSD"
+  schema_version?: 1;  // default: 1
+}
+export interface CredentialSlotStatus {
+  slot: NonEmptyStr;
+  label: NonEmptyStr;
+  fields?: string[];  // default: []
+  activation?: "restart_required";  // default: "restart_required"
+  configured?: boolean;  // default: false
+  version?: number;  // default: 1
+  updated_at?: string | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
 export type DeploymentMode = "DESKTOP" | "HOSTED";
 export interface DiagnosticBundleManifest {
   bundle_id: string;
@@ -119,6 +165,26 @@ export interface LocalSession {
   schema_version?: 1;  // default: 1
 }
 export type LogLevel = "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL";
+export interface ManageAccountsRequest {
+  request_id: string;
+  capability_snapshot_id: string;
+  operation: "REGISTER" | "LOGIN" | "ME" | "LOGOUT";
+  username?: string | null;  // default: null
+  password?: string | null;  // default: null
+  session_token?: string | null;  // default: null
+  runtime_profile?: string;  // default: "research"
+  schema_version?: 1;  // default: 1
+}
+export interface ManageAccountsSuccess {
+  outcome?: "SUCCESS";  // default: "SUCCESS"
+  request_id: string;
+  result_version?: 1;  // default: 1
+  user?: AccountRecord | null;  // default: null
+  session_token?: string;  // default: ""
+  csrf_token?: string;  // default: ""
+  revoked?: boolean;  // default: false
+  schema_version?: 1;  // default: 1
+}
 export interface ManageWatchlistsRequest {
   request_id: string;
   capability_snapshot_id: string;
@@ -180,6 +246,17 @@ export interface ServerRuntimeValidationWire {
   errors?: NonEmptyStr[];  // default: []
   port_available?: boolean;  // default: true
 }
+export interface SettingDefinition {
+  key: NonEmptyStr;
+  label: NonEmptyStr;
+  description?: string;  // default: ""
+  value_kind?: "string" | "boolean" | "decimal" | "integer";  // default: "string"
+  allowed_values?: string[];  // default: []
+  minimum?: number | null;  // default: null
+  maximum?: number | null;  // default: null
+  activation?: "hot" | "restart_required";  // default: "restart_required"
+  schema_version?: 1;  // default: 1
+}
 export interface StorageGuardPolicy {
   min_free_space_mb?: number;  // default: 512
   max_artifact_size_mb?: number;  // default: 4096
@@ -204,6 +281,16 @@ export interface SystemReadiness {
   active_workers: number;
   checked_at: string;
   reasons?: NonEmptyStr[];  // default: []
+}
+export interface SystemSettingsRecord {
+  scope?: "system";  // default: "system"
+  subject_id?: string;  // default: "system"
+  user_id?: null;  // default: null
+  settings: { [key: string]: string };
+  version?: number;  // default: 1
+  updated_at: string;
+  restart_required?: boolean;  // default: false
+  schema_version?: 1;  // default: 1
 }
 export type UppercaseToken = string;
 export type UriStr = string;
@@ -307,7 +394,7 @@ export interface WorkspaceFailure {
   problem: ProblemDetails;
   schema_version?: 1;  // default: 1
 }
-export type WorkspaceFailureCode = "WORKSPACE_VALIDATION_FAILED" | "WORKSPACE_NOT_FOUND" | "WORKSPACE_ALREADY_OPEN" | "WORKER_UNKNOWN" | "WORKER_UNTRUSTED" | "WORKER_EXPIRED" | "LEASE_UNAVAILABLE" | "LEASE_TOKEN_STALE" | "TRANSFER_INVALID" | "TRANSFER_INCOMPLETE" | "ISOLATION_CONFLICT" | "CAPABILITY_UNAVAILABLE";
+export type WorkspaceFailureCode = "WORKSPACE_VALIDATION_FAILED" | "WORKSPACE_NOT_FOUND" | "WORKSPACE_ALREADY_OPEN" | "WORKER_UNKNOWN" | "WORKER_UNTRUSTED" | "WORKER_EXPIRED" | "LEASE_UNAVAILABLE" | "LEASE_TOKEN_STALE" | "TRANSFER_INVALID" | "TRANSFER_INCOMPLETE" | "ISOLATION_CONFLICT" | "ACCOUNT_REGISTRATION_FAILED" | "ACCOUNT_AUTHENTICATION_FAILED" | "CAPABILITY_UNAVAILABLE";
 export interface WorkspaceRef {
   workspace_id: string;
   name: Name1To160;

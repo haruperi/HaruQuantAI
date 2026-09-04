@@ -6,6 +6,7 @@ import asyncio
 import json
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 from uuid import uuid4, uuid7
 
@@ -38,6 +39,10 @@ from tests.services.interfaces.observe_market_catalogue.fakes import (
 from tests.services.interfaces.observe_market_data.fakes import (
     QueuedStreamProvider,
     make_event,
+)
+from tests.services.interfaces.workspace_shared import (
+    mount_identity_stack,
+    mount_settings_stack,
 )
 
 _EVENT_TIME = datetime(2026, 9, 3, 12, 0, 0, tzinfo=UTC)
@@ -496,9 +501,21 @@ async def test_catalogue_route_fails_closed_without_capability() -> None:
 
 
 @pytest.mark.asyncio
-async def test_settings_routes_serve_from_database() -> None:
-    """Verify settings endpoints read and write to central SQLite database."""
+async def test_settings_routes_unmounted_returns_503() -> None:
+    """Verify settings routes fail closed with 503 when the settings capability is unmounted."""
     registry = ServiceRegistry()
+    async with _client(registry) as client:
+        res = await client.get("/api/v1/settings")
+        assert res.status_code == 503
+        assert res.json()["error"]["code"] == "CAPABILITY_UNAVAILABLE"
+
+
+@pytest.mark.asyncio
+async def test_settings_routes_serve_from_database(tmp_path: Path) -> None:
+    """Verify settings endpoints read and write to central SQLite database."""
+    registry, _store_scope, _gw_scope = await mount_settings_stack(
+        tmp_path / "test_settings_asgi.db"
+    )
     async with _client(registry) as client:
         # GET /api/v1/settings
         res = await client.get("/api/v1/settings")
@@ -554,9 +571,37 @@ async def test_trading_route_fails_closed_without_capability() -> None:
 
 
 @pytest.mark.asyncio
-async def test_auth_routes_register_login_me_logout() -> None:
-    """Verify registration, login, identity recovery, and logout endpoints."""
+async def test_auth_routes_unmounted_returns_503() -> None:
+    """Verify auth routes fail closed with 503 when the identity capability is unmounted."""
     registry = ServiceRegistry()
+    async with _client(registry) as client:
+        res = await client.post(
+            "/api/v1/auth/register",
+            json={
+                "username": "test_user",
+                "password": "TestPassword123!",  # pragma: allowlist secret
+            },
+        )
+        assert res.status_code == 503
+        assert res.json()["error"]["code"] == "CAPABILITY_UNAVAILABLE"
+
+        res_login = await client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": "test_user",
+                "password": "TestPassword123!",  # pragma: allowlist secret
+            },
+        )
+        assert res_login.status_code == 503
+        assert res_login.json()["error"]["code"] == "CAPABILITY_UNAVAILABLE"
+
+
+@pytest.mark.asyncio
+async def test_auth_routes_register_login_me_logout(tmp_path: Path) -> None:
+    """Verify registration, login, identity recovery, and logout endpoints."""
+    registry, _store_scope, _gw_scope = await mount_identity_stack(
+        tmp_path / "test_auth_asgi.db"
+    )
     unique_user = f"user_{uuid4().hex[:8]}"
     test_pwd = "StrongPassword123!"  # pragma: allowlist secret
 

@@ -8,7 +8,7 @@ import type { CorrelationMatrix, PortfolioConstraintSet, PortfolioMember, Portfo
 import type { ResearchManifest } from "./research";
 import type { KillSwitchState, RiskDecision } from "./risk";
 import type { ExecutionAuthorityRef, TradePlan, TradingSession, TradingSessionRef } from "./trading";
-import type { HealthState, NonEmptyStr, WatchlistRecord } from "./workspace";
+import type { AccountRecord, BridgeRuntimeSettings, CredentialSlotStatus, HealthState, NonEmptyStr, SettingDefinition, SystemSettingsRecord, WatchlistRecord } from "./workspace";
 
 export interface AdministerCapabilitiesRequest {
   request_id: string;
@@ -263,6 +263,26 @@ export interface ObserveMarketDataSuccess {
   snapshot?: MarketTickSnapshot | null;  // default: null
   schema_version?: 1;  // default: 1
 }
+export interface OperateIdentityRequest {
+  request_id: string;
+  capability_snapshot_id: string;
+  operation: "REGISTER" | "LOGIN" | "ME" | "LOGOUT";
+  username?: string | null;  // default: null
+  password?: string | null;  // default: null
+  session_token?: string | null;  // default: null
+  runtime_profile?: string;  // default: "research"
+  schema_version?: 1;  // default: 1
+}
+export interface OperateIdentitySuccess {
+  outcome?: "SUCCESS";  // default: "SUCCESS"
+  request_id: string;
+  result_version?: 1;  // default: 1
+  user?: AccountRecord | null;  // default: null
+  session_token?: string;  // default: ""
+  csrf_token?: string;  // default: ""
+  revoked?: boolean;  // default: false
+  schema_version?: 1;  // default: 1
+}
 export interface OperatePortfoliosRequest {
   request_id: string;
   capability_snapshot_id: string;
@@ -291,6 +311,26 @@ export interface OperateResearchSuccess {
   request_id: string;
   result_version?: 1;  // default: 1
   preview?: ResearchPreview | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
+export interface OperateSettingsRequest {
+  request_id: string;
+  capability_snapshot_id: string;
+  operation: "READ_SYSTEM" | "UPDATE_SYSTEM" | "READ_MANIFEST" | "READ_CREDENTIALS" | "UPDATE_CREDENTIAL" | "READ_BRIDGE_RUNTIME";
+  settings?: { [key: string]: string };
+  slot?: string | null;  // default: null
+  material?: { [key: string]: string };
+  schema_version?: 1;  // default: 1
+}
+export interface OperateSettingsSuccess {
+  outcome?: "SUCCESS";  // default: "SUCCESS"
+  request_id: string;
+  result_version?: 1;  // default: 1
+  system?: SystemSettingsRecord | null;  // default: null
+  manifest?: SettingDefinition[];  // default: []
+  credentials?: CredentialSlotStatus[];  // default: []
+  credential_updated?: boolean;  // default: false
+  bridge?: BridgeRuntimeSettings | null;  // default: null
   schema_version?: 1;  // default: 1
 }
 export interface OperateTradingEventSubscription {

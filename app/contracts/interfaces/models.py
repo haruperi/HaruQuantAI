@@ -55,6 +55,11 @@ from app.contracts.trading.models import (  # noqa: TC001
     TradingSessionRef,
 )
 from app.contracts.workspace.models import (  # noqa: TC001
+    AccountRecord,
+    BridgeRuntimeSettings,
+    CredentialSlotStatus,
+    SettingDefinition,
+    SystemSettingsRecord,
     WatchlistRecord,
 )
 
@@ -1428,6 +1433,76 @@ class OperateWatchlistsSuccess(WireModel):
 # directly. Nested components (``AutomationCommandDescriptor``,
 # ``ComponentStateSummary``) are inline record parts, not registered
 # public records.
+
+
+class OperateIdentityRequest(WireModel):
+    """Operation-discriminated identity gateway request.
+
+    REGISTER/LOGIN require ``username`` and ``password``; ME/LOGOUT
+    require ``session_token``. The shape mirrors the Workspace
+    manage-accounts contract without its coordination fields.
+    """
+
+    request_id: Uuid7
+    capability_snapshot_id: Uuid7
+    operation: Literal["REGISTER", "LOGIN", "ME", "LOGOUT"]
+    username: str | None = None
+    password: str | None = None
+    session_token: str | None = None
+    runtime_profile: str = "research"
+    schema_version: Literal[1] = 1
+
+
+class OperateIdentitySuccess(WireModel):
+    """Successful identity gateway operation result."""
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    user: AccountRecord | None = None
+    session_token: str = ""
+    csrf_token: str = ""
+    revoked: bool = False
+    schema_version: Literal[1] = 1
+
+
+class OperateSettingsRequest(WireModel):
+    """Operation-discriminated settings gateway request.
+
+    UPDATE_SYSTEM requires ``settings``; UPDATE_CREDENTIAL requires
+    ``slot`` and ``material``; every other operation takes no payload.
+    """
+
+    request_id: Uuid7
+    capability_snapshot_id: Uuid7
+    operation: Literal[
+        "READ_SYSTEM",
+        "UPDATE_SYSTEM",
+        "READ_MANIFEST",
+        "READ_CREDENTIALS",
+        "UPDATE_CREDENTIAL",
+        "READ_BRIDGE_RUNTIME",
+    ]
+    settings: dict[str, str] = Field(default_factory=dict)
+    slot: str | None = None
+    material: dict[str, str] = Field(default_factory=dict)
+    schema_version: Literal[1] = 1
+
+
+class OperateSettingsSuccess(WireModel):
+    """Successful settings gateway operation result."""
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    system: SystemSettingsRecord | None = None
+    manifest: tuple[SettingDefinition, ...] = ()
+    credentials: tuple[CredentialSlotStatus, ...] = ()
+    credential_updated: bool = False
+    bridge: BridgeRuntimeSettings | None = None
+    schema_version: Literal[1] = 1
+
+
 WIRE_MODELS: dict[str, type[WireModel]] = {
     "ApiVersion": ApiVersionWire,
     "ConcurrencyToken": ConcurrencyTokenWire,
@@ -1459,6 +1534,10 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
     "ObserveMarketCatalogueSuccess": ObserveMarketCatalogueSuccess,
     "OperateWatchlistsRequest": OperateWatchlistsRequest,
     "OperateWatchlistsSuccess": OperateWatchlistsSuccess,
+    "OperateIdentityRequest": OperateIdentityRequest,
+    "OperateIdentitySuccess": OperateIdentitySuccess,
+    "OperateSettingsRequest": OperateSettingsRequest,
+    "OperateSettingsSuccess": OperateSettingsSuccess,
     "OperateResearchRequest": OperateResearchRequest,
     "OperateResearchSuccess": OperateResearchSuccess,
     "EditProjectsRequest": EditProjectsRequest,

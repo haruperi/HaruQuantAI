@@ -11,8 +11,10 @@ if TYPE_CHECKING:
         EditProjectsCapability,
         ObserveMarketCatalogueCapability,
         ObserveMarketDataCapability,
+        OperateIdentityCapability,
         OperatePortfoliosCapability,
         OperateResearchCapability,
+        OperateSettingsCapability,
         OperateTradingCapability,
         OperateWatchlistsCapability,
         ServeApiEventsCapability,
@@ -76,4 +78,14 @@ OPERATE_WATCHLISTS_CAPABILITY: CapabilityKey[OperateWatchlistsCapability] = (
         name="interfaces.operate-watchlists",
         major=1,
     )
+)
+
+OPERATE_IDENTITY_CAPABILITY: CapabilityKey[OperateIdentityCapability] = CapabilityKey(
+    name="interfaces.operate-identity",
+    major=1,
+)
+
+OPERATE_SETTINGS_CAPABILITY: CapabilityKey[OperateSettingsCapability] = CapabilityKey(
+    name="interfaces.operate-settings",
+    major=1,
 )

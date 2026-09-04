@@ -9,6 +9,8 @@ if TYPE_CHECKING:
 
     from app.contracts.workspace.errors import WorkspaceFailure
     from app.contracts.workspace.models import (
+        AdministerSettingsRequest,
+        AdministerSettingsSuccess,
         DiagnosticBundleRef,
         DistributeWorkersRequest,
         DistributeWorkersSuccess,
@@ -16,6 +18,8 @@ if TYPE_CHECKING:
         HostWorkspacesSuccess,
         JobKind,
         LocalSession,
+        ManageAccountsRequest,
+        ManageAccountsSuccess,
         ManageWatchlistsRequest,
         ManageWatchlistsSuccess,
         RuntimeSupportProfile,
@@ -434,5 +438,42 @@ class ManageWatchlistsCapability(Protocol):
         Returns:
             The watchlist page, mutation result, or deletion flag on
             success, otherwise a structured workspace failure.
+        """
+        ...
+
+
+@runtime_checkable
+class ManageAccountsCapability(Protocol):
+    """Capability protocol for account and session operations."""
+
+    async def manage_accounts(
+        self, request: ManageAccountsRequest
+    ) -> ManageAccountsSuccess | WorkspaceFailure:
+        """Serve one operation-discriminated account request.
+
+        Args:
+            request: REGISTER, LOGIN, ME, or LOGOUT request.
+
+        Returns:
+            Account operation success, or a structured workspace failure.
+        """
+        ...
+
+
+@runtime_checkable
+class AdministerSettingsCapability(Protocol):
+    """Capability protocol for system settings administration."""
+
+    async def administer_settings(
+        self, request: AdministerSettingsRequest
+    ) -> AdministerSettingsSuccess | WorkspaceFailure:
+        """Serve one operation-discriminated settings request.
+
+        Args:
+            request: Settings read/update/manifest/credentials/bridge
+                request.
+
+        Returns:
+            Settings operation success, or a structured workspace failure.
         """
         ...

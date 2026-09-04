@@ -5,11 +5,12 @@
 > HaruQuantAI. Every HTTP, SSE, CLI, MCP, and automation surface is a
 > registered feature in this package that resolves business capabilities
 > through `FeatureContext` and never imports a business implementation.
-> **Status:** `In Progress` — 5 registered features
+> **Status:** `In Progress` — 7 registered features
 > (`FEAT-IFACE-SERVE_API_EVENTS`, `FEAT-IFACE-OBSERVE_MARKET_DATA`,
-> `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE`, `FEAT-IFACE-OPERATE_WATCHLISTS`,
+> `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE`, `FEAT-IFACE-OPERATE_IDENTITY`,
+> `FEAT-IFACE-OPERATE_SETTINGS`, `FEAT-IFACE-OPERATE_WATCHLISTS`,
 > `FEAT-IFACE-OPERATE_TRADING`).
-> **Last updated:** `2026-09-03`
+> **Last updated:** `2026-09-04`
 
 This README is the Interfaces domain's source of truth. The baseline
 reconciliation that established this domain is recorded in
@@ -38,14 +39,13 @@ declared capability has no active provider.
   references, and artifact download validation.
 - Presentation-neutral command delegation for CLI/MCP/automation callers.
 - Translation of wire DTOs to and from public contract records.
-- Central database settings and credentials retrieval and updates backed
-  by SQLite (`haruquantai.db`).
-- Central database authentication and sessions backed by SQLite (`users`
-  and `sessions` in `haruquantai.db`).
+- HTTP cookie and CSRF session transport delegating authentication
+  to `workspace.manage-accounts@1` and settings to `workspace.administer-settings@1`.
 
 ### Does not own
 
 - Business logic, domain state, or market-data truth of any kind.
+- Direct database storage, tables, or SQL access.
 
 ### Explicit capability boundary
 
@@ -71,17 +71,20 @@ D-IFACE MAY NOT:
 ### Authentication boundary
 
 Authentication, session, and CSRF enforcement are boundary transport
-concerns owned by Interfaces features (`FEAT-IFACE-SERVE_API_EVENTS`), backed
-by the authoritative SQLite `users` and `sessions` tables with `scrypt`
-password hashing and `hq_session` / `hq_csrf` cookie headers (`/api/v1/auth/*`).
+concerns owned by Interfaces features (`FEAT-IFACE-SERVE_API_EVENTS` and
+`FEAT-IFACE-OPERATE_IDENTITY`), backed by the Workspace-owned
+`workspace.manage-accounts@1` capability with `hq_session` / `hq_csrf`
+cookie headers (`/api/v1/auth/*`).
 
 ## 2. Feature Registry
 
 | Status | Feature | Provides | Notes |
 | --- | --- | --- | --- |
-| Completed | `FEAT-IFACE-SERVE_API_EVENTS` | `interfaces.serve-api-events@1` | Transport foundation: versioning, OpenAPI, SSE buffer, idempotency, jobs, artifacts, settings DB, and session/auth boundary. |
+| Completed | `FEAT-IFACE-SERVE_API_EVENTS` | `interfaces.serve-api-events@1` | Transport foundation: versioning, OpenAPI, SSE buffer, idempotency, jobs, artifacts, and route dispatch. |
 | Completed | `FEAT-IFACE-OBSERVE_MARKET_DATA` | `interfaces.observe-market-data@1` | Phase 3 Market Ticks vertical slice; requires `data.stream-market-events@1`. |
 | Completed | `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE` | `interfaces.observe-market-catalogue@1` | Phase 6 Markets slice backend; requires `catalogue.catalog-instruments@1`. |
+| Completed | `FEAT-IFACE-OPERATE_IDENTITY` | `interfaces.operate-identity@1` | External identity and session boundary; requires `workspace.manage-accounts@1`. |
+| Completed | `FEAT-IFACE-OPERATE_SETTINGS` | `interfaces.operate-settings@1` | System settings and credential slot boundary; requires `workspace.administer-settings@1`. |
 | Completed | `FEAT-IFACE-OPERATE_WATCHLISTS` | `interfaces.operate-watchlists@1` | Phase 6 Watchlists slice backend; requires `workspace.manage-watchlists@1`. |
 | Completed | `FEAT-IFACE-OPERATE_TRADING` | `interfaces.operate-trading@1` | Phase 7 Governed Trading Gateway; resolves optional trading capabilities and fails closed. |
 | Pending | `FEAT-IFACE-OPERATE_RESEARCH` | `interfaces.operate-research@1` | With the Research workbench migration. |
@@ -100,6 +103,8 @@ responsibility; one feature per route is explicitly rejected.
 | `interfaces.serve-api-events@1` | `app/contracts/interfaces/` | `FEAT-IFACE-SERVE_API_EVENTS` |
 | `interfaces.observe-market-data@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OBSERVE_MARKET_DATA` |
 | `interfaces.observe-market-catalogue@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OBSERVE_MARKET_CATALOGUE` |
+| `interfaces.operate-identity@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_IDENTITY` |
+| `interfaces.operate-settings@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_SETTINGS` |
 | `interfaces.operate-watchlists@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_WATCHLISTS` |
 | `interfaces.operate-trading@1` | `app/contracts/interfaces/` | `FEAT-IFACE-OPERATE_TRADING` |
 | `interfaces.automate-commands@1` | `app/contracts/interfaces/` | `FEAT-IFACE-AUTOMATE_COMMANDS` (pending) |

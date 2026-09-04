@@ -1,5 +1,40 @@
 {
   "$defs": {
+    "AccountRecord": {
+      "additionalProperties": false,
+      "description": "One workstation account's identity claims.\n\n``expires_at`` is the owning session's expiry; ``runtime_profile`` is\nthe account's execution profile selection.",
+      "properties": {
+        "expires_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "runtime_profile": {
+          "default": "research",
+          "title": "Runtime Profile",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "user_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "username": {
+          "$ref": "#/$defs/NonEmptyStr"
+        }
+      },
+      "required": [
+        "user_id",
+        "username",
+        "expires_at"
+      ],
+      "title": "AccountRecord",
+      "type": "object"
+    },
     "AdministerCapabilitiesRequest": {
       "additionalProperties": false,
       "description": "Operation-discriminated capability administration gateway request.",
@@ -686,6 +721,47 @@
       "title": "AutomationSchema",
       "type": "object"
     },
+    "BridgeRuntimeSettings": {
+      "additionalProperties": false,
+      "description": "MT5 snapshot bridge listener runtime settings.\n\nValues mirror the TickBridge EA's documented defaults; the auth token\nis the shared secret the EA presents in its hello frame.",
+      "properties": {
+        "auth_token": {
+          "default": "",
+          "title": "Auth Token",
+          "type": "string"
+        },
+        "host": {
+          "default": "127.0.0.1",
+          "title": "Host",
+          "type": "string"
+        },
+        "port": {
+          "default": 9001,
+          "maximum": 65535,
+          "minimum": 1,
+          "title": "Port",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "source_id": {
+          "default": "mt5-terminal-1",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "symbols": {
+          "default": "EURUSD,GBPUSD,USDJPY,XAUUSD",
+          "title": "Symbols",
+          "type": "string"
+        }
+      },
+      "title": "BridgeRuntimeSettings",
+      "type": "object"
+    },
     "BrokerAccountSnapshot": {
       "additionalProperties": false,
       "description": "Provider-truth account and balance projection.",
@@ -1317,6 +1393,68 @@
         "method_version"
       ],
       "title": "CorrelationRequest",
+      "type": "object"
+    },
+    "CredentialSlotStatus": {
+      "additionalProperties": false,
+      "description": "Write-only credential slot status without credential values.",
+      "properties": {
+        "activation": {
+          "const": "restart_required",
+          "default": "restart_required",
+          "title": "Activation",
+          "type": "string"
+        },
+        "configured": {
+          "default": false,
+          "title": "Configured",
+          "type": "boolean"
+        },
+        "fields": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Fields",
+          "type": "array"
+        },
+        "label": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "slot": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "updated_at": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Updated At"
+        },
+        "version": {
+          "default": 1,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "slot",
+        "label"
+      ],
+      "title": "CredentialSlotStatus",
       "type": "object"
     },
     "DomainEvent": {
@@ -2582,6 +2720,146 @@
       "title": "ObserveMarketDataSuccess",
       "type": "object"
     },
+    "OperateIdentityRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated identity gateway request.\n\nREGISTER/LOGIN require ``username`` and ``password``; ME/LOGOUT\nrequire ``session_token``. The shape mirrors the Workspace\nmanage-accounts contract without its coordination fields.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "REGISTER",
+            "LOGIN",
+            "ME",
+            "LOGOUT"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "password": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Password"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "runtime_profile": {
+          "default": "research",
+          "title": "Runtime Profile",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_token": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Session Token"
+        },
+        "username": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Username"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "OperateIdentityRequest",
+      "type": "object"
+    },
+    "OperateIdentitySuccess": {
+      "additionalProperties": false,
+      "description": "Successful identity gateway operation result.",
+      "properties": {
+        "csrf_token": {
+          "default": "",
+          "title": "Csrf Token",
+          "type": "string"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "revoked": {
+          "default": false,
+          "title": "Revoked",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "session_token": {
+          "default": "",
+          "title": "Session Token",
+          "type": "string"
+        },
+        "user": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AccountRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "OperateIdentitySuccess",
+      "type": "object"
+    },
     "OperatePortfoliosRequest": {
       "additionalProperties": false,
       "description": "Operation-discriminated portfolio operations gateway request.\n\nVIEW, VALIDATE, and COMPARE require ``portfolio_version_id``; COMPARE\nadditionally requires ``compared_result_id``.",
@@ -2787,6 +3065,150 @@
         "request_id"
       ],
       "title": "OperateResearchSuccess",
+      "type": "object"
+    },
+    "OperateSettingsRequest": {
+      "additionalProperties": false,
+      "description": "Operation-discriminated settings gateway request.\n\nUPDATE_SYSTEM requires ``settings``; UPDATE_CREDENTIAL requires\n``slot`` and ``material``; every other operation takes no payload.",
+      "properties": {
+        "capability_snapshot_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Capability Snapshot Id",
+          "type": "string"
+        },
+        "material": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Material",
+          "type": "object"
+        },
+        "operation": {
+          "enum": [
+            "READ_SYSTEM",
+            "UPDATE_SYSTEM",
+            "READ_MANIFEST",
+            "READ_CREDENTIALS",
+            "UPDATE_CREDENTIAL",
+            "READ_BRIDGE_RUNTIME"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "settings": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Settings",
+          "type": "object"
+        },
+        "slot": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Slot"
+        }
+      },
+      "required": [
+        "request_id",
+        "capability_snapshot_id",
+        "operation"
+      ],
+      "title": "OperateSettingsRequest",
+      "type": "object"
+    },
+    "OperateSettingsSuccess": {
+      "additionalProperties": false,
+      "description": "Successful settings gateway operation result.",
+      "properties": {
+        "bridge": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BridgeRuntimeSettings"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "credential_updated": {
+          "default": false,
+          "title": "Credential Updated",
+          "type": "boolean"
+        },
+        "credentials": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CredentialSlotStatus"
+          },
+          "title": "Credentials",
+          "type": "array"
+        },
+        "manifest": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SettingDefinition"
+          },
+          "title": "Manifest",
+          "type": "array"
+        },
+        "outcome": {
+          "const": "SUCCESS",
+          "default": "SUCCESS",
+          "title": "Outcome",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "result_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Version",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "system": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SystemSettingsRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "request_id"
+      ],
+      "title": "OperateSettingsSuccess",
       "type": "object"
     },
     "OperateTradingEventSubscription": {
@@ -4938,6 +5360,87 @@
       ],
       "type": "string"
     },
+    "SettingDefinition": {
+      "additionalProperties": false,
+      "description": "One editable non-secret system setting's manifest definition.",
+      "properties": {
+        "activation": {
+          "default": "restart_required",
+          "enum": [
+            "hot",
+            "restart_required"
+          ],
+          "title": "Activation",
+          "type": "string"
+        },
+        "allowed_values": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Values",
+          "type": "array"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "label": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum"
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "value_kind": {
+          "default": "string",
+          "enum": [
+            "string",
+            "boolean",
+            "decimal",
+            "integer"
+          ],
+          "title": "Value Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "label"
+      ],
+      "title": "SettingDefinition",
+      "type": "object"
+    },
     "Side": {
       "enum": [
         "BUY",
@@ -5048,6 +5551,63 @@
         "error"
       ],
       "type": "string"
+    },
+    "SystemSettingsRecord": {
+      "additionalProperties": false,
+      "description": "Versioned system settings projection under legacy wire keys.",
+      "properties": {
+        "restart_required": {
+          "default": false,
+          "title": "Restart Required",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "scope": {
+          "const": "system",
+          "default": "system",
+          "title": "Scope",
+          "type": "string"
+        },
+        "settings": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Settings",
+          "type": "object"
+        },
+        "subject_id": {
+          "default": "system",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "updated_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "user_id": {
+          "default": null,
+          "title": "User Id",
+          "type": "null"
+        },
+        "version": {
+          "default": 1,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "settings",
+        "updated_at"
+      ],
+      "title": "SystemSettingsRecord",
+      "type": "object"
     },
     "TaskContract": {
       "additionalProperties": false,
@@ -5971,6 +6531,12 @@
     "ObserveMarketDataSuccess": {
       "$ref": "#/$defs/ObserveMarketDataSuccess"
     },
+    "OperateIdentityRequest": {
+      "$ref": "#/$defs/OperateIdentityRequest"
+    },
+    "OperateIdentitySuccess": {
+      "$ref": "#/$defs/OperateIdentitySuccess"
+    },
     "OperatePortfoliosRequest": {
       "$ref": "#/$defs/OperatePortfoliosRequest"
     },
@@ -5982,6 +6548,12 @@
     },
     "OperateResearchSuccess": {
       "$ref": "#/$defs/OperateResearchSuccess"
+    },
+    "OperateSettingsRequest": {
+      "$ref": "#/$defs/OperateSettingsRequest"
+    },
+    "OperateSettingsSuccess": {
+      "$ref": "#/$defs/OperateSettingsSuccess"
     },
     "OperateTradingEventSubscription": {
       "$ref": "#/$defs/OperateTradingEventSubscription"

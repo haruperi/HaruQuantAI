@@ -6,10 +6,12 @@ from app.kernel.capability import CapabilityKey
 
 if TYPE_CHECKING:
     from app.contracts.workspace.ports import (
+        AdministerSettingsCapability,
         BuildDiagnosticsCapability,
         ConfigureRuntimeCapability,
         DistributeWorkersCapability,
         HostWorkspacesCapability,
+        ManageAccountsCapability,
         ManageWatchlistsCapability,
         ManageWorkspacesCapability,
         SecureLocalAccessCapability,
@@ -51,5 +53,17 @@ HOST_WORKSPACES_CAPABILITY: CapabilityKey[HostWorkspacesCapability] = Capability
 
 MANAGE_WATCHLISTS_CAPABILITY: CapabilityKey[ManageWatchlistsCapability] = CapabilityKey(
     name="workspace.manage-watchlists",
+    major=1,
+)
+
+ADMINISTER_SETTINGS_CAPABILITY: CapabilityKey[AdministerSettingsCapability] = (
+    CapabilityKey(
+        name="workspace.administer-settings",
+        major=1,
+    )
+)
+
+MANAGE_ACCOUNTS_CAPABILITY: CapabilityKey[ManageAccountsCapability] = CapabilityKey(
+    name="workspace.manage-accounts",
     major=1,
 )

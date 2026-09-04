@@ -34,7 +34,9 @@ The Workspace domain delivers workspace lifecycle, runtime configuration, local/
 - `FEAT-WS-BUILD_DIAGNOSTICS` — Diagnostics.
 - `FEAT-WS-DISTRIBUTE_WORKERS` — Distributed Worker Pool.
 - `FEAT-WS-HOST_WORKSPACES` — Hosted Workspace Boundary.
+- `FEAT-WS-MANAGE_ACCOUNTS` — Account and Session Store.
 - `FEAT-WS-MANAGE_WATCHLISTS` — Account Watchlist Store.
+- `FEAT-WS-ADMINISTER_SETTINGS` — System Settings Administration.
 
 ### Does not own
 
@@ -59,6 +61,9 @@ Rows labelled `FEAT-* capability surface` describe planned semantic contract bun
 | Implemented | `FEAT-WS-BUILD_DIAGNOSTICS` capability surface | `v1` | Interfaces, Orchestration, Simulator | Diagnostics. |
 | Implemented | `FEAT-WS-DISTRIBUTE_WORKERS` capability surface | `v1` | Interfaces, Orchestration, Simulator | Distributed Worker Pool. |
 | Implemented | `FEAT-WS-HOST_WORKSPACES` capability surface | `v1` | Interfaces, Orchestration, Simulator | Hosted Workspace Boundary. |
+| Implemented | `FEAT-WS-MANAGE_ACCOUNTS` capability surface | `v1` | Interfaces | Account and Session Store. |
+| Implemented | `FEAT-WS-MANAGE_WATCHLISTS` capability surface | `v1` | Interfaces | Account Watchlist Store. |
+| Implemented | `FEAT-WS-ADMINISTER_SETTINGS` capability surface | `v1` | Interfaces | System Settings Administration. |
 
 **Cross-domain requirement references (not runtime dependencies)**
 
