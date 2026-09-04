@@ -21,10 +21,7 @@ from typing import Any
 _ALLOWED_CONFIG_KEYS = frozenset({"database_path"})
 
 _DEFAULT_DATABASE_PATH = (
-    Path(__file__).resolve().parent.parent.parent.parent.parent.parent
-    / "data"
-    / "database"
-    / "haruquantai.db"
+    Path(__file__).resolve().parents[4] / "data" / "database" / "haruquantai.db"
 )
 
 

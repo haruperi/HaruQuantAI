@@ -39,6 +39,22 @@ Unknown keys are rejected with `ValueError`.
 
 None
 
+## Operations
+
+Strict pass-through bridge without calculations or state mutations, delegating directly to `data.browse-reference@1`:
+- `OBSERVE_SERIES`: Forward series catalogue queries.
+- `UPDATE_SERIES`: Forward series and instrument contract specification updates.
+- `DELETE_SERIES`: Forward series deletion requests.
+- `OBSERVE_INSTRUMENTS` & `OBSERVE_INSTRUMENT`: Forward instrument specification queries.
+- `UPDATE_INSTRUMENT`: Forward instrument specification updates.
+- `OBSERVE_BROKERS`: Forward broker profile queries.
+- `OBSERVE_BARS`: Forward historical bar reads.
+- `INSPECT_QUALITY`: Forward data quality anomaly inspection requests.
+- `CLONE_SERIES`: Forward timezone series cloning requests.
+- `EXPORT_DATA`: Forward CSV and historical data export requests.
+- `DOWNLOAD_DUKASCOPY`: Forward Dukascopy download requests.
+- `BATCH_ACTION`: Forward batch operations (bulk delete, export, download).
+
 ## Failure Behavior
 
 - Returns `CAPABILITY_UNAVAILABLE` (status 503) when the gateway has been closed

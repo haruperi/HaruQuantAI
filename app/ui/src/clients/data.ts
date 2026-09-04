@@ -182,7 +182,7 @@ export interface SeriesUpdateBody {
   timezone?: string | null;
   date_from?: number | null;
   date_to?: number | null;
-  data_type?: number | null;
+  data_type?: number | string | null;
   decimals?: number | null;
   source?: number | null;
   row_count?: number | null;
@@ -197,6 +197,10 @@ export interface SeriesUpdateBody {
   min_distance?: number | null;
   order_size_multiplier?: number | null;
   order_size_step?: number | null;
+  swap_mode?: number | null;
+  swap_long?: number | null;
+  swap_short?: number | null;
+  swap_rollover3days?: number | null;
 }
 
 /** Updated series summary returned by the governed edit. */
@@ -283,11 +287,15 @@ export const instrumentSpecSchema = z.object({
   tick_step: z.number().nullable(),
   default_spread: z.number().nullable(),
   default_slippage: z.number().nullable(),
-  data_type: z.number().int().nullable(),
+  data_type: z.union([z.string(), z.number()]).nullable(),
   order_size_multiplier: z.number().nullable(),
   order_size_step: z.number().nullable(),
   min_distance: z.number().nullable(),
   swap: z.string().nullable(),
+  swap_mode: z.number().nullable().optional(),
+  swap_long: z.number().nullable().optional(),
+  swap_short: z.number().nullable().optional(),
+  swap_rollover3days: z.number().nullable().optional(),
 });
 export type InstrumentSpec = z.infer<typeof instrumentSpecSchema>;
 
@@ -659,6 +667,127 @@ export function importDataset(
   });
 }
 
+/** Quality report schema for anomalies inspection. */
+export const qualityReportSchema = z.object({
+  problems: z.object({
+    gap: z.object({ count: z.number(), percent: z.string() }),
+    spike: z.object({ count: z.number(), percent: z.string() }),
+    ohlc: z.object({ count: z.number(), percent: z.string() }),
+  }),
+  timeline: z.array(z.object({ time: z.number(), type: z.string() })),
+  details: z.array(
+    z.object({
+      timestamp: z.string(),
+      issue: z.string(),
+      description: z.string(),
+    })
+  ),
+});
+export type QualityReport = z.infer<typeof qualityReportSchema>;
+
+/** Inspect historical data quality anomalies (gaps, spikes, bad OHLC). */
+export function quality(
+  symbol: string,
+  timeframe: string = "M1",
+  options?: RequestOptions
+): Promise<ApiResponse<QualityReport>> {
+  return request<QualityReport>(dataRoutes.quality, {
+    schema: qualityReportSchema,
+    query: { symbol, timeframe },
+    ...options,
+  });
+}
+
+/** Delete a series record and optionally its parquet files. */
+export function deleteSeries(
+  seriesId: number,
+  deleteFiles: boolean = false,
+  options?: RequestOptions
+): Promise<ApiResponse<{ deleted: boolean; series_id: number }>> {
+  return request<{ deleted: boolean; series_id: number }>(dataRoutes.deleteSeries, {
+    schema: z.object({ deleted: z.boolean(), series_id: z.number() }),
+    pathParams: { series_id: seriesId },
+    query: { delete_files: deleteFiles ? "true" : "false" },
+    ...options,
+  });
+}
+
+/** Clone a series into a new shifted timezone. */
+export function cloneSeries(
+  body: { symbol: string; target_shift_hours: number; postfix: string },
+  options?: RequestOptions
+): Promise<ApiResponse<{ symbol: string; rows: number; timezone: string }>> {
+  return request<{ symbol: string; rows: number; timezone: string }>(dataRoutes.clone, {
+    schema: z.object({ symbol: z.string(), rows: z.number(), timezone: z.string() }),
+    body,
+    ...options,
+  });
+}
+
+/** Export bars into CSV or MT4 files. */
+export function exportData(
+  body: {
+    symbol: string;
+    format: "csv" | "mt4";
+    timeframe?: string;
+    start?: string;
+    end?: string;
+  },
+  options?: RequestOptions
+): Promise<ApiResponse<Record<string, unknown>>> {
+  return request<Record<string, unknown>>(dataRoutes.export, {
+    schema: z.record(z.string(), z.unknown()),
+    body,
+    ...options,
+  });
+}
+
+/** Queue or trigger Dukascopy download. */
+export function downloadDukascopy(
+  body: { symbols: string[]; date_from?: string; date_to?: string },
+  options?: RequestOptions
+): Promise<ApiResponse<{ status: string; symbols: string[]; message: string }>> {
+  return request<{ status: string; symbols: string[]; message: string }>(dataRoutes.download, {
+    schema: z.object({ status: z.string(), symbols: z.array(z.string()), message: z.string() }),
+    body,
+    ...options,
+  });
+}
+
+/** Read download configuration and available sources. */
+export function downloadConfig(
+  options?: RequestOptions
+): Promise<ApiResponse<Record<string, unknown>>> {
+  return request<Record<string, unknown>>(dataRoutes.downloadConfig, {
+    schema: z.record(z.string(), z.unknown()),
+    ...options,
+  });
+}
+
+/** Execute batch action across multiple series IDs. */
+export function batchAction(
+  body: { action: string; series_ids: number[] },
+  options?: RequestOptions
+): Promise<ApiResponse<Record<string, unknown>>> {
+  return request<Record<string, unknown>>(dataRoutes.batch, {
+    schema: z.record(z.string(), z.unknown()),
+    body,
+    ...options,
+  });
+}
+
+/** Import local file into series. */
+export function importFile(
+  body: Record<string, unknown>,
+  options?: RequestOptions
+): Promise<ApiResponse<Record<string, unknown>>> {
+  return request<Record<string, unknown>>(dataRoutes.import, {
+    schema: z.record(z.string(), z.unknown()),
+    body,
+    ...options,
+  });
+}
+
 export const data = {
   capabilities,
   symbols,
@@ -667,11 +796,19 @@ export const data = {
   brokers,
   instrument,
   updateSeries,
+  deleteSeries,
   updateInstrument,
   syncReference,
   markets,
   quotes,
   bars,
+  quality,
+  cloneSeries,
+  exportData,
+  downloadDukascopy,
+  downloadConfig,
+  batchAction,
+  importFile,
   stream,
   snapshotStream,
   depthStream,

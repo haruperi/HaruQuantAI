@@ -122,6 +122,13 @@ _DATA_SYMBOLS_ROUTE = "/api/v1/data/symbols"
 _DATA_BARS_ROUTE = "/api/v1/data/bars"
 _DATA_QUOTES_ROUTE = "/api/v1/data/quotes"
 _DATA_REFERENCE_SYNC_ROUTE = "/api/v1/data/reference/sync"
+_DATA_QUALITY_ROUTE = "/api/v1/data/quality"
+_DATA_CLONE_ROUTE = "/api/v1/data/clone"
+_DATA_EXPORT_ROUTE = "/api/v1/data/export"
+_DATA_DOWNLOAD_ROUTE = "/api/v1/data/download"
+_DATA_DOWNLOAD_CONFIG_ROUTE = "/api/v1/data/download/config"
+_DATA_BATCH_ROUTE = "/api/v1/data/batch"
+_DATA_IMPORT_ROUTE = "/api/v1/data/import"
 _DATA_SERIES_ID_PATTERN = re.compile(r"^/api/v1/data/series/(\d+)$")
 _DATA_INSTRUMENT_ID_PATTERN = re.compile(r"^/api/v1/data/instruments/([^/]+)$")
 _BAR_TIMEFRAMES = frozenset({"M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN1"})
@@ -1232,6 +1239,13 @@ def _is_data_reference_path(path: str) -> bool:
         _DATA_SYMBOLS_ROUTE,
         _DATA_QUOTES_ROUTE,
         _DATA_REFERENCE_SYNC_ROUTE,
+        _DATA_QUALITY_ROUTE,
+        _DATA_CLONE_ROUTE,
+        _DATA_EXPORT_ROUTE,
+        _DATA_DOWNLOAD_ROUTE,
+        _DATA_DOWNLOAD_CONFIG_ROUTE,
+        _DATA_BATCH_ROUTE,
+        _DATA_IMPORT_ROUTE,
     ):
         return True
     if _DATA_SERIES_ID_PATTERN.match(path) is not None:
@@ -1331,10 +1345,44 @@ async def _serve_data_series_item(
     receive: Receive,
     send: Send,
     series_id: int,
+    method: str,
+    params: dict[str, str],
     request_id: str,
     trace_id: str | None,
 ) -> None:
-    """Serve one governed series edit against the reference catalogue."""
+    """Serve one governed series edit or deletion against the reference catalogue."""
+    route = f"{_DATA_SERIES_ROUTE}/{series_id}"
+    if method == "DELETE":
+        delete_files = params.get("delete_files", "false").lower() == "true"
+        req = ObserveMarketReferenceRequest(
+            request_id=str(uuid7()),
+            operation="DELETE_SERIES",
+            series_id=series_id,
+            payload={"delete_files": delete_files},
+        )
+        result = await gateway.observe_market_reference(req)
+        if isinstance(result, InterfaceFailure):
+            await _send_error(
+                send,
+                _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+                result.problem.code or "DELETE_FAILED",
+                result.problem.detail or "Series deletion failed",
+                route,
+                "api.data.series.delete",
+                trace_id,
+            )
+            return
+        await _serve_data_json(
+            send,
+            route,
+            "api.data.series.delete",
+            cast("JsonObject | list[JsonObject]", result.data),
+            request_id,
+            trace_id,
+            side_effect="write",
+        )
+        return
+
     body = await _read_json_body(receive)
     if body is None:
         await _send_error(
@@ -1365,11 +1413,274 @@ async def _serve_data_series_item(
             trace_id,
         )
         return
-    route = f"{_DATA_SERIES_ROUTE}/{series_id}"
     await _serve_data_json(
         send,
         route,
         "api.data.series.update",
+        cast("JsonObject | list[JsonObject]", result.data),
+        request_id,
+        trace_id,
+        side_effect="write",
+    )
+
+
+async def _serve_data_quality(
+    gateway: ObserveMarketReferenceCapability,
+    params: dict[str, str],
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve data quality anomaly detection inspection."""
+    symbol = params.get("symbol", "").strip()
+    timeframe = params.get("timeframe", "M1").strip() or "M1"
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation="INSPECT_QUALITY",
+        symbol=symbol,
+        timeframe=timeframe,
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
+        await _send_error(
+            send,
+            _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+            result.problem.code or "QUALITY_INSPECT_FAILED",
+            result.problem.detail or "Quality inspection failed",
+            _DATA_QUALITY_ROUTE,
+            "api.data.quality",
+            trace_id,
+        )
+        return
+    await _serve_data_json(
+        send,
+        _DATA_QUALITY_ROUTE,
+        "api.data.quality",
+        cast("JsonObject | list[JsonObject]", result.data),
+        request_id,
+        trace_id,
+    )
+
+
+async def _serve_data_clone(
+    gateway: ObserveMarketReferenceCapability,
+    receive: Receive,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve cloning of a series into a shifted timezone."""
+    body = await _read_json_body(receive) or {}
+    symbol = str(body.get("symbol", ""))
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation="CLONE_SERIES",
+        symbol=symbol,
+        payload=body,
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
+        await _send_error(
+            send,
+            _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+            result.problem.code or "CLONE_FAILED",
+            result.problem.detail or "Series clone failed",
+            _DATA_CLONE_ROUTE,
+            "api.data.clone",
+            trace_id,
+        )
+        return
+    await _serve_data_json(
+        send,
+        _DATA_CLONE_ROUTE,
+        "api.data.clone",
+        cast("JsonObject | list[JsonObject]", result.data),
+        request_id,
+        trace_id,
+        side_effect="write",
+    )
+
+
+async def _serve_data_export(
+    gateway: ObserveMarketReferenceCapability,
+    receive: Receive,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve data export in CSV or MT4 format."""
+    body = await _read_json_body(receive) or {}
+    symbol = str(body.get("symbol", ""))
+    timeframe = str(body.get("timeframe", "M1"))
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation="EXPORT_DATA",
+        symbol=symbol,
+        timeframe=timeframe,
+        payload=body,
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
+        await _send_error(
+            send,
+            _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+            result.problem.code or "EXPORT_FAILED",
+            result.problem.detail or "Data export failed",
+            _DATA_EXPORT_ROUTE,
+            "api.data.export",
+            trace_id,
+        )
+        return
+    await _serve_data_json(
+        send,
+        _DATA_EXPORT_ROUTE,
+        "api.data.export",
+        cast("JsonObject | list[JsonObject]", result.data),
+        request_id,
+        trace_id,
+    )
+
+
+async def _serve_data_download(
+    gateway: ObserveMarketReferenceCapability,
+    receive: Receive,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve Dukascopy historical data download request."""
+    body = await _read_json_body(receive) or {}
+    raw_symbols = body.get("symbols", [])
+    symbols = tuple(str(s) for s in raw_symbols)
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation="DOWNLOAD_DUKASCOPY",
+        symbols=symbols,
+        payload=body,
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
+        await _send_error(
+            send,
+            _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+            result.problem.code or "DOWNLOAD_FAILED",
+            result.problem.detail or "Download failed",
+            _DATA_DOWNLOAD_ROUTE,
+            "api.data.download",
+            trace_id,
+        )
+        return
+    await _serve_data_json(
+        send,
+        _DATA_DOWNLOAD_ROUTE,
+        "api.data.download",
+        cast("JsonObject | list[JsonObject]", result.data),
+        request_id,
+        trace_id,
+        side_effect="write",
+    )
+
+
+async def _serve_data_download_config(
+    gateway: ObserveMarketReferenceCapability,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve Dukascopy download configuration and available sources."""
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation="DOWNLOAD_CONFIG",
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
+        await _send_error(
+            send,
+            _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+            result.problem.code or "CONFIG_FAILED",
+            result.problem.detail or "Download config failed",
+            _DATA_DOWNLOAD_CONFIG_ROUTE,
+            "api.data.download.config",
+            trace_id,
+        )
+        return
+    await _serve_data_json(
+        send,
+        _DATA_DOWNLOAD_CONFIG_ROUTE,
+        "api.data.download.config",
+        cast("JsonObject | list[JsonObject]", result.data),
+        request_id,
+        trace_id,
+    )
+
+
+async def _serve_data_batch(
+    gateway: ObserveMarketReferenceCapability,
+    receive: Receive,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve batch actions across series."""
+    body = await _read_json_body(receive) or {}
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation="BATCH_ACTION",
+        payload=body,
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
+        await _send_error(
+            send,
+            _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+            result.problem.code or "BATCH_FAILED",
+            result.problem.detail or "Batch action failed",
+            _DATA_BATCH_ROUTE,
+            "api.data.batch",
+            trace_id,
+        )
+        return
+    await _serve_data_json(
+        send,
+        _DATA_BATCH_ROUTE,
+        "api.data.batch",
+        cast("JsonObject | list[JsonObject]", result.data),
+        request_id,
+        trace_id,
+        side_effect="write",
+    )
+
+
+async def _serve_data_import(
+    gateway: ObserveMarketReferenceCapability,
+    receive: Receive,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve file import into market data repository."""
+    body = await _read_json_body(receive) or {}
+    req = ObserveMarketReferenceRequest(
+        request_id=str(uuid7()),
+        operation="IMPORT_FILE",
+        payload=body,
+    )
+    result = await gateway.observe_market_reference(req)
+    if isinstance(result, InterfaceFailure):
+        await _send_error(
+            send,
+            _failure_http_status(result, HTTPStatus.BAD_REQUEST),
+            result.problem.code or "IMPORT_FAILED",
+            result.problem.detail or "File import failed",
+            _DATA_IMPORT_ROUTE,
+            "api.data.import",
+            trace_id,
+        )
+        return
+    await _serve_data_json(
+        send,
+        _DATA_IMPORT_ROUTE,
+        "api.data.import",
         cast("JsonObject | list[JsonObject]", result.data),
         request_id,
         trace_id,
@@ -1657,6 +1968,7 @@ async def _serve_data_write_routes(
     send: Send,
     path: str,
     method: str,
+    params: dict[str, str],
     request_id: str,
     trace_id: str | None,
 ) -> bool:
@@ -1668,6 +1980,7 @@ async def _serve_data_write_routes(
         send: ASGI send callable.
         path: Request path.
         method: Uppercase request method.
+        params: Flattened query parameters.
         request_id: Mirrored or generated request identifier.
         trace_id: Optional mirrored trace identifier.
 
@@ -1702,9 +2015,16 @@ async def _serve_data_write_routes(
         )
         return True
     series_match = _DATA_SERIES_ID_PATTERN.match(path)
-    if series_match is not None and method == "PATCH":
+    if series_match is not None and method in ("PATCH", "DELETE"):
         await _serve_data_series_item(
-            gateway, receive, send, int(series_match.group(1)), request_id, trace_id
+            gateway,
+            receive,
+            send,
+            int(series_match.group(1)),
+            method,
+            params,
+            request_id,
+            trace_id,
         )
         return True
     instrument_match = _DATA_INSTRUMENT_ID_PATTERN.match(path)
@@ -1812,6 +2132,12 @@ async def _dispatch_data_reference(
     if path == _DATA_BARS_ROUTE and method == "GET":
         await _serve_bars(gateway, scope, send, request_id, trace_id)
         return True
+    if path == _DATA_QUALITY_ROUTE and method == "GET":
+        await _serve_data_quality(gateway, params, send, request_id, trace_id)
+        return True
+    if path == _DATA_DOWNLOAD_CONFIG_ROUTE and method == "GET":
+        await _serve_data_download_config(gateway, send, request_id, trace_id)
+        return True
     if await _serve_data_catalogue_read(
         gateway, path, method, params, send, request_id, trace_id
     ):
@@ -1820,8 +2146,23 @@ async def _dispatch_data_reference(
         gateway, path, method, params, send, request_id, trace_id
     ):
         return True
+    if path == _DATA_CLONE_ROUTE and method == "POST":
+        await _serve_data_clone(gateway, receive, send, request_id, trace_id)
+        return True
+    if path == _DATA_EXPORT_ROUTE and method == "POST":
+        await _serve_data_export(gateway, receive, send, request_id, trace_id)
+        return True
+    if path == _DATA_DOWNLOAD_ROUTE and method == "POST":
+        await _serve_data_download(gateway, receive, send, request_id, trace_id)
+        return True
+    if path == _DATA_BATCH_ROUTE and method == "POST":
+        await _serve_data_batch(gateway, receive, send, request_id, trace_id)
+        return True
+    if path == _DATA_IMPORT_ROUTE and method == "POST":
+        await _serve_data_import(gateway, receive, send, request_id, trace_id)
+        return True
     return await _serve_data_write_routes(
-        gateway, receive, send, path, method, request_id, trace_id
+        gateway, receive, send, path, method, params, request_id, trace_id
     )
 
 

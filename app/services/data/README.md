@@ -42,6 +42,8 @@ The Data domain delivers historical data ingestion, immutable series versions, q
 - `FEAT-DATA-TRACK_MARKET_NEWS` — Economic Calendar and News Evidence.
 - `FEAT-DATA-STREAM_MARKET_EVENTS` — Real-Time Market Events.
 - `FEAT-DATA-IMPORT_QUANTDATA` — QuantDataManager Source.
+- `FEAT-DATA-BROWSE_REFERENCE` — Market Reference Browser.
+- `FEAT-DATA-MARKET_DATA_STORE` — Partitioned Parquet Market Data Store.
 
 ### Does not own
 
@@ -75,6 +77,7 @@ Rows labelled `FEAT-* capability surface` describe planned semantic contract bun
 | Complete | `FEAT-DATA-STREAM_MARKET_EVENTS` capability surface | `v1` | Strategy, Risk, Trading, Interfaces | Real-Time Market Events. |
 | Implemented | `FEAT-DATA-IMPORT_QUANTDATA` capability surface | `v1` | Catalogue, Workspace | QuantDataManager Source. |
 | Implemented | `FEAT-DATA-BROWSE_REFERENCE` capability surface | `v1` | Interfaces, Workspace | Market Reference Browser. |
+| Implemented | `FEAT-DATA-MARKET_DATA_STORE` capability surface | `v1` | Data, Interfaces, Workspace | Partitioned Parquet Market Data Store. |
 
 **Cross-domain requirement references (not runtime dependencies)**
 

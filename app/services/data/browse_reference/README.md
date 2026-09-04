@@ -46,6 +46,22 @@ Namespace `data.browse_reference` retaining market reference catalogue (`data`),
 broker profiles (`broker`), instrument specifications (`instruments`), and
 cached bar history (`data_bars`) in SQLite.
 
+## Operations
+
+- `READ_SERIES`: Read market series catalog rows from the SQLite `data` table.
+- `UPDATE_SERIES`: Atomically update series attributes in `data` and contract specifications in `instruments` (including spread, min distance, pip/tick specs, and swap fields; inserts missing instruments if newly created).
+- `DELETE_SERIES`: Delete a market series record from the `data` table by `series_id`.
+- `READ_INSTRUMENTS`: Query all available instrument specifications.
+- `READ_INSTRUMENT`: Query single instrument specification by instrument name from `instruments`.
+- `UPDATE_INSTRUMENT`: Update contract specification in `instruments` table.
+- `READ_BROKERS`: Query configured broker profiles.
+- `READ_BARS`: Read historical OHLCV bars from `data_bars` cache or scan Parquet storage via `MarketDataReferenceRepository`.
+- `INSPECT_QUALITY`: Run quality anomaly detection (gaps, spikes, bad OHLC) on historical bar data.
+- `CLONE_SERIES`: Clone a series to a target timezone offset and generate shifted Parquet records.
+- `EXPORT_DATA`: Resample bars dynamically across timeframes with Polars and export formatted CSV.
+- `DOWNLOAD_DUKASCOPY`: Trigger historical Dukascopy data download and update cataloging.
+- `BATCH_ACTION`: Execute coordinated bulk actions (batch delete, export, or download).
+
 ## Failure Behavior
 
 - Requesting bars for an unrecorded symbol or timeframe returns `DATA_FEED_UNAVAILABLE`

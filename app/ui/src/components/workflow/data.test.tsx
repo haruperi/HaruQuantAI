@@ -155,8 +155,8 @@ describe("DataWorkspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Edit series EURJPY_M1" }));
 
     const dialog = await screen.findByRole("dialog");
-    expect(dialog).toHaveAttribute("aria-label", "Edit series EURJPY_M1");
-    expect((screen.getByLabelText("Symbol name") as HTMLInputElement).value).toBe(
+    expect(dialog).toHaveAttribute("aria-label", "Edit symbol");
+    expect((screen.getByLabelText("Data symbol name") as HTMLInputElement).value).toBe(
       "EURJPY_M1"
     );
     await waitFor(() =>
@@ -166,9 +166,10 @@ describe("DataWorkspace", () => {
     );
     expect(
       (screen.getByLabelText("Bar type") as HTMLInputElement).value
-    ).toBe("Start of Bar");
-    expect(screen.getByLabelText("Hide")).not.toBeChecked();
-    expect(screen.getByText("Remove weekends")).toBeInTheDocument();
+    ).toBe("Timestamp represents start of bar time (MetaTrader, Dukascopy, forex data)");
+    expect(screen.getByText("Data settings")).toBeInTheDocument();
+    expect(screen.getByText("Choose instrument")).toBeInTheDocument();
+    expect(screen.getByText("Swap")).toBeInTheDocument();
   });
 
   it("saves the edited series and refetches the tab", async () => {
@@ -190,14 +191,14 @@ describe("DataWorkspace", () => {
 
     await waitFor(() => expect(screen.getByText("EURJPY_M1")).toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: "Edit series EURJPY_M1" }));
-    const symbolInput = await screen.findByLabelText("Symbol name");
+    const symbolInput = await screen.findByLabelText("Data symbol name");
     fireEvent.change(symbolInput, { target: { value: "EDITED_M1" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() =>
       expect(apiClients.data.updateSeries).toHaveBeenCalledWith(
         7,
-        expect.objectContaining({ symbol: "EDITED_M1", show: 1 })
+        expect.objectContaining({ symbol: "EDITED_M1" })
       )
     );
     await waitFor(() =>
@@ -206,16 +207,16 @@ describe("DataWorkspace", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("discards edits when Cancel closes the dialog", async () => {
+  it("discards edits when Close closes the dialog", async () => {
     mockSeries([SERIES_ROW]);
     mockInstrumentSpec();
     render(<DataWorkspace />);
 
     await waitFor(() => expect(screen.getByText("EURJPY_M1")).toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: "Edit series EURJPY_M1" }));
-    const symbolInput = await screen.findByLabelText("Symbol name");
+    const symbolInput = await screen.findByLabelText("Data symbol name");
     fireEvent.change(symbolInput, { target: { value: "EDITED_M1" } });
-    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(apiClients.data.updateSeries).not.toHaveBeenCalled();

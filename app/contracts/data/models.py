@@ -1586,6 +1586,14 @@ type BrowseReferenceOperation = Literal[
     "READ_INSTRUMENT",
     "UPDATE_INSTRUMENT",
     "UPDATE_SERIES",
+    "DELETE_SERIES",
+    "INSPECT_QUALITY",
+    "DOWNLOAD_DUKASCOPY",
+    "IMPORT_FILE",
+    "EXPORT_DATA",
+    "CLONE_SERIES",
+    "BATCH_ACTION",
+    "DOWNLOAD_CONFIG",
     "LIST_MARKET_DIRECTORY",
 ]
 

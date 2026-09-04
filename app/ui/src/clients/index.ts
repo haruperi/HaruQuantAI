@@ -66,6 +66,7 @@ export type {
   UpdatedSeries,
   InstrumentUpdateBody,
   ReferenceSyncSummary,
+  QualityReport,
   MarketsQuery,
   QuotesParams,
   StreamQuery,

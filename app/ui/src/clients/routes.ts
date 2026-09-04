@@ -335,6 +335,59 @@ export const dataRoutes = {
     governed: true,
     idempotencyRequired: true,
   }),
+  deleteSeries: route({
+    id: "api.data.series_delete",
+    method: "DELETE",
+    path: "/api/v1/data/series/{series_id}",
+    permission: "data:write",
+    sideEffect: "write",
+  }),
+  quality: route({
+    id: "api.data.quality",
+    method: "GET",
+    path: "/api/v1/data/quality",
+    permission: "data:read",
+  }),
+  clone: route({
+    id: "api.data.clone",
+    method: "POST",
+    path: "/api/v1/data/clone",
+    permission: "data:write",
+    sideEffect: "write",
+  }),
+  export: route({
+    id: "api.data.export",
+    method: "POST",
+    path: "/api/v1/data/export",
+    permission: "data:write",
+  }),
+  download: route({
+    id: "api.data.download",
+    method: "POST",
+    path: "/api/v1/data/download",
+    permission: "data:write",
+    sideEffect: "write",
+  }),
+  downloadConfig: route({
+    id: "api.data.download_config",
+    method: "GET",
+    path: "/api/v1/data/download/config",
+    permission: "data:read",
+  }),
+  batch: route({
+    id: "api.data.batch",
+    method: "POST",
+    path: "/api/v1/data/batch",
+    permission: "data:write",
+    sideEffect: "write",
+  }),
+  import: route({
+    id: "api.data.import",
+    method: "POST",
+    path: "/api/v1/data/import",
+    permission: "data:write",
+    sideEffect: "write",
+  }),
 } as const;
 
 // --- Strategies (4) ------------------------------------------------------

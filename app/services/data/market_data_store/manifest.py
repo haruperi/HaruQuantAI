@@ -1,13 +1,16 @@
 """Feature specification for Partitioned Parquet Market Data Store."""
 
-from app.contracts.data.capabilities import MARKET_DATA_STORE_CAPABILITY
+from app.contracts.data.capabilities import (
+    BROWSE_REFERENCE_CAPABILITY,
+    MARKET_DATA_STORE_CAPABILITY,
+)
 from app.kernel.feature import FeatureSpec
 from app.kernel.state import RetentionPolicy, StateDeclaration
 
 SPEC: FeatureSpec = FeatureSpec(
     feature_id="FEAT-DATA-MARKET_DATA_STORE",
     domain="data",
-    provides=frozenset({MARKET_DATA_STORE_CAPABILITY}),
+    provides=frozenset({MARKET_DATA_STORE_CAPABILITY, BROWSE_REFERENCE_CAPABILITY}),
     requires=frozenset(),
     optional=frozenset(),
     conflicts=frozenset(),

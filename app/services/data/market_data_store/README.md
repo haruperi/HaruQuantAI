@@ -58,6 +58,11 @@ Mount resolves no external dependencies through `FeatureContext` and stages `dat
 - `SCAN_BARS`: Return a Polars LazyFrame with predicate pushdown (source, timeframe, symbol, datetime range).
 - `QUERY_SQL`: Execute analytical SQL directly over Parquet partitions using DuckDB.
 - `GET_LATEST_TIMESTAMP`: Query the high-watermark timestamp from the DuckDB catalog without scanning files.
+- `RESAMPLE_BARS` (`MarketDataReferenceRepository`): Dynamic multi-timeframe resampling (M1..MN) using Polars `group_by_dynamic` over partitioned historical Parquet files.
+- `INSPECT_QUALITY` (`MarketDataReferenceRepository`): Automated anomaly detection engine evaluating price gaps (>4x bar duration in active sessions), price spikes (>5x rolling ATR), and invalid bar geometry (High < Low, Close > High, Open < Low).
+- `CLONE_TIMEZONE` (`MarketDataReferenceRepository`): Non-destructive timestamp shift engine writing new timezone-offset Parquet partitions.
+- `EXPORT_CSV` (`MarketDataReferenceRepository`): High-throughput formatted CSV export with configurable date/time layouts, delimiters, and column mappings.
+- `EXPORT_MT4` (`MT4Exporter`): Generation of binary MetaTrader 4 `.hst` (History Header v400) and `.fxt` (Testing Header v405) files from resampled historical Parquet datasets.
 
 ## Failure Behavior
 

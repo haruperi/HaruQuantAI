@@ -22,6 +22,9 @@ from app.contracts.data.models import (
     BrowseReferenceSuccess,
 )
 from app.services.data.browse_reference.config import BrowseReferenceConfig
+from app.services.data.market_data_store.reference_repository import (
+    MarketDataReferenceRepository,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -132,6 +135,7 @@ class BrowseReferenceService:
         self._db_path.parent.mkdir(parents=True, exist_ok=True)
         self._conn = sqlite3.connect(str(self._db_path))
         self._conn.row_factory = sqlite3.Row
+        self._repo = MarketDataReferenceRepository(db_path=self._db_path)
         self._closed = False
         self._init_db()
 
@@ -733,6 +737,7 @@ class BrowseReferenceService:
             """
             SELECT name, description, point, trade_contract_size,
                    trade_tick_size, spread, path, volume_min, volume_step,
+                   trade_stops_level, swap_mode, swap_rollover3days,
                    swap_long, swap_short, currency_base, currency_profit, digits
             FROM instruments WHERE name = ?
             """,
@@ -743,19 +748,23 @@ class BrowseReferenceService:
             raise ReferenceNotFoundError(msg)
         return {
             "instrument": str(row["name"]),
-            "description": row["description"],
-            "broker_profile": None,
+            "description": row["description"] or str(row["name"]),
+            "broker_profile": "SQ default",
             "point_value": _optional_float(row["point"]),
             "contract_size": _optional_float(row["trade_contract_size"]),
             "tick_size": _optional_float(row["trade_tick_size"]),
             "tick_step": _optional_float(row["trade_tick_size"]),
             "default_spread": _optional_float(row["spread"]),
             "default_slippage": 0.0,
-            "data_type": row["path"],
+            "data_type": row["path"] or "Forex",
             "order_size_multiplier": _optional_float(row["volume_min"]),
             "order_size_step": _optional_float(row["volume_step"]),
-            "min_distance": 0.0,
+            "min_distance": _optional_float(row["trade_stops_level"]) or 0.0,
             "swap": str(row["swap_long"]) if row["swap_long"] is not None else None,
+            "swap_mode": _optional_int(row["swap_mode"]) or 0,
+            "swap_long": _optional_float(row["swap_long"]) or 0.0,
+            "swap_short": _optional_float(row["swap_short"]) or 0.0,
+            "swap_rollover3days": _optional_int(row["swap_rollover3days"]) or 3,
         }
 
     def update_instrument_spec(
@@ -764,7 +773,25 @@ class BrowseReferenceService:
         fields: Mapping[str, Any],
     ) -> dict[str, Any]:
         """Update specification fields for one instrument."""
-        self.get_instrument_spec(instrument)
+        existing = self._conn.execute(
+            "SELECT 1 FROM instruments WHERE name = ?", (instrument,)
+        ).fetchone()
+        if existing is None:
+            with self._conn:
+                self._conn.execute(
+                    "INSERT INTO instruments (name, description, point, trade_contract_size, trade_tick_size, spread, path, volume_min, volume_step) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        instrument,
+                        instrument,
+                        0.0001,
+                        100000.0,
+                        0.0001,
+                        0,
+                        "Forex",
+                        1.0,
+                        0.0,
+                    ),
+                )
         updates: dict[str, object] = {}
         field_mapping = {
             "description": "description",
@@ -780,6 +807,14 @@ class BrowseReferenceService:
             "volume_min": "volume_min",
             "order_size_step": "volume_step",
             "volume_step": "volume_step",
+            "min_distance": "trade_stops_level",
+            "trade_stops_level": "trade_stops_level",
+            "data_type": "path",
+            "path": "path",
+            "swap_mode": "swap_mode",
+            "swap_long": "swap_long",
+            "swap_short": "swap_short",
+            "swap_rollover3days": "swap_rollover3days",
         }
         for field, col in field_mapping.items():
             if field in fields and fields[field] is not None:
@@ -999,6 +1034,42 @@ class BrowseReferenceService:
             )
             return BrowseReferenceSuccess(request_id=request.request_id, data=data)
         except BarsUnavailableError as e:
+            if request.symbol:
+                parquet_bars = self._repo.read_bars(
+                    symbol=request.symbol,
+                    timeframe=request.timeframe or "M1",
+                    start=request.start,
+                    end=request.end,
+                    limit=request.limit or 500,
+                )
+                if parquet_bars:
+                    start_str = (
+                        datetime.fromtimestamp(
+                            parquet_bars[0]["time"], tz=UTC
+                        ).isoformat()
+                        if parquet_bars
+                        else None
+                    )
+                    end_str = (
+                        datetime.fromtimestamp(
+                            parquet_bars[-1]["time"], tz=UTC
+                        ).isoformat()
+                        if parquet_bars
+                        else None
+                    )
+                    return BrowseReferenceSuccess(
+                        request_id=request.request_id,
+                        data={
+                            "source_id": "data.bars.parquet@1",
+                            "symbol": request.symbol,
+                            "timeframe": request.timeframe or "M1",
+                            "count": len(parquet_bars),
+                            "bars": parquet_bars,
+                            "cache_status": "hit_parquet",
+                            "start": start_str,
+                            "end": end_str,
+                        },
+                    )
             return DataFailure(
                 request_id=request.request_id,
                 code="DATA_FEED_UNAVAILABLE",
@@ -1132,16 +1203,8 @@ class BrowseReferenceService:
         if mut_res is not None:
             return mut_res
 
-        return DataFailure(
-            request_id=request.request_id,
-            code="DATA_VALIDATION_FAILED",
-            problem=ProblemDetails(
-                title="Unknown Operation",
-                detail=f"Unsupported operation: {request.operation}",
-                status=400,
-                code="VALIDATION_FAILED",
-            ),
-        )
+        # Delegate QuantDataManager operations to MarketDataReferenceRepository
+        return await self._repo.browse_reference(request)
 
 
 if __name__ == "__main__":
