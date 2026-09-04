@@ -43,6 +43,21 @@ def test_protocol_contains_owner_gates() -> None:
     commit = orchestrator._transition_for(transitions, "REVIEWER", "PENDING_COMMIT")
     assert execute.gate == "APPROVED: EXECUTE"
     assert commit.gate == "APPROVED: COMMIT"
+    quick = orchestrator._transition_for(
+        transitions, "PLANNER", "QUICK_FIX_PENDING_APPROVAL"
+    )
+    assert quick.gate == "APPROVED: EXECUTE"
     gates = [item.gate for item in transitions if item.gate]
-    assert gates == ["APPROVED: EXECUTE", "APPROVED: COMMIT"]
+    assert gates.count("APPROVED: EXECUTE") == 2
+    assert gates.count("APPROVED: COMMIT") == 1
     assert "CONTINUE: REVIEWER" not in protocol_path.read_text(encoding="utf-8")
+
+
+def test_protocol_contains_quick_fix_terminal_transition() -> None:
+    protocol_path = Path(__file__).resolve().parents[1] / "protocol.toml"
+    _, transitions = orchestrator._parse_protocol(protocol_path)
+    terminal = orchestrator._transition_for(
+        transitions, "EXECUTOR", "QUICK_FIX_COMPLETE"
+    )
+    assert terminal.target_role == "NONE"
+    assert terminal.target_template is None

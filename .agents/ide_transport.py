@@ -19,7 +19,7 @@ from workflow_protocol import (
     validate_role_mutations,
 )
 
-IDE_MODES = frozenset({"solo", "delegate"})
+IDE_MODES = frozenset({"solo", "delegate", "quick-fix"})
 APP_HANDLE_SCHEMA_VERSION = 1
 
 
@@ -210,7 +210,9 @@ def complete_ide_role(
         bound_id = _bind_delegate_handle(cfg, state, role.upper(), app_agent_id)
     else:
         if app_agent_id:
-            raise OrchestratorError("Solo mode does not accept an app-agent handle.")
+            raise OrchestratorError(
+                "Same-chat IDE modes do not accept an app-agent handle."
+            )
         bound_id = ""
 
     repo = Path(cfg["repo"])

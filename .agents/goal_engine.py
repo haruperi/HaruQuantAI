@@ -257,6 +257,8 @@ def _goal_record(state: dict[str, Any], event: str, **facts: Any) -> None:
 
 def create_goal_state(cfg: dict[str, Any], spec: dict[str, Any]) -> dict[str, Any]:
     """Resolve a Goal exactly once and persist its frozen child scope."""
+    if cfg.get("mode") == "quick-fix":
+        raise OrchestratorError("Quick-Fix mode cannot activate or supervise a Goal.")
     raw_stop_on_blocked = spec.get("stop_on_blocked", True)
     if not isinstance(raw_stop_on_blocked, bool):
         raise OrchestratorError("stop_on_blocked must be a boolean.")

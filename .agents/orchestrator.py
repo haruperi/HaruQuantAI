@@ -67,6 +67,7 @@ def _require_cli_mode(cfg: dict[str, Any]) -> None:
         "delegate-headless",
         "delegate-multi",
         "manual",
+        "quick-fix",
     }:
         raise OrchestratorError(
             f"Workflow mode is {mode!r}; run .agents/configure.py first."
@@ -670,6 +671,8 @@ def cmd_doctor(args: argparse.Namespace) -> int:
             print(f"[N/A] role {role} process runner is unused in {mode} mode")
     if mode == "solo":
         print("[ok] IDE solo transport: current chat performs each prepared role")
+    elif mode == "quick-fix":
+        print("[ok] Quick-Fix: current chat plans and executes directly on clean main")
     elif mode == "delegate":
         print(
             "[ok] IDE delegate transport: controlling chat must expose app-native "

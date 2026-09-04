@@ -11,6 +11,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from runtime_policy import RuntimePolicyError, load_runtime_policy
+from workflow_runtime import _ensure_runtime_policy_unchanged
 
 
 def _write_policy(
@@ -211,6 +212,44 @@ def test_schema_v3_headless_policy_uses_canonical_session_mode(tmp_path: Path) -
     assert command[command.index("--mode") + 1] == "solo-headless"
 
 
+def test_quick_fix_requires_interactive_policy(tmp_path: Path) -> None:
+    path = tmp_path / "run-config.toml"
+    path.write_text(
+        """schema_version = 3
+mode = "quick-fix"
+approval_policy = "interactive"
+max_iterations = 3
+
+[unattended]
+allow_execute = false
+allow_local_commit = false
+allow_local_merge = false
+
+[recovery]
+enabled = false
+max_escalations = 0
+additional_iterations = 0
+vendor = "codex"
+model = "gpt-5.6-sol"
+effort = "high"
+""",
+        encoding="utf-8",
+    )
+    policy = load_runtime_policy(path, legacy_roles={}, default_max_iterations=5)
+    assert policy.effective_mode == "quick-fix"
+    assert policy.is_ide
+    assert not policy.can_preauthorize_execute()
+
+    path.write_text(
+        path.read_text(encoding="utf-8").replace(
+            'approval_policy = "interactive"', 'approval_policy = "unattended"'
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(RuntimePolicyError, match="requires interactive"):
+        load_runtime_policy(path, legacy_roles={}, default_max_iterations=5)
+
+
 def test_schema_v2_never_falls_back_to_tracked_role_configs(tmp_path: Path) -> None:
     path = tmp_path / "run-config.toml"
     _write_policy(path)
@@ -255,7 +294,7 @@ def test_frozen_runtime_policy_drift_fails_closed(
     )
 
     with pytest.raises(orc.OrchestratorError, match="changed after run activation"):
-        orc._ensure_runtime_policy_unchanged(cfg, state)
+        _ensure_runtime_policy_unchanged(cfg, state)
 
 
 def test_legacy_policy_can_resume_but_cannot_start_a_new_run(

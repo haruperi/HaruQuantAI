@@ -204,6 +204,31 @@ Transport symmetry:
 
 `CONTINUE: GOAL` may be used only as chat transport/resume after a child has validly reached `ACCEPTED`; it grants no authority.
 
+### 2.10 Quick-Fix mode
+
+`quick-fix` is an explicit schema-v3 exception for a small, coherent,
+reversible change safe without an independent Reviewer. It cannot run a Goal.
+
+```text
+clean main → Quick-Fix Planner → APPROVED: EXECUTE
+           → Quick-Fix Executor → QUICK_FIX_COMPLETE
+```
+
+- Planner and Executor run sequentially in the same IDE chat from complete,
+  validated dedicated prompts.
+- Activation requires clean `main`, records its HEAD as baseline, keeps
+  `branch = "main"`, and creates or switches no branch.
+- Execution requires the entire trimmed owner message to be exactly
+  `APPROVED: EXECUTE`; unattended policy and recovery are invalid.
+- Executor modifies only approved paths, runs bounded validation, and never
+  reviews, commits, merges, pushes, or performs destructive rollback.
+- Success verifies unchanged HEAD and exact paths, archives evidence, clears
+  active Task files, and leaves the approved diff uncommitted on `main`.
+- Broad, security-sensitive, external/live, migration, dependency, or
+  independently reviewed work uses the normal atomic Task workflow.
+
+Normal Task branch, Reviewer, commit, and no-ff merge rules remain unchanged.
+
 ## 3. Coding style and verification
 
 - Follow the Google Python Style Guide and repository Ruff configuration. Use 4-space indentation and `ruff format`.

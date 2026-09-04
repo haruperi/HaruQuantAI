@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -49,14 +50,21 @@ def _handle_planner(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     iteration = state["iteration"]
     print(f"\n=== PLANNER — Dry Run {iteration} ===")
     stdout, log = _invoke_pending(cfg, state, "PLANNER")
+    quick_fix = state.get("runtime_mode") == "quick-fix"
+    success_handoff = "QUICK_FIX_PENDING_APPROVAL" if quick_fix else "PENDING_APPROVAL"
+    blocked_handoff = "QUICK_FIX_BLOCKED" if quick_fix else "BLOCKED"
     block = _resolve_handoff(
-        cfg["journals"]["planner"], stdout, "PLANNER", {"PENDING_APPROVAL", "BLOCKED"}
+        cfg["journals"]["planner"],
+        stdout,
+        "PLANNER",
+        {success_handoff, blocked_handoff},
     )
     _validate_activating(
         block, _transition_for(cfg["transitions"], "PLANNER", block["handoff"])
     )
     current_branch = _git_ok(cfg["repo"], "branch", "--show-current")
-    if current_branch != state.get("branch") or current_branch == cfg["main_branch"]:
+    invalid_main = not quick_fix and current_branch == cfg["main_branch"]
+    if current_branch != state.get("branch") or invalid_main:
         msg = (
             f"Planner changed task branch state: current={current_branch!r}, "
             f"expected={state.get('branch')!r}."
@@ -64,9 +72,9 @@ def _handle_planner(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         raise OrchestratorError(msg)
     state["plan_hash"] = _sha_file(cfg["journals"]["planner"])
     _record(state, "planner", handoff=block["handoff"], log=str(log))
-    if block["handoff"] == "BLOCKED":
+    if block["handoff"] == blocked_handoff:
         validate_next_agent(
-            cfg, state, expected_source="PLANNER", expected_handoff="BLOCKED"
+            cfg, state, expected_source="PLANNER", expected_handoff=blocked_handoff
         )
         state.setdefault("blockers", []).append(
             {"iteration": iteration, "raised_by": "PLANNER", "status": "OPEN"}
@@ -74,7 +82,7 @@ def _handle_planner(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         state["phase"] = "planner_blocked"
     else:
         validate_next_agent(
-            cfg, state, expected_source="PLANNER", expected_handoff="PENDING_APPROVAL"
+            cfg, state, expected_source="PLANNER", expected_handoff=success_handoff
         )
         state["phase"] = "approve"
     finish_ide_role(state)
@@ -115,9 +123,14 @@ def _handle_approval(
             "Owner rejected the preceding dry run. Produce a complete revised dry run "
             "that addresses the owner direction without implementing anything."
         )
-        _write_orchestrator_planner_prompt(cfg, state, "OWNER_REJECTED")
+        rejection_handoff = (
+            "QUICK_FIX_OWNER_REJECTED"
+            if state.get("runtime_mode") == "quick-fix"
+            else "OWNER_REJECTED"
+        )
+        _write_orchestrator_planner_prompt(cfg, state, rejection_handoff)
         state["phase"] = "planner"
-        _record(state, "owner_rejection", handoff="OWNER_REJECTED")
+        _record(state, "owner_rejection", handoff=rejection_handoff)
     _save_state(cfg, state)
 
 
@@ -153,22 +166,28 @@ def _handle_executor(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     if isinstance(correction, dict):
         state["approved_write_paths"] = correction["approved_write_paths"]
         state.pop("executor_handoff_correction", None)
+    quick_fix = state.get("runtime_mode") == "quick-fix"
+    success_handoff = "QUICK_FIX_COMPLETE" if quick_fix else "READY_FOR_REVIEW"
+    blocked_handoff = "QUICK_FIX_BLOCKED" if quick_fix else "BLOCKED"
     block = _resolve_handoff(
-        cfg["journals"]["executor"], stdout, "EXECUTOR", {"READY_FOR_REVIEW", "BLOCKED"}
+        cfg["journals"]["executor"],
+        stdout,
+        "EXECUTOR",
+        {success_handoff, blocked_handoff},
     )
     _validate_activating(
         block, _transition_for(cfg["transitions"], "EXECUTOR", block["handoff"])
     )
     state["executor_report_hash"] = _sha_file(cfg["journals"]["executor"])
     _record(state, "executor", handoff=block["handoff"], log=str(log))
-    if block["handoff"] == "BLOCKED":
+    if block["handoff"] == blocked_handoff:
         blocked_iteration = state["iteration"]
         state.setdefault("blockers", []).append(
             {"iteration": blocked_iteration, "raised_by": "EXECUTOR", "status": "OPEN"}
         )
         state["iteration"] = blocked_iteration + 1
         validate_next_agent(
-            cfg, state, expected_source="EXECUTOR", expected_handoff="BLOCKED"
+            cfg, state, expected_source="EXECUTOR", expected_handoff=blocked_handoff
         )
         state["correction_context"] = (
             "This is a blocker-resolution dry run. Plan only the minimum "
@@ -177,6 +196,8 @@ def _handle_executor(cfg: dict[str, Any], state: dict[str, Any]) -> None:
             "reviewed."
         )
         state["phase"] = "planner"
+    elif quick_fix:
+        _complete_quick_fix(cfg, state)
     else:
         validate_next_agent(
             cfg, state, expected_source="EXECUTOR", expected_handoff="READY_FOR_REVIEW"
@@ -184,6 +205,58 @@ def _handle_executor(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         state["phase"] = "reviewer"
     finish_ide_role(state)
     _save_state(cfg, state)
+
+
+def _complete_quick_fix(cfg: dict[str, Any], state: dict[str, Any]) -> None:
+    """Archive a validated Quick-Fix and leave its approved diff on main."""
+    repo = Path(cfg["repo"])
+    if _git_ok(repo, "branch", "--show-current") != cfg["main_branch"]:
+        raise OrchestratorError("Quick-Fix completion did not remain on main.")
+    if _git_ok(repo, "rev-parse", "HEAD") != state["baseline"]:
+        raise OrchestratorError("Quick-Fix must not create a commit.")
+    changed = set(
+        filter(None, _git_ok(repo, "diff", "--name-only", "HEAD").splitlines())
+    )
+    changed.update(
+        filter(
+            None,
+            _git_ok(repo, "ls-files", "--others", "--exclude-standard").splitlines(),
+        )
+    )
+    changed.difference_update(ALL_COORDINATION_PATHS)
+    approved = set(state.get("approved_write_paths", []))
+    outside = sorted(changed - approved)
+    if outside:
+        raise OrchestratorError(f"Quick-Fix terminal scope mismatch: {outside}")
+    archive = Path(cfg["runs_dir"]) / str(state["run_id"]) / "quick-fix"
+    archive.mkdir(parents=True, exist_ok=True)
+    for name, source in (
+        ("planner.md", cfg["journals"]["planner"]),
+        ("executor.md", cfg["journals"]["executor"]),
+    ):
+        shutil.copyfile(source, archive / name)
+    state["status"] = "QUICK_FIX_COMPLETE"
+    state["phase"] = "done"
+    state["quick_fix_changed_paths"] = sorted(changed)
+    _record(state, "quick_fix_complete", handoff="QUICK_FIX_COMPLETE")
+    (archive / "completion.json").write_text(
+        json.dumps(
+            {
+                "run_id": state["run_id"],
+                "task_id": state["task"]["task_id"],
+                "baseline": state["baseline"],
+                "plan_sha256": state["approved_plan_hash"],
+                "executor_report_sha256": state["executor_report_hash"],
+                "authorization_source": state["execute_authorization_source"],
+                "changed_paths": sorted(changed),
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    for path in (*cfg["journals"].values(), cfg["next_agent"]):
+        path.write_bytes(b"")
 
 
 def _handle_reviewer(cfg: dict[str, Any], state: dict[str, Any]) -> None:
@@ -547,7 +620,12 @@ def router(  # noqa: PLR0911
                     source=blocker_info.get("source", "OWNER_MESSAGE"),
                     evidence_recorded=bool(blocker_info.get("evidence")),
                 )
-                _write_orchestrator_planner_prompt(cfg, state, "BLOCKER_RESOLVED")
+                blocker_handoff = (
+                    "QUICK_FIX_BLOCKER_RESOLVED"
+                    if state.get("runtime_mode") == "quick-fix"
+                    else "BLOCKER_RESOLVED"
+                )
+                _write_orchestrator_planner_prompt(cfg, state, blocker_handoff)
                 state["phase"] = "planner"
                 state.pop("blocker_resolution", None)
                 _save_state(cfg, state)

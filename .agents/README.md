@@ -50,6 +50,11 @@ See `.agents/GOALS.md` for the complete Goal contract.
 
 ## Modes
 
+`quick-fix` is the sole shortened mode: one IDE chat performs a dedicated
+Planner dry run and, after exact interactive `APPROVED: EXECUTE`, a dedicated
+Executor on clean `main`. It has no Reviewer, commit gate, automatic commit,
+merge, or Goal support and leaves the validated diff uncommitted.
+
 | Mode | Task same-role continuity | Goal child boundary |
 | --- | --- | --- |
 | `solo` | current IDE chat performs Controller + P/E/R sequentially; no role subagent/CLI | fresh IDE chat per child, with a persisted handoff claim |
@@ -58,6 +63,7 @@ See `.agents/GOALS.md` for the complete Goal contract.
 | `delegate-headless` | one CLI vendor, distinct persistent session per role | fresh same-vendor P/E/R session set per child |
 | `delegate-multi` | separate role vendor/model and exact native session ID per role/run | new Task run ID and session ledger per child |
 | `manual` | return to same P/E/R chat within Task | new P/E/R chat set per child; same Goal Orchestrator chat |
+| `quick-fix` | current IDE chat performs Planner + Executor on clean `main` | not supported |
 
 Schema-v3 `.agents/run-config.toml` is authoritative for mode, headless role models/effort/providers, approval policy, normal iteration limit, unattended local permissions, and bounded recovery. The deterministic CLI drives Task/Goal state in every mode. Only `solo-headless`, `delegate-headless`, and `delegate-multi` use `.agents/session_runner.py` to launch reasoning-role CLI sessions. IDE `solo` performs the prepared role in the current chat; IDE `delegate` invokes/resumes app-native inspectable agents; `manual` waits for operator-managed chats.
 
@@ -121,6 +127,10 @@ uv run .agents/make_task.py --list
 uv run .agents/make_task.py 1.1
 uv run .agents/orchestrator.py start --task-file .agents/task.toml
 ```
+
+For Quick-Fix, configure `mode = "quick-fix"`, start normally, complete
+Planner, relay the exact owner message with `resume --approved`, and complete
+Executor. Evidence is archived and the approved diff remains on `main`.
 
 Task resume/gates:
 

@@ -54,7 +54,7 @@ def test_configurator_only_advertises_supported_vendors(orc: ModuleType) -> None
     assert set(module.VENDORS) == {"codex", "agy", "cline", "zai"}
 
 
-def test_configurator_advertises_six_canonical_modes(orc: ModuleType) -> None:
+def test_configurator_advertises_canonical_modes(orc: ModuleType) -> None:
     module = _load_configure(orc)
     assert tuple(name for name, _description in module.MODES) == (
         "solo",
@@ -63,7 +63,28 @@ def test_configurator_advertises_six_canonical_modes(orc: ModuleType) -> None:
         "delegate-headless",
         "delegate-multi",
         "manual",
+        "quick-fix",
     )
+
+
+def test_quick_fix_configuration_is_forced_interactive(
+    orc: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    module = _load_configure(orc)
+    output = tmp_path / "run-config.toml"
+    selections = iter((f"{module.MODES[-1][0]} — {module.MODES[-1][1]}",))
+    monkeypatch.setattr(module, "RUN_CONFIG", output)
+    monkeypatch.setattr(module, "_pick", lambda *_args, **_kwargs: next(selections))
+    monkeypatch.setattr(module, "_ask", lambda _prompt: "2")
+    assert module.main() == 0
+    parsed = tomllib.loads(output.read_text(encoding="utf-8"))
+    assert parsed["mode"] == "quick-fix"
+    assert parsed["approval_policy"] == "interactive"
+    assert parsed["unattended"] == {
+        "allow_execute": False,
+        "allow_local_commit": False,
+        "allow_local_merge": False,
+    }
 
 
 def test_headless_model_prompts_identify_the_selected_role(
