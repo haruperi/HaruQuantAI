@@ -359,6 +359,7 @@ async def _serve(args: argparse.Namespace) -> int:
                     "FEAT-IFACE-OPERATE_SETTINGS": FeatureConfig(enabled=True),
                     "FEAT-IFACE-OPERATE_WATCHLISTS": FeatureConfig(enabled=True),
                     "FEAT-IFACE-OPERATE_TRADING": FeatureConfig(enabled=True),
+                    "FEAT-TRD-MANAGE_EXECUTION_SESSIONS": FeatureConfig(enabled=True),
                 },
             )
             await engine.reconcile_with_config(default_config)

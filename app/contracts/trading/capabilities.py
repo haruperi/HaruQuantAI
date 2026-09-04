@@ -10,11 +10,19 @@ if TYPE_CHECKING:
         DispatchOrdersCapability,
         ExecutePublicActionsCapability,
         JournalExecutionCapability,
+        ManageExecutionSessionsCapability,
         ManageProtectionsCapability,
         ManageTradingSessionsCapability,
         ReconcileTradingCapability,
         ValidateTradePlansCapability,
     )
+
+MANAGE_EXECUTION_SESSIONS_CAPABILITY: CapabilityKey[
+    ManageExecutionSessionsCapability
+] = CapabilityKey(
+    name="trading.manage-execution-sessions",
+    major=1,
+)
 
 MANAGE_TRADING_SESSIONS_CAPABILITY: CapabilityKey[ManageTradingSessionsCapability] = (
     CapabilityKey(

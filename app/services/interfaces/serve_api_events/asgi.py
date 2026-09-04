@@ -63,11 +63,11 @@ from app.contracts.interfaces.models import (
     OperateWatchlistsSuccess,
     StreamEvent,
 )
+from app.contracts.trading.models import ManageExecutionSessionsRequest
 from app.services.interfaces.serve_api_events import (
     _data_reference_db,
     _db_hydration,
     _markets_db,
-    _trading_db,
 )
 from app.services.interfaces.serve_api_events._data_reference_db import (
     BarsUnavailableError,
@@ -82,6 +82,7 @@ if TYPE_CHECKING:
     from app.contracts.interfaces.ports import (
         ObserveMarketDataCapability,
         OperateSettingsCapability,
+        OperateTradingCapability,
     )
     from app.kernel.capability import CapabilityKey
     from app.kernel.registry import ServiceRegistry
@@ -1936,6 +1937,7 @@ _TRADING_SUBPATH_ACTION_PARTS: Final = 2
 
 
 async def _serve_trading_sessions(
+    gateway: OperateTradingCapability,
     path: str,
     method: str,
     principal_id: str,
@@ -1948,9 +1950,26 @@ async def _serve_trading_sessions(
     if method == "GET":
         query = parse_qs(query_string.decode("latin-1"))
         mode_filter = query.get("mode", [None])[0]
-        sessions = _trading_db.list_execution_sessions(
-            principal_id=principal_id, mode=mode_filter
+        req = ManageExecutionSessionsRequest(
+            request_id=str(uuid7()),
+            capability_snapshot_id=str(uuid7()),
+            operation="LIST_SESSIONS",
+            principal_id=principal_id,
+            mode=mode_filter,
         )
+        res = await gateway.manage_execution_sessions(req)
+        if isinstance(res, InterfaceFailure):
+            await _send_error(
+                send,
+                HTTPStatus(res.problem.status),
+                res.problem.code or res.code,
+                res.problem.detail,
+                path,
+                "api.trading.execution_sessions",
+                trace_id,
+            )
+            return
+        sessions = [s.model_dump(mode="json") for s in res.sessions]
         envelope = ApiResponse(
             status="success",
             message=HTTPStatus.OK.phrase,
@@ -1967,11 +1986,29 @@ async def _serve_trading_sessions(
         )
         await _send_json(send, HTTPStatus.OK, envelope)
         return
-    session = _trading_db.get_active_or_default_session(principal_id=principal_id)
+    req = ManageExecutionSessionsRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="GET_ACTIVE_OR_DEFAULT",
+        principal_id=principal_id,
+    )
+    res = await gateway.manage_execution_sessions(req)
+    if isinstance(res, InterfaceFailure):
+        await _send_error(
+            send,
+            HTTPStatus(res.problem.status),
+            res.problem.code or res.code,
+            res.problem.detail,
+            path,
+            "api.trading.execution_sessions.create",
+            trace_id,
+        )
+        return
+    session = res.session.model_dump(mode="json") if res.session else {}
     envelope = ApiResponse(
         status="success",
         message=HTTPStatus.CREATED.phrase,
-        data=session or {},
+        data=session,
         metadata=_metadata(
             request_id,
             path,
@@ -1986,6 +2023,7 @@ async def _serve_trading_sessions(
 
 
 async def _serve_trading_session_actions(
+    gateway: OperateTradingCapability,
     path: str,
     method: str,
     principal_id: str,
@@ -2004,32 +2042,42 @@ async def _serve_trading_session_actions(
         return False
 
     session_id, action = parts[0], parts[1]
-    res: dict[str, Any]
-    try:
-        if action == "default":
-            res = _trading_db.set_default_session(session_id, principal_id=principal_id)
-        elif action == "start":
-            res = _trading_db.start_session(session_id)
-        elif action == "stop":
-            res = _trading_db.stop_session(session_id)
-        else:
-            return False
-    except LookupError:
+    if action == "default":
+        operation: Literal["SET_DEFAULT", "START_SESSION", "STOP_SESSION"] = (
+            "SET_DEFAULT"
+        )
+    elif action == "start":
+        operation = "START_SESSION"
+    elif action == "stop":
+        operation = "STOP_SESSION"
+    else:
+        return False
+
+    req = ManageExecutionSessionsRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation=operation,
+        session_id=session_id,
+        principal_id=principal_id,
+    )
+    res = await gateway.manage_execution_sessions(req)
+    if isinstance(res, InterfaceFailure):
         await _send_error(
             send,
-            HTTPStatus.NOT_FOUND,
-            "SESSION_NOT_FOUND",
-            "Session not found",
+            HTTPStatus(res.problem.status),
+            res.problem.code or res.code,
+            res.problem.detail,
             path,
             f"api.trading.execution_sessions.{action}",
             trace_id,
         )
         return True
 
+    data = res.session.model_dump(mode="json") if res.session else {}
     envelope = ApiResponse(
         status="success",
         message=HTTPStatus.OK.phrase,
-        data=res,
+        data=data,
         metadata=_metadata(
             request_id,
             path,
@@ -2045,6 +2093,7 @@ async def _serve_trading_session_actions(
 
 
 async def _serve_trading_account_profile(
+    gateway: OperateTradingCapability,
     path: str,
     principal_id: str,
     username: str,
@@ -2053,9 +2102,27 @@ async def _serve_trading_account_profile(
     send: Send,
 ) -> None:
     """Serve trading account profile."""
-    profile = _trading_db.get_account_profile(
-        principal_id=principal_id, username=username
+    req = ManageExecutionSessionsRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="GET_ACCOUNT_PROFILE",
+        principal_id=principal_id,
+        username=username,
     )
+    res = await gateway.manage_execution_sessions(req)
+    if isinstance(res, InterfaceFailure):
+        await _send_error(
+            send,
+            HTTPStatus(res.problem.status),
+            res.problem.code or res.code,
+            res.problem.detail,
+            path,
+            "api.trading.account_profile",
+            trace_id,
+        )
+        return
+
+    profile = res.profile.model_dump(mode="json") if res.profile else {}
     envelope = ApiResponse(
         status="success",
         message=HTTPStatus.OK.phrase,
@@ -2074,6 +2141,7 @@ async def _serve_trading_account_profile(
 
 
 async def _serve_trading_constraints(
+    gateway: OperateTradingCapability,
     path: str,
     request_id: str,
     trace_id: str | None,
@@ -2083,7 +2151,26 @@ async def _serve_trading_constraints(
     prefix = "/api/v1/trading/instruments/"
     suffix = "/constraints"
     symbol = path[len(prefix) : -len(suffix)].strip()
-    constraints = _trading_db.get_instrument_constraints(symbol)
+    req = ManageExecutionSessionsRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="GET_INSTRUMENT_CONSTRAINTS",
+        symbol=symbol,
+    )
+    res = await gateway.manage_execution_sessions(req)
+    if isinstance(res, InterfaceFailure):
+        await _send_error(
+            send,
+            HTTPStatus(res.problem.status),
+            res.problem.code or res.code,
+            res.problem.detail,
+            path,
+            "api.trading.instrument_constraints",
+            trace_id,
+        )
+        return
+
+    constraints = res.constraints.model_dump(mode="json") if res.constraints else {}
     envelope = ApiResponse(
         status="success",
         message=HTTPStatus.OK.phrase,
@@ -2130,27 +2217,27 @@ async def _serve_trading(
     if path == "/api/v1/trading/execution-sessions":
         qs = bytes(scope.get("query_string", b""))
         await _serve_trading_sessions(
-            path, method, principal_id, qs, request_id, trace_id, send
+            gateway, path, method, principal_id, qs, request_id, trace_id, send
         )
         return
 
     if path.startswith("/api/v1/trading/execution-sessions/"):
         handled = await _serve_trading_session_actions(
-            path, method, principal_id, request_id, trace_id, send
+            gateway, path, method, principal_id, request_id, trace_id, send
         )
         if handled:
             return
 
     if path == "/api/v1/trading/account-profile":
         await _serve_trading_account_profile(
-            path, principal_id, username, request_id, trace_id, send
+            gateway, path, principal_id, username, request_id, trace_id, send
         )
         return
 
     if path.startswith("/api/v1/trading/instruments/") and path.endswith(
         "/constraints"
     ):
-        await _serve_trading_constraints(path, request_id, trace_id, send)
+        await _serve_trading_constraints(gateway, path, request_id, trace_id, send)
         return
 
     operation: Literal[

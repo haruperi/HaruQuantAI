@@ -43,6 +43,7 @@ from tests.services.interfaces.observe_market_data.fakes import (
 from tests.services.interfaces.workspace_shared import (
     mount_identity_stack,
     mount_settings_stack,
+    mount_trading_stack,
 )
 
 _EVENT_TIME = datetime(2026, 9, 3, 12, 0, 0, tzinfo=UTC)
@@ -667,15 +668,32 @@ async def test_auth_routes_register_login_me_logout(tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_trading_routes_execution_sessions_and_profile() -> None:
-    """Verify execution sessions, account profile, and instrument constraints."""
+async def test_trading_routes_unmounted_execution_sessions_returns_503() -> None:
+    """Verify trading routes fail closed when execution_sessions is unmounted."""
     from app.contracts.interfaces.capabilities import OPERATE_TRADING_CAPABILITY
-    from app.services.interfaces.operate_trading.config import OperateTradingConfig
+    from app.services.interfaces.operate_trading.config import (
+        OperateTradingConfig,
+    )
     from app.services.interfaces.operate_trading.gateway import TradingGateway
 
     registry = ServiceRegistry()
     gateway = TradingGateway(config=OperateTradingConfig())
     registry.register(OPERATE_TRADING_CAPABILITY, gateway, "test-owner")
+
+    async with _client(registry) as client:
+        res = await client.get("/api/v1/trading/execution-sessions")
+        assert res.status_code == 503
+        assert res.json()["error"]["code"] == "CAPABILITY_UNAVAILABLE"
+
+
+@pytest.mark.asyncio
+async def test_trading_routes_execution_sessions_and_profile(
+    tmp_path: Path,
+) -> None:
+    """Verify execution sessions, account profile, and instrument constraints."""
+    registry, _store_scope, _gw_scope = await mount_trading_stack(
+        tmp_path / "test_trading_asgi.db"
+    )
 
     async with _client(registry) as client:
         # 1. GET /api/v1/trading/execution-sessions

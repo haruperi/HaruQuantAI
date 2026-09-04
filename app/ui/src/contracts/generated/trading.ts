@@ -25,6 +25,27 @@ export interface AccountOperationsSuccess {
   result_version?: 1;  // default: 1
   schema_version?: 1;  // default: 1
 }
+export interface AccountProfileRecord {
+  contract_version?: string;  // default: "v1"
+  schema_id?: string;  // default: "api.trading.account_profile.v1"
+  account_name: string;
+  session_name: string;
+  trade_mode?: string;  // default: "SIMULATION"
+  selected_mode?: string;  // default: "sim"
+  mode_compatible?: boolean;  // default: true
+  environment_label?: string;  // default: "Simulation Environment"
+  source?: string;  // default: "simulator"
+  currency?: string;  // default: "USD"
+  balance?: number;  // default: 100000.0
+  equity?: number;  // default: 100000.0
+  profit?: number;  // default: 0.0
+  margin?: number;  // default: 0.0
+  free_margin?: number;  // default: 100000.0
+  margin_level?: number | null;  // default: null
+  leverage?: number;  // default: 100.0
+  retrieved_at?: string;  // default: ""
+  schema_version?: 1;  // default: 1
+}
 export interface DispatchEvidence {
   evidence_id: string;
   operation_id: string;
@@ -97,6 +118,65 @@ export interface ExecutionProvenance {
   export_bounds: JsonObject;
   schema_version?: 1;  // default: 1
 }
+export interface ExecutionSessionRecord {
+  session_id: string;
+  principal_id: string;
+  environment_id: string;
+  name: string;
+  description?: string;  // default: ""
+  mode: string;
+  provider: string;
+  provider_account_ref?: string | null;  // default: null
+  credential_ref?: string | null;  // default: null
+  simulation_session_id?: string | null;  // default: null
+  sim_sequence?: number | null;  // default: null
+  simulation_runtime_ref?: string | null;  // default: null
+  dataset_ref?: string | null;  // default: null
+  dataset_revision?: string | null;  // default: null
+  dataset_hash?: string | null;  // default: null
+  sim_initial_balance?: number;  // default: 100000.0
+  sim_leverage?: number;  // default: 100
+  sim_account_currency?: string;  // default: "USD"
+  lifecycle_state?: string;  // default: "stopped"
+  recovery_state?: string;  // default: "not_required"
+  is_default?: boolean;  // default: false
+  is_active?: boolean;  // default: false
+  auto_start?: boolean;  // default: false
+  metadata?: JsonObject;
+  last_error_code?: string | null;  // default: null
+  last_reconciled_at?: string | null;  // default: null
+  started_at?: string | null;  // default: null
+  stopped_at?: string | null;  // default: null
+  archived_at?: string | null;  // default: null
+  version?: number;  // default: 1
+  created_at?: string;  // default: ""
+  updated_at?: string;  // default: ""
+  schema_version?: 1;  // default: 1
+}
+export interface InstrumentConstraintsRecord {
+  contract_version?: string;  // default: "v1"
+  schema_id?: string;  // default: "api.trading.instrument_constraints.v1"
+  symbol: string;
+  source_id?: string;  // default: "mt5"
+  quantity_unit?: string;  // default: "lots"
+  min_quantity?: string;  // default: "0.01"
+  max_quantity?: string;  // default: "100.0"
+  quantity_step?: string;  // default: "0.01"
+  price_tick?: string;  // default: "0.00001"
+  digits?: number;  // default: 5
+  pip_size?: number;  // default: 0.0001
+  trade_tick_size?: number;  // default: 1e-05
+  trade_tick_value_profit?: number;  // default: 1.0
+  trade_tick_value_loss?: number;  // default: 1.0
+  trade_contract_size?: number;  // default: 100000.0
+  profit_currency?: string;  // default: "USD"
+  supported_order_types?: string[];  // default: ["MARKET", "LIMIT", "STOP", "STOP_LIMIT"]
+  supported_time_in_force?: string[];  // default: ["IOC", "FOK"]
+  supports_stop_loss?: boolean;  // default: true
+  supports_take_profit?: boolean;  // default: true
+  retrieved_at?: string;  // default: ""
+  schema_version?: 1;  // default: 1
+}
 export interface JournalExecutionRequest {
   request_id: string;
   capability_snapshot_id: string;
@@ -113,6 +193,27 @@ export interface JournalExecutionSuccess {
   ledger_entry?: OperationalLedgerEntry | null;  // default: null
   outcome?: "SUCCESS";  // default: "SUCCESS"
   result_version?: 1;  // default: 1
+  schema_version?: 1;  // default: 1
+}
+export interface ManageExecutionSessionsRequest {
+  request_id: string;
+  capability_snapshot_id: string;
+  operation: "LIST_SESSIONS" | "GET_ACTIVE_OR_DEFAULT" | "SET_DEFAULT" | "START_SESSION" | "STOP_SESSION" | "GET_ACCOUNT_PROFILE" | "GET_INSTRUMENT_CONSTRAINTS";
+  principal_id?: string | null;  // default: null
+  mode?: string | null;  // default: null
+  session_id?: string | null;  // default: null
+  username?: string | null;  // default: null
+  symbol?: string | null;  // default: null
+  schema_version?: 1;  // default: 1
+}
+export interface ManageExecutionSessionsSuccess {
+  outcome?: "SUCCESS";  // default: "SUCCESS"
+  request_id: string;
+  result_version?: 1;  // default: 1
+  sessions?: ExecutionSessionRecord[];  // default: []
+  session?: ExecutionSessionRecord | null;  // default: null
+  profile?: AccountProfileRecord | null;  // default: null
+  constraints?: InstrumentConstraintsRecord | null;  // default: null
   schema_version?: 1;  // default: 1
 }
 export interface ManageProtectionsRequest {

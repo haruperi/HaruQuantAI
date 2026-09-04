@@ -1223,6 +1223,130 @@ class ExecutePublicActionsSuccess(WireModel):
     schema_version: Literal[1] = 1
 
 
+class ExecutionSessionRecord(WireModel):
+    """Execution session projection for the workstation UI and API."""
+
+    session_id: str
+    principal_id: str
+    environment_id: str
+    name: str
+    description: str = ""
+    mode: str
+    provider: str
+    provider_account_ref: str | None = None
+    credential_ref: str | None = None
+    simulation_session_id: str | None = None
+    sim_sequence: int | None = None
+    simulation_runtime_ref: str | None = None
+    dataset_ref: str | None = None
+    dataset_revision: str | None = None
+    dataset_hash: str | None = None
+    sim_initial_balance: float = 100000.0
+    sim_leverage: int = 100
+    sim_account_currency: str = "USD"
+    lifecycle_state: str = "stopped"
+    recovery_state: str = "not_required"
+    is_default: bool = False
+    is_active: bool = False
+    auto_start: bool = False
+    metadata: JsonObject = Field(default_factory=dict)
+    last_error_code: str | None = None
+    last_reconciled_at: str | None = None
+    started_at: str | None = None
+    stopped_at: str | None = None
+    archived_at: str | None = None
+    version: int = 1
+    created_at: str = ""
+    updated_at: str = ""
+    schema_version: Literal[1] = 1
+
+
+class AccountProfileRecord(WireModel):
+    """Trading account profile projection."""
+
+    contract_version: str = "v1"
+    schema_id: str = "api.trading.account_profile.v1"
+    account_name: str
+    session_name: str
+    trade_mode: str = "SIMULATION"
+    selected_mode: str = "sim"
+    mode_compatible: bool = True
+    environment_label: str = "Simulation Environment"
+    source: str = "simulator"
+    currency: str = "USD"
+    balance: float = 100000.0
+    equity: float = 100000.0
+    profit: float = 0.0
+    margin: float = 0.0
+    free_margin: float = 100000.0
+    margin_level: float | None = None
+    leverage: float = 100.0
+    retrieved_at: str = ""
+    schema_version: Literal[1] = 1
+
+
+class InstrumentConstraintsRecord(WireModel):
+    """Trading instrument constraints projection."""
+
+    contract_version: str = "v1"
+    schema_id: str = "api.trading.instrument_constraints.v1"
+    symbol: str
+    source_id: str = "mt5"
+    quantity_unit: str = "lots"
+    min_quantity: str = "0.01"
+    max_quantity: str = "100.0"
+    quantity_step: str = "0.01"
+    price_tick: str = "0.00001"
+    digits: int = 5
+    pip_size: float = 0.0001
+    trade_tick_size: float = 0.00001
+    trade_tick_value_profit: float = 1.0
+    trade_tick_value_loss: float = 1.0
+    trade_contract_size: float = 100000.0
+    profit_currency: str = "USD"
+    supported_order_types: tuple[str, ...] = ("MARKET", "LIMIT", "STOP", "STOP_LIMIT")
+    supported_time_in_force: tuple[str, ...] = ("IOC", "FOK")
+    supports_stop_loss: bool = True
+    supports_take_profit: bool = True
+    retrieved_at: str = ""
+    schema_version: Literal[1] = 1
+
+
+class ManageExecutionSessionsRequest(WireModel):
+    """Operation-discriminated execution sessions request."""
+
+    request_id: Uuid7
+    capability_snapshot_id: Uuid7
+    operation: Literal[
+        "LIST_SESSIONS",
+        "GET_ACTIVE_OR_DEFAULT",
+        "SET_DEFAULT",
+        "START_SESSION",
+        "STOP_SESSION",
+        "GET_ACCOUNT_PROFILE",
+        "GET_INSTRUMENT_CONSTRAINTS",
+    ]
+    principal_id: str | None = None
+    mode: str | None = None
+    session_id: str | None = None
+    username: str | None = None
+    symbol: str | None = None
+    schema_version: Literal[1] = 1
+
+
+class ManageExecutionSessionsSuccess(WireModel):
+    """Successful execution sessions operation result."""
+
+    outcome: Literal["SUCCESS"] = "SUCCESS"
+    request_id: Uuid7
+    result_version: Literal[1] = 1
+    sessions: tuple[ExecutionSessionRecord, ...] = ()
+    session: ExecutionSessionRecord | None = None
+    profile: AccountProfileRecord | None = None
+    constraints: InstrumentConstraintsRecord | None = None
+    schema_version: Literal[1] = 1
+
+
 # TradingModeValue, TradingSessionStateValue, and TradingOperationStateValue
 # are PEP 695 ``type`` aliases, and the payload record R28 (TradingEvent)
 # is registered in WIRE_EVENTS; ProtectionSpec and FilterSpec are inline
@@ -1272,4 +1396,9 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
     "JournalExecutionSuccess": JournalExecutionSuccess,
     "ExecutePublicActionsRequest": ExecutePublicActionsRequest,
     "ExecutePublicActionsSuccess": ExecutePublicActionsSuccess,
+    "ExecutionSessionRecord": ExecutionSessionRecord,
+    "AccountProfileRecord": AccountProfileRecord,
+    "InstrumentConstraintsRecord": InstrumentConstraintsRecord,
+    "ManageExecutionSessionsRequest": ManageExecutionSessionsRequest,
+    "ManageExecutionSessionsSuccess": ManageExecutionSessionsSuccess,
 }

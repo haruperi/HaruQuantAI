@@ -12,16 +12,43 @@ from app.contracts.interfaces.models import (
     OperateTradingRequest,
     OperateTradingSuccess,
 )
+from app.contracts.trading.errors import TradingFailure
 
 if TYPE_CHECKING:
     from app.contracts.common.events import DomainEvent
+    from app.contracts.trading.models import (
+        ManageExecutionSessionsRequest,
+        ManageExecutionSessionsSuccess,
+    )
     from app.contracts.trading.ports import (
         AccountOperationsCapability,
         DispatchOrdersCapability,
+        ManageExecutionSessionsCapability,
         ManageTradingSessionsCapability,
     )
     from app.services.interfaces.operate_trading.config import (
         OperateTradingConfig,
+    )
+
+
+def _failure_from_trading(failure: TradingFailure) -> InterfaceFailure:
+    """Map one trading failure into the interface failure envelope.
+
+    Args:
+        failure: Trading-domain typed failure.
+
+    Returns:
+        Structured InterfaceFailure envelope.
+    """
+    return InterfaceFailure(
+        request_id=failure.request_id,
+        code="INTERFACE_VALIDATION_FAILED",
+        problem=ProblemDetails(
+            title=failure.problem.title,
+            status=failure.problem.status,
+            code=failure.problem.code or failure.code,
+            detail=failure.problem.detail,
+        ),
     )
 
 
@@ -34,6 +61,7 @@ class TradingGateway:
         account_operations: AccountOperationsCapability | None = None,
         dispatch_orders: DispatchOrdersCapability | None = None,
         trading_sessions: ManageTradingSessionsCapability | None = None,
+        execution_sessions: ManageExecutionSessionsCapability | None = None,
     ) -> None:
         """Initialize the trading operations gateway.
 
@@ -42,11 +70,13 @@ class TradingGateway:
             account_operations: Optional account operations capability.
             dispatch_orders: Optional order dispatch capability.
             trading_sessions: Optional trading sessions capability.
+            execution_sessions: Optional execution sessions capability.
         """
         self._config = config
         self._account_operations = account_operations
         self._dispatch_orders = dispatch_orders
         self._trading_sessions = trading_sessions
+        self._execution_sessions = execution_sessions
         self._closed = False
 
     @property
@@ -57,6 +87,48 @@ class TradingGateway:
     async def close(self) -> None:
         """Dispose of the gateway and withdraw active providers."""
         self._closed = True
+
+    async def manage_execution_sessions(
+        self,
+        request: ManageExecutionSessionsRequest,
+    ) -> ManageExecutionSessionsSuccess | InterfaceFailure:
+        """Translate and delegate execution sessions request.
+
+        Args:
+            request: Execution sessions request.
+
+        Returns:
+            Execution sessions result on success, otherwise a structured
+            interface failure.
+        """
+        if self._closed:
+            return InterfaceFailure(
+                request_id=request.request_id,
+                code="CAPABILITY_UNAVAILABLE",
+                problem=ProblemDetails(
+                    title="Capability Unavailable",
+                    detail="The trading operations gateway has been disposed.",
+                    status=503,
+                    code="CAPABILITY_UNAVAILABLE",
+                ),
+            )
+
+        if self._execution_sessions is None:
+            return InterfaceFailure(
+                request_id=request.request_id,
+                code="CAPABILITY_UNAVAILABLE",
+                problem=ProblemDetails(
+                    title="Capability Unavailable",
+                    detail="Execution sessions capability is not mounted.",
+                    status=503,
+                    code="CAPABILITY_UNAVAILABLE",
+                ),
+            )
+
+        result = await self._execution_sessions.manage_execution_sessions(request)
+        if isinstance(result, TradingFailure):
+            return _failure_from_trading(result)
+        return result
 
     async def operate_trading(
         self,

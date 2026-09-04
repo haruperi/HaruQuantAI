@@ -15,6 +15,8 @@ if TYPE_CHECKING:
         ExecutePublicActionsSuccess,
         JournalExecutionRequest,
         JournalExecutionSuccess,
+        ManageExecutionSessionsRequest,
+        ManageExecutionSessionsSuccess,
         ManageProtectionsRequest,
         ManageProtectionsSuccess,
         ManageTradingSessionsRequest,
@@ -183,5 +185,25 @@ class ExecutePublicActionsCapability(Protocol):
         Returns:
             The routed action, state query, and bounded result rows on
             success, otherwise a structured trading failure.
+        """
+        ...
+
+
+@runtime_checkable
+class ManageExecutionSessionsCapability(Protocol):
+    """Capability protocol for execution sessions, profile, and constraints."""
+
+    async def manage_execution_sessions(
+        self,
+        request: ManageExecutionSessionsRequest,
+    ) -> ManageExecutionSessionsSuccess | TradingFailure:
+        """List, create, transition, profile, and query execution sessions.
+
+        Args:
+            request: Operation-discriminated execution sessions request.
+
+        Returns:
+            Execution sessions result on success, otherwise a structured
+            trading failure.
         """
         ...

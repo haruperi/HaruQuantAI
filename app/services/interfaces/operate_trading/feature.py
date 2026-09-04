@@ -8,6 +8,7 @@ from app.contracts.interfaces.capabilities import OPERATE_TRADING_CAPABILITY
 from app.contracts.trading.capabilities import (
     ACCOUNT_OPERATIONS_CAPABILITY,
     DISPATCH_ORDERS_CAPABILITY,
+    MANAGE_EXECUTION_SESSIONS_CAPABILITY,
     MANAGE_TRADING_SESSIONS_CAPABILITY,
 )
 from app.services.interfaces.operate_trading.config import (
@@ -69,12 +70,14 @@ class OperateTradingFeature:
         account_ops = context.optional(ACCOUNT_OPERATIONS_CAPABILITY)
         dispatch_orders = context.optional(DISPATCH_ORDERS_CAPABILITY)
         trading_sessions = context.optional(MANAGE_TRADING_SESSIONS_CAPABILITY)
+        execution_sessions = context.optional(MANAGE_EXECUTION_SESSIONS_CAPABILITY)
 
         gateway = TradingGateway(
             config=parsed,
             account_operations=account_ops,
             dispatch_orders=dispatch_orders,
             trading_sessions=trading_sessions,
+            execution_sessions=execution_sessions,
         )
         context.register_callback(gateway.close)
         context.provide(OPERATE_TRADING_CAPABILITY, gateway)

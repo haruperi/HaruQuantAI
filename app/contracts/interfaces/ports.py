@@ -48,6 +48,10 @@ if TYPE_CHECKING:
         OperateWatchlistsRequest,
         OperateWatchlistsSuccess,
     )
+    from app.contracts.trading.models import (
+        ManageExecutionSessionsRequest,
+        ManageExecutionSessionsSuccess,
+    )
 
 
 @runtime_checkable
@@ -552,6 +556,21 @@ class OperateTradingCapability(Protocol):
             An asynchronous iterator of trading operations events wrapped
             in the common domain event envelope with ordered replay and
             resync semantics.
+        """
+        ...
+
+    async def manage_execution_sessions(
+        self,
+        request: ManageExecutionSessionsRequest,
+    ) -> ManageExecutionSessionsSuccess | InterfaceFailure:
+        """Translate and delegate execution sessions request.
+
+        Args:
+            request: Execution sessions request.
+
+        Returns:
+            Execution sessions result on success, otherwise a structured
+            interface failure.
         """
         ...
 

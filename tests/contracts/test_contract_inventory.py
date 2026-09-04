@@ -64,7 +64,7 @@ EXPECTED_RECORD_COUNTS: dict[str, int] = {
 
 # Expected "**Capability bundles (N):**" counts per README sections 4.1-4.15.
 EXPECTED_CAPABILITY_COUNTS: dict[str, int] = {
-    "workspace": 7,
+    "workspace": 9,
     "catalogue": 7,
     "data": 15,
     "strategy": 13,
@@ -73,12 +73,12 @@ EXPECTED_CAPABILITY_COUNTS: dict[str, int] = {
     "research": 13,
     "portfolio": 8,
     "orchestration": 7,
-    "interfaces": 10,
+    "interfaces": 12,
     "ui": 17,
     "plugins": 7,
     "broker": 10,
     "risk": 7,
-    "trading": 8,
+    "trading": 9,
 }
 
 # README record names that are PEP 695 type aliases rather than registry
@@ -104,7 +104,15 @@ PORT_RECORD_SUFFIXES: tuple[str, ...] = ("Request", "Success", "Subscription")
 # key outside this snapshot, the inventory, a port suffix, or a payload alias
 # is an undocumented drift and fails reconciliation.
 AUXILIARY_REGISTRY_KEYS: dict[str, frozenset[str]] = {
-    "workspace": frozenset(),
+    "workspace": frozenset(
+        {
+            "AccountRecord",
+            "BridgeRuntimeSettings",
+            "CredentialSlotStatus",
+            "SettingDefinition",
+            "SystemSettingsRecord",
+        }
+    ),
     "catalogue": frozenset(
         {
             "InstrumentVersionCreated",
@@ -144,7 +152,13 @@ AUXILIARY_REGISTRY_KEYS: dict[str, frozenset[str]] = {
     "plugins": frozenset(),
     "broker": frozenset({"ProviderRecord"}),
     "risk": frozenset({"OrderedCheck", "ScenarioShock"}),
-    "trading": frozenset(),
+    "trading": frozenset(
+        {
+            "AccountProfileRecord",
+            "ExecutionSessionRecord",
+            "InstrumentConstraintsRecord",
+        }
+    ),
 }
 
 CAPABILITY_IDENTIFIER_PATTERN = re.compile(r"^[a-z][a-z0-9.-]*@[1-9]\d*$")

@@ -26,6 +26,7 @@ None
 
 - `trading.account-operations@1`
 - `trading.dispatch-orders@1`
+- `trading.manage-execution-sessions@1`
 - `trading.manage-trading-sessions@1`
 
 ## Configuration

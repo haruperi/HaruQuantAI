@@ -176,3 +176,58 @@ async def mount_settings_stack(
         scope=gateway_scope,
     )
     return registry, store_scope, gateway_scope
+
+
+async def mount_trading_stack(
+    db_path: Path | str | None = None,
+) -> tuple[
+    ServiceRegistry,
+    FeatureScope,
+    FeatureScope,
+]:
+    """Mount the execution sessions store and trading gateway capabilities into one registry.
+
+    Returns:
+        Registry, store scope, and gateway scope.
+    """
+    from app.contracts.interfaces.capabilities import OPERATE_TRADING_CAPABILITY
+    from app.contracts.trading.capabilities import (
+        MANAGE_EXECUTION_SESSIONS_CAPABILITY,
+    )
+    from app.services.interfaces.operate_trading.config import (
+        OperateTradingConfig,
+    )
+    from app.services.interfaces.operate_trading.gateway import TradingGateway
+    from app.services.trading.manage_execution_sessions.config import (
+        ManageExecutionSessionsConfig,
+    )
+    from app.services.trading.manage_execution_sessions.execution_sessions import (
+        ExecutionSessionsService,
+    )
+
+    registry = ServiceRegistry()
+    config = (
+        ManageExecutionSessionsConfig(database_path=db_path)
+        if db_path is not None
+        else ManageExecutionSessionsConfig()
+    )
+    store = ExecutionSessionsService(config)
+    store_scope = FeatureScope(owner_id="FEAT-TRD-MANAGE_EXECUTION_SESSIONS")
+    registry.register(
+        MANAGE_EXECUTION_SESSIONS_CAPABILITY,
+        store,
+        owner_id="FEAT-TRD-MANAGE_EXECUTION_SESSIONS",
+        scope=store_scope,
+    )
+    gateway = TradingGateway(
+        config=OperateTradingConfig(),
+        execution_sessions=store,
+    )
+    gateway_scope = FeatureScope(owner_id="FEAT-IFACE-OPERATE_TRADING")
+    registry.register(
+        OPERATE_TRADING_CAPABILITY,
+        gateway,
+        owner_id="FEAT-IFACE-OPERATE_TRADING",
+        scope=gateway_scope,
+    )
+    return registry, store_scope, gateway_scope

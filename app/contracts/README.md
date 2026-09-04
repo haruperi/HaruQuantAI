@@ -177,7 +177,7 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 **Public records:** `WorkspaceRef`, `WorkspaceVersion`, `WorkspaceConfiguration`, `RuntimeConfiguration`, `StorageGuardPolicy`, `WorkspaceWriterLease`, `WorkspaceWriterFence`, `WorkspaceBackupManifest`, `WorkspaceRestorePlan`, `SecretRef`, `PrincipalRef`, `LocalSession`, `SystemHealth`, `SystemReadiness`, `DiagnosticBundleRef`, `DiagnosticBundleManifest`, `WorkerCapabilityDescriptor`, `WorkerRegistration`, `WorkerLease`, `WorkerTaskEnvelope`, `ArtifactManifest`, `HostedWorkspaceContext`, `WorkspaceAuthorizationDecision`, `WatchlistItemRecord`, `WatchlistRecord`, `ManageWatchlistsRequest`, and `ManageWatchlistsSuccess`.
 
-**Capability bundles (7):** `ManageWorkspacesCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability` (implemented), `DistributeWorkersCapability`, `HostWorkspacesCapability`, and `ManageWatchlistsCapability`.
+**Capability bundles (9):** `ManageWorkspacesCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability` (implemented), `DistributeWorkersCapability`, `HostWorkspacesCapability`, `ManageWatchlistsCapability`, `ManageAccountsCapability`, and `AdministerSettingsCapability`.
 
 ### 4.2 `app/contracts/catalogue/`
 
@@ -233,7 +233,7 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 **Public records:** `ApiVersion`, `ConcurrencyToken`, `EventCursor`, `EventReplayBatch`, `AsyncJobRef`, `ArtifactDownloadRequest`, `BulkRequestToken`, `AutomationCommand`, `AutomationSchema`, `McpOperation`, `ResearchPreview`, `ProjectGraphProjection`, `PortfolioBuilderProjection`, `CapabilityAdministrationProjection`, `TradingActionPreview`, `TradingReadinessProjection`, `MarketTickQuote`, `MarketTickSnapshot`, `ObserveMarketDataRequest`, `ObserveMarketDataSuccess`, `ObserveMarketDataEventSubscription`, `StreamEvent`, `ApiMetadata`, `ApiError`, `ApiResponse`, `MarketCatalogueEntry`, `ObserveMarketCatalogueRequest`, `ObserveMarketCatalogueSuccess`, `OperateWatchlistsRequest`, and `OperateWatchlistsSuccess`.
 
-**Capability bundles (10):** `ServeApiEventsCapability`, `ObserveMarketDataCapability`, `ObserveMarketCatalogueCapability`, `OperateWatchlistsCapability`, `AutomateCommandsCapability`, `OperateResearchCapability`, `EditProjectsCapability`, `OperatePortfoliosCapability`, `AdministerCapabilitiesCapability`, and `OperateTradingCapability`.
+**Capability bundles (12):** `ServeApiEventsCapability`, `ObserveMarketDataCapability`, `ObserveMarketCatalogueCapability`, `OperateWatchlistsCapability`, `AutomateCommandsCapability`, `OperateResearchCapability`, `EditProjectsCapability`, `OperatePortfoliosCapability`, `AdministerCapabilitiesCapability`, `OperateTradingCapability`, `OperateIdentityCapability`, and `OperateSettingsCapability`.
 
 ### 4.11 `app/contracts/ui/`
 
@@ -263,7 +263,7 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 **Public records:** `TradingMode`, `TradingSessionRef`, `TradingSession`, `TradingSessionState`, `TradingOperationRef`, `TradingOperation`, `TradingOperationState`, `TradeIntentRef`, `TradePlan`, `TradingReadiness`, `ExecutionAuthorityRef`, `DispatchEvidence`, `DispatchReceipt`, `TradingOrder`, `TradingDeal`, `TradingPositionProjection`, `ReconciliationRequest`, `ReconciliationFinding`, `ProtectionSet`, `ProtectionChange`, `TradingJournalRecord`, `ExecutionProvenance`, `OperationalAccount`, `OperationalLedgerEntry`, `OperationalValuation`, `PublicTradingAction`, `TradingStateQuery`, and `TradingEvent`.
 
-**Capability bundles (8):** `ManageTradingSessionsCapability`, `ValidateTradePlansCapability`, `AccountOperationsCapability`, `DispatchOrdersCapability`, `ReconcileTradingCapability`, `ManageProtectionsCapability`, `JournalExecutionCapability`, and `ExecutePublicActionsCapability`.
+**Capability bundles (9):** `ManageExecutionSessionsCapability`, `ManageTradingSessionsCapability`, `ValidateTradePlansCapability`, `AccountOperationsCapability`, `DispatchOrdersCapability`, `ReconcileTradingCapability`, `ManageProtectionsCapability`, `JournalExecutionCapability`, and `ExecutePublicActionsCapability`.
 
 ### 4.16 Common and Focused Versioned Slices
 

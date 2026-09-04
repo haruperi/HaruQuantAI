@@ -4,6 +4,7 @@ from app.contracts.interfaces.capabilities import OPERATE_TRADING_CAPABILITY
 from app.contracts.trading.capabilities import (
     ACCOUNT_OPERATIONS_CAPABILITY,
     DISPATCH_ORDERS_CAPABILITY,
+    MANAGE_EXECUTION_SESSIONS_CAPABILITY,
     MANAGE_TRADING_SESSIONS_CAPABILITY,
 )
 from app.kernel.feature import FeatureSpec
@@ -17,6 +18,7 @@ SPEC: FeatureSpec = FeatureSpec(
         {
             ACCOUNT_OPERATIONS_CAPABILITY,
             DISPATCH_ORDERS_CAPABILITY,
+            MANAGE_EXECUTION_SESSIONS_CAPABILITY,
             MANAGE_TRADING_SESSIONS_CAPABILITY,
         }
     ),

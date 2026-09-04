@@ -77,6 +77,7 @@ interfaces-operate-identity = "app.services.interfaces.operate_identity.feature:
 interfaces-operate-settings = "app.services.interfaces.operate_settings.feature:feature"
 interfaces-operate-watchlists = "app.services.interfaces.operate_watchlists.feature:feature"
 interfaces-operate-trading = "app.services.interfaces.operate_trading.feature:feature"
+trading-manage-execution-sessions = "app.services.trading.manage_execution_sessions.feature:feature"
 
 # ============================================================================
 # Ruff Configuration (Formatting, Linting, Import Sorting, Security, Complexity)
