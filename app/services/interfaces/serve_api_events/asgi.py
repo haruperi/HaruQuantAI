@@ -67,7 +67,6 @@ from app.contracts.interfaces.models import (
     StreamEvent,
 )
 from app.contracts.trading.models import ManageExecutionSessionsRequest
-from app.services.interfaces.serve_api_events import _db_hydration
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping
@@ -2943,7 +2942,6 @@ async def _lifespan(receive: Receive, send: Send) -> None:
     while True:
         message = await receive()
         if message.get("type") == "lifespan.startup":
-            _db_hydration.ensure_database_hydrated()
             await send({"type": "lifespan.startup.complete"})
         elif message.get("type") == "lifespan.shutdown":
             await send({"type": "lifespan.shutdown.complete"})
