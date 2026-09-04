@@ -59,11 +59,21 @@ from app.contracts.interfaces.models import (
     OperateWatchlistsSuccess,
     StreamEvent,
 )
+from app.services.interfaces.serve_api_events import (
+    _data_reference_db,
+    _db_hydration,
+    _markets_db,
+    _trading_db,
+)
 from app.services.interfaces.serve_api_events._auth_db import (
     get_session_identity,
     login_user,
     logout_session,
     register_user,
+)
+from app.services.interfaces.serve_api_events._data_reference_db import (
+    BarsUnavailableError,
+    ReferenceNotFoundError,
 )
 from app.services.interfaces.serve_api_events._settings_db import (
     get_credentials_status,
@@ -77,7 +87,7 @@ if TYPE_CHECKING:
     from collections.abc import MutableMapping
     from typing import Any
 
-    from app.contracts.common.models import JsonValue
+    from app.contracts.common.models import JsonObject, JsonValue
     from app.contracts.interfaces.ports import ObserveMarketDataCapability
     from app.kernel.capability import CapabilityKey
     from app.kernel.registry import ServiceRegistry
@@ -94,6 +104,9 @@ _MAX_CATALOGUE_PAGE_SIZE = 500
 _UUID7_PATTERN = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 )
+_WATCHLIST_ID_PATTERN = re.compile(
+    r"^(?:[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|id-[0-9a-fA-F_\-]+|[a-zA-Z0-9_\-\.]{1,128})$"
+)
 
 _SNAPSHOT_ROUTE = "/api/v1/market/ticks"
 _STREAM_ROUTE = "/api/v1/market/ticks/stream"
@@ -109,6 +122,20 @@ _SETTINGS_CREDENTIALS_ROUTE = "/api/v1/settings/credentials"
 _SETTINGS_CREDENTIAL_PREFIX = "/api/v1/settings/credentials/"
 _TRADING_PREFIX = "/api/v1/trading"
 _AUTH_PREFIX = "/api/v1/auth"
+_DATA_PREFIX = "/api/v1/data"
+_DATA_CAPABILITIES_ROUTE = "/api/v1/data/capabilities"
+_DATA_SERIES_ROUTE = "/api/v1/data/series"
+_DATA_INSTRUMENTS_ROUTE = "/api/v1/data/instruments"
+_DATA_BROKERS_ROUTE = "/api/v1/data/brokers"
+_DATA_SYMBOLS_ROUTE = "/api/v1/data/symbols"
+_DATA_BARS_ROUTE = "/api/v1/data/bars"
+_DATA_QUOTES_ROUTE = "/api/v1/data/quotes"
+_DATA_REFERENCE_SYNC_ROUTE = "/api/v1/data/reference/sync"
+_DATA_SERIES_ID_PATTERN = re.compile(r"^/api/v1/data/series/(\d+)$")
+_DATA_INSTRUMENT_ID_PATTERN = re.compile(r"^/api/v1/data/instruments/([^/]+)$")
+_BAR_TIMEFRAMES = frozenset({"M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN1"})
+_DEFAULT_BAR_COUNT = 500
+_MAX_BAR_COUNT = 1_000_000
 _AUTH_REGISTER_ROUTE = "/api/v1/auth/register"
 _AUTH_LOGIN_ROUTE = "/api/v1/auth/login"
 _AUTH_LOGOUT_ROUTE = "/api/v1/auth/logout"
@@ -142,6 +169,52 @@ def _header(scope: Scope, name: str) -> str | None:
         if raw_name.lower() == wanted:
             return raw_value.decode("latin-1")
     return None
+
+
+_COOKIE_PAIR_LEN: Final = 2
+_SESSION_COOKIE_NAME: Final = "hq_session"
+_CSRF_COOKIE_NAME: Final = "hq_csrf"
+_AUTH_TTL_SECONDS: Final = 7 * 86400
+
+
+def _get_cookie(scope: Scope, name: str) -> str | None:
+    """Read a cookie value from the request scope headers.
+
+    Args:
+        scope: ASGI connection scope.
+        name: Name of the cookie.
+
+    Returns:
+        Cookie string value if found, None otherwise.
+    """
+    cookie_header = _header(scope, "cookie")
+    if not cookie_header:
+        return None
+    for item in cookie_header.split(";"):
+        parts = item.strip().split("=", maxsplit=1)
+        if len(parts) == _COOKIE_PAIR_LEN and parts[0].strip() == name:
+            return parts[1].strip()
+    return None
+
+
+def _get_request_identity(scope: Scope) -> tuple[str, str]:
+    """Return (account_id, username) from active session or fallback default.
+
+    Args:
+        scope: ASGI connection scope.
+
+    Returns:
+        Tuple of principal identifier and username.
+    """
+    token = _get_cookie(scope, _SESSION_COOKIE_NAME)
+    if token:
+        ident = get_session_identity(token)
+        if ident:
+            return (
+                str(ident.get("user_id") or "usr_haruquantai"),
+                str(ident.get("username") or "haruquantai"),
+            )
+    return ("usr_haruquantai", "haruquantai")
 
 
 def _parse_symbols(scope: Scope) -> tuple[str, ...]:
@@ -777,9 +850,21 @@ async def _serve_catalogue(
             ),
         )
         return
+    rows: list[dict[str, Any]] = [
+        entry.model_dump(mode="json") for entry in result.entries
+    ]
+    if not rows:
+        market_query = query.get("query", [None])[0]
+        db_data = _markets_db.list_market_directory(
+            query=market_query,
+            cursor=page_cursor,
+            limit=page_size,
+            request_id=request_id,
+        )
+        rows = db_data["rows"]
     data: dict[str, Any] = {
         "source_id": _PROVIDER_CATALOGUE_SOURCE_ID,
-        "rows": [entry.model_dump(mode="json") for entry in result.entries],
+        "rows": rows,
         "limit": page_size,
         "next_cursor": result.next_cursor,
         "revision": result.revision,
@@ -945,6 +1030,7 @@ async def _serve_watchlists_collection(
     )
     if gateway is None:
         return
+
     if method == "GET":
         request = _watchlist_request("LIST")
     else:
@@ -998,7 +1084,7 @@ async def _serve_watchlists_item(
     request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
     trace_id = _header(scope, "x-trace-id")
     method = str(scope.get("method", "")).upper()
-    if not _UUID7_PATTERN.match(watchlist_id):
+    if not _WATCHLIST_ID_PATTERN.match(watchlist_id):
         await _send_error(
             send,
             HTTPStatus.BAD_REQUEST,
@@ -1021,6 +1107,7 @@ async def _serve_watchlists_item(
     )
     if gateway is None:
         return
+
     if method == "DELETE":
         request = _watchlist_request("DELETE", watchlist_id=watchlist_id)
     else:
@@ -1063,6 +1150,467 @@ async def _serve_watchlists_item(
     result = await gateway.operate_watchlists(request)
     await _serve_watchlist_result(
         result, send, request_id, route, trace_id, deleted_id=watchlist_id
+    )
+
+
+def _query_params(scope: Scope) -> dict[str, str]:
+    """Flatten one query string into a last-value-wins mapping.
+
+    Args:
+        scope: ASGI connection scope.
+
+    Returns:
+        Mapping of parameter name to its final value.
+    """
+    parsed = parse_qs(scope.get("query_string", b"").decode("latin-1"))
+    return {name: values[-1] for name, values in parsed.items() if values}
+
+
+async def _serve_data_json(
+    send: Send,
+    path: str,
+    operation: str,
+    payload: JsonObject | list[JsonObject],
+    request_id: str,
+    trace_id: str | None,
+    side_effect: Literal["read", "write"] = "read",
+) -> None:
+    """Serve one success envelope for a Data reference read or write."""
+    await _send_json(
+        send,
+        HTTPStatus.OK,
+        ApiResponse(
+            status="success",
+            message=HTTPStatus.OK.phrase,
+            data=payload,
+            metadata=_metadata(
+                request_id,
+                path,
+                operation,
+                side_effect,
+                False,
+                None,
+                trace_id,
+            ),
+        ),
+    )
+
+
+async def _serve_bars(
+    scope: Scope,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve one bounded bar history from the persisted reference store.
+
+    A symbol/timeframe pair with no stored history answers with an honest
+    503 ``UPSTREAM_UNAVAILABLE``; the boundary never substitutes generated
+    bars for a provider history a chart would render as real.
+    """
+    params = _query_params(scope)
+    symbol = params.get("symbol", "").strip()
+    if not symbol:
+        await _send_error(
+            send,
+            HTTPStatus.UNPROCESSABLE_CONTENT,
+            "VALIDATION_FAILED",
+            "The symbol query parameter is required.",
+            _DATA_BARS_ROUTE,
+            "api.data.bars",
+            trace_id,
+        )
+        return
+    timeframe = params.get("timeframe", "H1").strip() or "H1"
+    if timeframe not in _BAR_TIMEFRAMES:
+        await _send_error(
+            send,
+            HTTPStatus.UNPROCESSABLE_CONTENT,
+            "VALIDATION_FAILED",
+            "The requested timeframe is not a canonical Data timeframe.",
+            _DATA_BARS_ROUTE,
+            "api.data.bars",
+            trace_id,
+        )
+        return
+    start = params.get("start") or None
+    end = params.get("end") or None
+    if start is not None and end is not None and end <= start:
+        await _send_error(
+            send,
+            HTTPStatus.UNPROCESSABLE_CONTENT,
+            "BAR_WINDOW_INVALID",
+            "The requested bar window end must not precede its start.",
+            _DATA_BARS_ROUTE,
+            "api.data.bars",
+            trace_id,
+        )
+        return
+    try:
+        limit = int(params.get("limit", _DEFAULT_BAR_COUNT))
+    except ValueError:
+        limit = _DEFAULT_BAR_COUNT
+    limit = max(1, min(limit, _MAX_BAR_COUNT))
+    try:
+        payload = _data_reference_db.get_bars(
+            symbol,
+            timeframe,
+            limit=limit,
+            start=start,
+            end=end,
+            request_id=request_id,
+        )
+    except BarsUnavailableError as error:
+        await _send_error(
+            send,
+            HTTPStatus.SERVICE_UNAVAILABLE,
+            "UPSTREAM_UNAVAILABLE",
+            str(error),
+            _DATA_BARS_ROUTE,
+            "api.data.bars",
+            trace_id,
+        )
+        return
+    await _serve_data_json(
+        send, _DATA_BARS_ROUTE, "api.data.bars", payload, request_id, trace_id
+    )
+
+
+async def _serve_data_series_item(
+    receive: Receive,
+    send: Send,
+    series_id: int,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve one governed series edit against the reference catalogue."""
+    body = await _read_json_body(receive)
+    if body is None:
+        await _send_error(
+            send,
+            HTTPStatus.BAD_REQUEST,
+            "VALIDATION_FAILED",
+            "The request body must be a JSON object.",
+            _DATA_SERIES_ROUTE,
+            "api.data.series.update",
+            trace_id,
+        )
+        return
+    try:
+        payload = _data_reference_db.update_market_series(series_id, body)
+    except ValueError:
+        await _send_error(
+            send,
+            HTTPStatus.UNPROCESSABLE_CONTENT,
+            "VALIDATION_FAILED",
+            "Series symbol and instrument are required.",
+            _DATA_SERIES_ROUTE,
+            "api.data.series.update",
+            trace_id,
+        )
+        return
+    except ReferenceNotFoundError:
+        await _send_error(
+            send,
+            HTTPStatus.NOT_FOUND,
+            "SERIES_NOT_FOUND",
+            f"No series {series_id} exists in the reference catalogue.",
+            _DATA_SERIES_ROUTE,
+            "api.data.series.update",
+            trace_id,
+        )
+        return
+    route = f"{_DATA_SERIES_ROUTE}/{series_id}"
+    await _serve_data_json(
+        send,
+        route,
+        "api.data.series.update",
+        payload,
+        request_id,
+        trace_id,
+        side_effect="write",
+    )
+
+
+async def _serve_data_instrument_item(
+    receive: Receive,
+    send: Send,
+    instrument: str,
+    method: str,
+    request_id: str,
+    trace_id: str | None,
+) -> None:
+    """Serve one instrument specification read or governed edit."""
+    route = f"{_DATA_INSTRUMENTS_ROUTE}/{instrument}"
+    if method == "GET":
+        try:
+            payload = _data_reference_db.get_instrument_spec(instrument)
+        except ReferenceNotFoundError:
+            await _send_error(
+                send,
+                HTTPStatus.NOT_FOUND,
+                "INSTRUMENT_NOT_FOUND",
+                f"No instrument {instrument} exists in the reference catalogue.",
+                route,
+                "api.data.instrument",
+                trace_id,
+            )
+            return
+        await _serve_data_json(
+            send, route, "api.data.instrument", payload, request_id, trace_id
+        )
+        return
+    body = await _read_json_body(receive)
+    if body is None:
+        await _send_error(
+            send,
+            HTTPStatus.BAD_REQUEST,
+            "VALIDATION_FAILED",
+            "The request body must be a JSON object.",
+            route,
+            "api.data.instrument.update",
+            trace_id,
+        )
+        return
+    try:
+        payload = _data_reference_db.update_instrument_spec(instrument, body)
+    except ReferenceNotFoundError:
+        await _send_error(
+            send,
+            HTTPStatus.NOT_FOUND,
+            "INSTRUMENT_NOT_FOUND",
+            f"No instrument {instrument} exists in the reference catalogue.",
+            route,
+            "api.data.instrument.update",
+            trace_id,
+        )
+        return
+    await _serve_data_json(
+        send,
+        route,
+        "api.data.instrument.update",
+        payload,
+        request_id,
+        trace_id,
+        side_effect="write",
+    )
+
+
+async def _serve_data_capability_routes(
+    registry: ServiceRegistry,
+    scope: Scope,
+    receive: Receive,
+    send: Send,
+    path: str,
+    method: str,
+) -> bool:
+    """Delegate capability-gated catalogue and stream aliases.
+
+    Args:
+        registry: Live composition service registry.
+        scope: ASGI connection scope.
+        receive: ASGI receive callable.
+        send: ASGI send callable.
+        path: Request path.
+        method: Uppercase request method.
+
+    Returns:
+        True when the route was handled.
+    """
+    if path in _CATALOGUE_ROUTES and method == "GET":
+        await _serve_catalogue(registry, scope, receive, send)
+        return True
+    if path == _ALIAS_STREAM_ROUTE and method == "GET":
+        await _serve_stream(registry, scope, receive, send)
+        return True
+    return False
+
+
+async def _serve_data_catalogue_read(
+    path: str,
+    params: dict[str, str],
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> bool:
+    """Serve the static capability surface and reference catalogue reads.
+
+    Args:
+        path: Request path.
+        params: Flattened query parameters.
+        send: ASGI send callable.
+        request_id: Mirrored or generated request identifier.
+        trace_id: Optional mirrored trace identifier.
+
+    Returns:
+        True when the route was handled.
+    """
+    payload: JsonObject | list[JsonObject]
+    if path == _DATA_CAPABILITIES_ROUTE:
+        payload = _data_reference_db.list_capabilities()
+        operation = "api.data.capabilities"
+    elif path == _DATA_SERIES_ROUTE:
+        payload = _data_reference_db.list_market_series(
+            limit=int(params.get("limit", "50"))
+        )
+        operation = "api.data.series"
+    elif path == _DATA_INSTRUMENTS_ROUTE:
+        payload = _data_reference_db.list_instruments(
+            limit=int(params.get("limit", "50"))
+        )
+        operation = "api.data.instruments"
+    elif path == _DATA_BROKERS_ROUTE:
+        payload = _data_reference_db.list_brokers(limit=int(params.get("limit", "50")))
+        operation = "api.data.brokers"
+    else:
+        return False
+    await _serve_data_json(send, path, operation, payload, request_id, trace_id)
+    return True
+
+
+async def _serve_data_discovery_read(
+    path: str,
+    params: dict[str, str],
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> bool:
+    """Serve symbol discovery and explicit-symbol quote reads.
+
+    Args:
+        path: Request path.
+        params: Flattened query parameters.
+        send: ASGI send callable.
+        request_id: Mirrored or generated request identifier.
+        trace_id: Optional mirrored trace identifier.
+
+    Returns:
+        True when the route was handled.
+    """
+    if path == _DATA_SYMBOLS_ROUTE:
+        payload = _data_reference_db.list_symbols(
+            source_id=params.get("source_id", "mt5"),
+            query=params.get("query"),
+            cursor=params.get("cursor"),
+            limit=int(params.get("limit", "50")),
+            request_id=request_id,
+        )
+        await _serve_data_json(
+            send, path, "api.data.symbols", payload, request_id, trace_id
+        )
+        return True
+    if path == _DATA_QUOTES_ROUTE:
+        symbols = [
+            symbol.strip()
+            for symbol in params.get("symbols", "").split(",")
+            if symbol.strip()
+        ]
+        payload = _data_reference_db.list_quotes(
+            symbols,
+            source_id=params.get("source_id", "mt5"),
+            request_id=request_id,
+        )
+        await _serve_data_json(
+            send, path, "api.data.quotes", payload, request_id, trace_id
+        )
+        return True
+    return False
+
+
+async def _serve_data_write_routes(
+    receive: Receive,
+    send: Send,
+    path: str,
+    method: str,
+    request_id: str,
+    trace_id: str | None,
+) -> bool:
+    """Serve the governed reference writes and item reads/edits.
+
+    Args:
+        receive: ASGI receive callable.
+        send: ASGI send callable.
+        path: Request path.
+        method: Uppercase request method.
+        request_id: Mirrored or generated request identifier.
+        trace_id: Optional mirrored trace identifier.
+
+    Returns:
+        True when the route was handled.
+    """
+    if path == _DATA_REFERENCE_SYNC_ROUTE and method == "POST":
+        payload = _data_reference_db.sync_reference()
+        await _serve_data_json(
+            send,
+            path,
+            "api.data.reference.sync",
+            payload,
+            request_id,
+            trace_id,
+            side_effect="write",
+        )
+        return True
+    series_match = _DATA_SERIES_ID_PATTERN.match(path)
+    if series_match is not None and method == "PATCH":
+        await _serve_data_series_item(
+            receive, send, int(series_match.group(1)), request_id, trace_id
+        )
+        return True
+    instrument_match = _DATA_INSTRUMENT_ID_PATTERN.match(path)
+    if instrument_match is not None and method in ("GET", "PATCH"):
+        await _serve_data_instrument_item(
+            receive,
+            send,
+            instrument_match.group(1),
+            method,
+            request_id,
+            trace_id,
+        )
+        return True
+    return False
+
+
+async def _serve_data(
+    registry: ServiceRegistry,
+    scope: Scope,
+    receive: Receive,
+    send: Send,
+) -> None:
+    """Serve the Data reference boundary: discovery, catalogue, and bars.
+
+    ``/api/v1/data/markets`` and the ``snapshot-stream`` alias keep their
+    capability-gated catalogue/stream handlers; every other ``/data`` route
+    reads the hydrated reference store.
+    """
+    path = str(scope.get("path", ""))
+    method = str(scope.get("method", "GET")).upper()
+    request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
+    trace_id = _header(scope, "x-trace-id")
+    params = _query_params(scope)
+
+    if await _serve_data_capability_routes(
+        registry, scope, receive, send, path, method
+    ):
+        return
+    if path == _DATA_BARS_ROUTE and method == "GET":
+        await _serve_bars(scope, send, request_id, trace_id)
+        return
+    if await _serve_data_catalogue_read(path, params, send, request_id, trace_id):
+        return
+    if await _serve_data_discovery_read(path, params, send, request_id, trace_id):
+        return
+    if await _serve_data_write_routes(
+        receive, send, path, method, request_id, trace_id
+    ):
+        return
+    await _send_error(
+        send,
+        HTTPStatus.NOT_FOUND,
+        "NOT_FOUND",
+        "The requested boundary route is not registered.",
+        path,
+        "api.data",
+        trace_id,
     )
 
 
@@ -1200,17 +1748,187 @@ async def _serve_settings(
     )
 
 
+_TRADING_SUBPATH_ACTION_PARTS: Final = 2
+
+
+async def _serve_trading_sessions(
+    path: str,
+    method: str,
+    principal_id: str,
+    query_string: bytes,
+    request_id: str,
+    trace_id: str | None,
+    send: Send,
+) -> None:
+    """Serve trading execution sessions listing and creation."""
+    if method == "GET":
+        query = parse_qs(query_string.decode("latin-1"))
+        mode_filter = query.get("mode", [None])[0]
+        sessions = _trading_db.list_execution_sessions(
+            principal_id=principal_id, mode=mode_filter
+        )
+        envelope = ApiResponse(
+            status="success",
+            message=HTTPStatus.OK.phrase,
+            data=sessions,
+            metadata=_metadata(
+                request_id,
+                path,
+                "api.trading.execution_sessions",
+                "read",
+                False,
+                None,
+                trace_id,
+            ),
+        )
+        await _send_json(send, HTTPStatus.OK, envelope)
+        return
+    session = _trading_db.get_active_or_default_session(principal_id=principal_id)
+    envelope = ApiResponse(
+        status="success",
+        message=HTTPStatus.CREATED.phrase,
+        data=session or {},
+        metadata=_metadata(
+            request_id,
+            path,
+            "api.trading.execution_sessions.create",
+            "write",
+            False,
+            None,
+            trace_id,
+        ),
+    )
+    await _send_json(send, HTTPStatus.CREATED, envelope)
+
+
+async def _serve_trading_session_actions(
+    path: str,
+    method: str,
+    principal_id: str,
+    request_id: str,
+    trace_id: str | None,
+    send: Send,
+) -> bool:
+    """Serve session action triggers: default, start, stop.
+
+    Returns:
+        True if the request matched and was handled, False otherwise.
+    """
+    subpath = path[len("/api/v1/trading/execution-sessions/") :].strip("/")
+    parts = subpath.split("/")
+    if len(parts) != _TRADING_SUBPATH_ACTION_PARTS or method != "POST":
+        return False
+
+    session_id, action = parts[0], parts[1]
+    res: dict[str, Any]
+    try:
+        if action == "default":
+            res = _trading_db.set_default_session(session_id, principal_id=principal_id)
+        elif action == "start":
+            res = _trading_db.start_session(session_id)
+        elif action == "stop":
+            res = _trading_db.stop_session(session_id)
+        else:
+            return False
+    except LookupError:
+        await _send_error(
+            send,
+            HTTPStatus.NOT_FOUND,
+            "SESSION_NOT_FOUND",
+            "Session not found",
+            path,
+            f"api.trading.execution_sessions.{action}",
+            trace_id,
+        )
+        return True
+
+    envelope = ApiResponse(
+        status="success",
+        message=HTTPStatus.OK.phrase,
+        data=res,
+        metadata=_metadata(
+            request_id,
+            path,
+            f"api.trading.execution_sessions.{action}",
+            "write",
+            False,
+            None,
+            trace_id,
+        ),
+    )
+    await _send_json(send, HTTPStatus.OK, envelope)
+    return True
+
+
+async def _serve_trading_account_profile(
+    path: str,
+    principal_id: str,
+    username: str,
+    request_id: str,
+    trace_id: str | None,
+    send: Send,
+) -> None:
+    """Serve trading account profile."""
+    profile = _trading_db.get_account_profile(
+        principal_id=principal_id, username=username
+    )
+    envelope = ApiResponse(
+        status="success",
+        message=HTTPStatus.OK.phrase,
+        data=profile,
+        metadata=_metadata(
+            request_id,
+            path,
+            "api.trading.account_profile",
+            "read",
+            False,
+            None,
+            trace_id,
+        ),
+    )
+    await _send_json(send, HTTPStatus.OK, envelope)
+
+
+async def _serve_trading_constraints(
+    path: str,
+    request_id: str,
+    trace_id: str | None,
+    send: Send,
+) -> None:
+    """Serve instrument trading constraints."""
+    prefix = "/api/v1/trading/instruments/"
+    suffix = "/constraints"
+    symbol = path[len(prefix) : -len(suffix)].strip()
+    constraints = _trading_db.get_instrument_constraints(symbol)
+    envelope = ApiResponse(
+        status="success",
+        message=HTTPStatus.OK.phrase,
+        data=constraints,
+        metadata=_metadata(
+            request_id,
+            path,
+            "api.trading.instrument_constraints",
+            "read",
+            False,
+            None,
+            trace_id,
+        ),
+    )
+    await _send_json(send, HTTPStatus.OK, envelope)
+
+
 async def _serve_trading(
     registry: ServiceRegistry,
     scope: Scope,
     _receive: Receive,
     send: Send,
 ) -> None:
-    """Serve trading operations via OPERATE_TRADING_CAPABILITY."""
+    """Serve trading operations, execution sessions, and account profile."""
     path = str(scope.get("path", ""))
     method = str(scope.get("method", "GET")).upper()
     request_id = _header(scope, "x-request-id") or f"req-{uuid4()}"
     trace_id = _header(scope, "x-trace-id")
+    principal_id, username = _get_request_identity(scope)
 
     gateway = await _resolve_gateway(
         registry,
@@ -1223,6 +1941,32 @@ async def _serve_trading(
         send,
     )
     if gateway is None:
+        return
+
+    if path == "/api/v1/trading/execution-sessions":
+        qs = bytes(scope.get("query_string", b""))
+        await _serve_trading_sessions(
+            path, method, principal_id, qs, request_id, trace_id, send
+        )
+        return
+
+    if path.startswith("/api/v1/trading/execution-sessions/"):
+        handled = await _serve_trading_session_actions(
+            path, method, principal_id, request_id, trace_id, send
+        )
+        if handled:
+            return
+
+    if path == "/api/v1/trading/account-profile":
+        await _serve_trading_account_profile(
+            path, principal_id, username, request_id, trace_id, send
+        )
+        return
+
+    if path.startswith("/api/v1/trading/instruments/") and path.endswith(
+        "/constraints"
+    ):
+        await _serve_trading_constraints(path, request_id, trace_id, send)
         return
 
     operation: Literal[
@@ -1276,32 +2020,6 @@ async def _serve_trading(
             ),
         ),
     )
-
-
-_COOKIE_PAIR_LEN: Final = 2
-_SESSION_COOKIE_NAME: Final = "hq_session"
-_CSRF_COOKIE_NAME: Final = "hq_csrf"
-_AUTH_TTL_SECONDS: Final = 7 * 86400
-
-
-def _get_cookie(scope: Scope, name: str) -> str | None:
-    """Read a cookie value from the request scope headers.
-
-    Args:
-        scope: ASGI connection scope.
-        name: Name of the cookie.
-
-    Returns:
-        Cookie string value if found, None otherwise.
-    """
-    cookie_header = _header(scope, "cookie")
-    if not cookie_header:
-        return None
-    for item in cookie_header.split(";"):
-        parts = item.strip().split("=", maxsplit=1)
-        if len(parts) == _COOKIE_PAIR_LEN and parts[0].strip() == name:
-            return parts[1].strip()
-    return None
 
 
 def _build_auth_cookies(
@@ -1628,10 +2346,41 @@ async def _lifespan(receive: Receive, send: Send) -> None:
     while True:
         message = await receive()
         if message.get("type") == "lifespan.startup":
+            _db_hydration.ensure_database_hydrated()
             await send({"type": "lifespan.startup.complete"})
         elif message.get("type") == "lifespan.shutdown":
             await send({"type": "lifespan.shutdown.complete"})
             return
+
+
+async def _serve_watchlists_routing(
+    registry: ServiceRegistry,
+    scope: Scope,
+    receive: Receive,
+    send: Send,
+    path: str,
+    method: str,
+) -> bool:
+    """Route watchlist collection and item requests.
+
+    Args:
+        registry: Live composition service registry.
+        scope: ASGI connection scope.
+        receive: ASGI receive callable.
+        send: ASGI send callable.
+        path: Request path.
+        method: Uppercase request method.
+
+    Returns:
+        True when the request was handled.
+    """
+    if path == _WATCHLISTS_ROUTE and method in ("GET", "POST"):
+        await _serve_watchlists_collection(registry, scope, receive, send)
+        return True
+    if path.startswith(_WATCHLISTS_ROUTE + "/") and method in ("PATCH", "DELETE"):
+        await _serve_watchlists_item(registry, scope, receive, send)
+        return True
+    return False
 
 
 async def _dispatch(
@@ -1659,11 +2408,10 @@ async def _dispatch(
     if path.startswith(_TRADING_PREFIX):
         await _serve_trading(registry, scope, receive, send)
         return
-    if path == _WATCHLISTS_ROUTE and method in ("GET", "POST"):
-        await _serve_watchlists_collection(registry, scope, receive, send)
+    if await _serve_watchlists_routing(registry, scope, receive, send, path, method):
         return
-    if path.startswith(_WATCHLISTS_ROUTE + "/") and method in ("PATCH", "DELETE"):
-        await _serve_watchlists_item(registry, scope, receive, send)
+    if path.startswith(_DATA_PREFIX):
+        await _serve_data(registry, scope, receive, send)
         return
     if method != "GET":
         await _send_error(

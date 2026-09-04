@@ -191,7 +191,7 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 **Public records:** `DataSeriesRef`, `DataSeriesVersion`, `DataConnectionRef`, `DataImportPlan`, `DataImportReceipt`, `Bar`, `Tick`, `SeriesCoverage`, `DataQualityFinding`, `DataQualityDecision`, `AggregationSpec`, `RetentionPolicy`, `RunDataBinding`, `AlignedSeries`, `ConnectorProfile`, `ConnectorSyncPlan`, `ConnectorSyncReceipt`, `VolumeProfileSource`, `ExternalIndicatorSeriesVersion`, `SyntheticModelSpec`, `ScenarioSeriesVersion`, `MarketNewsObservation`, `MarketNewsRevision`, `MarketEvent`, `MarketFeedState`, `MarketReplayRef`, and `QuantDataImportSpec`.
 
-**Capability bundles (14):** `IngestHistoryCapability`, `SyncConnectorsCapability`, `ImportQuantdataCapability`, `NormalizeTicksCapability`, `ResolveQualityCapability`, `AggregateBarsCapability`, `ManageRetentionCapability`, `AlignSeriesCapability`, `PrepareProfilesCapability`, `ImportIndicatorsCapability`, `BindRunDataCapability`, `GenerateScenariosCapability`, `TrackMarketNewsCapability`, and `StreamMarketEventsCapability`.
+**Capability bundles (15):** `IngestHistoryCapability`, `SyncConnectorsCapability`, `ImportQuantdataCapability`, `NormalizeTicksCapability`, `ResolveQualityCapability`, `AggregateBarsCapability`, `ManageRetentionCapability`, `AlignSeriesCapability`, `PrepareProfilesCapability`, `ImportIndicatorsCapability`, `BindRunDataCapability`, `GenerateScenariosCapability`, `TrackMarketNewsCapability`, `StreamMarketEventsCapability`, and `MarketDataStoreCapability`.
 
 ### 4.4 `app/contracts/strategy/`
 

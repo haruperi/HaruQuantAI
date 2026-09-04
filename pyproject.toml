@@ -72,6 +72,7 @@ interfaces-serve-api-events = "app.services.interfaces.serve_api_events.feature:
 interfaces-observe-market-data = "app.services.interfaces.observe_market_data.feature:feature"
 interfaces-observe-market-catalogue = "app.services.interfaces.observe_market_catalogue.feature:feature"
 interfaces-operate-watchlists = "app.services.interfaces.operate_watchlists.feature:feature"
+interfaces-operate-trading = "app.services.interfaces.operate_trading.feature:feature"
 
 # ============================================================================
 # Ruff Configuration (Formatting, Linting, Import Sorting, Security, Complexity)

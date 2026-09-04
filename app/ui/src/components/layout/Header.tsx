@@ -394,7 +394,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <div className="header-container-stack">
+    <div className={`header-container-stack${profileMenuOpen ? ' profile-menu-open' : ''}`}>
       {/* 1. TOP HEADER BAR matching reference image */}
       <header className="cme-header-top">
         {/* Brand HaruQuantAI Logo */}

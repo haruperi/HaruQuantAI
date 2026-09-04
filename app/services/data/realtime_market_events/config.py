@@ -19,3 +19,23 @@ class RealtimeMarketEventsConfig:
     max_replay_limit: int = 10_000
     default_ordering_mode: str = "RECEIPT_ORDER"
     backpressure_policy: str = "DROP_AND_GAP"
+    # MT5 snapshot bridge listener (haruquant.mt5.snapshot.v2). Disabled by
+    # default: authentication is fail-closed, so enabling requires a token.
+    snapshot_bridge_enabled: bool = False
+    snapshot_bridge_host: str = "127.0.0.1"
+    snapshot_bridge_port: int = 9001
+    snapshot_bridge_source_id: str = "mt5-terminal-1"
+    snapshot_bridge_auth_token: str = ""
+    snapshot_bridge_symbols: str = "EURUSD,GBPUSD,USDJPY,XAUUSD"
+
+    def snapshot_bridge_symbol_tuple(self) -> tuple[str, ...]:
+        """Split the configured bridge symbol list into a tuple.
+
+        Returns:
+            Non-empty trimmed symbols in configured order.
+        """
+        return tuple(
+            symbol.strip()
+            for symbol in self.snapshot_bridge_symbols.split(",")
+            if symbol.strip()
+        )

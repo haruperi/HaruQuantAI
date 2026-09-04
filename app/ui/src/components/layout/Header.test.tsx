@@ -344,12 +344,18 @@ describe("profile dropdown interactions", () => {
   it("opens from the chevron and closes on Escape", async () => {
     render(<Header />);
     await openMenu();
+    expect(document.querySelector(".header-container-stack")).toHaveClass(
+      "profile-menu-open",
+    );
     expect(
       screen.getByRole("button", { name: "Close profile menu" }),
     ).toHaveAttribute("aria-expanded", "true");
 
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("menu", { name: "Profile menu" })).toBeNull();
+    expect(document.querySelector(".header-container-stack")).not.toHaveClass(
+      "profile-menu-open",
+    );
   });
 
   it("lists the simulator menu groups: account mode, settings, logout", async () => {

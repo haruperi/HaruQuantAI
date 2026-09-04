@@ -35,6 +35,12 @@ None.
 | `max_replay_limit` | integer | No | Maximum replayable historical events per subscription (default: 10,000). |
 | `default_ordering_mode` | string | No | Default ordering mode (`RECEIPT_ORDER` or `PROVIDER_SEQUENCE`). |
 | `backpressure_policy` | string | No | Backpressure policy upon buffer saturation (default: `DROP_AND_GAP`). |
+| `snapshot_bridge_enabled` | boolean | No | Bind the authenticated MT5 snapshot bridge listener (default: `false`). |
+| `snapshot_bridge_host` | string | No | Bridge listener bind host (default: `127.0.0.1`). |
+| `snapshot_bridge_port` | integer | No | Bridge listener bind port (default: 9001). |
+| `snapshot_bridge_source_id` | string | No | Exact source identity the bridge requires from the EA hello (default: `mt5-terminal-1`). |
+| `snapshot_bridge_auth_token` | string | No | Shared secret the bridge requires from the EA hello; enabling without a token keeps the listener off (default: empty). |
+| `snapshot_bridge_symbols` | string | No | Comma-separated symbol set commanded to the EA on authentication (default: `EURUSD,GBPUSD,USDJPY,XAUUSD`). |
 
 ## Persistent State
 
@@ -42,7 +48,7 @@ Namespace `data.realtime_market_events` retaining real-time market event records
 
 ## Runtime Effects
 
-Mount registers `data.stream-market-events@1` in `FeatureContext`. Operations govern provider feed binding, feed state observation, gap/staleness detection, reconnect lifecycles, bounded live event subscriptions, and immutable replay partitions.
+Mount registers `data.stream-market-events@1` in `FeatureContext`. Operations govern provider feed binding, feed state observation, gap/staleness detection, reconnect lifecycles, bounded live event subscriptions, and immutable replay partitions. When `snapshot_bridge_enabled` is set with an authentication token, mount additionally binds the `haruquant.mt5.snapshot.v2` TCP listener for the MetaTrader 5 TickBridge EA; accepted snapshots are normalized into ingested `MarketEvent` records. A bind failure logs a warning and leaves the feature serving without live snapshots.
 
 ## Operations
 

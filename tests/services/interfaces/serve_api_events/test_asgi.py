@@ -508,16 +508,14 @@ async def test_settings_routes_serve_from_database() -> None:
         assert "settings" in payload["data"]
         assert payload["data"]["scope"] == "system"
 
-        # PUT /api/v1/settings
+        # PUT /api/v1/settings using the workstation's legacy wire key; the
+        # boundary maps it onto the dotted storage key and projects it back.
         update_res = await client.put(
             "/api/v1/settings",
-            json={"settings": {"system.app_name": "HaruQuantAI Test"}},
+            json={"settings": {"APP_NAME": "HaruQuantAI Test"}},
         )
         assert update_res.status_code == 200
-        assert (
-            update_res.json()["data"]["settings"]["system.app_name"]
-            == "HaruQuantAI Test"
-        )
+        assert update_res.json()["data"]["settings"]["APP_NAME"] == "HaruQuantAI Test"
 
         # GET /api/v1/settings/manifest
         manifest_res = await client.get("/api/v1/settings/manifest")
@@ -621,3 +619,60 @@ async def test_auth_routes_register_login_me_logout() -> None:
         # 8. Post-logout identity fails
         post_logout_me = await client.get("/api/v1/auth/me")
         assert post_logout_me.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_trading_routes_execution_sessions_and_profile() -> None:
+    """Verify execution sessions, account profile, and instrument constraints."""
+    from app.contracts.interfaces.capabilities import OPERATE_TRADING_CAPABILITY
+    from app.services.interfaces.operate_trading.config import OperateTradingConfig
+    from app.services.interfaces.operate_trading.gateway import TradingGateway
+
+    registry = ServiceRegistry()
+    gateway = TradingGateway(config=OperateTradingConfig())
+    registry.register(OPERATE_TRADING_CAPABILITY, gateway, "test-owner")
+
+    async with _client(registry) as client:
+        # 1. GET /api/v1/trading/execution-sessions
+        sessions_res = await client.get("/api/v1/trading/execution-sessions")
+        assert sessions_res.status_code == 200
+        sessions_data = sessions_res.json()
+        assert sessions_data["status"] == "success"
+        sessions = sessions_data["data"]
+        assert len(sessions) >= 1
+        sid = sessions[0]["session_id"]
+
+        # 2. POST /api/v1/trading/execution-sessions/{session_id}/default
+        def_res = await client.post(f"/api/v1/trading/execution-sessions/{sid}/default")
+        assert def_res.status_code == 200
+        assert def_res.json()["data"]["is_default"] is True
+
+        # 3. POST /api/v1/trading/execution-sessions/{session_id}/start
+        start_res = await client.post(f"/api/v1/trading/execution-sessions/{sid}/start")
+        assert start_res.status_code == 200
+        assert start_res.json()["data"]["lifecycle_state"] == "running"
+        assert start_res.json()["data"]["is_active"] is True
+
+        # 4. POST /api/v1/trading/execution-sessions/{session_id}/stop
+        stop_res = await client.post(f"/api/v1/trading/execution-sessions/{sid}/stop")
+        assert stop_res.status_code == 200
+        assert stop_res.json()["data"]["lifecycle_state"] == "stopped"
+        assert stop_res.json()["data"]["is_active"] is False
+
+        # 5. GET /api/v1/trading/account-profile
+        profile_res = await client.get("/api/v1/trading/account-profile")
+        assert profile_res.status_code == 200
+        profile_data = profile_res.json()["data"]
+        assert profile_data["schema_id"] == "api.trading.account_profile.v1"
+        assert profile_data["trade_mode"] == "SIMULATION"
+        assert profile_data["balance"] is not None
+
+        # 6. GET /api/v1/trading/instruments/EURUSD/constraints
+        constraints_res = await client.get(
+            "/api/v1/trading/instruments/EURUSD/constraints"
+        )
+        assert constraints_res.status_code == 200
+        constraints_data = constraints_res.json()["data"]
+        assert constraints_data["symbol"] == "EURUSD"
+        assert constraints_data["schema_id"] == "api.trading.instrument_constraints.v1"
+        assert "min_quantity" in constraints_data

@@ -3,7 +3,7 @@
 > **Package:** `app/ui/`
 > **Status:** `In Progress` — 31 registered UI features (`FEAT-UI-07` withdrawn);
 > 27 `Completed` and 4 `Pending` requirement coverage or focused-folder ownership.
-> **Last updated:** `2026-09-03`
+> **Last updated:** `2026-09-04`
 
 > This README is the package's **single source of truth** for requirements, final
 > structure, implementation sequence, progress, verification evidence, and tests.
@@ -273,6 +273,12 @@ flowchart LR
 ```
 
 ### Structure rules
+
+Shared data tables use the global `Be Vietnam Pro` font and the dense typography
+contract in `src/index.css`: 11px regular body text in a 30px row with a 29px
+calculated line height. Light mode uses `rgb(37, 50, 60)` for table-cell text;
+dark mode retains the theme foreground token so the same component remains
+legible on navy surfaces.
 
 - Each registered feature owns one focused production module folder; framework route
   entries may remain in `src/app/` and delegate to their owning feature.
@@ -880,9 +886,9 @@ None; scope and authority are owned by the registered settings operation.
 | Pending   | `Header.tsx`, `TimeCorrectionDialog.tsx`                       | Shell header, mode and confirmation indicators, interactive digital clock with session-local correction dialog, 1-Click switch, profile section with dropdown chevron                         | `Header`, `TimeCorrectionDialog` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients, context, `ProfileDropdown`, widgets/workspaces, store         |
 | Completed | `Sidebar.tsx`, `Sidebar.test.tsx`                               | Domain-grouped widget navigation, collapsible accordions, and collapsed flyout submenus                                                                                                       | `Sidebar`, `DOMAIN_GROUPS`           | **Standard library:** None**Required third-party:** React, Next**Local:** store, widgets/workspaces                                                    |
 | Pending   | `WorkspaceGrid.tsx`                                              | Workspace content router: template picker, empty state, or docking host                                                                                                                       | `WorkspaceGrid`                    | **Standard library:** browser APIs**Required third-party:** React**Local:** widgets/workspaces, `DockingWorkspace`                                 |
-| Completed | `DockingWorkspace.tsx`                                           | Dockview docking host: fluid splitters, tab docking, edge splits, explicit Expand/Restore-only title-bar action, Alt+Arrow keyboard moves, layout persistence (FR-UI-006/007/008/024/200/202) | `DockingWorkspace`                 | **Standard library:** browser APIs**Required third-party:** React, dockview-react, dockview-core**Local:** widgets/workspaces, `WidgetContentHost` |
+| Completed | `DockingWorkspace.tsx`                                           | Dockview docking host: persistent workspace tabs above the canvas, fluid splitters, tab docking, edge splits, Expand/Restore grouping of all in-workspace widgets into a native tab bar, Alt+Arrow keyboard moves, layout persistence (FR-UI-006/007/008/024/200/202) | `DockingWorkspace`                 | **Standard library:** browser APIs**Required third-party:** React, dockview-react, dockview-core**Local:** widgets/workspaces, `WidgetContentHost` |
 | Completed | `WidgetContentHost.tsx`                                          | Widget-type to widget-component rendering switch shared by layout hosts                                                                                                                       | `WidgetContentHost`                | **Standard library:** None**Required third-party:** React**Local:** widget features                                                                   |
-| Completed | `ProfileDropdown.tsx`, `Header.test.tsx`                       | Header profile menu: account-mode selection (SIM/DEMO/LIVE) and Settings/Logout actions (FR-UI-011/013)                                                                                       | `ProfileDropdown`                  | **Standard library:** browser APIs**Required third-party:** React**Local:** context, store                                                            |
+| Completed | `ProfileDropdown.tsx`, `Header.test.tsx`                       | Header profile menu: account-mode selection (SIM/DEMO/LIVE), Settings/Logout actions, and open-menu stacking above expanded workspace widgets (FR-UI-011/013)                                  | `ProfileDropdown`                  | **Standard library:** browser APIs**Required third-party:** React**Local:** context, store                                                            |
 | Completed | `clock.ts`, `clock.test.ts`, `TimeCorrectionDialog.test.tsx` | Session clock and drift presentation, digital-clock segment decomposition, and manual correction conversion                                                                                   | clock helpers                        | **Standard library:** Date**Required third-party:** React**Local:** clients/settings                                                                  |
 
 | Status    | Requirement ID | Responsibility                                                                                                                                                                                                                                                                                                                                                                                   | Component / Function / Type                         | Side Effects                            | Failure presentation                                                            | Usage / Test                                                                                                                               |

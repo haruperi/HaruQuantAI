@@ -26,7 +26,7 @@ CLI usage:
 from __future__ import annotations
 
 import asyncio
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator, Callable, Mapping
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, NoReturn
 from uuid import uuid7
@@ -120,6 +120,24 @@ def _failure(
     )
 
 
+def _quote_source(payload: Mapping[str, object]) -> Mapping[str, object]:
+    """Select the quote-carrying mapping inside one provider payload.
+
+    Providers may emit flat quote payloads or normalized ``MarketEvent``
+    envelopes whose quote fields live under ``values``; both are accepted.
+
+    Args:
+        payload: Provider event payload.
+
+    Returns:
+        The mapping to read quote fields from.
+    """
+    values = payload.get("values")
+    if isinstance(values, dict):
+        return values
+    return payload
+
+
 def _project_quote(event: DomainEvent) -> MarketTickQuote | None:
     """Project one provider event payload into a quote record.
 
@@ -130,10 +148,10 @@ def _project_quote(event: DomainEvent) -> MarketTickQuote | None:
         The projected quote, or None when the payload does not carry a
         projectable symbol/bid/ask shape.
     """
-    payload = event.payload
-    symbol = payload.get("symbol")
-    bid = payload.get("bid")
-    ask = payload.get("ask")
+    source = _quote_source(event.payload)
+    symbol = source.get("symbol")
+    bid = source.get("bid")
+    ask = source.get("ask")
     if not isinstance(symbol, str) or not symbol:
         return None
     if isinstance(bid, bool) or not isinstance(bid, (int, float, str)):
@@ -163,7 +181,7 @@ def _matches_filter(symbols: tuple[str, ...], event: DomainEvent) -> bool:
     """
     if not symbols:
         return True
-    payload_symbol = event.payload.get("symbol")
+    payload_symbol = _quote_source(event.payload).get("symbol")
     return isinstance(payload_symbol, str) and payload_symbol in frozenset(symbols)
 
 

@@ -2,6 +2,92 @@
 
 ## [Unreleased]
 
+### Serve live MT5 snapshots through an authenticated bridge listener
+
+The Market Ticks widget can now receive live quotes from the MetaTrader 5
+TickBridge EA. The new `Mt5SnapshotBridgeServer`
+(`data/realtime_market_events/snapshot_bridge.py`) implements the
+`haruquant.mt5.snapshot.v2` line protocol: it binds the configured host/port
+(default `127.0.0.1:9001`), authenticates the EA hello against the
+configured source ID and shared token, commands the symbol set, and
+normalizes every accepted snapshot quote into an ingested `MarketEvent` that
+fans out to the observation gateway and the boundary SSE stream. The
+observation gateway now projects both flat provider payloads and normalized
+`MarketEvent` envelopes, which is what makes the real ingest chain feed the
+SSE snapshot frames.
+
+#### Added (4)
+
+- Added the authenticated MT5 snapshot bridge listener with fail-closed
+  hello validation (wrong source/token closes without acknowledgement) and
+  compact `set_symbols` framing the EA parses.
+- Added six `snapshot_bridge_*` configuration keys to
+  `FEAT-DATA-STREAM_MARKET_EVENTS` (enabled, host, port, source_id,
+  auth_token, symbols); the default serve composition sources them from the
+  settings table, and a bind failure degrades to a warning instead of
+  failing startup.
+- Added the `mt5_snapshot_bridge` credential slot
+  (`credentials.mt5_snapshot_auth_token`) with a generated token stored in
+  the boundary database; the EA presents this token in its hello frame.
+- Added bridge protocol tests: authenticated ingest through to subscribers,
+  wrong-token closure, and pre-authentication rejection.
+
+#### Changed (1)
+
+- The observation gateway's quote projection and symbol filter now read
+  quote fields from flat payloads or normalized `MarketEvent.values`
+  envelopes, so real ingested events reach the SSE snapshot frames.
+
+### Close the workstation UI's missing backend gaps against the old API
+
+The five widgets still failing after the Phase 7 bridge are restored by
+serving their real backend surfaces from the hydrated boundary database,
+using the reference API in `.migration/api` as the contract source:
+Settings (manifest shape and legacy uppercase keys), Market Ticks
+(resolves its symbol set from `MT5_SNAPSHOT_SYMBOLS`, which the settings
+projection now serves), Watchlists/Chart/Order Ticket symbol directory
+(`/api/v1/data/symbols` cursor pages), Chart bar history
+(`/api/v1/data/bars`, served exclusively from the persisted broker-fetched
+cache; unknown symbol/timeframe pairs fail closed with
+`UPSTREAM_UNAVAILABLE` and never render generated bars), and the Data
+Explorer (series/instruments/brokers catalogues, reference sync reporting,
+instrument spec read, governed series/instrument edits, and quote
+projections whose live price fields stay null).
+
+#### Added (6)
+
+- Added `_data_reference_db.py`: Data reference projections (14-capability
+  surface, series/instrument/broker catalogues, cursor-paginated symbol
+  discovery, quote projection, stored-only bar history, reference sync
+  report, instrument spec read/edit, governed series edit).
+- Added hydration for `data_series` (60 rows), `data_brokers` (9 rows), and
+  `data_bars` (61 real broker-fetched histories, best dataset per
+  symbol/timeframe) from the reference database at startup.
+- Added `/api/v1/data` boundary dispatch with the catalogue, discovery,
+  bars, sync, and item routes; unknown data routes keep the canonical
+  boundary 404.
+- Added boundary tests for the settings contract, reference catalogues,
+  bar-history failure modes, and governed item edits
+  (`test_data_reference_boundary.py`).
+
+#### Changed (5)
+
+- Reworked `_settings_db.py` around the authoritative 49-definition
+  manifest ported from the reference API (`value_kind`, `allowed_values`,
+  bounds, `activation`); system settings are now served under the legacy
+  uppercase wire keys the widgets read, mapped onto dotted storage keys.
+- Fixed `_dispatch` calling a renamed watchlist item handler
+  (`_serve_watchlist_item` → `_serve_watchlists_item`), which crashed
+  PATCH/DELETE watchlist requests at runtime.
+- Restored the missing `feature()` factory in
+  `operate_trading/feature.py` required by its registered entry point, and
+  rewrote its README to the canonical validator-exact structure.
+- Reconciled the Data capability bundle count (14 → 15 with
+  `MarketDataStoreCapability`) across `app/contracts/README.md` and the
+  contract inventory expectations.
+- Documented the full mounted boundary surface and four new functional
+  requirements (FR-IFACE-SAE-011..014) in the serve-api-events README.
+
 ### Migrate the remaining read-only widgets to the D-UI model
 
 News (`FEAT-UI-29`), Market Hours (`FEAT-UI-30`), and Instrument Panels

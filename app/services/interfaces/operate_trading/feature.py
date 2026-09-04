@@ -79,3 +79,12 @@ class OperateTradingFeature:
         context.register_callback(gateway.close)
         context.provide(OPERATE_TRADING_CAPABILITY, gateway)
         self._gateway = gateway
+
+
+def feature() -> OperateTradingFeature:
+    """Factory for discovery via entry points.
+
+    Returns:
+        New OperateTradingFeature instance.
+    """
+    return OperateTradingFeature()

@@ -66,7 +66,7 @@ EXPECTED_RECORD_COUNTS: dict[str, int] = {
 EXPECTED_CAPABILITY_COUNTS: dict[str, int] = {
     "workspace": 7,
     "catalogue": 7,
-    "data": 14,
+    "data": 15,
     "strategy": 13,
     "simulator": 12,
     "analytics": 9,

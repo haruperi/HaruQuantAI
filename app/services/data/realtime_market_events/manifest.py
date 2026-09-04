@@ -35,6 +35,12 @@ SPEC: FeatureSpec = FeatureSpec(
             "max_replay_limit",
             "default_ordering_mode",
             "backpressure_policy",
+            "snapshot_bridge_enabled",
+            "snapshot_bridge_host",
+            "snapshot_bridge_port",
+            "snapshot_bridge_source_id",
+            "snapshot_bridge_auth_token",
+            "snapshot_bridge_symbols",
         }
     ),
 )

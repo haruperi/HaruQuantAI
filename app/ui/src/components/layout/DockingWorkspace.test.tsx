@@ -17,6 +17,8 @@ const widget = (over: Partial<Widget> & Pick<Widget, "id" | "type" | "title">): 
   ...over,
 });
 
+const mockedTabGroup = {};
+
 const makeApi = () => {
   const panels: {
     id: string;
@@ -35,7 +37,7 @@ const makeApi = () => {
         exitMaximized: vi.fn(() => { maximized = false; }),
         isMaximized: () => maximized,
         moveTo: vi.fn(),
-        group: {},
+        group: id === "a" ? mockedTabGroup : {},
         location: { type: "floating" as const },
       },
     };
@@ -67,8 +69,10 @@ vi.mock("dockview-react", () => ({
   DockviewReact: (props: {
     onReady: (event: { api: unknown }) => void;
     defaultTabComponent?: React.ComponentType<{
+      containerApi: unknown;
       api: {
         id: string;
+        group: object;
         isMaximized: () => boolean;
         maximize: () => void;
         exitMaximized: () => void;
@@ -85,8 +89,10 @@ vi.mock("dockview-react", () => ({
           <div className="dv-resize-container">
           {Tab && (
             <Tab
+              containerApi={fakeApi}
               api={{
                 id: "a",
+                group: mockedTabGroup,
                 isMaximized: () => fakeApi.getPanel("a")?.api.isMaximized() ?? false,
                 maximize: () => fakeApi.getPanel("a")?.api.maximize(),
                 exitMaximized: () => fakeApi.getPanel("a")?.api.exitMaximized(),
@@ -286,6 +292,43 @@ describe("FR-UI-006/008 widget header drag handle and expansion control", () => 
     expect(panel.api.exitMaximized).not.toHaveBeenCalled();
     expect(document.querySelector(".dv-resize-container")).not.toHaveClass("workspace-floating-widget--expanded");
     expect(document.querySelector(".widget-header-expand-btn")).toHaveAttribute("aria-label", "Expand widget");
+  });
+
+  it("groups sibling workspace widgets into native tabs before expansion", () => {
+    const workspace = workspaceWith(
+      [
+        widget({ id: "a", type: "markets", title: "Markets" }),
+        widget({ id: "b", type: "chart", title: "EURUSD Chart" }),
+        widget({ id: "c", type: "positions", title: "Positions" }),
+      ],
+      {
+        grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" },
+        panels: {
+          a: { id: "a", title: "Markets" },
+          b: { id: "b", title: "EURUSD Chart" },
+          c: { id: "c", title: "Positions" },
+        },
+      },
+    );
+    act(() => {
+      useWorkspaceStore.setState((state) => ({
+        workspaces: [...state.workspaces, workspace],
+        activeWorkspaceId: workspace.id,
+      }));
+    });
+    render(<DockingWorkspace workspace={workspace} />);
+
+    const targetGroup = fakeApi.getPanel("a")?.api.group;
+    fireEvent.click(document.querySelector(".widget-header-expand-btn") as HTMLButtonElement);
+
+    expect(fakeApi.getPanel("b")?.api.moveTo).toHaveBeenCalledWith({
+      group: targetGroup,
+      skipSetActive: true,
+    });
+    expect(fakeApi.getPanel("c")?.api.moveTo).toHaveBeenCalledWith({
+      group: targetGroup,
+      skipSetActive: true,
+    });
   });
 
   it("keeps Dockview native maximize for docked groups", () => {

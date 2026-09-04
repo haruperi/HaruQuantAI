@@ -329,6 +329,35 @@ async def _serve(args: argparse.Namespace) -> int:
             await engine.reconcile_with_config(load_config_from_file(config_path))
         else:
             engine = CompositionEngine()
+            from app.composition.config import AppConfig, FeatureConfig
+            from app.services.interfaces.serve_api_events._settings_db import (
+                get_mt5_snapshot_bridge_runtime,
+            )
+
+            bridge = get_mt5_snapshot_bridge_runtime()
+            default_config = AppConfig(
+                profile="research",
+                features={
+                    "FEAT-CAT-CATALOG_INSTRUMENTS": FeatureConfig(enabled=True),
+                    "FEAT-WS-MANAGE_WATCHLISTS": FeatureConfig(enabled=True),
+                    "FEAT-DATA-STREAM_MARKET_EVENTS": FeatureConfig(
+                        enabled=True,
+                        config={
+                            "snapshot_bridge_enabled": True,
+                            "snapshot_bridge_host": bridge["host"],
+                            "snapshot_bridge_port": int(bridge["port"]),
+                            "snapshot_bridge_source_id": bridge["source_id"],
+                            "snapshot_bridge_auth_token": bridge["auth_token"],
+                            "snapshot_bridge_symbols": bridge["symbols"],
+                        },
+                    ),
+                    "FEAT-IFACE-OBSERVE_MARKET_CATALOGUE": FeatureConfig(enabled=True),
+                    "FEAT-IFACE-OBSERVE_MARKET_DATA": FeatureConfig(enabled=True),
+                    "FEAT-IFACE-OPERATE_WATCHLISTS": FeatureConfig(enabled=True),
+                    "FEAT-IFACE-OPERATE_TRADING": FeatureConfig(enabled=True),
+                },
+            )
+            await engine.reconcile_with_config(default_config)
 
         if args.reload or args.workers > 1:
             logger.warning(

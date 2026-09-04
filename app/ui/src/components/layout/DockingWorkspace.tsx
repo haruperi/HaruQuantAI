@@ -6,8 +6,8 @@
  * Hosts a Dockview docking layout for one workspace, mirroring the CME Group
  * Simulator's workspace behaviour: fluid pixel-level splitters between regions,
  * tab dragging that docks into groups or splits regions at edges, automatic
- * refill of vacated regions, per-group maximize (double-click a tab), and
- * Alt+Arrow keyboard panel moves. The store's widget list is the panel
+ * refill of vacated regions, workspace-wide tab grouping on maximize
+ * (double-click a tab), and Alt+Arrow keyboard panel moves. The store's widget list is the panel
  * registry; the serialized layout tree persists through the store and is
  * rebuilt deterministically for legacy grid layouts and template presets
  * (FR-UI-201).
@@ -64,14 +64,31 @@ const DockWidgetTab: React.FC<IDockviewPanelHeaderProps> = (props) => {
 
   useEffect(() => {
     const floatingContainer = tabRef.current?.closest('.dv-resize-container');
-    if (!(floatingContainer instanceof HTMLElement)) return undefined;
-    floatingContainer.classList.toggle('workspace-floating-widget--expanded', isExpanded);
+    if (!(floatingContainer instanceof HTMLElement) || !isExpanded) return undefined;
+    floatingContainer.classList.add('workspace-floating-widget--expanded');
     return () => floatingContainer.classList.remove('workspace-floating-widget--expanded');
   }, [isExpanded]);
 
   const handleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
     const floatingContainer = e.currentTarget.closest('.dv-resize-container');
+
+    if (!isExpanded) {
+      // Maximizing is a workspace-wide focus mode. Consolidate every local
+      // panel into the selected panel's group so Dockview supplies one native,
+      // keyboard-accessible tab bar instead of hiding sibling widgets behind
+      // the expanded floating container. Popouts remain in their own windows.
+      for (const panel of props.containerApi.panels) {
+        if (
+          panel.id !== props.api.id &&
+          panel.api.group !== props.api.group &&
+          panel.api.location.type !== 'popout'
+        ) {
+          panel.api.moveTo({ group: props.api.group, skipSetActive: true });
+        }
+      }
+    }
+
     if (!floatingContainer) {
       if (isExpanded && props.api.isMaximized()) props.api.exitMaximized();
       else if (!isExpanded && !props.api.isMaximized()) props.api.maximize();

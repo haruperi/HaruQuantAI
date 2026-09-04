@@ -65,6 +65,25 @@ Unknown keys are rejected with `ValueError`.
   translating absence to the stable `CAPABILITY_UNAVAILABLE` envelope.
   `uv run haruquantai` composes the runtime and serves this adapter;
   request-scoped racing tasks are released in the handler's teardown.
+- The mounting surface also serves the database-backed workstation surfaces
+  from the hydrated boundary database (`data/database/haruquantai.db`,
+  initialized by `_db_hydration.py` at lifespan startup): authentication
+  (`/api/v1/auth/*`), settings (`/api/v1/settings`,
+  `/api/v1/settings/manifest`, `/api/v1/settings/credentials[/{slot}]`,
+  with legacy uppercase wire keys projected onto dotted storage keys),
+  watchlists (`/api/v1/watchlists` collection and item routes via the
+  `interfaces.operate-watchlists@1` gateway), trading
+  (`/api/v1/trading/execution-sessions[.../{action}]`,
+  `/api/v1/trading/account-profile`,
+  `/api/v1/trading/instruments/{symbol}/constraints` via the
+  `interfaces.operate-trading@1` gateway), and the Data reference boundary
+  (`/api/v1/data/capabilities|series|instruments|brokers|symbols|bars|quotes`,
+  `POST /api/v1/data/reference/sync`,
+  `PATCH /api/v1/data/series/{id}`,
+  `GET|PATCH /api/v1/data/instruments/{instrument}`). Bar history is served
+  exclusively from the persisted reference store (`data_bars`); a
+  symbol/timeframe pair without stored history answers with an honest
+  `UPSTREAM_UNAVAILABLE` failure rather than a generated series.
 
 ## Persistent State
 
@@ -85,6 +104,10 @@ cleared on disposal.
 | FR-IFACE-SAE-008 | Track asynchronous job lifecycle references with bounded progress. | job references |
 | FR-IFACE-SAE-009 | Validate artifact downloads against committed state and storage-root containment. | artifact validation |
 | FR-IFACE-SAE-010 | Translate capability absence into the stable CAPABILITY_UNAVAILABLE failure with no mutation. | unavailable translation |
+| FR-IFACE-SAE-011 | Hydrate the boundary database reference tables (watchlists, instruments, sessions, series, brokers, cached bars) from the reference database at startup, idempotently. | startup hydration |
+| FR-IFACE-SAE-012 | Serve the administrator settings manifest (49 definitions), legacy-keyed system settings projection, and credential-slot status from the boundary database. | settings boundary |
+| FR-IFACE-SAE-013 | Serve the Data reference catalogue, cursor-paginated symbol discovery, quote projections with null live fields, and governed series/instrument edits from the boundary database. | data reference boundary |
+| FR-IFACE-SAE-014 | Serve stored-only bar history with bounded windows; unknown pairs fail closed with UPSTREAM_UNAVAILABLE and no synthesized bars. | bar history read |
 
 Run the bounded executable demonstration with:
 
