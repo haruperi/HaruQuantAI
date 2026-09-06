@@ -21,11 +21,13 @@ Every feature is implemented through the project feature pipeline. Domain README
 
 All feature and control inventories are normative unless explicitly marked **Excluded**. **Core** means required for the core release. **Extension** means a committed later delivery that users can enable independently; it does not mean an undecided suggestion. A capability gate governs availability, and an acceptance gate governs readiness. Neither substitutes for implementation.
 
-Navigation: [Delivery roadmap](#29-single-delivery-roadmap-and-exit-gates) · [Tick execution and performance](#56-tick-execution-and-application-performance) · [Reconciliation decisions](#41-deterministic-and-agentic-reconciliation-decisions) · [Agentic features](#43-agentic-focused-feature-registry) · [Agent roster](#44-built-in-agent-roster-and-deterministic-domain-mapping) · [Chat Bot and strategy creation](#47-chat-bot-and-ai-assisted-strategy-creation) · [Implementation tasks](#52-complete-agentic-feature-implementation-tasks) · [Source coverage](#55-source-coverage-authority-and-final-handoff)
+Navigation: [Feature–Requirement Traceability Register](HaruQuantAI_Feature_Requirement_Traceability_Register.md) · [Delivery roadmap](#29-single-delivery-roadmap-and-exit-gates) · [Tick execution and performance](#56-tick-execution-and-application-performance) · [Reconciliation decisions](#41-deterministic-and-agentic-reconciliation-decisions) · [Agentic features](#43-agentic-focused-feature-registry) · [Agent roster](#44-built-in-agent-roster-and-deterministic-domain-mapping) · [Chat Bot and strategy creation](#47-chat-bot-and-ai-assisted-strategy-creation) · [Implementation tasks](#52-complete-agentic-feature-implementation-tasks) · [Source coverage](#55-source-coverage-authority-and-final-handoff)
 
 Reading guide: product decisions and scope are in §§1–3; workbenches in §§4–20; ownership and integration in §§21–28; the single delivery roadmap and acceptance gates in §§29–35; deterministic engine details in §§36–40; reconciliation and shared contracts in §§41–42; Agentic features, roles, schemas and workflows in §§43–46; Chat Bot in §47; reasoning, state and runtime policy in §§48–50; complete Agentic implementation tasks in §§51–53; migration and source coverage in §§54–55; mandatory tick execution, native numerical architecture, resource budgets, benchmarks and focused performance tasks in §56.
 
 The product combines deterministic research code with AI reasoning through public capability contracts. Chat Bot helps explain results, design research and create strategies. Each specialist uses the domain that owns the requested capability, and every accepted strategy, numerical result, risk decision and execution state retains its deterministic owner. Milestones U1–U3 introduce useful AI immediately after the prerequisites it needs. Every backtest uses its explicitly selected recorded/generated tick method. Strategy bar clocks do not reduce execution to bars. The native tick engine and shared application resource controls are core U1–U2 deliverables, with measurable gates in §56.
+
+The companion [Feature–Requirement Traceability Register](HaruQuantAI_Feature_Requirement_Traceability_Register.md) is authoritative for this specification's target Product → Domain → Feature decomposition, primary requirement ownership, shared-NFR applicability and anti-double-counting rules. Owning package READMEs and runtime manifests remain authoritative for current registration, implementation status and evidence; a target feature card does not by itself claim implementation.
 
 ---
 
@@ -1987,7 +1989,7 @@ Milestone U2 uses a bounded local process pool behind Orchestration and Simulato
 
 ## 27. Master functional traceability matrix
 
-The module-specific requirements above define detailed behavior. This matrix binds the highest-risk user controls to ownership, records, persistence, failure modes, and a release test.
+The module-specific requirements above define detailed behavior. This matrix binds the highest-risk user controls to ownership, records, persistence, failure modes, and a release test. Its 32 `FR-*` rows are non-additive traceability overlays: they do not duplicate or increase the primary functional-requirement count maintained by the companion Feature–Requirement Traceability Register.
 
 | FR ID | Screen/control and behavior | Owner / capability | Input → output record | Persistence owner | Failure/degraded state | Acceptance test |
 |---|---|---|---|---|---|---|
@@ -2083,11 +2085,13 @@ The module-specific requirements above define detailed behavior. This matrix bin
 
 ### 28.5 Financial/research integrity
 
-- Prominently label simulated/hypothetical performance and avoid investment-advice language.
-- Preserve IS/validation/OOS identity through every result, metric, grid, chart, and export.
-- Disclose survivorship, data gaps, substitutions, benchmarks, and cost assumptions.
-- Prevent silent use of future data, current profile values, or updated strategies in historical runs.
-- Optimizer and AI output is research evidence. Qualification follows recorded policies, and live-use readiness comes only from the existing Trading/Risk lifecycle.
+| ID | Requirement |
+|---|---|
+| NFR-F-001 | Prominently label simulated/hypothetical performance and avoid investment-advice language. |
+| NFR-F-002 | Preserve IS/validation/OOS identity through every result, metric, grid, chart, and export. |
+| NFR-F-003 | Disclose survivorship, data gaps, substitutions, benchmarks, and cost assumptions. |
+| NFR-F-004 | Prevent silent use of future data, current profile values, or updated strategies in historical runs. |
+| NFR-F-005 | Optimizer and AI output is research evidence. Qualification follows recorded policies, and live-use readiness comes only from the existing Trading/Risk lifecycle. |
 
 ---
 
