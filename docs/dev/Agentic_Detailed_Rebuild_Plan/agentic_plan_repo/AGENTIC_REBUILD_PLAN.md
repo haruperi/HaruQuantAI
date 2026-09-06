@@ -334,6 +334,7 @@ Each workflow must prove idempotency, checkpoints where applicable, deadlines, b
 
 ---
 
+
 ## Detailed execution documents
 
 - [Phase 0 — ownership, provider, interface, state, and donor readiness](agentic_rebuild/00_PHASE_ZERO.md)
@@ -392,6 +393,7 @@ The downloadable single-file edition contains the same execution plan in one doc
 | [ ] | `AGT-5.18` | `FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS` | `AGT-1.02, AGT-1.03, AGT-1.04, AGT-1.05, AGT-2.07, AGT-3.11, AGT-3.13` | `feat(agentic): implement strategy proposal composition and handoff` |
 | [ ] | `AGT-6.19` | `FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS` | `AGT-1.02, AGT-1.03, AGT-1.04, AGT-1.05, AGT-2.06, AGT-5.16` | `feat(agentic): implement sandboxed source artifact fallback` |
 | [ ] | `AGT-6.20` | `FEAT-AGT-CALIBRATE_OUTCOMES` | `AGT-1.02, AGT-2.09, AGT-3.11` | `feat(agentic): implement post-horizon outcome calibration` |
+
 
 ### Integration and companion work
 
