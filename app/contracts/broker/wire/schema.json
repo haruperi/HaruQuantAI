@@ -1686,6 +1686,86 @@
       ],
       "type": "string"
     },
+    "TradeResult": {
+      "additionalProperties": false,
+      "description": "Provider-neutral result returned for an execution request.",
+      "properties": {
+        "ask": {
+          "minimum": 0,
+          "title": "Ask",
+          "type": "number"
+        },
+        "bid": {
+          "minimum": 0,
+          "title": "Bid",
+          "type": "number"
+        },
+        "comment": {
+          "title": "Comment",
+          "type": "string"
+        },
+        "deal": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Deal",
+          "type": "integer"
+        },
+        "order": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Order",
+          "type": "integer"
+        },
+        "price": {
+          "minimum": 0,
+          "title": "Price",
+          "type": "number"
+        },
+        "request_id": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Request Id",
+          "type": "integer"
+        },
+        "retcode": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Retcode",
+          "type": "integer"
+        },
+        "retcode_external": {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "title": "Retcode External",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "volume": {
+          "minimum": 0,
+          "title": "Volume",
+          "type": "number"
+        }
+      },
+      "required": [
+        "retcode",
+        "deal",
+        "order",
+        "volume",
+        "price",
+        "bid",
+        "ask",
+        "comment",
+        "request_id",
+        "retcode_external"
+      ],
+      "title": "TradeResult",
+      "type": "object"
+    },
     "TransportOrdersRequest": {
       "additionalProperties": false,
       "description": "Operation-discriminated execution transport request.\n\nVALIDATE_REQUEST, SUBMIT, CANCEL, and MODIFY require only\n``operation_request``; JOURNAL requires only ``operation_id``.",
@@ -1915,6 +1995,9 @@
     },
     "ReadProviderStateSuccess": {
       "$ref": "#/$defs/ReadProviderStateSuccess"
+    },
+    "TradeResult": {
+      "$ref": "#/$defs/TradeResult"
     },
     "TransportOrdersRequest": {
       "$ref": "#/$defs/TransportOrdersRequest"

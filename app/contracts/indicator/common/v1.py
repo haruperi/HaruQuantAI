@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
+from app.contracts.data.timeframes import ENUM_TIMEFRAMES  # noqa: TC001
+
 
 @dataclass(frozen=True, slots=True)
 class IndicatorConfigV1:
@@ -37,7 +39,7 @@ class MarketDatasetV1(Protocol):
     """Market dataset interface."""
 
     symbol: str
-    timeframe: str
+    timeframe: ENUM_TIMEFRAMES
     records: tuple[OHLCVRecordV1, ...]
 
 

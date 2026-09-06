@@ -15,6 +15,7 @@ from app.contracts.broker.models import (
     BrokerSymbolInfo,
     BrokerTerminalInfo,
 )
+from app.contracts.data.timeframes import PERIOD_M2
 from app.kernel.context import DefaultFeatureContext
 from app.kernel.events import EventBus
 from app.kernel.registry import ServiceRegistry
@@ -242,6 +243,12 @@ def test_binance_orders_and_trading() -> None:
     assert client.get_last_error() == (0, "Success")
     assert resolve_timeframe("1h") == "1h"
     assert resolve_timeframe("H1") == "1h"
+    assert resolve_timeframe("D3") == "3d"
+    assert resolve_timeframe("3D") == "3d"
+    with pytest.raises(ValueError, match="does not support"):
+        resolve_timeframe(PERIOD_M2)
+    with pytest.raises(ValueError, match="unsupported Binance"):
+        resolve_timeframe(True)
 
     client.disconnect()
     assert client.is_connected() is False

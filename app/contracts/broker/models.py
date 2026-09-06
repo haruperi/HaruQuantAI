@@ -8,6 +8,7 @@ from typing import Annotated, Literal
 from pydantic import Field, StringConstraints, model_validator
 
 from app.contracts.broker.errors import *
+from app.contracts.broker.structures import TradeResult
 
 # These reference types are annotation-only for readers but Pydantic resolves
 # them at class-creation time, so they must remain runtime imports.
@@ -616,6 +617,7 @@ class TransportOrdersSuccess(WireModel):
 # WIRE_MODELS. ProviderEvent is a DomainEvent envelope whose typed payload
 # is registered in ``app/contracts/broker/events.py`` instead.
 WIRE_MODELS: dict[str, type[WireModel]] = {
+    "TradeResult": TradeResult,
     "BrokerProviderProfile": BrokerProviderProfile,
     "BrokerSessionRef": BrokerSessionRef,
     "BrokerSessionState": BrokerSessionState,

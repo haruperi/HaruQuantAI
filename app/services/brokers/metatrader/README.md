@@ -12,6 +12,11 @@ Provide live MetaTrader 5 terminal connection and operational capabilities
 mirroring the standard broker interface using the official `MetaTrader5` package
 and database-stored credentials.
 
+The feature converts the Data-owned `ENUM_TIMEFRAMES` values to terminal
+integers at its provider boundary. Its Broker-owned `MT5TradeRetcode` vocabulary
+contains the complete 41-code classified sequence; these outcomes remain
+provider-specific and are not generic HaruQuantAI trading-success semantics.
+
 ## Provides
 
 `broker.provider.metatrader@1, broker.operations@1`

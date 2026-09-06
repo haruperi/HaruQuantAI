@@ -149,9 +149,12 @@ are implementation-decision evidence; this README owns the package policy.
 | `Rejected adoption` | Do not create a public HaruQuantAI identifier merely to match MQL5. A provider-private representation may exist only when its provider genuinely requires it. |
 | `HaruQuantAI-native` | Preserve the current contract unless a later independently reviewed Task proves and migrates an exact replacement. |
 
-The source catalogue is not imported, parsed, or consulted at runtime. Later
-Tasks derive their exact bounded identifier sets from it during development and
-lock the resulting public contract behavior in code and tests.
+The source catalogue is not imported, parsed, or consulted at runtime. The
+committed
+[`MQL5_Contract_Value_Manifest.json`](../../docs/dev/MQL5_Contract_Value_Manifest.json)
+locks the accepted identifier set, values, source positions, and focused module
+routes. `scripts/generate_mql5_contracts.py` renders the canonical Python
+definitions from that manifest and verifies drift with `--check`.
 
 #### Python representation and value fidelity
 
@@ -169,6 +172,10 @@ lock the resulting public contract behavior in code and tests.
   serialization conventions. A non-wire value structure uses an immutable,
   explicitly typed record. Raw provider or SDK structures never cross a
   domain boundary.
+- Platform-neutral structures use the cycle-free bases in
+  `common/wire_model.py`: classified integer fields enforce their signed or
+  unsigned primitive width, and classified datetimes reject naive values and
+  normalize aware values to UTC before transport.
 - Platform-neutral structures use the classification's `Contract` name.
   `Mql`, `MetaTrader`, `MT5`, or terminal wording remains only for a genuinely
   provider-specific contract.
@@ -184,15 +191,15 @@ there is no global `mql5` package and no second contract registry.
 
 | Source functionality | Canonical owner/module direction |
 |---|---|
-| Chart state and events | UI chart vocabulary; Data owns timeframes and series semantics. |
-| Graphical objects | UI object vocabulary without rendering implementation. |
-| Indicator constants | Indicator calculation, plot, buffer, and parameter vocabulary. |
-| Environment state | Workspace owns runtime/program state; Catalogue owns symbol facts; Broker owns provider-observed account facts; Analytics owns statistics. |
-| Trade constants | Trading owns order, deal, position, and execution intent; Broker owns provider outcomes; Risk owns pre-trade decision vocabulary. |
-| Named constants | The semantic owner selected by the classification, in its focused constants module. |
-| Data structures | The classified owner, using an existing model module when semantics match and a focused structure module otherwise. |
-| Errors and warnings | The owner that detects/translates the condition; managed I/O and security conditions belong to Interfaces. |
-| Input and output | Interfaces, with managed resource and security semantics. |
+| Chart state and events | `ui/chart_constants.py`; Data owns `data/timeframes.py` and series semantics. |
+| Graphical objects | `ui/object_constants.py`, without rendering implementation. |
+| Indicator constants | `indicator/constants.py` for calculation, plot, buffer, and parameter vocabulary. |
+| Environment state | `workspace/environment_constants.py`; Catalogue owns symbol facts, Broker owns provider-observed account facts, and Analytics owns statistics. |
+| Trade constants | `trading/constants.py`; Broker owns provider outcomes and Risk owns pre-trade decision vocabulary. |
+| Named constants | The classified semantic owner in a focused constants module. |
+| Data structures | Owner-local `structures.py`, with existing models retained when their semantics are intentionally richer. |
+| Errors and warnings | Owner-local `error_codes.py`; managed I/O and security conditions belong to Interfaces. |
+| Input and output | `interfaces/io_constants.py`, with managed resource and security semantics. |
 
 Initializers remain empty or docstring-only. Consumers import the defining
 module directly. No module gains provider selection, authorization, retries,
@@ -206,6 +213,12 @@ consumer, annotation, serializer, fixture, test, registry, schema, and generated
 client atomically or introduce an explicit versioned compatibility window.
 Raw string aliases are accepted only at declared external or user-input
 boundaries; internal code uses canonical typed values.
+
+Provider maps expose only periods the provider actually supports. Passing an
+unsupported canonical `ENUM_TIMEFRAMES` member or integer to a partial provider
+resolver raises `ValueError` instead of silently selecting another interval;
+provider-native string boundaries remain explicit and may include HaruQuantAI
+extensions such as Binance `D3`.
 
 A transitional alias is non-authoritative, points to the canonical value, has
 a documented removal condition, and is removed only after repository-wide
@@ -228,18 +241,17 @@ migration decisions:
 2. **Trading enum families.** Trading owns exact `ENUM_ORDER_TYPE`,
    `ENUM_ORDER_TYPE_TIME`, `ENUM_ORDER_TYPE_FILLING`, and `ENUM_ORDER_STATE`
    families. Existing `OrderType`, `TimeInForce`, and `OrderState` concepts are
-   not coerced when their semantics differ: later Tasks map only proven
-   equivalents and retain or rename HaruQuantAI-native generic-order or
-   lifecycle abstractions until every consumer is explicitly migrated.
+   intentionally retained as richer HaruQuantAI semantic extensions; they are
+   not aliases of the exact MQL5 families.
 3. **MetaTrader retcodes.** `MT5TradeRetcode`, its description mapping, and its
    lookup remain provider-specific Broker contracts. Their complete classified
    source sequence is authoritative, including `INVALID_ORDER` and every later
    value. Provider-specific terminal errors remain separate from generic
    HaruQuantAI error vocabulary.
 
-#### Later-child validation and rollback
+#### Maintenance validation and rollback
 
-Every implementation Task must record its exact source identifiers, classified
+Every subsequent contract Task must record its exact source identifiers, classified
 contracts, owner/module destinations, collisions, affected consumers, and
 schema impact before editing. It must preserve rejected/native boundaries,
 leave `main` valid, use change-scoped tests during implementation, and run all
@@ -314,7 +326,7 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 ### 4.3 `app/contracts/data/`
 
-**Public records:** `DataSeriesRef`, `DataSeriesVersion`, `DataConnectionRef`, `DataImportPlan`, `DataImportReceipt`, `Bar`, `Tick`, `SeriesCoverage`, `DataQualityFinding`, `DataQualityDecision`, `AggregationSpec`, `RetentionPolicy`, `RunDataBinding`, `AlignedSeries`, `ConnectorProfile`, `ConnectorSyncPlan`, `ConnectorSyncReceipt`, `VolumeProfileSource`, `ExternalIndicatorSeriesVersion`, `SyntheticModelSpec`, `ScenarioSeriesVersion`, `MarketNewsObservation`, `MarketNewsRevision`, `MarketEvent`, `MarketFeedState`, `MarketReplayRef`, and `QuantDataImportSpec`.
+**Public records:** `DataSeriesRef`, `DataSeriesVersion`, `DataConnectionRef`, `DataImportPlan`, `DataImportReceipt`, `Bar`, `Tick`, `RateBar`, `OrderBookEntry`, `CalendarCountry`, `CalendarEvent`, `CalendarValue`, `SeriesCoverage`, `DataQualityFinding`, `DataQualityDecision`, `AggregationSpec`, `RetentionPolicy`, `RunDataBinding`, `AlignedSeries`, `ConnectorProfile`, `ConnectorSyncPlan`, `ConnectorSyncReceipt`, `VolumeProfileSource`, `ExternalIndicatorSeriesVersion`, `SyntheticModelSpec`, `ScenarioSeriesVersion`, `MarketNewsObservation`, `MarketNewsRevision`, `MarketEvent`, `MarketFeedState`, `MarketReplayRef`, and `QuantDataImportSpec`.
 
 **Capability bundles (16):** `IngestHistoryCapability`, `SyncConnectorsCapability`, `ImportQuantdataCapability`, `NormalizeTicksCapability`, `ResolveQualityCapability`, `AggregateBarsCapability`, `ManageRetentionCapability`, `AlignSeriesCapability`, `PrepareProfilesCapability`, `ImportIndicatorsCapability`, `BindRunDataCapability`, `GenerateScenariosCapability`, `TrackMarketNewsCapability`, `StreamMarketEventsCapability`, `MarketDataStoreCapability`, and `BrowseReferenceCapability`.
 
@@ -374,19 +386,19 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 ### 4.13 `app/contracts/broker/`
 
-**Public records:** `BrokerProviderProfile`, `BrokerSessionRef`, `BrokerSessionState`, `BrokerSessionReadiness`, `BrokerAccountSnapshot`, `BrokerTradingState`, `BrokerMarketState`, `ProviderEvent`, `BrokerOperationRequest`, `BrokerOperationReceipt`, `BrokerOperationOutcome`, `ProviderCorrelation`, and `BrokerHistoryPage`.
+**Public records:** `BrokerProviderProfile`, `BrokerSessionRef`, `BrokerSessionState`, `BrokerSessionReadiness`, `BrokerAccountSnapshot`, `BrokerTradingState`, `BrokerMarketState`, `ProviderEvent`, `BrokerOperationRequest`, `BrokerOperationReceipt`, `BrokerOperationOutcome`, `ProviderCorrelation`, `BrokerHistoryPage`, and `TradeResult`.
 
 **Capability bundles (10):** `BrokerResolverCapability`, `BrokerOperationsCapability`, `ManageSessionsCapability`, `ReadProviderStateCapability`, `TransportOrdersCapability`, plus one `ProviderBackend` binding each for `broker.provider.metatrader@1`, `broker.provider.ctrader@1`, `broker.provider.binance@1`, `broker.provider.dukascopy@1`, and `broker.provider.yahoo@1`.
 
 ### 4.14 `app/contracts/risk/`
 
-**Public records:** `RiskDecisionState`, `RiskProfileRef`, `RiskProfileVersion`, `FirmMandateVersion`, `RiskEvidenceRef`, `RiskSnapshot`, `PositionSizeRecommendation`, `StopLossAssessment`, `ProposedAction`, `RiskDecision`, `NoTradeDecision`, `RiskLimitResult`, `RiskApprovalRequest`, `RiskApprovalToken`, `RiskCapacityReservation`, `KillSwitchScope`, `KillSwitchState`, `KillSwitchTransition`, `StrategyEligibilityDecision`, `PortfolioAllocationReview`, `AllocationBudget`, `RiskScenarioRequest`, `RiskScenarioResult`, and `RiskAuditRecord`.
+**Public records:** `RiskDecisionState`, `RiskProfileRef`, `RiskProfileVersion`, `FirmMandateVersion`, `RiskEvidenceRef`, `RiskSnapshot`, `PositionSizeRecommendation`, `StopLossAssessment`, `ProposedAction`, `RiskDecision`, `NoTradeDecision`, `RiskLimitResult`, `RiskApprovalRequest`, `RiskApprovalToken`, `RiskCapacityReservation`, `KillSwitchScope`, `KillSwitchState`, `KillSwitchTransition`, `StrategyEligibilityDecision`, `PortfolioAllocationReview`, `AllocationBudget`, `RiskScenarioRequest`, `RiskScenarioResult`, `RiskAuditRecord`, and `TradeCheckResult`.
 
 **Capability bundles (7):** `DefineRiskContractsCapability`, `CalculateRiskCapability`, `ControlKillSwitchCapability`, `GovernAdmissionCapability`, `ManageApprovalsCapability`, `GovernAllocationsCapability`, and `AuditRiskDecisionsCapability`.
 
 ### 4.15 `app/contracts/trading/`
 
-**Public records:** `TradingMode`, `TradingSessionRef`, `TradingSession`, `TradingSessionState`, `TradingOperationRef`, `TradingOperation`, `TradingOperationState`, `TradeIntentRef`, `TradePlan`, `TradingReadiness`, `ExecutionAuthorityRef`, `DispatchEvidence`, `DispatchReceipt`, `TradingOrder`, `TradingDeal`, `TradingPositionProjection`, `ReconciliationRequest`, `ReconciliationFinding`, `ProtectionSet`, `ProtectionChange`, `TradingJournalRecord`, `ExecutionProvenance`, `OperationalAccount`, `OperationalLedgerEntry`, `OperationalValuation`, `PublicTradingAction`, `TradingStateQuery`, and `TradingEvent`.
+**Public records:** `TradingMode`, `TradingSessionRef`, `TradingSession`, `TradingSessionState`, `TradingOperationRef`, `TradingOperation`, `TradingOperationState`, `TradeIntentRef`, `TradePlan`, `TradingReadiness`, `ExecutionAuthorityRef`, `DispatchEvidence`, `DispatchReceipt`, `TradingOrder`, `TradingDeal`, `TradingPositionProjection`, `ReconciliationRequest`, `ReconciliationFinding`, `ProtectionSet`, `ProtectionChange`, `TradingJournalRecord`, `ExecutionProvenance`, `OperationalAccount`, `OperationalLedgerEntry`, `OperationalValuation`, `PublicTradingAction`, `TradingStateQuery`, `TradingEvent`, `TradeRequest`, and `TradeTransaction`.
 
 **Capability bundles (9):** `ManageExecutionSessionsCapability`, `ManageTradingSessionsCapability`, `ValidateTradePlansCapability`, `AccountOperationsCapability`, `DispatchOrdersCapability`, `ReconcileTradingCapability`, `ManageProtectionsCapability`, `JournalExecutionCapability`, and `ExecutePublicActionsCapability`.
 
@@ -394,8 +406,8 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 | Status | Namespace | Responsibility |
 |---|---|---|
-| Completed | `app/contracts/common/` | Shared wire base, response metadata/envelopes, authentication/audit/event helpers, validation, health, and idempotency records. |
-| Completed | `app/contracts/indicator/` | Focused versioned indicator contract slices such as RSI and Williams %R. |
+| Completed | `app/contracts/common/` | Shared wire base, response metadata/envelopes, authentication/audit/event helpers, validation, health, idempotency records, numeric/sentinel constants, and `DateTimeParts`. |
+| Completed | `app/contracts/indicator/` | Focused versioned indicator contract slices plus generated indicator constants, error codes, and `IndicatorParameter`. |
 | Completed | `app/contracts/notification/` | Focused versioned notification-delivery records and port. |
 
 These packages follow the same purity and evolution rules. They are listed separately because the machine-reconciled owner inventory remains fixed at sections 4.1–4.15.

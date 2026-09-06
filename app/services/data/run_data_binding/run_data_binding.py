@@ -38,12 +38,23 @@ from app.contracts.data.models import (
     RunDataBinding,
 )
 from app.contracts.data.ports import BindRunDataCapability
+from app.contracts.data.timeframes import PERIOD_M1, parse_timeframe
 from app.services.data.run_data_binding.config import RunDataBindingConfig
 
 if TYPE_CHECKING:
     from app.kernel.events import EventBus
 
 logger = logging.getLogger(__name__)
+
+
+def _is_tick_or_m1(value: str) -> bool:
+    """Resolve a precision-boundary value through the canonical period API."""
+    if value.strip().upper() == "TICK":
+        return True
+    try:
+        return parse_timeframe(value) is PERIOD_M1
+    except ValueError:
+        return False
 
 
 def _generate_uuid7() -> Uuid7:
@@ -109,7 +120,7 @@ def _check_precision_mode(
     elif (
         precision == "M1_SIMULATION"
         and not has_tick_data
-        and available_timeframe not in ("TICK", "M1")
+        and not _is_tick_or_m1(available_timeframe)
     ):
         return (
             f"Precision '{precision}' requires M1 or finer data, "

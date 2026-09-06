@@ -47,7 +47,7 @@ CAPABILITY_OWNERS: tuple[str, ...] = OWNERS[1:]
 EXPECTED_RECORD_COUNTS: dict[str, int] = {
     "workspace": 27,
     "catalogue": 18,
-    "data": 27,
+    "data": 32,
     "strategy": 26,
     "simulator": 23,
     "analytics": 22,
@@ -57,9 +57,9 @@ EXPECTED_RECORD_COUNTS: dict[str, int] = {
     "interfaces": 30,
     "ui": 37,
     "plugins": 13,
-    "broker": 13,
-    "risk": 24,
-    "trading": 28,
+    "broker": 14,
+    "risk": 25,
+    "trading": 30,
 }
 
 # Expected "**Capability bundles (N):**" counts per README sections 4.1-4.15.

@@ -4,7 +4,34 @@
 
 This repository-first audit answers whether every current public declaration under `app/contracts/` has been considered against the MQL5 mental-mapping catalogue. It does not define an MT5 bridge, wire-compatibility promise, or runtime dependency. The companion MQL5 catalogue is source-first and contains 2,408 identifiers; this audit is implementation-first and contains 1,477 current HaruQuantAI declarations.
 
-The canonical code evidence is the Python source under `app/contracts/`. The README primary registry and generated wire schemas are overlapping parity projections, not exhaustive replacement inventories. Proposed names and dispositions below are decision evidence only; current code remains authoritative until later atomic migration tasks are approved.
+The canonical code evidence is the Python source under `app/contracts/`. The README primary registry and generated wire schemas are overlapping parity projections, not exhaustive replacement inventories. The large table below preserves the pre-migration reverse-inventory evidence; the execution addendum records how its decisions were resolved in canonical code.
+
+## Migration execution addendum
+
+The consolidated `TASK-MQL5-CONTRACT-MIGRATION` implements the classified
+catalogue as HaruQuantAI's own contract vocabulary, without an MT5 bridge or
+runtime SDK dependency:
+
+- All 1,983 accepted catalogue rows are represented. The committed
+  `MQL5_Contract_Value_Manifest.json` records 1,859 value-bearing rows and their
+  enum-family/source metadata; `scripts/generate_mql5_contracts.py` renders the
+  focused owner modules and provides deterministic `--check` validation.
+- All 425 `Rejected adoption` rows remain absent from the generated public
+  surface. Rejected gaps still participate in reconstructed enum numbering so
+  later accepted values retain the source value.
+- The twelve accepted structures are implemented as platform-neutral owner
+  contracts: ten new wire roots, the existing richer Data `Tick` wire root,
+  and the focused non-wire `IndicatorParameter` value. Exact structure names
+  omit the MQL/MT5 prefix unless the contract is genuinely provider-specific.
+- The 1,477-row table remains the evidence snapshot of contracts that existed
+  before this migration. Its 86 cited semantic relationships are retained;
+  unrelated HaruQuantAI-native lifecycle, safety, capability, provenance, and
+  UI contracts were not replaced.
+- The fifteen owner-decision rows are resolved: Data owns
+  `ENUM_TIMEFRAMES`/`PERIOD_*`; four Broker provider maps are typed conversions
+  at explicit boundaries; the richer `Timeframe`, `OrderType`, `TimeInForce`,
+  and `OrderState` contracts remain semantic extensions; and MetaTrader trade
+  retcodes now use the complete classified sequence.
 
 ## Inventory boundary and row granularity
 
@@ -20,7 +47,9 @@ Public fields, enum members, methods, and class attributes remain inside their o
 - **Rejected adoption:** a cited MQL5 candidate is materially incompatible and must remain separate.
 - **HaruQuantAI-native:** no defensible MQL5 counterpart exists after the documented candidate review.
 
-Dispositions are `Retain as-is`, `Rename in later task`, `Extend or merge in later task`, `Keep separate`, `Retire in later task`, or `Owner decision required`. No disposition is implemented by this audit.
+Dispositions in the canonical table describe the pre-migration audit state.
+Their implemented resolution is authoritative in the addendum above and in
+the current contract source.
 
 ## Inventory summary
 
@@ -1701,7 +1730,11 @@ The following mapped declarations currently live under a different owner than th
 | app.contracts.trading.models.DispatchReceipt | trading | broker | MqlTradeResult |
 | app.contracts.trading.models.OperationalAccount | trading | broker | ENUM_ACCOUNT_INFO_INTEGER, ENUM_ACCOUNT_INFO_DOUBLE, ENUM_ACCOUNT_INFO_STRING |
 
-### Owner decisions required
+### Owner decisions resolved by the migration
+
+The following rows preserve the questions as originally audited. Their shared
+resolution is recorded in the migration execution addendum and the contracts
+README; none remains an open owner decision.
 
 | Current contract | Decision | Evidence |
 | --- | --- | --- |
@@ -1771,8 +1804,8 @@ Native rows are fully enumerated in the canonical table and summarized here by c
 ## Material reconciliation findings
 
 1. The current contract surface is not consumed by the MQL5-source catalogue: most present declarations are HaruQuantAI-native capability, lifecycle, provenance, safety, UI, research, and orchestration concepts.
-2. `Timeframe`, four provider-local `TIMEFRAME_MAP` constants, and four `resolve_timeframe` functions overlap `ENUM_TIMEFRAMES`. All four maps duplicate MQL5-style aliases while translating to provider-native values; the MetaTrader map additionally preserves the MQL5 numeric values. Canonical ownership and provider conversion need an explicit later decision.
-3. `MT5TradeRetcode` and its description map omit `TRADE_RETCODE_INVALID_ORDER` and diverge from the catalogue values beginning at `POSITION_CLOSED`. This audit records the conflict but does not modify provider behavior.
+2. Data now owns canonical `ENUM_TIMEFRAMES` and `PERIOD_*` values. The four provider-local `TIMEFRAME_MAP` constants use those enum keys and retain provider conversion in explicit boundary resolvers; the richer custom `Timeframe` model remains separate.
+3. `MT5TradeRetcode` and its description map now include `TRADE_RETCODE_INVALID_ORDER` and the complete classified sequence through `TRADE_RETCODE_HEDGE_PROHIBITED`.
 4. `Tick` is the one clear platform-neutral structure rename (`MqlTick` to `Tick`). Other market, account, symbol, order, deal, position, chart, indicator, and statistics contracts are richer HaruQuantAI semantic extensions rather than one-to-one adoptions.
 5. `IndicatorResultV1`, `ResultSegment`, `KeyboardBinding`, and `ChartAlternative` are HaruQuantAI-native: their output, segmentation, command-binding, and accessibility semantics do not overlap the cited MQL5 identifier types.
 6. README primary records and capability bundles are intentionally narrower than the full Python declaration surface. Generated schemas also include dependency definitions. Neither projection should be used alone to claim complete current-contract coverage.
@@ -1781,4 +1814,17 @@ Native rows are fully enumerated in the canonical table and summarized here by c
 
 This audit classifies top-level ownership units. Nested fields, enum members, and methods are exhaustively represented in `Public Surface`, but they are not independently classified because their lifecycle and ownership belong to the enclosing declaration. MQL5 mappings cite exact source identifiers and are intentionally conservative; broad thematic resemblance is not treated as compatibility.
 
-No contract, consumer, provider, capability version, schema, generated client, or import has changed. Any rename, consolidation, enum adoption, provider conversion, or retcode repair requires a later atomic Task with explicit owner approval and consumer/provider impact analysis. The Review 1 grammar and seven-domain corrections are reflected in the source catalogue; runtime contract migration remains outside this audit.
+The execution addendum supersedes the original no-change conclusion: the
+approved consolidated migration added the accepted vocabulary, resolved the
+provider/timeframe and retcode decisions, registered the new wire structures,
+regenerated affected schemas and TypeScript projections, and migrated bounded
+internal consumers. External request strings, provider wire values, persisted
+metadata, and custom-timeframe values remain explicit boundary representations,
+not competing canonical contracts.
+
+The reviewed structure implementation uses cycle-free shared wire bases,
+enforces the classified signed/unsigned integer widths, and normalizes every
+aware classified datetime to UTC while rejecting naive timestamps. Provider
+resolvers preserve documented native string boundaries (including Binance
+`D3`) and reject unsupported canonical periods rather than substituting a
+different duration.

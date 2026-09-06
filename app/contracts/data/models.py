@@ -27,6 +27,13 @@ from app.contracts.common.models import (
     ValidationIssue,
     WireModel,
 )
+from app.contracts.data.structures import (
+    CalendarCountry,
+    CalendarEvent,
+    CalendarValue,
+    OrderBookEntry,
+    RateBar,
+)
 
 # Constrained local string aliases reused across data records.
 type NonEmptyStr = Annotated[str, StringConstraints(min_length=1)]
@@ -1633,7 +1640,12 @@ class BrowseReferenceSuccess(WireModel):
 # other PEP 695 ``type`` aliases are not classes, so they cannot be
 # registered in WIRE_MODELS.
 WIRE_MODELS: dict[str, type[WireModel]] = {
+    "CalendarCountry": CalendarCountry,
+    "CalendarEvent": CalendarEvent,
+    "CalendarValue": CalendarValue,
     "DataSeriesRef": DataSeriesRef,
+    "OrderBookEntry": OrderBookEntry,
+    "RateBar": RateBar,
     "SeriesInterval": SeriesInterval,
     "SeriesCoverage": SeriesCoverage,
     "DataSeriesVersion": DataSeriesVersion,

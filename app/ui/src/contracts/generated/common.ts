@@ -46,6 +46,17 @@ export interface CapabilitySnapshot {
   causal_request_id?: string | null;  // default: null
   schema_version?: 1;  // default: 1
 }
+export interface DateTimeParts {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  min: number;
+  sec: number;
+  day_of_week: number;
+  day_of_year: number;
+  schema_version?: 1;  // default: 1
+}
 export type Direction = "LONG" | "SHORT" | "BOTH";
 export interface DomainEvent {
   event_id: string;

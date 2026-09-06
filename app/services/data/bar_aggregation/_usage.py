@@ -12,6 +12,7 @@ from app.contracts.data.models import (
     Bar,
     Tick,
 )
+from app.contracts.data.timeframes import PERIOD_H2, PERIOD_M1, PERIOD_M5, PERIOD_M10
 from app.services.data.bar_aggregation.bar_aggregation import (
     BarAggregationService,
     _format_decimal,
@@ -70,7 +71,7 @@ def example_resampling(m1_bars: list[Bar] | None = None) -> tuple[Bar, ...]:
             ]
     return data_aggregate_timeframes(
         bars,
-        target_timeframe="M5",
+        target_timeframe=PERIOD_M5,
         alignment_origin="UTC_MIDNIGHT",
     )
 
@@ -133,7 +134,7 @@ def example_tick_aggregation() -> list[Bar]:
     return list(
         data_aggregate_timeframes(
             source_bars,
-            target_timeframe="M1",
+            target_timeframe=PERIOD_M1,
             alignment_origin="UTC_MIDNIGHT",
         )
     )
@@ -150,11 +151,11 @@ async def main() -> None:
     expected_m10_minutes = 10
     expected_h2_minutes = 120
 
-    tf_m5 = data_define_custom_timeframes("M5")
+    tf_m5 = data_define_custom_timeframes(PERIOD_M5)
     assert tf_m5.unit == "MINUTE" and tf_m5.multiple == expected_m5_minutes
-    tf_m10 = data_define_custom_timeframes("M10")
+    tf_m10 = data_define_custom_timeframes(PERIOD_M10)
     assert tf_m10.unit == "MINUTE" and tf_m10.multiple == expected_m10_minutes
-    tf_h2 = data_define_custom_timeframes("H2")
+    tf_h2 = data_define_custom_timeframes(PERIOD_H2)
     assert tf_h2.unit == "MINUTE" and tf_h2.multiple == expected_h2_minutes
     print(f" -> M5 parsed: {tf_m5}, M10 parsed: {tf_m10}, H2 parsed: {tf_h2}")
 
@@ -182,7 +183,7 @@ async def main() -> None:
     ]
     m5_bars = data_aggregate_timeframes(
         m1_bars,
-        target_timeframe="M5",
+        target_timeframe=PERIOD_M5,
         alignment_origin="UTC_MIDNIGHT",
     )
     assert (
