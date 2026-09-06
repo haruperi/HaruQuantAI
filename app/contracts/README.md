@@ -126,6 +126,131 @@ flowchart LR
     CONTRACTS x-.-x COMPOSITION
 ```
 
+### MQL5 mental-mapping adoption and migration
+
+HaruQuantAI uses the MQL5 constants, enumerations, and structures vocabulary as
+a design and mental-mapping source. This creates familiar public names and
+values where the semantics fit; it does not create an MT5 runtime dependency,
+bridge, wire-compatibility promise, SDK dependency, or requirement that MT5 be
+installed or available. Canonical HaruQuantAI Python definitions and their
+generated schemas own implemented behavior. The committed
+[`MQL5_Constants_Enumerations_Structures_Classification.md`](../../docs/dev/MQL5_Constants_Enumerations_Structures_Classification.md)
+and
+[`HaruQuantAI_Contract_Reconciliation_Audit.md`](../../docs/dev/HaruQuantAI_Contract_Reconciliation_Audit.md)
+are implementation-decision evidence; this README owns the package policy.
+
+#### Classification execution policy
+
+| Classification | Implementation rule |
+|---|---|
+| `Exact adoption` | Preserve the classified identifier, bounded meaning, and documented value. |
+| `Platform-neutral rename` | Use the classification's `Contract` name and omit MQL, MetaTrader, or terminal wording from a neutral contract. |
+| `Semantic extension` | Preserve the valid MQL5 base meaning while documenting HaruQuantAI additions such as provider neutrality, provenance, lifecycle, validation, safety, or richer state. |
+| `Rejected adoption` | Do not create a public HaruQuantAI identifier merely to match MQL5. A provider-private representation may exist only when its provider genuinely requires it. |
+| `HaruQuantAI-native` | Preserve the current contract unless a later independently reviewed Task proves and migrates an exact replacement. |
+
+The source catalogue is not imported, parsed, or consulted at runtime. Later
+Tasks derive their exact bounded identifier sets from it during development and
+lock the resulting public contract behavior in code and tests.
+
+#### Python representation and value fidelity
+
+- An MQL5 integer enumeration becomes an explicitly typed `IntEnum` using the
+  classified `Contract` name. Its classified member spellings and numeric
+  values remain exact enum members.
+- A direct MQL-style identifier such as `PERIOD_H1` may be exposed from the
+  defining module as a typed `Final` reference to its canonical enum member.
+  It must not duplicate the raw numeric value or become a second authority.
+- A standalone value becomes a typed `Final` constant. Explicit decimal,
+  hexadecimal, bit-mask, string, Boolean, and sentinel values remain exact.
+  An implicit enum value is reconstructed only from documented source order
+  and must be fixed by a focused value test.
+- A wire-visible structure follows the owning namespace's strict model and
+  serialization conventions. A non-wire value structure uses an immutable,
+  explicitly typed record. Raw provider or SDK structures never cross a
+  domain boundary.
+- Platform-neutral structures use the classification's `Contract` name.
+  `Mql`, `MetaTrader`, `MT5`, or terminal wording remains only for a genuinely
+  provider-specific contract.
+- A semantic extension may add fields, members, or values only when the owner
+  documents them as HaruQuantAI additions, proves they are collision-free,
+  and does not represent them as MQL5 parity.
+
+#### Ownership and functional module placement
+
+The classification's `Domain` column selects the one semantic owner below
+`app/contracts/`. Within that owner, coherent functionality selects the module;
+there is no global `mql5` package and no second contract registry.
+
+| Source functionality | Canonical owner/module direction |
+|---|---|
+| Chart state and events | UI chart vocabulary; Data owns timeframes and series semantics. |
+| Graphical objects | UI object vocabulary without rendering implementation. |
+| Indicator constants | Indicator calculation, plot, buffer, and parameter vocabulary. |
+| Environment state | Workspace owns runtime/program state; Catalogue owns symbol facts; Broker owns provider-observed account facts; Analytics owns statistics. |
+| Trade constants | Trading owns order, deal, position, and execution intent; Broker owns provider outcomes; Risk owns pre-trade decision vocabulary. |
+| Named constants | The semantic owner selected by the classification, in its focused constants module. |
+| Data structures | The classified owner, using an existing model module when semantics match and a focused structure module otherwise. |
+| Errors and warnings | The owner that detects/translates the condition; managed I/O and security conditions belong to Interfaces. |
+| Input and output | Interfaces, with managed resource and security semantics. |
+
+Initializers remain empty or docstring-only. Consumers import the defining
+module directly. No module gains provider selection, authorization, retries,
+persistence, I/O, lifecycle effects, or other implementation policy.
+
+#### Compatibility, schemas, and consumer migration
+
+Additive vocabulary may land before its consumers. A breaking name, type, or
+value change must either migrate every affected in-repository producer,
+consumer, annotation, serializer, fixture, test, registry, schema, and generated
+client atomically or introduce an explicit versioned compatibility window.
+Raw string aliases are accepted only at declared external or user-input
+boundaries; internal code uses canonical typed values.
+
+A transitional alias is non-authoritative, points to the canonical value, has
+a documented removal condition, and is removed only after repository-wide
+reference and schema evidence proves that no supported consumer depends on it.
+Plain internal constants do not enter wire schemas automatically. Every enum or
+structure crossing a wire boundary updates the canonical registry, JSON schema,
+generated client, round-trip tests, and owner inventory in the same Task.
+
+#### Resolved reconciliation decisions
+
+The fifteen `Owner decision required` audit rows resolve into three coherent
+migration decisions:
+
+1. **Timeframes.** Data owns canonical `ENUM_TIMEFRAMES` and `PERIOD_*`
+   standard values. Binance, cTrader, Dukascopy, and MetaTrader maps/resolvers
+   remain provider-local conversions typed from that enum. The richer
+   `Timeframe` model remains available only where a validated arbitrary multiple
+   is required. Standard internal values migrate to enum members; parsing of
+   strings such as `"H1"` remains at explicit input boundaries.
+2. **Trading enum families.** Trading owns exact `ENUM_ORDER_TYPE`,
+   `ENUM_ORDER_TYPE_TIME`, `ENUM_ORDER_TYPE_FILLING`, and `ENUM_ORDER_STATE`
+   families. Existing `OrderType`, `TimeInForce`, and `OrderState` concepts are
+   not coerced when their semantics differ: later Tasks map only proven
+   equivalents and retain or rename HaruQuantAI-native generic-order or
+   lifecycle abstractions until every consumer is explicitly migrated.
+3. **MetaTrader retcodes.** `MT5TradeRetcode`, its description mapping, and its
+   lookup remain provider-specific Broker contracts. Their complete classified
+   source sequence is authoritative, including `INVALID_ORDER` and every later
+   value. Provider-specific terminal errors remain separate from generic
+   HaruQuantAI error vocabulary.
+
+#### Later-child validation and rollback
+
+Every implementation Task must record its exact source identifiers, classified
+contracts, owner/module destinations, collisions, affected consumers, and
+schema impact before editing. It must preserve rejected/native boundaries,
+leave `main` valid, use change-scoped tests during implementation, and run all
+applicable contract generation, inventory, round-trip, import-purity, Ruff, and
+strict-mypy gates before acceptance.
+
+Rollback follows the atomic Task boundary. Before commit, reverse only the
+Task's approved paths with a surgical patch. After merge, use a separately
+authorized Task; never rewrite history or partially remove a shared enum or
+structure after consumers depend on it.
+
 ## 3. Workflows
 
 ### Workflow Scope Values
