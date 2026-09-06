@@ -1577,6 +1577,7 @@ class StreamMarketEventsSubscription(WireModel):
 type BrowseReferenceOperation = Literal[
     "LIST_CAPABILITIES",
     "LIST_SERIES",
+    "READ_SERIES",
     "LIST_INSTRUMENTS",
     "LIST_BROKERS",
     "DISCOVER_SYMBOLS",

@@ -11,12 +11,12 @@ import logging
 import sqlite3
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Final
+from typing import Any, Final, cast
 
 import polars as pl
 import pyarrow.parquet as pq
 
-from app.contracts.common.models import ProblemDetails
+from app.contracts.common.models import JsonValue, ProblemDetails
 from app.contracts.data.errors import DataFailure
 from app.contracts.data.models import BrowseReferenceRequest, BrowseReferenceSuccess
 from app.services.data.market_data_store.mt4_exporter import (
@@ -350,7 +350,7 @@ class MarketDataReferenceRepository:
         bars: list[dict[str, Any]] = []
         for row in df_bars.iter_rows(named=True):
             dt: datetime = row["datetime"]
-            epoch_sec = int(dt.timestamp()) if dt else 0
+            epoch_sec = int(dt.timestamp())
             bars.append(
                 {
                     "time": epoch_sec,
@@ -505,6 +505,7 @@ class MarketDataReferenceRepository:
         for f in parquet_files:
             table = pq.read_table(f)
             df = pl.from_arrow(table)
+            assert isinstance(df, pl.DataFrame)
             # Shift datetime column
             shifted_df = df.with_columns(
                 pl.col("DateTime") + timedelta(hours=target_shift_hours)
@@ -635,17 +636,18 @@ class MarketDataReferenceRepository:
         try:
             op = request.operation
             if op == "LIST_SERIES":
-                data = self.list_series(
+                series_list = self.list_series(
                     limit=request.limit or 200,
                     search=request.query,
                 )
-                return BrowseReferenceSuccess(request_id=request.request_id, data=data)
+                return BrowseReferenceSuccess(
+                    request_id=request.request_id, data=cast("JsonValue", series_list)
+                )
 
             if op == "READ_SERIES":
+                raw_series_id = request.payload.get("series_id")
                 series_id = request.series_id or (
-                    int(request.payload["series_id"])
-                    if "series_id" in request.payload
-                    else None
+                    int(str(raw_series_id)) if raw_series_id is not None else None
                 )
                 if series_id is None:
                     return DataFailure(
@@ -657,8 +659,8 @@ class MarketDataReferenceRepository:
                             status=400,
                         ),
                     )
-                data = self.get_series(series_id)
-                if data is None:
+                series_data = self.get_series(series_id)
+                if series_data is None:
                     return DataFailure(
                         request_id=request.request_id,
                         code="DATA_NOT_FOUND",
@@ -668,13 +670,14 @@ class MarketDataReferenceRepository:
                             status=404,
                         ),
                     )
-                return BrowseReferenceSuccess(request_id=request.request_id, data=data)
+                return BrowseReferenceSuccess(
+                    request_id=request.request_id, data=cast("JsonValue", series_data)
+                )
 
             if op == "UPDATE_SERIES":
+                raw_series_id = request.payload.get("series_id")
                 series_id = request.series_id or (
-                    int(request.payload.get("series_id"))
-                    if request.payload.get("series_id")
-                    else None
+                    int(str(raw_series_id)) if raw_series_id is not None else None
                 )
                 if series_id is None:
                     return DataFailure(
@@ -686,14 +689,16 @@ class MarketDataReferenceRepository:
                             status=400,
                         ),
                     )
-                data = self.update_series(series_id, request.payload)
-                return BrowseReferenceSuccess(request_id=request.request_id, data=data)
+                updated_series = self.update_series(series_id, request.payload)
+                return BrowseReferenceSuccess(
+                    request_id=request.request_id,
+                    data=cast("JsonValue", updated_series),
+                )
 
             if op == "DELETE_SERIES":
+                raw_series_id = request.payload.get("series_id")
                 series_id = request.series_id or (
-                    int(request.payload.get("series_id"))
-                    if request.payload.get("series_id")
-                    else None
+                    int(str(raw_series_id)) if raw_series_id is not None else None
                 )
                 if series_id is None:
                     return DataFailure(
@@ -713,12 +718,16 @@ class MarketDataReferenceRepository:
                 )
 
             if op == "LIST_INSTRUMENTS":
-                data = self.list_instruments()
-                return BrowseReferenceSuccess(request_id=request.request_id, data=data)
+                instruments = self.list_instruments()
+                return BrowseReferenceSuccess(
+                    request_id=request.request_id, data=cast("JsonValue", instruments)
+                )
 
             if op == "LIST_BROKERS":
-                data = self.list_brokers()
-                return BrowseReferenceSuccess(request_id=request.request_id, data=data)
+                brokers = self.list_brokers()
+                return BrowseReferenceSuccess(
+                    request_id=request.request_id, data=cast("JsonValue", brokers)
+                )
 
             if op == "READ_BARS":
                 symbol = request.symbol or ""
@@ -734,14 +743,16 @@ class MarketDataReferenceRepository:
                     )
                 timeframe = request.timeframe or "M1"
                 limit = request.limit or 5000
-                data = self.read_bars(
+                bars = self.read_bars(
                     symbol=symbol,
                     timeframe=timeframe,
                     start=request.start,
                     end=request.end,
                     limit=limit,
                 )
-                return BrowseReferenceSuccess(request_id=request.request_id, data=data)
+                return BrowseReferenceSuccess(
+                    request_id=request.request_id, data=cast("JsonValue", bars)
+                )
 
             if op == "INSPECT_QUALITY":
                 symbol = request.symbol or ""
@@ -756,15 +767,20 @@ class MarketDataReferenceRepository:
                         ),
                     )
                 timeframe = request.timeframe or "M1"
-                data = self.inspect_quality(symbol=symbol, timeframe=timeframe)
-                return BrowseReferenceSuccess(request_id=request.request_id, data=data)
+                quality = self.inspect_quality(symbol=symbol, timeframe=timeframe)
+                return BrowseReferenceSuccess(
+                    request_id=request.request_id, data=cast("JsonValue", quality)
+                )
 
             if op == "CLONE_SERIES":
                 symbol = request.symbol or str(request.payload.get("symbol", ""))
-                shift_hours = int(request.payload.get("target_shift_hours", 0))
+                raw_shift = request.payload.get("target_shift_hours", 0)
+                shift_hours = int(str(raw_shift)) if raw_shift is not None else 0
                 postfix = str(request.payload.get("postfix", "_clone"))
-                data = self.clone_series(symbol, shift_hours, postfix)
-                return BrowseReferenceSuccess(request_id=request.request_id, data=data)
+                cloned = self.clone_series(symbol, shift_hours, postfix)
+                return BrowseReferenceSuccess(
+                    request_id=request.request_id, data=cast("JsonValue", cloned)
+                )
 
             if op == "EXPORT_DATA":
                 fmt = str(request.payload.get("format", "csv")).lower()
@@ -790,7 +806,7 @@ class MarketDataReferenceRepository:
                 if fmt in ("mt4", "fxt", "hst"):
                     res = self.export_mt4(symbol, timeframe=timeframe)
                     return BrowseReferenceSuccess(
-                        request_id=request.request_id, data=res
+                        request_id=request.request_id, data=cast("JsonValue", res)
                     )
                 return DataFailure(
                     request_id=request.request_id,
@@ -810,7 +826,7 @@ class MarketDataReferenceRepository:
                     request_id=request.request_id,
                     data={
                         "status": "QUEUED",
-                        "symbols": symbols,
+                        "symbols": cast("JsonValue", symbols),
                         "message": f"Queued download for {len(symbols)} symbol(s)",
                     },
                 )

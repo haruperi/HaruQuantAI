@@ -13,9 +13,9 @@ import sqlite3
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Final
+from typing import Any, Final, cast
 
-from app.contracts.common.models import ProblemDetails
+from app.contracts.common.models import JsonObject, ProblemDetails
 from app.contracts.data.errors import DataFailure
 from app.contracts.data.models import (
     BrowseReferenceRequest,
@@ -1059,16 +1059,19 @@ class BrowseReferenceService:
                     )
                     return BrowseReferenceSuccess(
                         request_id=request.request_id,
-                        data={
-                            "source_id": "data.bars.parquet@1",
-                            "symbol": request.symbol,
-                            "timeframe": request.timeframe or "M1",
-                            "count": len(parquet_bars),
-                            "bars": parquet_bars,
-                            "cache_status": "hit_parquet",
-                            "start": start_str,
-                            "end": end_str,
-                        },
+                        data=cast(
+                            "JsonObject",
+                            {
+                                "source_id": "data.bars.parquet@1",
+                                "symbol": request.symbol,
+                                "timeframe": request.timeframe or "M1",
+                                "count": len(parquet_bars),
+                                "bars": parquet_bars,
+                                "cache_status": "hit_parquet",
+                                "start": start_str,
+                                "end": end_str,
+                            },
+                        ),
                     )
             return DataFailure(
                 request_id=request.request_id,

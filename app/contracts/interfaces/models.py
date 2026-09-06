@@ -1507,6 +1507,7 @@ class OperateSettingsSuccess(WireModel):
 type ObserveMarketReferenceOperation = Literal[
     "LIST_CAPABILITIES",
     "LIST_SERIES",
+    "READ_SERIES",
     "LIST_INSTRUMENTS",
     "LIST_BROKERS",
     "DISCOVER_SYMBOLS",
