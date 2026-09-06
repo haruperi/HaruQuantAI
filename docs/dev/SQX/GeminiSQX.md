@@ -1361,6 +1361,309 @@ class NeuralModelInference:
 
 ---
 
+### 3.10 Building Blocks & Custom Indicator Architecture Specification
+
+In StrategyQuantX, the **Building Block** is the fundamental atomic unit of the trading strategy genome. Every indicator, price action pattern, comparison, trading rule, order action, and exit decorator is implemented as a self-contained, typed, and annotated Building Block snippet.
+
+The StrategyQuantX engine contains **572 compiled building blocks** across **10 functional categories** (extracted from `Snippets.jar`):
+
+```mermaid
+graph TD
+    BB[Building Block Ecosystem: 572 Blocks] --> Cat_Ind[1. Indicators: 394 Blocks]
+    BB --> Cat_Comp[2. Comparisons: 27 Blocks]
+    BB --> Cat_Time[3. BarAndTime: 37 Blocks]
+    BB --> Cat_Price[4. Price: 30 Blocks]
+    BB --> Cat_Candle[5. CandlePatterns: 7 Blocks]
+    BB --> Cat_Order[6. Order Actions: 21 Blocks]
+    BB --> Cat_Control[7. StrategyControl: 25 Blocks]
+    BB --> Cat_Func[8. Functions: 18 Blocks]
+    BB --> Cat_Action[9. OtherActions: 8 Blocks]
+    BB --> Cat_Other[10. Other Primitives: 5 Blocks]
+
+    Cat_Ind --> Ind_Val[Raw Indicator Calculations: DataSeries Number]
+    Cat_Ind --> Ind_Cond[Pre-Composed Condition Blocks: Boolean Signals]
+    Ind_Cond --> Opp_Engine[OppositeBlock Symmetry Engine: Automated Long/Short Inversion]
+```
+
+#### A. The 10 Block Categories & Forensic Inventory
+
+| Category | Class Count | Purpose & Canonical Blocks | Output Type |
+|---|---|---|---|
+| **`Indicators`** | 394 | Technical indicators and their pre-composed condition variants. Includes Trend (SMA, EMA, KAMA, SuperTrend, Parabolic SAR, Ichimoku, Aroon, Vortex), Oscillators (RSI, Stochastic, CCI, MACD, Awesome, Williams %R, Ultimate), Volatility (ATR, Bollinger Bands, Keltner, Donchian, Standard Deviation, Ulcer Index), Volume & Order Flow (OBV, MFI, Volume Profile, TPO Profile, VWAP, Anchored VWAP). | `DataSeries` (Number) or `Boolean` |
+| **`Comparisons`** | 27 | Relational operators evaluating relationships between two blocks: `IsGreater`, `IsLower`, `IsEqual`, `IsNotEqual`, `IsGreaterOrEqual`, `IsLowerOrEqual`, `CrossesAbove`, `CrossesBelow`, `IsBetween`, `IsOutside`, `RisingBy`, `FallingBy`. | `Boolean` |
+| **`BarAndTime`** | 37 | Temporal, calendar, and session filters: `DayOfWeek`, `DayOfMonth`, `MonthOfYear`, `HourOfDay`, `MinuteOfHour`, `TimeRange`, `SessionOpen`, `SessionClose`, `IsMonday`, `IsFriday`, `FirstDayOfMonth`, `BarsSinceEntry`, `BarsSinceExit`. | `Boolean` or `Number` |
+| **`Price`** | 30 | Price series and bar geometric properties: `Open`, `High`, `Low`, `Close`, `Volume`, `MedianPrice` ($(H+L)/2$), `TypicalPrice` ($(H+L+C)/3$), `WeightedPrice` ($(H+L+2C)/4$), `Highest`, `Lowest`, `BarRange` ($H-L$), `BarBody` ($|C-O|$), `BarChange` ($C_t - C_{t-1}$). | `DataSeries` (Number) |
+| **`CandlePatterns`** | 7 | Algorithmic candlestick recognizers: `Hammer`, `InvertedHammer`, `Doji`, `EngulfingBullish`, `EngulfingBearish`, `InsideBar`, `OutsideBar`. | `Boolean` |
+| **`Order`** | 21 | Execution actions: `EnterAtMarket`, `EnterAtStop`, `EnterAtLimit`, `ClosePosition`, `ClosePartial`, `CancelOrder`, `ReversePosition`. | `OrderAction` |
+| **`StrategyControl`** | 25 | Strategy trading guardrails and filters: `DontTradeOnWeekends`, `ExitAtEndOfDay`, `ExitOnFriday`, `LimitTimeRange`, `MaxTradesPerDay`, `MaxOpenPositions`, `MinDistanceBetweenTrades`. | `Boolean` / `Control` |
+| **`Functions`** | 18 | Mathematical operations: `Sum`, `Average`, `StandardDeviation`, `Slope`, `Correlation`, `PercentChange`, `Normalize`, `Min`, `Max`. | `Number` |
+| **`OtherActions`** | 8 | Side effects: `SetVariable`, `PrintLog`, `SendNotification`, `DrawOnChart`. | `Void` |
+| **`Other`** | 5 | Core boolean primitives: `AlwaysTrue`, `AlwaysFalse`, `CommentBlock`. | `Boolean` |
+
+---
+
+#### B. Forensic Anatomy of an Indicator: The Dual-Block Pattern
+
+StrategyQuantX structures technical indicators using a **Dual-Block Pattern**:
+1. **The Raw Indicator Block (`IndicatorBlock`)**:
+   - Calculates and stores continuous floating-point series (`DataSeries Value`, plus optional secondary buffers like `UpperBand`, `LowerBand`, `SignalLine`).
+   - Used inside math formulas, custom comparisons, trailing stops, and multi-symbol charts.
+2. **The Pre-Composed Condition Block (`ConditionBlock`)**:
+   - Directly produces a discrete boolean evaluation (`true`/`false`) on each bar.
+   - Dramatically reduces search combinatorial explosion in genetic algorithms and simplifies visual flowchart construction in AlgoWizard.
+
+##### 1. Raw Indicator Block Example (`RSI.java`)
+
+```java
+package SQ.Blocks.Indicators.RSI;
+
+import com.strategyquant.datalib.DataSeries;
+import com.strategyquant.tradinglib.*;
+import SQ.Calculators.RSICalculator;
+import SQ.Internal.IndicatorBlock;
+
+@BuildingBlock(name="(RSI) Relative Strength Index", display="RSI(@Chart@#Period#)[#Shift#]", returnType = ReturnTypes.Number)
+@Indicator(oscillator=true, middleValue=50, min=0, max=100, step=0.5)
+@ParameterSet(set="Period=14")
+@ParameterSet(set="Period=20")
+public class RSI extends IndicatorBlock {
+    @Parameter
+    public DataSeries Input;
+
+    @Parameter(defaultValue="14", minValue=2, maxValue=10000, step=1)
+    public int Period;
+
+    @Output(name = "RSI", color = Colors.Red)
+    public DataSeries Value;
+
+    private RSICalculator rsiCalculator;
+
+    @Override
+    protected void OnInit() {
+        rsiCalculator = new RSICalculator(Period);
+    }
+
+    @Override
+    protected void OnBarUpdate() {
+        rsiCalculator.onBarUpdate(Input.get(0), getCurrentBar());
+        Value.set(0, rsiCalculator.getValue());
+    }
+}
+```
+
+##### 2. Pre-Composed Condition Block Example (`RSICrossUp.java`)
+
+```java
+package SQ.Blocks.Indicators.RSI;
+
+import SQ.Internal.ConditionBlock;
+import com.strategyquant.datalib.DataSeries;
+import com.strategyquant.tradinglib.*;
+
+@BuildingBlock(name="RSI crosses above Level", display="RSI(@Chart@#Period#)[#Shift#] crosses above #Level#", returnType = ReturnTypes.Boolean)
+@SortOrder(500)
+@OppositeBlock(value="RSICrossDown", oscillator=true, middleValue=50, field="Level")
+@ParameterSet(set="Period=14")
+public class RSICrossUp extends ConditionBlock {
+    @Parameter
+    public DataSeries Input;
+
+    @Parameter(defaultValue="14", minValue=2, maxValue=10000, step=1)
+    public int Period;
+
+    @Parameter(defaultValue="30", minValue=0, maxValue=100, step=0.5)
+    public double Level;
+
+    @Parameter
+    public int Shift;
+
+    @Override
+    public boolean OnBlockEvaluate() {
+        RSI indicator = Strategy.Indicators.RSI(Input, Period);
+        double prev = indicator.Value.getRounded(Shift + 1);
+        double curr = indicator.Value.getRounded(Shift);
+
+        return (prev < Level) && (curr > Level);
+    }
+}
+```
+
+---
+
+#### C. The `@OppositeBlock` Deterministic Symmetry Engine
+
+A cornerstone of StrategyQuantX's robust strategy synthesis is the **Deterministic Strategy Symmetry Engine**:
+- When the operator enables **"Generate Symmetric Rules"** in the Builder, the engine does not generate Short rules randomly.
+- Instead, every Long rule is automatically reflected into a mathematically symmetric Short rule using the `@OppositeBlock` metadata attached to condition blocks.
+
+##### Inversion Rules:
+1. **Oscillators with Middle Value (`middleValue = 50`)**:
+   - Long Rule: `RSI(14) crosses above 30`
+   - Inversion: The opposite block is `RSICrossDown`. The numeric parameter `Level` is inverted around `middleValue = 50`:
+     $$\text{Level}_{\text{short}} = 2 \times \text{MiddleValue} - \text{Level}_{\text{long}} = 2 \times 50 - 30 = 70$$
+   - Synthesized Short Rule: `RSI(14) crosses below 70`.
+2. **Trend & Band Indicators (Dual-Line Crosses)**:
+   - Long Rule: `BarClosesAboveSuperTrend` or `FastEMAAboveSlowEMA`.
+   - Inversion: Maps directly to `BarClosesBelowSuperTrend` or `FastEMABelowSlowEMA`.
+3. **Price Level Offsets**:
+   - Long Rule: `Close > Highest(High, 20) + 10 pips`.
+   - Inversion: `Close < Lowest(Low, 20) - 10 pips`.
+
+---
+
+#### D. Dynamic Snippet Extensibility (The Code Editor)
+
+In StrategyQuantX, Building Blocks are not hardcoded. The platform features an open **Snippet Architecture** (`user/extend/Snippets/`):
+- Users can create custom indicators, conditions, exit methods, money management algorithms, and databank columns using Java.
+- The built-in **Code Editor (`AppCodeEditor`)** compiles snippets dynamically into the classloader, instantly exposing new blocks to the **Builder**, **AlgoWizard**, and **Optimizer**.
+- An integrated **Indicator Tester** allows developers to test their indicator logic against historical data and view the computed buffers on an interactive chart before compiling them into the strategy generation engine.
+
+---
+
+#### E. Python 3.14 Reimplementation Pattern (`app/services/plugins/manage_snippets/`)
+
+In the HaruQuantAI platform, the Building Block ecosystem is reimplemented in pure, high-performance Python 3.14 with Numba / NumPy vectorization and dynamic plugin registration:
+
+```python
+# app/contracts/indicator/building_block.py
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Callable, Any
+import numpy as np
+
+class ReturnType(str, Enum):
+    NUMBER = "number"
+    BOOLEAN = "boolean"
+    ORDER = "order"
+
+class BlockCategory(str, Enum):
+    INDICATORS = "Indicators"
+    COMPARISONS = "Comparisons"
+    BAR_AND_TIME = "BarAndTime"
+    PRICE = "Price"
+    CANDLE_PATTERNS = "CandlePatterns"
+    ORDER = "Order"
+    STRATEGY_CONTROL = "StrategyControl"
+
+@dataclass
+class BlockParameter:
+    name: str
+    param_type: type
+    default_value: Any
+    min_value: Any = None
+    max_value: Any = None
+    step: Any = None
+
+# Base Indicator Block (Raw DataSeries Calculation)
+class IndicatorBlock:
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def calculate(self, high: np.ndarray, low: np.ndarray, close: np.ndarray, volume: np.ndarray) -> np.ndarray:
+        raise NotImplementedError
+
+# Base Condition Block (Boolean Evaluation)
+class ConditionBlock:
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def evaluate(self, market_cache: dict[str, np.ndarray], shift: int = 0) -> bool:
+        raise NotImplementedError
+```
+
+##### Reimplementing RSI with Vectorized Calculation & Automated Symmetry:
+
+```python
+# app/services/plugins/manage_snippets/indicators/rsi.py
+import numpy as np
+from numba import njit
+from app.contracts.indicator.building_block import (
+    IndicatorBlock, ConditionBlock, BlockParameter, ReturnType, BlockCategory
+)
+from app.services.plugins.manage_snippets.registry import register_block, register_opposite
+
+@njit(fastmath=True)
+def calculate_rsi(prices: np.ndarray, period: int) -> np.ndarray:
+    n = len(prices)
+    rsi = np.empty(n, dtype=np.float64)
+    rsi[:period] = np.nan
+
+    gains = 0.0
+    losses = 0.0
+    for i in range(1, period + 1):
+        diff = prices[i] - prices[i - 1]
+        if diff >= 0:
+            gains += diff
+        else:
+            losses -= diff
+
+    avg_gain = gains / period
+    avg_loss = losses / period
+
+    rs = avg_gain / (avg_loss + 1e-10)
+    rsi[period] = 100.0 - (100.0 / (1.0 + rs))
+
+    for i in range(period + 1, n):
+        diff = prices[i] - prices[i - 1]
+        gain = diff if diff > 0 else 0.0
+        loss = -diff if diff < 0 else 0.0
+
+        avg_gain = (avg_gain * (period - 1) + gain) / period
+        avg_loss = (avg_loss * (period - 1) + loss) / period
+
+        rs = avg_gain / (avg_loss + 1e-10)
+        rsi[i] = 100.0 - (100.0 / (1.0 + rs))
+
+    return rsi
+
+@register_block(
+    id="SQ.Blocks.Indicators.RSI",
+    name="(RSI) Relative Strength Index",
+    category=BlockCategory.INDICATORS,
+    return_type=ReturnType.NUMBER,
+    parameters=[
+        BlockParameter("period", int, default_value=14, min_value=2, max_value=200, step=1)
+    ]
+)
+class RSIIndicator(IndicatorBlock):
+    period: int = 14
+
+    def calculate(self, high: np.ndarray, low: np.ndarray, close: np.ndarray, volume: np.ndarray) -> np.ndarray:
+        return calculate_rsi(close, self.period)
+
+
+@register_block(
+    id="SQ.Blocks.Indicators.RSI.RSICrossUp",
+    name="RSI crosses above Level",
+    category=BlockCategory.INDICATORS,
+    return_type=ReturnType.BOOLEAN,
+    parameters=[
+        BlockParameter("period", int, default_value=14, min_value=2, max_value=200, step=1),
+        BlockParameter("level", float, default_value=30.0, min_value=0.0, max_value=100.0, step=0.5)
+    ]
+)
+@register_opposite(
+    opposite_id="SQ.Blocks.Indicators.RSI.RSICrossDown",
+    middle_value=50.0,
+    symmetric_param="level"
+)
+class RSICrossUpCondition(ConditionBlock):
+    period: int = 14
+    level: float = 30.0
+
+    def evaluate(self, market_cache: dict[str, np.ndarray], shift: int = 0) -> bool:
+        rsi_series = market_cache[f"RSI_{self.period}"]
+        prev = rsi_series[-(shift + 2)]
+        curr = rsi_series[-(shift + 1)]
+        return bool(prev < self.level and curr >= self.level)
+```
+
+---
+
+## 4. Technical Architecture: Python 3.14 + FastAPI & Node / React 19
+
 ### 4.1 Backend Domain Decomposition (`app/services/`)
 
 Following HaruQuantAI's strict domain boundaries:
