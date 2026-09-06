@@ -263,7 +263,7 @@ export interface ObserveMarketDataSuccess {
   snapshot?: MarketTickSnapshot | null;  // default: null
   schema_version?: 1;  // default: 1
 }
-export type ObserveMarketReferenceOperation = "LIST_CAPABILITIES" | "LIST_SERIES" | "LIST_INSTRUMENTS" | "LIST_BROKERS" | "DISCOVER_SYMBOLS" | "READ_QUOTES" | "READ_BARS" | "SYNC_REFERENCE" | "READ_INSTRUMENT" | "UPDATE_INSTRUMENT" | "UPDATE_SERIES" | "LIST_MARKET_DIRECTORY";
+export type ObserveMarketReferenceOperation = "LIST_CAPABILITIES" | "LIST_SERIES" | "LIST_INSTRUMENTS" | "LIST_BROKERS" | "DISCOVER_SYMBOLS" | "READ_QUOTES" | "READ_BARS" | "SYNC_REFERENCE" | "READ_INSTRUMENT" | "UPDATE_INSTRUMENT" | "UPDATE_SERIES" | "DELETE_SERIES" | "INSPECT_QUALITY" | "DOWNLOAD_DUKASCOPY" | "IMPORT_FILE" | "EXPORT_DATA" | "CLONE_SERIES" | "BATCH_ACTION" | "DOWNLOAD_CONFIG" | "LIST_MARKET_DIRECTORY";
 export interface ObserveMarketReferenceRequest {
   request_id: string;
   operation: ObserveMarketReferenceOperation;
