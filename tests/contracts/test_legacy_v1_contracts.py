@@ -7,6 +7,7 @@ from app.contracts.data.tick_stream.v1 import (
     TickStreamEventV1,
     TickStreamRequestV1,
 )
+from app.contracts.data.timeframes import PERIOD_D1
 from app.contracts.indicator.common.v1 import (
     IndicatorConfigV1,
     IndicatorResultV1,
@@ -88,7 +89,7 @@ def test_indicator_common_contracts_v1() -> None:
 
     class DummyMarketDataset(MarketDatasetV1):
         symbol = "AAPL"
-        timeframe = "D1"
+        timeframe = PERIOD_D1
         records = (DummyOHLCV(),)
 
     dataset = DummyMarketDataset()

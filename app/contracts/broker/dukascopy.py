@@ -5,6 +5,20 @@ from __future__ import annotations
 from enum import IntEnum
 from typing import Any
 
+from app.contracts.data.timeframes import (
+    ENUM_TIMEFRAMES,
+    PERIOD_D1,
+    PERIOD_H1,
+    PERIOD_H4,
+    PERIOD_M1,
+    PERIOD_M5,
+    PERIOD_M10,
+    PERIOD_M15,
+    PERIOD_M30,
+    PERIOD_MN1,
+    PERIOD_W1,
+)
+
 
 class DukascopyErrorCode(IntEnum):
     """Dukascopy JForex API error codes."""
@@ -47,27 +61,34 @@ def get_dukascopy_error_description(code: int) -> str:
     return DUKASCOPY_ERROR_DESCRIPTIONS.get(code, f"Unknown Dukascopy error [{code}]")
 
 
-TIMEFRAME_MAP: dict[str, str] = {
-    "1M": "1m",
-    "M1": "1m",
-    "5M": "5m",
-    "M5": "5m",
-    "10M": "10m",
-    "M10": "10m",
-    "15M": "15m",
-    "M15": "15m",
-    "30M": "30m",
-    "M30": "30m",
-    "1H": "1h",
-    "H1": "1h",
-    "4H": "4h",
-    "H4": "4h",
-    "1D": "1d",
-    "D1": "1d",
-    "1W": "1w",
-    "W1": "1w",
-    "1MN": "1mn",
-    "MN1": "1mn",
+TIMEFRAME_MAP: dict[ENUM_TIMEFRAMES, str] = {
+    PERIOD_M1: "1m",
+    PERIOD_M5: "5m",
+    PERIOD_M10: "10m",
+    PERIOD_M15: "15m",
+    PERIOD_M30: "30m",
+    PERIOD_H1: "1h",
+    PERIOD_H4: "4h",
+    PERIOD_D1: "1d",
+    PERIOD_W1: "1w",
+    PERIOD_MN1: "1mn",
+}
+
+_TIMEFRAME_ALIASES = {
+    alias: period
+    for period, aliases in {
+        PERIOD_M1: ("1M", "M1"),
+        PERIOD_M5: ("5M", "M5"),
+        PERIOD_M10: ("10M", "M10"),
+        PERIOD_M15: ("15M", "M15"),
+        PERIOD_M30: ("30M", "M30"),
+        PERIOD_H1: ("1H", "H1"),
+        PERIOD_H4: ("4H", "H4"),
+        PERIOD_D1: ("1D", "D1"),
+        PERIOD_W1: ("1W", "W1"),
+        PERIOD_MN1: ("1MN", "MN1"),
+    }.items()
+    for alias in aliases
 }
 
 
@@ -79,11 +100,28 @@ def resolve_timeframe(tf: Any) -> str:
 
     Returns:
         Dukascopy period string (e.g. '1m', '1h', '1d').
+
+    Raises:
+        ValueError: If a canonical timeframe is invalid or unsupported.
     """
+    if isinstance(tf, bool):
+        raise ValueError(f"unsupported Dukascopy timeframe: {tf!r}")
+    if isinstance(tf, (ENUM_TIMEFRAMES, int)):
+        try:
+            period = ENUM_TIMEFRAMES(tf)
+        except ValueError as error:
+            raise ValueError(f"invalid canonical timeframe: {tf!r}") from error
+        try:
+            return TIMEFRAME_MAP[period]
+        except KeyError as error:
+            raise ValueError(
+                f"Dukascopy does not support canonical timeframe {period.name}"
+            ) from error
     if isinstance(tf, str):
         cleaned = tf.strip().upper()
-        if cleaned in TIMEFRAME_MAP:
-            return TIMEFRAME_MAP[cleaned]
+        alias_period = _TIMEFRAME_ALIASES.get(cleaned)
+        if alias_period is not None:
+            return TIMEFRAME_MAP[alias_period]
         return tf.lower()
     return "1m"
 

@@ -5,6 +5,24 @@ from __future__ import annotations
 from enum import IntEnum
 from typing import Any
 
+from app.contracts.data.timeframes import (
+    ENUM_TIMEFRAMES,
+    PERIOD_D1,
+    PERIOD_H1,
+    PERIOD_H2,
+    PERIOD_H4,
+    PERIOD_H6,
+    PERIOD_H8,
+    PERIOD_H12,
+    PERIOD_M1,
+    PERIOD_M3,
+    PERIOD_M5,
+    PERIOD_M15,
+    PERIOD_M30,
+    PERIOD_MN1,
+    PERIOD_W1,
+)
+
 
 class BinanceErrorCode(IntEnum):
     """Binance REST and WebSocket API error codes."""
@@ -71,38 +89,54 @@ def get_binance_error_description(code: int) -> str:
     return BINANCE_ERROR_DESCRIPTIONS.get(code, f"Unknown Binance error [{code}]")
 
 
-TIMEFRAME_MAP: dict[str, str] = {
-    "1M": "1m",
-    "M1": "1m",
-    "3M": "3m",
-    "M3": "3m",
-    "5M": "5m",
-    "M5": "5m",
-    "15M": "15m",
-    "M15": "15m",
-    "30M": "30m",
-    "M30": "30m",
-    "1H": "1h",
-    "H1": "1h",
-    "2H": "2h",
-    "H2": "2h",
-    "4H": "4h",
-    "H4": "4h",
-    "6H": "6h",
-    "H6": "6h",
-    "8H": "8h",
-    "H8": "8h",
-    "12H": "12h",
-    "H12": "12h",
-    "1D": "1d",
-    "D1": "1d",
-    "3D": "3d",
-    "D3": "3d",
-    "1W": "1w",
-    "W1": "1w",
-    "1MO": "1M",
-    "MN1": "1M",
+TIMEFRAME_MAP: dict[ENUM_TIMEFRAMES, str] = {
+    PERIOD_M1: "1m",
+    PERIOD_M3: "3m",
+    PERIOD_M5: "5m",
+    PERIOD_M15: "15m",
+    PERIOD_M30: "30m",
+    PERIOD_H1: "1h",
+    PERIOD_H2: "2h",
+    PERIOD_H4: "4h",
+    PERIOD_H6: "6h",
+    PERIOD_H8: "8h",
+    PERIOD_H12: "12h",
+    PERIOD_D1: "1d",
+    PERIOD_W1: "1w",
+    PERIOD_MN1: "1M",
 }
+
+_TIMEFRAME_ALIASES: dict[str, ENUM_TIMEFRAMES] = {
+    "1M": PERIOD_M1,
+    "M1": PERIOD_M1,
+    "3M": PERIOD_M3,
+    "M3": PERIOD_M3,
+    "5M": PERIOD_M5,
+    "M5": PERIOD_M5,
+    "15M": PERIOD_M15,
+    "M15": PERIOD_M15,
+    "30M": PERIOD_M30,
+    "M30": PERIOD_M30,
+    "1H": PERIOD_H1,
+    "H1": PERIOD_H1,
+    "2H": PERIOD_H2,
+    "H2": PERIOD_H2,
+    "4H": PERIOD_H4,
+    "H4": PERIOD_H4,
+    "6H": PERIOD_H6,
+    "H6": PERIOD_H6,
+    "8H": PERIOD_H8,
+    "H8": PERIOD_H8,
+    "12H": PERIOD_H12,
+    "H12": PERIOD_H12,
+    "1D": PERIOD_D1,
+    "D1": PERIOD_D1,
+    "1W": PERIOD_W1,
+    "W1": PERIOD_W1,
+    "1MO": PERIOD_MN1,
+    "MN1": PERIOD_MN1,
+}
+_PROVIDER_TIMEFRAME_ALIASES = {"3D": "3d", "D3": "3d"}
 
 
 def resolve_timeframe(tf: Any) -> str:
@@ -113,11 +147,31 @@ def resolve_timeframe(tf: Any) -> str:
 
     Returns:
         Binance interval string (e.g. '1m', '1h', '1d').
+
+    Raises:
+        ValueError: If a canonical timeframe is invalid or unsupported.
     """
+    if isinstance(tf, bool):
+        raise ValueError(f"unsupported Binance timeframe: {tf!r}")
+    if isinstance(tf, (ENUM_TIMEFRAMES, int)):
+        try:
+            period = ENUM_TIMEFRAMES(tf)
+        except ValueError as error:
+            raise ValueError(f"invalid canonical timeframe: {tf!r}") from error
+        try:
+            return TIMEFRAME_MAP[period]
+        except KeyError as error:
+            raise ValueError(
+                f"Binance does not support canonical timeframe {period.name}"
+            ) from error
     if isinstance(tf, str):
         cleaned = tf.strip().upper()
-        if cleaned in TIMEFRAME_MAP:
-            return TIMEFRAME_MAP[cleaned]
+        alias_period = _TIMEFRAME_ALIASES.get(cleaned)
+        if alias_period is not None:
+            return TIMEFRAME_MAP[alias_period]
+        provider_alias = _PROVIDER_TIMEFRAME_ALIASES.get(cleaned)
+        if provider_alias is not None:
+            return provider_alias
         return tf.lower()
     return "1m"
 

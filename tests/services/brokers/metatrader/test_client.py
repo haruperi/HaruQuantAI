@@ -452,6 +452,8 @@ def test_bars_and_ticks(client: MT5Client) -> None:
     assert resolve_timeframe("1m") == 1
     assert resolve_timeframe("H1") == 16385
     assert resolve_timeframe("1d") == 16408
+    with pytest.raises(ValueError, match="unsupported MetaTrader"):
+        resolve_timeframe(True)
 
     # get_bars with range
     bars_range = client.get_bars("EURUSD", timeframe="1h", date_from=1000, date_to=2000)

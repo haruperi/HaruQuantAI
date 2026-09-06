@@ -33,6 +33,7 @@ from app.contracts.common.models import (
     WireModel,
 )
 from app.contracts.data.models import SeriesInterval  # noqa: TC001
+from app.contracts.trading.structures import TradeRequest, TradeTransaction
 
 # Constrained local string alias reused across trading records.
 type NonEmptyStr = Annotated[str, StringConstraints(min_length=1)]
@@ -1353,6 +1354,8 @@ class ManageExecutionSessionsSuccess(WireModel):
 # nested records spelled inside table rows rather than numbered public
 # records, so none of them is registered in WIRE_MODELS.
 WIRE_MODELS: dict[str, type[WireModel]] = {
+    "TradeRequest": TradeRequest,
+    "TradeTransaction": TradeTransaction,
     "TradingMode": TradingMode,
     "TradingSessionRef": TradingSessionRef,
     "TradingSession": TradingSession,

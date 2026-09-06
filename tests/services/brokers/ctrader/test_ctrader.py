@@ -15,6 +15,7 @@ from app.contracts.broker.models import (
     BrokerSymbolInfo,
     BrokerTerminalInfo,
 )
+from app.contracts.data.timeframes import PERIOD_M6
 from app.kernel.context import DefaultFeatureContext
 from app.kernel.events import EventBus
 from app.kernel.registry import ServiceRegistry
@@ -237,6 +238,10 @@ def test_ctrader_orders_and_trading() -> None:
     assert client.get_last_error() == (0, "Success")
     assert resolve_timeframe("1m") == "m1"
     assert resolve_timeframe("H1") == "h1"
+    with pytest.raises(ValueError, match="does not support"):
+        resolve_timeframe(PERIOD_M6)
+    with pytest.raises(ValueError, match="unsupported cTrader"):
+        resolve_timeframe(True)
 
     client.disconnect()
     assert client.is_connected() is False

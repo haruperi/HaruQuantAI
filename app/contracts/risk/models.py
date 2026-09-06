@@ -18,6 +18,7 @@ from app.contracts.common.models import (
     ValidationIssue,
     WireModel,
 )
+from app.contracts.risk.structures import TradeCheckResult
 
 # This reference type is annotation-only for readers but Pydantic resolves it
 # at class-creation time, so it must remain a runtime import.
@@ -1240,6 +1241,7 @@ class AuditRiskDecisionsSuccess(WireModel):
 # RiskScenarioRequest.shocks), so they are registered alongside their owner
 # rows exactly like the Broker nested-record precedent.
 WIRE_MODELS: dict[str, type[WireModel]] = {
+    "TradeCheckResult": TradeCheckResult,
     "RiskDecisionState": RiskDecisionState,
     "RiskProfileRef": RiskProfileRef,
     "RiskProfileVersion": RiskProfileVersion,

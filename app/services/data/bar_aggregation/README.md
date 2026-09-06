@@ -10,6 +10,12 @@
 
 Aggregate lower-resolution series into higher-timeframe OHLCV bars and define timeframe semantics without crossing effective session boundaries.
 
+Standard internal timeframes use the Data-owned `ENUM_TIMEFRAMES` and
+`PERIOD_*` contracts. String aliases are parsed only at request and
+configuration boundaries. The existing `Timeframe` value model remains the
+canonical representation for validated custom positive multiples such as M10
+and H2.
+
 ## Provides
 
 `data.aggregate-bars@1`

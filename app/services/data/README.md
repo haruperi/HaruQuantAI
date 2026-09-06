@@ -1106,6 +1106,15 @@ The primary domain-logic module `app/services/data/quantdata_manager_source/quan
 
 ## 5. Package-Wide Requirements, Configuration, and Architecture Invariants
 
+### Timeframe representation
+
+Data owns `ENUM_TIMEFRAMES` and the exact `PERIOD_*` values for standard
+periods. Internal standard-period selection and comparison use those contracts.
+The richer `Timeframe` model remains authoritative for validated custom
+positive multiples. HTTP/configuration input, persisted partition metadata,
+file names, and provider payloads retain stable string encodings only at their
+explicit parse/serialization boundaries.
+
 ### Persistence - Database
 
 The domain-owned table namespace is `data_`. The authoritative logical entities are: data_series, data_series_versions, quality_findings, external_indicator_series_versions. Universal representation and persistence rules are owned by `app/contracts/README.md` §§15 and 23.12; Data-specific storage semantics remain here.

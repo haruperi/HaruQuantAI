@@ -288,6 +288,78 @@
       "title": "CapabilitySnapshot",
       "type": "object"
     },
+    "DateTimeParts": {
+      "additionalProperties": false,
+      "description": "Validated UTC calendar components for a point in time.",
+      "properties": {
+        "day": {
+          "maximum": 31,
+          "minimum": 1,
+          "title": "Day",
+          "type": "integer"
+        },
+        "day_of_week": {
+          "maximum": 6,
+          "minimum": 0,
+          "title": "Day Of Week",
+          "type": "integer"
+        },
+        "day_of_year": {
+          "maximum": 365,
+          "minimum": 0,
+          "title": "Day Of Year",
+          "type": "integer"
+        },
+        "hour": {
+          "maximum": 23,
+          "minimum": 0,
+          "title": "Hour",
+          "type": "integer"
+        },
+        "min": {
+          "maximum": 59,
+          "minimum": 0,
+          "title": "Min",
+          "type": "integer"
+        },
+        "month": {
+          "maximum": 12,
+          "minimum": 1,
+          "title": "Month",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sec": {
+          "maximum": 59,
+          "minimum": 0,
+          "title": "Sec",
+          "type": "integer"
+        },
+        "year": {
+          "maximum": 9999,
+          "minimum": 1970,
+          "title": "Year",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "year",
+        "month",
+        "day",
+        "hour",
+        "min",
+        "sec",
+        "day_of_week",
+        "day_of_year"
+      ],
+      "title": "DateTimeParts",
+      "type": "object"
+    },
     "DomainEvent": {
       "additionalProperties": false,
       "description": "Causally linked, ordered cross-boundary event envelope.",
@@ -1076,6 +1148,9 @@
     },
     "CapabilitySnapshot": {
       "$ref": "#/$defs/CapabilitySnapshot"
+    },
+    "DateTimeParts": {
+      "$ref": "#/$defs/DateTimeParts"
     },
     "IdempotencyKey": {
       "$ref": "#/$defs/IdempotencyKey"

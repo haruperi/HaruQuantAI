@@ -1,13 +1,17 @@
-"""MetaTrader 5 provider-specific contracts, error codes, retcodes, and mappings."""
+"""MetaTrader provider-specific errors and canonical boundary conversions."""
 
 from __future__ import annotations
 
+import re
 from enum import IntEnum
 from typing import Any
 
+from app.contracts.broker import trade_retcodes as canonical
+from app.contracts.data.timeframes import ENUM_TIMEFRAMES, PERIOD_M1
+
 
 class MT5TerminalError(IntEnum):
-    """MetaTrader 5 terminal and IPC error codes returned by mt5.last_error()."""
+    """MetaTrader terminal and IPC error codes returned by ``last_error``."""
 
     SUCCESS = 1
     FAIL = -1
@@ -27,42 +31,49 @@ class MT5TerminalError(IntEnum):
 
 
 class MT5TradeRetcode(IntEnum):
-    """MetaTrader 5 trade server return codes returned in MqlTradeResult.retcode."""
+    """Complete MetaTrader trade-server return-code sequence."""
 
-    REQUOTE = 10004
-    REJECT = 10006
-    CANCEL = 10007
-    PLACED = 10008
-    DONE = 10009
-    DONE_PARTIAL = 10010
-    ERROR = 10011
-    TIMEOUT = 10012
-    INVALID = 10013
-    INVALID_VOLUME = 10014
-    INVALID_PRICE = 10015
-    INVALID_STOPS = 10016
-    TRADE_DISABLED = 10017
-    MARKET_CLOSED = 10018
-    NO_MONEY = 10019
-    PRICE_CHANGED = 10020
-    PRICE_OFF = 10021
-    INVALID_EXPIRATION = 10022
-    ORDER_CHANGED = 10023
-    TOO_MANY_REQUESTS = 10024
-    NO_CHANGES = 10025
-    SERVER_DISABLES_AT = 10026
-    CLIENT_DISABLES_AT = 10027
-    LOCKED = 10028
-    FROZEN = 10029
-    INVALID_FILL = 10030
-    CONNECTION = 10031
-    ONLY_REAL = 10032
-    LIMIT_ORDERS = 10033
-    LIMIT_VOLUME = 10034
-    POSITION_CLOSED = 10035
-    INVALID_CLOSE_VOLUME = 10036
-    CLOSE_ORDER_EXIST = 10038
-    LIMIT_POSITIONS = 10039
+    REQUOTE = canonical.TRADE_RETCODE_REQUOTE
+    REJECT = canonical.TRADE_RETCODE_REJECT
+    CANCEL = canonical.TRADE_RETCODE_CANCEL
+    PLACED = canonical.TRADE_RETCODE_PLACED
+    DONE = canonical.TRADE_RETCODE_DONE
+    DONE_PARTIAL = canonical.TRADE_RETCODE_DONE_PARTIAL
+    ERROR = canonical.TRADE_RETCODE_ERROR
+    TIMEOUT = canonical.TRADE_RETCODE_TIMEOUT
+    INVALID = canonical.TRADE_RETCODE_INVALID
+    INVALID_VOLUME = canonical.TRADE_RETCODE_INVALID_VOLUME
+    INVALID_PRICE = canonical.TRADE_RETCODE_INVALID_PRICE
+    INVALID_STOPS = canonical.TRADE_RETCODE_INVALID_STOPS
+    TRADE_DISABLED = canonical.TRADE_RETCODE_TRADE_DISABLED
+    MARKET_CLOSED = canonical.TRADE_RETCODE_MARKET_CLOSED
+    NO_MONEY = canonical.TRADE_RETCODE_NO_MONEY
+    PRICE_CHANGED = canonical.TRADE_RETCODE_PRICE_CHANGED
+    PRICE_OFF = canonical.TRADE_RETCODE_PRICE_OFF
+    INVALID_EXPIRATION = canonical.TRADE_RETCODE_INVALID_EXPIRATION
+    ORDER_CHANGED = canonical.TRADE_RETCODE_ORDER_CHANGED
+    TOO_MANY_REQUESTS = canonical.TRADE_RETCODE_TOO_MANY_REQUESTS
+    NO_CHANGES = canonical.TRADE_RETCODE_NO_CHANGES
+    SERVER_DISABLES_AT = canonical.TRADE_RETCODE_SERVER_DISABLES_AT
+    CLIENT_DISABLES_AT = canonical.TRADE_RETCODE_CLIENT_DISABLES_AT
+    LOCKED = canonical.TRADE_RETCODE_LOCKED
+    FROZEN = canonical.TRADE_RETCODE_FROZEN
+    INVALID_FILL = canonical.TRADE_RETCODE_INVALID_FILL
+    CONNECTION = canonical.TRADE_RETCODE_CONNECTION
+    ONLY_REAL = canonical.TRADE_RETCODE_ONLY_REAL
+    LIMIT_ORDERS = canonical.TRADE_RETCODE_LIMIT_ORDERS
+    LIMIT_VOLUME = canonical.TRADE_RETCODE_LIMIT_VOLUME
+    INVALID_ORDER = canonical.TRADE_RETCODE_INVALID_ORDER
+    POSITION_CLOSED = canonical.TRADE_RETCODE_POSITION_CLOSED
+    INVALID_CLOSE_VOLUME = canonical.TRADE_RETCODE_INVALID_CLOSE_VOLUME
+    CLOSE_ORDER_EXIST = canonical.TRADE_RETCODE_CLOSE_ORDER_EXIST
+    LIMIT_POSITIONS = canonical.TRADE_RETCODE_LIMIT_POSITIONS
+    REJECT_CANCEL = canonical.TRADE_RETCODE_REJECT_CANCEL
+    LONG_ONLY = canonical.TRADE_RETCODE_LONG_ONLY
+    SHORT_ONLY = canonical.TRADE_RETCODE_SHORT_ONLY
+    CLOSE_ONLY = canonical.TRADE_RETCODE_CLOSE_ONLY
+    FIFO_CLOSE = canonical.TRADE_RETCODE_FIFO_CLOSE
+    HEDGE_PROHIBITED = canonical.TRADE_RETCODE_HEDGE_PROHIBITED
 
 
 MT5_TERMINAL_ERROR_DESCRIPTIONS: dict[int, str] = {
@@ -71,15 +82,17 @@ MT5_TERMINAL_ERROR_DESCRIPTIONS: dict[int, str] = {
     MT5TerminalError.INVALID_PARAMS: "Invalid arguments passed to function",
     MT5TerminalError.NO_MEMORY: "Out of memory",
     MT5TerminalError.NOT_FOUND: "Requested item not found",
-    MT5TerminalError.INVALID_VERSION: "Unsupported terminal or Python package version",
+    MT5TerminalError.INVALID_VERSION: "Unsupported terminal or package version",
     MT5TerminalError.AUTH_FAILED: "Authorization failed",
     MT5TerminalError.UNSUPPORTED: "Unsupported method or call",
-    MT5TerminalError.AUTO_TRADING_DISABLED: "Auto-trading is disabled in terminal settings",
+    MT5TerminalError.AUTO_TRADING_DISABLED: "Auto-trading is disabled",
     MT5TerminalError.INTERNAL_FAIL: "Internal IPC failure",
-    MT5TerminalError.INTERNAL_FAIL_SEND: "Failed to send IPC request to terminal",
-    MT5TerminalError.INTERNAL_FAIL_RECV: "Failed to receive IPC response from terminal",
-    MT5TerminalError.INTERNAL_FAIL_INIT: "Failed to initialize IPC connection to terminal",
-    MT5TerminalError.INTERNAL_FAIL_CONNECT: "Failed to connect to MetaTrader 5 terminal (terminal may not be running)",
+    MT5TerminalError.INTERNAL_FAIL_SEND: "Failed to send IPC request",
+    MT5TerminalError.INTERNAL_FAIL_RECV: "Failed to receive IPC response",
+    MT5TerminalError.INTERNAL_FAIL_INIT: "Failed to initialize IPC connection",
+    MT5TerminalError.INTERNAL_FAIL_CONNECT: (
+        "Failed to connect to MetaTrader 5 terminal (terminal may not be running)"
+    ),
     MT5TerminalError.INTERNAL_FAIL_TIMEOUT: "IPC communication timed out",
 }
 
@@ -96,121 +109,91 @@ MT5_TRADE_RETCODE_DESCRIPTIONS: dict[int, str] = {
     MT5TradeRetcode.INVALID_VOLUME: "Invalid order volume",
     MT5TradeRetcode.INVALID_PRICE: "Invalid order price",
     MT5TradeRetcode.INVALID_STOPS: "Invalid stop loss or take profit price",
-    MT5TradeRetcode.TRADE_DISABLED: "Trading is disabled on account or instrument",
-    MT5TradeRetcode.MARKET_CLOSED: "Market is closed for the instrument",
+    MT5TradeRetcode.TRADE_DISABLED: "Trading is disabled",
+    MT5TradeRetcode.MARKET_CLOSED: "Market is closed",
     MT5TradeRetcode.NO_MONEY: "Insufficient funds to execute trade",
     MT5TradeRetcode.PRICE_CHANGED: "Prices have changed",
-    MT5TradeRetcode.PRICE_OFF: "No quotes available to process request",
+    MT5TradeRetcode.PRICE_OFF: "No quotes are available",
     MT5TradeRetcode.INVALID_EXPIRATION: "Invalid order expiration date",
     MT5TradeRetcode.ORDER_CHANGED: "Order state has changed",
     MT5TradeRetcode.TOO_MANY_REQUESTS: "Too frequent trade requests",
-    MT5TradeRetcode.NO_CHANGES: "No changes specified in modification request",
+    MT5TradeRetcode.NO_CHANGES: "No changes specified",
     MT5TradeRetcode.SERVER_DISABLES_AT: "Auto-trading disabled by server",
-    MT5TradeRetcode.CLIENT_DISABLES_AT: "Auto-trading disabled by client terminal",
+    MT5TradeRetcode.CLIENT_DISABLES_AT: "Auto-trading disabled by client",
     MT5TradeRetcode.LOCKED: "Request locked for processing",
     MT5TradeRetcode.FROZEN: "Order or position is frozen",
-    MT5TradeRetcode.INVALID_FILL: "Unsupported order execution fill type",
+    MT5TradeRetcode.INVALID_FILL: "Unsupported order fill type",
     MT5TradeRetcode.CONNECTION: "No connection with trade server",
-    MT5TradeRetcode.ONLY_REAL: "Operation allowed only for live accounts",
-    MT5TradeRetcode.LIMIT_ORDERS: "Number of pending orders has reached the limit",
-    MT5TradeRetcode.LIMIT_VOLUME: "Volume of orders and positions for symbol reached limit",
-    MT5TradeRetcode.POSITION_CLOSED: "Position with specified ticket is already closed",
-    MT5TradeRetcode.INVALID_CLOSE_VOLUME: "Close volume exceeds open position volume",
-    MT5TradeRetcode.CLOSE_ORDER_EXIST: "Close order already exists for this position",
-    MT5TradeRetcode.LIMIT_POSITIONS: "Number of open positions has reached the limit",
+    MT5TradeRetcode.ONLY_REAL: "Operation allowed only for real accounts",
+    MT5TradeRetcode.LIMIT_ORDERS: "Pending-order limit reached",
+    MT5TradeRetcode.LIMIT_VOLUME: "Symbol volume limit reached",
+    MT5TradeRetcode.INVALID_ORDER: "Unsupported or prohibited order type",
+    MT5TradeRetcode.POSITION_CLOSED: "Position is already closed",
+    MT5TradeRetcode.INVALID_CLOSE_VOLUME: "Close volume exceeds position volume",
+    MT5TradeRetcode.CLOSE_ORDER_EXIST: "Close order already exists",
+    MT5TradeRetcode.LIMIT_POSITIONS: "Open-position limit reached",
+    MT5TradeRetcode.REJECT_CANCEL: "Pending-order activation rejected",
+    MT5TradeRetcode.LONG_ONLY: "Only long positions are allowed",
+    MT5TradeRetcode.SHORT_ONLY: "Only short positions are allowed",
+    MT5TradeRetcode.CLOSE_ONLY: "Only position closing is allowed",
+    MT5TradeRetcode.FIFO_CLOSE: "Positions must be closed FIFO",
+    MT5TradeRetcode.HEDGE_PROHIBITED: "Opposite positions are prohibited",
+}
+
+TIMEFRAME_MAP: dict[ENUM_TIMEFRAMES, int] = {
+    timeframe: int(timeframe) for timeframe in ENUM_TIMEFRAMES
 }
 
 
+def _timeframe_aliases() -> dict[str, ENUM_TIMEFRAMES]:
+    aliases: dict[str, ENUM_TIMEFRAMES] = {}
+    for timeframe in ENUM_TIMEFRAMES:
+        name = timeframe.name.removeprefix("PERIOD_")
+        aliases[name] = timeframe
+        match = re.fullmatch(r"([MHDW])(\d+)", name)
+        if match:
+            unit, multiple = match.groups()
+            aliases[f"{multiple}{unit}"] = timeframe
+        elif name == "MN1":
+            aliases["1MN"] = timeframe
+    return aliases
+
+
+_TIMEFRAME_ALIASES = _timeframe_aliases()
+
+
 def get_mt5_error_description(code: int) -> str:
-    """Retrieve human-readable description for an MT5 terminal error code.
-
-    Args:
-        code: Integer error code.
-
-    Returns:
-        Description string.
-    """
+    """Return the description of one terminal error code."""
     return MT5_TERMINAL_ERROR_DESCRIPTIONS.get(code, f"Unknown MT5 error [{code}]")
 
 
 def get_mt5_retcode_description(retcode: int) -> str:
-    """Retrieve human-readable description for an MT5 trade server return code.
-
-    Args:
-        retcode: Integer return code.
-
-    Returns:
-        Description string.
-    """
+    """Return the description of one trade-server result code."""
     return MT5_TRADE_RETCODE_DESCRIPTIONS.get(
         retcode, f"Unknown MT5 trade retcode [{retcode}]"
     )
 
 
-TIMEFRAME_MAP: dict[str, int] = {
-    "1M": 1,
-    "M1": 1,
-    "2M": 2,
-    "M2": 2,
-    "3M": 3,
-    "M3": 3,
-    "4M": 4,
-    "M4": 4,
-    "5M": 5,
-    "M5": 5,
-    "6M": 6,
-    "M6": 6,
-    "10M": 10,
-    "M10": 10,
-    "12M": 12,
-    "M12": 12,
-    "15M": 15,
-    "M15": 15,
-    "20M": 20,
-    "M20": 20,
-    "30M": 30,
-    "M30": 30,
-    "1H": 16385,
-    "H1": 16385,
-    "2H": 16386,
-    "H2": 16386,
-    "3H": 16387,
-    "H3": 16387,
-    "4H": 16388,
-    "H4": 16388,
-    "6H": 16390,
-    "H6": 16390,
-    "8H": 16392,
-    "H8": 16392,
-    "12H": 16396,
-    "H12": 16396,
-    "1D": 16408,
-    "D1": 16408,
-    "1W": 32769,
-    "W1": 32769,
-    "1MN": 49153,
-    "MN1": 49153,
-}
+def resolve_timeframe(value: Any) -> int:
+    """Encode a canonical or boundary timeframe as a MetaTrader integer.
 
-
-def resolve_timeframe(tf: Any) -> int:
-    """Resolve timeframe argument into standard MT5 integer constant.
-
-    Args:
-        tf: String (e.g. '1m', 'H1', '1d') or integer constant.
-
-    Returns:
-        MT5 integer timeframe constant (defaults to 1 for M1).
+    Raises:
+        ValueError: If a boolean is supplied as a timeframe.
     """
-    if isinstance(tf, int):
-        return tf
-    if isinstance(tf, str):
-        cleaned = tf.strip().upper()
-        if cleaned in TIMEFRAME_MAP:
-            return TIMEFRAME_MAP[cleaned]
+    if isinstance(value, bool):
+        raise ValueError(f"unsupported MetaTrader timeframe: {value!r}")
+    if isinstance(value, ENUM_TIMEFRAMES):
+        return TIMEFRAME_MAP[value]
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        cleaned = value.strip().upper()
+        timeframe = _TIMEFRAME_ALIASES.get(cleaned)
+        if timeframe is not None:
+            return TIMEFRAME_MAP[timeframe]
         if cleaned.isdigit():
             return int(cleaned)
-    return 1  # Default to M1
+    return TIMEFRAME_MAP[PERIOD_M1]
 
 
 __all__ = [

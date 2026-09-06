@@ -5,6 +5,24 @@ from __future__ import annotations
 from enum import IntEnum
 from typing import Any
 
+from app.contracts.data.timeframes import (
+    ENUM_TIMEFRAMES,
+    PERIOD_D1,
+    PERIOD_H1,
+    PERIOD_H4,
+    PERIOD_H12,
+    PERIOD_M1,
+    PERIOD_M2,
+    PERIOD_M3,
+    PERIOD_M4,
+    PERIOD_M5,
+    PERIOD_M10,
+    PERIOD_M15,
+    PERIOD_M30,
+    PERIOD_MN1,
+    PERIOD_W1,
+)
+
 
 class CTraderErrorCode(IntEnum):
     """cTrader OpenAPI error and return codes."""
@@ -51,35 +69,42 @@ def get_ctrader_error_description(code: int) -> str:
     return CTRADER_ERROR_DESCRIPTIONS.get(code, f"Unknown cTrader error [{code}]")
 
 
-TIMEFRAME_MAP: dict[str, str] = {
-    "1M": "m1",
-    "M1": "m1",
-    "2M": "m2",
-    "M2": "m2",
-    "3M": "m3",
-    "M3": "m3",
-    "4M": "m4",
-    "M4": "m4",
-    "5M": "m5",
-    "M5": "m5",
-    "10M": "m10",
-    "M10": "m10",
-    "15M": "m15",
-    "M15": "m15",
-    "30M": "m30",
-    "M30": "m30",
-    "1H": "h1",
-    "H1": "h1",
-    "4H": "h4",
-    "H4": "h4",
-    "12H": "h12",
-    "H12": "h12",
-    "1D": "d1",
-    "D1": "d1",
-    "1W": "w1",
-    "W1": "w1",
-    "1MN": "mn1",
-    "MN1": "mn1",
+TIMEFRAME_MAP: dict[ENUM_TIMEFRAMES, str] = {
+    PERIOD_M1: "m1",
+    PERIOD_M2: "m2",
+    PERIOD_M3: "m3",
+    PERIOD_M4: "m4",
+    PERIOD_M5: "m5",
+    PERIOD_M10: "m10",
+    PERIOD_M15: "m15",
+    PERIOD_M30: "m30",
+    PERIOD_H1: "h1",
+    PERIOD_H4: "h4",
+    PERIOD_H12: "h12",
+    PERIOD_D1: "d1",
+    PERIOD_W1: "w1",
+    PERIOD_MN1: "mn1",
+}
+
+_TIMEFRAME_ALIASES = {
+    alias: period
+    for period, aliases in {
+        PERIOD_M1: ("1M", "M1"),
+        PERIOD_M2: ("2M", "M2"),
+        PERIOD_M3: ("3M", "M3"),
+        PERIOD_M4: ("4M", "M4"),
+        PERIOD_M5: ("5M", "M5"),
+        PERIOD_M10: ("10M", "M10"),
+        PERIOD_M15: ("15M", "M15"),
+        PERIOD_M30: ("30M", "M30"),
+        PERIOD_H1: ("1H", "H1"),
+        PERIOD_H4: ("4H", "H4"),
+        PERIOD_H12: ("12H", "H12"),
+        PERIOD_D1: ("1D", "D1"),
+        PERIOD_W1: ("1W", "W1"),
+        PERIOD_MN1: ("1MN", "MN1"),
+    }.items()
+    for alias in aliases
 }
 
 
@@ -91,11 +116,28 @@ def resolve_timeframe(tf: Any) -> str:
 
     Returns:
         cTrader trendbar period string (e.g. 'm1', 'h1', 'd1').
+
+    Raises:
+        ValueError: If a canonical timeframe is invalid or unsupported.
     """
+    if isinstance(tf, bool):
+        raise ValueError(f"unsupported cTrader timeframe: {tf!r}")
+    if isinstance(tf, (ENUM_TIMEFRAMES, int)):
+        try:
+            period = ENUM_TIMEFRAMES(tf)
+        except ValueError as error:
+            raise ValueError(f"invalid canonical timeframe: {tf!r}") from error
+        try:
+            return TIMEFRAME_MAP[period]
+        except KeyError as error:
+            raise ValueError(
+                f"cTrader does not support canonical timeframe {period.name}"
+            ) from error
     if isinstance(tf, str):
         cleaned = tf.strip().upper()
-        if cleaned in TIMEFRAME_MAP:
-            return TIMEFRAME_MAP[cleaned]
+        alias_period = _TIMEFRAME_ALIASES.get(cleaned)
+        if alias_period is not None:
+            return TIMEFRAME_MAP[alias_period]
         return tf.lower()
     return "m1"
 

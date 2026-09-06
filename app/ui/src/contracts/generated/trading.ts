@@ -85,6 +85,13 @@ export interface DispatchReceipt {
   received_at: string;
   schema_version?: 1;  // default: 1
 }
+export type ENUM_DEAL_TYPE = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17;
+export type ENUM_ORDER_STATE = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+export type ENUM_ORDER_TYPE = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export type ENUM_ORDER_TYPE_FILLING = 0 | 1 | 3 | 2;
+export type ENUM_ORDER_TYPE_TIME = 0 | 1 | 2 | 3;
+export type ENUM_TRADE_REQUEST_ACTIONS = 1 | 5 | 6 | 7 | 8 | 10;
+export type ENUM_TRADE_TRANSACTION_TYPE = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 export interface ExecutePublicActionsRequest {
   request_id: string;
   capability_snapshot_id: string;
@@ -392,6 +399,45 @@ export interface TradePlan {
   session_id: string;
   evidence_version_ids?: string[];  // default: []
   content_hash: string;
+  schema_version?: 1;  // default: 1
+}
+export interface TradeRequest {
+  action: ENUM_TRADE_REQUEST_ACTIONS;
+  magic: number;
+  order: number;
+  symbol: string;
+  volume: number;
+  price: number;
+  stoplimit: number;
+  sl: number;
+  tp: number;
+  deviation: number;
+  type: ENUM_ORDER_TYPE;
+  type_filling: ENUM_ORDER_TYPE_FILLING;
+  type_time: ENUM_ORDER_TYPE_TIME;
+  expiration?: string | null;  // default: null
+  comment?: string;  // default: ""
+  position?: number;  // default: 0
+  position_by?: number;  // default: 0
+  schema_version?: 1;  // default: 1
+}
+export interface TradeTransaction {
+  deal: number;
+  order: number;
+  symbol: string;
+  type: ENUM_TRADE_TRANSACTION_TYPE;
+  order_type: ENUM_ORDER_TYPE;
+  order_state: ENUM_ORDER_STATE;
+  deal_type: ENUM_DEAL_TYPE;
+  time_type: ENUM_ORDER_TYPE_TIME;
+  time_expiration?: string | null;  // default: null
+  price: number;
+  price_trigger: number;
+  price_sl: number;
+  price_tp: number;
+  volume: number;
+  position: number;
+  position_by: number;
   schema_version?: 1;  // default: 1
 }
 export interface TradingDeal {

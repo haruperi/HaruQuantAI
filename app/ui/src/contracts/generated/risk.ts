@@ -441,3 +441,14 @@ export interface StrategyEligibilityDecision {
   schema_version?: 1;  // default: 1
 }
 export type StrategyEligibilityOutcome = "ELIGIBLE" | "CONDITIONAL" | "INELIGIBLE";
+export interface TradeCheckResult {
+  retcode: number;
+  balance: number;
+  equity: number;
+  profit: number;
+  margin: number;
+  margin_free: number;
+  margin_level: number;
+  comment: string;
+  schema_version?: 1;  // default: 1
+}

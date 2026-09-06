@@ -50,6 +50,12 @@ from app.contracts.data.models import (
     Bar,
 )
 from app.contracts.data.ports import AggregateBarsCapability
+from app.contracts.data.timeframes import (
+    ENUM_TIMEFRAMES,
+    PERIOD_CURRENT,
+    PERIOD_MN1,
+    parse_timeframe,
+)
 from app.services.data.bar_aggregation.config import BarAggregationConfig
 
 if TYPE_CHECKING:
@@ -57,24 +63,33 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-_STANDARD_PRESETS: dict[str, Timeframe] = {
-    "M1": Timeframe(unit="MINUTE", multiple=1),
-    "M5": Timeframe(unit="MINUTE", multiple=5),
-    "M15": Timeframe(unit="MINUTE", multiple=15),
-    "M30": Timeframe(unit="MINUTE", multiple=30),
-    "H1": Timeframe(unit="MINUTE", multiple=60),
-    "H4": Timeframe(unit="MINUTE", multiple=240),
-    "D1": Timeframe(unit="DAY", multiple=1),
-    "W1": Timeframe(unit="WEEK", multiple=1),
-    "MN": Timeframe(unit="MONTH", multiple=1),
-    "MN1": Timeframe(unit="MONTH", multiple=1),
-}
-
 _TIMEFRAME_REGEX = re.compile(r"^(M|H|D|W|MN)(\d+)$", re.IGNORECASE)
 _MAX_TIMEFRAME_MULTIPLE = 1_000_000
 _MINUTES_IN_HOUR = 60
 _DAYS_IN_WEEK = 7
 _MONTHS_IN_YEAR = 12
+
+
+def _standard_timeframe_model(period: ENUM_TIMEFRAMES) -> Timeframe:
+    """Map one exact standard-period identifier to the richer interval model."""
+    code = period.name.removeprefix("PERIOD_")
+    if code.startswith("MN"):
+        return Timeframe(unit="MONTH", multiple=int(code[2:]))
+    unit, multiple = code[0], int(code[1:])
+    if unit == "M":
+        return Timeframe(unit="MINUTE", multiple=multiple)
+    if unit == "H":
+        return Timeframe(unit="MINUTE", multiple=multiple * _MINUTES_IN_HOUR)
+    if unit == "D":
+        return Timeframe(unit="DAY", multiple=multiple)
+    return Timeframe(unit="WEEK", multiple=multiple)
+
+
+_STANDARD_PRESETS: dict[ENUM_TIMEFRAMES, Timeframe] = {
+    period: _standard_timeframe_model(period)
+    for period in ENUM_TIMEFRAMES
+    if period is not PERIOD_CURRENT
+}
 
 
 def _generate_uuid7() -> Uuid7:
@@ -192,8 +207,12 @@ def _parse_timeframe_str(timeframe_str: str) -> Timeframe:
         msg = "Timeframe string cannot be empty"
         raise ValueError(msg)
 
-    if cleaned in _STANDARD_PRESETS:
-        return _STANDARD_PRESETS[cleaned]
+    if cleaned == "MN":
+        return _STANDARD_PRESETS[PERIOD_MN1]
+    try:
+        return _STANDARD_PRESETS[parse_timeframe(cleaned)]
+    except KeyError, ValueError:
+        pass
 
     match = _TIMEFRAME_REGEX.match(cleaned)
     if not match:
@@ -236,6 +255,11 @@ def data_define_custom_timeframes(
     if isinstance(timeframe_input, Timeframe):
         _validate_multiple_bounds(timeframe_input.multiple)
         return timeframe_input
+
+    if isinstance(timeframe_input, ENUM_TIMEFRAMES):
+        if timeframe_input is PERIOD_CURRENT:
+            raise ValueError("PERIOD_CURRENT has no standalone aggregation interval")
+        return _STANDARD_PRESETS[timeframe_input]
 
     if isinstance(timeframe_input, dict):
         return _parse_timeframe_dict(timeframe_input)
@@ -366,7 +390,7 @@ def _get_bucket_start(
 
 def data_aggregate_timeframes(
     bars: Sequence[Bar],
-    target_timeframe: str | Timeframe | dict[str, Any],
+    target_timeframe: ENUM_TIMEFRAMES | str | Timeframe | dict[str, Any],
     *,
     session_start_hour: int | None = None,
     session_end_hour: int | None = None,

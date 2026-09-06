@@ -537,6 +537,117 @@
       "title": "DispatchReceipt",
       "type": "object"
     },
+    "ENUM_DEAL_TYPE": {
+      "description": "Defines the identifier set for deal type.",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "title": "ENUM_DEAL_TYPE",
+      "type": "integer"
+    },
+    "ENUM_ORDER_STATE": {
+      "description": "Defines the identifier set for order state.",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "title": "ENUM_ORDER_STATE",
+      "type": "integer"
+    },
+    "ENUM_ORDER_TYPE": {
+      "description": "Defines the identifier set for order type.",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "title": "ENUM_ORDER_TYPE",
+      "type": "integer"
+    },
+    "ENUM_ORDER_TYPE_FILLING": {
+      "description": "Defines the identifier set for order type filling.",
+      "enum": [
+        0,
+        1,
+        3,
+        2
+      ],
+      "title": "ENUM_ORDER_TYPE_FILLING",
+      "type": "integer"
+    },
+    "ENUM_ORDER_TYPE_TIME": {
+      "description": "Defines the identifier set for order type time.",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "title": "ENUM_ORDER_TYPE_TIME",
+      "type": "integer"
+    },
+    "ENUM_TRADE_REQUEST_ACTIONS": {
+      "description": "Defines the identifier set for trade request actions.",
+      "enum": [
+        1,
+        5,
+        6,
+        7,
+        8,
+        10
+      ],
+      "title": "ENUM_TRADE_REQUEST_ACTIONS",
+      "type": "integer"
+    },
+    "ENUM_TRADE_TRANSACTION_TYPE": {
+      "description": "Defines the identifier set for trade transaction type.",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "title": "ENUM_TRADE_TRANSACTION_TYPE",
+      "type": "integer"
+    },
     "ExecutePublicActionsRequest": {
       "additionalProperties": false,
       "description": "Operation-discriminated public action request.\n\nROUTE_ACTION and GOVERN_BULK require only ``action``; QUERY_STATE\nrequires only ``query``.",
@@ -3048,6 +3159,238 @@
       "title": "TradePlan",
       "type": "object"
     },
+    "TradeRequest": {
+      "additionalProperties": false,
+      "description": "Canonical provider-neutral trade execution request.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ENUM_TRADE_REQUEST_ACTIONS"
+        },
+        "comment": {
+          "default": "",
+          "title": "Comment",
+          "type": "string"
+        },
+        "deviation": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Deviation",
+          "type": "integer"
+        },
+        "expiration": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expiration"
+        },
+        "magic": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Magic",
+          "type": "integer"
+        },
+        "order": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Order",
+          "type": "integer"
+        },
+        "position": {
+          "default": 0,
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Position",
+          "type": "integer"
+        },
+        "position_by": {
+          "default": 0,
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Position By",
+          "type": "integer"
+        },
+        "price": {
+          "minimum": 0,
+          "title": "Price",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sl": {
+          "minimum": 0,
+          "title": "Sl",
+          "type": "number"
+        },
+        "stoplimit": {
+          "minimum": 0,
+          "title": "Stoplimit",
+          "type": "number"
+        },
+        "symbol": {
+          "title": "Symbol",
+          "type": "string"
+        },
+        "tp": {
+          "minimum": 0,
+          "title": "Tp",
+          "type": "number"
+        },
+        "type": {
+          "$ref": "#/$defs/ENUM_ORDER_TYPE"
+        },
+        "type_filling": {
+          "$ref": "#/$defs/ENUM_ORDER_TYPE_FILLING"
+        },
+        "type_time": {
+          "$ref": "#/$defs/ENUM_ORDER_TYPE_TIME"
+        },
+        "volume": {
+          "minimum": 0,
+          "title": "Volume",
+          "type": "number"
+        }
+      },
+      "required": [
+        "action",
+        "magic",
+        "order",
+        "symbol",
+        "volume",
+        "price",
+        "stoplimit",
+        "sl",
+        "tp",
+        "deviation",
+        "type",
+        "type_filling",
+        "type_time"
+      ],
+      "title": "TradeRequest",
+      "type": "object"
+    },
+    "TradeTransaction": {
+      "additionalProperties": false,
+      "description": "Canonical provider-neutral trade lifecycle transaction.",
+      "properties": {
+        "deal": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Deal",
+          "type": "integer"
+        },
+        "deal_type": {
+          "$ref": "#/$defs/ENUM_DEAL_TYPE"
+        },
+        "order": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Order",
+          "type": "integer"
+        },
+        "order_state": {
+          "$ref": "#/$defs/ENUM_ORDER_STATE"
+        },
+        "order_type": {
+          "$ref": "#/$defs/ENUM_ORDER_TYPE"
+        },
+        "position": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Position",
+          "type": "integer"
+        },
+        "position_by": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Position By",
+          "type": "integer"
+        },
+        "price": {
+          "minimum": 0,
+          "title": "Price",
+          "type": "number"
+        },
+        "price_sl": {
+          "minimum": 0,
+          "title": "Price Sl",
+          "type": "number"
+        },
+        "price_tp": {
+          "minimum": 0,
+          "title": "Price Tp",
+          "type": "number"
+        },
+        "price_trigger": {
+          "minimum": 0,
+          "title": "Price Trigger",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "symbol": {
+          "title": "Symbol",
+          "type": "string"
+        },
+        "time_expiration": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Time Expiration"
+        },
+        "time_type": {
+          "$ref": "#/$defs/ENUM_ORDER_TYPE_TIME"
+        },
+        "type": {
+          "$ref": "#/$defs/ENUM_TRADE_TRANSACTION_TYPE"
+        },
+        "volume": {
+          "minimum": 0,
+          "title": "Volume",
+          "type": "number"
+        }
+      },
+      "required": [
+        "deal",
+        "order",
+        "symbol",
+        "type",
+        "order_type",
+        "order_state",
+        "deal_type",
+        "time_type",
+        "price",
+        "price_trigger",
+        "price_sl",
+        "price_tp",
+        "volume",
+        "position",
+        "position_by"
+      ],
+      "title": "TradeTransaction",
+      "type": "object"
+    },
     "TradingDeal": {
       "additionalProperties": false,
       "description": "One authority execution deal (record R15).\n\nDeals are the authority for executed quantity and realized state;\nuniqueness ``(session_id, authority_deal_id)`` spans records and is\nstore-enforced.",
@@ -4412,6 +4755,12 @@
     },
     "TradePlan": {
       "$ref": "#/$defs/TradePlan"
+    },
+    "TradeRequest": {
+      "$ref": "#/$defs/TradeRequest"
+    },
+    "TradeTransaction": {
+      "$ref": "#/$defs/TradeTransaction"
     },
     "TradingDeal": {
       "$ref": "#/$defs/TradingDeal"

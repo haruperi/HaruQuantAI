@@ -833,6 +833,215 @@
       "title": "BrowseReferenceSuccess",
       "type": "object"
     },
+    "CalendarCountry": {
+      "additionalProperties": false,
+      "description": "Economic-calendar country metadata.",
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        },
+        "currency_symbol": {
+          "title": "Currency Symbol",
+          "type": "string"
+        },
+        "id": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Id",
+          "type": "integer"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "url_name": {
+          "title": "Url Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "code",
+        "currency",
+        "currency_symbol",
+        "url_name"
+      ],
+      "title": "CalendarCountry",
+      "type": "object"
+    },
+    "CalendarEvent": {
+      "additionalProperties": false,
+      "description": "Economic-calendar event definition.",
+      "properties": {
+        "country_id": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Country Id",
+          "type": "integer"
+        },
+        "digits": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Digits",
+          "type": "integer"
+        },
+        "event_code": {
+          "title": "Event Code",
+          "type": "string"
+        },
+        "frequency": {
+          "$ref": "#/$defs/ENUM_CALENDAR_EVENT_FREQUENCY"
+        },
+        "id": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Id",
+          "type": "integer"
+        },
+        "importance": {
+          "$ref": "#/$defs/ENUM_CALENDAR_EVENT_IMPORTANCE"
+        },
+        "multiplier": {
+          "$ref": "#/$defs/ENUM_CALENDAR_EVENT_MULTIPLIER"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sector": {
+          "$ref": "#/$defs/ENUM_CALENDAR_EVENT_SECTOR"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "time_mode": {
+          "$ref": "#/$defs/ENUM_CALENDAR_EVENT_TIMEMODE"
+        },
+        "type": {
+          "$ref": "#/$defs/ENUM_CALENDAR_EVENT_TYPE"
+        },
+        "unit": {
+          "$ref": "#/$defs/ENUM_CALENDAR_EVENT_UNIT"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "sector",
+        "frequency",
+        "time_mode",
+        "country_id",
+        "unit",
+        "importance",
+        "multiplier",
+        "digits",
+        "source_url",
+        "event_code",
+        "name"
+      ],
+      "title": "CalendarEvent",
+      "type": "object"
+    },
+    "CalendarValue": {
+      "additionalProperties": false,
+      "description": "One versioned observation for an economic-calendar event.",
+      "properties": {
+        "actual_value": {
+          "maximum": 9223372036854775807,
+          "minimum": -9223372036854775808,
+          "title": "Actual Value",
+          "type": "integer"
+        },
+        "event_id": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Event Id",
+          "type": "integer"
+        },
+        "forecast_value": {
+          "maximum": 9223372036854775807,
+          "minimum": -9223372036854775808,
+          "title": "Forecast Value",
+          "type": "integer"
+        },
+        "id": {
+          "maximum": 18446744073709551615,
+          "minimum": 0,
+          "title": "Id",
+          "type": "integer"
+        },
+        "impact_type": {
+          "$ref": "#/$defs/ENUM_CALENDAR_EVENT_IMPACT"
+        },
+        "period": {
+          "format": "date-time",
+          "title": "Period",
+          "type": "string"
+        },
+        "prev_value": {
+          "maximum": 9223372036854775807,
+          "minimum": -9223372036854775808,
+          "title": "Prev Value",
+          "type": "integer"
+        },
+        "revised_prev_value": {
+          "maximum": 9223372036854775807,
+          "minimum": -9223372036854775808,
+          "title": "Revised Prev Value",
+          "type": "integer"
+        },
+        "revision": {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "time": {
+          "format": "date-time",
+          "title": "Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "event_id",
+        "time",
+        "period",
+        "revision",
+        "actual_value",
+        "prev_value",
+        "revised_prev_value",
+        "forecast_value",
+        "impact_type"
+      ],
+      "title": "CalendarValue",
+      "type": "object"
+    },
     "ConnectorProfile": {
       "additionalProperties": false,
       "description": "One versioned connector identity and its governed limits.\n\nCredential references are opaque Workspace ``SecretRef`` identifiers\nand remain unavailable to strategy, result-panel, and research\nprocesses.",
@@ -1712,6 +1921,125 @@
         "REJECT"
       ],
       "type": "string"
+    },
+    "ENUM_BOOK_TYPE": {
+      "description": "Defines the identifier set for book type.",
+      "enum": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "title": "ENUM_BOOK_TYPE",
+      "type": "integer"
+    },
+    "ENUM_CALENDAR_EVENT_FREQUENCY": {
+      "description": "Defines the identifier set for calendar event frequency.",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "title": "ENUM_CALENDAR_EVENT_FREQUENCY",
+      "type": "integer"
+    },
+    "ENUM_CALENDAR_EVENT_IMPACT": {
+      "description": "Defines the identifier set for calendar event impact.",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "title": "ENUM_CALENDAR_EVENT_IMPACT",
+      "type": "integer"
+    },
+    "ENUM_CALENDAR_EVENT_IMPORTANCE": {
+      "description": "Defines the identifier set for calendar event importance.",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "title": "ENUM_CALENDAR_EVENT_IMPORTANCE",
+      "type": "integer"
+    },
+    "ENUM_CALENDAR_EVENT_MULTIPLIER": {
+      "description": "Defines the identifier set for calendar event multiplier.",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "title": "ENUM_CALENDAR_EVENT_MULTIPLIER",
+      "type": "integer"
+    },
+    "ENUM_CALENDAR_EVENT_SECTOR": {
+      "description": "Defines the identifier set for calendar event sector.",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "title": "ENUM_CALENDAR_EVENT_SECTOR",
+      "type": "integer"
+    },
+    "ENUM_CALENDAR_EVENT_TIMEMODE": {
+      "description": "Defines the identifier set for calendar event timemode.",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "title": "ENUM_CALENDAR_EVENT_TIMEMODE",
+      "type": "integer"
+    },
+    "ENUM_CALENDAR_EVENT_TYPE": {
+      "description": "Defines the identifier set for calendar event type.",
+      "enum": [
+        0,
+        1,
+        2
+      ],
+      "title": "ENUM_CALENDAR_EVENT_TYPE",
+      "type": "integer"
+    },
+    "ENUM_CALENDAR_EVENT_UNIT": {
+      "description": "Defines the identifier set for calendar event unit.",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "title": "ENUM_CALENDAR_EVENT_UNIT",
+      "type": "integer"
     },
     "ExternalIndicatorSeriesVersion": {
       "additionalProperties": false,
@@ -3063,6 +3391,45 @@
       "title": "NormalizeTicksSuccess",
       "type": "object"
     },
+    "OrderBookEntry": {
+      "additionalProperties": false,
+      "description": "One price level in an order-book snapshot.",
+      "properties": {
+        "price": {
+          "minimum": 0,
+          "title": "Price",
+          "type": "number"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "type": {
+          "$ref": "#/$defs/ENUM_BOOK_TYPE"
+        },
+        "volume": {
+          "maximum": 9223372036854775807,
+          "minimum": -9223372036854775808,
+          "title": "Volume",
+          "type": "integer"
+        },
+        "volume_real": {
+          "minimum": 0,
+          "title": "Volume Real",
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "price",
+        "volume",
+        "volume_real"
+      ],
+      "title": "OrderBookEntry",
+      "type": "object"
+    },
     "Precision": {
       "enum": [
         "SELECTED_TIMEFRAME",
@@ -3395,6 +3762,73 @@
         "decoder_version"
       ],
       "title": "QuantDataImportSpec",
+      "type": "object"
+    },
+    "RateBar": {
+      "additionalProperties": false,
+      "description": "One OHLC market-data bar.",
+      "properties": {
+        "close": {
+          "minimum": 0,
+          "title": "Close",
+          "type": "number"
+        },
+        "high": {
+          "minimum": 0,
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "minimum": 0,
+          "title": "Low",
+          "type": "number"
+        },
+        "open": {
+          "minimum": 0,
+          "title": "Open",
+          "type": "number"
+        },
+        "real_volume": {
+          "maximum": 9223372036854775807,
+          "minimum": -9223372036854775808,
+          "title": "Real Volume",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "spread": {
+          "maximum": 2147483647,
+          "minimum": -2147483648,
+          "title": "Spread",
+          "type": "integer"
+        },
+        "tick_volume": {
+          "maximum": 9223372036854775807,
+          "minimum": -9223372036854775808,
+          "title": "Tick Volume",
+          "type": "integer"
+        },
+        "time": {
+          "format": "date-time",
+          "title": "Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume",
+        "spread",
+        "real_volume"
+      ],
+      "title": "RateBar",
       "type": "object"
     },
     "ResolveQualityRequest": {
@@ -4740,6 +5174,15 @@
     "BrowseReferenceSuccess": {
       "$ref": "#/$defs/BrowseReferenceSuccess"
     },
+    "CalendarCountry": {
+      "$ref": "#/$defs/CalendarCountry"
+    },
+    "CalendarEvent": {
+      "$ref": "#/$defs/CalendarEvent"
+    },
+    "CalendarValue": {
+      "$ref": "#/$defs/CalendarValue"
+    },
     "ConnectorProfile": {
       "$ref": "#/$defs/ConnectorProfile"
     },
@@ -4824,6 +5267,9 @@
     "NormalizeTicksSuccess": {
       "$ref": "#/$defs/NormalizeTicksSuccess"
     },
+    "OrderBookEntry": {
+      "$ref": "#/$defs/OrderBookEntry"
+    },
     "PrepareProfilesRequest": {
       "$ref": "#/$defs/PrepareProfilesRequest"
     },
@@ -4832,6 +5278,9 @@
     },
     "QuantDataImportSpec": {
       "$ref": "#/$defs/QuantDataImportSpec"
+    },
+    "RateBar": {
+      "$ref": "#/$defs/RateBar"
     },
     "ResolveQualityRequest": {
       "$ref": "#/$defs/ResolveQualityRequest"

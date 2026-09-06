@@ -218,6 +218,19 @@ export interface ReadProviderStateSuccess {
   schema_version?: 1;  // default: 1
 }
 export type ReadinessState = "NOT_READY" | "READY";
+export interface TradeResult {
+  retcode: number;
+  deal: number;
+  order: number;
+  volume: number;
+  price: number;
+  bid: number;
+  ask: number;
+  comment: string;
+  request_id: number;
+  retcode_external: number;
+  schema_version?: 1;  // default: 1
+}
 export interface TransportOrdersRequest {
   request_id: string;
   capability_snapshot_id: string;

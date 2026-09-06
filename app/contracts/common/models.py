@@ -5,7 +5,9 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from pydantic import Field, StringConstraints, model_validator
+
+from app.contracts.common.wire_model import WireModel as WireModel  # noqa: PLC0414
 
 Uuid7 = Annotated[
     str,
@@ -131,12 +133,6 @@ type RuntimeRiskDecision = Literal[
     "BLOCK",
     "ERROR",
 ]
-
-
-class WireModel(BaseModel):
-    """Base configuration shared by public wire records."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
 
 
 class Money(WireModel):
@@ -354,7 +350,10 @@ class ProgressUpdate(WireModel):
     schema_version: Literal[1] = 1
 
 
+from app.contracts.common.structures import DateTimeParts  # noqa: E402
+
 WIRE_MODELS: dict[str, type[WireModel]] = {
+    "DateTimeParts": DateTimeParts,
     "Money": Money,
     "Timeframe": Timeframe,
     "SeriesPointKey": SeriesPointKey,

@@ -114,6 +114,44 @@ export interface BrowseReferenceSuccess {
   data?: JsonValue;  // default: null
   schema_version?: 1;  // default: 1
 }
+export interface CalendarCountry {
+  id: number;
+  name: string;
+  code: string;
+  currency: string;
+  currency_symbol: string;
+  url_name: string;
+  schema_version?: 1;  // default: 1
+}
+export interface CalendarEvent {
+  id: number;
+  type: ENUM_CALENDAR_EVENT_TYPE;
+  sector: ENUM_CALENDAR_EVENT_SECTOR;
+  frequency: ENUM_CALENDAR_EVENT_FREQUENCY;
+  time_mode: ENUM_CALENDAR_EVENT_TIMEMODE;
+  country_id: number;
+  unit: ENUM_CALENDAR_EVENT_UNIT;
+  importance: ENUM_CALENDAR_EVENT_IMPORTANCE;
+  multiplier: ENUM_CALENDAR_EVENT_MULTIPLIER;
+  digits: number;
+  source_url: string;
+  event_code: string;
+  name: string;
+  schema_version?: 1;  // default: 1
+}
+export interface CalendarValue {
+  id: number;
+  event_id: number;
+  time: string;
+  period: string;
+  revision: number;
+  actual_value: number;
+  prev_value: number;
+  revised_prev_value: number;
+  forecast_value: number;
+  impact_type: ENUM_CALENDAR_EVENT_IMPACT;
+  schema_version?: 1;  // default: 1
+}
 export interface ConnectorProfile {
   profile_id: string;
   connector_kind: NonEmptyStr;
@@ -240,6 +278,15 @@ export interface DataSeriesVersion {
   schema_version?: 1;  // default: 1
 }
 export type DeduplicationPolicy = "KEEP_FIRST" | "KEEP_LAST" | "REJECT";
+export type ENUM_BOOK_TYPE = 1 | 2 | 3 | 4;
+export type ENUM_CALENDAR_EVENT_FREQUENCY = 0 | 1 | 2 | 3 | 4 | 5;
+export type ENUM_CALENDAR_EVENT_IMPACT = 0 | 1 | 2;
+export type ENUM_CALENDAR_EVENT_IMPORTANCE = 0 | 1 | 2 | 3;
+export type ENUM_CALENDAR_EVENT_MULTIPLIER = 0 | 1 | 2 | 3 | 4;
+export type ENUM_CALENDAR_EVENT_SECTOR = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+export type ENUM_CALENDAR_EVENT_TIMEMODE = 0 | 1 | 2 | 3;
+export type ENUM_CALENDAR_EVENT_TYPE = 0 | 1 | 2;
+export type ENUM_CALENDAR_EVENT_UNIT = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 export interface ExternalIndicatorSeriesVersion {
   series_id: string;
   version: number;
@@ -426,6 +473,13 @@ export interface NormalizeTicksSuccess {
   result_version?: 1;  // default: 1
   schema_version?: 1;  // default: 1
 }
+export interface OrderBookEntry {
+  type: ENUM_BOOK_TYPE;
+  price: number;
+  volume: number;
+  volume_real: number;
+  schema_version?: 1;  // default: 1
+}
 export interface PrepareProfilesRequest {
   request_id: string;
   capability_snapshot_id: string;
@@ -451,6 +505,17 @@ export interface QuantDataImportSpec {
   series_selection?: NonEmptyStr[];  // default: []
   decoder_version: NonEmptyStr;
   mapping_version_ids?: string[];  // default: []
+  schema_version?: 1;  // default: 1
+}
+export interface RateBar {
+  time: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  tick_volume: number;
+  spread: number;
+  real_volume: number;
   schema_version?: 1;  // default: 1
 }
 export interface ResolveQualityRequest {

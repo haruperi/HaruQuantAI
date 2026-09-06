@@ -3172,6 +3172,64 @@
       ],
       "type": "string"
     },
+    "TradeCheckResult": {
+      "additionalProperties": false,
+      "description": "Provider-neutral pre-trade funds and margin check result.",
+      "properties": {
+        "balance": {
+          "title": "Balance",
+          "type": "number"
+        },
+        "comment": {
+          "title": "Comment",
+          "type": "string"
+        },
+        "equity": {
+          "title": "Equity",
+          "type": "number"
+        },
+        "margin": {
+          "title": "Margin",
+          "type": "number"
+        },
+        "margin_free": {
+          "title": "Margin Free",
+          "type": "number"
+        },
+        "margin_level": {
+          "title": "Margin Level",
+          "type": "number"
+        },
+        "profit": {
+          "title": "Profit",
+          "type": "number"
+        },
+        "retcode": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Retcode",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "retcode",
+        "balance",
+        "equity",
+        "profit",
+        "margin",
+        "margin_free",
+        "margin_level",
+        "comment"
+      ],
+      "title": "TradeCheckResult",
+      "type": "object"
+    },
     "ValidationIssue": {
       "additionalProperties": false,
       "description": "Machine-readable validation issue.",
@@ -3333,6 +3391,9 @@
     },
     "StrategyEligibilityDecision": {
       "$ref": "#/$defs/StrategyEligibilityDecision"
+    },
+    "TradeCheckResult": {
+      "$ref": "#/$defs/TradeCheckResult"
     }
   },
   "namespace": "risk",
