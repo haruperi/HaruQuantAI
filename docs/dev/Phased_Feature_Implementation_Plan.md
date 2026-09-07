@@ -286,9 +286,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-02"></a>
 
-### - [ ] Task 1.02 — FEAT-UI-14 — Call the typed backend and resume observation
+### - [x] Task 1.02 — FEAT-UI-14 — Call the typed backend and resume observation
 
-**Status:** `EXISTING_UNVERIFIED` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
+**Status:** `COMPLETE` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
 
 **Order prerequisites:** Phase 0 entry gate; no feature-task predecessor.
 
@@ -296,7 +296,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 Widgets share compatible authenticated requests, typed errors and reconnect behavior without duplicating transport semantics.
 
-**Reuse:** `app/ui/src/clients`. Retain the existing implementation; map current tests/usage to every listed requirement, execute them on the pinned baseline, and implement only failed, missing or newly required behaviour. Complete required contract, registration, integration, performance and removal evidence; do not rewrite already-passing behaviour.
+**Reconciled owner:** `app/ui/src/clients`. The retained 169-route client catalogue now has strict approved-wire validation, deterministic safe-read/abort/idempotency behavior, a scoped latest-request and deduplicated cursor-resuming observation lifecycle, exact removable capability registration, named AT/ATN tests, offline usage and terminal evidence.
 
 #### ii. Functional and non-functional requirements
 
@@ -322,11 +322,11 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 | ATN-UI-14-001 | Disable and physically remove clients; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
-**Acceptance test targets:** `app/ui/src/clients/__tests__/traceability.test.tsx`; `app/ui/src/clients/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
+**Acceptance test targets:** `app/ui/src/clients/__tests__/traceability.test.ts`; `app/ui/src/clients/__tests__/lifecycle.test.ts`. The exact register test symbols and audited path binding are retained in terminal evidence.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Call the typed backend and resume observation). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Schema drift and wrong response shapes fail visibly; no unchecked any/object fallback supplies a business value. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-14/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-14/acceptance.json`. Terminal Executor results are recorded with Reviewer authority still pending.
 
 #### iv. Definition of Done and commit
 
@@ -334,7 +334,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `feat(ui): complete FEAT-UI-14`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260907-203821-559690-v3-phases-1-16-1.02-14` — pending the authorized Task commit and no-ff merge transaction.
 
 ---
 

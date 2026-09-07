@@ -30,10 +30,13 @@
       "contract_target": "app/ui/src/clients/contracts.ts",
       "contract_status": "EXISTING",
       "test_targets": [
-        "app/ui/src/clients/__tests__/traceability.test.tsx",
-        "app/ui/src/clients/__tests__/lifecycle.test.tsx"
+        "app/ui/src/clients/__tests__/traceability.test.ts",
+        "app/ui/src/clients/__tests__/lifecycle.test.ts"
       ],
-      "existing_test_targets": [],
+      "existing_test_targets": [
+        "app/ui/src/clients/__tests__/traceability.test.ts",
+        "app/ui/src/clients/__tests__/lifecycle.test.ts"
+      ],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json"
     },
     {

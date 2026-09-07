@@ -6,8 +6,8 @@
     "disposition_counts": {
       "ADAPT": 55,
       "IMPLEMENT": 656,
-      "PROVED_COMPLETE": 13,
-      "VERIFY": 127
+      "PROVED_COMPLETE": 16,
+      "VERIFY": 124
     }
   },
   "requirements": [
@@ -48,7 +48,7 @@
       "feature_id": "FEAT-UI-14",
       "task_id": "1.02",
       "text": "Validate generated/approved wire DTOs and preserve existing ApiResponse/ApiError/ApiMetadata/StreamEvent contracts.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json"
     },
     {
@@ -56,7 +56,7 @@
       "feature_id": "FEAT-UI-14",
       "task_id": "1.02",
       "text": "Manage cookie/CSRF headers, bounded safe-read retries, stream cursors, abort, stale request cancellation and deduplicated subscriptions.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json"
     },
     {
@@ -4626,7 +4626,7 @@
       "feature_id": "FEAT-UI-14",
       "task_id": "1.02",
       "text": "Removing FEAT-UI-14 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json"
     },
     {

@@ -183,6 +183,24 @@ function isTransientGetFailure(method: string, status: number): boolean {
   return status === 0 || status === 408 || status === 429 || status >= 500;
 }
 
+/** Translate an aborted scope into a stable, non-retryable client failure. */
+function abortedRequest(
+  contract: RouteContract,
+  requestId: string,
+  traceId: string | undefined,
+  cause?: unknown,
+): ApiClientError {
+  return new ApiClientError({
+    message: `request aborted for ${contract.id}`,
+    status: 0,
+    code: "GOVERNED_REQUEST_STALE",
+    requestId,
+    traceId: traceId ?? null,
+    retryable: false,
+    cause,
+  });
+}
+
 /** Sleep helper used only for the single retry back-off. */
 function delay(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -391,12 +409,24 @@ async function sendEnvelope<T>(
     try {
       response = await doFetch(contract, url, headers, options);
     } catch (cause) {
+      if (options.signal?.aborted) {
+        throw abortedRequest(contract, requestId, options.traceId, cause);
+      }
       if (
         retryEnabled &&
         attempt === 1 &&
         isTransientGetFailure(contract.method, 0)
       ) {
-        await delay(100, options.signal).catch(() => {});
+        try {
+          await delay(100, options.signal);
+        } catch (delayCause) {
+          throw abortedRequest(
+            contract,
+            requestId,
+            options.traceId,
+            delayCause,
+          );
+        }
         continue;
       }
       throw new ApiClientError({
@@ -417,7 +447,16 @@ async function sendEnvelope<T>(
       isTransientGetFailure(contract.method, response.status)
     ) {
       await response.text().catch(() => {});
-      await delay(100, options.signal).catch(() => {});
+      try {
+        await delay(100, options.signal);
+      } catch (delayCause) {
+        throw abortedRequest(
+          contract,
+          requestId,
+          options.traceId,
+          delayCause,
+        );
+      }
       continue;
     }
 
@@ -444,7 +483,15 @@ function buildHeaders(
   }
   if (contract.idempotencyRequired) {
     const key = options.idempotencyKey ?? safeRandomUuid();
-    if (key) headers["Idempotency-Key"] = key;
+    if (!key) {
+      throw new ApiClientError({
+        message: `idempotency identity unavailable for ${contract.id}`,
+        status: 0,
+        code: "IDEMPOTENCY_KEY_REQUIRED",
+        requestId,
+      });
+    }
+    headers["Idempotency-Key"] = key;
   }
   // Double-submit CSRF: read the JS-readable csrf cookie and mirror it as a
   // header for non-safe methods under cookie auth.

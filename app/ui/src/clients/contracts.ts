@@ -80,7 +80,9 @@ export const apiMetadataSchema = z
     next_cursor: z.string().nullable().nullish(),
     page_size: z.number().int().min(0).max(200).nullish(),
     idempotency_replayed: z.boolean().default(false),
+    schema_version: z.literal(1).default(1),
   })
+  .strict()
   .superRefine((value, ctx) => {
     if (value.stale && !value.stale_reason) {
       ctx.addIssue({
@@ -91,7 +93,23 @@ export const apiMetadataSchema = z
     }
   });
 
-export type ApiMetadata = z.infer<typeof apiMetadataSchema>;
+export interface ApiMetadata {
+  readonly contract_version: "v1";
+  readonly schema_id: "api.metadata.v1";
+  readonly request_id: string;
+  readonly route: string;
+  readonly operation: string;
+  readonly trace_id?: string | null;
+  readonly side_effect: RouteSideEffect;
+  readonly duration_ms?: number | null;
+  readonly timestamp: string;
+  readonly stale: boolean;
+  readonly stale_reason?: string | null;
+  readonly next_cursor?: string | null;
+  readonly page_size?: number | null;
+  readonly idempotency_replayed: boolean;
+  readonly schema_version?: 1;
+}
 
 /**
  * Structured error payload.
@@ -100,16 +118,27 @@ export type ApiMetadata = z.infer<typeof apiMetadataSchema>;
  * values capped at 256 characters by the backend; the frontend performs a
  * structural check only (the bound is documented, not re-enforced here).
  */
-export const apiErrorSchema = z.object({
-  code: apiErrorCode,
-  message: z.string().min(1),
-  details: z.record(z.string(), z.unknown()).default({}),
-  request_id: z.string().nullable().nullish(),
-  trace_id: z.string().nullable().nullish(),
-  retryable: z.boolean().default(false),
-});
+export const apiErrorSchema = z
+  .object({
+    code: apiErrorCode,
+    message: z.string().min(1),
+    details: z.record(z.string(), z.unknown()).default({}),
+    request_id: z.string().nullable().nullish(),
+    trace_id: z.string().nullable().nullish(),
+    retryable: z.boolean().default(false),
+    schema_version: z.literal(1).default(1),
+  })
+  .strict();
 
-export type ApiError = z.infer<typeof apiErrorSchema>;
+export interface ApiError {
+  readonly code: ApiErrorCode;
+  readonly message: string;
+  readonly details: Readonly<Record<string, unknown>>;
+  readonly request_id?: string | null;
+  readonly trace_id?: string | null;
+  readonly retryable: boolean;
+  readonly schema_version?: 1;
+}
 
 /**
  * Success branch of the response envelope.
@@ -118,23 +147,29 @@ export type ApiError = z.infer<typeof apiErrorSchema>;
  * validates its own response shape.
  */
 function successResponseSchema<T extends z.ZodTypeAny>(dataSchema: T) {
-  return z.object({
-    status: z.literal("success"),
-    message: z.string().min(1),
-    data: dataSchema,
-    error: z.null(),
-    metadata: apiMetadataSchema,
-  });
+  return z
+    .object({
+      status: z.literal("success"),
+      message: z.string().min(1),
+      data: dataSchema,
+      error: z.null(),
+      metadata: apiMetadataSchema,
+      schema_version: z.literal(1).default(1),
+    })
+    .strict();
 }
 
 /** Error branch of the response envelope. */
-const errorResponseSchema = z.object({
-  status: z.literal("error"),
-  message: z.string().min(1),
-  data: z.null(),
-  error: apiErrorSchema,
-  metadata: apiMetadataSchema,
-});
+const errorResponseSchema = z
+  .object({
+    status: z.literal("error"),
+    message: z.string().min(1),
+    data: z.null(),
+    error: apiErrorSchema,
+    metadata: apiMetadataSchema,
+    schema_version: z.literal(1).default(1),
+  })
+  .strict();
 
 /**
  * Build a discriminated-union response schema for a given payload type.
@@ -191,16 +226,39 @@ export type StreamEventType = z.infer<typeof streamEventType>;
  * (`app/services/api/workstation/data/stream_routes.py`). Each SSE frame carries `id`
  * (sequence), `event` (event_type), and `data` (this JSON envelope).
  */
-export const streamEventSchema = z.object({
-  sequence: z.number().int().min(0),
-  request_id: z.string().min(1),
-  trace_id: z.string().nullable().nullish(),
-  route: z.string().min(1).startsWith("/"),
-  event_type: streamEventType,
-  timestamp: z.string().min(1),
-  payload: z.record(z.string(), z.unknown()).nullable().nullish(),
-  error: z.string().nullable().nullish(),
-  cursor: z.string().nullable().nullish(),
-});
+const streamErrorSchema = z
+  .record(z.string(), z.unknown())
+  .transform((error) => {
+    const message = error.message;
+    return typeof message === "string" && message.length > 0
+      ? message
+      : "stream reported an error";
+  });
 
-export type StreamEvent = z.infer<typeof streamEventSchema>;
+export const streamEventSchema = z
+  .object({
+    sequence: z.number().int().min(0),
+    request_id: z.string().min(1),
+    trace_id: z.string().nullable().nullish(),
+    route: z.string().min(1).startsWith("/"),
+    event_type: streamEventType,
+    timestamp: z.string().min(1),
+    payload: z.record(z.string(), z.unknown()).nullable().nullish(),
+    error: streamErrorSchema.nullable().nullish(),
+    cursor: z.string().nullable().nullish(),
+    schema_version: z.literal(1).default(1),
+  })
+  .strict();
+
+export interface StreamEvent {
+  readonly sequence: number;
+  readonly request_id: string;
+  readonly trace_id?: string | null;
+  readonly route: string;
+  readonly event_type: StreamEventType;
+  readonly timestamp: string;
+  readonly payload?: Readonly<Record<string, unknown>> | null;
+  readonly error?: string | null;
+  readonly cursor?: string | null;
+  readonly schema_version?: 1;
+}

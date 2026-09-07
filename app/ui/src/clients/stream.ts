@@ -118,6 +118,17 @@ export async function* openStream(
       signal: options.signal,
     });
   } catch (cause) {
+    if (options.signal?.aborted) {
+      throw new ApiClientError({
+        message: `stream aborted for ${contract.id}`,
+        status: 0,
+        code: "GOVERNED_REQUEST_STALE",
+        retryable: false,
+        requestId,
+        traceId: options.traceId ?? null,
+        cause,
+      });
+    }
     throw new ApiClientError({
       message: `network error opening stream ${contract.id}`,
       status: 0,
@@ -144,10 +155,14 @@ export async function* openStream(
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  let completed = false;
   try {
     while (true) {
       const { done, value } = await reader.read();
-      if (done) break;
+      if (done) {
+        completed = true;
+        break;
+      }
       buffer += decoder.decode(value, { stream: true });
       // SSE frames are separated by a blank line. Process complete frames.
       let separatorIndex = buffer.indexOf("\n\n");
@@ -166,6 +181,17 @@ export async function* openStream(
     }
   } catch (cause) {
     if (cause instanceof ApiClientError) throw cause;
+    if (options.signal?.aborted) {
+      throw new ApiClientError({
+        message: `stream aborted for ${contract.id}`,
+        status: 0,
+        code: "GOVERNED_REQUEST_STALE",
+        retryable: false,
+        requestId,
+        traceId: options.traceId ?? null,
+        cause,
+      });
+    }
     throw new ApiClientError({
       message: `stream read error for ${contract.id}`,
       status: 0,
@@ -176,6 +202,13 @@ export async function* openStream(
       cause,
     });
   } finally {
+    if (!completed) {
+      try {
+        await reader.cancel();
+      } catch {
+        // Best-effort cancellation; the originating error remains authoritative.
+      }
+    }
     try {
       reader.releaseLock();
     } catch {

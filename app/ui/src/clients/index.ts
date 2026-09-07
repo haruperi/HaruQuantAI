@@ -79,6 +79,22 @@ export type {
 export { BAR_TIMEFRAMES } from "./data";
 export { openStream } from "./stream";
 export type { StreamTransportOptions } from "./stream";
+export {
+  TypedBackendCapabilityRegistry,
+  TypedBackendFeature,
+} from "./feature";
+export {
+  TypedBackendLifecycle,
+  type RequestTransport,
+  type StreamErrorListener,
+  type StreamListener,
+  type StreamSubscription,
+  type StreamTransport,
+} from "./lifecycle";
+export {
+  TYPED_BACKEND_CAPABILITY,
+  TYPED_BACKEND_MANIFEST,
+} from "./manifest";
 export type { StrategyCatalogue, StrategyVersion } from "./strategies";
 export type {
   BarPreview,
