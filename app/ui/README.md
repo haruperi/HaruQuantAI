@@ -161,7 +161,7 @@ Feature owners are independent and physically removable. The selected package is
 | Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
 | [`FEAT-UI-01`](#feat-ui-01) | Compose and restore the research workspace | `app/ui/src/widgets/workspaces/` | U1 | 4 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-14`](#feat-ui-14) | Call the typed backend and resume observation | `app/ui/src/clients/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-14`](#feat-ui-14) | Call the typed backend and resume observation | `app/ui/src/clients/` | U1 | 2 | 1 | PROVED_COMPLETE |
 | [`FEAT-UI-15`](#feat-ui-15) | Capture current authorized widget context | `app/ui/src/context/` | U2 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-UI-16`](#feat-ui-16) | Navigate capabilities and explain workspace controls | `app/ui/src/components/layout/` | U1 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-UI-17`](#feat-ui-17) | Present session access and scope changes | `app/ui/src/app/` | U1 | 2 | 1 | NOT_REVALIDATED |
@@ -528,7 +528,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-01`. Withd
 
 > **Feature ID:** `FEAT-UI-14`
 > **Domain:** `ui`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Complete` — typed wire validation, scoped request/stream lifecycle, removal, usage and acceptance evidence **PROVED_COMPLETE**.
 > **Selected owner:** `app/ui/src/clients/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -597,8 +597,8 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-14-001` | Validate generated/approved wire DTOs and preserve existing ApiResponse/ApiError/ApiMetadata/StreamEvent contracts. | `AT-UI-14-001` | Schema drift and wrong response shapes fail visibly; no unchecked any/object fallback supplies a business value. |
-| PENDING | `FR-TRC-UI-14-002` | Manage cookie/CSRF headers, bounded safe-read retries, stream cursors, abort, stale request cancellation and deduplicated subscriptions. | `AT-UI-14-002` | Mutations are retried only by their original idempotency identity and reconciliation policy; navigation aborts stale observations. |
+| PROVED_COMPLETE | `FR-TRC-UI-14-001` | Validate generated/approved wire DTOs and preserve existing ApiResponse/ApiError/ApiMetadata/StreamEvent contracts. | `AT-UI-14-001` | Strict Zod mirrors reject unknown envelope fields, wrong versions/branches and invalid owner payloads; stream error objects are validated before safe-message projection. |
+| PROVED_COMPLETE | `FR-TRC-UI-14-002` | Manage cookie/CSRF headers, bounded safe-read retries, stream cursors, abort, stale request cancellation and deduplicated subscriptions. | `AT-UI-14-002` | One request identity survives the sole safe-read retry, mutations never enter the generic retry path, abort prevents a stale retry, and one keyed observation resumes once from its last validated sequence. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -606,7 +606,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-14-001` | Removing FEAT-UI-14 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-14-001` | Disable and physically remove clients; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PROVED_COMPLETE | `NFR-TRC-UI-14-001` | Removing FEAT-UI-14 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-14-001` | Exact-key withdrawal disposes owned requests/streams, reports `DEPENDENCY_UNAVAILABLE`, and preserves an unrelated capability object without fallback selection. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -616,15 +616,17 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/ui/clients/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/ui/clients/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-14/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `app/ui/src/clients/__tests__/traceability.test.ts`; `app/ui/src/clients/__tests__/lifecycle.test.ts`; retained focused transport tests | PROVED_COMPLETE: `test_trc_call_typed_backend_001` and `test_trc_call_typed_backend_002` bind strict schema and complete transport-lifecycle oracles. |
+| Every ATN ID in this card | `app/ui/src/clients/__tests__/lifecycle.test.ts` | PROVED_COMPLETE: `test_trc_call_typed_backend_nfr_001` binds exact withdrawal, unavailable behavior, unrelated-object preservation and cleanup. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-UI-14/acceptance.json` | ACCEPTED evidence records actual contract, composition, Interfaces and UI gates; backend provider and browser E2E are correctly not applicable to this presentation transport feature. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
 #### Feature Usage Examples
 
 **Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+The executable owner is `app/ui/src/clients/_usage.tsx`; it runs offline with injected transports, validates a typed owner envelope, rejects drift, supersedes a stale request, shares and cursor-resumes one observation, withdraws the exact capability, preserves an unrelated object and awaits cleanup. See `app/ui/src/clients/README.md` for public operations and limits.
 
 #### Removal Behaviour
 

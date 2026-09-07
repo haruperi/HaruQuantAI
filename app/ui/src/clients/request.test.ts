@@ -235,6 +235,49 @@ describe("request — FR-UI-001 typed transport", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it("does not retry a mutation even when retry is requested", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response(null, { status: 503 }));
+    globalThis.fetch = fetchMock as unknown as typeof globalThis.fetch;
+
+    await expect(
+      request(operatorRoutes.approvals, {
+        body: {},
+        idempotencyKey: "same-operation-identity",
+        retry: true,
+      }),
+    ).rejects.toBeInstanceOf(ApiClientError);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const headers = fetchMock.mock.calls[0]?.[1]?.headers as Record<
+      string,
+      string
+    >;
+    expect(headers["Idempotency-Key"]).toBe("same-operation-identity");
+  });
+
+  it("aborts during safe-read backoff without issuing a stale retry", async () => {
+    vi.useFakeTimers();
+    const controller = new AbortController();
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response(null, { status: 503 }));
+    globalThis.fetch = fetchMock as unknown as typeof globalThis.fetch;
+    const pending = request(dataRoutes.symbols, { signal: controller.signal });
+    const rejected = expect(pending).rejects.toMatchObject({
+      code: "GOVERNED_REQUEST_STALE",
+      retryable: false,
+    });
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    controller.abort("navigation");
+    await vi.runAllTimersAsync();
+
+    await rejected;
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
   it("propagates stale metadata through the envelope", async () => {
     const staleEnvelope = {
       ...envelope({ status: "healthy", checked_at: "2026-08-03T12:00:00Z" }),

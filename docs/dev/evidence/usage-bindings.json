@@ -19,11 +19,11 @@
       "feature_id": "FEAT-UI-14",
       "task_id": "1.02",
       "usage_target": "app/ui/src/clients/_usage.tsx",
-      "usage_status": "PLANNED",
-      "executable_recipe": "npm --prefix app/ui run test -- src/clients/__tests__/traceability.test.tsx",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "npm --prefix app/ui run test -- src/clients/__tests__/traceability.test.ts",
       "test_targets": [
-        "app/ui/src/clients/__tests__/traceability.test.tsx",
-        "app/ui/src/clients/__tests__/lifecycle.test.tsx"
+        "app/ui/src/clients/__tests__/traceability.test.ts",
+        "app/ui/src/clients/__tests__/lifecycle.test.ts"
       ],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json",
       "offline_only": true,

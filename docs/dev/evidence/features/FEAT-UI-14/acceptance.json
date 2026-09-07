@@ -1,0 +1,99 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-UI-14",
+  "task_id": "1.02",
+  "status": "ACCEPTED",
+  "owner_specification": "app/ui/README.md",
+  "baseline_commit": "feb395241912214ac6a7af3491f3abc519b70c9d",
+  "acceptance_commit": "task-closeout:20260907-203821-559690-v3-phases-1-16-1.02-14",
+  "requirements": [
+    {
+      "id": "FR-TRC-UI-14-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/clients/__tests__/traceability.test.ts::test_trc_call_typed_backend_001"
+    },
+    {
+      "id": "FR-TRC-UI-14-002",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/clients/__tests__/lifecycle.test.ts::test_trc_call_typed_backend_002 and request/stream focused tests"
+    },
+    {
+      "id": "NFR-TRC-UI-14-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/clients/__tests__/lifecycle.test.ts::test_trc_call_typed_backend_nfr_001"
+    },
+    { "id": "NFR-A-001", "status": "PASS", "evidence_target": "Typed feature manifest, package ownership and architecture check" },
+    { "id": "NFR-A-002", "status": "PASS", "evidence_target": "Exact public capability and no import-time registration" },
+    { "id": "NFR-A-003", "status": "PASS", "evidence_target": "Interfaces wire authority retained; client mirrors only" },
+    { "id": "NFR-A-004", "status": "PASS", "evidence_target": "Explicit lifecycle owner and exact disposer" },
+    { "id": "NFR-A-005", "status": "PASS", "evidence_target": "No feature-to-feature implementation import added" },
+    { "id": "NFR-A-006", "status": "PASS", "evidence_target": "Feature-local manifest, lifecycle and removal evidence" },
+    { "id": "NFR-P-002", "status": "PASS", "evidence_target": "Bounded one-retry and one-reconnect policies" },
+    { "id": "NFR-P-003", "status": "PASS", "evidence_target": "Deduplicated stream source and latest-only request ownership" },
+    { "id": "NFR-P-005", "status": "PASS", "evidence_target": "Focused Vitest, typecheck and production build" },
+    { "id": "NFR-P-013", "status": "PASS", "evidence_target": "Mutation generic retry denied; original idempotency identity retained" },
+    { "id": "NFR-R-002", "status": "PASS", "evidence_target": "Typed explicit unavailable and stale outcomes" },
+    { "id": "NFR-R-003", "status": "PASS", "evidence_target": "Bounded cursor resume from last validated event" },
+    { "id": "NFR-R-005", "status": "PASS", "evidence_target": "Idempotent abort, withdrawal and task settlement" },
+    { "id": "NFR-S-001", "status": "PASS", "evidence_target": "Strict approved wire-envelope validation" },
+    { "id": "NFR-S-002", "status": "PASS", "evidence_target": "Cookie/CSRF/idempotency boundaries retained" },
+    { "id": "NFR-S-003", "status": "PASS", "evidence_target": "Safe bounded lifecycle keys reject payload-like values" },
+    { "id": "NFR-S-004", "status": "PASS", "evidence_target": "No credential or owner payload persistence" },
+    { "id": "NFR-S-005", "status": "PASS", "evidence_target": "Unknown schema fields and invalid versions fail closed" },
+    { "id": "NFR-S-006", "status": "PASS", "evidence_target": "Offline usage and secret scan; no sensitive output" },
+    { "id": "NFR-TRC-SHARED-BOUNDARIES", "status": "PASS", "evidence_target": "Contracts, lifecycle, manifest and README boundary evidence" },
+    { "id": "NFR-TRC-SHARED-CONFIG", "status": "PASS", "evidence_target": "Manifest declares no config keys; constants are internal limits" },
+    { "id": "NFR-TRC-SHARED-EVIDENCE", "status": "PASS", "evidence_target": "Named AT/ATN tests, usage and acceptance manifest" },
+    { "id": "NFR-TRC-SHARED-INTEGRITY", "status": "PASS", "evidence_target": "Generated evidence drift and Phase-0 validation gates" },
+    { "id": "NFR-TRC-SHARED-STORED-IDENTITY", "status": "PASS", "evidence_target": "Stable request/idempotency/cursor identity tests" }
+  ],
+  "catalogue_entries": [
+    "ApiResponse, ApiError, ApiMetadata and StreamEvent runtime mirrors",
+    "169 retained typed route contracts and domain clients",
+    "Cookie, CSRF, request, trace and idempotency transport controls",
+    "Latest-request and deduplicated cursor-resuming stream lifecycle"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "Strict Zod wire mirrors and AT-UI-14-001 schema-drift tests"
+    },
+    "provider": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-UI-14 is the presentation transport consumer and owns no backend provider."
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "Explicit ui.typed-backend@1 manifest, registry, exact withdrawal and lifecycle tests"
+    },
+    "interfaces": {
+      "status": "PASS",
+      "evidence": "Mirrors app/contracts/interfaces WireModel v1 and retains the 169 approved route catalogue"
+    },
+    "ui": {
+      "status": "PASS",
+      "evidence": "Six focused Vitest files, offline usage, TypeScript typecheck and Next production build"
+    },
+    "end_to_end": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "Transport behavior is verified with deterministic offline responses; real-provider browser qualification is owned by Task 1.30."
+    }
+  },
+  "commands": [
+    {
+      "command": "npm --prefix app/ui run test -- src/clients/request.test.ts src/clients/stream.test.ts src/clients/clients.test.ts src/clients/clients.contract.test.ts src/clients/__tests__/traceability.test.ts src/clients/__tests__/lifecycle.test.ts",
+      "exit_code": 0
+    },
+    { "command": "npm --prefix app/ui run usage -- src/clients/_usage.tsx", "exit_code": 0 },
+    { "command": "npm --prefix app/ui run typecheck", "exit_code": 0 },
+    { "command": "npm --prefix app/ui run build", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/generate_phase0_evidence.py --check", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/validate_phase0.py", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/validate_feature_docs.py", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/architecture_check.py", "exit_code": 0 }
+  ],
+  "review": {
+    "reviewer_verdict": "PENDING",
+    "reviewer_notes": "Executor evidence is terminal but untrusted until independent Review 1. No future approval is claimed."
+  }
+}
