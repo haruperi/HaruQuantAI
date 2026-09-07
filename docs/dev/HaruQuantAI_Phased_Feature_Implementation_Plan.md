@@ -65,7 +65,7 @@ Task order is the order printed below. A task can start only after its required 
 
 ### 2.1 Required evidence bundle — every feature
 
-Persist `docs/dev/SQX/evidence/features/<FEAT-ID>/acceptance.json`, linked test reports and the feature acceptance commit. The manifest records feature/task/source/README hashes, baseline and tested commit, each FR/local-NFR/shared-NFR/catalogue/acceptance mapping, exact commands and exit codes, fixture hashes, environment, review outcome, coverage, usage transcript or browser trace, lifecycle/removal results, and operation qualification status. Do not place credentials or private raw data in evidence.
+Persist `docs/dev/evidence/features/<FEAT-ID>/acceptance.json`, linked test reports and the feature acceptance commit. The manifest records feature/task/source/README hashes, baseline and tested commit, each FR/local-NFR/shared-NFR/catalogue/acceptance mapping, exact commands and exit codes, fixture hashes, environment, review outcome, coverage, usage transcript or browser trace, lifecycle/removal results, and operation qualification status. Do not place credentials or private raw data in evidence.
 
 To avoid a self-referential Git hash, evidence committed with the feature pins its tested tree/parent and report hashes. The Reviewer/Task close-out receipt records the final accepted commit SHA after creation; link it in the normal tracker/evidence index without creating another implementation task or an empty commit. Keep the planned scope immutable and record execution progress in the tracker and acceptance receipts.
 
@@ -223,7 +223,7 @@ Review source reconciliation, 205 one-to-one task slots, canonical README entrie
 
 **Visible completion:** Open a real workspace, sign in, change a setting, submit a bounded demonstration job, observe and cancel it in the Jobs widget, then reopen the layout.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_01.spec.ts` and `docs/dev/SQX/evidence/phases/phase-01.json`, owned by Task 1.30. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_01.spec.ts` and `docs/dev/evidence/phases/phase-01.json`, owned by Task 1.30. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-1-01"></a>
 
@@ -271,7 +271,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Compose and restore the research workspace). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Host/sidebar/type validation/templates all consume the same registry; a removed widget cannot be rediscovered by a stale static mapping. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-01/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-01/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -325,7 +325,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Call the typed backend and resume observation). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Schema drift and wrong response shapes fail visibly; no unchecked any/object fallback supplies a business value. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-14/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-14/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -381,7 +381,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Initialize/open a workspace with one active writer fence and explicit read-only recovery mode. Expected: Two concurrent writers yield one owner and one denied/read-only session; reopening preserves the same workspace ID. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-WS-MANAGE_WORKSPACES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-MANAGE_WORKSPACES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -437,7 +437,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Verify session expiry, revocation, principal and authorized account/workspace before returning a bounded identity projection. Expected: Expired, revoked and wrong-account sessions produce denial before any receiver mutation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -491,7 +491,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate extension identity/version, contributions, dependencies, compatible contracts, resources/hashes, permission/egress/resource requests and migration declarations. Expected: Unknown/overbroad permissions or incompatible majors fail before activation; manifest inspection executes no package code. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -549,7 +549,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Navigate large typed collections accessibly). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Numeric/date/null sorts preserve owner semantics; unknown/missing plugin columns have a recoverable unavailable state. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -605,7 +605,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Review typed edits and consequential action scope). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Keyboard/screen-reader fixtures reach confirm/cancel and restore focus; nested-modal traps are replaced with drawer/route/back navigation. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -663,7 +663,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Version and validate the existing API envelope, request/trace/idempotency metadata, side-effect classification and bounded errors. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: Wire compatibility goldens pass; a long command returns its actual owner job reference, not fabricated completion. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -719,7 +719,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Execute registered namespace-bound transactions with idempotency and expected revision; reject undeclared table/namespace access. Expected: A workflow writer cannot update claim tables; two competing expected-revision writes accept exactly one. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-WS-EXECUTE_PERSISTENCE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-EXECUTE_PERSISTENCE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -775,7 +775,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Create and resolve opaque secret references only for an authorized selected adapter generation and purpose. Expected: A UI, Agentic role or unrelated provider cannot resolve a secret; the approved adapter receives it only inside its isolated boundary. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-WS-SECURE_LOCAL_ACCESS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-SECURE_LOCAL_ACCESS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -831,7 +831,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Read and update schema-validated setting revisions using expected revision; reject unknown keys and incompatible combinations. Expected: A stale update conflicts; invalid values do not increment the version or partially apply. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -885,7 +885,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Register immutable owner-scoped contributions with exact ID/version/generation and return a disposer handle. Expected: Duplicate/conflicting registration is rejected; disposal removes only its own generation, not all matching names. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-PLUG-REGISTER_CONTRIBUTIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-PLUG-REGISTER_CONTRIBUTIONS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -941,7 +941,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Translate authenticated account/session operations into the Workspace identity contract with current cookie/CSRF semantics. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: Forgery/expiry/revocation/cross-account fixtures deny before mutation and never expose secret tokens. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-OPERATE_IDENTITY/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-OPERATE_IDENTITY/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1001,7 +1001,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Reserve a finite hierarchical resource profile for every heavy operation and reject/queue impossible requests before allocation. Expected: A child job cannot reserve its parent’s capacity again; missing or negative caps do not mean unlimited permission. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1059,7 +1059,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate immutable mandate identity/integrity, effective interval, objectives, enabled roles/features, environment/account/asset scope and finite budgets. Expected: Tampered, absent, future or expired mandate fails; the narrowest applicable owner/system rule wins. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1113,7 +1113,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Present session access and scope changes). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Cross-account cached selections and requests are cleared/aborted; unauthorized content is not briefly displayed. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-17/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-17/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1169,7 +1169,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Stage, flush and validate byte count/schema declaration/content hash before atomic publication; issue a custody receipt. Expected: A bad hash or truncated write yields no published artifact reference; retry of the same publication is idempotent. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-WS-MANAGE_ARTIFACTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-MANAGE_ARTIFACTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1227,7 +1227,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Persist accepted immutable job/input identity and enqueue intent atomically before reporting acceptance. Expected: A crash after the response but before dispatch still leaves one resolvable job; replaying the same logical request does not enqueue another. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ORCH-MANAGE_JOBS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ORCH-MANAGE_JOBS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1287,7 +1287,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Append correlated redacted role/model/tool/lease/handoff/policy/state/cost/refusal/failure/cleanup records. Expected: Secrets/unrestricted private text are redacted before persistence; bounded export preserves sequence and immutable artifact references. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-OPERATE_RUNS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-OPERATE_RUNS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1345,7 +1345,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Register immutable role/version, prompt, schemas, tools, model policy, limits, conflicts, refusals and evaluation references. Expected: Duplicate identity/version or unknown fields fail; registration returns one exact disposer handle. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-REGISTER_ROLES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-REGISTER_ROLES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1401,7 +1401,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Assemble scoped capability, build, runtime, trace and failure metadata with explicit unknown/unavailable states. Expected: A removed provider yields its owner’s readiness reason, not an invented healthy status. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-WS-BUILD_DIAGNOSTICS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-BUILD_DIAGNOSTICS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1457,7 +1457,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Dispatch small immutable work descriptors with pinned inputs/provider/runtime/seed/output schema and share read-only handles instead of pickling full histories. Expected: Windows spawn fixtures perform no import-time work; every worker verifies hashes and compatible generations before execution. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ORCH-EXECUTE_LOCAL_WORK/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ORCH-EXECUTE_LOCAL_WORK/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1519,7 +1519,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Register declared receiver capability/schema/permission/side-effect/environment/idempotency/cost/timeout/result-trust descriptors. Expected: Broker/order/approval/unrestricted shell/deployment tools are structurally unregistrable. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-GOVERN_TOOL_CALLS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-GOVERN_TOOL_CALLS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1579,7 +1579,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Pin provider/model/profile/role/prompt/composite/schema/context/tools/privacy/region/retention before a structured call. Expected: The returned provider/model identity must match the selected eligible profile; private SDK objects never cross the boundary. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-INVOKE_MODELS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-INVOKE_MODELS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1635,7 +1635,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Translate versioned settings queries/updates using expected revision and owner validation. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: Unknown keys/conflicts/narrower effective policy survive mapping unchanged. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-OPERATE_SETTINGS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-OPERATE_SETTINGS/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-ORCH-DELIVER_NOTIFICATIONS (Task 11.04, Phase 11). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -1693,7 +1693,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Expose authenticated job/resource/worker projections and supported owner control commands. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: Unsupported pause, wrong scope and quarantine release without authority fail closed. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-OPERATE_JOBS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-OPERATE_JOBS/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-ORCH-MANAGE_REMOTE_WORKERS (Task 15.01, Phase 15). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -1751,7 +1751,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Navigate capabilities and explain workspace controls). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Missing providers disable only affected actions with a reason; no menu item is declared operational from documentation alone. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-16/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-16/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1807,7 +1807,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Review effective settings and safe configuration changes). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: A CPU/memory/tick setting cannot silently change historical runs or override a stricter owner policy. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-13/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-13/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1863,7 +1863,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect and control jobs and workers). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: A correctly produced refusal is not a successful research badge; waiting for a person holds no fabricated worker slot. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-RUN_MONITOR/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-RUN_MONITOR/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -1919,9 +1919,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect bounded redacted diagnostic logs). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Clear display does not delete retained audit; attacker-controlled log text cannot execute markup. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-DEBUG_CONSOLE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-DEBUG_CONSOLE/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P01 — Open a real workspace, sign in, change a setting, submit a bounded demonstration job, observe and cancel it in the Jobs widget, then reopen the layout. Publish `docs/dev/SQX/evidence/phases/phase-01.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P01 — Open a real workspace, sign in, change a setting, submit a bounded demonstration job, observe and cancel it in the Jobs widget, then reopen the layout. Publish `docs/dev/evidence/phases/phase-01.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -1941,7 +1941,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Import a small authorized CSV or pinned provider fixture, inspect counts and chart data, diagnose a gap, apply a non-destructive repair, export the selected version, and reopen the same version after restart.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_02.spec.ts` and `docs/dev/SQX/evidence/phases/phase-02.json`, owned by Task 2.32. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_02.spec.ts` and `docs/dev/evidence/phases/phase-02.json`, owned by Task 2.32. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-2-01"></a>
 
@@ -1985,7 +1985,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Create/clone/edit/search/page instruments and preview mass edits and referenced-object deletion impact. Expected: A mass edit identifies exact affected IDs; referenced historical revisions remain readable after a new version is published. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-CAT-CATALOG_INSTRUMENTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-CAT-CATALOG_INSTRUMENTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2039,7 +2039,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Create/clone/edit ordered day/time session elements, SEOC flags and weekday templates in a named timezone/calendar version. Expected: Overlapping/invalid intervals are rejected; a weekday shortcut expands to the exact stored ordered elements. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-CAT-DEFINE_SESSIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-CAT-DEFINE_SESSIONS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2095,7 +2095,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate the MetaTrader 5 provider/version, credential references, instrument/history support and permitted-use configuration before connection. Expected: Unsupported history/schema/permission returns an explicit refusal; planned support is never displayed as connected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-METATRADER/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-METATRADER/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2151,7 +2151,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate the cTrader provider/version, credential references, instrument/history support and permitted-use configuration before connection. Expected: Unsupported history/schema/permission returns an explicit refusal; planned support is never displayed as connected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-CTRADER/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-CTRADER/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2207,7 +2207,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate the Binance provider/version, credential references, instrument/history support and permitted-use configuration before connection. Expected: Unsupported history/schema/permission returns an explicit refusal; planned support is never displayed as connected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-BINANCE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-BINANCE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2263,7 +2263,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate the Dukascopy provider/version, credential references, instrument/history support and permitted-use configuration before connection. Expected: Unsupported history/schema/permission returns an explicit refusal; planned support is never displayed as connected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-DUKASCOPY/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-DUKASCOPY/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2319,7 +2319,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate the Yahoo provider/version, credential references, instrument/history support and permitted-use configuration before connection. Expected: Unsupported history/schema/permission returns an explicit refusal; planned support is never displayed as connected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-YAHOO/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-YAHOO/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2373,7 +2373,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Resolve an explicit configured provider against its public supported-operation and current readiness declarations. Expected: Multiple compatible providers without explicit selection do not lead to nondeterministic choice. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-RESOLVE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-RESOLVE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2429,7 +2429,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Write closed Parquet parts using the initial Zstandard level 3 and approximately 128 MiB uncompressed row-group profile, bounded by admission. Expected: Appending a new period leaves all prior part hashes unchanged; no file-per-row/tick write path exists. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-MARKET_DATA_STORE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-MARKET_DATA_STORE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2483,7 +2483,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version exact provider symbols, postfix/mapping rules, timezone and customized instrument/session associations. Expected: The selected provider_symbol is passed unchanged to the adapter; a profile edit creates a new version. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-CAT-MAP_PROVIDERS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-CAT-MAP_PROVIDERS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2537,7 +2537,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Publish typed commission, swap, spread/slippage, minimum-distance, lot/size and netting/hedging profile descriptors with revision and units. Expected: Mixed/unknown units or invalid bounds fail validation; current profile changes do not alter a pinned run. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-CAT-DEFINE_TRADING_RULES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-CAT-DEFINE_TRADING_RULES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2591,7 +2591,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Resolve currency paths using only rates available by the pinned observation cutoff and expose rate/path provenance. Expected: A future quote cannot complete a historical path; missing or stale paths return typed unavailability. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-CAT-CONVERT_CURRENCIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-CAT-CONVERT_CURRENCIES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2647,7 +2647,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Detect gaps, duplicates, ordering faults, spikes, nonfinite/negative/zero-volume concerns, invalid OHLC and out-of-session observations under versioned thresholds. Expected: Boundary fixtures produce stable rule IDs, observation IDs and severity; zero volume is flagged by its feed policy, not universally fabricated or dropped. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-RESOLVE_QUALITY/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-RESOLVE_QUALITY/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2701,7 +2701,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Aggregate observations into half-open intervals with pinned origin, timezone/session/calendar and gap policy. Expected: An event exactly on the boundary enters the next interval; DST fixtures preserve the declared interval semantics. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-AGGREGATE_BARS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-AGGREGATE_BARS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2757,7 +2757,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Return paged observation previews, statistics, coverage and explicit chart LOD with version and sample. Expected: Preview respects requested projection and limits; missing series is unavailable rather than substituted. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-MANAGE_RETENTION/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-MANAGE_RETENTION/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2811,7 +2811,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Normalize timestamp resolution, source sequence, bid/ask/last atoms, volume meaning and masks without deduplicating equal-time updates. Expected: Equal-time quote changes remain in source order; last-only data never gains fabricated bid/ask quotes. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-NORMALIZE_TICKS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-NORMALIZE_TICKS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2865,7 +2865,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Generate bounded scenario series from explicit method/version/seed/units/gap parameters. Expected: The same seed/configuration yields the same series hash; changing a parameter creates a new version. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-GENERATE_SCENARIOS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-GENERATE_SCENARIOS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2919,7 +2919,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Register allowed source classes and retain observation, publication/availability, revision, licensing, trust, asset applicability and content hashes. Expected: A revised document unavailable at the requested cutoff is excluded; absent/inapplicable evidence returns typed coverage reasons. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-TRACK_MARKET_NEWS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-TRACK_MARKET_NEWS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -2975,7 +2975,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Import bounded delimited/CSV, Arrow/Parquet and registered tick/bar formats using an explicit column, encoding, timezone and malformed-row policy. Expected: Wrong type/version or timestamp mapping fails with row/path reasons; no format is inferred solely from its extension. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-INGEST_HISTORY/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-INGEST_HISTORY/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3029,7 +3029,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Resolve all primary/additional chart requirements into immutable observation/profile/calendar hashes and explicit coverage. Expected: Removing a required partition blocks admission; a current profile cannot silently replace the pinned historical version. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-BIND_RUN_DATA/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-BIND_RUN_DATA/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3083,7 +3083,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Stream normalized source events with stable identity/sequence, observed time, source and freshness status. Expected: Out-of-order/gap/reconnect fixtures preserve ordering diagnostics; a disconnected source becomes stale/unavailable, not frozen-live. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-STREAM_MARKET_EVENTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-STREAM_MARKET_EVENTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3137,7 +3137,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Create/edit/import/export/search groups and page their members with counts and protected-system status. Expected: CSV/XML membership exchange round-trips stable instrument IDs; protected group deletion is rejected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-CAT-MANAGE_UNIVERSES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-CAT-MANAGE_UNIVERSES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3191,7 +3191,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Align by declared observation/availability timestamps, calendar, units and as-of join policy. Expected: A higher-timeframe bar that has not closed cannot be joined into a lower-timeframe decision. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-ALIGN_SERIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-ALIGN_SERIES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3245,7 +3245,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Plan source-specific date/instrument updates using exact provider support and finite resource/rate budgets. Expected: An unsupported pause or range returns a per-item outcome; bulk commands resolve the authorized job set. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-SYNC_CONNECTORS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-SYNC_CONNECTORS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3299,7 +3299,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Bind source type, quantity/volume meaning, sessions, price scale and bin-input coverage. Expected: Tick-volume and exchange-volume fixtures remain differently labelled and cannot be compared as identical evidence. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-PREPARE_PROFILES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-PREPARE_PROFILES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3353,7 +3353,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Inspect supported QDM tick/bar artifacts with explicit version, symbol, timezone, precision and coverage mapping. Expected: Unknown layouts are unavailable/opaque; a supported fixture preserves count, timestamp and price/volume semantics. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-IMPORT_QUANTDATA/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-IMPORT_QUANTDATA/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3407,7 +3407,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Inspect supported CSV/XML catalogue schemas in a bounded parser and map to typed owner revisions. Expected: XXE/DTD/network resolution and duplicate identities fail; supported fixtures preserve units, timezone and mapping semantics. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-CAT-EXCHANGE_CATALOGUE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-CAT-EXCHANGE_CATALOGUE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3461,7 +3461,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Define/recognize a bounded external-series format and preview timestamp/value/unit/schema mappings. Expected: Malformed or incompatible formats return diagnostic rows before publication; recognition does not execute embedded content. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-IMPORT_INDICATORS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-IMPORT_INDICATORS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3515,7 +3515,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Return cursor-paged series metadata and Catalogue references with all §12.2 grid fields and explicit unavailable/partial states. Expected: Changing page/sort preserves row identity and snapshot; missing downstream providers are named. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-DATA-BROWSE_REFERENCE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-DATA-BROWSE_REFERENCE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3571,7 +3571,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Reuse the current Data/reference boundary and translate supported owner schema/actions without creating another data catalogue. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: Page/snapshot/size/permission errors are preserved; unsupported actions return CAPABILITY_UNAVAILABLE. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-OBSERVE_MARKET_REFERENCE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-OBSERVE_MARKET_REFERENCE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3627,7 +3627,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Operate the Data Manager workspace). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Filtering/selection/batch actions preserve stable IDs; missing capabilities are explicit and system/protected items cannot be edited locally. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-18/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-18/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3683,11 +3683,11 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect market charts and typed overlays). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Unavailable/wrong-series market data is not substituted; source version and synthetic/recorded labels remain visible. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-04/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-04/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-IFACE-OPERATE_RESULTS (Task 4.19, Phase 4). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
-**Phase checkpoint owner:** Run E2E-P02 — Import a small authorized CSV or pinned provider fixture, inspect counts and chart data, diagnose a gap, apply a non-destructive repair, export the selected version, and reopen the same version after restart. Publish `docs/dev/SQX/evidence/phases/phase-02.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P02 — Import a small authorized CSV or pinned provider fixture, inspect counts and chart data, diagnose a gap, apply a non-destructive repair, export the selected version, and reopen the same version after restart. Publish `docs/dev/evidence/phases/phase-02.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -3707,7 +3707,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Open Strategy Studio, construct an EMA crossover using real catalogue descriptors, validate, save/reopen an immutable revision, export/import native HSL and inspect pseudocode.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_03.spec.ts` and `docs/dev/SQX/evidence/phases/phase-03.json`, owned by Task 3.18. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_03.spec.ts` and `docs/dev/evidence/phases/phase-03.json`, owned by Task 3.18. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-3-01"></a>
 
@@ -3755,7 +3755,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Use declared price/source inputs, periods, seed, warm-up, session and availability policy; preserve multi-output component identity. Expected: EMA uses the simple mean of the first N valid closed values, then alpha=2/(N+1); no pre-seed output is usable. Future-value perturbations cannot alter already available outputs. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IND-CALCULATE_TREND/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IND-CALCULATE_TREND/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3813,7 +3813,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version oscillator units, bounds where applicable, smoothing, missingness and symmetry metadata; CCI is not declared bounded merely because it has a midpoint. Expected: Wilder RSI returns 50 for zero gain and zero loss, 100 for zero loss only and 0 for zero gain only; comparison/equality-boundary fixtures agree with the reference. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IND-CALCULATE_MOMENTUM/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IND-CALCULATE_MOMENTUM/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3871,7 +3871,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Bind estimator definition, window, annualization/session/OHLC assumptions, seed and unavailable conditions rather than treating all volatility measures as interchangeable. Expected: ATR seeds the mean of N valid true ranges using the prior available close and then Wilder smoothing; zero/invalid denominators and inadequate history are unavailable. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IND-CALCULATE_VOLATILITY/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IND-CALCULATE_VOLATILITY/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3929,7 +3929,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Require declared feed volume meaning, price/volume alignment and missingness; bind adjusted-data and session assumptions. Expected: Exchange-volume and tick-count inputs retain different provenance; a missing quantity cannot be silently interpreted as zero traded volume. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IND-CALCULATE_VOLUME_FLOW/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IND-CALCULATE_VOLUME_FLOW/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -3987,7 +3987,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Define each pattern with explicit body/shadow ratios, comparison policy, lookback and closed-bar availability before registration. Expected: Boundary and gap fixtures return true/false/unknown according to the registered definition; a forming or missing bar cannot produce a confirmed pattern. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IND-DETECT_CANDLE_PATTERNS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IND-DETECT_CANDLE_PATTERNS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4045,7 +4045,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Apply typed units, finite numerical domains, rolling state, fit-window metadata and explicit zero-variance/invalid arithmetic policies. Expected: Divide-by-zero and invalid log/root inputs are unavailable; fitted transforms reject evaluation timestamps and reuse training-fitted state on validation/test. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IND-TRANSFORM_SERIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IND-TRANSFORM_SERIES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4103,7 +4103,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate HSL language hsl version 2.0.0, schema hsl://schema/strategy/2.0.0, root records, ordered rules and node-store discriminators. Expected: Unknown executable fields/nodes, duplicate IDs, cycles, invalid references and unit/type mismatches produce stable node/path diagnostics; invalid drafts remain inspectable but unrunnable. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-DEFINE_AST/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-DEFINE_AST/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4161,7 +4161,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Register immutable block descriptors with type/unit/clock/lookback/parameter/missingness/symmetry/target support and exact contribution disposal. Expected: Two conflicting block ID/version definitions are rejected; removing a contribution removes only that descriptor and makes affected drafts explicitly incompatible. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-CATALOG_BLOCKS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-CATALOG_BLOCKS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4215,7 +4215,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate exactly one PRIMARY plus ordered SECONDARY/ORDER_TARGET bindings, instrument/timeframe/session references and nonnegative shifts. Expected: A second PRIMARY or negative shift fails at its path; reordering secondary bindings changes the appropriate canonical identity. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-CONFIGURE_CHARTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-CONFIGURE_CHARTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4271,7 +4271,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version disabled/fixed/percent/ATR/formula/absolute SL/PT, break-even, trailing, holding-bar and session/Friday exit definitions. Expected: Missing distance, illegal units, unsupported provider or a widening protective update fails validation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-MODEL_ATM_EXITS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-MODEL_ATM_EXITS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4327,7 +4327,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version template slots and retain/replace/extend/randomize/lock rules for long/short entry, exit and order subgraphs. Expected: Crossover, mutation and mirroring leave locked subgraphs unchanged; an incompatible template opens read-only with a report. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-EDIT_TEMPLATES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-EDIT_TEMPLATES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4381,7 +4381,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate typed indicator expressions, inputs, units, output shapes, causal history and supported operations. Expected: Unknown calls, cycles, future access or arbitrary source strings are rejected; supported definitions have deterministic test vectors. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-DEFINE_INDICATORS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-DEFINE_INDICATORS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4437,7 +4437,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Bind HSL content/semantic hash, node/provider versions, typed constants/operands/parameters/state, clock subscriptions and numerical policy. Expected: Unsupported nodes, types, clocks or provider generations produce source-mapped diagnostics before execution. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-COMPILE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-COMPILE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4495,7 +4495,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Create/load/clone/archive immutable strategy revisions with typed metadata, parameters, variables and lineage. Expected: Changing a display name follows metadata revision policy; previous run references still resolve the exact prior content hash. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-VERSION_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-VERSION_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4551,7 +4551,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Generate ordered pseudocode from the compiled plan with node/source mapping, units, clocks and warnings. Expected: The same branch/order/exit semantics are visible as in the plan; unavailable nodes cannot become executable-looking success. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-GENERATE_CODE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-GENERATE_CODE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4607,7 +4607,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Inspect .hsl.json and typed .hqa.zip manifests with member hashes, schema/dependencies, bounded hostile-input validation and opaque-member policy. Expected: Bad hash, traversal, case collision, zip bomb, deep JSON/XML or unsupported framing yields no accepted executable entity. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-EXCHANGE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-EXCHANGE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-ANA-EXCHANGE_RESULTS (Task 4.18, Phase 4); FEAT-POR-COMPOSE_PORTFOLIOS (Task 10.01, Phase 10); FEAT-ORCH-DEFINE_PROJECTS (Task 11.02, Phase 11); FEAT-RES-VALIDATE_MODELS (Task 14.05, Phase 14); FEAT-PLUG-MANAGE_LIFECYCLE (Task 12.08, Phase 12). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -4665,7 +4665,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Translate strategy authoring/revision/patch/exchange requests with exact candidate hash and expected revision. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: Changed base/selection conflicts remain visible; a save cannot implicitly start a backtest. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-OPERATE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-OPERATE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-STRAT-ACCEPT_PROPOSALS (Task 6.01, Phase 6); FEAT-STRAT-PACKAGE_STRATEGIES (Task 16.11, Phase 16); FEAT-STRAT-IMPORT_SQX (Task 16.10, Phase 16); FEAT-STRAT-DEFINE_SEARCH_SPACES (Task 8.01, Phase 8). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -4723,11 +4723,11 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Edit and review a strategy). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Round-trip edits and undo/redo preserve all supported nodes, order, parameters and bindings; invalid/unknown nodes remain inspectable but unrunnable. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-STRATEGY_STUDIO/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-STRATEGY_STUDIO/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-IFACE-AGENTIC_GATEWAY (Task 5.09, Phase 5); FEAT-IFACE-OPERATE_SIMULATIONS (Task 4.11, Phase 4). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
-**Phase checkpoint owner:** Run E2E-P03 — Open Strategy Studio, construct an EMA crossover using real catalogue descriptors, validate, save/reopen an immutable revision, export/import native HSL and inspect pseudocode. Publish `docs/dev/SQX/evidence/phases/phase-03.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P03 — Open Strategy Studio, construct an EMA crossover using real catalogue descriptors, validate, save/reopen an immutable revision, export/import native HSL and inspect pseudocode. Publish `docs/dev/evidence/phases/phase-03.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -4747,7 +4747,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Select the saved EMA strategy and versioned data, run an explicit recorded/generated tick backtest, reconnect during execution, inspect metrics/trades/equity, move selected databank members and export a provenance-complete result.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_04.spec.ts` and `docs/dev/SQX/evidence/phases/phase-04.json`, owned by Task 4.27. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_04.spec.ts` and `docs/dev/evidence/phases/phase-04.json`, owned by Task 4.27. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-4-01"></a>
 
@@ -4793,7 +4793,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect reproducible performance and lifecycle evidence). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Simulated-clock replay gives identical selection/operation order; stop/unmount leaves no timer/listener/worker/request. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-PERFORMANCE_LAB/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-PERFORMANCE_LAB/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4849,7 +4849,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Calculate fixed units, fixed currency risk, balance-percent risk, equity-percent risk and equity-price allocation from explicit finite inputs. Expected: Missing stop distance, conversion, price or illegal constraints fails; balance and equity bases cannot be interchanged silently. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RSK-SIZE_POSITIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RSK-SIZE_POSITIONS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4903,7 +4903,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Return authorized versioned risk/limit/admissibility projections with observation time, scope, expiry and provenance. Expected: Wrong-account or stale evidence is denied/unavailable; a model cannot replace missing risk truth. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RSK-ASSESS_RESEARCH_RISK/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RSK-ASSESS_RESEARCH_RISK/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -4957,7 +4957,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Expose immutable simulation-compatible account/mode/position-policy references for governed evaluations. Expected: A live session cannot be selected through a simulation-only request; missing policy prerequisites fail before execution. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-TRD-MANAGE_EXECUTION_SESSIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-TRD-MANAGE_EXECUTION_SESSIONS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5011,7 +5011,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Expose versioned netting/hedging, ownership, duplicate/replace/reversal and permitted transition semantics as typed pure descriptors. Expected: A simulator request cannot widen strategy/account scope; duplicate and replacement fixtures use the same owner-declared policy. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-TRD-MODEL_EXECUTION_POLICIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-TRD-MODEL_EXECUTION_POLICIES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5069,7 +5069,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Implement recorded replay and generated replay as registered methods with versioned algorithm/configuration, source, seed, density/timing/path/spread/gap/quantization policy. Expected: Generated methods cannot activate without a complete algorithm artifact and goldens; no unrequested method is selected by default. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-SIM-MODEL_TICKS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-SIM-MODEL_TICKS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5127,7 +5127,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Register each metric’s formula/version, units, sample, denominator, required inputs, rounding and typed undefined cases before enabling its column. Expected: No-loss Profit Factor, fewer-than-two-period Sharpe, zero-variance SQN and invalid/nonpositive CAGR inputs are undefined, never invented finite values. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-COMPUTE_METRICS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-COMPUTE_METRICS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5183,7 +5183,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Require a registered recorded/generated tick method or an explicitly selected saved profile that supplies it. Expected: Omitting the method is a validation error; M1/H1 chart timeframes never silently choose a bar-only engine. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-SIM-CONFIGURE_ENGINE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-SIM-CONFIGURE_ENGINE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5245,7 +5245,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Lower the target-neutral plan into typed instruction/operand/parameter/state buffers and execute all eligible events in a compiled nopython loop. Expected: Compiled-signature/profile checks show no per-tick Pydantic, dictionary traversal, pandas row iteration, capability resolution, SQL, SSE or model call. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-SIM-EXECUTE_TICKS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-SIM-EXECUTE_TICKS/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-IND-CALCULATE_MARKET_PROFILES (Task 13.01, Phase 13); FEAT-RES-INFER_MODELS (Task 14.03, Phase 14). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -5303,7 +5303,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Stream required ledgers/series/reducers into staged immutable parts and verify schema/count/hash before result metadata commitment. Expected: Failure after byte promotion but before metadata commit leaves a reconcilable orphan, never an active result pointing at partial bytes. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-SIM-COMMIT_RESULTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-SIM-COMMIT_RESULTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5359,7 +5359,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Validate/translate pinned simulation inputs and return the owner’s actual job/run handle. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: An omitted method is rejected by the owner and not replaced by a gateway default. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-OPERATE_SIMULATIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-OPERATE_SIMULATIONS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.18 (FEAT-UI-STRATEGY_STUDIO). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -5417,7 +5417,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Key cached results by strategy semantics/effective parameters, data/tick method/configuration/seed, costs, initial state, numerical/runtime, metrics and output profile. Expected: Changing any semantic field misses the cache; unrelated display metadata does not falsely create independent evidence. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-SIM-CACHE_EVALUATIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-SIM-CACHE_EVALUATIONS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5473,7 +5473,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate typed filter AST, stable identity tie-break sort, projection and snapshot cursor with page_size ≤200. Expected: Unknown columns/operators or raw SQL are rejected; expired tokens return typed resync rather than unstable continuation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-QUERY_RESULTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-QUERY_RESULTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5531,7 +5531,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Create/rename/clone/archive/delete databanks and version saved column/sort/filter/pin/visibility views. Expected: Missing plugin columns degrade explicitly; name collisions and stale revisions produce an actionable conflict. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-DATABANK_MEMBERSHIP/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-DATABANK_MEMBERSHIP/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5587,7 +5587,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Provide trade/order/position/signal references, timestamp/direction/size/price/cost/outcome/exit/MAE/MFE/R/sample fields with explicit availability. Expected: Missing initial risk yields unavailable R; absent tick excursions are not zero; expired orders retain their distinct record type. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-ANALYZE_TRADES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-ANALYZE_TRADES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5643,7 +5643,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Expose equity/balance/drawdown/benchmark/long-short/sample/periodic-return/rolling metric series with unit, currency, calendar, sample, count and provenance. Expected: No benchmark is hard-coded; incompatible currencies/calendars or missing data are explicit. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-PROJECT_SERIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-PROJECT_SERIES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5699,7 +5699,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Align two or more results by typed metric/sample/currency/calendar/definition and expose missing or incompatible fields. Expected: No implicit currency conversion or incompatible-definition equality is reported; original values remain visible. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-COMPARE_RESULTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-COMPARE_RESULTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5755,7 +5755,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Export server-resolved result/trade projections and versioned HTML/PDF/CSV/Parquet/Arrow/native report artifacts with filters, units, timezone and hashes. Expected: Output includes the requested population beyond the viewport; CSV formula injection and unsafe markup are contained. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-EXCHANGE_RESULTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-EXCHANGE_RESULTS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.16 (FEAT-STRAT-EXCHANGE_STRATEGIES). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -5813,7 +5813,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Translate typed snapshot/cursor/filter/projection/selection-token queries and governed bulk commands. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: page_size >200 and raw SQL are denied; server selection semantics survive transport. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-OPERATE_RESULTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-OPERATE_RESULTS/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-ANA-FILTER_CORRELATION (Task 10.03, Phase 10); FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS (Task 12.07, Phase 12). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -5873,7 +5873,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Configure and observe a canonical backtest). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: No method is silently selected; actual source/emitted/estimated tick counts are labelled correctly. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-27/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-27/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5929,7 +5929,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Compose the result inspection workspace). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Removing one panel/provider produces a named unavailable view without breaking other result views. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-32/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-32/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -5985,7 +5985,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Organize and act on a databank). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Removing a contributed column does not discard other view settings or change data; visible-row count is never substituted for selected population count. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-DATABANK_GRID/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-DATABANK_GRID/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6041,7 +6041,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Read a provenance-rich result summary). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: No-loss Profit Factor and undefined Sharpe remain unavailable; imported or incomplete data cannot appear natively qualified. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-RESULT_OVERVIEW/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-RESULT_OVERVIEW/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6097,7 +6097,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect and select individual trades). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Cross-page selection opens the exact ticket; missing R/MAE/MFE is not displayed as zero. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-TRADE_LIST/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-TRADE_LIST/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6153,7 +6153,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect equity, drawdown and benchmark paths). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Zoom/downsampling cannot alter risk metrics; time and trade-index axes are not silently interchanged. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-EQUITY_CHART/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-EQUITY_CHART/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6209,7 +6209,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Compare trade behavior across dimensions). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Open/close-time changes request a new projection and do not move source trades; missing categories are explicit. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-TRADE_ANALYSIS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-TRADE_ANALYSIS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6265,9 +6265,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect fills against their actual market context). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Missing data produces an authorized resolution action; a similarly named series is never substituted. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-TRADES_ON_CHART/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-TRADES_ON_CHART/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P04 — Select the saved EMA strategy and versioned data, run an explicit recorded/generated tick backtest, reconnect during execution, inspect metrics/trades/equity, move selected databank members and export a provenance-complete result. Publish `docs/dev/SQX/evidence/phases/phase-04.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P04 — Select the saved EMA strategy and versioned data, run an explicit recorded/generated tick backtest, reconnect during execution, inspect metrics/trades/equity, move selected databank members and export a provenance-complete result. Publish `docs/dev/evidence/phases/phase-04.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -6287,7 +6287,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Ask Chat Bot about a selected real result; show refreshed authorized evidence, specialist attribution, claim references, and run-inspector detail in the same conversation.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_05.spec.ts` and `docs/dev/SQX/evidence/phases/phase-05.json`, owned by Task 5.11. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_05.spec.ts` and `docs/dev/evidence/phases/phase-05.json`, owned by Task 5.11. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-5-01"></a>
 
@@ -6333,7 +6333,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Capture current authorized widget context). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Raw DOM, screenshots, credentials, private state and executable instruction fields are rejected. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-15/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-15/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6389,7 +6389,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Accept one idempotent turn identity and monotonic sequence under verified conversation/workspace/account scope. Expected: Replaying a submitted turn returns the same accepted turn; a concurrent stale writer is rejected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-WS-MANAGE_CONVERSATIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-MANAGE_CONVERSATIONS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6449,7 +6449,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Select owner evidence by scope, schema, availability cutoff, licensing, trust, freshness, revision and integrity. Expected: Future/revised/unlicensed/wrong-scope evidence is excluded with a reason; required missing evidence refuses. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-ASSEMBLE_CONTEXT/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-ASSEMBLE_CONTEXT/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6511,7 +6511,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate identity/mandate/idempotency/definition/input/readiness/budget and persist the initial run/checkpoint before shared-job execution. Expected: Duplicate submit returns one run; a missing required operation capability yields a typed refusal. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-RUN_WORKFLOWS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-RUN_WORKFLOWS/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-AGT-MANAGE_MEMORY (Task 11.05, Phase 11). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -6573,7 +6573,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Evaluate version-pinned roles/prompts/models/tools/workflows on strict output, grounding, safety, tool, reproducibility, economic and operational evidence. Expected: Golden/ambiguous/refusal/leakage/injection/null/stress/OOD corpus is retained; zero forbidden calls/leaks/promotion is a hard corpus gate. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-EVALUATE_PROFILES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-EVALUATE_PROFILES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6633,7 +6633,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Create separately typed observed fact, deterministic derivation, model inference, forecast and recommendation with scope/horizon/assumptions/falsifier/uncertainty/provenance. Expected: A model cannot promote its narrative into an observed fact by choosing a label; unsupported empirical claims remain UNKNOWN. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-MANAGE_CLAIMS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-MANAGE_CLAIMS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6691,7 +6691,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Produce a typed summary only from supplied version-pinned claims/evidence and optional deliberation records. Expected: Invented/omitted material evidence and recomputed receiver results fail validation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-SYNTHESIZE_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-SYNTHESIZE_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-AGT-DELIBERATE_RESEARCH (Task 7.03, Phase 7). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -6757,7 +6757,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Accept a fresh bounded Interfaces-validated workspace snapshot and verify principal/account/widget/generation/time/hash/redaction. Expected: Cross-user/account, expired, unknown/removed widget, oversized or secret-bearing context fails; every message gets a new snapshot. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-ASSIST_OPERATOR/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-ASSIST_OPERATOR/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-AGT-MANAGE_MEMORY (Task 11.05, Phase 11). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -6817,7 +6817,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Rebuild/validate authenticated per-turn WorkspaceContextSnapshot from current typed widget contributions and enforce size/TTL/redaction. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: Wrong-session/account, unregistered/removed widget and stale snapshot fail before Agentic invocation. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-AGENTIC_GATEWAY/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-AGENTIC_GATEWAY/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.18 (FEAT-UI-STRATEGY_STUDIO). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -6877,7 +6877,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Ask context-aware questions and review specialist output). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Removed widgets do not appear next turn; provisional deltas cannot trigger commands or become canonical artifacts. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-CHAT_BOT/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-CHAT_BOT/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -6933,9 +6933,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect Agentic evidence and governed work). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: A transcript or model confidence never replaces claim/evidence truth; status changes preserve immutable content identity. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-AGENTIC_RUN_INSPECTOR/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-AGENTIC_RUN_INSPECTOR/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P05 — Ask Chat Bot about a selected real result; show refreshed authorized evidence, specialist attribution, claim references, and run-inspector detail in the same conversation. Publish `docs/dev/SQX/evidence/phases/phase-05.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P05 — Ask Chat Bot about a selected real result; show refreshed authorized evidence, specialist attribution, claim references, and run-inspector detail in the same conversation. Publish `docs/dev/evidence/phases/phase-05.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -6955,7 +6955,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Describe an idea, register campaign/protocol/holdout policy, review an HSL draft or base-bound patch, accept the exact candidate, then separately authorize a bounded backtest from the existing UI.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_06.spec.ts` and `docs/dev/SQX/evidence/phases/phase-06.json`, owned by Task 6.11. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_06.spec.ts` and `docs/dev/evidence/phases/phase-06.json`, owned by Task 6.11. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-6-01"></a>
 
@@ -6999,7 +6999,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate proposed scope/behavior, thesis, horizon, invalidation, evidence, requested evaluation and expiry under current identity/permission. Expected: A stale/invalid/forbidden execution field fails; quantity/order/approval fields are not accepted as proposal authority. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-ACCEPT_PROPOSALS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-ACCEPT_PROPOSALS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.17 (FEAT-IFACE-OPERATE_STRATEGIES). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -7057,7 +7057,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Register immutable campaign purpose, hypothesis families, dataset families, search/compute budget and preregistration before generated variants run. Expected: A generated candidate without a canonical owner receipt is refused; a new chat/model/name does not create a fresh budget. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-GOVERN_CAMPAIGNS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-GOVERN_CAMPAIGNS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -7113,7 +7113,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version hypothesis/mechanism/confounders/falsifier/rejection criterion plus data, costs, seed, baseline, metrics and finite budgets. Expected: Missing material sample/cost/baseline/stop fields produces validation diagnostics, not permissive defaults. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-DEFINE_PROTOCOLS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-DEFINE_PROTOCOLS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -7173,7 +7173,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Compose expiring thesis/scope/direction-or-behavior/horizon/invalidation/evidence/uncertainty/evaluation candidates. Expected: Broker/order/fill/approval/price/quantity/lot/notional/size fields are rejected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -7229,7 +7229,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Reserve exact campaign/family/dataset/holdout/protocol/request/principal/purpose/expiry against expected revision and idempotency. Expected: Concurrent requests cannot both spend the final available look; retries return the same reservation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-GOVERN_HOLDOUTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-GOVERN_HOLDOUTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -7287,7 +7287,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Resolve immutable strategy/databank/query inputs, effective configuration, alternate contexts, output membership policy and budgets before idempotent start. Expected: A changed query cannot alter an active population; duplicate start returns one Research run. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-RUN_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-RUN_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-SIM-PERTURB_INPUTS (Task 7.01, Phase 7). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -7345,7 +7345,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Translate Research-owned plan/run/campaign/holdout commands and preserve identity/budgets/receipts. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: An interface retry cannot create a second accepted trial or holdout look. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-OPERATE_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-OPERATE_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-RES-TEST_ROBUSTNESS (Task 7.04, Phase 7); FEAT-RES-QUALIFY_RESEARCH (Task 7.06, Phase 7); FEAT-RES-PREPARE_NEURAL_DATASETS (Task 14.01, Phase 14); FEAT-RES-LABEL_NEURAL_DATA (Task 14.02, Phase 14); FEAT-RES-TRAIN_MODELS (Task 14.04, Phase 14); FEAT-RES-VALIDATE_MODELS (Task 14.05, Phase 14); FEAT-RES-EXPLAIN_MODELS (Task 14.06, Phase 14). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -7407,7 +7407,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Obtain canonical Research campaign/family/dataset/search identities before generated research and retain mandatory owner references/receipts. Expected: Local authored strings cannot create an independent Research campaign or holdout allocation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-GOVERN_RESEARCH_SEARCH/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-GOVERN_RESEARCH_SEARCH/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-OPT-SEARCH_PARAMETERS (Task 9.01, Phase 9). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -7469,7 +7469,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Compose scope/horizon/mechanism/evidence/prerequisites/confounders/falsifier/rejection criterion under explicit research-draft or supported classification. Expected: A draft may encode unvalidated assumptions but cannot claim empirical support or qualification. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-DESIGN_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-DESIGN_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-OPT-SEARCH_PARAMETERS (Task 9.01, Phase 9). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -7531,7 +7531,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Generate canonical HSL drafts or base-revision-bound typed patches using registered blocks, units, parameters, clocks, tests and displayed assumptions. Expected: Unknown blocks/arbitrary source fail; new drafts need not claim prior profitability; repairs stop after the permitted limit. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_SPECS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_SPECS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -7587,9 +7587,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect research campaigns, protocols and evidence). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Failed/null/refused/invalid/pruned and cache-hit evidence is not hidden by winner-only filters. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-28/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-28/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P06 — Describe an idea, register campaign/protocol/holdout policy, review an HSL draft or base-bound patch, accept the exact candidate, then separately authorize a bounded backtest from the existing UI. Publish `docs/dev/SQX/evidence/phases/phase-06.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P06 — Describe an idea, register campaign/protocol/holdout policy, review an HSL draft or base-bound patch, accept the exact candidate, then separately authorize a bounded backtest from the existing UI. Publish `docs/dev/evidence/phases/phase-06.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -7609,7 +7609,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Choose stable result IDs, run an ordered perturbation/robustness pipeline, cancel one scenario, inspect truthful partial results and baseline deltas, and obtain evidence-bound qualification/challenge.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_07.spec.ts` and `docs/dev/SQX/evidence/phases/phase-07.json`, owned by Task 7.07. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_07.spec.ts` and `docs/dev/evidence/phases/phase-07.json`, owned by Task 7.07. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-7-01"></a>
 
@@ -7655,7 +7655,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version parameter jitter, price/data perturbation, spread/slippage stress, skipped/degraded execution and alternate-method contexts with explicit seed and units. Expected: A changed perturbation or tick method produces a distinct evaluation identity and cannot overwrite the baseline. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-SIM-PERTURB_INPUTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-SIM-PERTURB_INPUTS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 6.06 (FEAT-RES-RUN_RESEARCH). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -7713,7 +7713,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Run seeded ledger reshuffling, block resampling and skipped-trade methods with finite samples and explicit assumptions. Expected: Same input/seed/method yields reproducible distributions; results are labelled ledger/statistical evidence, not tick backtests. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-ANALYZE_DISTRIBUTIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-ANALYZE_DISTRIBUTIONS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -7773,7 +7773,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Commit challenger first-pass assessments before proposer narrative and record provider/model/prompt/evidence/context correlation. Expected: Blind-first-pass ordering is provable; weak independence is disclosed or refused under policy. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-DELIBERATE_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-DELIBERATE_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 5.07 (FEAT-AGT-SYNTHESIZE_RESEARCH). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -7831,7 +7831,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version ordered Monte Carlo ledger/retest, what-if, additional-markets, higher-fidelity, WFO/WFM, SPP and sequential stages with budgets/sample/seed/pass rules. Expected: Reorder/save/load preserves semantics; a U6-only missing provider blocks only the selected dependent operation rather than producing mock evidence. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-TEST_ROBUSTNESS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-TEST_ROBUSTNESS/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-OPT-VALIDATE_WALK_FORWARD (Task 9.02, Phase 9); FEAT-OPT-PERMUTE_PARAMETERS (Task 9.03, Phase 9); FEAT-OPT-SEARCH_PARAMETERS (Task 9.01, Phase 9). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -7891,7 +7891,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect robustness and scenario evidence). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: A reshuffled ledger is labelled statistical and a cancelled stage cannot appear passed. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-ROBUSTNESS_RESULTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-ROBUSTNESS_RESULTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -7947,7 +7947,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Evaluate complete baseline/robustness/sample/holdout/metric evidence under the pinned acceptance policy. Expected: Missing mandatory stages, sealed-sample violations, undefined metrics or stale evidence produce failed/insufficient outcomes rather than implied consent. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-QUALIFY_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-QUALIFY_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-OPT-VALIDATE_WALK_FORWARD (Task 9.02, Phase 9). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -8007,9 +8007,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Retest a fixed strategy population). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: A query changing later cannot alter an active retest set; originals remain unchanged. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-STRATEGY_RETESTER/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-STRATEGY_RETESTER/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P07 — Choose stable result IDs, run an ordered perturbation/robustness pipeline, cancel one scenario, inspect truthful partial results and baseline deltas, and obtain evidence-bound qualification/challenge. Publish `docs/dev/SQX/evidence/phases/phase-07.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P07 — Choose stable result IDs, run an ordered perturbation/robustness pipeline, cancel one scenario, inspect truthful partial results and baseline deltas, and obtain evidence-bound qualification/challenge. Publish `docs/dev/evidence/phases/phase-07.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -8029,7 +8029,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Create a strategy space in Builder, run a seeded random/island search, inspect acceptance/rejection reasons, and open committed candidates in the existing Databank and Results.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_08.spec.ts` and `docs/dev/SQX/evidence/phases/phase-08.json`, owned by Task 8.05. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_08.spec.ts` and `docs/dev/evidence/phases/phase-08.json`, owned by Task 8.05. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-8-01"></a>
 
@@ -8075,7 +8075,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version strategy mode, direction/symmetry, architecture, condition count, depth/node/lookback limits and required/optional/disabled exits. Expected: A grammar that cannot satisfy the requested bounds fails with a reason rather than generating indefinitely. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-DEFINE_SEARCH_SPACES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-DEFINE_SEARCH_SPACES/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.17 (FEAT-IFACE-OPERATE_STRATEGIES). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -8133,7 +8133,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Apply versioned metric/sample/operator/threshold/unit/null hard rules before fitness and retain every dismissal reason. Expected: An undefined required metric fails eligibility even when another objective is high; zero-trade candidates are rejected where the declared protocol requires it. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-RANK_CANDIDATES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-RANK_CANDIDATES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -8189,7 +8189,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Generate bounded candidates from weighted enabled blocks and typed depth/node/lookback/parameter/lock constraints using pinned PRNG streams. Expected: Impossible grammar/depth returns unsatisfied constraints within the attempt budget; no circular or invalid accepted tree is generated. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-GENERATE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-GENERATE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -8249,7 +8249,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Initialize K×M×N unique filter-passing fully evaluated candidates, rank them and allocate M×N survivors by deterministic round-robin. Expected: Insufficient eligible candidates returns INSUFFICIENT_ELIGIBLE_CANDIDATES with counts; raw AST attempts and duplicates do not satisfy the target. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-EVOLVE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-EVOLVE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -8305,9 +8305,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Configure and run strategy generation). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Impossible constraints, missing blocks and denied resource estimates remain visible; UI never creates executable strategy source or private sampling logic. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-STRATEGY_BUILDER/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-STRATEGY_BUILDER/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P08 — Create a strategy space in Builder, run a seeded random/island search, inspect acceptance/rejection reasons, and open committed candidates in the existing Databank and Results. Publish `docs/dev/SQX/evidence/phases/phase-08.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P08 — Create a strategy space in Builder, run a seeded random/island search, inspect acceptance/rejection reasons, and open committed candidates in the existing Databank and Results. Publish `docs/dev/evidence/phases/phase-08.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -8327,7 +8327,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Select a saved strategy, validate a finite legal parameter lattice, execute search/WFO/WFM/permutation, inspect complete 2D evidence and explicitly promote a new revision.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_09.spec.ts` and `docs/dev/SQX/evidence/phases/phase-09.json`, owned by Task 9.06. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_09.spec.ts` and `docs/dev/evidence/phases/phase-09.json`, owned by Task 9.06. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-9-01"></a>
 
@@ -8375,7 +8375,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Build legal parameter lattices from typed bounds/step/options/dependencies and count Cartesian combinations with arbitrary-precision integers before allocation. Expected: Floating cardinality errors do not add/drop a legal value; invalid dependent parameters fail instead of coercing. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-OPT-SEARCH_PARAMETERS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-OPT-SEARCH_PARAMETERS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 7.04 (FEAT-RES-TEST_ROBUSTNESS), Task 6.08 (FEAT-AGT-GOVERN_RESEARCH_SEARCH), Task 6.09 (FEAT-AGT-DESIGN_RESEARCH). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -8433,7 +8433,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version training/test lengths, step, anchored/rolling mode, parameter search, warm-up, costs, seed and bounded matrix cells. Expected: An invalid/overlapping fit window or unbounded matrix fails preflight; each fold fits/selects only within its development interval. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-OPT-VALIDATE_WALK_FORWARD/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-OPT-VALIDATE_WALK_FORWARD/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 7.04 (FEAT-RES-TEST_ROBUSTNESS), Task 7.06 (FEAT-RES-QUALIFY_RESEARCH). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -8489,7 +8489,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Resolve finite parameter population, exact or sampled coverage, seed and retention before execution. Expected: A sampled population records rule/size/omissions and is not represented as exhaustive enumeration. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-OPT-PERMUTE_PARAMETERS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-OPT-PERMUTE_PARAMETERS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 7.04 (FEAT-RES-TEST_ROBUSTNESS). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -8547,7 +8547,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Translate typed parameter/WFO/WFM/SPP plans and exact output retention/method/budget choices. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: An infeasible/excessive space fails visibly; the gateway never enumerates the Cartesian product. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-OPERATE_OPTIMIZATION/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-OPERATE_OPTIMIZATION/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -8603,7 +8603,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Plan and inspect parameter optimization). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: No hidden parameter coercion, full browser Cartesian expansion or gateway-side optimization occurs. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-PARAMETER_OPTIMIZER/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-PARAMETER_OPTIMIZER/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -8659,9 +8659,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect parameter surfaces and walk-forward evidence). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: An omitted cell is not zero; selecting a point retains exact parameter and result IDs. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-OPTIMIZATION_RESULTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-OPTIMIZATION_RESULTS/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P09 — Select a saved strategy, validate a finite legal parameter lattice, execute search/WFO/WFM/permutation, inspect complete 2D evidence and explicitly promote a new revision. Publish `docs/dev/SQX/evidence/phases/phase-09.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P09 — Select a saved strategy, validate a finite legal parameter lattice, execute search/WFO/WFM/permutation, inspect complete 2D evidence and explicitly promote a new revision. Publish `docs/dev/evidence/phases/phase-09.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -8681,7 +8681,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Send databank results to Portfolio Composer, inspect alignment and currency warnings, allocate weights, simulate shared capital, search combinations, save a portfolio and inspect advisory/correlation decisions.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_10.spec.ts` and `docs/dev/SQX/evidence/phases/phase-10.json`, owned by Task 10.12. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_10.spec.ts` and `docs/dev/evidence/phases/phase-10.json`, owned by Task 10.12. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-10-01"></a>
 
@@ -8727,7 +8727,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Add/remove/reorder stable Strategy/result references, exposing duplicate/missing/sample/currency/shared-capital incompatibilities. Expected: Reordering changes presentation only unless a named model declares order sensitivity; missing constituents block computation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-POR-COMPOSE_PORTFOLIOS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-POR-COMPOSE_PORTFOLIOS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.16 (FEAT-STRAT-EXCHANGE_STRATEGIES). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -8785,7 +8785,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Pin return frequency, currency, calendar, weighting, missing/zero-period policy, minimum overlap and method. Expected: Core Pearson requires at least two pairs and nonzero variance; undefined coefficients remain typed unavailable. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-POR-ANALYZE_CORRELATION/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-POR-ANALYZE_CORRELATION/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -8841,7 +8841,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Resolve the exact candidate population and request Portfolio correlation with frequency/sample/calendar/currency/missing/negative handling. Expected: An undefined coefficient or insufficient overlap remains a typed exclusion/decision reason, not zero correlation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-FILTER_CORRELATION/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-FILTER_CORRELATION/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 4.19 (FEAT-IFACE-OPERATE_RESULTS). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -8899,7 +8899,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Implement core weighting with explicit cash, normalization, metric nonnegative transform and zero-total-score fallback. Expected: A zero-score population follows the recorded fallback; negative raw scores are not treated as valid weights without a transform. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-POR-OPTIMIZE_WEIGHTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-POR-OPTIMIZE_WEIGHTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -8955,7 +8955,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Require an explicit fixed-ledger aggregation or interacting-capital tick-resimulation mode with capital, leverage, sizing, fees and rebalance policy. Expected: Independent ledger summation cannot be labelled equivalent when cross-symbol signals/cash/risk alter fills. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-POR-SIMULATE_PORTFOLIOS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-POR-SIMULATE_PORTFOLIOS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9011,7 +9011,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Project contribution, concentration, gross/net exposure, currency/group risks and declared scenarios from pinned constituents/weights. Expected: Missing or stale inputs yield explicit incomplete evidence rather than a clean risk verdict. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-POR-ANALYZE_PORTFOLIO_RISK/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-POR-ANALYZE_PORTFOLIO_RISK/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9065,7 +9065,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Preview exact constituent/weight/capital/currency/sample conflicts for merge/split operations. Expected: Overlapping capital or duplicate strategy references are explicit and cannot be silently combined. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-POR-MERGE_PORTFOLIOS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-POR-MERGE_PORTFOLIOS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9121,7 +9121,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Resolve an immutable databank/query universe and validate min/max constituent count, symbols/sectors/groups/sample/currency/capital/correlation constraints. Expected: The accepted population is explicit; impossible eligibility yields reasons before combinatorial allocation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-POR-SEARCH_PORTFOLIOS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-POR-SEARCH_PORTFOLIOS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9181,7 +9181,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Use current account/allocation/analytics/mandate/risk evidence for nonbinding weights/ranges/questions/uncertainty and strict expiry. Expected: No lot/quantity/notional/order/approval field is accepted; wrong or stale account evidence refuses. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-ADVISE_PORTFOLIO/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-ADVISE_PORTFOLIO/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9237,7 +9237,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Translate versioned portfolio definitions, weighting/search constraints and explicit aggregation/resimulation modes. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: A stale revision conflicts; live approval is never inferred from a successful research request. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-OPERATE_PORTFOLIOS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-OPERATE_PORTFOLIOS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9293,7 +9293,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Compose and compare a portfolio). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: No silent weight normalization, constraint relaxation or hidden Buy & Hold series occurs. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-PORTFOLIO_COMPOSER/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-PORTFOLIO_COMPOSER/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9349,9 +9349,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Search a bounded portfolio universe). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: The browser does not materialize a power set or calculate correlation. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-PORTFOLIO_BUILDER/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-PORTFOLIO_BUILDER/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P10 — Send databank results to Portfolio Composer, inspect alignment and currency warnings, allocate weights, simulate shared capital, search combinations, save a portfolio and inspect advisory/correlation decisions. Publish `docs/dev/SQX/evidence/phases/phase-10.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P10 — Send databank results to Portfolio Composer, inspect alignment and currency warnings, allocate weights, simulate shared capital, search combinations, save a portfolio and inspect advisory/correlation decisions. Publish `docs/dev/evidence/phases/phase-10.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -9371,7 +9371,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Publish a finite Data → research → retest → optimize → portfolio → notification project, restart during a node attempt, then inspect receiver receipts, recovered history and bounded Agentic memory/calibration.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_11.spec.ts` and `docs/dev/SQX/evidence/phases/phase-11.json`, owned by Task 11.09. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_11.spec.ts` and `docs/dev/evidence/phases/phase-11.json`, owned by Task 11.09. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-11-01"></a>
 
@@ -9415,7 +9415,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Resolve execution outcome references with account scope, horizon maturity, costs, revisions and integrity metadata. Expected: An open horizon, ambiguous match or unauthorized account cannot produce a mature outcome. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-TRD-OBSERVE_OUTCOMES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-TRD-OBSERVE_OUTCOMES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9471,7 +9471,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Create/open/clone/rename/edit/reorder/disable tasks and publish a typed graph with versioned capability and input/output schemas. Expected: A post-publish edit creates a new revision and cannot change an active run. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ORCH-DEFINE_PROJECTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ORCH-DEFINE_PROJECTS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.16 (FEAT-STRAT-EXCHANGE_STRATEGIES). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -9527,7 +9527,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate typed wait, stop/start, scoped load/save/delete, log-statistics and script task inputs with finite deadlines and permissions. Expected: A host path, arbitrary browser expression or undeclared operation is rejected before side effects. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ORCH-EXECUTE_UTILITIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ORCH-EXECUTE_UTILITIES/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-PLUG-ISOLATE_ANALYSIS (Task 12.03, Phase 12). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -9585,7 +9585,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version in-app/SMTP channel, recipient references, condition, template and explicit authorized test-send settings. Expected: Server/port/TLS/sender/test-recipient inputs validate before send; the test has its own audited user action. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ORCH-DELIVER_NOTIFICATIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ORCH-DELIVER_NOTIFICATIONS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 1.25 (FEAT-IFACE-OPERATE_SETTINGS). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -9647,7 +9647,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Separate task working context, episodic outcomes, validated semantic memory and audit classes with explicit scope/retention. Expected: Unknown/cross-class operations fail and workflow progress remains the workflow owner’s truth. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-MANAGE_MEMORY/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-MANAGE_MEMORY/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 5.04 (FEAT-AGT-RUN_WORKFLOWS), Task 5.08 (FEAT-AGT-ASSIST_OPERATOR). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -9705,7 +9705,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Preview exact whole/from-here/only node sets and resolve required inputs, reused outputs and skipped work against a pinned graph. Expected: Missing or stale upstream output blocks the planned scope; selection never silently uses current mutable state. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ORCH-RUN_PROJECTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ORCH-RUN_PROJECTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9765,7 +9765,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Match immutable forecast/recommendation target/horizon/observation rules to later authoritative outcomes without rewriting the original. Expected: Open/ambiguous/revised/unmatched horizons remain unavailable or explicitly amended; no hindsight mutation occurs. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-CALIBRATE_OUTCOMES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-CALIBRATE_OUTCOMES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9821,7 +9821,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Translate graph revision and whole/from-here/only commands to the Orchestration owner. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: No UI coordinate or current mutable setting replaces the pinned graph/input plan. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-EDIT_PROJECTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-EDIT_PROJECTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9877,9 +9877,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Compose and control a research project). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Graph cycles/unbounded loops/incompatible inputs are owner errors; dragging a node cannot alter a running graph revision. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-PROJECT_EDITOR/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-PROJECT_EDITOR/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P11 — Publish a finite Data → research → retest → optimize → portfolio → notification project, restart during a node attempt, then inspect receiver receipts, recovered history and bounded Agentic memory/calibration. Publish `docs/dev/SQX/evidence/phases/phase-11.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P11 — Publish a finite Data → research → retest → optimize → portfolio → notification project, restart during a node attempt, then inspect receiver receipts, recovered history and bounded Agentic memory/calibration. Publish `docs/dev/evidence/phases/phase-11.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -9899,7 +9899,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Fork a scoped plugin resource, edit it in Code Editor, build/test in an attested sandbox, inspect Indicator Tester discrepancies, preview a read-only result panel, then install and remove the extension explicitly.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_12.spec.ts` and `docs/dev/SQX/evidence/phases/phase-12.json`, owned by Task 12.13. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_12.spec.ts` and `docs/dev/evidence/phases/phase-12.json`, owned by Task 12.13. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-12-01"></a>
 
@@ -9943,7 +9943,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Issue purpose/object/generation-bound isolation leases with CPU/memory/storage/process/time/egress limits and credential absence. Expected: Missing attestation or requested unrestricted host access fails before model invocation or staging writes. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-PLUG-SANDBOX_PERMISSIONS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-PLUG-SANDBOX_PERMISSIONS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -9999,7 +9999,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Create/fork/clone/rename/delete package-scoped resources, protecting standard sources until explicitly forked. Expected: A host path or another package’s resource is inaccessible; builtin source edits produce a new user fork. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-PLUG-AUTHOR_PACKAGES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-PLUG-AUTHOR_PACKAGES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -10055,7 +10055,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Run selected pinned toolchains against authorized immutable source/test artifacts only after sandbox/resource admission. Expected: No arbitrary host path, inherited production credential or undeclared network destination is reachable. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-PLUG-ISOLATE_ANALYSIS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-PLUG-ISOLATE_ANALYSIS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 11.03 (FEAT-ORCH-EXECUTE_UTILITIES). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -10113,7 +10113,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Create a sandboxed non-host-privileged frame/renderer with explicit result-schema compatibility and default-deny network/navigation/download policy. Expected: A hostile panel cannot access host globals, cookies, tokens, SQL, files or another result. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-PLUG-RENDER_RESULT_PANELS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-PLUG-RENDER_RESULT_PANELS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -10169,7 +10169,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Lower the same target-neutral plan to each advertised target using pinned operator, numerical, clock and position-policy mappings. Expected: Unsupported constructs fail before executable-success publication; source snapshots retain source-node diagnostics. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-GENERATE_MQL5/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-GENERATE_MQL5/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-RES-VALIDATE_MODELS (Task 14.05, Phase 14). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -10227,7 +10227,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Lower the same target-neutral plan to each advertised target using pinned operator, numerical, clock and position-policy mappings. Expected: Unsupported constructs fail before executable-success publication; source snapshots retain source-node diagnostics. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-GENERATE_PYTHON/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-GENERATE_PYTHON/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-RES-VALIDATE_MODELS (Task 14.05, Phase 14). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -10283,7 +10283,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate analysis provider/version, result schema, options, population, resource estimate and allowed read projection. Expected: Wrong-schema or unauthorized columns fail before dispatch; no provider gets the raw database/filesystem/session token. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 4.19 (FEAT-IFACE-OPERATE_RESULTS). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -10341,7 +10341,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Quarantine imported packages and verify manifest/schema/signature/permissions/resources/compatibility before separate install and enable actions. Expected: A malicious or unverified package cannot run during preview; compile success is not installation approval. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-PLUG-MANAGE_LIFECYCLE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-PLUG-MANAGE_LIFECYCLE/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.16 (FEAT-STRAT-EXCHANGE_STRATEGIES). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -10397,7 +10397,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Bind conformance evidence to package/provider/contract/runtime versions and exact supported operations/targets. Expected: Changing a material version invalidates inherited compatibility; missing test evidence leaves the cell unverified. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-PLUG-MAINTAIN_COMPATIBILITY/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-PLUG-MAINTAIN_COMPATIBILITY/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -10459,7 +10459,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Require the exact approved requirement and receiver-validated unsupported-expression report before source generation. Expected: Missing/changed/forged/expired/overbroad gap refuses before model call or file write. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -10515,7 +10515,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Translate exact package/resource identities and scoped lifecycle/build/permission commands. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: Upload/inspection does not execute code or grant installation; all file/path parsing stays with owners. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-ADMINISTER_CAPABILITIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-ADMINISTER_CAPABILITIES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -10571,7 +10571,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Edit scoped code and inspect build evidence). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Builtin source is not overwritten; unsaved edits survive failed compile/save and conflicting revisions require review. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-CODE_EDITOR/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-CODE_EDITOR/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -10627,9 +10627,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Compare indicator providers and previews). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: A missing file/provider or unsupported reference is unavailable; the UI does not compute the indicator itself. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-INDICATOR_TESTER/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-INDICATOR_TESTER/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P12 — Fork a scoped plugin resource, edit it in Code Editor, build/test in an attested sandbox, inspect Indicator Tester discrepancies, preview a read-only result panel, then install and remove the extension explicitly. Publish `docs/dev/SQX/evidence/phases/phase-12.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P12 — Fork a scoped plugin resource, edit it in Code Editor, build/test in an attested sandbox, inspect Indicator Tester discrepancies, preview a read-only result panel, then install and remove the extension explicitly. Publish `docs/dev/evidence/phases/phase-12.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -10649,7 +10649,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Inspect Volume Profile/TPO and stock-picker results, open advanced statistical/3D analysis, disable GPU or the extension, and confirm that core 2D results remain intact.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_13.spec.ts` and `docs/dev/SQX/evidence/phases/phase-13.json`, owned by Task 13.04. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_13.spec.ts` and `docs/dev/evidence/phases/phase-13.json`, owned by Task 13.04. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-13-01"></a>
 
@@ -10697,7 +10697,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Compute profiles from eligible Data-prepared source slices with pinned volume meaning, bin size, session and tie/expansion policies. Expected: Empty sessions, equal-volume POC ties, gaps and exact bin boundaries match goldens; bin totals conserve the eligible input volume/TPO counts. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IND-CALCULATE_MARKET_PROFILES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IND-CALCULATE_MARKET_PROFILES/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 4.09 (FEAT-SIM-EXECUTE_TICKS). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -10753,7 +10753,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Register deterministic rule/signal architecture as the core baseline and separately version fuzzy membership/aggregation/threshold and pattern-template extensions. Expected: An unknown architecture is inspectable but cannot execute; fuzzy score units and threshold ties are defined before activation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-DEFINE_ARCHITECTURES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-DEFINE_ARCHITECTURES/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -10807,7 +10807,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Bind the observable universe, corporate/adjustment policy, rebalance clock, selection/ranking rules and capital constraints. Expected: A future-added or unavailable instrument cannot enter a historical selection silently; coverage exclusions are explicit. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-SIM-SIMULATE_STOCKPICKERS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-SIM-SIMULATE_STOCKPICKERS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -10863,9 +10863,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Explore advanced statistical and profile visualizations). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: GPU-off and unsupported WebGL paths expose complete 2D/table values; the visual engine computes no trading metric. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-ADVANCED_ANALYSIS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-ADVANCED_ANALYSIS/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P13 — Inspect Volume Profile/TPO and stock-picker results, open advanced statistical/3D analysis, disable GPU or the extension, and confirm that core 2D results remain intact. Publish `docs/dev/SQX/evidence/phases/phase-13.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P13 — Inspect Volume Profile/TPO and stock-picker results, open advanced statistical/3D analysis, disable GPU or the extension, and confirm that core 2D results remain intact. Publish `docs/dev/evidence/phases/phase-13.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -10885,7 +10885,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Define causal features and labels, train a bounded model, inspect leakage checks and baseline comparison, publish a model card, run qualified inference and view its evidence in Neural Research.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_14.spec.ts` and `docs/dev/SQX/evidence/phases/phase-14.json`, owned by Task 14.07. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_14.spec.ts` and `docs/dev/evidence/phases/phase-14.json`, owned by Task 14.07. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-14-01"></a>
 
@@ -10931,7 +10931,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version ordered features, units, input shapes, missing/zero-variance policy, categorical mappings and exact fit window. Expected: A validation/test timestamp in a fit request is rejected; validation reuses the original fitted scaler/imputer/encoder/selector. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-PREPARE_NEURAL_DATASETS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-PREPARE_NEURAL_DATASETS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 6.07 (FEAT-IFACE-OPERATE_RESEARCH). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -10989,7 +10989,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Implement ATR-at-t0 additive triple barriers, forward-return regression and a separately named return-volatility multiplicative barrier variant. Expected: The variants retain different method IDs/units; p0±k×ATR is never silently substituted for p0×(1±k×sigma). Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-LABEL_NEURAL_DATA/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-LABEL_NEURAL_DATA/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 6.07 (FEAT-IFACE-OPERATE_RESEARCH). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -11047,7 +11047,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Load only safe declared graph/tensor formats with immutable model/preprocessing hashes, ordered inputs and supported operators. Expected: Unknown operator/dtype or malformed weights fail preflight; arbitrary Python/Java object deserialization is impossible. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-INFER_MODELS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-INFER_MODELS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 4.09 (FEAT-SIM-EXECUTE_TICKS). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -11105,7 +11105,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Deliver MLP first, causal TCN second, then LSTM/GRU under declared task, shape/dtype, sequence length, receptive field, device and resource contracts. Expected: Future padding is rejected; actual TCN graph/repeats determine receptive field; sequence reset/truncation/state persistence are explicit. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-TRAIN_MODELS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-TRAIN_MODELS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 6.07 (FEAT-IFACE-OPERATE_RESEARCH). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -11163,7 +11163,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Use time-ordered folds, overlap purging and embargo derived from actual information horizons, with final OOS sealed. Expected: Any training feature/label interval overlapping evaluation is excluded under the recorded rule; tuning never sees the final test interval. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-VALIDATE_MODELS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-VALIDATE_MODELS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.16 (FEAT-STRAT-EXCHANGE_STRATEGIES), Task 12.05 (FEAT-STRAT-GENERATE_MQL5), Task 12.06 (FEAT-STRAT-GENERATE_PYTHON), Task 6.07 (FEAT-IFACE-OPERATE_RESEARCH). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -11219,7 +11219,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Run permutation importance and separately registered SHAP providers with bounded samples/background chosen from training-only reference data. Expected: A validation/test-selected background is rejected; unsupported model/provider combinations return unavailable. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-RES-EXPLAIN_MODELS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-RES-EXPLAIN_MODELS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 6.07 (FEAT-IFACE-OPERATE_RESEARCH). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -11277,9 +11277,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Design, train and validate neural research). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: A preprocessing fit cannot use final OOS; unsupported class/metric/model/target states remain unavailable. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-NEURAL_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-NEURAL_RESEARCH/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P14 — Define causal features and labels, train a bounded model, inspect leakage checks and baseline comparison, publish a model card, run qualified inference and view its evidence in Neural Research. Publish `docs/dev/SQX/evidence/phases/phase-14.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P14 — Define causal features and labels, train a bounded model, inspect leakage checks and baseline comparison, publish a model card, run qualified inference and view its evidence in Neural Research. Publish `docs/dev/evidence/phases/phase-14.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -11299,7 +11299,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Register an authenticated worker, submit bounded work, lose its lease, suppress stale/duplicate completion, drain or quarantine it, and inspect all transitions in the existing Jobs widget.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_15.spec.ts` and `docs/dev/SQX/evidence/phases/phase-15.json`, owned by Task 15.01. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_15.spec.ts` and `docs/dev/evidence/phases/phase-15.json`, owned by Task 15.01. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-15-01"></a>
 
@@ -11347,11 +11347,11 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Register authenticated workers with capacity, operations and runtime/numerical compatibility; admit only healthy compatible providers. Expected: Unknown/revoked identities or incompatible numerical fingerprints receive no lease; draining/offline/quarantined nodes get no new work. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ORCH-MANAGE_REMOTE_WORKERS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ORCH-MANAGE_REMOTE_WORKERS/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 1.26 (FEAT-IFACE-OPERATE_JOBS). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
-**Phase checkpoint owner:** Run E2E-P15 — Register an authenticated worker, submit bounded work, lose its lease, suppress stale/duplicate completion, drain or quarantine it, and inspect all transitions in the existing Jobs widget. Publish `docs/dev/SQX/evidence/phases/phase-15.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P15 — Register an authenticated worker, submit bounded work, lose its lease, suppress stale/duplicate completion, drain or quarantine it, and inspect all transitions in the existing Jobs widget. Publish `docs/dev/evidence/phases/phase-15.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
@@ -11371,7 +11371,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Visible completion:** Use a verified external data/strategy format, inspect conversion losses, produce a target-verified strategy package, exercise scoped CLI/MCP commands, and verify desktop/headless installation and cleanup.
 
-**Phase evidence:** `tests/ui/e2e/research/phase_16.spec.ts` and `docs/dev/SQX/evidence/phases/phase-16.json`, owned by Task 16.12. All prior affected UI/data/recovery regressions remain required.
+**Phase evidence:** `tests/ui/e2e/research/phase_16.spec.ts` and `docs/dev/evidence/phases/phase-16.json`, owned by Task 16.12. All prior affected UI/data/recovery regressions remain required.
 
 <a id="task-16-01"></a>
 
@@ -11417,7 +11417,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Through the real mounted gateway, authenticate the scoped fixture user and submit the smallest request for: Register only explicitly scoped public owner commands with the same identity/schema/budget/idempotency/approval requirements as HTTP. Repeat a safe/idempotent request and then repeat without its provider or authority. Expected: An automation/MCP client cannot bypass holdout, sandbox, receiver or live authority boundaries. The owning README supplies the exact request JSON, route and expected envelope.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-IFACE-AUTOMATE_COMMANDS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-IFACE-AUTOMATE_COMMANDS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -11473,7 +11473,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Produce a thin desktop wrapper around the existing application and a headless Docker image from pinned source and lockfiles. Expected: Clean CI builds both outputs; their embedded application/contract versions and source commit match the distribution manifest. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-WS-DISTRIBUTE_APPLICATION/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-DISTRIBUTE_APPLICATION/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -11529,7 +11529,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate the Darwinex provider/version, credential references, instrument/history support and permitted-use configuration before connection. Expected: Unsupported history/schema/permission returns an explicit refusal; planned support is never displayed as connected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-DARWINEX/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-DARWINEX/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -11585,7 +11585,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate the Coinbase provider/version, credential references, instrument/history support and permitted-use configuration before connection. Expected: Unsupported history/schema/permission returns an explicit refusal; planned support is never displayed as connected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-COINBASE/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-COINBASE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -11641,7 +11641,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate the Bitfinex provider/version, credential references, instrument/history support and permitted-use configuration before connection. Expected: Unsupported history/schema/permission returns an explicit refusal; planned support is never displayed as connected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-BITFINEX/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-BITFINEX/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -11697,7 +11697,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate the Poloniex provider/version, credential references, instrument/history support and permitted-use configuration before connection. Expected: Unsupported history/schema/permission returns an explicit refusal; planned support is never displayed as connected. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-POLONIEX/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-POLONIEX/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -11751,7 +11751,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Accept only explicitly installed feed contributions with a finite vendor/version/instrument/schema/rights matrix. Expected: An empty contribution set is unavailable, not a connected equity or futures service. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-BRK-CONNECT_MARKET_FEEDS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-BRK-CONNECT_MARKET_FEEDS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -11807,7 +11807,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Lower the same target-neutral plan to each advertised target using pinned operator, numerical, clock and position-policy mappings. Expected: Unsupported constructs fail before executable-success publication; source snapshots retain source-node diagnostics. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-GENERATE_TARGETS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-GENERATE_TARGETS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -11863,7 +11863,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Validate declared orders.bin/dailyEquity.bin framing, record count, field layout, string encoding, units and epoch before conversion. Expected: A mismatched format tag, truncated record/comment, impossible count or nonfinite/overflow value rejects the affected import, never silently truncates it. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-ANA-IMPORT_EXTERNAL_LEDGERS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-ANA-IMPORT_EXTERNAL_LEDGERS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
@@ -11921,7 +11921,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Dispatch only on a verified format/version descriptor; inspect strategy.xml, orders.bin, dailyEquity.bin and settings.xml with bounded framing. Expected: An unknown variant remains opaque/unavailable and cannot be labelled full fidelity; missing/truncated members are explicit. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-IMPORT_SQX/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-IMPORT_SQX/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.17 (FEAT-IFACE-OPERATE_STRATEGIES). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -11979,7 +11979,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline primary-module demonstration using a temporary workspace and the pinned fixture for: Version general metadata, parameters/categories/defaults/ranges, trading options and authorized resources against a strategy revision. Expected: Hidden parameters are not represented as a security guarantee; incompatible target/resource mappings fail preflight. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-STRAT-PACKAGE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-STRAT-PACKAGE_STRATEGIES/acceptance.json`. Record results; no pass is prefilled.
 
 **This provider also qualifies earlier consumers:** Task 3.17 (FEAT-IFACE-OPERATE_STRATEGIES). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
@@ -12037,9 +12037,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Review and build strategy distribution packages). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Hidden parameters are not described as secrecy; unsupported restriction combinations remain unavailable. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/SQX/evidence/features/FEAT-UI-STRATEGY_PACKAGER/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-STRATEGY_PACKAGER/acceptance.json`. Record results; no pass is prefilled.
 
-**Phase checkpoint owner:** Run E2E-P16 — Use a verified external data/strategy format, inspect conversion losses, produce a target-verified strategy package, exercise scoped CLI/MCP commands, and verify desktop/headless installation and cleanup. Publish `docs/dev/SQX/evidence/phases/phase-16.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
+**Phase checkpoint owner:** Run E2E-P16 — Use a verified external data/strategy format, inspect conversion losses, produce a target-verified strategy package, exercise scoped CLI/MCP commands, and verify desktop/headless installation and cleanup. Publish `docs/dev/evidence/phases/phase-16.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
 #### iv. Definition of Done and commit
 
