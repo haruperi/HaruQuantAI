@@ -1,12 +1,23 @@
 # HaruQuantAI V3 — Feature–Requirement Traceability Register
 
-**Version 1.0 · 6 September 2026 · Separate ownership and acceptance register**
+**Version 1.1 · 7 September 2026 · Self-contained ownership and acceptance register**
 
 ## 1. Decision and scope
 
 **The selected decomposition contains 205 features across 18 domains.** Each card defines a distinct public value, an explicit in/out boundary, functional obligations, quality constraints, dependencies, delivered catalogues and acceptance evidence. This is a specification/traceability artifact, not a claim that these features have been implemented or that all target contracts are already registered.
 
-Source: [`docs/dev/SQX/HaruQuantAI_Unified_Specification.md`](https://github.com/haruperi/HaruQuantAI/blob/c06456fe2c03bc89f52edad1a0a8428118287377/docs/dev/SQX/HaruQuantAI_Unified_Specification.md), commit `c06456fe2c03bc89f52edad1a0a8428118287377`, Git blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd`. The original specification is unchanged. No repository commit or production implementation was performed for this register.
+This register is the self-contained documentary anchor for the selected HaruQuantAI V3 scope. Its feature cards, catalogues, retained specification details, reconciliation decisions, and acceptance fixtures are normative within this artifact; the retired SQX documents listed below are historical provenance only and are not required to interpret or validate it. No production implementation is implied by this consolidation.
+
+**Semantic-equivalence comparison rule:** compare actual behavior, functionality, calculations, boundaries, and observable outcomes—not identifiers. A different feature ID, requirement ID, label, status, key spelling, section number, or grouping is not a missing feature when the same behavior is already specified. A gap exists only when required behavior or functionality is genuinely absent.
+
+| Retired source artifact | SHA-256 at repository baseline `d8f23a51ada672d0f0d319df62ed857a66e08dd5` | Historical Git provenance |
+| --- | --- | --- |
+| `CodexSQX.md` | `3E7D8BDAB5ABA8D3AB46674AE50CCE9FAA263FA7F613693A04FC0B2E663E6739` | Consolidated on the recorded baseline; retired after local completeness validation. |
+| `GeminiSQX.md` | `68702559513D93B8F91BD4223E82906A5E337080015228B1902A8AB3AE254B07` | Consolidated on the recorded baseline; retired after local completeness validation. |
+| `SQX.md` | `CF33750E64B009447C31F283F9940C1700B376A8DD734FCF73A89143CFF2352C` | Consolidated on the recorded baseline; retired after local completeness validation. |
+| `HaruQuantAI_Unified_Specification.md` | `6045D9E0E8EE24CA8B2997D8CD4B7968A1D2CC66F4CBFC6B880C824F74FA3290` | Consolidated on the recorded baseline; earlier source lineage commit `c06456fe2c03bc89f52edad1a0a8428118287377`, Git blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd`. |
+
+Historical `§1`–`§56` labels and original source IDs are retained solely as provenance aliases. They help trace how the register was derived but do not delegate semantics to a deleted document. Where a feature card uses such a label, the binding behavior is the behavior stated in that card, its linked local catalogue/requirement, or the retained details in Appendix A.
 
 **What is closed:** the curated source scope has feature owners, boundaries, requirement/refinement links, catalogue owners, applicable shared constraints, declared dependencies and acceptance obligations. **What is not certified:** current runtime binding, implementation completeness, the unprovided full 572-class donor inventory, external format grammars, real-provider support or measured performance. Those evidence dependencies have named owners and blocking acceptance conditions in §10; they are not silently treated as completed work.
 
@@ -46,7 +57,7 @@ HaruQuantAI V3
 
 ### 1.2 Reading and using the register
 
-Use the feature index to find the semantic owner, then read its card and linked catalogues. Use §7 to trace a raw source ID to that owner and its refining requirement set. Use §8 for section/prose coverage and §9 for cross-feature acceptance. Before production code, propagate the selected boundary and exact public keys into the authoritative owner README/contracts through the existing feature pipeline. Compatible current implementations are adapted, not duplicated.
+Use the feature index to find the semantic owner, then read its card and linked catalogues. Use §7 to trace a historical raw source ID to that owner and its refining requirement set. Use §8 for provenance-section coverage, §9 for cross-feature acceptance, and Appendix A for retained calculations, fixtures, exact Agentic schemas, and reconciliation decisions. Before production code, propagate the selected boundary and exact public keys into the authoritative owner README/contracts through the existing feature pipeline. Compatible current implementations are adapted, not duplicated.
 
 `REUSE_OWNER` preserves an inspected current owner identity; it does not claim all new obligations are implemented. `SELECTED_TARGET` fixes a new documentary boundary. Other source-exact labels preserve adopted specification identities. Contract files shown are **selected public targets unless the card explicitly says otherwise**; they are not an audited list of existing callable modules. All acceptance test paths and symbols below are intended deliverables, not assertions that those tests already exist.
 
@@ -54,9 +65,9 @@ Required edges must be available for mount/that foundational delivery. Operation
 
 ### 1.3 Verification boundary
 
-The supplied validator passes 13,474 structural invariants, including exact ownership references, nonempty acceptance links, catalogue links, source-ID counts, all56 section allocations, preserved Agentic counts, existing numeric UI identities, and an acyclic required graph. Its eight fault-injection self-tests detect deliberately broken mappings, duplicate owners, cycles and false runtime evidence.
+The generation-time validator passed 13,474 structural invariants, including exact ownership references, nonempty acceptance links, catalogue links, provenance-ID counts, all 56 historical section allocations, preserved Agentic counts, existing numeric UI identities, and an acyclic required graph. Its eight fault-injection self-tests detected deliberately broken mappings, duplicate owners, cycles, and false runtime evidence. These are recorded generation facts, not a claim that a validator remains shipped beside this Markdown file.
 
-Source extraction and semantic allocation were curated from connected GitHub reads. The complete source bytes were not mounted in the artifact runtime, so the optional independent **local source byte/ID comparison was not run**. The validator supports that comparison against the pinned checkout. Neither structural validation nor matching IDs mathematically proves that every natural-language clause is semantically satisfied; original source obligations and acceptance cells remain binding. No application tests, live trading, model evaluation or benchmarks were run.
+The original extraction and semantic allocation were curated from connected GitHub reads and were later reconciled against the four retired files at the baseline recorded above. Before retirement, the retained calculations, fixtures, Agentic schema names/fields, reconciliation decisions, counts, and generated-browser payload were checked locally. That documentary comparison does not prove runtime implementation, application tests, live trading, model evaluation, provider support, or benchmark performance; those remain subject to the owner and evidence gates stated in this register.
 
 ## 2. Domain totals and feature index
 
@@ -1025,7 +1036,7 @@ Meet the newly added 24-hour Builder/Optimizer max-admitted-load soak gate witho
 
 ## 4. Feature cards
 
-Every requirement below is owned by its enclosing feature. Catalogue entries are binding expansions of these requirements. Records and method inventories referenced from the source retain their full source fields; a listed record name is not permission to reduce that schema. Unavailable, partial, refused, invalid and conflict outcomes are distinct from successful receipt-backed completion.
+Every requirement below is owned by its enclosing feature. Catalogue entries are binding expansions of these requirements. Records and method inventories in the feature cards, local catalogues, and Appendix A.3 retain their complete selected fields and shapes; a listed record name is not permission to reduce that schema. Unavailable, partial, refused, invalid and conflict outcomes are distinct from successful receipt-backed completion.
 
 ## 4.1. Workspace
 
@@ -1085,7 +1096,7 @@ Workspace revision; writer lease/fence; backup manifest; recovery report; migrat
 | AT-WS-MANAGE_WORKSPACES-003 | `tests/services/workspace/manage_workspaces/test_traceability.py` | `test_trc_manage_workspaces_003` | PENDING |
 | ATN-WS-MANAGE_WORKSPACES-001 | `tests/services/workspace/manage_workspaces/test_lifecycle.py` | `test_trc_manage_workspaces_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1137,7 +1148,7 @@ Workspace revision; writer lease/fence; backup manifest; recovery report; migrat
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -1151,7 +1162,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-WS-EXECUTE_PERSISTENCE-003 | `tests/services/workspace/execute_persistence/test_traceability.py` | `test_trc_execute_persistence_003` | PENDING |
 | ATN-WS-EXECUTE_PERSISTENCE-001 | `tests/services/workspace/execute_persistence/test_lifecycle.py` | `test_trc_execute_persistence_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1203,7 +1214,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-ORCH-RESERVE_RESOURCES](#feat-orch-reserve-resources) | Heavy publication, hashing, cleanup, backup or export requires a finite resource reservation. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -1217,7 +1228,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-WS-MANAGE_ARTIFACTS-003 | `tests/services/workspace/manage_artifacts/test_traceability.py` | `test_trc_manage_artifacts_003` | PENDING |
 | ATN-WS-MANAGE_ARTIFACTS-001 | `tests/services/workspace/manage_artifacts/test_lifecycle.py` | `test_trc_manage_artifacts_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1267,7 +1278,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -1281,7 +1292,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-WS-MANAGE_ACCOUNTS-003 | `tests/services/workspace/manage_accounts/test_traceability.py` | `test_trc_manage_accounts_003` | PENDING |
 | ATN-WS-MANAGE_ACCOUNTS-001 | `tests/services/workspace/manage_accounts/test_lifecycle.py` | `test_trc_manage_accounts_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1331,7 +1342,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-1](#cat-interactions-17-1), [CAT-SETTINGS](#cat-settings)
 
@@ -1345,7 +1356,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-WS-SECURE_LOCAL_ACCESS-003 | `tests/services/workspace/secure_local_access/test_traceability.py` | `test_trc_secure_local_access_003` | PENDING |
 | ATN-WS-SECURE_LOCAL_ACCESS-001 | `tests/services/workspace/secure_local_access/test_lifecycle.py` | `test_trc_secure_local_access_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1395,7 +1406,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-SETTINGS](#cat-settings)
 
@@ -1409,7 +1420,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-WS-ADMINISTER_SETTINGS-003 | `tests/services/workspace/administer_settings/test_traceability.py` | `test_trc_administer_settings_003` | PENDING |
 | ATN-WS-ADMINISTER_SETTINGS-001 | `tests/services/workspace/administer_settings/test_lifecycle.py` | `test_trc_administer_settings_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1459,7 +1470,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -1473,7 +1484,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-WS-MANAGE_CONVERSATIONS-003 | `tests/services/workspace/manage_conversations/test_traceability.py` | `test_trc_manage_conversations_003` | PENDING |
 | ATN-WS-MANAGE_CONVERSATIONS-001 | `tests/services/workspace/manage_conversations/test_lifecycle.py` | `test_trc_manage_conversations_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1526,7 +1537,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-ORCH-MANAGE_JOBS](#feat-orch-manage-jobs) | Job/worker/resource diagnostics read Orchestration projections. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BLOCKS](#cat-blocks), [CAT-SETTINGS](#cat-settings), [CAT-WORKER-CONTROLS](#cat-worker-controls)
 
@@ -1540,7 +1551,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-WS-BUILD_DIAGNOSTICS-003 | `tests/services/workspace/build_diagnostics/test_traceability.py` | `test_trc_build_diagnostics_003` | PENDING |
 | ATN-WS-BUILD_DIAGNOSTICS-001 | `tests/services/workspace/build_diagnostics/test_lifecycle.py` | `test_trc_build_diagnostics_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1596,7 +1607,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-ORCH-EXECUTE_LOCAL_WORK](#feat-orch-execute-local-work) | Native-worker packaging must pass the same platform runtime checks. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -1610,7 +1621,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-WS-DISTRIBUTE_APPLICATION-003 | `tests/services/workspace/distribute_application/test_traceability.py` | `test_trc_distribute_application_003` | PENDING |
 | ATN-WS-DISTRIBUTE_APPLICATION-001 | `tests/services/workspace/distribute_application/test_lifecycle.py` | `test_trc_distribute_application_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1674,7 +1685,7 @@ Instrument grid and metadata fields in §12.4.
 | AT-CAT-CATALOG_INSTRUMENTS-002 | `tests/services/catalogue/instrument_catalogue/test_traceability.py` | `test_trc_catalog_instruments_002` | PENDING |
 | ATN-CAT-CATALOG_INSTRUMENTS-001 | `tests/services/catalogue/instrument_catalogue/test_lifecycle.py` | `test_trc_catalog_instruments_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1723,7 +1734,7 @@ Instrument grid and metadata fields in §12.4.
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-DATA](#cat-data), [CAT-INTERACTIONS-17-2](#cat-interactions-17-2), [CAT-INTERACTIONS-17-5](#cat-interactions-17-5)
 
@@ -1736,7 +1747,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-CAT-MAP_PROVIDERS-002 | `tests/services/catalogue/provider_mapping/test_traceability.py` | `test_trc_map_providers_002` | PENDING |
 | ATN-CAT-MAP_PROVIDERS-001 | `tests/services/catalogue/provider_mapping/test_lifecycle.py` | `test_trc_map_providers_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1785,7 +1796,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-DATA](#cat-data), [CAT-INTERACTIONS-17-5](#cat-interactions-17-5)
 
@@ -1798,7 +1809,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-CAT-DEFINE_SESSIONS-002 | `tests/services/catalogue/session_calendar/test_traceability.py` | `test_trc_define_sessions_002` | PENDING |
 | ATN-CAT-DEFINE_SESSIONS-001 | `tests/services/catalogue/session_calendar/test_lifecycle.py` | `test_trc_define_sessions_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1847,7 +1858,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-3](#cat-interactions-17-3)
 
@@ -1860,7 +1871,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-CAT-DEFINE_TRADING_RULES-002 | `tests/services/catalogue/define_trading_rules/test_traceability.py` | `test_trc_define_trading_rules_002` | PENDING |
 | ATN-CAT-DEFINE_TRADING_RULES-001 | `tests/services/catalogue/define_trading_rules/test_lifecycle.py` | `test_trc_define_trading_rules_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1911,7 +1922,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-DATA-BIND_RUN_DATA](#feat-data-bind-run-data) | Coverage/readiness reads a pinned Data binding. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-DATA](#cat-data), [CAT-INTERACTIONS-17-5](#cat-interactions-17-5)
 
@@ -1924,7 +1935,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-CAT-MANAGE_UNIVERSES-002 | `tests/services/catalogue/manage_universes/test_traceability.py` | `test_trc_manage_universes_002` | PENDING |
 | ATN-CAT-MANAGE_UNIVERSES-001 | `tests/services/catalogue/manage_universes/test_lifecycle.py` | `test_trc_manage_universes_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -1973,7 +1984,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -1986,7 +1997,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-CAT-CONVERT_CURRENCIES-002 | `tests/services/catalogue/convert_currencies/test_traceability.py` | `test_trc_convert_currencies_002` | PENDING |
 | ATN-CAT-CONVERT_CURRENCIES-001 | `tests/services/catalogue/convert_currencies/test_lifecycle.py` | `test_trc_convert_currencies_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2035,7 +2046,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-EXCHANGE](#cat-exchange)
 
@@ -2048,7 +2059,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-CAT-EXCHANGE_CATALOGUE-002 | `tests/services/catalogue/exchange_catalogue/test_traceability.py` | `test_trc_exchange_catalogue_002` | PENDING |
 | ATN-CAT-EXCHANGE_CATALOGUE-001 | `tests/services/catalogue/exchange_catalogue/test_lifecycle.py` | `test_trc_exchange_catalogue_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2117,7 +2128,7 @@ MetaTrader 5: instrument/history/format/rights/rate-limit compatibility matrix. 
 | AT-BRK-METATRADER-003 | `tests/services/brokers/metatrader/test_traceability.py` | `test_trc_metatrader_003` | PENDING |
 | ATN-BRK-METATRADER-001 | `tests/services/brokers/metatrader/test_lifecycle.py` | `test_trc_metatrader_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2184,7 +2195,7 @@ cTrader: instrument/history/format/rights/rate-limit compatibility matrix. Quali
 | AT-BRK-CTRADER-003 | `tests/services/brokers/ctrader/test_traceability.py` | `test_trc_ctrader_003` | PENDING |
 | ATN-BRK-CTRADER-001 | `tests/services/brokers/ctrader/test_lifecycle.py` | `test_trc_ctrader_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2251,7 +2262,7 @@ Binance: instrument/history/format/rights/rate-limit compatibility matrix. Quali
 | AT-BRK-BINANCE-003 | `tests/services/brokers/binance/test_traceability.py` | `test_trc_binance_003` | PENDING |
 | ATN-BRK-BINANCE-001 | `tests/services/brokers/binance/test_lifecycle.py` | `test_trc_binance_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2318,7 +2329,7 @@ Dukascopy: instrument/history/format/rights/rate-limit compatibility matrix. Qua
 | AT-BRK-DUKASCOPY-003 | `tests/services/brokers/dukascopy/test_traceability.py` | `test_trc_dukascopy_003` | PENDING |
 | ATN-BRK-DUKASCOPY-001 | `tests/services/brokers/dukascopy/test_lifecycle.py` | `test_trc_dukascopy_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2385,7 +2396,7 @@ Yahoo: instrument/history/format/rights/rate-limit compatibility matrix. Qualify
 | AT-BRK-YAHOO-003 | `tests/services/brokers/yahoo/test_traceability.py` | `test_trc_yahoo_003` | PENDING |
 | ATN-BRK-YAHOO-001 | `tests/services/brokers/yahoo/test_lifecycle.py` | `test_trc_yahoo_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2452,7 +2463,7 @@ Darwinex: instrument/history/format/rights/rate-limit compatibility matrix. Qual
 | AT-BRK-DARWINEX-003 | `tests/services/brokers/darwinex/test_traceability.py` | `test_trc_darwinex_003` | PENDING |
 | ATN-BRK-DARWINEX-001 | `tests/services/brokers/darwinex/test_lifecycle.py` | `test_trc_darwinex_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2519,7 +2530,7 @@ Coinbase: instrument/history/format/rights/rate-limit compatibility matrix. Qual
 | AT-BRK-COINBASE-003 | `tests/services/brokers/coinbase/test_traceability.py` | `test_trc_coinbase_003` | PENDING |
 | ATN-BRK-COINBASE-001 | `tests/services/brokers/coinbase/test_lifecycle.py` | `test_trc_coinbase_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2586,7 +2597,7 @@ Bitfinex: instrument/history/format/rights/rate-limit compatibility matrix. Qual
 | AT-BRK-BITFINEX-003 | `tests/services/brokers/bitfinex/test_traceability.py` | `test_trc_bitfinex_003` | PENDING |
 | ATN-BRK-BITFINEX-001 | `tests/services/brokers/bitfinex/test_lifecycle.py` | `test_trc_bitfinex_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2653,7 +2664,7 @@ Poloniex: instrument/history/format/rights/rate-limit compatibility matrix. Qual
 | AT-BRK-POLONIEX-003 | `tests/services/brokers/poloniex/test_traceability.py` | `test_trc_poloniex_003` | PENDING |
 | ATN-BRK-POLONIEX-001 | `tests/services/brokers/poloniex/test_lifecycle.py` | `test_trc_poloniex_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2702,7 +2713,7 @@ Poloniex: instrument/history/format/rights/rate-limit compatibility matrix. Qual
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -2715,7 +2726,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-BRK-RESOLVE-002 | `tests/services/brokers/resolve/test_traceability.py` | `test_trc_resolve_002` | PENDING |
 | ATN-BRK-RESOLVE-001 | `tests/services/brokers/resolve/test_lifecycle.py` | `test_trc_resolve_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2766,7 +2777,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-PLUG-REGISTER_CONTRIBUTIONS](#feat-plug-register-contributions) | External adapter installation uses the Plugins contribution boundary. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -2779,7 +2790,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-BRK-CONNECT_MARKET_FEEDS-002 | `tests/services/brokers/connect_market_feeds/test_traceability.py` | `test_trc_connect_market_feeds_002` | PENDING |
 | ATN-BRK-CONNECT_MARKET_FEEDS-001 | `tests/services/brokers/connect_market_feeds/test_lifecycle.py` | `test_trc_connect_market_feeds_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2836,7 +2847,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-CAT-MAP_PROVIDERS](#feat-cat-map-providers) | Symbol/profile resolution uses pinned Catalogue versions. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-EXCHANGE](#cat-exchange), [CAT-INTERACTIONS-17-5](#cat-interactions-17-5)
 
@@ -2850,7 +2861,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-INGEST_HISTORY-003 | `tests/services/data/historical_data_ingestion/test_traceability.py` | `test_trc_ingest_history_003` | PENDING |
 | ATN-DATA-INGEST_HISTORY-001 | `tests/services/data/historical_data_ingestion/test_lifecycle.py` | `test_trc_ingest_history_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2900,7 +2911,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-RESOURCE-LIMITS](#cat-resource-limits)
 
@@ -2914,7 +2925,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-MARKET_DATA_STORE-003 | `tests/services/data/market_data_store/test_traceability.py` | `test_trc_market_data_store_003` | PENDING |
 | ATN-DATA-MARKET_DATA_STORE-001 | `tests/services/data/market_data_store/test_lifecycle.py` | `test_trc_market_data_store_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -2964,7 +2975,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-5](#cat-interactions-17-5)
 
@@ -2978,7 +2989,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-RESOLVE_QUALITY-003 | `tests/services/data/data_quality_resolution/test_traceability.py` | `test_trc_resolve_quality_003` | PENDING |
 | ATN-DATA-RESOLVE_QUALITY-001 | `tests/services/data/data_quality_resolution/test_lifecycle.py` | `test_trc_resolve_quality_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3027,7 +3038,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -3040,7 +3051,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-AGGREGATE_BARS-002 | `tests/services/data/bar_aggregation/test_traceability.py` | `test_trc_aggregate_bars_002` | PENDING |
 | ATN-DATA-AGGREGATE_BARS-001 | `tests/services/data/bar_aggregation/test_lifecycle.py` | `test_trc_aggregate_bars_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3090,7 +3101,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-DATA](#cat-data), [CAT-INTERACTIONS-17-5](#cat-interactions-17-5)
 
@@ -3104,7 +3115,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-MANAGE_RETENTION-003 | `tests/services/data/data_inspection_retention/test_traceability.py` | `test_trc_manage_retention_003` | PENDING |
 | ATN-DATA-MANAGE_RETENTION-001 | `tests/services/data/data_inspection_retention/test_lifecycle.py` | `test_trc_manage_retention_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3153,7 +3164,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -3166,7 +3177,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-BIND_RUN_DATA-002 | `tests/services/data/run_data_binding/test_traceability.py` | `test_trc_bind_run_data_002` | PENDING |
 | ATN-DATA-BIND_RUN_DATA-001 | `tests/services/data/run_data_binding/test_lifecycle.py` | `test_trc_bind_run_data_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3215,7 +3226,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -3228,7 +3239,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-ALIGN_SERIES-002 | `tests/services/data/external_series_alignment/test_traceability.py` | `test_trc_align_series_002` | PENDING |
 | ATN-DATA-ALIGN_SERIES-001 | `tests/services/data/external_series_alignment/test_lifecycle.py` | `test_trc_align_series_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3277,7 +3288,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-DATA](#cat-data), [CAT-INTERACTIONS-17-5](#cat-interactions-17-5), [CAT-PROJECT-TASKS](#cat-project-tasks)
 
@@ -3290,7 +3301,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-SYNC_CONNECTORS-002 | `tests/services/data/connector_synchronization/test_traceability.py` | `test_trc_sync_connectors_002` | PENDING |
 | ATN-DATA-SYNC_CONNECTORS-001 | `tests/services/data/connector_synchronization/test_lifecycle.py` | `test_trc_sync_connectors_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3339,7 +3350,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -3352,7 +3363,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-NORMALIZE_TICKS-002 | `tests/services/data/tick_normalization/test_traceability.py` | `test_trc_normalize_ticks_002` | PENDING |
 | ATN-DATA-NORMALIZE_TICKS-001 | `tests/services/data/tick_normalization/test_lifecycle.py` | `test_trc_normalize_ticks_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3401,7 +3412,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -3414,7 +3425,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-PREPARE_PROFILES-002 | `tests/services/data/profile_source_preparation/test_traceability.py` | `test_trc_prepare_profiles_002` | PENDING |
 | ATN-DATA-PREPARE_PROFILES-001 | `tests/services/data/profile_source_preparation/test_lifecycle.py` | `test_trc_prepare_profiles_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3463,7 +3474,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-DATA](#cat-data), [CAT-INTERACTIONS-17-5](#cat-interactions-17-5)
 
@@ -3476,7 +3487,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-IMPORT_INDICATORS-002 | `tests/services/data/external_indicator_series/test_traceability.py` | `test_trc_import_indicators_002` | PENDING |
 | ATN-DATA-IMPORT_INDICATORS-001 | `tests/services/data/external_indicator_series/test_lifecycle.py` | `test_trc_import_indicators_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3525,7 +3536,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -3538,7 +3549,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-GENERATE_SCENARIOS-002 | `tests/services/data/synthetic_scenario_series/test_traceability.py` | `test_trc_generate_scenarios_002` | PENDING |
 | ATN-DATA-GENERATE_SCENARIOS-001 | `tests/services/data/synthetic_scenario_series/test_lifecycle.py` | `test_trc_generate_scenarios_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3587,7 +3598,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -3600,7 +3611,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-TRACK_MARKET_NEWS-002 | `tests/services/data/economic_news_evidence/test_traceability.py` | `test_trc_track_market_news_002` | PENDING |
 | ATN-DATA-TRACK_MARKET_NEWS-001 | `tests/services/data/economic_news_evidence/test_lifecycle.py` | `test_trc_track_market_news_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3649,7 +3660,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -3662,7 +3673,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-STREAM_MARKET_EVENTS-002 | `tests/services/data/realtime_market_events/test_traceability.py` | `test_trc_stream_market_events_002` | PENDING |
 | ATN-DATA-STREAM_MARKET_EVENTS-001 | `tests/services/data/realtime_market_events/test_lifecycle.py` | `test_trc_stream_market_events_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3711,7 +3722,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -3724,7 +3735,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-IMPORT_QUANTDATA-002 | `tests/services/data/quantdata_manager_source/test_traceability.py` | `test_trc_import_quantdata_002` | PENDING |
 | ATN-DATA-IMPORT_QUANTDATA-001 | `tests/services/data/quantdata_manager_source/test_lifecycle.py` | `test_trc_import_quantdata_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3776,7 +3787,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-DATA-SYNC_CONNECTORS](#feat-data-sync-connectors) | Transfer controls require connector synchronization. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-DATA](#cat-data)
 
@@ -3789,7 +3800,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-DATA-BROWSE_REFERENCE-002 | `tests/services/data/browse_reference/test_traceability.py` | `test_trc_browse_reference_002` | PENDING |
 | ATN-DATA-BROWSE_REFERENCE-001 | `tests/services/data/browse_reference/test_lifecycle.py` | `test_trc_browse_reference_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3859,7 +3870,7 @@ SMA; EMA; WMA; DEMA; TEMA; HullMA; Kaufman AMA; ZeroLagEMA; ALMA; VWAP; Ichimoku
 | ATN-IND-CALCULATE_TREND-001 | `tests/services/indicators/calculate_trend/test_lifecycle.py` | `test_trc_calculate_trend_nfr_001` | PENDING |
 | ATN-IND-CALCULATE_TREND-002 | `tests/services/indicators/calculate_trend/test_lifecycle.py` | `test_trc_calculate_trend_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3927,7 +3938,7 @@ RSI; Stochastic; CCI; MACD; RateOfChange; Momentum; Williams %R; UltimateOscilla
 | ATN-IND-CALCULATE_MOMENTUM-001 | `tests/services/indicators/calculate_momentum/test_lifecycle.py` | `test_trc_calculate_momentum_nfr_001` | PENDING |
 | ATN-IND-CALCULATE_MOMENTUM-002 | `tests/services/indicators/calculate_momentum/test_lifecycle.py` | `test_trc_calculate_momentum_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -3995,7 +4006,7 @@ ATR; Bollinger Bands; Keltner Channel; Donchian Channel; StandardDeviation; Chai
 | ATN-IND-CALCULATE_VOLATILITY-001 | `tests/services/indicators/calculate_volatility/test_lifecycle.py` | `test_trc_calculate_volatility_nfr_001` | PENDING |
 | ATN-IND-CALCULATE_VOLATILITY-002 | `tests/services/indicators/calculate_volatility/test_lifecycle.py` | `test_trc_calculate_volatility_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4063,7 +4074,7 @@ OBV; MFI; Chaikin Money Flow; VolumeWeightedMACD; Accumulation/Distribution; vol
 | ATN-IND-CALCULATE_VOLUME_FLOW-001 | `tests/services/indicators/calculate_volume_flow/test_lifecycle.py` | `test_trc_calculate_volume_flow_nfr_001` | PENDING |
 | ATN-IND-CALCULATE_VOLUME_FLOW-002 | `tests/services/indicators/calculate_volume_flow/test_lifecycle.py` | `test_trc_calculate_volume_flow_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4131,7 +4142,7 @@ Doji; Hammer; InvertedHammer; BullishEngulfing; BearishEngulfing; MorningStar; E
 | ATN-IND-DETECT_CANDLE_PATTERNS-001 | `tests/services/indicators/detect_candle_patterns/test_lifecycle.py` | `test_trc_detect_candle_patterns_nfr_001` | PENDING |
 | ATN-IND-DETECT_CANDLE_PATTERNS-002 | `tests/services/indicators/detect_candle_patterns/test_lifecycle.py` | `test_trc_detect_candle_patterns_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4199,7 +4210,7 @@ Min; Max; Sum; Average; StandardDeviation; Variance; LinearRegressionSlope; Norm
 | ATN-IND-TRANSFORM_SERIES-001 | `tests/services/indicators/transform_series/test_lifecycle.py` | `test_trc_transform_series_nfr_001` | PENDING |
 | ATN-IND-TRANSFORM_SERIES-002 | `tests/services/indicators/transform_series/test_lifecycle.py` | `test_trc_transform_series_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4267,7 +4278,7 @@ Price/session bins; POC; VAH/VAL; value-area percentage; TPO intervals; typed de
 | ATN-IND-CALCULATE_MARKET_PROFILES-001 | `tests/services/indicators/calculate_market_profiles/test_lifecycle.py` | `test_trc_calculate_market_profiles_nfr_001` | PENDING |
 | ATN-IND-CALCULATE_MARKET_PROFILES-002 | `tests/services/indicators/calculate_market_profiles/test_lifecycle.py` | `test_trc_calculate_market_profiles_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4296,7 +4307,7 @@ Price/session bins; POC; VAH/VAL; value-area percentage; TPO intervals; typed de
 | FR-TRC-STRAT-DEFINE_AST-001 | Validate HSL language hsl version 2.0.0, schema hsl://schema/strategy/2.0.0, root records, ordered rules and node-store discriminators. | AT-STRAT-DEFINE_AST-001 — Unknown executable fields/nodes, duplicate IDs, cycles, invalid references and unit/type mismatches produce stable node/path diagnostics; invalid drafts remain inspectable but unrunnable. |
 | FR-TRC-STRAT-DEFINE_AST-002 | Normalize content and compute separate canonical content and semantic hashes without reordering short-circuit expressions. | AT-STRAT-DEFINE_AST-002 — Metadata-only edits preserve semantic hash; a rule-order or parameter change does not; neither hash is treated as a new research family. |
 | FR-TRC-STRAT-DEFINE_AST-003 | Apply ordered true/false/unknown logic, strict comparison/crossover and typed invalid arithmetic semantics. | AT-STRAT-DEFINE_AST-003 — False AND unknown is false; true OR unknown is true; NOT unknown stays unknown; equality on either crossover sample does not trigger a strict cross. |
-| FR-TRC-STRAT-DEFINE_AST-004 | Convert the §37.2 compact EMA fixture and §37.9 adapter intermediate into the single canonical node-store form. | AT-STRAT-DEFINE_AST-004 — Converted entry, exit, parameters, bindings and clock meanings match the source fixture; no alternative production schema is registered. |
+| FR-TRC-STRAT-DEFINE_AST-004 | Convert the Appendix A.2 compact EMA fixture and XML/HSL adapter intermediate into the single canonical node-store form. | AT-STRAT-DEFINE_AST-004 — Converted entry, exit, parameters, bindings and clock meanings match the retained fixture; no alternative production schema is registered. |
 
 #### Feature-specific non-functional requirements
 | ID | Local quality / removal constraint | Acceptance ID / expected result |
@@ -4335,7 +4346,7 @@ HslTypeRef; VALUE/EXPRESSION/CONDITION/STATEMENT/ACTION; rules/events; variables
 | AT-STRAT-DEFINE_AST-004 | `tests/services/strategy/define_ast/test_traceability.py` | `test_trc_define_ast_004` | PENDING |
 | ATN-STRAT-DEFINE_AST-001 | `tests/services/strategy/define_ast/test_lifecycle.py` | `test_trc_define_ast_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4394,7 +4405,7 @@ HslTypeRef; VALUE/EXPRESSION/CONDITION/STATEMENT/ACTION; rules/events; variables
 | [FEAT-IND-TRANSFORM_SERIES](#feat-ind-transform-series) | Mathematical series blocks consume owner transforms. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BLOCK-COUNTS](#cat-block-counts), [CAT-BLOCKS](#cat-blocks), [CAT-BUILDER](#cat-builder)
 
@@ -4409,7 +4420,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-CATALOG_BLOCKS-004 | `tests/services/strategy/catalog_blocks/test_traceability.py` | `test_trc_catalog_blocks_004` | PENDING |
 | ATN-STRAT-CATALOG_BLOCKS-001 | `tests/services/strategy/catalog_blocks/test_lifecycle.py` | `test_trc_catalog_blocks_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4460,7 +4471,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-HSL](#cat-hsl)
 
@@ -4473,7 +4484,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-CONFIGURE_CHARTS-002 | `tests/services/strategy/configure_charts/test_traceability.py` | `test_trc_configure_charts_002` | PENDING |
 | ATN-STRAT-CONFIGURE_CHARTS-001 | `tests/services/strategy/configure_charts/test_lifecycle.py` | `test_trc_configure_charts_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4527,7 +4538,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-STRAT-EDIT_TEMPLATES](#feat-strat-edit-templates) | Template expansion resolves the selected template version. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BUILDER](#cat-builder), [CAT-HSL](#cat-hsl), [CAT-INTERACTIONS-17-2](#cat-interactions-17-2), [CAT-INTERACTIONS-17-7](#cat-interactions-17-7)
 
@@ -4542,7 +4553,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-VERSION_STRATEGIES-004 | `tests/services/strategy/version_strategies/test_traceability.py` | `test_trc_version_strategies_004` | PENDING |
 | ATN-STRAT-VERSION_STRATEGIES-001 | `tests/services/strategy/version_strategies/test_lifecycle.py` | `test_trc_version_strategies_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4606,7 +4617,7 @@ Template constructs and original examples; symmetry mappings in CAT-HSL.
 | AT-STRAT-EDIT_TEMPLATES-003 | `tests/services/strategy/edit_templates/test_traceability.py` | `test_trc_edit_templates_003` | PENDING |
 | ATN-STRAT-EDIT_TEMPLATES-001 | `tests/services/strategy/edit_templates/test_lifecycle.py` | `test_trc_edit_templates_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4656,7 +4667,7 @@ Template constructs and original examples; symmetry mappings in CAT-HSL.
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BUILDER](#cat-builder), [CAT-INTERACTIONS-17-3](#cat-interactions-17-3)
 
@@ -4670,7 +4681,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-DEFINE_SEARCH_SPACES-003 | `tests/services/strategy/define_search_spaces/test_traceability.py` | `test_trc_define_search_spaces_003` | PENDING |
 | ATN-STRAT-DEFINE_SEARCH_SPACES-001 | `tests/services/strategy/define_search_spaces/test_lifecycle.py` | `test_trc_define_search_spaces_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4720,7 +4731,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BUILDER](#cat-builder), [CAT-HSL](#cat-hsl), [CAT-INTERACTIONS-17-3](#cat-interactions-17-3)
 
@@ -4734,7 +4745,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-MODEL_ATM_EXITS-003 | `tests/services/strategy/model_atm_exits/test_traceability.py` | `test_trc_model_atm_exits_003` | PENDING |
 | ATN-STRAT-MODEL_ATM_EXITS-001 | `tests/services/strategy/model_atm_exits/test_lifecycle.py` | `test_trc_model_atm_exits_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4785,7 +4796,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -4798,7 +4809,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-DEFINE_ARCHITECTURES-002 | `tests/services/strategy/define_architectures/test_traceability.py` | `test_trc_define_architectures_002` | PENDING |
 | ATN-STRAT-DEFINE_ARCHITECTURES-001 | `tests/services/strategy/define_architectures/test_lifecycle.py` | `test_trc_define_architectures_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4847,7 +4858,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-6](#cat-interactions-17-6)
 
@@ -4860,7 +4871,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-DEFINE_INDICATORS-002 | `tests/services/strategy/define_indicators/test_traceability.py` | `test_trc_define_indicators_002` | PENDING |
 | ATN-STRAT-DEFINE_INDICATORS-001 | `tests/services/strategy/define_indicators/test_lifecycle.py` | `test_trc_define_indicators_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4910,7 +4921,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-HSL](#cat-hsl), [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -4924,7 +4935,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-COMPILE_STRATEGIES-003 | `tests/services/strategy/compile_strategies/test_traceability.py` | `test_trc_compile_strategies_003` | PENDING |
 | ATN-STRAT-COMPILE_STRATEGIES-001 | `tests/services/strategy/compile_strategies/test_lifecycle.py` | `test_trc_compile_strategies_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -4980,7 +4991,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-PLUG-MANAGE_LIFECYCLE](#feat-plug-manage-lifecycle) | Executable extension bundles require separate Plugins intake. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-EXCHANGE](#cat-exchange), [CAT-INTERACTIONS-17-1](#cat-interactions-17-1), [CAT-INTERACTIONS-17-2](#cat-interactions-17-2), [CAT-PROJECT-TASKS](#cat-project-tasks)
 
@@ -4994,7 +5005,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-EXCHANGE_STRATEGIES-003 | `tests/services/strategy/exchange_strategies/test_traceability.py` | `test_trc_exchange_strategies_003` | PENDING |
 | ATN-STRAT-EXCHANGE_STRATEGIES-001 | `tests/services/strategy/exchange_strategies/test_lifecycle.py` | `test_trc_exchange_strategies_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5049,7 +5060,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-ANA-IMPORT_EXTERNAL_LEDGERS](#feat-ana-import-external-ledgers) | Binary ledgers/equity and external metric provenance require Analytics validation. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-EXCHANGE](#cat-exchange), [CAT-SQX-MAPPING](#cat-sqx-mapping)
 
@@ -5064,7 +5075,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-IMPORT_SQX-004 | `tests/services/strategy/import_sqx/test_traceability.py` | `test_trc_import_sqx_004` | PENDING |
 | ATN-STRAT-IMPORT_SQX-001 | `tests/services/strategy/import_sqx/test_lifecycle.py` | `test_trc_import_sqx_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5116,7 +5127,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-HSL](#cat-hsl), [CAT-INTERACTIONS-17-2](#cat-interactions-17-2), [CAT-INTERACTIONS-17-5](#cat-interactions-17-5)
 
@@ -5130,7 +5141,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-GENERATE_CODE-003 | `tests/services/strategy/generate_code/test_traceability.py` | `test_trc_generate_code_003` | PENDING |
 | ATN-STRAT-GENERATE_CODE-001 | `tests/services/strategy/generate_code/test_lifecycle.py` | `test_trc_generate_code_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5197,7 +5208,7 @@ MQL5 strategy and supported neural inference graphs
 | AT-STRAT-GENERATE_MQL5-003 | `tests/services/strategy/generate_mql5/test_traceability.py` | `test_trc_generate_mql5_003` | PENDING |
 | ATN-STRAT-GENERATE_MQL5-001 | `tests/services/strategy/generate_mql5/test_lifecycle.py` | `test_trc_generate_mql5_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5264,7 +5275,7 @@ Standalone Python research strategy and qualified inference export
 | AT-STRAT-GENERATE_PYTHON-003 | `tests/services/strategy/generate_python/test_traceability.py` | `test_trc_generate_python_003` | PENDING |
 | ATN-STRAT-GENERATE_PYTHON-001 | `tests/services/strategy/generate_python/test_lifecycle.py` | `test_trc_generate_python_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5333,7 +5344,7 @@ MQL4; EasyLanguage; JForex; NinjaTrader; XML exchange
 | AT-STRAT-GENERATE_TARGETS-003 | `tests/services/strategy/generate_targets/test_traceability.py` | `test_trc_generate_targets_003` | PENDING |
 | ATN-STRAT-GENERATE_TARGETS-001 | `tests/services/strategy/generate_targets/test_lifecycle.py` | `test_trc_generate_targets_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5390,7 +5401,7 @@ MQL4; EasyLanguage; JForex; NinjaTrader; XML exchange
 | [FEAT-WS-SECURE_LOCAL_ACCESS](#feat-ws-secure-local-access) | Signing credentials resolve only inside the authorized build adapter. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-7](#cat-interactions-17-7)
 
@@ -5404,7 +5415,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-PACKAGE_STRATEGIES-003 | `tests/services/strategy/package_strategies/test_traceability.py` | `test_trc_package_strategies_003` | PENDING |
 | ATN-STRAT-PACKAGE_STRATEGIES-001 | `tests/services/strategy/package_strategies/test_lifecycle.py` | `test_trc_package_strategies_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5453,7 +5464,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -5466,7 +5477,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-STRAT-ACCEPT_PROPOSALS-002 | `tests/services/strategy/accept_proposals/test_traceability.py` | `test_trc_accept_proposals_002` | PENDING |
 | ATN-STRAT-ACCEPT_PROPOSALS-001 | `tests/services/strategy/accept_proposals/test_lifecycle.py` | `test_trc_accept_proposals_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5518,7 +5529,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BUILDER](#cat-builder)
 
@@ -5532,7 +5543,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RSK-SIZE_POSITIONS-003 | `tests/services/risk/size_positions/test_traceability.py` | `test_trc_size_positions_003` | PENDING |
 | ATN-RSK-SIZE_POSITIONS-001 | `tests/services/risk/size_positions/test_lifecycle.py` | `test_trc_size_positions_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5581,7 +5592,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -5594,7 +5605,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RSK-ASSESS_RESEARCH_RISK-002 | `tests/services/risk/assess_research_risk/test_traceability.py` | `test_trc_assess_research_risk_002` | PENDING |
 | ATN-RSK-ASSESS_RESEARCH_RISK-001 | `tests/services/risk/assess_research_risk/test_lifecycle.py` | `test_trc_assess_research_risk_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5645,7 +5656,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -5658,7 +5669,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-TRD-MANAGE_EXECUTION_SESSIONS-002 | `tests/services/trading/manage_execution_sessions/test_traceability.py` | `test_trc_manage_execution_sessions_002` | PENDING |
 | ATN-TRD-MANAGE_EXECUTION_SESSIONS-001 | `tests/services/trading/manage_execution_sessions/test_lifecycle.py` | `test_trc_manage_execution_sessions_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5707,7 +5718,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -5720,7 +5731,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-TRD-MODEL_EXECUTION_POLICIES-002 | `tests/services/trading/model_execution_policies/test_traceability.py` | `test_trc_model_execution_policies_002` | PENDING |
 | ATN-TRD-MODEL_EXECUTION_POLICIES-001 | `tests/services/trading/model_execution_policies/test_lifecycle.py` | `test_trc_model_execution_policies_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5769,7 +5780,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -5782,7 +5793,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-TRD-OBSERVE_OUTCOMES-002 | `tests/services/trading/observe_outcomes/test_traceability.py` | `test_trc_observe_outcomes_002` | PENDING |
 | ATN-TRD-OBSERVE_OUTCOMES-001 | `tests/services/trading/observe_outcomes/test_lifecycle.py` | `test_trc_observe_outcomes_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5840,7 +5851,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-WS-ADMINISTER_SETTINGS](#feat-ws-administer-settings) | Versioned resource settings are read by reference; settings storage does not become a second admission ledger. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-RESOURCE-LIMITS](#cat-resource-limits), [CAT-SETTINGS](#cat-settings), [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -5856,7 +5867,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-ORCH-RESERVE_RESOURCES-001 | `tests/services/orchestration/reserve_resources/test_lifecycle.py` | `test_trc_reserve_resources_nfr_001` | PENDING |
 | ATN-ORCH-RESERVE_RESOURCES-002 | `tests/services/orchestration/reserve_resources/test_lifecycle.py` | `test_trc_reserve_resources_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5907,7 +5918,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-RESOURCE-LIMITS](#cat-resource-limits)
 
@@ -5922,7 +5933,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ORCH-MANAGE_JOBS-004 | `tests/services/orchestration/manage_jobs/test_traceability.py` | `test_trc_manage_jobs_004` | PENDING |
 | ATN-ORCH-MANAGE_JOBS-001 | `tests/services/orchestration/manage_jobs/test_lifecycle.py` | `test_trc_manage_jobs_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -5972,7 +5983,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -5986,7 +5997,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ORCH-EXECUTE_LOCAL_WORK-003 | `tests/services/orchestration/execute_local_work/test_traceability.py` | `test_trc_execute_local_work_003` | PENDING |
 | ATN-ORCH-EXECUTE_LOCAL_WORK-001 | `tests/services/orchestration/execute_local_work/test_lifecycle.py` | `test_trc_execute_local_work_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6037,7 +6048,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-7](#cat-interactions-17-7), [CAT-RESOURCE-LIMITS](#cat-resource-limits), [CAT-WORKER-CONTROLS](#cat-worker-controls)
 
@@ -6052,7 +6063,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ORCH-MANAGE_REMOTE_WORKERS-004 | `tests/services/orchestration/manage_remote_workers/test_traceability.py` | `test_trc_manage_remote_workers_004` | PENDING |
 | ATN-ORCH-MANAGE_REMOTE_WORKERS-001 | `tests/services/orchestration/manage_remote_workers/test_lifecycle.py` | `test_trc_manage_remote_workers_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6102,7 +6113,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-4](#cat-interactions-17-4), [CAT-INTERACTIONS-17-7](#cat-interactions-17-7), [CAT-PROJECT-TASKS](#cat-project-tasks)
 
@@ -6116,7 +6127,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ORCH-DEFINE_PROJECTS-003 | `tests/services/orchestration/define_projects/test_traceability.py` | `test_trc_define_projects_003` | PENDING |
 | ATN-ORCH-DEFINE_PROJECTS-001 | `tests/services/orchestration/define_projects/test_lifecycle.py` | `test_trc_define_projects_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6175,7 +6186,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-ORCH-EXECUTE_UTILITIES](#feat-orch-execute-utilities) | Scoped utility nodes require the utility executor. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-PROJECT-TASKS](#cat-project-tasks)
 
@@ -6189,7 +6200,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ORCH-RUN_PROJECTS-003 | `tests/services/orchestration/run_projects/test_traceability.py` | `test_trc_run_projects_003` | PENDING |
 | ATN-ORCH-RUN_PROJECTS-001 | `tests/services/orchestration/run_projects/test_lifecycle.py` | `test_trc_run_projects_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6242,7 +6253,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-ANA-QUERY_RESULTS](#feat-ana-query-results) | Statistics queries use Analytics-owned projections. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-PROJECT-TASKS](#cat-project-tasks)
 
@@ -6255,7 +6266,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ORCH-EXECUTE_UTILITIES-002 | `tests/services/orchestration/execute_utilities/test_traceability.py` | `test_trc_execute_utilities_002` | PENDING |
 | ATN-ORCH-EXECUTE_UTILITIES-001 | `tests/services/orchestration/execute_utilities/test_lifecycle.py` | `test_trc_execute_utilities_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6308,7 +6319,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-PLUG-REGISTER_CONTRIBUTIONS](#feat-plug-register-contributions) | Additional channel providers use removable contributions. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BLOCKS](#cat-blocks), [CAT-INTERACTIONS-17-1](#cat-interactions-17-1), [CAT-PROJECT-TASKS](#cat-project-tasks), [CAT-SETTINGS](#cat-settings)
 
@@ -6322,7 +6333,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ORCH-DELIVER_NOTIFICATIONS-003 | `tests/services/orchestration/deliver_notifications/test_traceability.py` | `test_trc_deliver_notifications_003` | PENDING |
 | ATN-ORCH-DELIVER_NOTIFICATIONS-001 | `tests/services/orchestration/deliver_notifications/test_lifecycle.py` | `test_trc_deliver_notifications_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6377,7 +6388,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-ANA-COMPUTE_METRICS](#feat-ana-compute-metrics) | Metric/reducer compatibility is checked for the requested output profile. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BUILDER](#cat-builder), [CAT-SETTINGS](#cat-settings)
 
@@ -6391,7 +6402,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-SIM-CONFIGURE_ENGINE-003 | `tests/services/simulator/configure_engine/test_traceability.py` | `test_trc_configure_engine_003` | PENDING |
 | ATN-SIM-CONFIGURE_ENGINE-001 | `tests/services/simulator/configure_engine/test_lifecycle.py` | `test_trc_configure_engine_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6442,7 +6453,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-HSL](#cat-hsl), [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -6457,7 +6468,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-SIM-MODEL_TICKS-004 | `tests/services/simulator/model_ticks/test_traceability.py` | `test_trc_model_ticks_004` | PENDING |
 | ATN-SIM-MODEL_TICKS-001 | `tests/services/simulator/model_ticks/test_lifecycle.py` | `test_trc_model_ticks_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6522,7 +6533,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-RES-INFER_MODELS](#feat-res-infer-models) | Model nodes require qualified immutable inference operators. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BLOCKS](#cat-blocks), [CAT-HSL](#cat-hsl), [CAT-RESOURCE-LIMITS](#cat-resource-limits), [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -6539,7 +6550,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-SIM-EXECUTE_TICKS-001 | `tests/services/simulator/execute_ticks/test_lifecycle.py` | `test_trc_execute_ticks_nfr_001` | PENDING |
 | ATN-SIM-EXECUTE_TICKS-002 | `tests/services/simulator/execute_ticks/test_lifecycle.py` | `test_trc_execute_ticks_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6591,7 +6602,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-ANA-COMPUTE_METRICS](#feat-ana-compute-metrics) | Accepted metrics are computed by the bound Analytics reducer definitions. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -6605,7 +6616,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-SIM-COMMIT_RESULTS-003 | `tests/services/simulator/commit_results/test_traceability.py` | `test_trc_commit_results_003` | PENDING |
 | ATN-SIM-COMMIT_RESULTS-001 | `tests/services/simulator/commit_results/test_lifecycle.py` | `test_trc_commit_results_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6655,7 +6666,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -6669,7 +6680,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-SIM-CACHE_EVALUATIONS-003 | `tests/services/simulator/cache_evaluations/test_traceability.py` | `test_trc_cache_evaluations_003` | PENDING |
 | ATN-SIM-CACHE_EVALUATIONS-001 | `tests/services/simulator/cache_evaluations/test_lifecycle.py` | `test_trc_cache_evaluations_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6719,7 +6730,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -6733,7 +6744,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-SIM-PERTURB_INPUTS-003 | `tests/services/simulator/perturb_inputs/test_traceability.py` | `test_trc_perturb_inputs_003` | PENDING |
 | ATN-SIM-PERTURB_INPUTS-001 | `tests/services/simulator/perturb_inputs/test_lifecycle.py` | `test_trc_perturb_inputs_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6782,7 +6793,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -6795,7 +6806,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-SIM-SIMULATE_STOCKPICKERS-002 | `tests/services/simulator/simulate_stockpickers/test_traceability.py` | `test_trc_simulate_stockpickers_002` | PENDING |
 | ATN-SIM-SIMULATE_STOCKPICKERS-001 | `tests/services/simulator/simulate_stockpickers/test_lifecycle.py` | `test_trc_simulate_stockpickers_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6863,7 +6874,7 @@ CAT-METRICS and CAT-RESULT-COLUMNS.
 | AT-ANA-COMPUTE_METRICS-004 | `tests/services/analytics/compute_metrics/test_traceability.py` | `test_trc_compute_metrics_004` | PENDING |
 | ATN-ANA-COMPUTE_METRICS-001 | `tests/services/analytics/compute_metrics/test_lifecycle.py` | `test_trc_compute_metrics_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6913,7 +6924,7 @@ CAT-METRICS and CAT-RESULT-COLUMNS.
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -6927,7 +6938,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ANA-QUERY_RESULTS-003 | `tests/services/analytics/query_results/test_traceability.py` | `test_trc_query_results_003` | PENDING |
 | ATN-ANA-QUERY_RESULTS-001 | `tests/services/analytics/query_results/test_lifecycle.py` | `test_trc_query_results_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -6978,7 +6989,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-1](#cat-interactions-17-1), [CAT-INTERACTIONS-17-2](#cat-interactions-17-2), [CAT-INTERACTIONS-17-7](#cat-interactions-17-7), [CAT-PROJECT-TASKS](#cat-project-tasks), [CAT-SETTINGS](#cat-settings)
 
@@ -6993,7 +7004,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ANA-DATABANK_MEMBERSHIP-004 | `tests/services/analytics/databank_membership/test_traceability.py` | `test_trc_databank_membership_004` | PENDING |
 | ATN-ANA-DATABANK_MEMBERSHIP-001 | `tests/services/analytics/databank_membership/test_lifecycle.py` | `test_trc_databank_membership_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7045,7 +7056,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-DATA-BIND_RUN_DATA](#feat-data-bind-run-data) | Trades-on-chart overlays require the exact market-series binding. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-TRADE-FIELDS](#cat-trade-fields)
 
@@ -7059,7 +7070,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ANA-ANALYZE_TRADES-003 | `tests/services/analytics/analyze_trades/test_traceability.py` | `test_trc_analyze_trades_003` | PENDING |
 | ATN-ANA-ANALYZE_TRADES-001 | `tests/services/analytics/analyze_trades/test_lifecycle.py` | `test_trc_analyze_trades_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7111,7 +7122,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-DATA-ALIGN_SERIES](#feat-data-align-series) | External benchmark/market overlays require explicit alignment. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BLOCKS](#cat-blocks), [CAT-CHARTS](#cat-charts)
 
@@ -7125,7 +7136,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ANA-PROJECT_SERIES-003 | `tests/services/analytics/project_series/test_traceability.py` | `test_trc_project_series_003` | PENDING |
 | ATN-ANA-PROJECT_SERIES-001 | `tests/services/analytics/project_series/test_lifecycle.py` | `test_trc_project_series_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7175,7 +7186,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -7189,7 +7200,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ANA-COMPARE_RESULTS-003 | `tests/services/analytics/compare_results/test_traceability.py` | `test_trc_compare_results_003` | PENDING |
 | ATN-ANA-COMPARE_RESULTS-001 | `tests/services/analytics/compare_results/test_lifecycle.py` | `test_trc_compare_results_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7241,7 +7252,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-2](#cat-interactions-17-2)
 
@@ -7255,7 +7266,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ANA-FILTER_CORRELATION-003 | `tests/services/analytics/filter_correlation/test_traceability.py` | `test_trc_filter_correlation_003` | PENDING |
 | ATN-ANA-FILTER_CORRELATION-001 | `tests/services/analytics/filter_correlation/test_lifecycle.py` | `test_trc_filter_correlation_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7305,7 +7316,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-EXCHANGE](#cat-exchange), [CAT-INTERACTIONS-17-2](#cat-interactions-17-2)
 
@@ -7319,7 +7330,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ANA-EXCHANGE_RESULTS-003 | `tests/services/analytics/exchange_results/test_traceability.py` | `test_trc_exchange_results_003` | PENDING |
 | ATN-ANA-EXCHANGE_RESULTS-001 | `tests/services/analytics/exchange_results/test_lifecycle.py` | `test_trc_exchange_results_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7369,7 +7380,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-EXCHANGE](#cat-exchange)
 
@@ -7383,7 +7394,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ANA-IMPORT_EXTERNAL_LEDGERS-003 | `tests/services/analytics/import_external_ledgers/test_traceability.py` | `test_trc_import_external_ledgers_003` | PENDING |
 | ATN-ANA-IMPORT_EXTERNAL_LEDGERS-001 | `tests/services/analytics/import_external_ledgers/test_lifecycle.py` | `test_trc_import_external_ledgers_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7435,7 +7446,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-PLUG-ISOLATE_ANALYSIS](#feat-plug-isolate-analysis) | Untrusted computation requires the sandbox boundary. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-2](#cat-interactions-17-2), [CAT-PROJECT-TASKS](#cat-project-tasks)
 
@@ -7448,7 +7459,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ANA-PROVIDE_CUSTOM_ANALYSIS-002 | `tests/services/analytics/provide_custom_analysis/test_traceability.py` | `test_trc_provide_custom_analysis_002` | PENDING |
 | ATN-ANA-PROVIDE_CUSTOM_ANALYSIS-001 | `tests/services/analytics/provide_custom_analysis/test_lifecycle.py` | `test_trc_provide_custom_analysis_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7498,7 +7509,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -7512,7 +7523,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-ANA-ANALYZE_DISTRIBUTIONS-003 | `tests/services/analytics/analyze_distributions/test_traceability.py` | `test_trc_analyze_distributions_003` | PENDING |
 | ATN-ANA-ANALYZE_DISTRIBUTIONS-001 | `tests/services/analytics/analyze_distributions/test_lifecycle.py` | `test_trc_analyze_distributions_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7564,7 +7575,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-GENETIC](#cat-genetic)
 
@@ -7578,7 +7589,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-GOVERN_CAMPAIGNS-003 | `tests/services/research/govern_campaigns/test_traceability.py` | `test_trc_govern_campaigns_003` | PENDING |
 | ATN-RES-GOVERN_CAMPAIGNS-001 | `tests/services/research/govern_campaigns/test_lifecycle.py` | `test_trc_govern_campaigns_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7628,7 +7639,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-GENETIC](#cat-genetic), [CAT-INTERACTIONS-17-3](#cat-interactions-17-3)
 
@@ -7642,7 +7653,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-DEFINE_PROTOCOLS-003 | `tests/services/research/define_protocols/test_traceability.py` | `test_trc_define_protocols_003` | PENDING |
 | ATN-RES-DEFINE_PROTOCOLS-001 | `tests/services/research/define_protocols/test_lifecycle.py` | `test_trc_define_protocols_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7692,7 +7703,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -7706,7 +7717,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-GOVERN_HOLDOUTS-003 | `tests/services/research/govern_holdouts/test_traceability.py` | `test_trc_govern_holdouts_003` | PENDING |
 | ATN-RES-GOVERN_HOLDOUTS-001 | `tests/services/research/govern_holdouts/test_lifecycle.py` | `test_trc_govern_holdouts_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7761,7 +7772,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-SIM-PERTURB_INPUTS](#feat-sim-perturb-inputs) | Retest perturbation steps require their chosen provider. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-2](#cat-interactions-17-2), [CAT-PROJECT-TASKS](#cat-project-tasks)
 
@@ -7776,7 +7787,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-RUN_RESEARCH-004 | `tests/services/research/run_research/test_traceability.py` | `test_trc_run_research_004` | PENDING |
 | ATN-RES-RUN_RESEARCH-001 | `tests/services/research/run_research/test_lifecycle.py` | `test_trc_run_research_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7840,7 +7851,7 @@ CAT-GENETIC defaults and operator catalogue.
 | AT-RES-GENERATE_STRATEGIES-003 | `tests/services/research/generate_strategies/test_traceability.py` | `test_trc_generate_strategies_003` | PENDING |
 | ATN-RES-GENERATE_STRATEGIES-001 | `tests/services/research/generate_strategies/test_lifecycle.py` | `test_trc_generate_strategies_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7892,7 +7903,7 @@ CAT-GENETIC defaults and operator catalogue.
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BUILDER](#cat-builder), [CAT-GENETIC](#cat-genetic), [CAT-INTERACTIONS-17-3](#cat-interactions-17-3)
 
@@ -7908,7 +7919,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-EVOLVE_STRATEGIES-005 | `tests/services/research/evolve_strategies/test_traceability.py` | `test_trc_evolve_strategies_005` | PENDING |
 | ATN-RES-EVOLVE_STRATEGIES-001 | `tests/services/research/evolve_strategies/test_lifecycle.py` | `test_trc_evolve_strategies_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -7958,7 +7969,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BUILDER](#cat-builder), [CAT-GENETIC](#cat-genetic), [CAT-INTERACTIONS-17-3](#cat-interactions-17-3)
 
@@ -7972,7 +7983,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-RANK_CANDIDATES-003 | `tests/services/research/rank_candidates/test_traceability.py` | `test_trc_rank_candidates_003` | PENDING |
 | ATN-RES-RANK_CANDIDATES-001 | `tests/services/research/rank_candidates/test_lifecycle.py` | `test_trc_rank_candidates_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8026,7 +8037,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-OPT-SEARCH_PARAMETERS](#feat-opt-search-parameters) | Sequential parameter stages require search. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BUILDER](#cat-builder), [CAT-INTERACTIONS-17-3](#cat-interactions-17-3)
 
@@ -8040,7 +8051,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-TEST_ROBUSTNESS-003 | `tests/services/research/test_robustness/test_traceability.py` | `test_trc_test_robustness_003` | PENDING |
 | ATN-RES-TEST_ROBUSTNESS-001 | `tests/services/research/test_robustness/test_lifecycle.py` | `test_trc_test_robustness_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8093,7 +8104,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-OPT-VALIDATE_WALK_FORWARD](#feat-opt-validate-walk-forward) | WF qualification requires actual fold/window artifacts. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -8107,7 +8118,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-QUALIFY_RESEARCH-003 | `tests/services/research/qualify_research/test_traceability.py` | `test_trc_qualify_research_003` | PENDING |
 | ATN-RES-QUALIFY_RESEARCH-001 | `tests/services/research/qualify_research/test_lifecycle.py` | `test_trc_qualify_research_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8161,7 +8172,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-IND-CALCULATE_MARKET_PROFILES](#feat-ind-calculate-market-profiles) | Profile features require compatible profile evidence. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-NEURAL](#cat-neural)
 
@@ -8175,7 +8186,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-PREPARE_NEURAL_DATASETS-003 | `tests/services/research/prepare_neural_datasets/test_traceability.py` | `test_trc_prepare_neural_datasets_003` | PENDING |
 | ATN-RES-PREPARE_NEURAL_DATASETS-001 | `tests/services/research/prepare_neural_datasets/test_lifecycle.py` | `test_trc_prepare_neural_datasets_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8225,7 +8236,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-NEURAL](#cat-neural)
 
@@ -8239,7 +8250,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-LABEL_NEURAL_DATA-003 | `tests/services/research/label_neural_data/test_traceability.py` | `test_trc_label_neural_data_003` | PENDING |
 | ATN-RES-LABEL_NEURAL_DATA-001 | `tests/services/research/label_neural_data/test_lifecycle.py` | `test_trc_label_neural_data_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8291,7 +8302,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-PLUG-ISOLATE_ANALYSIS](#feat-plug-isolate-analysis) | External ML providers require isolated runtime attestation. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-NEURAL](#cat-neural), [CAT-PROJECT-TASKS](#cat-project-tasks)
 
@@ -8305,7 +8316,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-TRAIN_MODELS-003 | `tests/services/research/train_models/test_traceability.py` | `test_trc_train_models_003` | PENDING |
 | ATN-RES-TRAIN_MODELS-001 | `tests/services/research/train_models/test_lifecycle.py` | `test_trc_train_models_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8357,7 +8368,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-SIM-EXECUTE_TICKS](#feat-sim-execute-ticks) | Strategy-level qualification invokes the same selected tick engine. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-NEURAL](#cat-neural)
 
@@ -8371,7 +8382,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-VALIDATE_MODELS-003 | `tests/services/research/validate_models/test_traceability.py` | `test_trc_validate_models_003` | PENDING |
 | ATN-RES-VALIDATE_MODELS-001 | `tests/services/research/validate_models/test_lifecycle.py` | `test_trc_validate_models_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8422,7 +8433,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-NEURAL](#cat-neural)
 
@@ -8435,7 +8446,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-EXPLAIN_MODELS-002 | `tests/services/research/explain_models/test_traceability.py` | `test_trc_explain_models_002` | PENDING |
 | ATN-RES-EXPLAIN_MODELS-001 | `tests/services/research/explain_models/test_lifecycle.py` | `test_trc_explain_models_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8487,7 +8498,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-NEURAL](#cat-neural)
 
@@ -8501,7 +8512,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-RES-INFER_MODELS-003 | `tests/services/research/infer_models/test_traceability.py` | `test_trc_infer_models_003` | PENDING |
 | ATN-RES-INFER_MODELS-001 | `tests/services/research/infer_models/test_lifecycle.py` | `test_trc_infer_models_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8556,7 +8567,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-SIM-CACHE_EVALUATIONS](#feat-sim-cache-evaluations) | Exact cache reuse still passes Research accounting. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-GENETIC](#cat-genetic), [CAT-PROJECT-TASKS](#cat-project-tasks), [CAT-SETTINGS](#cat-settings)
 
@@ -8571,7 +8582,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-OPT-SEARCH_PARAMETERS-004 | `tests/services/optimization/search_parameters/test_traceability.py` | `test_trc_search_parameters_004` | PENDING |
 | ATN-OPT-SEARCH_PARAMETERS-001 | `tests/services/optimization/search_parameters/test_lifecycle.py` | `test_trc_search_parameters_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8621,7 +8632,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-GENETIC](#cat-genetic), [CAT-PROJECT-TASKS](#cat-project-tasks)
 
@@ -8635,7 +8646,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-OPT-VALIDATE_WALK_FORWARD-003 | `tests/services/optimization/validate_walk_forward/test_traceability.py` | `test_trc_validate_walk_forward_003` | PENDING |
 | ATN-OPT-VALIDATE_WALK_FORWARD-001 | `tests/services/optimization/validate_walk_forward/test_lifecycle.py` | `test_trc_validate_walk_forward_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8684,7 +8695,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-GENETIC](#cat-genetic)
 
@@ -8697,7 +8708,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-OPT-PERMUTE_PARAMETERS-002 | `tests/services/optimization/permute_parameters/test_traceability.py` | `test_trc_permute_parameters_002` | PENDING |
 | ATN-OPT-PERMUTE_PARAMETERS-001 | `tests/services/optimization/permute_parameters/test_lifecycle.py` | `test_trc_permute_parameters_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8749,7 +8760,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-7](#cat-interactions-17-7)
 
@@ -8763,7 +8774,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-POR-COMPOSE_PORTFOLIOS-003 | `tests/services/portfolio/compose_portfolios/test_traceability.py` | `test_trc_compose_portfolios_003` | PENDING |
 | ATN-POR-COMPOSE_PORTFOLIOS-001 | `tests/services/portfolio/compose_portfolios/test_lifecycle.py` | `test_trc_compose_portfolios_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8813,7 +8824,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BLOCKS](#cat-blocks), [CAT-INTERACTIONS-17-3](#cat-interactions-17-3), [CAT-METRICS](#cat-metrics)
 
@@ -8827,7 +8838,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-POR-ANALYZE_CORRELATION-003 | `tests/services/portfolio/analyze_correlation/test_traceability.py` | `test_trc_analyze_correlation_003` | PENDING |
 | ATN-POR-ANALYZE_CORRELATION-001 | `tests/services/portfolio/analyze_correlation/test_lifecycle.py` | `test_trc_analyze_correlation_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8877,7 +8888,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -8891,7 +8902,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-POR-OPTIMIZE_WEIGHTS-003 | `tests/services/portfolio/optimize_weights/test_traceability.py` | `test_trc_optimize_weights_003` | PENDING |
 | ATN-POR-OPTIMIZE_WEIGHTS-001 | `tests/services/portfolio/optimize_weights/test_lifecycle.py` | `test_trc_optimize_weights_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -8944,7 +8955,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-ANA-DATABANK_MEMBERSHIP](#feat-ana-databank-membership) | Databank output requires membership owner. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-PROJECT-TASKS](#cat-project-tasks)
 
@@ -8958,7 +8969,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-POR-SEARCH_PORTFOLIOS-003 | `tests/services/portfolio/search_portfolios/test_traceability.py` | `test_trc_search_portfolios_003` | PENDING |
 | ATN-POR-SEARCH_PORTFOLIOS-001 | `tests/services/portfolio/search_portfolios/test_lifecycle.py` | `test_trc_search_portfolios_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9008,7 +9019,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -9022,7 +9033,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-POR-SIMULATE_PORTFOLIOS-003 | `tests/services/portfolio/simulate_portfolios/test_traceability.py` | `test_trc_simulate_portfolios_003` | PENDING |
 | ATN-POR-SIMULATE_PORTFOLIOS-001 | `tests/services/portfolio/simulate_portfolios/test_lifecycle.py` | `test_trc_simulate_portfolios_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9072,7 +9083,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-METRICS](#cat-metrics)
 
@@ -9086,7 +9097,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-POR-ANALYZE_PORTFOLIO_RISK-003 | `tests/services/portfolio/analyze_portfolio_risk/test_traceability.py` | `test_trc_analyze_portfolio_risk_003` | PENDING |
 | ATN-POR-ANALYZE_PORTFOLIO_RISK-001 | `tests/services/portfolio/analyze_portfolio_risk/test_lifecycle.py` | `test_trc_analyze_portfolio_risk_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9135,7 +9146,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-2](#cat-interactions-17-2)
 
@@ -9148,7 +9159,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-POR-MERGE_PORTFOLIOS-002 | `tests/services/portfolio/merge_portfolios/test_traceability.py` | `test_trc_merge_portfolios_002` | PENDING |
 | ATN-POR-MERGE_PORTFOLIOS-001 | `tests/services/portfolio/merge_portfolios/test_lifecycle.py` | `test_trc_merge_portfolios_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9199,7 +9210,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -9212,7 +9223,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-PLUG-DECLARE_MANIFESTS-002 | `tests/services/plugins/declare_manifests/test_traceability.py` | `test_trc_declare_manifests_002` | PENDING |
 | ATN-PLUG-DECLARE_MANIFESTS-001 | `tests/services/plugins/declare_manifests/test_lifecycle.py` | `test_trc_declare_manifests_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9261,7 +9272,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -9274,7 +9285,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-PLUG-REGISTER_CONTRIBUTIONS-002 | `tests/services/plugins/register_contributions/test_traceability.py` | `test_trc_register_contributions_002` | PENDING |
 | ATN-PLUG-REGISTER_CONTRIBUTIONS-001 | `tests/services/plugins/register_contributions/test_lifecycle.py` | `test_trc_register_contributions_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9323,7 +9334,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -9336,7 +9347,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-PLUG-SANDBOX_PERMISSIONS-002 | `tests/services/plugins/sandbox_permissions/test_traceability.py` | `test_trc_sandbox_permissions_002` | PENDING |
 | ATN-PLUG-SANDBOX_PERMISSIONS-001 | `tests/services/plugins/sandbox_permissions/test_lifecycle.py` | `test_trc_sandbox_permissions_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9386,7 +9397,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -9400,7 +9411,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-PLUG-ISOLATE_ANALYSIS-003 | `tests/services/plugins/isolate_analysis/test_traceability.py` | `test_trc_isolate_analysis_003` | PENDING |
 | ATN-PLUG-ISOLATE_ANALYSIS-001 | `tests/services/plugins/isolate_analysis/test_lifecycle.py` | `test_trc_isolate_analysis_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9452,7 +9463,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-PLUG-ISOLATE_ANALYSIS](#feat-plug-isolate-analysis) | Code-bearing activation/build verification needs attested isolation. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-1](#cat-interactions-17-1), [CAT-INTERACTIONS-17-6](#cat-interactions-17-6)
 
@@ -9466,7 +9477,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-PLUG-MANAGE_LIFECYCLE-003 | `tests/services/plugins/manage_lifecycle/test_traceability.py` | `test_trc_manage_lifecycle_003` | PENDING |
 | ATN-PLUG-MANAGE_LIFECYCLE-001 | `tests/services/plugins/manage_lifecycle/test_lifecycle.py` | `test_trc_manage_lifecycle_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9516,7 +9527,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-RESULT-VIEWS](#cat-result-views)
 
@@ -9530,7 +9541,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-PLUG-RENDER_RESULT_PANELS-003 | `tests/services/plugins/render_result_panels/test_traceability.py` | `test_trc_render_result_panels_003` | PENDING |
 | ATN-PLUG-RENDER_RESULT_PANELS-001 | `tests/services/plugins/render_result_panels/test_lifecycle.py` | `test_trc_render_result_panels_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9581,7 +9592,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-PLUG-ISOLATE_ANALYSIS](#feat-plug-isolate-analysis) | Executable conformance tests require isolated execution. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-6](#cat-interactions-17-6)
 
@@ -9594,7 +9605,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-PLUG-MAINTAIN_COMPATIBILITY-002 | `tests/services/plugins/maintain_compatibility/test_traceability.py` | `test_trc_maintain_compatibility_002` | PENDING |
 | ATN-PLUG-MAINTAIN_COMPATIBILITY-001 | `tests/services/plugins/maintain_compatibility/test_lifecycle.py` | `test_trc_maintain_compatibility_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9644,7 +9655,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-2](#cat-interactions-17-2), [CAT-INTERACTIONS-17-6](#cat-interactions-17-6)
 
@@ -9658,7 +9669,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-PLUG-AUTHOR_PACKAGES-003 | `tests/services/plugins/author_packages/test_traceability.py` | `test_trc_author_packages_003` | PENDING |
 | ATN-PLUG-AUTHOR_PACKAGES-001 | `tests/services/plugins/author_packages/test_lifecycle.py` | `test_trc_author_packages_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9708,14 +9719,14 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Validate immutable mandate identity/integrity, effective interval, objectives, enabled roles/features, environment/account/asset scope and finite budgets. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-WS-MANAGE_ACCOUNTS](#feat-ws-manage-accounts), [FEAT-WS-ADMINISTER_SETTINGS](#feat-ws-administer-settings)
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records)
 
@@ -9730,7 +9741,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-ENFORCE_MANDATE-001 | `tests/services/agentic/enforce_mandate/test_lifecycle.py` | `test_trc_enforce_mandate_nfr_001` | PENDING |
 | ATN-AGT-ENFORCE_MANDATE-002 | `tests/services/agentic/enforce_mandate/test_lifecycle.py` | `test_trc_enforce_mandate_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9779,14 +9790,14 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Append correlated redacted role/model/tool/lease/handoff/policy/state/cost/refusal/failure/cleanup records. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-WS-EXECUTE_PERSISTENCE](#feat-ws-execute-persistence)
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-AGENTIC-STATE](#cat-agentic-state), [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -9802,7 +9813,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-OPERATE_RUNS-001 | `tests/services/agentic/operate_runs/test_lifecycle.py` | `test_trc_operate_runs_nfr_001` | PENDING |
 | ATN-AGT-OPERATE_RUNS-002 | `tests/services/agentic/operate_runs/test_lifecycle.py` | `test_trc_operate_runs_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9850,7 +9861,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Register immutable role/version, prompt, schemas, tools, model policy, limits, conflicts, refusals and evaluation references. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate)
 
@@ -9859,7 +9870,7 @@ All shared and capability-specific semantic record fields in §45.2–45.3, unde
 | [FEAT-PLUG-REGISTER_CONTRIBUTIONS](#feat-plug-register-contributions) | External role contributions use the existing Plugins lifecycle; built-in role registration is not contingent on external plugins. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -9874,7 +9885,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-REGISTER_ROLES-001 | `tests/services/agentic/register_roles/test_lifecycle.py` | `test_trc_register_roles_nfr_001` | PENDING |
 | ATN-AGT-REGISTER_ROLES-002 | `tests/services/agentic/register_roles/test_lifecycle.py` | `test_trc_register_roles_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9924,14 +9935,14 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Register declared receiver capability/schema/permission/side-effect/environment/idempotency/cost/timeout/result-trust descriptors. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-WS-MANAGE_ACCOUNTS](#feat-ws-manage-accounts), [FEAT-WS-EXECUTE_PERSISTENCE](#feat-ws-execute-persistence), [FEAT-ORCH-RESERVE_RESOURCES](#feat-orch-reserve-resources)
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-AGENTIC-STATE](#cat-agentic-state)
 
@@ -9948,7 +9959,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-GOVERN_TOOL_CALLS-001 | `tests/services/agentic/govern_tool_calls/test_lifecycle.py` | `test_trc_govern_tool_calls_nfr_001` | PENDING |
 | ATN-AGT-GOVERN_TOOL_CALLS-002 | `tests/services/agentic/govern_tool_calls/test_lifecycle.py` | `test_trc_govern_tool_calls_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -9997,7 +10008,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Pin provider/model/profile/role/prompt/composite/schema/context/tools/privacy/region/retention before a structured call. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-ORCH-RESERVE_RESOURCES](#feat-orch-reserve-resources)
 
@@ -10006,7 +10017,7 @@ All shared and capability-specific semantic record fields in §45.2–45.3, unde
 | [FEAT-PLUG-REGISTER_CONTRIBUTIONS](#feat-plug-register-contributions) | Select a ModelRuntimeProvider implementation via public contribution discovery. Deterministic test adapter is mandatory; optional network/ADK providers need separate eligibility. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records)
 
@@ -10022,7 +10033,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-INVOKE_MODELS-001 | `tests/services/agentic/invoke_models/test_lifecycle.py` | `test_trc_invoke_models_nfr_001` | PENDING |
 | ATN-AGT-INVOKE_MODELS-002 | `tests/services/agentic/invoke_models/test_lifecycle.py` | `test_trc_invoke_models_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10072,7 +10083,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Validate identity/mandate/idempotency/definition/input/readiness/budget and persist the initial run/checkpoint before shared-job execution. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-WS-EXECUTE_PERSISTENCE](#feat-ws-execute-persistence), [FEAT-ORCH-MANAGE_JOBS](#feat-orch-manage-jobs)
 
@@ -10084,7 +10095,7 @@ All shared and capability-specific semantic record fields in §45.2–45.3, unde
 | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | Only operations/workflows whose versioned policy requires this capability; absence is a typed unavailable/refusal, never a fabricated substitute. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-AGENTIC-STATE](#cat-agentic-state), [CAT-PROJECT-TASKS](#cat-project-tasks), [CAT-ROLES](#cat-roles), [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -10101,7 +10112,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-RUN_WORKFLOWS-001 | `tests/services/agentic/run_workflows/test_lifecycle.py` | `test_trc_run_workflows_nfr_001` | PENDING |
 | ATN-AGT-RUN_WORKFLOWS-002 | `tests/services/agentic/run_workflows/test_lifecycle.py` | `test_trc_run_workflows_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10150,7 +10161,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Select owner evidence by scope, schema, availability cutoff, licensing, trust, freshness, revision and integrity. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs)
 
@@ -10161,7 +10172,7 @@ All shared and capability-specific semantic record fields in §45.2–45.3, unde
 | [FEAT-DATA-BIND_RUN_DATA](#feat-data-bind-run-data) | Technical context requires exact Data bindings. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -10177,7 +10188,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-ASSEMBLE_CONTEXT-001 | `tests/services/agentic/assemble_context/test_lifecycle.py` | `test_trc_assemble_context_nfr_001` | PENDING |
 | ATN-AGT-ASSEMBLE_CONTEXT-002 | `tests/services/agentic/assemble_context/test_lifecycle.py` | `test_trc_assemble_context_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10226,7 +10237,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Separate task working context, episodic outcomes, validated semantic memory and audit classes with explicit scope/retention. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-WS-EXECUTE_PERSISTENCE](#feat-ws-execute-persistence)
 
@@ -10235,7 +10246,7 @@ All shared and capability-specific semantic record fields in §45.2–45.3, unde
 | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | Only operations/workflows whose versioned policy requires this capability; absence is a typed unavailable/refusal, never a fabricated substitute. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-AGENTIC-STATE](#cat-agentic-state)
 
@@ -10251,7 +10262,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-MANAGE_MEMORY-001 | `tests/services/agentic/manage_memory/test_lifecycle.py` | `test_trc_manage_memory_nfr_001` | PENDING |
 | ATN-AGT-MANAGE_MEMORY-002 | `tests/services/agentic/manage_memory/test_lifecycle.py` | `test_trc_manage_memory_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10300,14 +10311,14 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Evaluate version-pinned roles/prompts/models/tools/workflows on strict output, grounding, safety, tool, reproducibility, economic and operational evidence. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-WS-EXECUTE_PERSISTENCE](#feat-ws-execute-persistence)
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-AGENTIC-STATE](#cat-agentic-state)
 
@@ -10323,7 +10334,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-EVALUATE_PROFILES-001 | `tests/services/agentic/evaluate_profiles/test_lifecycle.py` | `test_trc_evaluate_profiles_nfr_001` | PENDING |
 | ATN-AGT-EVALUATE_PROFILES-002 | `tests/services/agentic/evaluate_profiles/test_lifecycle.py` | `test_trc_evaluate_profiles_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10374,7 +10385,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Accept a fresh bounded Interfaces-validated workspace snapshot and verify principal/account/widget/generation/time/hash/redaction. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-WS-MANAGE_ACCOUNTS](#feat-ws-manage-accounts), [FEAT-WS-MANAGE_CONVERSATIONS](#feat-ws-manage-conversations)
 
@@ -10385,7 +10396,7 @@ All shared and capability-specific semantic record fields in §45.2–45.3, unde
 | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | Only operations/workflows whose versioned policy requires this capability; absence is a typed unavailable/refusal, never a fabricated substitute. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-RESOURCE-LIMITS](#cat-resource-limits), [CAT-ROLES](#cat-roles)
 
@@ -10403,7 +10414,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-ASSIST_OPERATOR-002 | `tests/services/agentic/assist_operator/test_lifecycle.py` | `test_trc_assist_operator_nfr_002` | PENDING |
 | ATN-AGT-ASSIST_OPERATOR-003 | `tests/services/agentic/assist_operator/test_limits.py` | `test_trc_chat_initial_limits` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10452,14 +10463,14 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Create separately typed observed fact, deterministic derivation, model inference, forecast and recommendation with scope/horizon/assumptions/falsifier/uncertainty/provenance. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-WS-EXECUTE_PERSISTENCE](#feat-ws-execute-persistence)
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-AGENTIC-STATE](#cat-agentic-state), [CAT-ROLES](#cat-roles), [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -10475,7 +10486,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-MANAGE_CLAIMS-001 | `tests/services/agentic/manage_claims/test_lifecycle.py` | `test_trc_manage_claims_nfr_001` | PENDING |
 | ATN-AGT-MANAGE_CLAIMS-002 | `tests/services/agentic/manage_claims/test_lifecycle.py` | `test_trc_manage_claims_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10524,14 +10535,14 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Commit challenger first-pass assessments before proposer narrative and record provider/model/prompt/evidence/context correlation. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs)
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-ROLES](#cat-roles)
 
@@ -10547,7 +10558,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-DELIBERATE_RESEARCH-001 | `tests/services/agentic/deliberate_research/test_lifecycle.py` | `test_trc_deliberate_research_nfr_001` | PENDING |
 | ATN-AGT-DELIBERATE_RESEARCH-002 | `tests/services/agentic/deliberate_research/test_lifecycle.py` | `test_trc_deliberate_research_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10595,7 +10606,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Produce a typed summary only from supplied version-pinned claims/evidence and optional deliberation records. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs)
 
@@ -10604,7 +10615,7 @@ All shared and capability-specific semantic record fields in §45.2–45.3, unde
 | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | Only operations/workflows whose versioned policy requires this capability; absence is a typed unavailable/refusal, never a fabricated substitute. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-ROLES](#cat-roles)
 
@@ -10619,7 +10630,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-SYNTHESIZE_RESEARCH-001 | `tests/services/agentic/synthesize_research/test_lifecycle.py` | `test_trc_synthesize_research_nfr_001` | PENDING |
 | ATN-AGT-SYNTHESIZE_RESEARCH-002 | `tests/services/agentic/synthesize_research/test_lifecycle.py` | `test_trc_synthesize_research_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10668,7 +10679,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Obtain canonical Research campaign/family/dataset/search identities before generated research and retain mandatory owner references/receipts. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-RES-GOVERN_CAMPAIGNS](#feat-res-govern-campaigns), [FEAT-RES-GOVERN_HOLDOUTS](#feat-res-govern-holdouts), [FEAT-WS-EXECUTE_PERSISTENCE](#feat-ws-execute-persistence)
 
@@ -10678,7 +10689,7 @@ All shared and capability-specific semantic record fields in §45.2–45.3, unde
 | [FEAT-RES-RUN_RESEARCH](#feat-res-run-research) | Authorized simulations require the canonical Research entry point. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-AGENTIC-STATE](#cat-agentic-state)
 
@@ -10694,7 +10705,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-GOVERN_RESEARCH_SEARCH-001 | `tests/services/agentic/govern_research_search/test_lifecycle.py` | `test_trc_govern_research_search_nfr_001` | PENDING |
 | ATN-AGT-GOVERN_RESEARCH_SEARCH-002 | `tests/services/agentic/govern_research_search/test_lifecycle.py` | `test_trc_govern_research_search_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10743,7 +10754,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Compose scope/horizon/mechanism/evidence/prerequisites/confounders/falsifier/rejection criterion under explicit research-draft or supported classification. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-RES-DEFINE_PROTOCOLS](#feat-res-define-protocols)
 
@@ -10752,7 +10763,7 @@ All shared and capability-specific semantic record fields in §45.2–45.3, unde
 | [FEAT-OPT-SEARCH_PARAMETERS](#feat-opt-search-parameters) | DESIGN_SEARCH requires U6 search schema/readiness; hypothesis and experiment design do not. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-ROLES](#cat-roles)
 
@@ -10768,7 +10779,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-DESIGN_RESEARCH-001 | `tests/services/agentic/design_research/test_lifecycle.py` | `test_trc_design_research_nfr_001` | PENDING |
 | ATN-AGT-DESIGN_RESEARCH-002 | `tests/services/agentic/design_research/test_lifecycle.py` | `test_trc_design_research_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10817,14 +10828,14 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Generate canonical HSL drafts or base-revision-bound typed patches using registered blocks, units, parameters, clocks, tests and displayed assumptions. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-STRAT-VERSION_STRATEGIES](#feat-strat-version-strategies), [FEAT-STRAT-DEFINE_INDICATORS](#feat-strat-define-indicators)
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-ROLES](#cat-roles)
 
@@ -10840,7 +10851,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-COMPOSE_STRATEGY_SPECS-001 | `tests/services/agentic/compose_strategy_specs/test_lifecycle.py` | `test_trc_compose_strategy_specs_nfr_001` | PENDING |
 | ATN-AGT-COMPOSE_STRATEGY_SPECS-002 | `tests/services/agentic/compose_strategy_specs/test_lifecycle.py` | `test_trc_compose_strategy_specs_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10889,14 +10900,14 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Use current account/allocation/analytics/mandate/risk evidence for nonbinding weights/ranges/questions/uncertainty and strict expiry. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research), [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-POR-COMPOSE_PORTFOLIOS](#feat-por-compose-portfolios), [FEAT-POR-ANALYZE_PORTFOLIO_RISK](#feat-por-analyze-portfolio-risk), [FEAT-RSK-ASSESS_RESEARCH_RISK](#feat-rsk-assess-research-risk)
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-ROLES](#cat-roles)
 
@@ -10912,7 +10923,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-ADVISE_PORTFOLIO-001 | `tests/services/agentic/advise_portfolio/test_lifecycle.py` | `test_trc_advise_portfolio_nfr_001` | PENDING |
 | ATN-AGT-ADVISE_PORTFOLIO-002 | `tests/services/agentic/advise_portfolio/test_lifecycle.py` | `test_trc_advise_portfolio_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -10961,14 +10972,14 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Compose expiring thesis/scope/direction-or-behavior/horizon/invalidation/evidence/uncertainty/evaluation candidates. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-STRAT-ACCEPT_PROPOSALS](#feat-strat-accept-proposals)
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-ROLES](#cat-roles)
 
@@ -10984,7 +10995,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-COMPOSE_STRATEGY_PROPOSALS-001 | `tests/services/agentic/compose_strategy_proposals/test_lifecycle.py` | `test_trc_compose_strategy_proposals_nfr_001` | PENDING |
 | ATN-AGT-COMPOSE_STRATEGY_PROPOSALS-002 | `tests/services/agentic/compose_strategy_proposals/test_lifecycle.py` | `test_trc_compose_strategy_proposals_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11034,14 +11045,14 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Require the exact approved requirement and receiver-validated unsupported-expression report before source generation. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs), [FEAT-PLUG-SANDBOX_PERMISSIONS](#feat-plug-sandbox-permissions), [FEAT-PLUG-ISOLATE_ANALYSIS](#feat-plug-isolate-analysis), [FEAT-WS-MANAGE_ARTIFACTS](#feat-ws-manage-artifacts), [FEAT-WS-EXECUTE_PERSISTENCE](#feat-ws-execute-persistence)
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-AGENTIC-STATE](#cat-agentic-state), [CAT-ROLES](#cat-roles)
 
@@ -11058,7 +11069,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-AUTHOR_SANDBOX_ARTIFACTS-001 | `tests/services/agentic/author_sandbox_artifacts/test_lifecycle.py` | `test_trc_author_sandbox_artifacts_nfr_001` | PENDING |
 | ATN-AGT-AUTHOR_SANDBOX_ARTIFACTS-002 | `tests/services/agentic/author_sandbox_artifacts/test_lifecycle.py` | `test_trc_author_sandbox_artifacts_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11107,7 +11118,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 
 **Output boundary:** Match immutable forecast/recommendation target/horizon/observation rules to later authoritative outcomes without rewriting the original. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-All shared and capability-specific semantic record fields in §45.2–45.3, under §42.8 corrections; this register does not silently reduce those fields.
+All shared and capability-specific semantic record fields are retained locally in Appendix A.3 under the consistency decisions in Appendix A.4; this register does not silently reduce those fields.
 
 **Required feature providers:** [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-WS-EXECUTE_PERSISTENCE](#feat-ws-execute-persistence), [FEAT-ANA-COMPUTE_METRICS](#feat-ana-compute-metrics)
 
@@ -11118,7 +11129,7 @@ All shared and capability-specific semantic record fields in §45.2–45.3, unde
 | [FEAT-POR-SIMULATE_PORTFOLIOS](#feat-por-simulate-portfolios) | Portfolio calibration needs authoritative completed outcomes. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-AGENTIC-RECORDS](#cat-agentic-records), [CAT-AGENTIC-STATE](#cat-agentic-state)
 
@@ -11134,7 +11145,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | ATN-AGT-CALIBRATE_OUTCOMES-001 | `tests/services/agentic/calibrate_outcomes/test_lifecycle.py` | `test_trc_calibrate_outcomes_nfr_001` | PENDING |
 | ATN-AGT-CALIBRATE_OUTCOMES-002 | `tests/services/agentic/calibrate_outcomes/test_lifecycle.py` | `test_trc_calibrate_outcomes_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11202,7 +11213,7 @@ ApiResponse/ApiError/ApiMetadata/StreamEvent; HTTP 202 jobs; idempotency/ETag; b
 | ATN-IFACE-SERVE_API_EVENTS-001 | `tests/services/interfaces/serve_api_events/test_lifecycle.py` | `test_trc_serve_api_events_nfr_001` | PENDING |
 | ATN-IFACE-SERVE_API_EVENTS-002 | `tests/services/interfaces/serve_api_events/test_lifecycle.py` | `test_trc_serve_api_events_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11266,7 +11277,7 @@ Authentication/session/logout/revocation; hq_session/hq_csrf; principal/scope pr
 | ATN-IFACE-OPERATE_IDENTITY-001 | `tests/services/interfaces/operate_identity/test_lifecycle.py` | `test_trc_operate_identity_nfr_001` | PENDING |
 | ATN-IFACE-OPERATE_IDENTITY-002 | `tests/services/interfaces/operate_identity/test_lifecycle.py` | `test_trc_operate_identity_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11333,7 +11344,7 @@ Settings schema/read/update; credential slots by opaque ref; health/diagnostic/n
 | ATN-IFACE-OPERATE_SETTINGS-001 | `tests/services/interfaces/operate_settings/test_lifecycle.py` | `test_trc_operate_settings_nfr_001` | PENDING |
 | ATN-IFACE-OPERATE_SETTINGS-002 | `tests/services/interfaces/operate_settings/test_lifecycle.py` | `test_trc_operate_settings_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11402,7 +11413,7 @@ Series/catalogue/quality/import/export/clone/batch transfer capabilities; curren
 | ATN-IFACE-OBSERVE_MARKET_REFERENCE-001 | `tests/services/interfaces/observe_market_reference/test_lifecycle.py` | `test_trc_observe_market_reference_nfr_001` | PENDING |
 | ATN-IFACE-OBSERVE_MARKET_REFERENCE-002 | `tests/services/interfaces/observe_market_reference/test_lifecycle.py` | `test_trc_observe_market_reference_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11476,7 +11487,7 @@ Series/catalogue/quality/import/export/clone/batch transfer capabilities; curren
 | ATN-IFACE-OPERATE_STRATEGIES-001 | `tests/services/interfaces/operate_strategies/test_lifecycle.py` | `test_trc_operate_strategies_nfr_001` | PENDING |
 | ATN-IFACE-OPERATE_STRATEGIES-002 | `tests/services/interfaces/operate_strategies/test_lifecycle.py` | `test_trc_operate_strategies_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11552,7 +11563,7 @@ Series/catalogue/quality/import/export/clone/batch transfer capabilities; curren
 | ATN-IFACE-OPERATE_RESEARCH-001 | `tests/services/interfaces/operate_research/test_lifecycle.py` | `test_trc_operate_research_nfr_001` | PENDING |
 | ATN-IFACE-OPERATE_RESEARCH-002 | `tests/services/interfaces/operate_research/test_lifecycle.py` | `test_trc_operate_research_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11620,7 +11631,7 @@ Series/catalogue/quality/import/export/clone/batch transfer capabilities; curren
 | ATN-IFACE-OPERATE_SIMULATIONS-001 | `tests/services/interfaces/operate_simulations/test_lifecycle.py` | `test_trc_operate_simulations_nfr_001` | PENDING |
 | ATN-IFACE-OPERATE_SIMULATIONS-002 | `tests/services/interfaces/operate_simulations/test_lifecycle.py` | `test_trc_operate_simulations_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11688,7 +11699,7 @@ Series/catalogue/quality/import/export/clone/batch transfer capabilities; curren
 | ATN-IFACE-OPERATE_OPTIMIZATION-001 | `tests/services/interfaces/operate_optimization/test_lifecycle.py` | `test_trc_operate_optimization_nfr_001` | PENDING |
 | ATN-IFACE-OPERATE_OPTIMIZATION-002 | `tests/services/interfaces/operate_optimization/test_lifecycle.py` | `test_trc_operate_optimization_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11760,7 +11771,7 @@ Series/catalogue/quality/import/export/clone/batch transfer capabilities; curren
 | ATN-IFACE-OPERATE_RESULTS-001 | `tests/services/interfaces/operate_results/test_lifecycle.py` | `test_trc_operate_results_nfr_001` | PENDING |
 | ATN-IFACE-OPERATE_RESULTS-002 | `tests/services/interfaces/operate_results/test_lifecycle.py` | `test_trc_operate_results_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11832,7 +11843,7 @@ Series/catalogue/quality/import/export/clone/batch transfer capabilities; curren
 | ATN-IFACE-OPERATE_PORTFOLIOS-001 | `tests/services/interfaces/operate_portfolios/test_lifecycle.py` | `test_trc_operate_portfolios_nfr_001` | PENDING |
 | ATN-IFACE-OPERATE_PORTFOLIOS-002 | `tests/services/interfaces/operate_portfolios/test_lifecycle.py` | `test_trc_operate_portfolios_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11899,7 +11910,7 @@ Series/catalogue/quality/import/export/clone/batch transfer capabilities; curren
 | ATN-IFACE-EDIT_PROJECTS-001 | `tests/services/interfaces/edit_projects/test_lifecycle.py` | `test_trc_edit_projects_nfr_001` | PENDING |
 | ATN-IFACE-EDIT_PROJECTS-002 | `tests/services/interfaces/edit_projects/test_lifecycle.py` | `test_trc_edit_projects_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -11968,7 +11979,7 @@ Jobs/worker inspection; resource estimates; cancel/pause/drain/quarantine; remot
 | ATN-IFACE-OPERATE_JOBS-001 | `tests/services/interfaces/operate_jobs/test_lifecycle.py` | `test_trc_operate_jobs_nfr_001` | PENDING |
 | ATN-IFACE-OPERATE_JOBS-002 | `tests/services/interfaces/operate_jobs/test_lifecycle.py` | `test_trc_operate_jobs_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12039,7 +12050,7 @@ Jobs/worker inspection; resource estimates; cancel/pause/drain/quarantine; remot
 | ATN-IFACE-ADMINISTER_CAPABILITIES-001 | `tests/services/interfaces/administer_capabilities/test_lifecycle.py` | `test_trc_administer_capabilities_nfr_001` | PENDING |
 | ATN-IFACE-ADMINISTER_CAPABILITIES-002 | `tests/services/interfaces/administer_capabilities/test_lifecycle.py` | `test_trc_administer_capabilities_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12111,7 +12122,7 @@ Jobs/worker inspection; resource estimates; cancel/pause/drain/quarantine; remot
 | ATN-IFACE-AGENTIC_GATEWAY-001 | `tests/services/interfaces/agentic_gateway/test_lifecycle.py` | `test_trc_agentic_gateway_nfr_001` | PENDING |
 | ATN-IFACE-AGENTIC_GATEWAY-002 | `tests/services/interfaces/agentic_gateway/test_lifecycle.py` | `test_trc_agentic_gateway_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12179,7 +12190,7 @@ CLI/MCP/automation schemas; status/settings and typed allowed owner operations; 
 | ATN-IFACE-AUTOMATE_COMMANDS-001 | `tests/services/interfaces/automate_commands/test_lifecycle.py` | `test_trc_automate_commands_nfr_001` | PENDING |
 | ATN-IFACE-AUTOMATE_COMMANDS-002 | `tests/services/interfaces/automate_commands/test_lifecycle.py` | `test_trc_automate_commands_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12247,7 +12258,7 @@ All §22.3 widget types; existing type aliases and layout migrations; Dockview t
 | AT-UI-01-004 | `app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx` | `test_trc_host_workspace_004` | PENDING |
 | ATN-UI-01-001 | `app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx` | `test_trc_host_workspace_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12296,7 +12307,7 @@ All §22.3 widget types; existing type aliases and layout migrations; Dockview t
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -12309,7 +12320,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-UI-14-002 | `app/ui/src/clients/__tests__/traceability.test.tsx` | `test_trc_call_typed_backend_002` | PENDING |
 | ATN-UI-14-001 | `app/ui/src/clients/__tests__/lifecycle.test.tsx` | `test_trc_call_typed_backend_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12359,7 +12370,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-CHARTS](#cat-charts), [CAT-SHARED-RECORDS](#cat-shared-records)
 
@@ -12373,7 +12384,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-UI-15-003 | `app/ui/src/context/__tests__/traceability.test.tsx` | `test_trc_capture_context_003` | PENDING |
 | ATN-UI-15-001 | `app/ui/src/context/__tests__/lifecycle.test.tsx` | `test_trc_capture_context_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12426,7 +12437,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-IFACE-OPERATE_SETTINGS](#feat-iface-operate-settings) | Health/settings/diagnostics use their authenticated gateway. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-BLOCKS](#cat-blocks), [CAT-INTERACTIONS-17-1](#cat-interactions-17-1)
 
@@ -12440,7 +12451,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-UI-16-003 | `app/ui/src/components/layout/__tests__/traceability.test.tsx` | `test_trc_navigate_capabilities_003` | PENDING |
 | ATN-UI-16-001 | `app/ui/src/components/layout/__tests__/lifecycle.test.tsx` | `test_trc_navigate_capabilities_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12491,7 +12502,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-IFACE-OPERATE_IDENTITY](#feat-iface-operate-identity) | Verified session comes from the identity gateway. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -12504,7 +12515,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-UI-17-002 | `app/ui/src/app/__tests__/traceability.test.tsx` | `test_trc_gate_access_002` | PENDING |
 | ATN-UI-17-001 | `app/ui/src/app/__tests__/lifecycle.test.tsx` | `test_trc_gate_access_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12556,7 +12567,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-IFACE-OPERATE_SETTINGS](#feat-iface-operate-settings) | Settings and diagnostics are owner-backed. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-1](#cat-interactions-17-1), [CAT-SETTINGS](#cat-settings)
 
@@ -12570,7 +12581,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-UI-13-003 | `app/ui/src/widgets/system-settings/__tests__/traceability.test.tsx` | `test_trc_edit_system_settings_003` | PENDING |
 | ATN-UI-13-001 | `app/ui/src/widgets/system-settings/__tests__/lifecycle.test.tsx` | `test_trc_edit_system_settings_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12624,7 +12635,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-IFACE-OBSERVE_MARKET_REFERENCE](#feat-iface-observe-market-reference) | All Data Manager operations use the existing public boundary. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -12638,7 +12649,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-UI-18-003 | `app/ui/src/components/workflow/__tests__/traceability.test.tsx` | `test_trc_manage_data_003` | PENDING |
 | ATN-UI-18-001 | `app/ui/src/components/workflow/__tests__/lifecycle.test.tsx` | `test_trc_manage_data_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12704,7 +12715,7 @@ CAT-GRIDS and the operation stream in §40.5.
 | ATN-UI-VIEW_COLLECTIONS-001 | `app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx` | `test_trc_view_collections_nfr_001` | PENDING |
 | ATN-UI-VIEW_COLLECTIONS-002 | `app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx` | `test_trc_view_collections_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12754,7 +12765,7 @@ CAT-GRIDS and the operation stream in §40.5.
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-1](#cat-interactions-17-1), [CAT-INTERACTIONS-17-6](#cat-interactions-17-6)
 
@@ -12768,7 +12779,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-UI-REVIEW_DRAFTS-003 | `app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx` | `test_trc_review_drafts_003` | PENDING |
 | ATN-UI-REVIEW_DRAFTS-001 | `app/ui/src/widgets/draft-review/__tests__/lifecycle.test.tsx` | `test_trc_review_drafts_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12821,7 +12832,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-IFACE-OPERATE_RESULTS](#feat-iface-operate-results) | Result overlays use Analytics series. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** [CAT-INTERACTIONS-17-7](#cat-interactions-17-7)
 
@@ -12835,7 +12846,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-UI-04-003 | `app/ui/src/widgets/chart/__tests__/traceability.test.tsx` | `test_trc_view_market_charts_003` | PENDING |
 | ATN-UI-04-001 | `app/ui/src/widgets/chart/__tests__/lifecycle.test.tsx` | `test_trc_view_market_charts_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12888,7 +12899,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-IFACE-OPERATE_RESULTS](#feat-iface-operate-results) | Result inspection is owner-backed. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -12902,7 +12913,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-UI-27-003 | `app/ui/src/widgets/simulator/__tests__/traceability.test.tsx` | `test_trc_run_backtest_003` | PENDING |
 | ATN-UI-27-001 | `app/ui/src/widgets/simulator/__tests__/lifecycle.test.tsx` | `test_trc_run_backtest_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -12955,7 +12966,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | [FEAT-IFACE-OPERATE_RESULTS](#feat-iface-operate-results) | Analysis comparison projections. |
 
 #### Catalogue entries, algorithms and controls delivered
-The behavior and typed operations in this card constitute the bounded deliverable; detailed source semantics remain binding.
+The behavior, typed operations, local catalogue and requirements, and applicable retained Appendix A details in this card constitute the complete bounded documentary deliverable.
 
 **Detailed catalogue families:** No separate inventory; see the owned requirements.
 
@@ -12969,7 +12980,7 @@ The behavior and typed operations in this card constitute the bounded deliverabl
 | AT-UI-28-003 | `app/ui/src/widgets/research/__tests__/traceability.test.tsx` | `test_trc_browse_research_003` | PENDING |
 | ATN-UI-28-001 | `app/ui/src/widgets/research/__tests__/lifecycle.test.tsx` | `test_trc_browse_research_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13035,7 +13046,7 @@ CAT-RESULT-VIEWS; donor class aliases are not current feature names.
 | AT-UI-32-003 | `app/ui/src/widgets/analytics/__tests__/traceability.test.tsx` | `test_trc_browse_results_003` | PENDING |
 | ATN-UI-32-001 | `app/ui/src/widgets/analytics/__tests__/lifecycle.test.tsx` | `test_trc_browse_results_nfr_001` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13103,7 +13114,7 @@ Long/short entry/exit/other events; rule/group insert/negate/duplicate/delete; p
 | ATN-UI-STRATEGY_STUDIO-001 | `app/ui/src/widgets/strategy-editor/__tests__/lifecycle.test.tsx` | `test_trc_strategy_studio_nfr_001` | PENDING |
 | ATN-UI-STRATEGY_STUDIO-002 | `app/ui/src/widgets/strategy-editor/__tests__/lifecycle.test.tsx` | `test_trc_strategy_studio_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13169,7 +13180,7 @@ Build mode/direction/architecture/symmetry; what-to-build; genetic options; data
 | ATN-UI-STRATEGY_BUILDER-001 | `app/ui/src/widgets/strategy-search-space/__tests__/lifecycle.test.tsx` | `test_trc_strategy_builder_nfr_001` | PENDING |
 | ATN-UI-STRATEGY_BUILDER-002 | `app/ui/src/widgets/strategy-search-space/__tests__/lifecycle.test.tsx` | `test_trc_strategy_builder_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13235,7 +13246,7 @@ Source/query/artifact picker; data/trading/ATM/MM overrides; cross-check stage e
 | ATN-UI-STRATEGY_RETESTER-001 | `app/ui/src/widgets/research-settings/__tests__/lifecycle.test.tsx` | `test_trc_strategy_retester_nfr_001` | PENDING |
 | ATN-UI-STRATEGY_RETESTER-002 | `app/ui/src/widgets/research-settings/__tests__/lifecycle.test.tsx` | `test_trc_strategy_retester_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13301,7 +13312,7 @@ Optimization method; parameter table/auto-detection/reset/steps; data/sample/cos
 | ATN-UI-PARAMETER_OPTIMIZER-001 | `app/ui/src/widgets/optimization-settings/__tests__/lifecycle.test.tsx` | `test_trc_parameter_optimizer_nfr_001` | PENDING |
 | ATN-UI-PARAMETER_OPTIMIZER-002 | `app/ui/src/widgets/optimization-settings/__tests__/lifecycle.test.tsx` | `test_trc_parameter_optimizer_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13367,7 +13378,7 @@ New/open/clone/rename/archive; columns/views; select-all-except; tags/notes; mov
 | ATN-UI-DATABANK_GRID-001 | `app/ui/src/widgets/databank-grid/__tests__/lifecycle.test.tsx` | `test_trc_databank_grid_nfr_001` | PENDING |
 | ATN-UI-DATABANK_GRID-002 | `app/ui/src/widgets/databank-grid/__tests__/lifecycle.test.tsx` | `test_trc_databank_grid_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13433,7 +13444,7 @@ Summary tiles; balance/equity/return charts; long/short and IS/validation/OOS sp
 | ATN-UI-RESULT_OVERVIEW-001 | `app/ui/src/widgets/result-overview/__tests__/lifecycle.test.tsx` | `test_trc_result_overview_nfr_001` | PENDING |
 | ATN-UI-RESULT_OVERVIEW-002 | `app/ui/src/widgets/result-overview/__tests__/lifecycle.test.tsx` | `test_trc_result_overview_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13499,7 +13510,7 @@ Ticket/time/symbol/direction/size/prices/SL/PT/cost/net/pips/duration/exit/MAE/M
 | ATN-UI-TRADE_LIST-001 | `app/ui/src/widgets/trade-list/__tests__/lifecycle.test.tsx` | `test_trc_trade_list_nfr_001` | PENDING |
 | ATN-UI-TRADE_LIST-002 | `app/ui/src/widgets/trade-list/__tests__/lifecycle.test.tsx` | `test_trc_trade_list_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13565,7 +13576,7 @@ Time/trade X axis; benchmark/normalization; drawdown money/%/pips/open/off; volu
 | ATN-UI-EQUITY_CHART-001 | `app/ui/src/widgets/equity-chart/__tests__/lifecycle.test.tsx` | `test_trc_equity_chart_nfr_001` | PENDING |
 | ATN-UI-EQUITY_CHART-002 | `app/ui/src/widgets/equity-chart/__tests__/lifecycle.test.tsx` | `test_trc_equity_chart_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13631,7 +13642,7 @@ Twelve configurable slots; hour/day/month/year/session/duration/direction/size/r
 | ATN-UI-TRADE_ANALYSIS-001 | `app/ui/src/widgets/trade-analysis/__tests__/lifecycle.test.tsx` | `test_trc_trade_analysis_nfr_001` | PENDING |
 | ATN-UI-TRADE_ANALYSIS-002 | `app/ui/src/widgets/trade-analysis/__tests__/lifecycle.test.tsx` | `test_trc_trade_analysis_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13697,7 +13708,7 @@ Market bars/ticks; entry/exit/SL/PT/trailing/MAE/MFE overlays; previous/next tra
 | ATN-UI-TRADES_ON_CHART-001 | `app/ui/src/widgets/trades-on-chart/__tests__/lifecycle.test.tsx` | `test_trc_trades_on_chart_nfr_001` | PENDING |
 | ATN-UI-TRADES_ON_CHART-002 | `app/ui/src/widgets/trades-on-chart/__tests__/lifecycle.test.tsx` | `test_trc_trades_on_chart_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13763,7 +13774,7 @@ Baseline/scenario comparison; what-if/Monte Carlo ledger/retest; confidence/perc
 | ATN-UI-ROBUSTNESS_RESULTS-001 | `app/ui/src/widgets/robustness-results/__tests__/lifecycle.test.tsx` | `test_trc_robustness_results_nfr_001` | PENDING |
 | ATN-UI-ROBUSTNESS_RESULTS-002 | `app/ui/src/widgets/robustness-results/__tests__/lifecycle.test.tsx` | `test_trc_robustness_results_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13829,7 +13840,7 @@ Baseline/scenario comparison; what-if/Monte Carlo ledger/retest; confidence/perc
 | ATN-UI-OPTIMIZATION_RESULTS-001 | `app/ui/src/widgets/optimization-results/__tests__/lifecycle.test.tsx` | `test_trc_optimization_results_nfr_001` | PENDING |
 | ATN-UI-OPTIMIZATION_RESULTS-002 | `app/ui/src/widgets/optimization-results/__tests__/lifecycle.test.tsx` | `test_trc_optimization_results_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13895,7 +13906,7 @@ Constituents/reorder; raw/normalized weight; manual/equal/metric/inverse-vol/adv
 | ATN-UI-PORTFOLIO_COMPOSER-001 | `app/ui/src/widgets/portfolio-composer/__tests__/lifecycle.test.tsx` | `test_trc_portfolio_composer_nfr_001` | PENDING |
 | ATN-UI-PORTFOLIO_COMPOSER-002 | `app/ui/src/widgets/portfolio-composer/__tests__/lifecycle.test.tsx` | `test_trc_portfolio_composer_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -13961,7 +13972,7 @@ Universe/count/group/currency/sample/correlation/capital constraints; method/see
 | ATN-UI-PORTFOLIO_BUILDER-001 | `app/ui/src/widgets/portfolio-builder/__tests__/lifecycle.test.tsx` | `test_trc_portfolio_builder_nfr_001` | PENDING |
 | ATN-UI-PORTFOLIO_BUILDER-002 | `app/ui/src/widgets/portfolio-builder/__tests__/lifecycle.test.tsx` | `test_trc_portfolio_builder_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14027,7 +14038,7 @@ Graph/tree/tasks; new/open/save/clone/reorder/delete/enable; config copy/mass-ed
 | ATN-UI-PROJECT_EDITOR-001 | `app/ui/src/widgets/project-editor/__tests__/lifecycle.test.tsx` | `test_trc_project_editor_nfr_001` | PENDING |
 | ATN-UI-PROJECT_EDITOR-002 | `app/ui/src/widgets/project-editor/__tests__/lifecycle.test.tsx` | `test_trc_project_editor_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14093,7 +14104,7 @@ Monaco lazy editor; resource tree; new/save-as/save-all/rename/delete; undo/redo
 | ATN-UI-CODE_EDITOR-001 | `app/ui/src/widgets/code-editor/__tests__/lifecycle.test.tsx` | `test_trc_code_editor_nfr_001` | PENDING |
 | ATN-UI-CODE_EDITOR-002 | `app/ui/src/widgets/code-editor/__tests__/lifecycle.test.tsx` | `test_trc_code_editor_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14159,7 +14170,7 @@ Provider/indicator/file/exists/parameters/decimals/result/error/time; source/exp
 | ATN-UI-INDICATOR_TESTER-001 | `app/ui/src/widgets/indicator-tester/__tests__/lifecycle.test.tsx` | `test_trc_indicator_tester_nfr_001` | PENDING |
 | ATN-UI-INDICATOR_TESTER-002 | `app/ui/src/widgets/indicator-tester/__tests__/lifecycle.test.tsx` | `test_trc_indicator_tester_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14225,7 +14236,7 @@ Job/group/type/ID/state/times/elapsed/progress/priority/resources/worker/reason/
 | ATN-UI-RUN_MONITOR-001 | `app/ui/src/widgets/run-monitor/__tests__/lifecycle.test.tsx` | `test_trc_run_monitor_nfr_001` | PENDING |
 | ATN-UI-RUN_MONITOR-002 | `app/ui/src/widgets/run-monitor/__tests__/lifecycle.test.tsx` | `test_trc_run_monitor_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14291,7 +14302,7 @@ Severity/category/correlation/time filters; bounded tail; pause display/clear di
 | ATN-UI-DEBUG_CONSOLE-001 | `app/ui/src/widgets/debug-console/__tests__/lifecycle.test.tsx` | `test_trc_debug_console_nfr_001` | PENDING |
 | ATN-UI-DEBUG_CONSOLE-002 | `app/ui/src/widgets/debug-console/__tests__/lifecycle.test.tsx` | `test_trc_debug_console_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14359,7 +14370,7 @@ Composer/send/cancel/new conversation/history; fresh context; routing/progress/d
 | ATN-UI-CHAT_BOT-001 | `app/ui/src/widgets/chat-bot/__tests__/lifecycle.test.tsx` | `test_trc_chat_bot_nfr_001` | PENDING |
 | ATN-UI-CHAT_BOT-002 | `app/ui/src/widgets/chat-bot/__tests__/lifecycle.test.tsx` | `test_trc_chat_bot_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14425,7 +14436,7 @@ Workflow/node/attempt graph and table; role/model/prompt versions; evidence/clai
 | ATN-UI-AGENTIC_RUN_INSPECTOR-001 | `app/ui/src/widgets/agentic-run-inspector/__tests__/lifecycle.test.tsx` | `test_trc_agentic_run_inspector_nfr_001` | PENDING |
 | ATN-UI-AGENTIC_RUN_INSPECTOR-002 | `app/ui/src/widgets/agentic-run-inspector/__tests__/lifecycle.test.tsx` | `test_trc_agentic_run_inspector_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14491,7 +14502,7 @@ Dataset/bindings/features/label support; layers/parameter count/receptive field;
 | ATN-UI-NEURAL_RESEARCH-001 | `app/ui/src/widgets/neural-research/__tests__/lifecycle.test.tsx` | `test_trc_neural_research_nfr_001` | PENDING |
 | ATN-UI-NEURAL_RESEARCH-002 | `app/ui/src/widgets/neural-research/__tests__/lifecycle.test.tsx` | `test_trc_neural_research_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14557,7 +14568,7 @@ Metadata; parameter exposure/categories/defaults; trading options; resources; de
 | ATN-UI-STRATEGY_PACKAGER-001 | `app/ui/src/widgets/strategy-packager/__tests__/lifecycle.test.tsx` | `test_trc_strategy_packager_nfr_001` | PENDING |
 | ATN-UI-STRATEGY_PACKAGER-002 | `app/ui/src/widgets/strategy-packager/__tests__/lifecycle.test.tsx` | `test_trc_strategy_packager_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14623,7 +14634,7 @@ Plotly lazy 3D/2D surfaces; box/violin/fan/sensitivity/correlation; Volume Profi
 | ATN-UI-ADVANCED_ANALYSIS-001 | `app/ui/src/widgets/advanced-analysis/__tests__/lifecycle.test.tsx` | `test_trc_advanced_analysis_nfr_001` | PENDING |
 | ATN-UI-ADVANCED_ANALYSIS-002 | `app/ui/src/widgets/advanced-analysis/__tests__/lifecycle.test.tsx` | `test_trc_advanced_analysis_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -14689,7 +14700,7 @@ Plotly lazy 3D/2D surfaces; box/violin/fan/sensitivity/correlation; Volume Profi
 | ATN-UI-PERFORMANCE_LAB-001 | `app/ui/src/widgets/performance-lab/__tests__/lifecycle.test.tsx` | `test_trc_performance_lab_nfr_001` | PENDING |
 | ATN-UI-PERFORMANCE_LAB-002 | `app/ui/src/widgets/performance-lab/__tests__/lifecycle.test.tsx` | `test_trc_performance_lab_nfr_002` | PENDING |
 
-**Common delivery gate:** Strict feature configuration and manifest parity; no private implementation imports; exact effect cleanup/failed mount/removal; deterministic bounded offline usage; source §30/51 and repository quality gates; no production pass claimed.
+**Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
 **Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
 
@@ -15209,137 +15220,137 @@ Entries are feature-owned deliverables, not new runtime features or extra indepe
 
 | Entry ID / name | Accountable feature | Binding delivery / acceptance obligation |
 | --- | --- | --- |
-| CAT-AGENTIC-RECORDS-001 — FirmMandate | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-002 — MandateRequest | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-003 — MandateAccepted | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-004 — MandateScopeDecision | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-005 — MandateView | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-006 — OperationsRequest | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-007 — OperationRecord | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-008 — AgenticRunTrace | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-009 — IncidentRecord | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-010 — ReplayValidation | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-011 — AgenticReadinessView | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-012 — OperationReceipt | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-013 — OperationsExport | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-014 — RoleManifest | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-015 — RoleRegistryRequest | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-016 — RoleResolution | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-017 — RoleRegistrationReceipt | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-018 — RoleRemovalReceipt | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-019 — RoleList | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-020 — RoleEligibilityReferenceReceipt | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-021 — ToolManifest | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-022 — CapabilityLease | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-023 — HumanActionRequest | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-024 — HumanActionDecision | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-025 — ToolGovernanceRequest | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-026 — ToolAuthorizationDecision | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-027 — FilteredToolResult | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-028 — ToolRegistrationReceipt | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-029 — LeaseRevocationReceipt | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-030 — ModelProfile | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-031 — ModelInvocationRequest | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-032 — ModelInvocationSuccess | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-033 — ModelInvocationRefusal | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-034 — ModelRuntimeProvider | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-035 — WorkflowDefinition | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-036 — WorkflowRequest | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-037 — WorkflowRun | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-038 — WorkflowCheckpoint | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-039 — WorkflowAccepted | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-040 — WorkflowCancellationReceipt | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-041 — WorkflowExpiryReceipt | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-042 — WorkflowDrainReceipt | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-043 — WorkflowOutputManifest | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-044 — ContextAssemblyRequest | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-045 — AgenticContextBundle | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-046 — ContextExclusion | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-047 — ContextCoverage | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-048 — ContextExclusionReport | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-049 — MemoryCandidate | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-050 — MemoryRequest | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-051 — MemoryRecord | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-052 — MemoryPromotionDecision | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-053 — MemoryQueryResult | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-054 — MemoryCandidateReceipt | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-055 — MemorySupersessionReceipt | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-056 — MemoryPurgeReceipt | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-057 — MemoryExport | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-058 — EvaluationPlan | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-059 — ProfileEvaluationRequest | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-060 — ProfileEvaluationReport | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-061 — EligibilityDecision | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-062 — AblationResult | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-063 — EligibilityRevocationReceipt | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-064 — BaselineComparison | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-065 — OperatorAssistanceRequest | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-066 — RespondToOperatorRequest | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-067 — SpecialistHandoffRequest | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-068 — SpecialistAttribution | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-069 — OperatorAnswer | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-070 — OperatorSpecialistAnswer | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-071 — OperatorConversationSummary | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-072 — Claim | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-073 — ClaimRelation | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-074 — ClaimGraphRequest | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-075 — ClaimGraph | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-076 — ClaimReliabilityAssessment | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-077 — ClaimReceipt | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-078 — ClaimRelationReceipt | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-079 — ClaimStatusReceipt | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-080 — ClaimGraphView | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-081 — DeliberationPlan | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-082 — Challenge | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-083 — Dissent | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-084 — DeliberationRequest | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-085 — DeliberationRecord | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-086 — DeliberationCancellationReceipt | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-087 — DeliberationView | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-088 — SynthesisRequest | [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-089 — ResearchSynthesis | [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-090 — ResearchInsufficientEvidence | [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-091 — ResearchCampaign | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-092 — HypothesisFamily | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-093 — ResearchVariant | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-094 — ResearchAttempt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-095 — HoldoutReservationReceipt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-096 — ResearchSearchRequest | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-097 — HypothesisFamilyReceipt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-098 — ResearchVariantReceipt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-099 — ResearchAttemptReceipt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-100 — CampaignClosureReceipt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-101 — ResearchSearchView | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-102 — HypothesisCandidate | [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-103 — ExperimentRequestCandidate | [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-104 — SearchRequestCandidate | [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-105 — ResearchDesignRequest | [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-106 — StrategySpecRequest | [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-107 — StrategySpecCandidate | [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-108 — UnsupportedExpressionReport | [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-109 — StrategySpecHandoffReceipt | [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-110 — PortfolioAdvisoryRequest | [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-111 — PortfolioAdvisory | [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-112 — RiskQuestion | [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-113 — PortfolioAdvisoryInsufficientEvidence | [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-114 — StrategyProposalRequest | [FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS](#feat-agt-compose-strategy-proposals) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-115 — StrategyProposalCandidate | [FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS](#feat-agt-compose-strategy-proposals) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-116 — StrategyProposalReceipt | [FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS](#feat-agt-compose-strategy-proposals) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-117 — DslGapProof | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-118 — SandboxLeaseEvidence | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-119 — SandboxArtifactRequest | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-120 — SandboxArtifactManifest | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-121 — SandboxArtifactReceipt | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-122 — SandboxArtifactView | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-123 — SandboxCleanupReceipt | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-124 — OutcomeObservation | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-125 — OutcomeCalibrationRequest | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-126 — CalibrationScore | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-127 — ValueAttribution | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-128 — AgenticChangeCandidate | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-129 — ForecastCalibrationResult | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-130 — RecommendationCalibrationResult | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
-| CAT-AGENTIC-RECORDS-131 — OutcomeCalibrationView | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The complete source §45 semantic field inventory remains binding under §42.8 consistency corrections: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-001 — FirmMandate | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-002 — MandateRequest | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-003 — MandateAccepted | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-004 — MandateScopeDecision | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-005 — MandateView | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-006 — OperationsRequest | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-007 — OperationRecord | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-008 — AgenticRunTrace | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-009 — IncidentRecord | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-010 — ReplayValidation | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-011 — AgenticReadinessView | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-012 — OperationReceipt | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-013 — OperationsExport | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-014 — RoleManifest | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-015 — RoleRegistryRequest | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-016 — RoleResolution | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-017 — RoleRegistrationReceipt | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-018 — RoleRemovalReceipt | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-019 — RoleList | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-020 — RoleEligibilityReferenceReceipt | [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-021 — ToolManifest | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-022 — CapabilityLease | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-023 — HumanActionRequest | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-024 — HumanActionDecision | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-025 — ToolGovernanceRequest | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-026 — ToolAuthorizationDecision | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-027 — FilteredToolResult | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-028 — ToolRegistrationReceipt | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-029 — LeaseRevocationReceipt | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-030 — ModelProfile | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-031 — ModelInvocationRequest | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-032 — ModelInvocationSuccess | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-033 — ModelInvocationRefusal | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-034 — ModelRuntimeProvider | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-035 — WorkflowDefinition | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-036 — WorkflowRequest | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-037 — WorkflowRun | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-038 — WorkflowCheckpoint | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-039 — WorkflowAccepted | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-040 — WorkflowCancellationReceipt | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-041 — WorkflowExpiryReceipt | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-042 — WorkflowDrainReceipt | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-043 — WorkflowOutputManifest | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-044 — ContextAssemblyRequest | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-045 — AgenticContextBundle | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-046 — ContextExclusion | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-047 — ContextCoverage | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-048 — ContextExclusionReport | [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-049 — MemoryCandidate | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-050 — MemoryRequest | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-051 — MemoryRecord | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-052 — MemoryPromotionDecision | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-053 — MemoryQueryResult | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-054 — MemoryCandidateReceipt | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-055 — MemorySupersessionReceipt | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-056 — MemoryPurgeReceipt | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-057 — MemoryExport | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-058 — EvaluationPlan | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-059 — ProfileEvaluationRequest | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-060 — ProfileEvaluationReport | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-061 — EligibilityDecision | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-062 — AblationResult | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-063 — EligibilityRevocationReceipt | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-064 — BaselineComparison | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-065 — OperatorAssistanceRequest | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-066 — RespondToOperatorRequest | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-067 — SpecialistHandoffRequest | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-068 — SpecialistAttribution | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-069 — OperatorAnswer | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-070 — OperatorSpecialistAnswer | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-071 — OperatorConversationSummary | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-072 — Claim | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-073 — ClaimRelation | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-074 — ClaimGraphRequest | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-075 — ClaimGraph | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-076 — ClaimReliabilityAssessment | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-077 — ClaimReceipt | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-078 — ClaimRelationReceipt | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-079 — ClaimStatusReceipt | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-080 — ClaimGraphView | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-081 — DeliberationPlan | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-082 — Challenge | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-083 — Dissent | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-084 — DeliberationRequest | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-085 — DeliberationRecord | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-086 — DeliberationCancellationReceipt | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-087 — DeliberationView | [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-088 — SynthesisRequest | [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-089 — ResearchSynthesis | [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-090 — ResearchInsufficientEvidence | [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-091 — ResearchCampaign | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-092 — HypothesisFamily | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-093 — ResearchVariant | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-094 — ResearchAttempt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-095 — HoldoutReservationReceipt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-096 — ResearchSearchRequest | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-097 — HypothesisFamilyReceipt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-098 — ResearchVariantReceipt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-099 — ResearchAttemptReceipt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-100 — CampaignClosureReceipt | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-101 — ResearchSearchView | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-102 — HypothesisCandidate | [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-103 — ExperimentRequestCandidate | [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-104 — SearchRequestCandidate | [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-105 — ResearchDesignRequest | [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-106 — StrategySpecRequest | [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-107 — StrategySpecCandidate | [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-108 — UnsupportedExpressionReport | [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-109 — StrategySpecHandoffReceipt | [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-110 — PortfolioAdvisoryRequest | [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-111 — PortfolioAdvisory | [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-112 — RiskQuestion | [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-113 — PortfolioAdvisoryInsufficientEvidence | [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-114 — StrategyProposalRequest | [FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS](#feat-agt-compose-strategy-proposals) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-115 — StrategyProposalCandidate | [FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS](#feat-agt-compose-strategy-proposals) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-116 — StrategyProposalReceipt | [FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS](#feat-agt-compose-strategy-proposals) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-117 — DslGapProof | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-118 — SandboxLeaseEvidence | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-119 — SandboxArtifactRequest | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-120 — SandboxArtifactManifest | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-121 — SandboxArtifactReceipt | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-122 — SandboxArtifactView | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-123 — SandboxCleanupReceipt | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-124 — OutcomeObservation | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-125 — OutcomeCalibrationRequest | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-126 — CalibrationScore | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-127 — ValueAttribution | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-128 — AgenticChangeCandidate | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-129 — ForecastCalibrationResult | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-130 — RecommendationCalibrationResult | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
+| CAT-AGENTIC-RECORDS-131 — OutcomeCalibrationView | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The exact local v1 field inventory is retained under Appendix A.3; Appendix A.4 consistency corrections apply: strict/frozen/versioned, finite/bounded, UTC, JSON-safe, owner references, unknown-field rejection; a name is not an implemented schema. |
 
 <a id="cat-shared-records"></a>
 ### CAT-SHARED-RECORDS — Shared and integration record ownership
@@ -15530,42 +15541,42 @@ Entries are feature-owned deliverables, not new runtime features or extra indepe
 <a id="cat-agentic-state"></a>
 ### CAT-AGENTIC-STATE — All nine durable Agentic feature namespaces and their record sets
 
-**Source:** §42.8, §49. **Qualification:** REQUIRED_IMPLEMENTATION_AND_EVIDENCE. All item evidence is PENDING.
+**Historical provenance:** retired §§42.8 and 49. **Local binding authority:** [Appendix A.3.6](#a36-exact-agentic-persisted-state-ownership). **Qualification:** REQUIRED_IMPLEMENTATION_AND_EVIDENCE. All item evidence is PENDING.
 
 | Entry ID / name | Accountable feature | Binding delivery / acceptance obligation |
 | --- | --- | --- |
-| CAT-AGENTIC-STATE-001 — agentic_operation_records | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-002 — agentic_incidents | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-003 — agentic_replay_validations | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-004 — agentic_tool_manifests | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-005 — agentic_capability_leases | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-006 — agentic_tool_invocations | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-007 — agentic_human_actions | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-008 — agentic_workflow_runs | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-009 — agentic_workflow_checkpoints | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-010 — agentic_workflow_waits | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-011 — agentic_workflow_outputs | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-012 — agentic_memory_candidates | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-013 — agentic_memory_records | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-014 — agentic_memory_supersessions | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-015 — agentic_profile_evaluations | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-016 — agentic_profile_eligibility | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-017 — agentic_ablation_results | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-018 — agentic_claim_graphs | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-019 — agentic_claims | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-020 — agentic_claim_relations | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-021 — agentic_claim_status_history | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-022 — agentic_research_campaigns | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-023 — agentic_hypothesis_families | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-024 — agentic_research_variants | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-025 — agentic_research_attempts | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-026 — agentic_holdout_reservations | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-027 — agentic_sandbox_artifact_records | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-028 — agentic_sandbox_cleanup_records | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-029 — agentic_outcome_links | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-030 — agentic_calibration_scores | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-031 — agentic_value_attributions | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
-| CAT-AGENTIC-STATE-032 — agentic_change_candidates | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Apply the source §49 primary key, uniqueness, append-only/CAS, immutable identity and retained-state invariant. Feature-local additive migrations and owner-authorized reads/export; no sibling writes. Workflow outputs are included under REC-013; conversation text belongs to Workspace. |
+| CAT-AGENTIC-STATE-001 — agentic_operation_records | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-002 — agentic_incidents | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-003 — agentic_replay_validations | [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-004 — agentic_tool_manifests | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-005 — agentic_capability_leases | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-006 — agentic_tool_invocations | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-007 — agentic_human_actions | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-008 — agentic_workflow_runs | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-009 — agentic_workflow_checkpoints | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-010 — agentic_workflow_waits | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-011 — agentic_workflow_outputs | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-012 — agentic_memory_candidates | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-013 — agentic_memory_records | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-014 — agentic_memory_supersessions | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-015 — agentic_profile_evaluations | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-016 — agentic_profile_eligibility | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-017 — agentic_ablation_results | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-018 — agentic_claim_graphs | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-019 — agentic_claims | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-020 — agentic_claim_relations | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-021 — agentic_claim_status_history | [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-022 — agentic_research_campaigns | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-023 — agentic_hypothesis_families | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-024 — agentic_research_variants | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-025 — agentic_research_attempts | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-026 — agentic_holdout_reservations | [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-027 — agentic_sandbox_artifact_records | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-028 — agentic_sandbox_cleanup_records | [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-029 — agentic_outcome_links | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-030 — agentic_calibration_scores | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-031 — agentic_value_attributions | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
+| CAT-AGENTIC-STATE-032 — agentic_change_candidates | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Use the exact local persisted-state row for this record-set name in Appendix A.3.6, including its primary key, required invariant, core contents and business retention. Every durable namespace declares RETAIN; feature-local additive migrations and owner-authorized reads/export apply; no sibling writes. |
 
 <a id="cat-resource-limits"></a>
 ### CAT-RESOURCE-LIMITS — Finite baseline admission and numerical slicing controls
@@ -15798,7 +15809,7 @@ These connect feature capabilities; they are not additional features. A feature 
 
 ## 7. Original requirement-ID crosswalk
 
-**Identity rule:** each raw ID below belongs to the pinned specification artifact (`SPEC::<ID>`). This avoids collisions with other owner READMEs using the same raw numbering. Statements in this crosswalk are concise source paraphrases, not replacement text. Original source text and acceptance cells remain binding. The “refining FRs” column names an accountable feature’s requirement set: it is deliberately not a false one-source-row/one-task equivalence.
+**Identity rule:** each raw ID below belongs to the pinned specification artifact (`SPEC::<ID>`). This avoids collisions with other owner READMEs using the same raw numbering. Statements in this crosswalk are concise provenance paraphrases; the owning local FRs, catalogue entries, acceptance cells, and Appendix A retained details are the complete documentary behavior. The “refining FRs” column names an accountable feature’s requirement set: it is deliberately not a false one-source-row/one-task equivalence.
 
 ### FUNCTIONAL_PRODUCT — 217
 
@@ -16439,36 +16450,36 @@ Benchmark harnesses, source task IDs and acceptance gates are **not** additional
 | AGT-7.04 | INTEGRATION_ACCEPTANCE_TASK | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context), [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory), [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles), [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research), [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search), [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research), [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs), [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio), [FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS](#feat-agt-compose-strategy-proposals), [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts), [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Deliver/reconcile through the listed owner feature; no additional feature identity or completed status implied. |
 | AGT-7.05 | INTEGRATION_ACCEPTANCE_TASK | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context), [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory), [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles), [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research), [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search), [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research), [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs), [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio), [FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS](#feat-agt-compose-strategy-proposals), [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts), [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Deliver/reconcile through the listed owner feature; no additional feature identity or completed status implied. |
 | AGT-7.06 | INTEGRATION_ACCEPTANCE_TASK | [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context), [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory), [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles), [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research), [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search), [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research), [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs), [FEAT-AGT-ADVISE_PORTFOLIO](#feat-agt-advise-portfolio), [FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS](#feat-agt-compose-strategy-proposals), [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts), [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes), [FEAT-IFACE-AGENTIC_GATEWAY](#feat-iface-agentic-gateway), [FEAT-UI-CHAT_BOT](#feat-ui-chat-bot) | Deliver/reconcile through the listed owner feature; no additional feature identity or completed status implied. |
-| REC-001 | ADOPTED_SOURCE_DECISION | [FEAT-WS-BUILD_DIAGNOSTICS](#feat-ws-build-diagnostics) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-002 | ADOPTED_SOURCE_DECISION | [FEAT-RES-DEFINE_PROTOCOLS](#feat-res-define-protocols), [FEAT-OPT-SEARCH_PARAMETERS](#feat-opt-search-parameters) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-003 | ADOPTED_SOURCE_DECISION | [FEAT-SIM-CONFIGURE_ENGINE](#feat-sim-configure-engine) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-004 | ADOPTED_SOURCE_DECISION | [FEAT-STRAT-DEFINE_AST](#feat-strat-define-ast) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-005 | ADOPTED_SOURCE_DECISION | [FEAT-STRAT-CONFIGURE_CHARTS](#feat-strat-configure-charts), [FEAT-SIM-MODEL_TICKS](#feat-sim-model-ticks) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-006 | ADOPTED_SOURCE_DECISION | [FEAT-STRAT-DEFINE_AST](#feat-strat-define-ast), [FEAT-RES-GOVERN_CAMPAIGNS](#feat-res-govern-campaigns) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-007 | ADOPTED_SOURCE_DECISION | [FEAT-STRAT-EXCHANGE_STRATEGIES](#feat-strat-exchange-strategies) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-008 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-ORCH-MANAGE_JOBS](#feat-orch-manage-jobs) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-009 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-ORCH-MANAGE_JOBS](#feat-orch-manage-jobs) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-010 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research), [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-011 | ADOPTED_SOURCE_DECISION | [FEAT-IFACE-AGENTIC_GATEWAY](#feat-iface-agentic-gateway), [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-012 | ADOPTED_SOURCE_DECISION | [FEAT-WS-MANAGE_CONVERSATIONS](#feat-ws-manage-conversations), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-013 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research), [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-014 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory), [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-015 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search), [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs), [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-016 | ADOPTED_SOURCE_DECISION | [FEAT-RES-GOVERN_CAMPAIGNS](#feat-res-govern-campaigns), [FEAT-RES-GOVERN_HOLDOUTS](#feat-res-govern-holdouts), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-017 | ADOPTED_SOURCE_DECISION | [FEAT-RES-GOVERN_CAMPAIGNS](#feat-res-govern-campaigns), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-018 | ADOPTED_SOURCE_DECISION | [FEAT-RES-DEFINE_PROTOCOLS](#feat-res-define-protocols), [FEAT-OPT-SEARCH_PARAMETERS](#feat-opt-search-parameters), [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-019 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-PLUG-REGISTER_CONTRIBUTIONS](#feat-plug-register-contributions) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-020 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-021 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator), [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs), [FEAT-STRAT-VERSION_STRATEGIES](#feat-strat-version-strategies) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-022 | ADOPTED_SOURCE_DECISION | [FEAT-STRAT-DEFINE_AST](#feat-strat-define-ast), [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-023 | ADOPTED_SOURCE_DECISION | [FEAT-TRD-OBSERVE_OUTCOMES](#feat-trd-observe-outcomes), [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-024 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes), [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-025 | ADOPTED_SOURCE_DECISION | [FEAT-WS-BUILD_DIAGNOSTICS](#feat-ws-build-diagnostics) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-026 | ADOPTED_SOURCE_DECISION | [FEAT-WS-MANAGE_CONVERSATIONS](#feat-ws-manage-conversations), [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-027 | ADOPTED_SOURCE_DECISION | [FEAT-SIM-MODEL_TICKS](#feat-sim-model-ticks), [FEAT-SIM-EXECUTE_TICKS](#feat-sim-execute-ticks) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-028 | ADOPTED_SOURCE_DECISION | [FEAT-SIM-EXECUTE_TICKS](#feat-sim-execute-ticks), [FEAT-STRAT-COMPILE_STRATEGIES](#feat-strat-compile-strategies) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-029 | ADOPTED_SOURCE_DECISION | [FEAT-ORCH-RESERVE_RESOURCES](#feat-orch-reserve-resources) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
-| REC-030 | ADOPTED_SOURCE_DECISION | [FEAT-SIM-EXECUTE_TICKS](#feat-sim-execute-ticks), [FEAT-ANA-COMPUTE_METRICS](#feat-ana-compute-metrics) | Original §41 decision remains binding; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-001 | ADOPTED_SOURCE_DECISION | [FEAT-WS-BUILD_DIAGNOSTICS](#feat-ws-build-diagnostics) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-002 | ADOPTED_SOURCE_DECISION | [FEAT-RES-DEFINE_PROTOCOLS](#feat-res-define-protocols), [FEAT-OPT-SEARCH_PARAMETERS](#feat-opt-search-parameters) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-003 | ADOPTED_SOURCE_DECISION | [FEAT-SIM-CONFIGURE_ENGINE](#feat-sim-configure-engine) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-004 | ADOPTED_SOURCE_DECISION | [FEAT-STRAT-DEFINE_AST](#feat-strat-define-ast) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-005 | ADOPTED_SOURCE_DECISION | [FEAT-STRAT-CONFIGURE_CHARTS](#feat-strat-configure-charts), [FEAT-SIM-MODEL_TICKS](#feat-sim-model-ticks) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-006 | ADOPTED_SOURCE_DECISION | [FEAT-STRAT-DEFINE_AST](#feat-strat-define-ast), [FEAT-RES-GOVERN_CAMPAIGNS](#feat-res-govern-campaigns) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-007 | ADOPTED_SOURCE_DECISION | [FEAT-STRAT-EXCHANGE_STRATEGIES](#feat-strat-exchange-strategies) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-008 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-ORCH-MANAGE_JOBS](#feat-orch-manage-jobs) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-009 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-ORCH-MANAGE_JOBS](#feat-orch-manage-jobs) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-010 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research), [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-011 | ADOPTED_SOURCE_DECISION | [FEAT-IFACE-AGENTIC_GATEWAY](#feat-iface-agentic-gateway), [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-012 | ADOPTED_SOURCE_DECISION | [FEAT-WS-MANAGE_CONVERSATIONS](#feat-ws-manage-conversations), [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-013 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-RUN_WORKFLOWS](#feat-agt-run-workflows), [FEAT-AGT-MANAGE_CLAIMS](#feat-agt-manage-claims), [FEAT-AGT-DELIBERATE_RESEARCH](#feat-agt-deliberate-research), [FEAT-AGT-SYNTHESIZE_RESEARCH](#feat-agt-synthesize-research) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-014 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-MANAGE_MEMORY](#feat-agt-manage-memory), [FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS](#feat-agt-author-sandbox-artifacts) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-015 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-GOVERN_TOOL_CALLS](#feat-agt-govern-tool-calls), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search), [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs), [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-016 | ADOPTED_SOURCE_DECISION | [FEAT-RES-GOVERN_CAMPAIGNS](#feat-res-govern-campaigns), [FEAT-RES-GOVERN_HOLDOUTS](#feat-res-govern-holdouts), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-017 | ADOPTED_SOURCE_DECISION | [FEAT-RES-GOVERN_CAMPAIGNS](#feat-res-govern-campaigns), [FEAT-AGT-GOVERN_RESEARCH_SEARCH](#feat-agt-govern-research-search) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-018 | ADOPTED_SOURCE_DECISION | [FEAT-RES-DEFINE_PROTOCOLS](#feat-res-define-protocols), [FEAT-OPT-SEARCH_PARAMETERS](#feat-opt-search-parameters), [FEAT-AGT-DESIGN_RESEARCH](#feat-agt-design-research) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-019 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models), [FEAT-PLUG-REGISTER_CONTRIBUTIONS](#feat-plug-register-contributions) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-020 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles), [FEAT-AGT-REGISTER_ROLES](#feat-agt-register-roles), [FEAT-AGT-INVOKE_MODELS](#feat-agt-invoke-models) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-021 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-ASSIST_OPERATOR](#feat-agt-assist-operator), [FEAT-AGT-COMPOSE_STRATEGY_SPECS](#feat-agt-compose-strategy-specs), [FEAT-STRAT-VERSION_STRATEGIES](#feat-strat-version-strategies) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-022 | ADOPTED_SOURCE_DECISION | [FEAT-STRAT-DEFINE_AST](#feat-strat-define-ast), [FEAT-AGT-ENFORCE_MANDATE](#feat-agt-enforce-mandate) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-023 | ADOPTED_SOURCE_DECISION | [FEAT-TRD-OBSERVE_OUTCOMES](#feat-trd-observe-outcomes), [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-024 | ADOPTED_SOURCE_DECISION | [FEAT-AGT-CALIBRATE_OUTCOMES](#feat-agt-calibrate-outcomes), [FEAT-AGT-EVALUATE_PROFILES](#feat-agt-evaluate-profiles) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-025 | ADOPTED_SOURCE_DECISION | [FEAT-WS-BUILD_DIAGNOSTICS](#feat-ws-build-diagnostics) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-026 | ADOPTED_SOURCE_DECISION | [FEAT-WS-MANAGE_CONVERSATIONS](#feat-ws-manage-conversations), [FEAT-AGT-ASSEMBLE_CONTEXT](#feat-agt-assemble-context), [FEAT-AGT-OPERATE_RUNS](#feat-agt-operate-runs) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-027 | ADOPTED_SOURCE_DECISION | [FEAT-SIM-MODEL_TICKS](#feat-sim-model-ticks), [FEAT-SIM-EXECUTE_TICKS](#feat-sim-execute-ticks) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-028 | ADOPTED_SOURCE_DECISION | [FEAT-SIM-EXECUTE_TICKS](#feat-sim-execute-ticks), [FEAT-STRAT-COMPILE_STRATEGIES](#feat-strat-compile-strategies) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-029 | ADOPTED_SOURCE_DECISION | [FEAT-ORCH-RESERVE_RESOURCES](#feat-orch-reserve-resources) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
+| REC-XREF-030 | ADOPTED_SOURCE_DECISION | [FEAT-SIM-EXECUTE_TICKS](#feat-sim-execute-ticks), [FEAT-ANA-COMPUTE_METRICS](#feat-ana-compute-metrics) | The complete local issue, adopted resolution, and consequence are retained in Appendix A.4; local TRD entries resolve added examples without reopening adopted ownership. |
 
 ### Legacy aliases and retired mechanism mappings
 
@@ -16540,7 +16551,7 @@ Orchestration owns admission/jobs/workers/project attempts. Adapt/rehome compati
 
 **Owners:** [FEAT-STRAT-DEFINE_AST](#feat-strat-define-ast), [FEAT-STRAT-IMPORT_SQX](#feat-strat-import-sqx), [FEAT-STRAT-COMPILE_STRATEGIES](#feat-strat-compile-strategies). **Source:** §37.9, §42.7.
 
-Canonical language is hsl 2.0.0, schema hsl://schema/strategy/2.0.0 and §42.7 root/node-store. The flat §37.9 JSON is an adapter intermediate/golden mapping, not a second production schema. Preserve every listed source field through typed conversion and loss reporting.
+Canonical language is hsl 2.0.0, schema hsl://schema/strategy/2.0.0 and §42.7 root/node-store. The flat JSON in Appendix A.2 is an adapter intermediate/golden mapping, not a second production schema. Preserve every listed fixture field through typed conversion and loss reporting.
 
 ### TRD-004 — Manifest-backed contributions, not import globals
 
@@ -16696,25 +16707,22 @@ These are **not orphan requirements**: their scope, accountable feature, closure
 
 ## 11. Validation and controlled maintenance
 
-Run the register-only structural checks:
+Validate this Markdown anchor directly. Required documentary checks include unique feature/FR/catalogue ownership, nonempty acceptance links, the 205-feature and 131-Agentic-record counts, all 30 reconciliation decisions, balanced retained-section markers, parsable fenced JSON fixtures, internal Agentic record-name/field coverage, an acyclic required-dependency graph, and preservation of the simulated/hypothetical-performance disclosure. The searchable browser must parse its embedded JSON, retain 205 feature records, name this anchor as canonical, and remain non-authoritative.
 
-```powershell
-python validate_traceability.py traceability_register.json --self-test --report validation_report.json
-```
-
-Run the additional source check in a local checkout containing the pinned specification:
-
-```powershell
-python validate_traceability.py traceability_register.json `
-  --spec "docs/dev/SQX/HaruQuantAI_Unified_Specification.md" `
-  --self-test --report validation_report.json
-```
-
-The optional source check verifies the Git blob and the current identifier set. A later specification revision correctly fails the pinned hash until this register is deliberately reconciled. Windows checkout line-ending conversion changes raw bytes; supply the Git blob’s UTF-8/LF content for an exact byte check. Even a successful byte/ID check is not a substitute for semantic review or real acceptance tests.
+The retired-source hashes in §1 are immutable consolidation provenance, not runtime inputs. A later change to this anchor is reviewed semantically against the owning feature cards, package README/contracts, catalogues, §10 evidence gates, and Appendix A retained details. Matching an old byte hash or identifier set is neither required nor sufficient for a valid revision.
 
 The required-dependency topological order is stored in JSON for structural inspection. It is **not an executor-ready phased implementation plan**: task splitting, exact code signatures/defaults where not already normative, donor qualification, path-bounded changes and actual provider evidence still belong to the next implementation-plan work. No feature may fabricate a missing provider or infer a passing gate from this register.
 
-When a source requirement changes, update its artifact-scoped source row, owning FR(s), catalogue entries, applicable NFRs, dependencies, tests and release gate together. Preserve retired IDs as aliases rather than reusing them. Regenerate Markdown/HTML from canonical JSON and rerun both integrity and fault-injection checks. Never turn a source count discrepancy into a silent dropped requirement.
+When a requirement changes, update its provenance row, owning FR(s), catalogue entries, applicable NFRs, dependencies, tests, release gate, and any affected Appendix A retained detail together. Preserve retired IDs as aliases rather than reusing them. Regenerate or update the non-authoritative HTML companions from this anchor and rerun the integrity checks. Never turn an identifier/count discrepancy into a silent dropped behavior.
+
+### 11.1 Self-contained shared delivery and verification gate
+
+- **Authority and scope:** Implement only the owning feature's ratified FRs, NFRs and acceptance cells through its owning README and public contracts. Legacy donor evidence is optional migration evidence and cannot certify parity or completion.
+- **Contract and architecture:** Maintain strict feature configuration and manifest/README/public-contract parity. Do not import private cross-feature implementations. Required dependencies fail closed. Provider removal and physical feature removal cannot silently select a substitute.
+- **Lifecycle:** Managed tasks, subscriptions, capabilities, clients and contributions clean up on normal unmount, failed mount, replacement and repeated enable/disable. Stateful features own additive migrations and use the bounded Workspace persistence capability.
+- **Change-scoped automated evidence:** Run applicable contract/schema compatibility, configuration, business, numerical golden, lifecycle, persistence/concurrency/recovery, replacement/readiness/removal, interface/idempotency/stream, integration-workflow and architecture tests. Run targeted tests during implementation; final pre-commit/CI owns configured coverage and full-suite evidence.
+- **Quality and usage:** Apply repository-pinned formatting, lint, type, import-boundary and document validation plus the feature's bounded executable usage evidence. Specialized numerical, performance, security, accessibility, browser, provider, packaging and manual suites apply when the feature's local requirements, §3 NFRs, §6 workflows or §9 release gates require them.
+- **Evidence truth:** Pending, unavailable, simulated and unmeasured states remain explicit. Documentary allocation, donor history or a passing narrow test never establishes production readiness, provider availability, live safety or measured performance.
 
 ### Repository references used for identity reconciliation
 
@@ -16728,3 +16736,712 @@ When a source requirement changes, update its artifact-scoped source row, owning
 [app/services/brokers/README.md](https://github.com/haruperi/HaruQuantAI/blob/c06456fe2c03bc89f52edad1a0a8428118287377/app/services/brokers/README.md)
 [app/services/interfaces/README.md](https://github.com/haruperi/HaruQuantAI/blob/c06456fe2c03bc89f52edad1a0a8428118287377/app/services/interfaces/README.md)
 [app/ui/README.md](https://github.com/haruperi/HaruQuantAI/blob/c06456fe2c03bc89f52edad1a0a8428118287377/app/ui/README.md)
+
+## Appendix A — Retained self-contained specification details
+
+This section retains behavior-defining details that were previously available only through historical source-section references. It adds no feature, requirement, catalogue, or completion identity. The feature cards and owning package authorities remain controlling; these details make the anchor independently interpretable after source retirement.
+
+### A.1 Adopted numerical and model semantics
+
+#### Float64 comparison policy
+
+Under `hqa_numeric_clock_v1`, continuous indicator equality uses the literal comparison `abs(a-b) <= atol + rtol * max(abs(a),abs(b))`, equivalently:
+
+\[
+\operatorname{equal}(a,b) \iff \operatorname{abs}(a-b) \leq \mathrm{atol} + \mathrm{rtol}\times\max(\operatorname{abs}(a),\operatorname{abs}(b)).
+\]
+
+The initial values are `atol=1e-10` and `rtol=1e-9`. Greater/less comparisons are strictly outside that band; inclusive comparisons combine strict comparison with equality. Exact integer and Decimal values follow their declared exact/quantized policy, not this float tolerance. Missing, NaN, or infinite trading values produce typed unavailable/invalid results rather than a true signal or usable score.
+
+#### Roulette selection and bounded Gaussian mutation
+
+For a recorded non-negative fitness transform \(g\), fitness-proportionate selection uses:
+
+\[
+P(s_i)=\frac{g(f_i)}{\sum_j g(f_j)}.
+\]
+
+If every transformed score is zero, selection is uniform and emits a warning. No undocumented alternative selector is substituted.
+
+For a recorded \(\sigma\), bounds \([a,b]\), step, precision, unit, and seed, bounded Gaussian mutation is:
+
+\[
+\theta' = \operatorname{snap}\bigl(\operatorname{clip}(\theta+\mathcal N(0,\sigma^2(b-a)^2),a,b),\mathrm{step}\bigr).
+\]
+
+Execution order is mutate, clip, snap, then validate. The legal parameter lattice is anchored at \(a\); snapping selects the nearest legal value, with exact ties resolved toward the lower lattice index. Clipping must not yield a value outside that lattice. Invalid or empty compatible cases follow the declared recorded no-op/failure policy and never silently switch operators.
+
+#### Fractional differencing
+
+Fractional differencing is:
+
+\[
+(1-B)^d X_t=\sum_{k=0}^{\infty}(-1)^k {d\choose k}X_{t-k}.
+\]
+
+Production preprocessing records a finite truncation rule or weight tolerance, \(d\), ordered input/fit window, missing-value policy, and resulting transform identity. Fitting uses training history only; validation, test, and inference reuse the fitted artifact and never fit on future or out-of-sample values.
+
+#### MLP, stable softmax, focal loss, and conditional TCN receptive field
+
+An MLP layer applies its recorded affine transform, normalization, activation, and optional dropout in that order:
+
+\[
+h_1=\operatorname{LeakyReLU}(\operatorname{Norm}(W_1x+b_1)),\qquad
+h_l=\operatorname{Dropout}(\operatorname{LeakyReLU}(\operatorname{Norm}(W_lh_{l-1}+b_l))).
+\]
+
+Its output is \(\hat y=\operatorname{Softmax}(W_{\mathrm{out}}h_L+b_{\mathrm{out}})\). Stable Softmax subtracts the maximum logit before exponentiation. The retained focal-loss definition is:
+
+\[
+\mathcal{L}_{\mathrm{focal}}=-\alpha_t(1-p_t)^\gamma\log(p_t).
+\]
+
+For a TCN with exactly one convolution at each of \(L\) levels, constant kernel size \(K\), and dilations \(2^l\), the receptive field is:
+
+\[
+R=1+\sum_{l=0}^{L-1}(K-1)2^l.
+\]
+
+That equation is conditional on that stated stack. Any graph with other kernels, dilations, repeats, residual blocks, or multiple convolutions computes the receptive field from its actual graph. Causal-inference tests perturb future inputs and must leave past predictions unchanged.
+
+#### Generic midpoint reflection
+
+For a declared symmetric numerical domain with midpoint `middle`, the reflected short-side threshold is:
+
+\[
+\mathrm{short}=2 \times \mathrm{middle}-\mathrm{long}.
+\]
+
+Reflection is applied only where the block descriptor declares a valid midpoint and opposite mapping. Relational, action, band, and offset inversions use the typed mappings retained in the conversion fixture below; unsupported or ambiguous opposites fail explicitly.
+
+### A.2 Retained conversion and golden fixtures
+
+The following fixtures are acceptance inputs for deterministic conversion. They are not additional production schemas, recommended trading settings, or proof of universal SQX format support. The compact JSON must normalize into the one canonical HSL node-store model. The XML/HSL table and translated document are a field-preservation golden fixture; unknown or unqualified external variants remain subject to `EVD-SQX-01` and must be rejected or loss-reported.
+
+<!-- RETAINED-CONVERSION-FIXTURES-BEGIN -->
+
+The following compact v1 JSON is retained solely as an explicit conversion/golden-behavior fixture for a long EMA crossover with fixed unit sizing. It is not the HSL v2 authoring wire schema. U2 must convert it into the canonical root-document/node-store HSL model defined by FEAT-STRAT-DEFINE_AST and TRD-003 and prove equivalent signals, exits and results. Its binding resolves to synthetic test data; it contains both referenced parameters and an explicit exit. Reference and native conversion tests consume the same explicitly pinned tick fixture; any historical bar-only result is not reused as an equivalent tick result. These are development fixture values, not recommended trading settings. Production schemas add immutable revision hashes and complete provider/data manifests when saving and running.
+
+```json
+{
+  "schema_version": 1,
+  "strategy_id": "fixture-ema-cross",
+  "architecture": "rule_signal_v1",
+  "semantic_policy": "hqa_numeric_clock_v1",
+  "data_bindings": [
+    {"id": "main", "instrument_ref": "fixture-instrument", "timeframe": "H1"}
+  ],
+  "parameters": [
+    {"id": "fast", "type": "integer", "value": 10, "min": 2, "max": 20, "step": 1, "optimizable": true},
+    {"id": "slow", "type": "integer", "value": 30, "min": 21, "max": 60, "step": 1, "optimizable": true}
+  ],
+  "constraints": [{"kind": "parameter_less_than", "left": "fast", "right": "slow"}],
+  "sizing": {"kind": "fixed_units", "value": "1"},
+  "position_policy": {"mode": "single_position", "scope": "strategy_and_instrument"},
+  "events": [{
+    "id": "bar-evaluation",
+    "event": "evaluate",
+    "clock": "bar_close",
+    "rules": [
+      {
+        "id": "enter-long",
+        "kind": "if_then",
+        "condition": {
+          "node": "crosses_above", "version": 1,
+          "inputs": [
+            {"node": "ema", "version": 1, "binding": "main", "price": "close", "period_ref": "fast", "shift": 0},
+            {"node": "ema", "version": 1, "binding": "main", "price": "close", "period_ref": "slow", "shift": 0}
+          ]
+        },
+        "actions": [{"node": "enter_market", "version": 1, "binding": "main", "direction": "long", "size_ref": "strategy_sizing"}]
+      },
+      {
+        "id": "exit-long",
+        "kind": "if_then",
+        "condition": {
+          "node": "crosses_below", "version": 1,
+          "inputs": [
+            {"node": "ema", "version": 1, "binding": "main", "price": "close", "period_ref": "fast", "shift": 0},
+            {"node": "ema", "version": 1, "binding": "main", "price": "close", "period_ref": "slow", "shift": 0}
+          ]
+        },
+        "actions": [{"node": "close_position", "version": 1, "binding": "main", "direction": "long", "scope": "own_strategy", "quantity": "all"}]
+      }
+    ]
+  }]
+}
+```
+
+Each AST node receives a stable node ID on creation/import; the compact fixture omits those generated IDs for readability. Deterministic fixture expansion assigns IDs by canonical rule/input path before schema validation. Catalogue keys shown here are native semantic IDs. Map them to exact registered provider keys during contract implementation; the meaning and required fields cannot be dropped during that mapping.
+
+#### A.2.1 Comprehensive XML-to-JSON Field Translation Matrix
+
+| SQX XML Source Path / Element | HaruQuantAI HSL v2 JSON Target Path | Target Type | Semantic Meaning & Transformation Rule |
+|---|---|---|---|
+| `<StrategyFile Version="3.9.130" Type="Portfolio">` | `strategy_id`, `schema_version`, `kind` | String, String, Enum | Root strategy metadata. Set `schema_version: "2.0"`, `kind: "STRATEGY"` or `"PORTFOLIO"`. |
+| `<StrategyFile id="XYZ" name="MyStrategy">` | `id`, `name`, `metadata.created_from` | String, String, Object | Strategy identity; records provenance and import timestamp. |
+| `<MoneyManagement type="SQ.MoneyManagement.*">` | `money_management.type` | String (Enum) | Maps SQ money management classes (e.g. `FixedSize`, `RiskFixedPercentage`, `FixedAmount`) to snake_case enum values. |
+| `<MoneyManagement><Params><Param key="K" value="V"/>` | `money_management.parameters` | Key-Value Map | Parameter dictionary with automatic string-to-typed scalar conversion (`int`, `float`). |
+| `<GlobalSLPT><StopLoss type="ATR" coef="2.0" period="14"/>` | `global_exits.stop_loss` | Object | Protective SL descriptor: `{ "type": "ATR", "coefficient": 2.0, "period": 14 }`. Fixed pips map to `{ "type": "PIPS", "value": X }`. |
+| `<GlobalSLPT><ProfitTarget type="FixedPips" pips="100"/>` | `global_exits.profit_target` | Object | Protective PT descriptor: `{ "type": "PIPS", "value": 100.0 }`. |
+| `<Rules><Events><Rule name="R" type="Signal">` | `entry_rules[]` or `exit_rules[]` | Array of Rule Objects | Classified into entry or exit collection based on rule action verbs. |
+| `<Rule><signals><Item key="CrossesAbove" type="Condition">` | `rule.condition_tree` | Condition Expression Node | Maps condition operators: `CrossesAbove` $\rightarrow$ `"CROSSES_ABOVE"`, `IsHigher` $\rightarrow$ `"GREATER_THAN"`, etc. |
+| `<Block name="Line1">` / `<Block name="Line2">` | `condition_tree.operands[]` | AST Node List | Sequenced child operands in condition comparison blocks. |
+| `<Param key="#Symbol#">` | `parameters["symbol"]` | String | Parameter binding referencing chart symbol macro `#Symbol#`. |
+| `<Item><Block name="Line1" type="Indicator" key="RSI">` | `condition_tree.left_operand` | Indicator AST Node | Node `{ "node_type": "INDICATOR", "indicator_id": "RSI", "params": { "period": 14, "price": "CLOSE" } }`. |
+| `<Item><Block name="Line2" type="Constant" value="30">` | `condition_tree.right_operand` | Literal AST Node | Node `{ "node_type": "LITERAL", "data_type": "FLOAT", "value": 30.0 }`. |
+| `<Rule><Then><Action type="EnterAtMarket" direction="Long">` | `rule.actions[]` | Array of Action Objects | Action descriptor: `{ "action_type": "ENTER_AT_MARKET", "direction": "LONG", "size_formula_ref": "default" }`. |
+| `<Formula key="SQ.Formulas.Size.UseGlobalMM">` | `action.size_formula` | String | References registered sizing provider or inline calculation formula. |
+| `<Variables><Variable name="Var1" type="int" value="10"/>` | `variables[]` | Array of Variable Objects | Local variables: `[ { "name": "Var1", "data_type": "INT", "initial_value": 10 } ]`. |
+| `<Datas><Data symbol="EURUSD" timeframe="H1" role="Main">` | `data_subscriptions[]` | Array of Data Subscriptions | Primary and secondary multi-timeframe subscriptions: `[ { "symbol": "EURUSD", "timeframe": "H1", "role": "PRIMARY" } ]`. |
+
+#### A.2.2 Canonical Translated Strategy JSON Document (`strategy.hsl.json`)
+```json
+{
+  "$schema": "https://haruquant.ai/schemas/v2/strategy.hsl.json",
+  "schema_version": "2.0",
+  "strategy_id": "strat_eurusd_h1_001",
+  "revision_id": "rev_001_initial",
+  "name": "RSI Trend Momentum Breakout",
+  "author": "HaruQuant Importer",
+  "created_timestamp": "2026-09-06T12:00:00Z",
+  "trading_parameters": {
+    "symbol": "EURUSD",
+    "primary_timeframe": "H1",
+    "direction": "BOTH",
+    "order_validity_bars": 5
+  },
+  "money_management": {
+    "type": "risk_fixed_percentage",
+    "parameters": {
+      "risk_percentage": 2.0,
+      "max_lots": 10.0,
+      "min_lots": 0.01
+    }
+  },
+  "global_exits": {
+    "stop_loss": {
+      "type": "atr_multiple",
+      "coefficient": 2.0,
+      "period": 14
+    },
+    "profit_target": {
+      "type": "fixed_pips",
+      "pips": 100.0
+    },
+    "trailing_stop": {
+      "enabled": true,
+      "activation_pips": 40.0,
+      "distance_pips": 25.0
+    }
+  },
+  "data_subscriptions": [
+    {
+      "symbol": "EURUSD",
+      "timeframe": "H1",
+      "role": "PRIMARY"
+    }
+  ],
+  "variables": [
+    {
+      "name": "rsi_period",
+      "data_type": "INT",
+      "initial_value": 14,
+      "is_optimizable": true,
+      "min_value": 8,
+      "max_value": 30,
+      "step": 2
+    }
+  ],
+  "entry_rules": [
+    {
+      "rule_id": "rule_long_entry",
+      "rule_name": "Long Entry Signal",
+      "event_trigger": "ON_BAR_CLOSE",
+      "condition_tree": {
+        "operator": "AND",
+        "operands": [
+          {
+            "operator": "CROSSES_ABOVE",
+            "left": {
+              "node_type": "INDICATOR",
+              "indicator_id": "RSI",
+              "parameters": {
+                "period": { "variable_ref": "rsi_period" },
+                "price_source": "CLOSE"
+              }
+            },
+            "right": {
+              "node_type": "LITERAL",
+              "data_type": "FLOAT",
+              "value": 30.0
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "action_type": "ENTER_AT_MARKET",
+          "direction": "LONG",
+          "comment": "RSI Oversold Cross Long"
+        }
+      ]
+    }
+  ],
+  "exit_rules": []
+}
+```
+
+#### A.2.3 The `@OppositeBlock` Deterministic Symmetry Engine
+To achieve automatic, flawless mirror strategy generation (e.g. synthesizing Short Entry rules from Long Entry rules), the symmetry engine enforces exact mathematical and relational inversion rules:
+
+1. **Oscillator Level Reflection Formula**:
+   For bounded oscillators (RSI, Stochastic, CCI, Williams %R), numerical threshold reflection is governed by:
+   $$\text{Level}_{\text{short}} = 2 \times \text{MiddleValue} - \text{Level}_{\text{long}}$$
+(Plaintext: `Level_short = 2 * MiddleValue - Level_long`)
+   - **RSI (Range 0–100, Middle 50)**: Long threshold 30 reflects to $2 \times 50 - 30 = 70$.
+   - **Stochastic (Range 0–100, Middle 50)**: Long threshold 20 reflects to $2 \times 50 - 20 = 80$.
+   - **Commodity Channel Index (CCI, Middle 0)**: Long threshold $-100$ reflects to $2 \times 0 - (-100) = +100$.
+   - **Williams %R (Range $-100$ to $0$, Middle $-50$)**: Long threshold $-80$ reflects to $2 \times (-50) - (-80) = -20$.
+
+2. **Relational Operator Inversion Mapping**:
+   | Long Condition Operator | Reflected Short Condition Operator |
+   |---|---|
+   | `CrossesAbove` | `CrossesBelow` |
+   | `CrossesBelow` | `CrossesAbove` |
+   | `IsHigher` (`>`) | `IsLower` (`<`) |
+   | `IsLower` (`<`) | `IsHigher` (`>`) |
+   | `IsHigherOrEqual` (`>=`) | `IsLowerOrEqual` (`<=`) |
+   | `IsLowerOrEqual` (`<=`) | `IsHigherOrEqual` (`>=`) |
+   | `IsRising` | `IsFalling` |
+   | `IsFalling` | `IsRising` |
+
+3. **Price Offset & Action Inversions**:
+   - Price distances: $+\text{Offset} \leftrightarrow -\text{Offset}$
+   - Stop/Limit order directions: `BUY_STOP` $\leftrightarrow$ `SELL_STOP`, `BUY_LIMIT` $\leftrightarrow$ `SELL_LIMIT`
+   - Band indicators: `UpperBand` $\leftrightarrow$ `LowerBand`
+
+<!-- RETAINED-CONVERSION-FIXTURES-END -->
+
+### A.3 Exact Agentic public contracts and records
+
+This local inventory fixes the selected v1 Agentic modules, keys, protocols, operations, outcomes, events, record shapes, consumed interface context, and receiver-owned boundaries. It is a documentary target until the owning README and runtime contract are implemented and evidenced; it creates no duplicate provider.
+
+The module map is part of the exact semantic-shape inventory. A catalogued receipt, view, result, or event named in its operation/outcome/event columns has that mapped operation-specific role plus the shared strict-record rules below. The 37 rows explicitly labelled as selected v1 targets close field-shape omissions in the retired material; they are local documentary decisions, not inherited legacy inventories or runtime certification. U0 must bind bounded concrete types and compatibility tests without weakening or widening the mapped behavior.
+
+<!-- RETAINED-AGENTIC-SCHEMAS-BEGIN -->
+
+#### A.3.1 Agentic-owned physical contract modules
+
+All public definitions live under `app/contracts/agentic/`. `app/services/agentic/` implements them and does not re-export substitute models.
+
+| Module | Capability key | Protocol | Primary async method | Request union / operation | Success or domain outcome | Streaming |
+|---|---|---|---|---|---|---|
+| `mandate.py` | `agentic.mandate@1` | `MandateEnforcement` | `enforce_mandate(request)` | `VALIDATE`, `CHECK_SCOPE`, `INSPECT` | `MandateAccepted`, `MandateScopeDecision`, `MandateView` plus shared refusal/failure | — |
+| `operations.py` | `agentic.operations@1` | `AgenticOperations` | `operate_agentic_runs(request)` | `RECORD`, `INSPECT_TRACE`, `REPORT_INCIDENT`, `VALIDATE_REPLAY`, `INSPECT_READINESS`, `EXPORT` | `OperationReceipt`, `AgenticRunTrace`, `IncidentRecord`, `ReplayValidation`, `AgenticReadinessView`, `OperationsExport` plus shared refusal/failure | `AgenticIncidentRaised`, `AgenticReadinessChanged` |
+| `roles.py` | `agentic.roles@1` | `RoleContributionRegistry` | `manage_role_contributions(request)` | `REGISTER`, `UNREGISTER`, `RESOLVE`, `LIST`, `SET_ELIGIBILITY_REFERENCE` | `RoleRegistrationReceipt`, `RoleRemovalReceipt`, `RoleResolution`, `RoleList`, `RoleEligibilityReferenceReceipt` plus shared refusal/failure | `RoleContributionRegistered`, `RoleContributionRemoved`, `RoleEligibilityReferenceChanged` |
+| `tool_governance.py` | `agentic.tool-governance@1` | `ToolCallGovernance` | `govern_tool_calls(request)` | `REGISTER_TOOL`, `REQUEST_LEASE`, `AUTHORIZE_INVOCATION`, `FILTER_RESULT`, `REVOKE_LEASE`, `REQUEST_HUMAN_ACTION`, `DECIDE_HUMAN_ACTION` | `ToolRegistrationReceipt`, `CapabilityLease`, `ToolAuthorizationDecision`, `FilteredToolResult`, `LeaseRevocationReceipt`, `HumanActionRequest`, `HumanActionDecision` plus shared refusal/failure | `CapabilityLeaseIssued`, `CapabilityLeaseRevoked`, `HumanActionRequested`, `HumanActionDecided` |
+| `model_inference.py` | `agentic.model-inference@1` | `ModelInference` | `invoke_model(request)` | `INVOKE` | `ModelInvocationSuccess`, `ModelInvocationRefusal` plus shared refusal/failure | `ModelInvocationStarted`, `ModelInvocationCompleted`, `ModelInvocationRefused` |
+| `workflows.py` | `agentic.workflows@1` | `AgenticWorkflowRunner` | `run_agentic_workflows(request)` | `SUBMIT`, `PAUSE`, `RECORD_OUTPUT`, `INSPECT_OUTPUT`, `RESUME`, `CANCEL`, `EXPIRE`, `INSPECT`, `DRAIN` | `WorkflowAccepted`, `WorkflowRun`, `WorkflowCancellationReceipt`, `WorkflowExpiryReceipt`, `WorkflowDrainReceipt` plus shared refusal/failure | `WorkflowStateChanged`, `WorkflowProgressed`, `WorkflowWaitingForHuman`, `WorkflowTerminated` |
+| `context.py` | `agentic.context@1` | `AgenticContextAssembly` | `assemble_agentic_context(request)` | `ASSEMBLE`, `INSPECT_EXCLUSIONS` | `AgenticContextBundle`, `ContextExclusionReport` plus shared refusal/failure | — |
+| `memory.py` | `agentic.memory@1` | `AgenticMemory` | `manage_agentic_memory(request)` | `SUBMIT_CANDIDATE`, `PROMOTE`, `RETRIEVE`, `SUPERSEDE`, `PURGE`, `EXPORT` | `MemoryCandidateReceipt`, `MemoryPromotionDecision`, `MemoryQueryResult`, `MemorySupersessionReceipt`, `MemoryPurgeReceipt`, `MemoryExport` plus shared refusal/failure | `MemoryPromoted`, `MemorySuperseded`, `MemoryExpired` |
+| `profile_evaluation.py` | `agentic.profile-evaluation@1` | `AgenticProfileEvaluation` | `evaluate_agentic_profiles(request)` | `EVALUATE`, `INSPECT_ELIGIBILITY`, `REVOKE_ELIGIBILITY`, `COMPARE_BASELINE` | `ProfileEvaluationReport`, `EligibilityDecision`, `EligibilityRevocationReceipt`, `BaselineComparison` plus shared refusal/failure | `ProfileEligibilityChanged` |
+| `operator_assistance.py` | `agentic.operator-assistance@1` | `OperatorAssistance` | `assist_operator(request)` | `RESPOND`, `SUMMARIZE_SPECIALIST_RESULT` | `OperatorAnswer`, `OperatorSpecialistAnswer`, `OperatorConversationSummary` plus shared refusal/failure | `OperatorTurnAccepted`, `WorkspaceContextValidated`, `SpecialistRouteProposed`, `SpecialistRouteAuthorized`, `SpecialistStarted`, `SpecialistCompleted`, `OperatorResponseDelta`, `OperatorTurnCompleted`, `OperatorTurnRefused`, `OperatorTurnFailed` |
+| `claims.py` | `agentic.claims@1` | `AgenticClaimGraph` | `manage_claim_graphs(request)` | `CREATE_GRAPH`, `APPEND_CLAIM`, `RELATE_CLAIMS`, `TRANSITION_CLAIM`, `ASSESS_RELIABILITY`, `INSPECT_GRAPH` | `ClaimGraph`, `ClaimReceipt`, `ClaimRelationReceipt`, `ClaimStatusReceipt`, `ClaimReliabilityAssessment`, `ClaimGraphView` plus shared refusal/failure | `ClaimCreated`, `ClaimRelated`, `ClaimStatusChanged`, `ClaimExpired` |
+| `deliberation.py` | `agentic.deliberation@1` | `AgenticDeliberation` | `deliberate_research(request)` | `START`, `CONTINUE`, `CANCEL`, `INSPECT` | `DeliberationRecord`, `DeliberationCancellationReceipt`, `DeliberationView` plus shared refusal/failure | `DeliberationRoundStarted`, `ChallengeRecorded`, `DissentRecorded`, `DeliberationStopped` |
+| `synthesis.py` | `agentic.synthesis@1` | `AgenticResearchSynthesis` | `synthesize_research(request)` | `SYNTHESIZE` | `ResearchSynthesis`, `ResearchInsufficientEvidence` plus shared refusal/failure | `ResearchSynthesisCompleted` |
+| `research_search.py` | `agentic.research-search@1` | `AgenticResearchSearchGovernance` | `govern_research_search(request)` | `REGISTER_CAMPAIGN`, `REGISTER_FAMILY`, `REGISTER_VARIANT`, `RECORD_ATTEMPT`, `RESERVE_HOLDOUT`, `CLOSE_CAMPAIGN`, `INSPECT` | `ResearchCampaign`, `HypothesisFamilyReceipt`, `ResearchVariantReceipt`, `ResearchAttemptReceipt`, `HoldoutReservationReceipt`, `CampaignClosureReceipt`, `ResearchSearchView` plus shared refusal/failure | `ResearchCampaignOpened`, `ResearchAttemptRecorded`, `HoldoutReserved`, `ResearchCampaignClosed` |
+| `research_design.py` | `agentic.research-design@1` | `AgenticResearchDesign` | `design_research(request)` | `DESIGN_HYPOTHESIS`, `DESIGN_EXPERIMENT`, `DESIGN_SEARCH` | `HypothesisCandidate`, `ExperimentRequestCandidate`, `SearchRequestCandidate` plus shared refusal/failure | `ResearchDesignCompleted` |
+| `strategy_specs.py` | `agentic.strategy-specs@1` | `AgenticStrategySpecComposition` | `compose_strategy_specs(request)` | `COMPOSE`, `VALIDATE_HANDOFF` | `StrategySpecCandidate`, `StrategySpecHandoffReceipt`, `UnsupportedExpressionReport` plus shared refusal/failure | `StrategySpecComposed` |
+| `portfolio_advisory.py` | `agentic.portfolio-advisory@1` | `AgenticPortfolioAdvisory` | `advise_portfolio(request)` | `ADVISE` | `PortfolioAdvisory`, `PortfolioAdvisoryInsufficientEvidence` plus shared refusal/failure | `PortfolioAdvisoryCompleted` |
+| `strategy_proposals.py` | `agentic.strategy-proposals@1` | `AgenticStrategyProposalComposition` | `compose_strategy_proposals(request)` | `COMPOSE`, `SUBMIT` | `StrategyProposalCandidate`, `StrategyProposalReceipt` plus shared refusal/failure | `StrategyProposalComposed`, `StrategyProposalSubmitted` |
+| `sandbox_artifacts.py` | `agentic.sandbox-artifacts@1` | `AgenticSandboxArtifactAuthoring` | `author_sandbox_artifacts(request)` | `AUTHOR`, `INSPECT`, `CLEANUP` | `SandboxArtifactReceipt`, `SandboxArtifactView`, `SandboxCleanupReceipt` plus shared refusal/failure | `SandboxArtifactStaged`, `SandboxArtifactCleaned` |
+| `outcome_calibration.py` | `agentic.outcome-calibration@1` | `AgenticOutcomeCalibration` | `calibrate_agentic_outcomes(request)` | `CALIBRATE_FORECAST`, `CALIBRATE_RECOMMENDATION`, `INSPECT` | `ForecastCalibrationResult`, `RecommendationCalibrationResult`, `OutcomeCalibrationView` plus shared refusal/failure | `OutcomeCalibrationCompleted`, `AgenticChangeCandidateCreated` |
+
+
+Apply the local schema consistency rules stated below and in Appendix A.4 to every record below, including deterministic provenance, immutable graph revisions, usage projections and draft evidence classes. Every protocol exposes exactly one primary asynchronous request/response method named for its capability action. Multiple operations use a strict discriminator. Streaming is added only where live progress is semantically required and never exposes hidden chain-of-thought.
+
+#### A.3.2 Shared Agentic records
+
+All records are strict frozen Pydantic v2 models with unknown fields forbidden, aware UTC timestamps, finite numeric values, JSON-safe data, and `schema_version: Literal[1] = 1`.
+
+| Record | Exact v1 field inventory |
+|---|---|
+| `AgenticRunRef` | `task_id`, `run_id`, `workflow_id`, `workflow_version`, `request_id`, `correlation_id`, `schema_version` |
+| `RoleRef` | `role_id`, `role_version`, `owning_feature_id`, `profile_digest`, `schema_version` |
+| `EvidenceRef` | `owner_domain`, `capability_id`, `record_id`, `record_version`, `content_hash`, `observed_at`, `available_at`, `schema_version` |
+| `BudgetEnvelope` | `max_input_tokens`, `max_output_tokens`, `max_model_calls`, `max_tool_calls`, `max_cost`, `deadline_at`, `schema_version` |
+| `BudgetUsage` | `reserved_input_tokens`, `observed_input_tokens`, `observed_output_tokens`, `model_calls`, `tool_calls`, `observed_cost`, `elapsed_ms`, `schema_version` |
+| `UncertaintyBreakdown` | `evidence`, `statistical`, `epistemic`, `operational`, `calibrated_reliability`, `basis_refs`, `schema_version` |
+| `AgenticProvenance` | `run`, `role`, `model_profile_id`, `model_profile_digest`, `prompt_hash`, `composite_instruction_hash`, `tool_lease_ids`, `evidence_refs`, `policy_digests`, `config_digest`, `created_at`, `schema_version` |
+| `AgenticFailure` | `outcome=FAILURE`, `code`, `detail`, `retryable`, `run_ref`, `provenance`, `schema_version` |
+| `AgenticRefusal` | `outcome=REFUSED`, `reason_code`, `detail`, `missing_or_denied_capabilities`, `evidence_refs`, `run_ref`, `provenance`, `schema_version` |
+
+#### A.3.3 Capability-specific record inventory
+
+##### `agentic.mandate@1` — Mandate Enforcement
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `FirmMandate` | `mandate_id`, `version`, `issuer`, `issued_at`, `effective_at`, `expires_at`, `objectives`, `asset_scopes`, `account_scopes`, `environments`, `enabled_features`, `enabled_roles`, `budgets`, `human_action_policy`, `prohibited_authority`, `fallback_policy`, `policy_refs`, `integrity_digest`, `signature_ref`, `schema_version` |
+| `MandateRequest` | Discriminated union of `ValidateMandateRequest`, `CheckMandateScopeRequest`, and `InspectMandateRequest`. |
+| `MandateAccepted` | `outcome=ACCEPTED`, `mandate_ref`, `effective_limits`, `integrity_digest`, `checked_at`, `schema_version` |
+| `MandateScopeDecision` | `outcome=ALLOWED\|DENIED`, requested feature/role/environment/scope/budget, `reason_codes`, `effective_limits`, `checked_at`, `schema_version` |
+| `MandateView` | **Selected v1 target:** exact structural alias of `FirmMandate`; it has precisely the complete `FirmMandate` field inventory above. |
+
+##### `agentic.operations@1` — Operations, Incidents, and Replay Validation
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `OperationsRequest` | Union of `RecordOperationRequest`, `InspectRunTraceRequest`, `ReportIncidentRequest`, `ValidateReplayRequest`, `InspectAgenticReadinessRequest`, and `ExportOperationsRequest`. |
+| `OperationRecord` | `record_id`, `kind`, `run_ref`, `role_ref`, `capability_id`, `provider_generation`, `causation_id`, `payload_digest`, `redacted_paths`, `usage`, `occurred_at`, `schema_version` |
+| `AgenticRunTrace` | `trace_id`, `run_ref`, ordered `records`, `observed_usage`, `redacted_paths`, `assembled_at`, `content_hash`, `schema_version` |
+| `IncidentRecord` | `incident_id`, `run_ref`, `kind`, `trigger`, `containment`, `affected_leases`, `affected_roles`, `checkpoint_ref`, `preserved_evidence`, `detected_at`, `schema_version` |
+| `ReplayValidation` | `replay_id`, `source_run`, `verified_references`, `provider_generations`, `side_effects_permitted=false`, `eligible`, `reason_codes`, `checked_at`, `schema_version` |
+| `OperationReceipt` | **Selected v1 target:** `outcome=RECORDED`, `record: OperationRecord`, `sequence`, `deduplication_key`, `recorded_at`, `schema_version`. |
+| `AgenticReadinessView` | **Selected v1 target:** `capability_id`, `provider_generation`, `readiness=READY\|DEGRADED\|QUARANTINED\|UNAVAILABLE`, `reason_codes`, `incident_refs`, `checked_at`, `schema_version`. |
+| `OperationsExport` | **Selected v1 target:** `export_id`, `operation_records`, `run_traces`, `incidents`, `readiness_views`, `range_start`, `range_end`, `complete=true`, `content_hash`, `exported_at`, `schema_version`. A request that cannot produce a complete policy-bounded export returns a shared refusal/failure rather than a silently truncated success. |
+
+##### `agentic.roles@1` — Role Contribution Registry
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `RoleManifest` | `role_id`, `role_version`, `display_name`, `family`, `owning_feature_id`, `supported_operations`, `asset_scopes`, `languages`, `input_schema_ids`, `output_schema_ids`, `prompt_artifact_ref`, `prompt_hash`, `manifest_hash`, `composite_instruction_hash`, `model_policy`, `tool_ids`, `context_classes`, `memory_classes`, `limits_profile_ref`, `conflict_classes`, `refusal_codes`, `evaluation_profile_ref`, `schema_version` |
+| `RoleRegistryRequest` | Union of `RegisterRoleRequest`, `UnregisterRoleRequest`, `ResolveRoleRequest`, `ListRolesRequest`, and `SetRoleEligibilityReferenceRequest`. |
+| `RoleResolution` | `outcome=RESOLVED`, `role`, `eligibility_ref`, `effective_limits`, `registered_at`, `schema_version` |
+| `RoleRegistrationReceipt` | `role`, `registration_id`, `artifact_digests`, `registered_at`, `schema_version` |
+| `RoleRemovalReceipt` | **Selected v1 target:** `outcome=REMOVED`, `role`, `registration_id`, `removed_at`, `schema_version`. |
+| `RoleList` | **Selected v1 target:** `roles`, `eligibility_refs`, `listed_at`, `schema_version`. |
+| `RoleEligibilityReferenceReceipt` | **Selected v1 target:** `role`, `eligibility_ref`, `effective_at`, `schema_version`. |
+
+##### `agentic.tool-governance@1` — Tool Governance and Human Actions
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `ToolManifest` | `tool_id`, `tool_version`, `owning_feature_id`, `receiver_capability_id`, `request_schema_id`, `result_schema_id`, `permission_class`, `environments`, `side_effect_class`, `idempotency_policy`, `timeout_seconds`, `cost_policy`, `result_trust`, `schema_version` |
+| `CapabilityLease` | `lease_id`, `principal_id`, `role`, `run_ref`, `tool_id`, `receiver_capability_id`, `object_hash`, `scope`, `environment`, `side_effect_class`, immutable granted call/cost ceilings, receiver generation, permission and egress scope, `issued_at`, `expires_at`, `nonce`, `policy_version`, `human_action_ref`, `signature_ref`, `schema_version` |
+| `HumanActionRequest` | `action_id`, `action_type`, `principal_id`, `object_hash`, `scope`, `environment`, `requested_at`, `expires_at`, `nonce`, `policy_version`, `schema_version` |
+| `HumanActionDecision` | `action_id`, `decision=APPROVED\|REJECTED\|CANCELLED`, `decided_by`, `decided_at`, `signature_ref`, `schema_version` |
+| `ToolGovernanceRequest` | Union of tool registration, lease request, invocation authorization, result filtering, revocation, and human-action operations. |
+| `ToolAuthorizationDecision` | `outcome=ALLOWED\|DENIED`, `lease_id`, `invocation_id`, `reason_codes`, `remaining_calls`, `remaining_cost`, `checked_at`, `schema_version` |
+| `FilteredToolResult` | `invocation_id`, `tool_id`, `result_ref`, `result_digest`, `redacted_paths`, `injection_classification`, `observed_cost`, `schema_version` |
+| `ToolRegistrationReceipt` | **Selected v1 target:** `tool`, `registration_id`, `manifest_hash`, `registered_at`, `schema_version`. |
+| `LeaseRevocationReceipt` | **Selected v1 target:** `lease_id`, `principal_id`, `tool_id`, `receiver_capability_id`, `reason_codes`, `revoked_at`, `schema_version`. |
+
+##### `agentic.model-inference@1` — Provider-Neutral Model Invocation
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `ModelProfile` | `profile_id`, `version`, `provider_id`, `model_id`, `provider_generation`, `supported_input_schema_ids`, `supported_output_schema_ids`, `tool_policy`, `privacy_class`, `regions`, `retention_policy`, `token_limits`, `cost_policy`, `timeout_seconds`, `fallback_profile_ids`, `evaluation_ref`, `profile_digest`, `schema_version` |
+| `ModelInvocationRequest` | `operation=INVOKE`, `run_ref`, `role`, `profile_id`, `prompt_artifact_ref`, `prompt_hash`, `composite_instruction_hash`, `trusted_input`, `untrusted_evidence`, `tool_declarations`, `expected_output_schema_id`, `budget`, `schema_version` |
+| `ModelInvocationSuccess` | `outcome=SUCCESS`, `typed_output`, `reported_provider_id`, `reported_model_id`, `provider_generation`, `usage`, `provenance`, `schema_version` |
+| `ModelInvocationRefusal` | `outcome=REFUSED`, `reason_code`, `detail`, `usage`, `provenance`, `schema_version` |
+| `ModelRuntimeProvider` | Public async protocol shape `invoke(request: ModelInvocationRequest) -> ModelInvocationSuccess | ModelInvocationRefusal | AgenticFailure`; the request/profile pin provider/model/profile/schema/privacy/region/retention/tool/budget policy, the outcome reports provider generation and usage/provenance, Plugins owns adapter discovery/generation/disposal, and provider implementation types never cross the contract. |
+
+##### `agentic.workflows@1` — Durable Workflow Orchestration
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `WorkflowDefinition` | `workflow_id`, `version`, `request_schema_ids`, `required_capabilities`, `optional_capabilities`, `eligible_roles`, `routing_policy`, `limits`, `checkpoint_nodes`, `human_action_nodes`, `terminal_states`, `drain_policy`, `definition_digest`, `schema_version` |
+| `WorkflowRequest` | Union of `SubmitWorkflowRequest`, `PauseWorkflowRequest`, `RecordWorkflowOutputRequest`, `InspectWorkflowOutputRequest`, `ResumeWorkflowRequest`, `CancelWorkflowRequest`, `ExpireWorkflowRequest`, `InspectWorkflowRequest`, and `DrainWorkflowRequest`. |
+| `WorkflowRun` | `run_ref`, `state`, `current_node`, `sequence`, `revision`, `attempts`, `idempotency_key`, `budget`, `usage`, `deadline_at`, `terminal_reason`, `created_at`, `updated_at`, `schema_version` |
+| `WorkflowCheckpoint` | `checkpoint_id`, `run_ref`, `node_id`, `sequence`, `expected_revision`, `state_payload_digest`, `provider_generations`, `reservation_refs`, `created_at`, `schema_version` |
+| `WorkflowOutputManifest` | `output_id`, `run_ref`, `node_id`, `output_schema_id`, `artifact_ref`, `content_digest`, `retention_ref`, `access_ref`, `created_at`, `schema_version`; immutable and retained through Workspace artifact custody. |
+| `WorkflowAccepted` | **Selected v1 target:** `outcome=ACCEPTED`, `run_ref`, `definition_digest`, `state`, `revision`, `accepted_at`, `schema_version`. |
+| `WorkflowCancellationReceipt` | **Selected v1 target:** `outcome=CANCELLED`, `run_ref`, `expected_revision`, `revision`, `terminal_reason`, `cancelled_at`, `schema_version`. |
+| `WorkflowExpiryReceipt` | **Selected v1 target:** `outcome=EXPIRED`, `run_ref`, `expected_revision`, `revision`, `terminal_reason`, `expired_at`, `schema_version`. |
+| `WorkflowDrainReceipt` | **Selected v1 target:** `outcome=DRAINED`, `run_refs`, `terminal_run_refs`, `unresolved_run_refs`, `containment_ack_refs`, `drained_at`, `schema_version`. |
+
+##### `agentic.context@1` — Point-in-Time Context Assembly
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `ContextAssemblyRequest` | `operation=ASSEMBLE`, `run_ref`, `observation_at`, `scope`, `required_evidence_classes`, `candidate_refs`, `freshness_policy`, `trust_policy`, `license_policy`, `budget`, `schema_version` |
+| `AgenticContextBundle` | `bundle_id`, `run_ref`, `trusted_task_input`, `eligible_evidence`, `peer_messages`, `memory_records`, `excluded`, `coverage`, `captured_at`, `content_hash`, `schema_version` |
+| `ContextExclusion` | `candidate_ref`, `reason_code`, `detail`, `checked_at`, `schema_version` |
+| `ContextCoverage` | `requested_classes`, `covered_classes`, `missing_classes`, `partial`, `schema_version` |
+| `ContextExclusionReport` | **Selected v1 target:** `run_ref`, `excluded: tuple[ContextExclusion, ...]`, `coverage: ContextCoverage`, `checked_at`, `content_hash`, `schema_version`. |
+
+##### `agentic.memory@1` — Governed Memory
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `MemoryCandidate` | `candidate_id`, `memory_class`, `task_id`, `author`, `content`, `scope`, `source_evidence_refs`, `sensitivity`, `retention_class`, `expires_at`, `supersedes`, `content_hash`, `schema_version` |
+| `MemoryRequest` | Union of candidate submission, promotion, retrieval, supersession, purge, and export operations. |
+| `MemoryRecord` | `record_id`, all validated candidate fields, `redacted_paths`, `injection_classification`, `promotion_decision_ref`, `promoted_at`, `content_hash`, `schema_version` |
+| `MemoryPromotionDecision` | `outcome=PROMOTED\|REJECTED`, `candidate_id`, `reason_codes`, `record_ref`, `decided_at`, `schema_version` |
+| `MemoryQueryResult` | `query_id`, `records`, `excluded`, `checked_at`, `schema_version` |
+| `MemoryCandidateReceipt` | **Selected v1 target:** `outcome=ACCEPTED`, `candidate_id`, `content_hash`, `submitted_at`, `schema_version`. |
+| `MemorySupersessionReceipt` | **Selected v1 target:** `outcome=SUPERSEDED`, `record_ref`, `superseded_by_ref`, `reason_codes`, `effective_at`, `schema_version`. |
+| `MemoryPurgeReceipt` | **Selected v1 target:** `outcome=PURGED\|RETAINED`, `record_ref`, `legal_hold_refs`, `reason_codes`, `effective_at`, `schema_version`. `RETAINED` is required when retention or legal-hold policy prevents purge. |
+| `MemoryExport` | **Selected v1 target:** `export_id`, `records`, `excluded`, `retention_policy_ref`, `complete=true`, `content_hash`, `exported_at`, `schema_version`. A request that cannot produce a complete policy-bounded export returns a shared refusal/failure. |
+
+##### `agentic.profile-evaluation@1` — Profile and Topology Evaluation
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `EvaluationPlan` | `plan_id`, `subject_type`, `subject_ref`, `baseline_refs`, `evaluation_set_refs`, `grader_refs`, `dimensions`, `thresholds`, `ablation_topologies`, `budget`, `plan_digest`, `schema_version` |
+| `ProfileEvaluationRequest` | Union of `EvaluateProfileRequest`, `InspectEligibilityRequest`, `RevokeEligibilityRequest`, and `CompareBaselineRequest`. |
+| `ProfileEvaluationReport` | `evaluation_id`, `plan_ref`, dimension scores/evidence, safety failures, grader calibration, uncertainty, cost/latency, ablations, `content_hash`, `schema_version` |
+| `EligibilityDecision` | `subject_ref`, `action=ENABLE\|CONTINUE\|RESTRICT\|DISABLE\|RETIRE`, `effective_at`, `expires_at`, `reason_codes`, `evidence_refs`, `policy_version`, `schema_version` |
+| `AblationResult` | `topology_id`, `removed_roles`, `peer_visibility`, `utility`, `uncertainty`, `latency`, `cost`, `failure_surface`, `schema_version` |
+| `EligibilityRevocationReceipt` | **Selected v1 target:** `subject_ref`, `prior_decision_ref`, `action=DISABLE\|RETIRE`, `reason_codes`, `evidence_refs`, `effective_at`, `schema_version`. |
+| `BaselineComparison` | **Selected v1 target:** `comparison_id`, `subject_ref`, `evaluation_ref`, `baseline_refs`, `dimension_deltas`, `safety_failure_deltas`, `uncertainty_delta`, `cost_delta`, `latency_delta`, `compared_at`, `content_hash`, `schema_version`. |
+
+##### `agentic.operator-assistance@1` — Website Chat Bot and Specialist Delegation
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `OperatorAssistanceRequest` | Union of `RespondToOperatorRequest` and `SummarizeSpecialistResultRequest`. |
+| `RespondToOperatorRequest` | `operation=RESPOND`, `conversation_id`, `turn_id`, `principal_id`, `message`, `workspace_context`, `prior_turn_refs`, `response_mode`, `budget`, `schema_version` |
+| `SpecialistHandoffRequest` | `handoff_id`, `conversation_id`, `source_turn_id`, `objective`, `proposed_role_id`, `workflow_id`, `workspace_context_ref`, `evidence_requirements`, `budget`, `schema_version` |
+| `SpecialistAttribution` | `role`, `workflow_id`, `run_ref`, `result_ref`, `claim_refs`, `evidence_refs`, `contributed_at`, `schema_version` |
+| `OperatorAnswer` | `outcome=ANSWERED`, `conversation_id`, `turn_id`, `answer_markdown`, `answer_kind`, `evidence_refs`, `specialist_attributions`, `navigation_suggestions`, `uncertainty`, `provenance`, `schema_version` |
+| `OperatorSpecialistAnswer` | `outcome=SPECIALIST_ANSWER`, OperatorAnswer fields plus `handoff_receipt`, `schema_version` |
+| `OperatorConversationSummary` | **Selected v1 target:** `conversation_id`, `through_turn_id`, `summary_markdown`, `included_turn_refs`, `excluded_turn_refs`, `evidence_refs`, `redacted_paths`, `generated_at`, `provenance`, `content_hash`, `schema_version`. |
+
+##### `agentic.claims@1` — Claim-and-Evidence Graph
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `Claim` | `claim_id`, `graph_id`, `claim_type`, `statement`, `asset_scope`, `observation_horizon`, `valid_from`, `valid_to`, `evidence_refs`, `derivation_refs`, `assumptions`, `confounders`, `falsifier`, `uncertainty`, `author`, `status`, `created_at`, `content_hash`, `schema_version` |
+| `ClaimRelation` | `relation_id`, `graph_id`, `source_claim_id`, `target_claim_id`, `relation_type=SUPPORTS\|CONTRADICTS\|DEPENDS_ON\|REFINES\|SUPERSEDES`, `created_at`, `schema_version` |
+| `ClaimGraphRequest` | Union of graph creation, claim append, relation, status transition, reliability assessment, and inspection operations. |
+| `ClaimGraph` | `graph_id`, `graph_revision`, `objective`, ordered claim/relation refs, `root_claim_ids`, `created_at`, `content_hash`, `schema_version` |
+| `ClaimReliabilityAssessment` | `claim_id`, evidence/statistical/epistemic/operational dimensions, `calibrated_reliability`, `basis_refs`, `assessed_at`, `schema_version` |
+| `ClaimReceipt` | **Selected v1 target:** `outcome=APPENDED`, `graph_id`, `graph_revision`, `claim: Claim`, `content_hash`, `appended_at`, `schema_version`. |
+| `ClaimRelationReceipt` | **Selected v1 target:** `outcome=APPENDED`, `graph_id`, `graph_revision`, `relation: ClaimRelation`, `content_hash`, `appended_at`, `schema_version`. |
+| `ClaimStatusReceipt` | **Selected v1 target:** `outcome=TRANSITIONED`, `claim_id`, `graph_id`, `prior_status`, `status`, `reason_codes`, `evidence_refs`, `effective_at`, `schema_version`. Status history remains outside the immutable original claim-content digest as required by Appendix A.4. |
+| `ClaimGraphView` | **Selected v1 target:** exact composition `graph: ClaimGraph`, ordered `claims: tuple[Claim, ...]`, ordered `relations: tuple[ClaimRelation, ...]`, `current_statuses`, `assembled_at`, `content_hash`, `schema_version`. |
+
+##### `agentic.deliberation@1` — Independent Challenge and Deliberation
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `DeliberationPlan` | `plan_id`, `run_ref`, `claim_graph_ref`, `participants`, `challenge_modes`, `round_limit`, `fanout_limit`, `deadline_at`, `budget`, `peer_visibility_policy`, `stop_conditions`, `plan_digest`, `schema_version` |
+| `Challenge` | `challenge_id`, `claim_id`, `challenger`, `mode`, `counterclaim`, `evidence_refs`, `independence_score`, `correlation_factors`, `created_at`, `schema_version` |
+| `Dissent` | `dissent_id`, `claim_ids`, `author`, `materiality`, `statement`, `evidence_refs`, `resolved=false\|true`, `resolution_ref`, `created_at`, `schema_version` |
+| `DeliberationRequest` | Union of start, continue, cancel, and inspect operations. |
+| `DeliberationRecord` | `record_id`, `plan`, independent briefs, challenges, rebuttals, tool evidence, dissent, rounds, usage, `stop_reason`, `content_hash`, `schema_version` |
+| `DeliberationCancellationReceipt` | **Selected v1 target:** `outcome=CANCELLED`, `record_id`, `run_ref`, `stop_reason`, `cancelled_at`, `schema_version`. |
+| `DeliberationView` | **Selected v1 target:** exact structural alias of `DeliberationRecord`; it has precisely the complete `DeliberationRecord` field inventory above. |
+
+##### `agentic.synthesis@1` — Research Synthesis
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `SynthesisRequest` | `operation=SYNTHESIZE`, `run_ref`, `claim_graph_ref`, optional `deliberation_ref` under workflow challenge policy, `requested_output_type`, `minimum_support_policy`, `budget`, `schema_version` |
+| `ResearchSynthesis` | `outcome=SYNTHESIZED`, `synthesis_id`, supported conclusions, contested/refuted/unknown claims, dissent, limitations, open questions, uncertainty, evidence/claim refs, `provenance`, `content_hash`, `schema_version` |
+| `ResearchInsufficientEvidence` | `outcome=INSUFFICIENT_EVIDENCE`, missing evidence/challenge classes, contested material claims, reason codes, provenance, schema_version |
+
+##### `agentic.research-search@1` — Research Campaign and Search Governance
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `ResearchCampaign` | `campaign_id`, `research_owner_ref`, `registration_receipt_ref`, `objective`, `owner`, `hypothesis_family_ids`, `dataset_family_ids`, `search_budget_id`, `opened_at`, `status`, `pre_registration_digest`, `schema_version` |
+| `HypothesisFamily` | `family_id`, `research_family_ref`, `campaign_id`, `canonical_statement`, `mechanism_class`, `asset_scope`, `similarity_policy`, `created_at`, `content_hash`, `schema_version` |
+| `ResearchVariant` | `variant_id`, `family_id`, `spec_digest`, `parameter_changes`, `feature_changes`, `prompt_profile_changes`, `model_profile_changes`, `near_duplicate_score`, `charged_budget`, `created_at`, `schema_version` |
+| `ResearchAttempt` | `attempt_id`, `variant_id`, `status=ACCEPTED\|ACTIVE\|COMPLETED\|FAILED\|CANCELLED\|INVALID\|REFUSED`, `reason_code`, `receiver_request_ref`, `receiver_result_ref`, `started_at`, `completed_at`, `schema_version` |
+| `HoldoutReservationReceipt` | `reservation_id`, campaign/family/dataset/search identities, `receiver_policy_ref`, `status`, `reserved_at`, `expires_at`, `consumed_at`, `schema_version` |
+| `ResearchSearchRequest` | Union of campaign/family/variant/attempt/holdout/closure/inspection operations. |
+| `HypothesisFamilyReceipt` | **Selected v1 target:** `outcome=REGISTERED`, `family: HypothesisFamily`, `research_owner_receipt_ref`, `registered_at`, `schema_version`. |
+| `ResearchVariantReceipt` | **Selected v1 target:** `outcome=REGISTERED`, `variant: ResearchVariant`, `registered_at`, `schema_version`. |
+| `ResearchAttemptReceipt` | **Selected v1 target:** exact structural alias of `ResearchAttempt`; it has precisely the complete `ResearchAttempt` field inventory above. |
+| `CampaignClosureReceipt` | **Selected v1 target:** `outcome=CLOSED`, `campaign_id`, `status`, `reason_codes`, `attempt_refs`, `holdout_reservation_refs`, `closed_at`, `content_hash`, `schema_version`. |
+| `ResearchSearchView` | **Selected v1 target:** exact composition `campaign: ResearchCampaign`, `families: tuple[HypothesisFamily, ...]`, `variants: tuple[ResearchVariant, ...]`, `attempts: tuple[ResearchAttempt, ...]`, `holdout_reservations: tuple[HoldoutReservationReceipt, ...]`, `closure_receipt: CampaignClosureReceipt \| None`, `assembled_at`, `content_hash`, `schema_version`. |
+
+##### `agentic.research-design@1` — Falsifiable Research Design
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `HypothesisCandidate` | `candidate_id`, `campaign_id`, `family_id`, `statement`, `asset_scope`, `horizon`, `mechanism`, `evidence_refs`, `prerequisites`, `confounders`, `falsifier`, `rejection_criterion`, `uncertainty`, `provenance`, `content_hash`, `schema_version` |
+| `ExperimentRequestCandidate` | `candidate_id`, `hypothesis_ref`, `receiver_schema_id`, immutable input refs, time splits, embargo, cost/seed/baseline/metric refs, stop/failure rules, evidence classes, `request_digest`, `schema_version` |
+| `SearchRequestCandidate` | `candidate_id`, `experiment_ref`, `receiver_schema_id`, parameter space, method, objective, trial budget, early stop, robustness requirements, holdout receipt ref, `request_digest`, `schema_version` |
+| `ResearchDesignRequest` | Union of hypothesis, experiment, and search design operations. |
+
+##### `agentic.strategy-specs@1` — JSON Strategy and Indicator DSL Composition
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `StrategySpecRequest` | Union of `ComposeStrategySpecRequest` and `ValidateStrategySpecHandoffRequest`. |
+| `StrategySpecCandidate` | `candidate_id`, `artifact_type=STRATEGY\|INDICATOR`, `receiver_schema_id`, `dsl_document`, `hypothesis_ref`, `claim_graph_ref`, `campaign_ref`, `test_vectors`, `constraints`, `provenance`, `content_hash`, `schema_version` |
+| `UnsupportedExpressionReport` | `report_id`, `requirement_ref`, `unsupported_semantics`, `attempted_dsl_constructs`, `receiver_validator_ref`, `materiality`, `content_hash`, `schema_version` |
+| `StrategySpecHandoffReceipt` | `receipt_id`, `candidate_id`, `receiver`, `status=ACCEPTED\|REJECTED\|PENDING`, `receiver_record_ref`, `reason_codes`, `received_at`, `schema_version` |
+
+##### `agentic.portfolio-advisory@1` — Portfolio and Risk Advisory
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `PortfolioAdvisoryRequest` | `operation=ADVISE`, `run_ref`, account/portfolio/evidence refs, `requested_scope`, `observation_at`, `expires_at`, `budget`, `schema_version` |
+| `PortfolioAdvisory` | `outcome=ADVISORY`, `advisory_id`, non-binding weight/range suggestions, constraints, risk questions, evidence refs, dissent, uncertainty, `expires_at`, `provenance`, `content_hash`, `schema_version` |
+| `RiskQuestion` | `question_id`, `risk_kind`, `statement`, `evidence_refs`, `materiality`, `schema_version` |
+| `PortfolioAdvisoryInsufficientEvidence` | `outcome=INSUFFICIENT_EVIDENCE`, missing/stale scope, reason codes, provenance, schema_version |
+
+##### `agentic.strategy-proposals@1` — Strategy Proposal Composition and Handoff
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `StrategyProposalRequest` | Union of `ComposeStrategyProposalRequest` and `SubmitStrategyProposalRequest`. |
+| `StrategyProposalCandidate` | `candidate_id`, `instrument_or_scope`, `direction_or_behavior`, `thesis`, `horizon`, `invalidation`, `claim/evidence refs`, `uncertainty`, `requested_evaluation_scope`, `expires_at`, `provenance`, `content_hash`, `schema_version`; no execution fields. |
+| `StrategyProposalReceipt` | `receipt_id`, `candidate_id`, `receiver`, `status=ACCEPTED\|REJECTED\|EXPIRED\|PENDING`, `receiver_request_ref`, `reason_codes`, `received_at`, `schema_version` |
+
+##### `agentic.sandbox-artifacts@1` — Sandboxed Source Artifact Fallback
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `DslGapProof` | `proof_id`, `requirement_ref`, `unsupported_expression_report_ref`, `receiver_validator_ref`, `approved_scope`, `content_hash`, `schema_version` |
+| `SandboxLeaseEvidence` | `lease_ref`, isolation profile, resource ceilings, credential absence, egress policy, staging root, issue/expiry, attestation digest, schema_version |
+| `SandboxArtifactRequest` | Union of author, inspect, and cleanup operations. |
+| `SandboxArtifactManifest` | `artifact_id`, specification ref, files/path/hash/size, dependencies/SBOM, tests/static checks, search history, provenance, sandbox lease ref, aggregate digest, created_at, schema_version |
+| `SandboxArtifactReceipt` | `receipt_id`, `artifact_ref`, staging owner/ref, status, cleanup_due_at, created_at, schema_version |
+| `SandboxArtifactView` | **Selected v1 target:** exact composition `manifest: SandboxArtifactManifest`, `receipt: SandboxArtifactReceipt`, `lease_evidence: SandboxLeaseEvidence`, `inspected_at`, `schema_version`. |
+| `SandboxCleanupReceipt` | **Selected v1 target:** `outcome=CLEANED\|RETAINED`, `artifact_ref`, `staging_ref`, `removed_file_digests`, `retained_metadata_ref`, `reason_codes`, `decided_at`, `schema_version`. The retained metadata reference implements the adopted metadata-retention rule. |
+
+##### `agentic.outcome-calibration@1` — Post-Horizon Outcome Calibration
+
+| Record | Exact v1 field inventory / shape |
+|---|---|
+| `OutcomeObservation` | `observation_id`, `source_claim_or_advisory_ref`, `target`, `horizon_closed_at`, `receiver_outcome_refs`, `regime_ref`, `cost/slippage refs`, `content_hash`, `schema_version` |
+| `OutcomeCalibrationRequest` | Union of forecast calibration, recommendation calibration, and inspection operations. |
+| `CalibrationScore` | `score_id`, `subject_ref`, `scoring_rule`, `sample_count`, `score`, `uncertainty`, `window`, `baseline_refs`, `calculated_at`, `schema_version` |
+| `ValueAttribution` | `attribution_id`, `subject_ref`, role/round/prompt/model/tool/topology contributions, `incremental_utility`, `incremental_cost`, `uncertainty`, `schema_version` |
+| `AgenticChangeCandidate` | `candidate_id`, `change_type`, `target_ref`, `proposed_version`, `evidence_refs`, `expected_effect`, `required_evaluation_plan`, `created_at`, `schema_version` |
+| `ForecastCalibrationResult` | **Selected v1 target:** `outcome=CALIBRATED`, `observation: OutcomeObservation`, `scores: tuple[CalibrationScore, ...]`, `attributions: tuple[ValueAttribution, ...]`, `change_candidates: tuple[AgenticChangeCandidate, ...]`, `provenance`, `content_hash`, `calculated_at`, `schema_version`. |
+| `RecommendationCalibrationResult` | **Selected v1 target:** same exact structural composition and field inventory as `ForecastCalibrationResult`; the distinct record type identifies the `CALIBRATE_RECOMMENDATION` operation outcome. |
+| `OutcomeCalibrationView` | **Selected v1 target:** `subject_ref`, `observations: tuple[OutcomeObservation, ...]`, `scores: tuple[CalibrationScore, ...]`, `attributions: tuple[ValueAttribution, ...]`, `change_candidates: tuple[AgenticChangeCandidate, ...]`, `assembled_at`, `content_hash`, `schema_version`. |
+
+
+#### A.3.4 Consumed interface context contracts
+
+The website context is not owned by Agentic. D-UI owns exact widget contribution registration/disposal; D-IFACE owns the validated wire snapshot consumed by `FEAT-AGT-ASSIST_OPERATOR`.
+
+| Contract | Semantic owner | Exact v1 fields / rule |
+|---|---|---|
+| `ChatContextContribution` | UI | `contribution_id`, `widget_id`, `widget_type`, `widget_title`, `focus_rank`, typed `entity_refs`, typed `selection`, typed `filters`, `visible_error_codes`, safe label metadata, `captured_at`, `expires_at`, `content_hash`, `schema_version`. No DOM, secret, provider object, private implementation state, or executable instruction field. |
+| `WorkspaceContextSnapshot` | D-IFACE/UI boundary | `workspace_id`, `page_id`, `route`, `active_widget_id`, ordered contributions, permission/account projection, `captured_at`, `expires_at`, `redacted_paths`, `content_hash`, `schema_version`. Rebuilt for every message. |
+| `OperatorChatTransportRequest` | D-IFACE | Authenticated principal, conversation/turn identity, message, workspace snapshot, requested response mode, idempotency key, request/correlation IDs. |
+| `OperatorChatStreamEvent` | D-IFACE | Stable envelope for accepted/context-validated/route/specialist/progress/delta/completed/refused/failed events. No hidden reasoning. |
+
+Page context tells Chat Bot what the user is viewing. Material market, strategy, simulation, analytics, portfolio, risk, trading, or account facts are refreshed through the owning domain before assertion.
+
+#### A.3.5 Receiver-owned contracts
+
+The following semantics remain outside Agentic. Appendix A.4 and the owning feature cards settle ownership; U0 binds exact runtime keys in the owning README before any consuming manifest. Target keys do not authorize duplicate contracts.
+
+| Owner | Receiver-owned semantics |
+|---|---|
+| Workspace | Authentication/context references, settings, persistence execution, secrets, artifact staging, conversation/session storage and retention. |
+| Orchestration | Shared worker admission, jobs, execution attempts, cancellation and work-unit infrastructure. |
+| Data/Catalogue | Point-in-time evidence, source licensing/trust/revision, instruments, venues, sessions, account evidence. |
+| Indicators/Analytics | Deterministic calculations, metric formulas, interpretation-ready evidence. |
+| Research | Canonical research campaign/protocol/holdout policy where owned; data leakage rules. |
+| Simulator | Experiment/simulation request, journal, run, manifest, and result truth. |
+| Optimization | Search request, every trial/failure, robustness, overfit, and result truth. |
+| Strategy/Indicators | JSON DSL schema, semantic validation, compilation, candidate intake, registry, and lifecycle. |
+| Strategy | Untrusted proposal intake and receipt. |
+| Portfolio | Current allocation evidence and review/decision contracts. |
+| Risk | Current mandate/limits/decision evidence and all economic approval. |
+| Trading | Read-only outcome/evidence projections may be consumed through governed ports. No Agentic Trading command authority. |
+| Brokers | No Agentic capability dependency. Execution remains downstream of normal Strategy → Risk → Trading → Brokers controls. |
+| D-IFACE/UI | Chat transport, workspace snapshot, presentation, specialist attribution rendering, and future confirmed UI command execution. |
+
+#### A.3.6 Exact Agentic persisted-state ownership
+
+<!-- RETAINED-AGENTIC-STATE-BEGIN -->
+
+Each stateful feature declares its own `StateDeclaration`, migration manifest, adapter, indexes, constraints, retention, recovery, export, and deletion behavior. No shared `app/services/agentic/persistence/` package is permitted. Database execution uses the approved persistence capability; feature packages own semantics and migrations, not raw shared CRUD.
+
+Consequently, there is no shared `app/services/agentic/persistence/` implementation or raw shared CRUD authority.
+
+| Namespace | Table / record set | Primary key | Required invariant | Core contents | Business retention |
+|---|---|---|---|---|---|
+| `agentic.operations` | `agentic_operation_records` | `record_id` | `run_id, sequence` unique; append-only | Operational record metadata and redacted digests | Retain |
+| `agentic.operations` | `agentic_incidents` | `incident_id` | `run_id, correlation_id, kind` unique | Incident, containment, affected resources, preserved evidence | Retain |
+| `agentic.operations` | `agentic_replay_validations` | `replay_id` | Immutable source run/reference digest set | Replay eligibility and no-side-effect validation | Retain |
+| `agentic.tool_governance` | `agentic_tool_manifests` | `tool_id, tool_version` | Manifest digest unique | Registered tool declarations and disposer lineage | Retain while referenced |
+| `agentic.tool_governance` | `agentic_capability_leases` | `lease_id` | `nonce` unique; object hash immutable | Lease scope, budgets, expiry, revocation | Retain |
+| `agentic.tool_governance` | `agentic_tool_invocations` | `invocation_id` | `lease_id, sequence` unique | Authorization, receiver call, filtered result digest, usage | Retain |
+| `agentic.tool_governance` | `agentic_human_actions` | `action_id` | `nonce` unique; one terminal decision | Typed action request/decision/signature | Retain |
+| `agentic.workflows` | `agentic_workflow_runs` | `run_id` | `idempotency_key` unique; revision CAS | Workflow identity, state, budgets, usage, deadline, terminal reason | Retain |
+| `agentic.workflows` | `agentic_workflow_checkpoints` | `checkpoint_id` | `run_id, sequence` unique | Node/version/state digest/provider generations/reservations | Retain |
+| `agentic.workflows` | `agentic_workflow_waits` | `wait_id` | One active wait per run/node/action | Human/action/resource wait and expiry | Retain |
+| `agentic.workflows` | `agentic_workflow_outputs` | `output_id` | Content digest and run/node/schema/retention/access references immutable | Full immutable output manifest and referenced Workspace-custodied payload | Retain |
+| `agentic.memory` | `agentic_memory_candidates` | `candidate_id` | Content hash + task scoped dedup | Unpromoted candidate, classification, decision | TTL or retain by class |
+| `agentic.memory` | `agentic_memory_records` | `record_id` | Content hash + scope/version; immutable | Promoted/working/episodic/audit memory and redaction | Class-specific |
+| `agentic.memory` | `agentic_memory_supersessions` | `supersession_id` | Acyclic old→new relation | Append-only correction/supersession | Retain |
+| `agentic.profile_evaluation` | `agentic_profile_evaluations` | `evaluation_id` | Plan + subject version unique where policy requires | Dimension evidence, graders, safety, cost, latency | Retain |
+| `agentic.profile_evaluation` | `agentic_profile_eligibility` | `subject_type, subject_id, subject_version, sequence` | Append-only; one current effective decision | Eligibility action, evidence, issue/expiry/revocation | Retain |
+| `agentic.profile_evaluation` | `agentic_ablation_results` | `ablation_id` | Plan/topology unique | Utility, uncertainty, cost, latency, failure surface | Retain |
+| `agentic.claims` | `agentic_claim_graphs` | `graph_id` | Graph revision/content digest immutable | Graph identity, revision and root claims | Retain |
+| `agentic.claims` | `agentic_claims` | `claim_id` | Claim content hash immutable | Typed claim, scope, validity, uncertainty, provenance | Retain |
+| `agentic.claims` | `agentic_claim_relations` | `relation_id` | `graph_id, source, target, type` unique | Support/contradiction/dependency/refinement/supersession | Retain |
+| `agentic.claims` | `agentic_claim_status_history` | `transition_id` | `claim_id, sequence` unique | Append-only supported/contested/refuted/unknown/expired transitions | Retain |
+| `agentic.research_search` | `agentic_research_campaigns` | `campaign_id` | Pre-registration digest immutable | Objective, owners, family/dataset/search identities, status | Retain |
+| `agentic.research_search` | `agentic_hypothesis_families` | `family_id` | Canonical statement/mechanism/scope digest unique per campaign | Near-duplicate policy and family identity | Retain |
+| `agentic.research_search` | `agentic_research_variants` | `variant_id` | Spec digest plus family unique | Parameter/feature/prompt/model changes and charged budget | Retain |
+| `agentic.research_search` | `agentic_research_attempts` | `attempt_id` | One terminal status; receiver refs immutable | Every complete/failed/cancelled/invalid attempt | Retain |
+| `agentic.research_search` | `agentic_holdout_reservations` | `reservation_id` | Receiver receipt unique; one consumption transition | Canonical Research campaign/family/dataset and receipt binding; local status is reconciled from owner reservation/consumption | Retain |
+| `agentic.sandbox_artifacts` | `agentic_sandbox_artifact_records` | `artifact_id` | Aggregate manifest digest unique | Specification, lease, files, SBOM, tests, provenance, staging ref | Retain metadata |
+| `agentic.sandbox_artifacts` | `agentic_sandbox_cleanup_records` | `cleanup_id` | One terminal cleanup per artifact generation | Cleanup result, retained/deleted refs, completed time | Retain |
+| `agentic.outcome_calibration` | `agentic_outcome_links` | `observation_id` | Original subject + outcome window unique by rule | Forecast/recommendation to authoritative outcome linkage | Retain |
+| `agentic.outcome_calibration` | `agentic_calibration_scores` | `score_id` | Subject/scoring rule/window/version unique | Scores, samples, uncertainty, baselines | Retain |
+| `agentic.outcome_calibration` | `agentic_value_attributions` | `attribution_id` | Evaluation window/topology unique | Role/round/model/tool/topology value and cost attribution | Retain |
+| `agentic.outcome_calibration` | `agentic_change_candidates` | `candidate_id` | Target proposed version digest unique | Evidence-backed non-self-applying change proposal | Retain |
+
+Every physical durable namespace uses the Kernel-supported `StateDeclaration` value `RETAIN`. The table's **Business retention** column governs retention eligibility, TTL and purge policy, legal hold, reference eligibility, and cleanup of staging bytes; it does not define additional `StateDeclaration` enum values.
+
+Shared state rules:
+
+- Conversation tables belong to Workspace; deliberation, synthesis and operator assistance own no separate tables. Full immutable workflow output manifests and referenced payloads are retained by RUN_WORKFLOWS through Workspace custody.
+- All durable tables are strict and use aware UTC text timestamps or the repository's approved timestamp representation.
+- Append-only evidence omits mutable overwrite semantics; corrections append superseding records.
+- Supersession relations remain acyclic.
+- Every decision and external interaction records request and correlation identity.
+- Decimal cost and score values never use binary floating-point persistence.
+- State keys are content-, version- and generation-aware so approvals, eligibility and history do not carry across material changes.
+- Working memory is TTL-bound; audit, claims, research search, eligibility, incidents and calibration are retained according to policy.
+- Sandbox cleanup records permit one terminal cleanup per artifact generation.
+- Feature removal preserves retained records and removes only allowed ephemeral, TTL and staged resources.
+
+<!-- RETAINED-AGENTIC-STATE-END -->
+
+---
+
+<!-- RETAINED-AGENTIC-SCHEMAS-END -->
+
+### A.4 Complete reconciliation decisions
+
+The following issue, adopted resolution, and implementation/verification consequence entries are complete local decisions. Their `REC-*` identities are historical traceability keys, not links to an external authority.
+
+| ID | Overlap or conflict | Adopted resolution | Implementation consequence |
+|---|---|---|---|
+| REC-001 | Separate workbench and Agentic roadmaps delay useful AI and disagree about order. | §29 is the single release sequence U0–U13. Original AGT task IDs remain stable identifiers, not release phases. | Foundations start in U1; contextual Chat Bot ships with deterministic results in U2; research design and strategy creation assistance follow in U3. |
+| REC-002 | The workbench places parameter optimization in Research; the Agentic plan names an Optimization domain. | Research owns objectives, protocols, generation, qualification, campaigns and holdout policy. Optimization owns parameter-search execution, trial accounting, optimizer results and WFO/WFM search mechanics. | Move the workbench parameter-optimization implementation slice to Optimization. Research consumes its public results and owns the final research decision. U0 maps existing providers without creating a parallel engine. |
+| REC-003 | Sources alternate between Simulation and Simulator. | Simulator is the deterministic domain/package name. Simulation describes its activity and may remain in established transport routes. | Use `app/contracts/simulator/` and `app/services/simulator/`; migrate proposed `simulation.*` keys to owner-ratified `simulator.*` contracts. |
+| REC-004 | A generic JSON AST and an HSL plan could create competing languages. | HaruQuant Strategy Language (HSL) v2 is the canonical JSON Strategy AST. Strategy owns language, validation, versions and target-neutral compilation. | Human editing, Research generation and AI composition share the same schema, block catalogue, diagnostics and compiler. Existing v1 documents use explicit conversion reports. |
+| REC-005 | HSL leaves bar-close versus bar-open behavior undecided. | Add explicit `ON_BAR_CLOSE`; shift 0 sees the just-completed bar. Keep `ON_BAR_OPEN` and its distinct observability rules. | Preserve §37 numerical and execution semantics; never silently map a close decision to an open decision or change shifts. |
+| REC-006 | One hash was being used for identity, deduplication and research independence. | Store separate canonical content and semantic hashes. Neither proves an independent hypothesis or renewed holdout access. | Ordered rules and short-circuit behavior remain ordered. Initial semantic normalization does not reorder expressions. Research family/holdout accounting remains separate. |
+| REC-007 | Native file extensions differ across plans. | Write standalone HSL as `.hsl.json`; use `.hqa.zip` for the shared HaruQuantAI bundle. | Previously proposed `.hqs` and earlier native JSON forms are explicit import adapters where supported, not alternate native schemas. Bundle schema version and HSL language major are independent. |
+| REC-008 | Agentic workflows and Orchestration both describe scheduling and runs. | Agentic owns reasoning graphs, node decisions, waits and reasoning checkpoints. Orchestration owns shared job admission, queue capacity, execution attempts, workers and cancellation transport. | One shared job system hosts Agentic workflow work units and deterministic child jobs. Agentic retains receiver references and never recreates simulator or optimizer run truth. |
+| REC-009 | Agentic terminal outcomes differ from the workbench run enum. | Keep domain outcomes `SUCCEEDED`, `REFUSED`, `FAILED`, `CANCELLED`, `EXPIRED` and project them separately onto the shared job lifecycle. | A refused workflow may have a successfully completed worker job. The UI always shows both semantic outcome and infrastructure status; §42 defines the mapping. |
+| REC-010 | The first read-only slice omits deliberation, but synthesis declares it required. | Deliberation is optional at synthesis mount and mandatory only for workflows whose versioned policy requires challenge. | Direct evidence review works without councils. Missing required challenge returns insufficient evidence. No silent downgrade of a challenge-required workflow. |
+| REC-011 | Chat Bot declares its inbound Interfaces gateway as an external runtime prerequisite. | UI and Interfaces depend on Agentic capabilities. Agentic consumes public context DTOs and verified identity, with no reverse dependency on an HTTP gateway. | Removing website transport leaves internal Agentic clients usable; there is no gateway/Agentic dependency cycle. |
+| REC-012 | Conversation state has competing possible owners. | Workspace owns bounded conversation/session storage. Interfaces validates and translates chat transport. Agentic workflows retain turn/run/handoff references and canonical outcome artifacts. | `ASSIST_OPERATOR` has no private conversation tables. Chat transcript expiry cannot erase retained claims, receipts, decisions or audit records. |
+| REC-013 | Deliberation and synthesis state is unspecified. | Both own no separate durable namespace. Their immutable typed outputs are stored through Agentic workflow artifact operations and Workspace custody; Claims owns claim/status history. | Operations stores bounded audit metadata and references, not the sole copy of full evidence. No cross-feature table writes. |
+| REC-014 | Memory and sandbox state use unsupported retention labels. | Use Kernel-supported `RETAIN` for their durable evidence namespaces. Feature business rules apply TTL, legal hold and byte cleanup. | Do not introduce invented `StateDeclaration` enum values. Working/chat/staged bytes have explicit expiry while referenced evidence metadata remains retained. |
+| REC-015 | Several features call receivers without declaring tool governance. | Every Agentic feature that directly invokes a governed receiver declares `agentic.tool-governance@1`. | Research search, Strategy DSL handoff and outcome calibration add that dependency. Optional per-workflow ports are checked immediately before use. |
+| REC-016 | Search governance can become a second campaign or holdout authority. | Research owns canonical campaigns, hypothesis families, dataset families, search policy and authoritative holdout allocation for all clients. | Agentic stores its authored variants, costs, request attempts and exact owner receipts. Renaming a chat, role, model, strategy or campaign cannot reset shared scarcity. |
+| REC-017 | The source shorthand says attempted equals completed plus failed, omitting other outcomes and active attempts. | Count accepted attempts as active plus completed, failed, cancelled, invalid and refused; at closure active is zero. Pre-admission denials are separately retained. | Reservations, retries, terminal categories and cumulative costs reconcile under concurrency and restart. Null/negative results remain completed trials. |
+| REC-018 | Full optimization dependencies could delay strategy drafting. | Research campaign/protocol/holdout foundations arrive in U3; Optimization execution arrives in U6. Receiver ports not used by an operation are optional at mount. | U3 supports hypothesis design, bounded backtests and HSL candidates; `DESIGN_SEARCH`/governed optimization refuse until Optimization is ready. No mock search results. |
+| REC-019 | Provider protocol ownership differs between sources. | Agentic public contracts own the provider-neutral model-runtime protocol. Plugins owns discovery/contribution and adapter lifecycle; an optional provider distribution implements the protocol. | Credentials resolve inside the selected adapter through Workspace references. ADK is optional; no paid/network provider is required by ordinary tests. |
+| REC-020 | Eligibility bootstrap risks requiring already eligible models to evaluate the first model. | Provide a deterministic test provider and an evaluation-only restricted state. Seed evidence is independently reviewed and bound to exact role/prompt/model/schema versions. | Bootstrap cannot serve user research. Production eligibility is issued by deterministic evaluation policy; subjects cannot approve themselves. |
+| REC-021 | Chat creation assistance could be interpreted as direct strategy mutation. | Chat Bot delegates to the Strategy DSL Author. The specialist returns a draft or patch; Strategy validates it and the user reviews the exact candidate before acceptance. | Saving, starting a backtest, requesting a holdout and any downstream promotion are distinct owner commands. Initial Chat Bot verbs remain read, answer, explain, delegate, summarize and suggest navigation. |
+| REC-022 | A global prohibition on “order fields” would make strategy DSL impossible. | Declarative entry/exit/sizing nodes are permitted only inside the receiver-owned HSL document. Live orders, TradeIntent, risk approvals and execution commands remain absent from Agentic-owned action/proposal schemas. | A DSL node describing a market entry is an unevaluated program definition. It cannot be submitted to Trading or Brokers as an order. |
+| REC-023 | Claims of no Trading dependency conflict with outcome and context reads. | Agentic may consume read-only, owner-authored Trading evidence through governed projections where declared. It has no Trading command or Brokers capability edge. | Calibration may read matured execution outcomes without obtaining raw broker credentials, SDK objects or execution permissions. |
+| REC-024 | Thresholds, prompts or mandates could be changed by calibration output. | Calibration emits an immutable change candidate. Human/owner review and independent evaluation precede any new effective version. | Historic decisions and approvals remain bound to their original versions. There is no self-modifying production policy. |
+| REC-025 | Older plans contain unverified keys, factories, baseline statuses and approval-stage language. | Product semantics here are decided. U0 binds exact current contracts, `feature()` entry points, event placement and supported state declarations. Source baseline SHAs are historical evidence only. | Reuse compatible current ports; otherwise deliver a path-bounded owner contract task. A new key in this document is not evidence that a callable provider exists. Documentation integration does not authorize production deployment. |
+| REC-026 | A raw transcript can conflict with privacy and evidence retention. | Conversation content is minimized, scoped and expiring. Canonical structured artifacts and redacted provenance have their own retained ownership. | Do not log unrestricted private strategy text, secrets or hidden model reasoning. Evidence references are reauthorized whenever opened or exported. |
+| REC-027 | Earlier bar-clock wording and unresolved OHLC fills could imply bar-only backtests. | Every backtest uses its selected recorded/generated tick method. Strategy decision clocks are separate; fills and execution state follow the tick stream. | §§6/29/37/40/56 and all Research/Optimization/Portfolio/AI callers use the same rule; no hidden fidelity reduction. |
+| REC-028 | Benchmarks and HSL plans alone do not deliver native numerical speed. | CPython services compose Numba nopython kernels, typed HSL instruction/state buffers and owner-qualified numerical helpers; Cython/C++ addresses measured gaps. | Required core U2 numerical/equivalence/comparator gates; no advertised interpreter fallback. |
+| REC-029 | Independent caches, workers, queries and model jobs can exhaust the host. | Extend one Orchestration resource ledger across CPU, native/shared memory, threads, storage, I/O, GPU and AI work with bounded queues. | U1 foundations; mixed-load and lifecycle gates at each feature release (§56). |
+| REC-030 | Faster arithmetic or lower output retention can change trading results. | Preserve exact scaled money semantics, ordered tick state and owner metric definitions; output profiles alter retention only. | Differential oracle/native comparisons, overflow guards, tick-count reconciliation and explicit replay/availability rules. |
