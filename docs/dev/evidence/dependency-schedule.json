@@ -1,11 +1,11 @@
 {
-  "manifest_version": "1.0",
-  "timestamp": "2026-09-07T18:45:00+03:00",
+  "manifest_version": "2.0",
   "dag_properties": {
     "is_acyclic": true,
     "total_nodes": 205,
     "total_required_edges": 476,
-    "total_operation_edges": 233
+    "total_operation_edges": 233,
+    "total_schedule_constraints": 729
   },
   "phases": [
     {
@@ -577,6 +577,6258 @@
       ],
       "checkpoint_task": "16.12",
       "checkpoint_feature": "FEAT-UI-STRATEGY_PACKAGER"
+    }
+  ],
+  "required_edges": [
+    {
+      "consumer": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "consumer_task": "1.09",
+      "provider": "FEAT-WS-MANAGE_WORKSPACES",
+      "provider_task": "1.03",
+      "provider_capability": "workspace.manage-workspaces@1"
+    },
+    {
+      "consumer": "FEAT-WS-MANAGE_ARTIFACTS",
+      "consumer_task": "1.17",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-WS-SECURE_LOCAL_ACCESS",
+      "consumer_task": "1.10",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-WS-ADMINISTER_SETTINGS",
+      "consumer_task": "1.11",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-WS-MANAGE_CONVERSATIONS",
+      "consumer_task": "5.02",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-WS-MANAGE_CONVERSATIONS",
+      "consumer_task": "5.02",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-WS-BUILD_DIAGNOSTICS",
+      "consumer_task": "1.21",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-WS-DISTRIBUTE_APPLICATION",
+      "consumer_task": "16.02",
+      "provider": "FEAT-WS-MANAGE_WORKSPACES",
+      "provider_task": "1.03",
+      "provider_capability": "workspace.manage-workspaces@1"
+    },
+    {
+      "consumer": "FEAT-CAT-MAP_PROVIDERS",
+      "consumer_task": "2.10",
+      "provider": "FEAT-CAT-CATALOG_INSTRUMENTS",
+      "provider_task": "2.01",
+      "provider_capability": "catalogue.catalog-instruments@1"
+    },
+    {
+      "consumer": "FEAT-CAT-DEFINE_TRADING_RULES",
+      "consumer_task": "2.11",
+      "provider": "FEAT-CAT-CATALOG_INSTRUMENTS",
+      "provider_task": "2.01",
+      "provider_capability": "catalogue.catalog-instruments@1"
+    },
+    {
+      "consumer": "FEAT-CAT-DEFINE_TRADING_RULES",
+      "consumer_task": "2.11",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-CAT-MANAGE_UNIVERSES",
+      "consumer_task": "2.22",
+      "provider": "FEAT-CAT-CATALOG_INSTRUMENTS",
+      "provider_task": "2.01",
+      "provider_capability": "catalogue.catalog-instruments@1"
+    },
+    {
+      "consumer": "FEAT-CAT-CONVERT_CURRENCIES",
+      "consumer_task": "2.12",
+      "provider": "FEAT-CAT-CATALOG_INSTRUMENTS",
+      "provider_task": "2.01",
+      "provider_capability": "catalogue.catalog-instruments@1"
+    },
+    {
+      "consumer": "FEAT-CAT-EXCHANGE_CATALOGUE",
+      "consumer_task": "2.27",
+      "provider": "FEAT-CAT-CATALOG_INSTRUMENTS",
+      "provider_task": "2.01",
+      "provider_capability": "catalogue.catalog-instruments@1"
+    },
+    {
+      "consumer": "FEAT-CAT-EXCHANGE_CATALOGUE",
+      "consumer_task": "2.27",
+      "provider": "FEAT-CAT-MAP_PROVIDERS",
+      "provider_task": "2.10",
+      "provider_capability": "catalogue.map-providers@1"
+    },
+    {
+      "consumer": "FEAT-CAT-EXCHANGE_CATALOGUE",
+      "consumer_task": "2.27",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-CAT-EXCHANGE_CATALOGUE",
+      "consumer_task": "2.27",
+      "provider": "FEAT-CAT-MANAGE_UNIVERSES",
+      "provider_task": "2.22",
+      "provider_capability": "catalogue.manage-universes@1"
+    },
+    {
+      "consumer": "FEAT-CAT-EXCHANGE_CATALOGUE",
+      "consumer_task": "2.27",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-BRK-CONNECT_MARKET_FEEDS",
+      "consumer_task": "16.07",
+      "provider": "FEAT-BRK-RESOLVE",
+      "provider_task": "2.08",
+      "provider_capability": "broker.resolver@1"
+    },
+    {
+      "consumer": "FEAT-DATA-INGEST_HISTORY",
+      "consumer_task": "2.19",
+      "provider": "FEAT-DATA-MARKET_DATA_STORE",
+      "provider_task": "2.09",
+      "provider_capability": "data.market-data-store@1"
+    },
+    {
+      "consumer": "FEAT-DATA-MARKET_DATA_STORE",
+      "consumer_task": "2.09",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-DATA-MARKET_DATA_STORE",
+      "consumer_task": "2.09",
+      "provider": "FEAT-ORCH-RESERVE_RESOURCES",
+      "provider_task": "1.14",
+      "provider_capability": "orchestration.resource-admission@1"
+    },
+    {
+      "consumer": "FEAT-DATA-RESOLVE_QUALITY",
+      "consumer_task": "2.13",
+      "provider": "FEAT-DATA-MARKET_DATA_STORE",
+      "provider_task": "2.09",
+      "provider_capability": "data.market-data-store@1"
+    },
+    {
+      "consumer": "FEAT-DATA-RESOLVE_QUALITY",
+      "consumer_task": "2.13",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-DATA-AGGREGATE_BARS",
+      "consumer_task": "2.14",
+      "provider": "FEAT-DATA-MARKET_DATA_STORE",
+      "provider_task": "2.09",
+      "provider_capability": "data.market-data-store@1"
+    },
+    {
+      "consumer": "FEAT-DATA-AGGREGATE_BARS",
+      "consumer_task": "2.14",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-DATA-MANAGE_RETENTION",
+      "consumer_task": "2.15",
+      "provider": "FEAT-DATA-MARKET_DATA_STORE",
+      "provider_task": "2.09",
+      "provider_capability": "data.market-data-store@1"
+    },
+    {
+      "consumer": "FEAT-DATA-BIND_RUN_DATA",
+      "consumer_task": "2.20",
+      "provider": "FEAT-DATA-MARKET_DATA_STORE",
+      "provider_task": "2.09",
+      "provider_capability": "data.market-data-store@1"
+    },
+    {
+      "consumer": "FEAT-DATA-BIND_RUN_DATA",
+      "consumer_task": "2.20",
+      "provider": "FEAT-CAT-CATALOG_INSTRUMENTS",
+      "provider_task": "2.01",
+      "provider_capability": "catalogue.catalog-instruments@1"
+    },
+    {
+      "consumer": "FEAT-DATA-BIND_RUN_DATA",
+      "consumer_task": "2.20",
+      "provider": "FEAT-CAT-MAP_PROVIDERS",
+      "provider_task": "2.10",
+      "provider_capability": "catalogue.map-providers@1"
+    },
+    {
+      "consumer": "FEAT-DATA-BIND_RUN_DATA",
+      "consumer_task": "2.20",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-DATA-ALIGN_SERIES",
+      "consumer_task": "2.23",
+      "provider": "FEAT-DATA-BIND_RUN_DATA",
+      "provider_task": "2.20",
+      "provider_capability": "data.bind-run-data@1"
+    },
+    {
+      "consumer": "FEAT-DATA-ALIGN_SERIES",
+      "consumer_task": "2.23",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-DATA-SYNC_CONNECTORS",
+      "consumer_task": "2.24",
+      "provider": "FEAT-DATA-INGEST_HISTORY",
+      "provider_task": "2.19",
+      "provider_capability": "data.ingest-history@1"
+    },
+    {
+      "consumer": "FEAT-DATA-SYNC_CONNECTORS",
+      "consumer_task": "2.24",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-DATA-SYNC_CONNECTORS",
+      "consumer_task": "2.24",
+      "provider": "FEAT-BRK-RESOLVE",
+      "provider_task": "2.08",
+      "provider_capability": "broker.resolver@1"
+    },
+    {
+      "consumer": "FEAT-DATA-NORMALIZE_TICKS",
+      "consumer_task": "2.16",
+      "provider": "FEAT-CAT-CATALOG_INSTRUMENTS",
+      "provider_task": "2.01",
+      "provider_capability": "catalogue.catalog-instruments@1"
+    },
+    {
+      "consumer": "FEAT-DATA-PREPARE_PROFILES",
+      "consumer_task": "2.25",
+      "provider": "FEAT-DATA-BIND_RUN_DATA",
+      "provider_task": "2.20",
+      "provider_capability": "data.bind-run-data@1"
+    },
+    {
+      "consumer": "FEAT-DATA-PREPARE_PROFILES",
+      "consumer_task": "2.25",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-DATA-IMPORT_INDICATORS",
+      "consumer_task": "2.28",
+      "provider": "FEAT-DATA-INGEST_HISTORY",
+      "provider_task": "2.19",
+      "provider_capability": "data.ingest-history@1"
+    },
+    {
+      "consumer": "FEAT-DATA-IMPORT_INDICATORS",
+      "consumer_task": "2.28",
+      "provider": "FEAT-DATA-ALIGN_SERIES",
+      "provider_task": "2.23",
+      "provider_capability": "data.align-series@1"
+    },
+    {
+      "consumer": "FEAT-DATA-GENERATE_SCENARIOS",
+      "consumer_task": "2.17",
+      "provider": "FEAT-DATA-MARKET_DATA_STORE",
+      "provider_task": "2.09",
+      "provider_capability": "data.market-data-store@1"
+    },
+    {
+      "consumer": "FEAT-DATA-TRACK_MARKET_NEWS",
+      "consumer_task": "2.18",
+      "provider": "FEAT-DATA-MARKET_DATA_STORE",
+      "provider_task": "2.09",
+      "provider_capability": "data.market-data-store@1"
+    },
+    {
+      "consumer": "FEAT-DATA-STREAM_MARKET_EVENTS",
+      "consumer_task": "2.21",
+      "provider": "FEAT-BRK-RESOLVE",
+      "provider_task": "2.08",
+      "provider_capability": "broker.resolver@1"
+    },
+    {
+      "consumer": "FEAT-DATA-STREAM_MARKET_EVENTS",
+      "consumer_task": "2.21",
+      "provider": "FEAT-DATA-NORMALIZE_TICKS",
+      "provider_task": "2.16",
+      "provider_capability": "data.normalize-ticks@1"
+    },
+    {
+      "consumer": "FEAT-DATA-IMPORT_QUANTDATA",
+      "consumer_task": "2.26",
+      "provider": "FEAT-DATA-INGEST_HISTORY",
+      "provider_task": "2.19",
+      "provider_capability": "data.ingest-history@1"
+    },
+    {
+      "consumer": "FEAT-DATA-IMPORT_QUANTDATA",
+      "consumer_task": "2.26",
+      "provider": "FEAT-DATA-NORMALIZE_TICKS",
+      "provider_task": "2.16",
+      "provider_capability": "data.normalize-ticks@1"
+    },
+    {
+      "consumer": "FEAT-DATA-BROWSE_REFERENCE",
+      "consumer_task": "2.29",
+      "provider": "FEAT-DATA-MARKET_DATA_STORE",
+      "provider_task": "2.09",
+      "provider_capability": "data.market-data-store@1"
+    },
+    {
+      "consumer": "FEAT-DATA-BROWSE_REFERENCE",
+      "consumer_task": "2.29",
+      "provider": "FEAT-CAT-CATALOG_INSTRUMENTS",
+      "provider_task": "2.01",
+      "provider_capability": "catalogue.catalog-instruments@1"
+    },
+    {
+      "consumer": "FEAT-DATA-BROWSE_REFERENCE",
+      "consumer_task": "2.29",
+      "provider": "FEAT-CAT-MAP_PROVIDERS",
+      "provider_task": "2.10",
+      "provider_capability": "catalogue.map-providers@1"
+    },
+    {
+      "consumer": "FEAT-DATA-BROWSE_REFERENCE",
+      "consumer_task": "2.29",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-CATALOG_BLOCKS",
+      "consumer_task": "3.08",
+      "provider": "FEAT-STRAT-DEFINE_AST",
+      "provider_task": "3.07",
+      "provider_capability": "strategy.define-ast@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-CONFIGURE_CHARTS",
+      "consumer_task": "3.09",
+      "provider": "FEAT-STRAT-DEFINE_AST",
+      "provider_task": "3.07",
+      "provider_capability": "strategy.define-ast@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-CONFIGURE_CHARTS",
+      "consumer_task": "3.09",
+      "provider": "FEAT-CAT-CATALOG_INSTRUMENTS",
+      "provider_task": "2.01",
+      "provider_capability": "catalogue.catalog-instruments@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-CONFIGURE_CHARTS",
+      "consumer_task": "3.09",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-VERSION_STRATEGIES",
+      "consumer_task": "3.14",
+      "provider": "FEAT-STRAT-DEFINE_AST",
+      "provider_task": "3.07",
+      "provider_capability": "strategy.define-ast@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-VERSION_STRATEGIES",
+      "consumer_task": "3.14",
+      "provider": "FEAT-STRAT-CATALOG_BLOCKS",
+      "provider_task": "3.08",
+      "provider_capability": "strategy.catalog-blocks@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-VERSION_STRATEGIES",
+      "consumer_task": "3.14",
+      "provider": "FEAT-STRAT-CONFIGURE_CHARTS",
+      "provider_task": "3.09",
+      "provider_capability": "strategy.configure-charts@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-VERSION_STRATEGIES",
+      "consumer_task": "3.14",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-EDIT_TEMPLATES",
+      "consumer_task": "3.11",
+      "provider": "FEAT-STRAT-DEFINE_AST",
+      "provider_task": "3.07",
+      "provider_capability": "strategy.define-ast@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-EDIT_TEMPLATES",
+      "consumer_task": "3.11",
+      "provider": "FEAT-STRAT-CATALOG_BLOCKS",
+      "provider_task": "3.08",
+      "provider_capability": "strategy.catalog-blocks@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-DEFINE_SEARCH_SPACES",
+      "consumer_task": "8.01",
+      "provider": "FEAT-STRAT-DEFINE_AST",
+      "provider_task": "3.07",
+      "provider_capability": "strategy.define-ast@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-DEFINE_SEARCH_SPACES",
+      "consumer_task": "8.01",
+      "provider": "FEAT-STRAT-CATALOG_BLOCKS",
+      "provider_task": "3.08",
+      "provider_capability": "strategy.catalog-blocks@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-DEFINE_SEARCH_SPACES",
+      "consumer_task": "8.01",
+      "provider": "FEAT-STRAT-EDIT_TEMPLATES",
+      "provider_task": "3.11",
+      "provider_capability": "strategy.edit-templates@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-MODEL_ATM_EXITS",
+      "consumer_task": "3.10",
+      "provider": "FEAT-STRAT-DEFINE_AST",
+      "provider_task": "3.07",
+      "provider_capability": "strategy.define-ast@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-MODEL_ATM_EXITS",
+      "consumer_task": "3.10",
+      "provider": "FEAT-CAT-DEFINE_TRADING_RULES",
+      "provider_task": "2.11",
+      "provider_capability": "catalogue.define-trading-rules@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-DEFINE_ARCHITECTURES",
+      "consumer_task": "13.02",
+      "provider": "FEAT-STRAT-DEFINE_AST",
+      "provider_task": "3.07",
+      "provider_capability": "strategy.define-ast@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-DEFINE_ARCHITECTURES",
+      "consumer_task": "13.02",
+      "provider": "FEAT-STRAT-CATALOG_BLOCKS",
+      "provider_task": "3.08",
+      "provider_capability": "strategy.catalog-blocks@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-DEFINE_INDICATORS",
+      "consumer_task": "3.12",
+      "provider": "FEAT-STRAT-DEFINE_AST",
+      "provider_task": "3.07",
+      "provider_capability": "strategy.define-ast@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-DEFINE_INDICATORS",
+      "consumer_task": "3.12",
+      "provider": "FEAT-STRAT-CATALOG_BLOCKS",
+      "provider_task": "3.08",
+      "provider_capability": "strategy.catalog-blocks@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-DEFINE_INDICATORS",
+      "consumer_task": "3.12",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-COMPILE_STRATEGIES",
+      "consumer_task": "3.13",
+      "provider": "FEAT-STRAT-DEFINE_AST",
+      "provider_task": "3.07",
+      "provider_capability": "strategy.define-ast@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-COMPILE_STRATEGIES",
+      "consumer_task": "3.13",
+      "provider": "FEAT-STRAT-CATALOG_BLOCKS",
+      "provider_task": "3.08",
+      "provider_capability": "strategy.catalog-blocks@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-COMPILE_STRATEGIES",
+      "consumer_task": "3.13",
+      "provider": "FEAT-STRAT-CONFIGURE_CHARTS",
+      "provider_task": "3.09",
+      "provider_capability": "strategy.configure-charts@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-EXCHANGE_STRATEGIES",
+      "consumer_task": "3.16",
+      "provider": "FEAT-STRAT-VERSION_STRATEGIES",
+      "provider_task": "3.14",
+      "provider_capability": "strategy.version-strategies@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-EXCHANGE_STRATEGIES",
+      "consumer_task": "3.16",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-IMPORT_SQX",
+      "consumer_task": "16.10",
+      "provider": "FEAT-STRAT-EXCHANGE_STRATEGIES",
+      "provider_task": "3.16",
+      "provider_capability": "strategy.exchange-strategies@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-GENERATE_CODE",
+      "consumer_task": "3.15",
+      "provider": "FEAT-STRAT-COMPILE_STRATEGIES",
+      "provider_task": "3.13",
+      "provider_capability": "strategy.compile-strategies@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-GENERATE_CODE",
+      "consumer_task": "3.15",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-GENERATE_MQL5",
+      "consumer_task": "12.05",
+      "provider": "FEAT-STRAT-COMPILE_STRATEGIES",
+      "provider_task": "3.13",
+      "provider_capability": "strategy.compile-strategies@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-GENERATE_MQL5",
+      "consumer_task": "12.05",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-GENERATE_PYTHON",
+      "consumer_task": "12.06",
+      "provider": "FEAT-STRAT-COMPILE_STRATEGIES",
+      "provider_task": "3.13",
+      "provider_capability": "strategy.compile-strategies@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-GENERATE_PYTHON",
+      "consumer_task": "12.06",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-GENERATE_TARGETS",
+      "consumer_task": "16.08",
+      "provider": "FEAT-STRAT-COMPILE_STRATEGIES",
+      "provider_task": "3.13",
+      "provider_capability": "strategy.compile-strategies@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-GENERATE_TARGETS",
+      "consumer_task": "16.08",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-PACKAGE_STRATEGIES",
+      "consumer_task": "16.11",
+      "provider": "FEAT-STRAT-GENERATE_CODE",
+      "provider_task": "3.15",
+      "provider_capability": "strategy.generate-code@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-PACKAGE_STRATEGIES",
+      "consumer_task": "16.11",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-ACCEPT_PROPOSALS",
+      "consumer_task": "6.01",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-STRAT-ACCEPT_PROPOSALS",
+      "consumer_task": "6.01",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-RSK-SIZE_POSITIONS",
+      "consumer_task": "4.02",
+      "provider": "FEAT-CAT-DEFINE_TRADING_RULES",
+      "provider_task": "2.11",
+      "provider_capability": "catalogue.define-trading-rules@1"
+    },
+    {
+      "consumer": "FEAT-RSK-SIZE_POSITIONS",
+      "consumer_task": "4.02",
+      "provider": "FEAT-CAT-CONVERT_CURRENCIES",
+      "provider_task": "2.12",
+      "provider_capability": "catalogue.convert-currencies@1"
+    },
+    {
+      "consumer": "FEAT-RSK-ASSESS_RESEARCH_RISK",
+      "consumer_task": "4.03",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-TRD-MODEL_EXECUTION_POLICIES",
+      "consumer_task": "4.05",
+      "provider": "FEAT-CAT-DEFINE_TRADING_RULES",
+      "provider_task": "2.11",
+      "provider_capability": "catalogue.define-trading-rules@1"
+    },
+    {
+      "consumer": "FEAT-TRD-OBSERVE_OUTCOMES",
+      "consumer_task": "11.01",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-RESERVE_RESOURCES",
+      "consumer_task": "1.14",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-MANAGE_JOBS",
+      "consumer_task": "1.18",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-MANAGE_JOBS",
+      "consumer_task": "1.18",
+      "provider": "FEAT-ORCH-RESERVE_RESOURCES",
+      "provider_task": "1.14",
+      "provider_capability": "orchestration.resource-admission@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-EXECUTE_LOCAL_WORK",
+      "consumer_task": "1.22",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-EXECUTE_LOCAL_WORK",
+      "consumer_task": "1.22",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-MANAGE_REMOTE_WORKERS",
+      "consumer_task": "15.01",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-MANAGE_REMOTE_WORKERS",
+      "consumer_task": "15.01",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-MANAGE_REMOTE_WORKERS",
+      "consumer_task": "15.01",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-DEFINE_PROJECTS",
+      "consumer_task": "11.02",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-RUN_PROJECTS",
+      "consumer_task": "11.06",
+      "provider": "FEAT-ORCH-DEFINE_PROJECTS",
+      "provider_task": "11.02",
+      "provider_capability": "orchestration.define-projects@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-RUN_PROJECTS",
+      "consumer_task": "11.06",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-EXECUTE_UTILITIES",
+      "consumer_task": "11.03",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-EXECUTE_UTILITIES",
+      "consumer_task": "11.03",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-DELIVER_NOTIFICATIONS",
+      "consumer_task": "11.04",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-ORCH-DELIVER_NOTIFICATIONS",
+      "consumer_task": "11.04",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-SIM-CONFIGURE_ENGINE",
+      "consumer_task": "4.08",
+      "provider": "FEAT-STRAT-COMPILE_STRATEGIES",
+      "provider_task": "3.13",
+      "provider_capability": "strategy.compile-strategies@1"
+    },
+    {
+      "consumer": "FEAT-SIM-CONFIGURE_ENGINE",
+      "consumer_task": "4.08",
+      "provider": "FEAT-DATA-BIND_RUN_DATA",
+      "provider_task": "2.20",
+      "provider_capability": "data.bind-run-data@1"
+    },
+    {
+      "consumer": "FEAT-SIM-CONFIGURE_ENGINE",
+      "consumer_task": "4.08",
+      "provider": "FEAT-CAT-DEFINE_TRADING_RULES",
+      "provider_task": "2.11",
+      "provider_capability": "catalogue.define-trading-rules@1"
+    },
+    {
+      "consumer": "FEAT-SIM-CONFIGURE_ENGINE",
+      "consumer_task": "4.08",
+      "provider": "FEAT-RSK-SIZE_POSITIONS",
+      "provider_task": "4.02",
+      "provider_capability": "risk.size-positions@1"
+    },
+    {
+      "consumer": "FEAT-SIM-CONFIGURE_ENGINE",
+      "consumer_task": "4.08",
+      "provider": "FEAT-TRD-MODEL_EXECUTION_POLICIES",
+      "provider_task": "4.05",
+      "provider_capability": "trading.execution-policies@1"
+    },
+    {
+      "consumer": "FEAT-SIM-MODEL_TICKS",
+      "consumer_task": "4.06",
+      "provider": "FEAT-DATA-NORMALIZE_TICKS",
+      "provider_task": "2.16",
+      "provider_capability": "data.normalize-ticks@1"
+    },
+    {
+      "consumer": "FEAT-SIM-MODEL_TICKS",
+      "consumer_task": "4.06",
+      "provider": "FEAT-DATA-BIND_RUN_DATA",
+      "provider_task": "2.20",
+      "provider_capability": "data.bind-run-data@1"
+    },
+    {
+      "consumer": "FEAT-SIM-MODEL_TICKS",
+      "consumer_task": "4.06",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-SIM-EXECUTE_TICKS",
+      "consumer_task": "4.09",
+      "provider": "FEAT-SIM-CONFIGURE_ENGINE",
+      "provider_task": "4.08",
+      "provider_capability": "simulator.configure-engine@1"
+    },
+    {
+      "consumer": "FEAT-SIM-EXECUTE_TICKS",
+      "consumer_task": "4.09",
+      "provider": "FEAT-SIM-MODEL_TICKS",
+      "provider_task": "4.06",
+      "provider_capability": "simulator.tick-methods@1"
+    },
+    {
+      "consumer": "FEAT-SIM-EXECUTE_TICKS",
+      "consumer_task": "4.09",
+      "provider": "FEAT-ORCH-EXECUTE_LOCAL_WORK",
+      "provider_task": "1.22",
+      "provider_capability": "orchestration.local-workers@1"
+    },
+    {
+      "consumer": "FEAT-SIM-EXECUTE_TICKS",
+      "consumer_task": "4.09",
+      "provider": "FEAT-RSK-SIZE_POSITIONS",
+      "provider_task": "4.02",
+      "provider_capability": "risk.size-positions@1"
+    },
+    {
+      "consumer": "FEAT-SIM-EXECUTE_TICKS",
+      "consumer_task": "4.09",
+      "provider": "FEAT-TRD-MODEL_EXECUTION_POLICIES",
+      "provider_task": "4.05",
+      "provider_capability": "trading.execution-policies@1"
+    },
+    {
+      "consumer": "FEAT-SIM-EXECUTE_TICKS",
+      "consumer_task": "4.09",
+      "provider": "FEAT-CAT-CONVERT_CURRENCIES",
+      "provider_task": "2.12",
+      "provider_capability": "catalogue.convert-currencies@1"
+    },
+    {
+      "consumer": "FEAT-SIM-COMMIT_RESULTS",
+      "consumer_task": "4.10",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-SIM-COMMIT_RESULTS",
+      "consumer_task": "4.10",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-SIM-CACHE_EVALUATIONS",
+      "consumer_task": "4.12",
+      "provider": "FEAT-SIM-COMMIT_RESULTS",
+      "provider_task": "4.10",
+      "provider_capability": "simulator.commit-results@1"
+    },
+    {
+      "consumer": "FEAT-SIM-CACHE_EVALUATIONS",
+      "consumer_task": "4.12",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-SIM-CACHE_EVALUATIONS",
+      "consumer_task": "4.12",
+      "provider": "FEAT-ORCH-RESERVE_RESOURCES",
+      "provider_task": "1.14",
+      "provider_capability": "orchestration.resource-admission@1"
+    },
+    {
+      "consumer": "FEAT-SIM-PERTURB_INPUTS",
+      "consumer_task": "7.01",
+      "provider": "FEAT-SIM-EXECUTE_TICKS",
+      "provider_task": "4.09",
+      "provider_capability": "simulator.execute-ticks@1"
+    },
+    {
+      "consumer": "FEAT-SIM-PERTURB_INPUTS",
+      "consumer_task": "7.01",
+      "provider": "FEAT-SIM-COMMIT_RESULTS",
+      "provider_task": "4.10",
+      "provider_capability": "simulator.commit-results@1"
+    },
+    {
+      "consumer": "FEAT-SIM-PERTURB_INPUTS",
+      "consumer_task": "7.01",
+      "provider": "FEAT-ORCH-RESERVE_RESOURCES",
+      "provider_task": "1.14",
+      "provider_capability": "orchestration.resource-admission@1"
+    },
+    {
+      "consumer": "FEAT-SIM-SIMULATE_STOCKPICKERS",
+      "consumer_task": "13.03",
+      "provider": "FEAT-SIM-EXECUTE_TICKS",
+      "provider_task": "4.09",
+      "provider_capability": "simulator.execute-ticks@1"
+    },
+    {
+      "consumer": "FEAT-SIM-SIMULATE_STOCKPICKERS",
+      "consumer_task": "13.03",
+      "provider": "FEAT-CAT-MANAGE_UNIVERSES",
+      "provider_task": "2.22",
+      "provider_capability": "catalogue.manage-universes@1"
+    },
+    {
+      "consumer": "FEAT-SIM-SIMULATE_STOCKPICKERS",
+      "consumer_task": "13.03",
+      "provider": "FEAT-SIM-COMMIT_RESULTS",
+      "provider_task": "4.10",
+      "provider_capability": "simulator.commit-results@1"
+    },
+    {
+      "consumer": "FEAT-ANA-COMPUTE_METRICS",
+      "consumer_task": "4.07",
+      "provider": "FEAT-CAT-CONVERT_CURRENCIES",
+      "provider_task": "2.12",
+      "provider_capability": "catalogue.convert-currencies@1"
+    },
+    {
+      "consumer": "FEAT-ANA-QUERY_RESULTS",
+      "consumer_task": "4.13",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-ANA-QUERY_RESULTS",
+      "consumer_task": "4.13",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-ANA-QUERY_RESULTS",
+      "consumer_task": "4.13",
+      "provider": "FEAT-ORCH-RESERVE_RESOURCES",
+      "provider_task": "1.14",
+      "provider_capability": "orchestration.resource-admission@1"
+    },
+    {
+      "consumer": "FEAT-ANA-DATABANK_MEMBERSHIP",
+      "consumer_task": "4.14",
+      "provider": "FEAT-ANA-QUERY_RESULTS",
+      "provider_task": "4.13",
+      "provider_capability": "analytics.query-results@1"
+    },
+    {
+      "consumer": "FEAT-ANA-DATABANK_MEMBERSHIP",
+      "consumer_task": "4.14",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-ANA-ANALYZE_TRADES",
+      "consumer_task": "4.15",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-ANA-ANALYZE_TRADES",
+      "consumer_task": "4.15",
+      "provider": "FEAT-ANA-QUERY_RESULTS",
+      "provider_task": "4.13",
+      "provider_capability": "analytics.query-results@1"
+    },
+    {
+      "consumer": "FEAT-ANA-PROJECT_SERIES",
+      "consumer_task": "4.16",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-ANA-PROJECT_SERIES",
+      "consumer_task": "4.16",
+      "provider": "FEAT-ANA-QUERY_RESULTS",
+      "provider_task": "4.13",
+      "provider_capability": "analytics.query-results@1"
+    },
+    {
+      "consumer": "FEAT-ANA-COMPARE_RESULTS",
+      "consumer_task": "4.17",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-ANA-COMPARE_RESULTS",
+      "consumer_task": "4.17",
+      "provider": "FEAT-ANA-QUERY_RESULTS",
+      "provider_task": "4.13",
+      "provider_capability": "analytics.query-results@1"
+    },
+    {
+      "consumer": "FEAT-ANA-FILTER_CORRELATION",
+      "consumer_task": "10.03",
+      "provider": "FEAT-ANA-DATABANK_MEMBERSHIP",
+      "provider_task": "4.14",
+      "provider_capability": "analytics.databank-membership@1"
+    },
+    {
+      "consumer": "FEAT-ANA-FILTER_CORRELATION",
+      "consumer_task": "10.03",
+      "provider": "FEAT-POR-ANALYZE_CORRELATION",
+      "provider_task": "10.02",
+      "provider_capability": "portfolio.analyze-correlation@1"
+    },
+    {
+      "consumer": "FEAT-ANA-EXCHANGE_RESULTS",
+      "consumer_task": "4.18",
+      "provider": "FEAT-ANA-QUERY_RESULTS",
+      "provider_task": "4.13",
+      "provider_capability": "analytics.query-results@1"
+    },
+    {
+      "consumer": "FEAT-ANA-EXCHANGE_RESULTS",
+      "consumer_task": "4.18",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-ANA-EXCHANGE_RESULTS",
+      "consumer_task": "4.18",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-ANA-IMPORT_EXTERNAL_LEDGERS",
+      "consumer_task": "16.09",
+      "provider": "FEAT-ANA-EXCHANGE_RESULTS",
+      "provider_task": "4.18",
+      "provider_capability": "analytics.exchange-results@1"
+    },
+    {
+      "consumer": "FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS",
+      "consumer_task": "12.07",
+      "provider": "FEAT-ANA-QUERY_RESULTS",
+      "provider_task": "4.13",
+      "provider_capability": "analytics.query-results@1"
+    },
+    {
+      "consumer": "FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS",
+      "consumer_task": "12.07",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-ANA-ANALYZE_DISTRIBUTIONS",
+      "consumer_task": "7.02",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-ANA-ANALYZE_DISTRIBUTIONS",
+      "consumer_task": "7.02",
+      "provider": "FEAT-ANA-QUERY_RESULTS",
+      "provider_task": "4.13",
+      "provider_capability": "analytics.query-results@1"
+    },
+    {
+      "consumer": "FEAT-ANA-ANALYZE_DISTRIBUTIONS",
+      "consumer_task": "7.02",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-RES-GOVERN_CAMPAIGNS",
+      "consumer_task": "6.02",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-RES-GOVERN_CAMPAIGNS",
+      "consumer_task": "6.02",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-RES-DEFINE_PROTOCOLS",
+      "consumer_task": "6.03",
+      "provider": "FEAT-RES-GOVERN_CAMPAIGNS",
+      "provider_task": "6.02",
+      "provider_capability": "research.campaigns@1"
+    },
+    {
+      "consumer": "FEAT-RES-DEFINE_PROTOCOLS",
+      "consumer_task": "6.03",
+      "provider": "FEAT-DATA-BIND_RUN_DATA",
+      "provider_task": "2.20",
+      "provider_capability": "data.bind-run-data@1"
+    },
+    {
+      "consumer": "FEAT-RES-GOVERN_HOLDOUTS",
+      "consumer_task": "6.05",
+      "provider": "FEAT-RES-GOVERN_CAMPAIGNS",
+      "provider_task": "6.02",
+      "provider_capability": "research.campaigns@1"
+    },
+    {
+      "consumer": "FEAT-RES-GOVERN_HOLDOUTS",
+      "consumer_task": "6.05",
+      "provider": "FEAT-RES-DEFINE_PROTOCOLS",
+      "provider_task": "6.03",
+      "provider_capability": "research.protocols@1"
+    },
+    {
+      "consumer": "FEAT-RES-GOVERN_HOLDOUTS",
+      "consumer_task": "6.05",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-RES-RUN_RESEARCH",
+      "consumer_task": "6.06",
+      "provider": "FEAT-RES-DEFINE_PROTOCOLS",
+      "provider_task": "6.03",
+      "provider_capability": "research.protocols@1"
+    },
+    {
+      "consumer": "FEAT-RES-RUN_RESEARCH",
+      "consumer_task": "6.06",
+      "provider": "FEAT-RES-GOVERN_HOLDOUTS",
+      "provider_task": "6.05",
+      "provider_capability": "research.holdout@1"
+    },
+    {
+      "consumer": "FEAT-RES-RUN_RESEARCH",
+      "consumer_task": "6.06",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-RES-RUN_RESEARCH",
+      "consumer_task": "6.06",
+      "provider": "FEAT-SIM-EXECUTE_TICKS",
+      "provider_task": "4.09",
+      "provider_capability": "simulator.execute-ticks@1"
+    },
+    {
+      "consumer": "FEAT-RES-RUN_RESEARCH",
+      "consumer_task": "6.06",
+      "provider": "FEAT-SIM-COMMIT_RESULTS",
+      "provider_task": "4.10",
+      "provider_capability": "simulator.commit-results@1"
+    },
+    {
+      "consumer": "FEAT-RES-RUN_RESEARCH",
+      "consumer_task": "6.06",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-RES-GENERATE_STRATEGIES",
+      "consumer_task": "8.03",
+      "provider": "FEAT-STRAT-DEFINE_SEARCH_SPACES",
+      "provider_task": "8.01",
+      "provider_capability": "strategy.define-search-spaces@1"
+    },
+    {
+      "consumer": "FEAT-RES-GENERATE_STRATEGIES",
+      "consumer_task": "8.03",
+      "provider": "FEAT-STRAT-COMPILE_STRATEGIES",
+      "provider_task": "3.13",
+      "provider_capability": "strategy.compile-strategies@1"
+    },
+    {
+      "consumer": "FEAT-RES-GENERATE_STRATEGIES",
+      "consumer_task": "8.03",
+      "provider": "FEAT-RES-GOVERN_CAMPAIGNS",
+      "provider_task": "6.02",
+      "provider_capability": "research.campaigns@1"
+    },
+    {
+      "consumer": "FEAT-RES-EVOLVE_STRATEGIES",
+      "consumer_task": "8.04",
+      "provider": "FEAT-RES-GENERATE_STRATEGIES",
+      "provider_task": "8.03",
+      "provider_capability": "research.generate-strategies@1"
+    },
+    {
+      "consumer": "FEAT-RES-EVOLVE_STRATEGIES",
+      "consumer_task": "8.04",
+      "provider": "FEAT-RES-RUN_RESEARCH",
+      "provider_task": "6.06",
+      "provider_capability": "research.run-research@1"
+    },
+    {
+      "consumer": "FEAT-RES-EVOLVE_STRATEGIES",
+      "consumer_task": "8.04",
+      "provider": "FEAT-RES-RANK_CANDIDATES",
+      "provider_task": "8.02",
+      "provider_capability": "research.rank-candidates@1"
+    },
+    {
+      "consumer": "FEAT-RES-RANK_CANDIDATES",
+      "consumer_task": "8.02",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-RES-RANK_CANDIDATES",
+      "consumer_task": "8.02",
+      "provider": "FEAT-RES-DEFINE_PROTOCOLS",
+      "provider_task": "6.03",
+      "provider_capability": "research.protocols@1"
+    },
+    {
+      "consumer": "FEAT-RES-TEST_ROBUSTNESS",
+      "consumer_task": "7.04",
+      "provider": "FEAT-RES-RUN_RESEARCH",
+      "provider_task": "6.06",
+      "provider_capability": "research.run-research@1"
+    },
+    {
+      "consumer": "FEAT-RES-TEST_ROBUSTNESS",
+      "consumer_task": "7.04",
+      "provider": "FEAT-ANA-ANALYZE_DISTRIBUTIONS",
+      "provider_task": "7.02",
+      "provider_capability": "analytics.analyze-distributions@1"
+    },
+    {
+      "consumer": "FEAT-RES-TEST_ROBUSTNESS",
+      "consumer_task": "7.04",
+      "provider": "FEAT-SIM-PERTURB_INPUTS",
+      "provider_task": "7.01",
+      "provider_capability": "simulator.perturb-inputs@1"
+    },
+    {
+      "consumer": "FEAT-RES-QUALIFY_RESEARCH",
+      "consumer_task": "7.06",
+      "provider": "FEAT-RES-DEFINE_PROTOCOLS",
+      "provider_task": "6.03",
+      "provider_capability": "research.protocols@1"
+    },
+    {
+      "consumer": "FEAT-RES-QUALIFY_RESEARCH",
+      "consumer_task": "7.06",
+      "provider": "FEAT-RES-GOVERN_HOLDOUTS",
+      "provider_task": "6.05",
+      "provider_capability": "research.holdout@1"
+    },
+    {
+      "consumer": "FEAT-RES-QUALIFY_RESEARCH",
+      "consumer_task": "7.06",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-RES-PREPARE_NEURAL_DATASETS",
+      "consumer_task": "14.01",
+      "provider": "FEAT-DATA-BIND_RUN_DATA",
+      "provider_task": "2.20",
+      "provider_capability": "data.bind-run-data@1"
+    },
+    {
+      "consumer": "FEAT-RES-PREPARE_NEURAL_DATASETS",
+      "consumer_task": "14.01",
+      "provider": "FEAT-DATA-ALIGN_SERIES",
+      "provider_task": "2.23",
+      "provider_capability": "data.align-series@1"
+    },
+    {
+      "consumer": "FEAT-RES-PREPARE_NEURAL_DATASETS",
+      "consumer_task": "14.01",
+      "provider": "FEAT-IND-TRANSFORM_SERIES",
+      "provider_task": "3.06",
+      "provider_capability": "indicators.transform-series@1"
+    },
+    {
+      "consumer": "FEAT-RES-LABEL_NEURAL_DATA",
+      "consumer_task": "14.02",
+      "provider": "FEAT-DATA-BIND_RUN_DATA",
+      "provider_task": "2.20",
+      "provider_capability": "data.bind-run-data@1"
+    },
+    {
+      "consumer": "FEAT-RES-LABEL_NEURAL_DATA",
+      "consumer_task": "14.02",
+      "provider": "FEAT-IND-CALCULATE_VOLATILITY",
+      "provider_task": "3.03",
+      "provider_capability": "indicators.calculate-volatility@1"
+    },
+    {
+      "consumer": "FEAT-RES-TRAIN_MODELS",
+      "consumer_task": "14.04",
+      "provider": "FEAT-RES-PREPARE_NEURAL_DATASETS",
+      "provider_task": "14.01",
+      "provider_capability": "research.neural-datasets@1"
+    },
+    {
+      "consumer": "FEAT-RES-TRAIN_MODELS",
+      "consumer_task": "14.04",
+      "provider": "FEAT-RES-LABEL_NEURAL_DATA",
+      "provider_task": "14.02",
+      "provider_capability": "research.neural-labels@1"
+    },
+    {
+      "consumer": "FEAT-RES-TRAIN_MODELS",
+      "consumer_task": "14.04",
+      "provider": "FEAT-ORCH-EXECUTE_LOCAL_WORK",
+      "provider_task": "1.22",
+      "provider_capability": "orchestration.local-workers@1"
+    },
+    {
+      "consumer": "FEAT-RES-VALIDATE_MODELS",
+      "consumer_task": "14.05",
+      "provider": "FEAT-RES-TRAIN_MODELS",
+      "provider_task": "14.04",
+      "provider_capability": "research.train-models@1"
+    },
+    {
+      "consumer": "FEAT-RES-VALIDATE_MODELS",
+      "consumer_task": "14.05",
+      "provider": "FEAT-RES-DEFINE_PROTOCOLS",
+      "provider_task": "6.03",
+      "provider_capability": "research.protocols@1"
+    },
+    {
+      "consumer": "FEAT-RES-VALIDATE_MODELS",
+      "consumer_task": "14.05",
+      "provider": "FEAT-RES-GOVERN_HOLDOUTS",
+      "provider_task": "6.05",
+      "provider_capability": "research.holdout@1"
+    },
+    {
+      "consumer": "FEAT-RES-VALIDATE_MODELS",
+      "consumer_task": "14.05",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-RES-EXPLAIN_MODELS",
+      "consumer_task": "14.06",
+      "provider": "FEAT-RES-VALIDATE_MODELS",
+      "provider_task": "14.05",
+      "provider_capability": "research.model-validation@1"
+    },
+    {
+      "consumer": "FEAT-RES-EXPLAIN_MODELS",
+      "consumer_task": "14.06",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-RES-INFER_MODELS",
+      "consumer_task": "14.03",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-OPT-SEARCH_PARAMETERS",
+      "consumer_task": "9.01",
+      "provider": "FEAT-RES-DEFINE_PROTOCOLS",
+      "provider_task": "6.03",
+      "provider_capability": "research.protocols@1"
+    },
+    {
+      "consumer": "FEAT-OPT-SEARCH_PARAMETERS",
+      "consumer_task": "9.01",
+      "provider": "FEAT-RES-GOVERN_HOLDOUTS",
+      "provider_task": "6.05",
+      "provider_capability": "research.holdout@1"
+    },
+    {
+      "consumer": "FEAT-OPT-SEARCH_PARAMETERS",
+      "consumer_task": "9.01",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-OPT-SEARCH_PARAMETERS",
+      "consumer_task": "9.01",
+      "provider": "FEAT-SIM-EXECUTE_TICKS",
+      "provider_task": "4.09",
+      "provider_capability": "simulator.execute-ticks@1"
+    },
+    {
+      "consumer": "FEAT-OPT-SEARCH_PARAMETERS",
+      "consumer_task": "9.01",
+      "provider": "FEAT-SIM-COMMIT_RESULTS",
+      "provider_task": "4.10",
+      "provider_capability": "simulator.commit-results@1"
+    },
+    {
+      "consumer": "FEAT-OPT-SEARCH_PARAMETERS",
+      "consumer_task": "9.01",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-OPT-VALIDATE_WALK_FORWARD",
+      "consumer_task": "9.02",
+      "provider": "FEAT-OPT-SEARCH_PARAMETERS",
+      "provider_task": "9.01",
+      "provider_capability": "optimization.search@1"
+    },
+    {
+      "consumer": "FEAT-OPT-VALIDATE_WALK_FORWARD",
+      "consumer_task": "9.02",
+      "provider": "FEAT-DATA-BIND_RUN_DATA",
+      "provider_task": "2.20",
+      "provider_capability": "data.bind-run-data@1"
+    },
+    {
+      "consumer": "FEAT-OPT-PERMUTE_PARAMETERS",
+      "consumer_task": "9.03",
+      "provider": "FEAT-OPT-SEARCH_PARAMETERS",
+      "provider_task": "9.01",
+      "provider_capability": "optimization.search@1"
+    },
+    {
+      "consumer": "FEAT-OPT-PERMUTE_PARAMETERS",
+      "consumer_task": "9.03",
+      "provider": "FEAT-ANA-ANALYZE_DISTRIBUTIONS",
+      "provider_task": "7.02",
+      "provider_capability": "analytics.analyze-distributions@1"
+    },
+    {
+      "consumer": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "consumer_task": "10.01",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "consumer_task": "10.01",
+      "provider": "FEAT-CAT-CONVERT_CURRENCIES",
+      "provider_task": "2.12",
+      "provider_capability": "catalogue.convert-currencies@1"
+    },
+    {
+      "consumer": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "consumer_task": "10.01",
+      "provider": "FEAT-CAT-DEFINE_SESSIONS",
+      "provider_task": "2.02",
+      "provider_capability": "catalogue.define-sessions@1"
+    },
+    {
+      "consumer": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "consumer_task": "10.01",
+      "provider": "FEAT-ANA-QUERY_RESULTS",
+      "provider_task": "4.13",
+      "provider_capability": "analytics.query-results@1"
+    },
+    {
+      "consumer": "FEAT-POR-ANALYZE_CORRELATION",
+      "consumer_task": "10.02",
+      "provider": "FEAT-ANA-PROJECT_SERIES",
+      "provider_task": "4.16",
+      "provider_capability": "analytics.project-series@1"
+    },
+    {
+      "consumer": "FEAT-POR-ANALYZE_CORRELATION",
+      "consumer_task": "10.02",
+      "provider": "FEAT-DATA-ALIGN_SERIES",
+      "provider_task": "2.23",
+      "provider_capability": "data.align-series@1"
+    },
+    {
+      "consumer": "FEAT-POR-ANALYZE_CORRELATION",
+      "consumer_task": "10.02",
+      "provider": "FEAT-ORCH-RESERVE_RESOURCES",
+      "provider_task": "1.14",
+      "provider_capability": "orchestration.resource-admission@1"
+    },
+    {
+      "consumer": "FEAT-POR-OPTIMIZE_WEIGHTS",
+      "consumer_task": "10.04",
+      "provider": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "provider_task": "10.01",
+      "provider_capability": "portfolio.compose-portfolios@1"
+    },
+    {
+      "consumer": "FEAT-POR-OPTIMIZE_WEIGHTS",
+      "consumer_task": "10.04",
+      "provider": "FEAT-POR-ANALYZE_CORRELATION",
+      "provider_task": "10.02",
+      "provider_capability": "portfolio.analyze-correlation@1"
+    },
+    {
+      "consumer": "FEAT-POR-OPTIMIZE_WEIGHTS",
+      "consumer_task": "10.04",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-POR-SEARCH_PORTFOLIOS",
+      "consumer_task": "10.08",
+      "provider": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "provider_task": "10.01",
+      "provider_capability": "portfolio.compose-portfolios@1"
+    },
+    {
+      "consumer": "FEAT-POR-SEARCH_PORTFOLIOS",
+      "consumer_task": "10.08",
+      "provider": "FEAT-POR-ANALYZE_CORRELATION",
+      "provider_task": "10.02",
+      "provider_capability": "portfolio.analyze-correlation@1"
+    },
+    {
+      "consumer": "FEAT-POR-SEARCH_PORTFOLIOS",
+      "consumer_task": "10.08",
+      "provider": "FEAT-POR-OPTIMIZE_WEIGHTS",
+      "provider_task": "10.04",
+      "provider_capability": "portfolio.optimize-weights@1"
+    },
+    {
+      "consumer": "FEAT-POR-SEARCH_PORTFOLIOS",
+      "consumer_task": "10.08",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-POR-SEARCH_PORTFOLIOS",
+      "consumer_task": "10.08",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-POR-SIMULATE_PORTFOLIOS",
+      "consumer_task": "10.05",
+      "provider": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "provider_task": "10.01",
+      "provider_capability": "portfolio.compose-portfolios@1"
+    },
+    {
+      "consumer": "FEAT-POR-SIMULATE_PORTFOLIOS",
+      "consumer_task": "10.05",
+      "provider": "FEAT-SIM-EXECUTE_TICKS",
+      "provider_task": "4.09",
+      "provider_capability": "simulator.execute-ticks@1"
+    },
+    {
+      "consumer": "FEAT-POR-SIMULATE_PORTFOLIOS",
+      "consumer_task": "10.05",
+      "provider": "FEAT-SIM-COMMIT_RESULTS",
+      "provider_task": "4.10",
+      "provider_capability": "simulator.commit-results@1"
+    },
+    {
+      "consumer": "FEAT-POR-SIMULATE_PORTFOLIOS",
+      "consumer_task": "10.05",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-POR-ANALYZE_PORTFOLIO_RISK",
+      "consumer_task": "10.06",
+      "provider": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "provider_task": "10.01",
+      "provider_capability": "portfolio.compose-portfolios@1"
+    },
+    {
+      "consumer": "FEAT-POR-ANALYZE_PORTFOLIO_RISK",
+      "consumer_task": "10.06",
+      "provider": "FEAT-POR-ANALYZE_CORRELATION",
+      "provider_task": "10.02",
+      "provider_capability": "portfolio.analyze-correlation@1"
+    },
+    {
+      "consumer": "FEAT-POR-ANALYZE_PORTFOLIO_RISK",
+      "consumer_task": "10.06",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-POR-MERGE_PORTFOLIOS",
+      "consumer_task": "10.07",
+      "provider": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "provider_task": "10.01",
+      "provider_capability": "portfolio.compose-portfolios@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-REGISTER_CONTRIBUTIONS",
+      "consumer_task": "1.12",
+      "provider": "FEAT-PLUG-DECLARE_MANIFESTS",
+      "provider_task": "1.05",
+      "provider_capability": "plugins.declare-manifests@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-SANDBOX_PERMISSIONS",
+      "consumer_task": "12.01",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-SANDBOX_PERMISSIONS",
+      "consumer_task": "12.01",
+      "provider": "FEAT-ORCH-RESERVE_RESOURCES",
+      "provider_task": "1.14",
+      "provider_capability": "orchestration.resource-admission@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-ISOLATE_ANALYSIS",
+      "consumer_task": "12.03",
+      "provider": "FEAT-PLUG-SANDBOX_PERMISSIONS",
+      "provider_task": "12.01",
+      "provider_capability": "plugins.sandbox-permissions@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-ISOLATE_ANALYSIS",
+      "consumer_task": "12.03",
+      "provider": "FEAT-ORCH-EXECUTE_LOCAL_WORK",
+      "provider_task": "1.22",
+      "provider_capability": "orchestration.local-workers@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-ISOLATE_ANALYSIS",
+      "consumer_task": "12.03",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-MANAGE_LIFECYCLE",
+      "consumer_task": "12.08",
+      "provider": "FEAT-PLUG-DECLARE_MANIFESTS",
+      "provider_task": "1.05",
+      "provider_capability": "plugins.declare-manifests@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-MANAGE_LIFECYCLE",
+      "consumer_task": "12.08",
+      "provider": "FEAT-PLUG-REGISTER_CONTRIBUTIONS",
+      "provider_task": "1.12",
+      "provider_capability": "plugins.register-contributions@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-MANAGE_LIFECYCLE",
+      "consumer_task": "12.08",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-RENDER_RESULT_PANELS",
+      "consumer_task": "12.04",
+      "provider": "FEAT-PLUG-SANDBOX_PERMISSIONS",
+      "provider_task": "12.01",
+      "provider_capability": "plugins.sandbox-permissions@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-RENDER_RESULT_PANELS",
+      "consumer_task": "12.04",
+      "provider": "FEAT-PLUG-REGISTER_CONTRIBUTIONS",
+      "provider_task": "1.12",
+      "provider_capability": "plugins.register-contributions@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-MAINTAIN_COMPATIBILITY",
+      "consumer_task": "12.09",
+      "provider": "FEAT-PLUG-DECLARE_MANIFESTS",
+      "provider_task": "1.05",
+      "provider_capability": "plugins.declare-manifests@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-MAINTAIN_COMPATIBILITY",
+      "consumer_task": "12.09",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-AUTHOR_PACKAGES",
+      "consumer_task": "12.02",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-AUTHOR_PACKAGES",
+      "consumer_task": "12.02",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-PLUG-AUTHOR_PACKAGES",
+      "consumer_task": "12.02",
+      "provider": "FEAT-PLUG-DECLARE_MANIFESTS",
+      "provider_task": "1.05",
+      "provider_capability": "plugins.declare-manifests@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ENFORCE_MANDATE",
+      "consumer_task": "1.15",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ENFORCE_MANDATE",
+      "consumer_task": "1.15",
+      "provider": "FEAT-WS-ADMINISTER_SETTINGS",
+      "provider_task": "1.11",
+      "provider_capability": "workspace.administer-settings@1"
+    },
+    {
+      "consumer": "FEAT-AGT-OPERATE_RUNS",
+      "consumer_task": "1.19",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-OPERATE_RUNS",
+      "consumer_task": "1.19",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-AGT-REGISTER_ROLES",
+      "consumer_task": "1.20",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "consumer_task": "1.23",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "consumer_task": "1.23",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "consumer_task": "1.23",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "consumer_task": "1.23",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "consumer_task": "1.23",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "consumer_task": "1.23",
+      "provider": "FEAT-ORCH-RESERVE_RESOURCES",
+      "provider_task": "1.14",
+      "provider_capability": "orchestration.resource-admission@1"
+    },
+    {
+      "consumer": "FEAT-AGT-INVOKE_MODELS",
+      "consumer_task": "1.24",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-INVOKE_MODELS",
+      "consumer_task": "1.24",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-INVOKE_MODELS",
+      "consumer_task": "1.24",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-INVOKE_MODELS",
+      "consumer_task": "1.24",
+      "provider": "FEAT-ORCH-RESERVE_RESOURCES",
+      "provider_task": "1.14",
+      "provider_capability": "orchestration.resource-admission@1"
+    },
+    {
+      "consumer": "FEAT-AGT-RUN_WORKFLOWS",
+      "consumer_task": "5.04",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-RUN_WORKFLOWS",
+      "consumer_task": "5.04",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-RUN_WORKFLOWS",
+      "consumer_task": "5.04",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-RUN_WORKFLOWS",
+      "consumer_task": "5.04",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-AGT-RUN_WORKFLOWS",
+      "consumer_task": "5.04",
+      "provider": "FEAT-ORCH-MANAGE_JOBS",
+      "provider_task": "1.18",
+      "provider_capability": "orchestration.manage-jobs@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ASSEMBLE_CONTEXT",
+      "consumer_task": "5.03",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ASSEMBLE_CONTEXT",
+      "consumer_task": "5.03",
+      "provider": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "provider_task": "1.23",
+      "provider_capability": "agentic.tool-governance@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ASSEMBLE_CONTEXT",
+      "consumer_task": "5.03",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-MANAGE_MEMORY",
+      "consumer_task": "11.05",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-MANAGE_MEMORY",
+      "consumer_task": "11.05",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-MANAGE_MEMORY",
+      "consumer_task": "11.05",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-AGT-EVALUATE_PROFILES",
+      "consumer_task": "5.05",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-EVALUATE_PROFILES",
+      "consumer_task": "5.05",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-EVALUATE_PROFILES",
+      "consumer_task": "5.05",
+      "provider": "FEAT-AGT-INVOKE_MODELS",
+      "provider_task": "1.24",
+      "provider_capability": "agentic.model-inference@1"
+    },
+    {
+      "consumer": "FEAT-AGT-EVALUATE_PROFILES",
+      "consumer_task": "5.05",
+      "provider": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "provider_task": "1.23",
+      "provider_capability": "agentic.tool-governance@1"
+    },
+    {
+      "consumer": "FEAT-AGT-EVALUATE_PROFILES",
+      "consumer_task": "5.05",
+      "provider": "FEAT-AGT-RUN_WORKFLOWS",
+      "provider_task": "5.04",
+      "provider_capability": "agentic.workflows@1"
+    },
+    {
+      "consumer": "FEAT-AGT-EVALUATE_PROFILES",
+      "consumer_task": "5.05",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-EVALUATE_PROFILES",
+      "consumer_task": "5.05",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ASSIST_OPERATOR",
+      "consumer_task": "5.08",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ASSIST_OPERATOR",
+      "consumer_task": "5.08",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ASSIST_OPERATOR",
+      "consumer_task": "5.08",
+      "provider": "FEAT-AGT-INVOKE_MODELS",
+      "provider_task": "1.24",
+      "provider_capability": "agentic.model-inference@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ASSIST_OPERATOR",
+      "consumer_task": "5.08",
+      "provider": "FEAT-AGT-RUN_WORKFLOWS",
+      "provider_task": "5.04",
+      "provider_capability": "agentic.workflows@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ASSIST_OPERATOR",
+      "consumer_task": "5.08",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ASSIST_OPERATOR",
+      "consumer_task": "5.08",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ASSIST_OPERATOR",
+      "consumer_task": "5.08",
+      "provider": "FEAT-WS-MANAGE_CONVERSATIONS",
+      "provider_task": "5.02",
+      "provider_capability": "workspace.conversations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-MANAGE_CLAIMS",
+      "consumer_task": "5.06",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-MANAGE_CLAIMS",
+      "consumer_task": "5.06",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-MANAGE_CLAIMS",
+      "consumer_task": "5.06",
+      "provider": "FEAT-AGT-INVOKE_MODELS",
+      "provider_task": "1.24",
+      "provider_capability": "agentic.model-inference@1"
+    },
+    {
+      "consumer": "FEAT-AGT-MANAGE_CLAIMS",
+      "consumer_task": "5.06",
+      "provider": "FEAT-AGT-ASSEMBLE_CONTEXT",
+      "provider_task": "5.03",
+      "provider_capability": "agentic.context@1"
+    },
+    {
+      "consumer": "FEAT-AGT-MANAGE_CLAIMS",
+      "consumer_task": "5.06",
+      "provider": "FEAT-AGT-RUN_WORKFLOWS",
+      "provider_task": "5.04",
+      "provider_capability": "agentic.workflows@1"
+    },
+    {
+      "consumer": "FEAT-AGT-MANAGE_CLAIMS",
+      "consumer_task": "5.06",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-MANAGE_CLAIMS",
+      "consumer_task": "5.06",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DELIBERATE_RESEARCH",
+      "consumer_task": "7.03",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DELIBERATE_RESEARCH",
+      "consumer_task": "7.03",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DELIBERATE_RESEARCH",
+      "consumer_task": "7.03",
+      "provider": "FEAT-AGT-INVOKE_MODELS",
+      "provider_task": "1.24",
+      "provider_capability": "agentic.model-inference@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DELIBERATE_RESEARCH",
+      "consumer_task": "7.03",
+      "provider": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "provider_task": "1.23",
+      "provider_capability": "agentic.tool-governance@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DELIBERATE_RESEARCH",
+      "consumer_task": "7.03",
+      "provider": "FEAT-AGT-RUN_WORKFLOWS",
+      "provider_task": "5.04",
+      "provider_capability": "agentic.workflows@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DELIBERATE_RESEARCH",
+      "consumer_task": "7.03",
+      "provider": "FEAT-AGT-MANAGE_CLAIMS",
+      "provider_task": "5.06",
+      "provider_capability": "agentic.claims@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DELIBERATE_RESEARCH",
+      "consumer_task": "7.03",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-SYNTHESIZE_RESEARCH",
+      "consumer_task": "5.07",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-SYNTHESIZE_RESEARCH",
+      "consumer_task": "5.07",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-SYNTHESIZE_RESEARCH",
+      "consumer_task": "5.07",
+      "provider": "FEAT-AGT-INVOKE_MODELS",
+      "provider_task": "1.24",
+      "provider_capability": "agentic.model-inference@1"
+    },
+    {
+      "consumer": "FEAT-AGT-SYNTHESIZE_RESEARCH",
+      "consumer_task": "5.07",
+      "provider": "FEAT-AGT-MANAGE_CLAIMS",
+      "provider_task": "5.06",
+      "provider_capability": "agentic.claims@1"
+    },
+    {
+      "consumer": "FEAT-AGT-SYNTHESIZE_RESEARCH",
+      "consumer_task": "5.07",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+      "consumer_task": "6.08",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+      "consumer_task": "6.08",
+      "provider": "FEAT-AGT-RUN_WORKFLOWS",
+      "provider_task": "5.04",
+      "provider_capability": "agentic.workflows@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+      "consumer_task": "6.08",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+      "consumer_task": "6.08",
+      "provider": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "provider_task": "1.23",
+      "provider_capability": "agentic.tool-governance@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+      "consumer_task": "6.08",
+      "provider": "FEAT-RES-GOVERN_CAMPAIGNS",
+      "provider_task": "6.02",
+      "provider_capability": "research.campaigns@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+      "consumer_task": "6.08",
+      "provider": "FEAT-RES-GOVERN_HOLDOUTS",
+      "provider_task": "6.05",
+      "provider_capability": "research.holdout@1"
+    },
+    {
+      "consumer": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+      "consumer_task": "6.08",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DESIGN_RESEARCH",
+      "consumer_task": "6.09",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DESIGN_RESEARCH",
+      "consumer_task": "6.09",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DESIGN_RESEARCH",
+      "consumer_task": "6.09",
+      "provider": "FEAT-AGT-INVOKE_MODELS",
+      "provider_task": "1.24",
+      "provider_capability": "agentic.model-inference@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DESIGN_RESEARCH",
+      "consumer_task": "6.09",
+      "provider": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "provider_task": "1.23",
+      "provider_capability": "agentic.tool-governance@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DESIGN_RESEARCH",
+      "consumer_task": "6.09",
+      "provider": "FEAT-AGT-MANAGE_CLAIMS",
+      "provider_task": "5.06",
+      "provider_capability": "agentic.claims@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DESIGN_RESEARCH",
+      "consumer_task": "6.09",
+      "provider": "FEAT-AGT-SYNTHESIZE_RESEARCH",
+      "provider_task": "5.07",
+      "provider_capability": "agentic.synthesis@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DESIGN_RESEARCH",
+      "consumer_task": "6.09",
+      "provider": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+      "provider_task": "6.08",
+      "provider_capability": "agentic.research-search@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DESIGN_RESEARCH",
+      "consumer_task": "6.09",
+      "provider": "FEAT-AGT-RUN_WORKFLOWS",
+      "provider_task": "5.04",
+      "provider_capability": "agentic.workflows@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DESIGN_RESEARCH",
+      "consumer_task": "6.09",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-DESIGN_RESEARCH",
+      "consumer_task": "6.09",
+      "provider": "FEAT-RES-DEFINE_PROTOCOLS",
+      "provider_task": "6.03",
+      "provider_capability": "research.protocols@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "consumer_task": "6.10",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "consumer_task": "6.10",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "consumer_task": "6.10",
+      "provider": "FEAT-AGT-INVOKE_MODELS",
+      "provider_task": "1.24",
+      "provider_capability": "agentic.model-inference@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "consumer_task": "6.10",
+      "provider": "FEAT-AGT-MANAGE_CLAIMS",
+      "provider_task": "5.06",
+      "provider_capability": "agentic.claims@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "consumer_task": "6.10",
+      "provider": "FEAT-AGT-SYNTHESIZE_RESEARCH",
+      "provider_task": "5.07",
+      "provider_capability": "agentic.synthesis@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "consumer_task": "6.10",
+      "provider": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+      "provider_task": "6.08",
+      "provider_capability": "agentic.research-search@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "consumer_task": "6.10",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "consumer_task": "6.10",
+      "provider": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "provider_task": "1.23",
+      "provider_capability": "agentic.tool-governance@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "consumer_task": "6.10",
+      "provider": "FEAT-STRAT-VERSION_STRATEGIES",
+      "provider_task": "3.14",
+      "provider_capability": "strategy.version-strategies@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "consumer_task": "6.10",
+      "provider": "FEAT-STRAT-DEFINE_INDICATORS",
+      "provider_task": "3.12",
+      "provider_capability": "strategy.define-indicators@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-AGT-INVOKE_MODELS",
+      "provider_task": "1.24",
+      "provider_capability": "agentic.model-inference@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "provider_task": "1.23",
+      "provider_capability": "agentic.tool-governance@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-AGT-ASSEMBLE_CONTEXT",
+      "provider_task": "5.03",
+      "provider_capability": "agentic.context@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-AGT-MANAGE_CLAIMS",
+      "provider_task": "5.06",
+      "provider_capability": "agentic.claims@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-AGT-DELIBERATE_RESEARCH",
+      "provider_task": "7.03",
+      "provider_capability": "agentic.deliberation@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-AGT-SYNTHESIZE_RESEARCH",
+      "provider_task": "5.07",
+      "provider_capability": "agentic.synthesis@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "provider_task": "10.01",
+      "provider_capability": "portfolio.compose-portfolios@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-POR-ANALYZE_PORTFOLIO_RISK",
+      "provider_task": "10.06",
+      "provider_capability": "portfolio.analyze-portfolio-risk@1"
+    },
+    {
+      "consumer": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "consumer_task": "10.09",
+      "provider": "FEAT-RSK-ASSESS_RESEARCH_RISK",
+      "provider_task": "4.03",
+      "provider_capability": "risk.research-evidence@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+      "consumer_task": "6.04",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+      "consumer_task": "6.04",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+      "consumer_task": "6.04",
+      "provider": "FEAT-AGT-INVOKE_MODELS",
+      "provider_task": "1.24",
+      "provider_capability": "agentic.model-inference@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+      "consumer_task": "6.04",
+      "provider": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "provider_task": "1.23",
+      "provider_capability": "agentic.tool-governance@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+      "consumer_task": "6.04",
+      "provider": "FEAT-AGT-ASSEMBLE_CONTEXT",
+      "provider_task": "5.03",
+      "provider_capability": "agentic.context@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+      "consumer_task": "6.04",
+      "provider": "FEAT-AGT-MANAGE_CLAIMS",
+      "provider_task": "5.06",
+      "provider_capability": "agentic.claims@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+      "consumer_task": "6.04",
+      "provider": "FEAT-AGT-SYNTHESIZE_RESEARCH",
+      "provider_task": "5.07",
+      "provider_capability": "agentic.synthesis@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+      "consumer_task": "6.04",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+      "consumer_task": "6.04",
+      "provider": "FEAT-STRAT-ACCEPT_PROPOSALS",
+      "provider_task": "6.01",
+      "provider_capability": "strategy.proposal-intake@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-AGT-REGISTER_ROLES",
+      "provider_task": "1.20",
+      "provider_capability": "agentic.roles@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-AGT-INVOKE_MODELS",
+      "provider_task": "1.24",
+      "provider_capability": "agentic.model-inference@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "provider_task": "1.23",
+      "provider_capability": "agentic.tool-governance@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-AGT-RUN_WORKFLOWS",
+      "provider_task": "5.04",
+      "provider_capability": "agentic.workflows@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "provider_task": "6.10",
+      "provider_capability": "agentic.strategy-specs@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-PLUG-SANDBOX_PERMISSIONS",
+      "provider_task": "12.01",
+      "provider_capability": "plugins.sandbox-permissions@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-PLUG-ISOLATE_ANALYSIS",
+      "provider_task": "12.03",
+      "provider_capability": "plugins.isolate-analysis@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-WS-MANAGE_ARTIFACTS",
+      "provider_task": "1.17",
+      "provider_capability": "workspace.artifacts@1"
+    },
+    {
+      "consumer": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "consumer_task": "12.10",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-AGT-CALIBRATE_OUTCOMES",
+      "consumer_task": "11.07",
+      "provider": "FEAT-AGT-ENFORCE_MANDATE",
+      "provider_task": "1.15",
+      "provider_capability": "agentic.mandate@1"
+    },
+    {
+      "consumer": "FEAT-AGT-CALIBRATE_OUTCOMES",
+      "consumer_task": "11.07",
+      "provider": "FEAT-AGT-MANAGE_CLAIMS",
+      "provider_task": "5.06",
+      "provider_capability": "agentic.claims@1"
+    },
+    {
+      "consumer": "FEAT-AGT-CALIBRATE_OUTCOMES",
+      "consumer_task": "11.07",
+      "provider": "FEAT-AGT-OPERATE_RUNS",
+      "provider_task": "1.19",
+      "provider_capability": "agentic.operations@1"
+    },
+    {
+      "consumer": "FEAT-AGT-CALIBRATE_OUTCOMES",
+      "consumer_task": "11.07",
+      "provider": "FEAT-AGT-EVALUATE_PROFILES",
+      "provider_task": "5.05",
+      "provider_capability": "agentic.profile-evaluation@1"
+    },
+    {
+      "consumer": "FEAT-AGT-CALIBRATE_OUTCOMES",
+      "consumer_task": "11.07",
+      "provider": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "provider_task": "1.23",
+      "provider_capability": "agentic.tool-governance@1"
+    },
+    {
+      "consumer": "FEAT-AGT-CALIBRATE_OUTCOMES",
+      "consumer_task": "11.07",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-AGT-CALIBRATE_OUTCOMES",
+      "consumer_task": "11.07",
+      "provider": "FEAT-ANA-COMPUTE_METRICS",
+      "provider_task": "4.07",
+      "provider_capability": "analytics.compute-metrics@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-SERVE_API_EVENTS",
+      "consumer_task": "1.08",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_IDENTITY",
+      "consumer_task": "1.13",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_IDENTITY",
+      "consumer_task": "1.13",
+      "provider": "FEAT-WS-MANAGE_ACCOUNTS",
+      "provider_task": "1.04",
+      "provider_capability": "workspace.manage-accounts@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_SETTINGS",
+      "consumer_task": "1.25",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_SETTINGS",
+      "consumer_task": "1.25",
+      "provider": "FEAT-WS-ADMINISTER_SETTINGS",
+      "provider_task": "1.11",
+      "provider_capability": "workspace.administer-settings@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
+      "consumer_task": "2.30",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
+      "consumer_task": "2.30",
+      "provider": "FEAT-DATA-BROWSE_REFERENCE",
+      "provider_task": "2.29",
+      "provider_capability": "data.browse-reference@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_STRATEGIES",
+      "consumer_task": "3.17",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_RESEARCH",
+      "consumer_task": "6.07",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_SIMULATIONS",
+      "consumer_task": "4.11",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_OPTIMIZATION",
+      "consumer_task": "9.04",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_RESULTS",
+      "consumer_task": "4.19",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_PORTFOLIOS",
+      "consumer_task": "10.10",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-EDIT_PROJECTS",
+      "consumer_task": "11.08",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-OPERATE_JOBS",
+      "consumer_task": "1.26",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-ADMINISTER_CAPABILITIES",
+      "consumer_task": "12.11",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-AGENTIC_GATEWAY",
+      "consumer_task": "5.09",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-IFACE-AUTOMATE_COMMANDS",
+      "consumer_task": "16.01",
+      "provider": "FEAT-IFACE-SERVE_API_EVENTS",
+      "provider_task": "1.08",
+      "provider_capability": "interfaces.serve-api-events@1"
+    },
+    {
+      "consumer": "FEAT-UI-15",
+      "consumer_task": "5.01",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-15",
+      "consumer_task": "5.01",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-16",
+      "consumer_task": "1.27",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-16",
+      "consumer_task": "1.27",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-17",
+      "consumer_task": "1.16",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-13",
+      "consumer_task": "1.28",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-13",
+      "consumer_task": "1.28",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-18",
+      "consumer_task": "2.31",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-18",
+      "consumer_task": "2.31",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-18",
+      "consumer_task": "2.31",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-VIEW_COLLECTIONS",
+      "consumer_task": "1.06",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-VIEW_COLLECTIONS",
+      "consumer_task": "1.06",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-REVIEW_DRAFTS",
+      "consumer_task": "1.07",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-04",
+      "consumer_task": "2.32",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-04",
+      "consumer_task": "2.32",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-27",
+      "consumer_task": "4.20",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-27",
+      "consumer_task": "4.20",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-27",
+      "consumer_task": "4.20",
+      "provider": "FEAT-UI-REVIEW_DRAFTS",
+      "provider_task": "1.07",
+      "provider_capability": "ui.draft-review@1"
+    },
+    {
+      "consumer": "FEAT-UI-28",
+      "consumer_task": "6.11",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-28",
+      "consumer_task": "6.11",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-28",
+      "consumer_task": "6.11",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-32",
+      "consumer_task": "4.21",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-32",
+      "consumer_task": "4.21",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-STRATEGY_STUDIO",
+      "consumer_task": "3.18",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-STRATEGY_STUDIO",
+      "consumer_task": "3.18",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-STRATEGY_BUILDER",
+      "consumer_task": "8.05",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-STRATEGY_BUILDER",
+      "consumer_task": "8.05",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-STRATEGY_RETESTER",
+      "consumer_task": "7.07",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-STRATEGY_RETESTER",
+      "consumer_task": "7.07",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-PARAMETER_OPTIMIZER",
+      "consumer_task": "9.05",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-PARAMETER_OPTIMIZER",
+      "consumer_task": "9.05",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-PARAMETER_OPTIMIZER",
+      "consumer_task": "9.05",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-DATABANK_GRID",
+      "consumer_task": "4.22",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-DATABANK_GRID",
+      "consumer_task": "4.22",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-DATABANK_GRID",
+      "consumer_task": "4.22",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-RESULT_OVERVIEW",
+      "consumer_task": "4.23",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-RESULT_OVERVIEW",
+      "consumer_task": "4.23",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-TRADE_LIST",
+      "consumer_task": "4.24",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-TRADE_LIST",
+      "consumer_task": "4.24",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-TRADE_LIST",
+      "consumer_task": "4.24",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-EQUITY_CHART",
+      "consumer_task": "4.25",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-EQUITY_CHART",
+      "consumer_task": "4.25",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-TRADE_ANALYSIS",
+      "consumer_task": "4.26",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-TRADE_ANALYSIS",
+      "consumer_task": "4.26",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-TRADES_ON_CHART",
+      "consumer_task": "4.27",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-TRADES_ON_CHART",
+      "consumer_task": "4.27",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-ROBUSTNESS_RESULTS",
+      "consumer_task": "7.05",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-ROBUSTNESS_RESULTS",
+      "consumer_task": "7.05",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-OPTIMIZATION_RESULTS",
+      "consumer_task": "9.06",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-OPTIMIZATION_RESULTS",
+      "consumer_task": "9.06",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-OPTIMIZATION_RESULTS",
+      "consumer_task": "9.06",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-PORTFOLIO_COMPOSER",
+      "consumer_task": "10.11",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-PORTFOLIO_COMPOSER",
+      "consumer_task": "10.11",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-PORTFOLIO_COMPOSER",
+      "consumer_task": "10.11",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-PORTFOLIO_BUILDER",
+      "consumer_task": "10.12",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-PORTFOLIO_BUILDER",
+      "consumer_task": "10.12",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-PORTFOLIO_BUILDER",
+      "consumer_task": "10.12",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-PROJECT_EDITOR",
+      "consumer_task": "11.09",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-PROJECT_EDITOR",
+      "consumer_task": "11.09",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-PROJECT_EDITOR",
+      "consumer_task": "11.09",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-CODE_EDITOR",
+      "consumer_task": "12.12",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-CODE_EDITOR",
+      "consumer_task": "12.12",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-INDICATOR_TESTER",
+      "consumer_task": "12.13",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-INDICATOR_TESTER",
+      "consumer_task": "12.13",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-INDICATOR_TESTER",
+      "consumer_task": "12.13",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-RUN_MONITOR",
+      "consumer_task": "1.29",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-RUN_MONITOR",
+      "consumer_task": "1.29",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-RUN_MONITOR",
+      "consumer_task": "1.29",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-DEBUG_CONSOLE",
+      "consumer_task": "1.30",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-DEBUG_CONSOLE",
+      "consumer_task": "1.30",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-CHAT_BOT",
+      "consumer_task": "5.10",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-CHAT_BOT",
+      "consumer_task": "5.10",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-CHAT_BOT",
+      "consumer_task": "5.10",
+      "provider": "FEAT-UI-15",
+      "provider_task": "5.01",
+      "provider_capability": "ui.chat-context@1"
+    },
+    {
+      "consumer": "FEAT-UI-CHAT_BOT",
+      "consumer_task": "5.10",
+      "provider": "FEAT-UI-REVIEW_DRAFTS",
+      "provider_task": "1.07",
+      "provider_capability": "ui.draft-review@1"
+    },
+    {
+      "consumer": "FEAT-UI-AGENTIC_RUN_INSPECTOR",
+      "consumer_task": "5.11",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-AGENTIC_RUN_INSPECTOR",
+      "consumer_task": "5.11",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-AGENTIC_RUN_INSPECTOR",
+      "consumer_task": "5.11",
+      "provider": "FEAT-UI-VIEW_COLLECTIONS",
+      "provider_task": "1.06",
+      "provider_capability": "ui.collection-grid@1"
+    },
+    {
+      "consumer": "FEAT-UI-NEURAL_RESEARCH",
+      "consumer_task": "14.07",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-NEURAL_RESEARCH",
+      "consumer_task": "14.07",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-STRATEGY_PACKAGER",
+      "consumer_task": "16.12",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-STRATEGY_PACKAGER",
+      "consumer_task": "16.12",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-ADVANCED_ANALYSIS",
+      "consumer_task": "13.04",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-ADVANCED_ANALYSIS",
+      "consumer_task": "13.04",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    },
+    {
+      "consumer": "FEAT-UI-PERFORMANCE_LAB",
+      "consumer_task": "4.01",
+      "provider": "FEAT-UI-01",
+      "provider_task": "1.01",
+      "provider_capability": "ui.workspace-layout@1"
+    },
+    {
+      "consumer": "FEAT-UI-PERFORMANCE_LAB",
+      "consumer_task": "4.01",
+      "provider": "FEAT-UI-14",
+      "provider_task": "1.02",
+      "provider_capability": "ui.typed-backend@1"
+    }
+  ],
+  "schedule_constraints": [
+    {
+      "task": "1.06",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "1.06",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "1.07",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "1.08",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "1.09",
+      "predecessor": "1.03"
+    },
+    {
+      "task": "1.10",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "1.11",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "1.12",
+      "predecessor": "1.05"
+    },
+    {
+      "task": "1.13",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "1.13",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "1.14",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "1.14",
+      "predecessor": "1.11"
+    },
+    {
+      "task": "1.15",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "1.15",
+      "predecessor": "1.11"
+    },
+    {
+      "task": "1.16",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "1.16",
+      "predecessor": "1.13"
+    },
+    {
+      "task": "1.17",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "1.17",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "1.18",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "1.18",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "1.19",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "1.19",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "1.20",
+      "predecessor": "1.12"
+    },
+    {
+      "task": "1.20",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "1.21",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "1.21",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "1.21",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "1.22",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "1.22",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "1.23",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "1.23",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "1.23",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "1.23",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "1.23",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "1.23",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "1.24",
+      "predecessor": "1.12"
+    },
+    {
+      "task": "1.24",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "1.24",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "1.24",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "1.24",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "1.25",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "1.25",
+      "predecessor": "1.11"
+    },
+    {
+      "task": "1.25",
+      "predecessor": "1.21"
+    },
+    {
+      "task": "1.26",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "1.26",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "1.26",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "1.26",
+      "predecessor": "1.22"
+    },
+    {
+      "task": "1.27",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "1.27",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "1.27",
+      "predecessor": "1.25"
+    },
+    {
+      "task": "1.27",
+      "predecessor": "1.26"
+    },
+    {
+      "task": "1.28",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "1.28",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "1.28",
+      "predecessor": "1.25"
+    },
+    {
+      "task": "1.29",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "1.29",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "1.29",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "1.29",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "1.29",
+      "predecessor": "1.26"
+    },
+    {
+      "task": "1.30",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "1.30",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "1.30",
+      "predecessor": "1.25"
+    },
+    {
+      "task": "2.03",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "2.03",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "2.04",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "2.04",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "2.05",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "2.05",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "2.06",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "2.06",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "2.07",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "2.07",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "2.09",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "2.09",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "2.10",
+      "predecessor": "2.01"
+    },
+    {
+      "task": "2.11",
+      "predecessor": "2.01"
+    },
+    {
+      "task": "2.11",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "2.12",
+      "predecessor": "2.01"
+    },
+    {
+      "task": "2.13",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "2.13",
+      "predecessor": "2.09"
+    },
+    {
+      "task": "2.14",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "2.14",
+      "predecessor": "2.09"
+    },
+    {
+      "task": "2.15",
+      "predecessor": "2.09"
+    },
+    {
+      "task": "2.16",
+      "predecessor": "2.01"
+    },
+    {
+      "task": "2.17",
+      "predecessor": "2.09"
+    },
+    {
+      "task": "2.18",
+      "predecessor": "2.09"
+    },
+    {
+      "task": "2.19",
+      "predecessor": "2.08"
+    },
+    {
+      "task": "2.19",
+      "predecessor": "2.09"
+    },
+    {
+      "task": "2.19",
+      "predecessor": "2.10"
+    },
+    {
+      "task": "2.20",
+      "predecessor": "2.01"
+    },
+    {
+      "task": "2.20",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "2.20",
+      "predecessor": "2.09"
+    },
+    {
+      "task": "2.20",
+      "predecessor": "2.10"
+    },
+    {
+      "task": "2.21",
+      "predecessor": "2.08"
+    },
+    {
+      "task": "2.21",
+      "predecessor": "2.16"
+    },
+    {
+      "task": "2.22",
+      "predecessor": "2.01"
+    },
+    {
+      "task": "2.22",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "2.23",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "2.23",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "2.24",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "2.24",
+      "predecessor": "2.08"
+    },
+    {
+      "task": "2.24",
+      "predecessor": "2.19"
+    },
+    {
+      "task": "2.25",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "2.25",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "2.26",
+      "predecessor": "2.16"
+    },
+    {
+      "task": "2.26",
+      "predecessor": "2.19"
+    },
+    {
+      "task": "2.27",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "2.27",
+      "predecessor": "2.01"
+    },
+    {
+      "task": "2.27",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "2.27",
+      "predecessor": "2.10"
+    },
+    {
+      "task": "2.27",
+      "predecessor": "2.22"
+    },
+    {
+      "task": "2.28",
+      "predecessor": "2.19"
+    },
+    {
+      "task": "2.28",
+      "predecessor": "2.23"
+    },
+    {
+      "task": "2.29",
+      "predecessor": "2.01"
+    },
+    {
+      "task": "2.29",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "2.29",
+      "predecessor": "2.09"
+    },
+    {
+      "task": "2.29",
+      "predecessor": "2.10"
+    },
+    {
+      "task": "2.29",
+      "predecessor": "2.13"
+    },
+    {
+      "task": "2.29",
+      "predecessor": "2.24"
+    },
+    {
+      "task": "2.30",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "2.30",
+      "predecessor": "2.13"
+    },
+    {
+      "task": "2.30",
+      "predecessor": "2.15"
+    },
+    {
+      "task": "2.30",
+      "predecessor": "2.19"
+    },
+    {
+      "task": "2.30",
+      "predecessor": "2.24"
+    },
+    {
+      "task": "2.30",
+      "predecessor": "2.29"
+    },
+    {
+      "task": "2.31",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "2.31",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "2.31",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "2.31",
+      "predecessor": "2.30"
+    },
+    {
+      "task": "2.32",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "2.32",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "2.32",
+      "predecessor": "2.30"
+    },
+    {
+      "task": "3.01",
+      "predecessor": "2.23"
+    },
+    {
+      "task": "3.02",
+      "predecessor": "2.23"
+    },
+    {
+      "task": "3.03",
+      "predecessor": "2.23"
+    },
+    {
+      "task": "3.04",
+      "predecessor": "2.23"
+    },
+    {
+      "task": "3.05",
+      "predecessor": "2.23"
+    },
+    {
+      "task": "3.06",
+      "predecessor": "2.23"
+    },
+    {
+      "task": "3.08",
+      "predecessor": "1.12"
+    },
+    {
+      "task": "3.08",
+      "predecessor": "3.01"
+    },
+    {
+      "task": "3.08",
+      "predecessor": "3.02"
+    },
+    {
+      "task": "3.08",
+      "predecessor": "3.03"
+    },
+    {
+      "task": "3.08",
+      "predecessor": "3.04"
+    },
+    {
+      "task": "3.08",
+      "predecessor": "3.05"
+    },
+    {
+      "task": "3.08",
+      "predecessor": "3.06"
+    },
+    {
+      "task": "3.08",
+      "predecessor": "3.07"
+    },
+    {
+      "task": "3.09",
+      "predecessor": "2.01"
+    },
+    {
+      "task": "3.09",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "3.09",
+      "predecessor": "3.07"
+    },
+    {
+      "task": "3.10",
+      "predecessor": "2.11"
+    },
+    {
+      "task": "3.10",
+      "predecessor": "3.07"
+    },
+    {
+      "task": "3.11",
+      "predecessor": "3.07"
+    },
+    {
+      "task": "3.11",
+      "predecessor": "3.08"
+    },
+    {
+      "task": "3.12",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "3.12",
+      "predecessor": "3.07"
+    },
+    {
+      "task": "3.12",
+      "predecessor": "3.08"
+    },
+    {
+      "task": "3.13",
+      "predecessor": "3.07"
+    },
+    {
+      "task": "3.13",
+      "predecessor": "3.08"
+    },
+    {
+      "task": "3.13",
+      "predecessor": "3.09"
+    },
+    {
+      "task": "3.14",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "3.14",
+      "predecessor": "3.07"
+    },
+    {
+      "task": "3.14",
+      "predecessor": "3.08"
+    },
+    {
+      "task": "3.14",
+      "predecessor": "3.09"
+    },
+    {
+      "task": "3.14",
+      "predecessor": "3.10"
+    },
+    {
+      "task": "3.14",
+      "predecessor": "3.11"
+    },
+    {
+      "task": "3.15",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "3.15",
+      "predecessor": "3.13"
+    },
+    {
+      "task": "3.16",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "3.16",
+      "predecessor": "3.14"
+    },
+    {
+      "task": "3.17",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "3.17",
+      "predecessor": "3.08"
+    },
+    {
+      "task": "3.17",
+      "predecessor": "3.11"
+    },
+    {
+      "task": "3.17",
+      "predecessor": "3.14"
+    },
+    {
+      "task": "3.17",
+      "predecessor": "3.15"
+    },
+    {
+      "task": "3.17",
+      "predecessor": "3.16"
+    },
+    {
+      "task": "3.18",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "3.18",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "3.18",
+      "predecessor": "3.14"
+    },
+    {
+      "task": "3.18",
+      "predecessor": "3.15"
+    },
+    {
+      "task": "3.18",
+      "predecessor": "3.16"
+    },
+    {
+      "task": "3.18",
+      "predecessor": "3.17"
+    },
+    {
+      "task": "4.01",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "4.01",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "4.01",
+      "predecessor": "1.25"
+    },
+    {
+      "task": "4.02",
+      "predecessor": "2.11"
+    },
+    {
+      "task": "4.02",
+      "predecessor": "2.12"
+    },
+    {
+      "task": "4.03",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "4.05",
+      "predecessor": "2.11"
+    },
+    {
+      "task": "4.06",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "4.06",
+      "predecessor": "2.16"
+    },
+    {
+      "task": "4.06",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "4.07",
+      "predecessor": "2.12"
+    },
+    {
+      "task": "4.08",
+      "predecessor": "2.11"
+    },
+    {
+      "task": "4.08",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "4.08",
+      "predecessor": "3.13"
+    },
+    {
+      "task": "4.08",
+      "predecessor": "4.02"
+    },
+    {
+      "task": "4.08",
+      "predecessor": "4.05"
+    },
+    {
+      "task": "4.08",
+      "predecessor": "4.06"
+    },
+    {
+      "task": "4.08",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "1.22"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "2.12"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "3.01"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "3.02"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "3.03"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "3.04"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "3.05"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "3.06"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "4.02"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "4.05"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "4.06"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "4.09",
+      "predecessor": "4.08"
+    },
+    {
+      "task": "4.10",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "4.10",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "4.10",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "4.10",
+      "predecessor": "4.09"
+    },
+    {
+      "task": "4.11",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "4.11",
+      "predecessor": "4.08"
+    },
+    {
+      "task": "4.11",
+      "predecessor": "4.09"
+    },
+    {
+      "task": "4.11",
+      "predecessor": "4.10"
+    },
+    {
+      "task": "4.12",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "4.12",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "4.12",
+      "predecessor": "4.10"
+    },
+    {
+      "task": "4.13",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "4.13",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "4.13",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "4.13",
+      "predecessor": "4.10"
+    },
+    {
+      "task": "4.14",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "4.14",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "4.15",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "4.15",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "4.15",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "4.16",
+      "predecessor": "2.23"
+    },
+    {
+      "task": "4.16",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "4.16",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "4.17",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "4.17",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "4.18",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "4.18",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "4.18",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "4.19",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "4.19",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "4.19",
+      "predecessor": "4.14"
+    },
+    {
+      "task": "4.19",
+      "predecessor": "4.15"
+    },
+    {
+      "task": "4.19",
+      "predecessor": "4.16"
+    },
+    {
+      "task": "4.19",
+      "predecessor": "4.17"
+    },
+    {
+      "task": "4.19",
+      "predecessor": "4.18"
+    },
+    {
+      "task": "4.20",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "4.20",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "4.20",
+      "predecessor": "1.07"
+    },
+    {
+      "task": "4.20",
+      "predecessor": "4.09"
+    },
+    {
+      "task": "4.20",
+      "predecessor": "4.11"
+    },
+    {
+      "task": "4.20",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "4.21",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "4.21",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "4.21",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "4.22",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "4.22",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "4.22",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "4.22",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "4.23",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "4.23",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "4.23",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "4.24",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "4.24",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "4.24",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "4.24",
+      "predecessor": "4.15"
+    },
+    {
+      "task": "4.24",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "4.25",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "4.25",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "4.25",
+      "predecessor": "4.16"
+    },
+    {
+      "task": "4.25",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "4.26",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "4.26",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "4.26",
+      "predecessor": "4.15"
+    },
+    {
+      "task": "4.26",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "4.27",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "4.27",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "4.27",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "4.27",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "5.01",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "5.01",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "5.02",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "5.02",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "5.03",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "5.03",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "5.03",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "5.03",
+      "predecessor": "2.18"
+    },
+    {
+      "task": "5.03",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "5.03",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "5.04",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "5.04",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "5.04",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "5.04",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "5.04",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "5.04",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "5.04",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "5.04",
+      "predecessor": "5.03"
+    },
+    {
+      "task": "5.05",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "5.05",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "5.05",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "5.05",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "5.05",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "5.05",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "5.05",
+      "predecessor": "5.04"
+    },
+    {
+      "task": "5.06",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "5.06",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "5.06",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "5.06",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "5.06",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "5.06",
+      "predecessor": "5.03"
+    },
+    {
+      "task": "5.06",
+      "predecessor": "5.04"
+    },
+    {
+      "task": "5.07",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "5.07",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "5.07",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "5.07",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "5.07",
+      "predecessor": "5.06"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "5.02"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "5.03"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "5.04"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "5.05"
+    },
+    {
+      "task": "5.08",
+      "predecessor": "5.07"
+    },
+    {
+      "task": "5.09",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "5.09",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "5.09",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "5.09",
+      "predecessor": "5.02"
+    },
+    {
+      "task": "5.09",
+      "predecessor": "5.04"
+    },
+    {
+      "task": "5.09",
+      "predecessor": "5.08"
+    },
+    {
+      "task": "5.10",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "5.10",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "5.10",
+      "predecessor": "1.07"
+    },
+    {
+      "task": "5.10",
+      "predecessor": "5.01"
+    },
+    {
+      "task": "5.10",
+      "predecessor": "5.05"
+    },
+    {
+      "task": "5.10",
+      "predecessor": "5.07"
+    },
+    {
+      "task": "5.10",
+      "predecessor": "5.09"
+    },
+    {
+      "task": "5.11",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "5.11",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "5.11",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "5.11",
+      "predecessor": "5.06"
+    },
+    {
+      "task": "5.11",
+      "predecessor": "5.09"
+    },
+    {
+      "task": "6.01",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "6.01",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "6.02",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "6.02",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "6.03",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "6.03",
+      "predecessor": "6.02"
+    },
+    {
+      "task": "6.04",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "6.04",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "6.04",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "6.04",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "6.04",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "6.04",
+      "predecessor": "5.03"
+    },
+    {
+      "task": "6.04",
+      "predecessor": "5.06"
+    },
+    {
+      "task": "6.04",
+      "predecessor": "5.07"
+    },
+    {
+      "task": "6.04",
+      "predecessor": "6.01"
+    },
+    {
+      "task": "6.05",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "6.05",
+      "predecessor": "6.02"
+    },
+    {
+      "task": "6.05",
+      "predecessor": "6.03"
+    },
+    {
+      "task": "6.06",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "6.06",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "6.06",
+      "predecessor": "4.09"
+    },
+    {
+      "task": "6.06",
+      "predecessor": "4.10"
+    },
+    {
+      "task": "6.06",
+      "predecessor": "4.12"
+    },
+    {
+      "task": "6.06",
+      "predecessor": "4.14"
+    },
+    {
+      "task": "6.06",
+      "predecessor": "6.03"
+    },
+    {
+      "task": "6.06",
+      "predecessor": "6.05"
+    },
+    {
+      "task": "6.07",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "6.07",
+      "predecessor": "6.02"
+    },
+    {
+      "task": "6.07",
+      "predecessor": "6.03"
+    },
+    {
+      "task": "6.07",
+      "predecessor": "6.05"
+    },
+    {
+      "task": "6.07",
+      "predecessor": "6.06"
+    },
+    {
+      "task": "6.08",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "6.08",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "6.08",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "6.08",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "6.08",
+      "predecessor": "5.04"
+    },
+    {
+      "task": "6.08",
+      "predecessor": "6.02"
+    },
+    {
+      "task": "6.08",
+      "predecessor": "6.05"
+    },
+    {
+      "task": "6.08",
+      "predecessor": "6.06"
+    },
+    {
+      "task": "6.09",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "6.09",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "6.09",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "6.09",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "6.09",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "6.09",
+      "predecessor": "5.04"
+    },
+    {
+      "task": "6.09",
+      "predecessor": "5.06"
+    },
+    {
+      "task": "6.09",
+      "predecessor": "5.07"
+    },
+    {
+      "task": "6.09",
+      "predecessor": "6.03"
+    },
+    {
+      "task": "6.09",
+      "predecessor": "6.08"
+    },
+    {
+      "task": "6.10",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "6.10",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "6.10",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "6.10",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "6.10",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "6.10",
+      "predecessor": "3.12"
+    },
+    {
+      "task": "6.10",
+      "predecessor": "3.14"
+    },
+    {
+      "task": "6.10",
+      "predecessor": "5.06"
+    },
+    {
+      "task": "6.10",
+      "predecessor": "5.07"
+    },
+    {
+      "task": "6.10",
+      "predecessor": "6.08"
+    },
+    {
+      "task": "6.11",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "6.11",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "6.11",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "6.11",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "6.11",
+      "predecessor": "6.04"
+    },
+    {
+      "task": "6.11",
+      "predecessor": "6.06"
+    },
+    {
+      "task": "6.11",
+      "predecessor": "6.07"
+    },
+    {
+      "task": "6.11",
+      "predecessor": "6.09"
+    },
+    {
+      "task": "6.11",
+      "predecessor": "6.10"
+    },
+    {
+      "task": "7.01",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "7.01",
+      "predecessor": "4.09"
+    },
+    {
+      "task": "7.01",
+      "predecessor": "4.10"
+    },
+    {
+      "task": "7.02",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "7.02",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "7.02",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "7.03",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "7.03",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "7.03",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "7.03",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "7.03",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "7.03",
+      "predecessor": "5.04"
+    },
+    {
+      "task": "7.03",
+      "predecessor": "5.06"
+    },
+    {
+      "task": "7.04",
+      "predecessor": "6.06"
+    },
+    {
+      "task": "7.04",
+      "predecessor": "7.01"
+    },
+    {
+      "task": "7.04",
+      "predecessor": "7.02"
+    },
+    {
+      "task": "7.05",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "7.05",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "7.05",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "7.05",
+      "predecessor": "7.02"
+    },
+    {
+      "task": "7.05",
+      "predecessor": "7.03"
+    },
+    {
+      "task": "7.05",
+      "predecessor": "7.04"
+    },
+    {
+      "task": "7.06",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "7.06",
+      "predecessor": "6.03"
+    },
+    {
+      "task": "7.06",
+      "predecessor": "6.05"
+    },
+    {
+      "task": "7.06",
+      "predecessor": "7.04"
+    },
+    {
+      "task": "7.07",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "7.07",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "7.07",
+      "predecessor": "6.07"
+    },
+    {
+      "task": "7.07",
+      "predecessor": "7.04"
+    },
+    {
+      "task": "7.07",
+      "predecessor": "7.06"
+    },
+    {
+      "task": "8.01",
+      "predecessor": "3.07"
+    },
+    {
+      "task": "8.01",
+      "predecessor": "3.08"
+    },
+    {
+      "task": "8.01",
+      "predecessor": "3.11"
+    },
+    {
+      "task": "8.02",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "8.02",
+      "predecessor": "6.03"
+    },
+    {
+      "task": "8.03",
+      "predecessor": "3.13"
+    },
+    {
+      "task": "8.03",
+      "predecessor": "6.02"
+    },
+    {
+      "task": "8.03",
+      "predecessor": "8.01"
+    },
+    {
+      "task": "8.04",
+      "predecessor": "6.06"
+    },
+    {
+      "task": "8.04",
+      "predecessor": "8.02"
+    },
+    {
+      "task": "8.04",
+      "predecessor": "8.03"
+    },
+    {
+      "task": "8.05",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "8.05",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "8.05",
+      "predecessor": "6.07"
+    },
+    {
+      "task": "8.05",
+      "predecessor": "8.02"
+    },
+    {
+      "task": "8.05",
+      "predecessor": "8.04"
+    },
+    {
+      "task": "9.01",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "9.01",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "9.01",
+      "predecessor": "4.09"
+    },
+    {
+      "task": "9.01",
+      "predecessor": "4.10"
+    },
+    {
+      "task": "9.01",
+      "predecessor": "4.12"
+    },
+    {
+      "task": "9.01",
+      "predecessor": "6.03"
+    },
+    {
+      "task": "9.01",
+      "predecessor": "6.05"
+    },
+    {
+      "task": "9.02",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "9.02",
+      "predecessor": "9.01"
+    },
+    {
+      "task": "9.03",
+      "predecessor": "7.02"
+    },
+    {
+      "task": "9.03",
+      "predecessor": "9.01"
+    },
+    {
+      "task": "9.04",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "9.04",
+      "predecessor": "9.01"
+    },
+    {
+      "task": "9.04",
+      "predecessor": "9.02"
+    },
+    {
+      "task": "9.04",
+      "predecessor": "9.03"
+    },
+    {
+      "task": "9.05",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "9.05",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "9.05",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "9.05",
+      "predecessor": "9.04"
+    },
+    {
+      "task": "9.06",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "9.06",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "9.06",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "9.06",
+      "predecessor": "9.02"
+    },
+    {
+      "task": "9.06",
+      "predecessor": "9.03"
+    },
+    {
+      "task": "9.06",
+      "predecessor": "9.04"
+    },
+    {
+      "task": "10.01",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "10.01",
+      "predecessor": "2.02"
+    },
+    {
+      "task": "10.01",
+      "predecessor": "2.12"
+    },
+    {
+      "task": "10.01",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "10.02",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "10.02",
+      "predecessor": "2.23"
+    },
+    {
+      "task": "10.02",
+      "predecessor": "4.16"
+    },
+    {
+      "task": "10.03",
+      "predecessor": "4.14"
+    },
+    {
+      "task": "10.03",
+      "predecessor": "10.02"
+    },
+    {
+      "task": "10.04",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "10.04",
+      "predecessor": "10.01"
+    },
+    {
+      "task": "10.04",
+      "predecessor": "10.02"
+    },
+    {
+      "task": "10.05",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "10.05",
+      "predecessor": "4.09"
+    },
+    {
+      "task": "10.05",
+      "predecessor": "4.10"
+    },
+    {
+      "task": "10.05",
+      "predecessor": "10.01"
+    },
+    {
+      "task": "10.06",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "10.06",
+      "predecessor": "10.01"
+    },
+    {
+      "task": "10.06",
+      "predecessor": "10.02"
+    },
+    {
+      "task": "10.07",
+      "predecessor": "10.01"
+    },
+    {
+      "task": "10.08",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "10.08",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "10.08",
+      "predecessor": "4.14"
+    },
+    {
+      "task": "10.08",
+      "predecessor": "10.01"
+    },
+    {
+      "task": "10.08",
+      "predecessor": "10.02"
+    },
+    {
+      "task": "10.08",
+      "predecessor": "10.04"
+    },
+    {
+      "task": "10.08",
+      "predecessor": "10.05"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "4.03"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "5.03"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "5.06"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "5.07"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "7.03"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "10.01"
+    },
+    {
+      "task": "10.09",
+      "predecessor": "10.06"
+    },
+    {
+      "task": "10.10",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "10.10",
+      "predecessor": "10.01"
+    },
+    {
+      "task": "10.10",
+      "predecessor": "10.02"
+    },
+    {
+      "task": "10.10",
+      "predecessor": "10.04"
+    },
+    {
+      "task": "10.10",
+      "predecessor": "10.05"
+    },
+    {
+      "task": "10.10",
+      "predecessor": "10.06"
+    },
+    {
+      "task": "10.10",
+      "predecessor": "10.07"
+    },
+    {
+      "task": "10.10",
+      "predecessor": "10.08"
+    },
+    {
+      "task": "10.11",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "10.11",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "10.11",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "10.11",
+      "predecessor": "10.05"
+    },
+    {
+      "task": "10.11",
+      "predecessor": "10.10"
+    },
+    {
+      "task": "10.12",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "10.12",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "10.12",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "10.12",
+      "predecessor": "10.03"
+    },
+    {
+      "task": "10.12",
+      "predecessor": "10.08"
+    },
+    {
+      "task": "10.12",
+      "predecessor": "10.09"
+    },
+    {
+      "task": "10.12",
+      "predecessor": "10.10"
+    },
+    {
+      "task": "11.01",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "11.02",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "11.03",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "11.03",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "11.03",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "11.03",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "11.04",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "11.04",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "11.04",
+      "predecessor": "1.12"
+    },
+    {
+      "task": "11.04",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "11.05",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "11.05",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "11.05",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "11.05",
+      "predecessor": "5.03"
+    },
+    {
+      "task": "11.06",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "11.06",
+      "predecessor": "2.24"
+    },
+    {
+      "task": "11.06",
+      "predecessor": "3.16"
+    },
+    {
+      "task": "11.06",
+      "predecessor": "5.04"
+    },
+    {
+      "task": "11.06",
+      "predecessor": "6.06"
+    },
+    {
+      "task": "11.06",
+      "predecessor": "9.01"
+    },
+    {
+      "task": "11.06",
+      "predecessor": "10.08"
+    },
+    {
+      "task": "11.06",
+      "predecessor": "11.02"
+    },
+    {
+      "task": "11.06",
+      "predecessor": "11.03"
+    },
+    {
+      "task": "11.06",
+      "predecessor": "11.04"
+    },
+    {
+      "task": "11.07",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "11.07",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "11.07",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "11.07",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "11.07",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "11.07",
+      "predecessor": "4.10"
+    },
+    {
+      "task": "11.07",
+      "predecessor": "5.05"
+    },
+    {
+      "task": "11.07",
+      "predecessor": "5.06"
+    },
+    {
+      "task": "11.07",
+      "predecessor": "10.05"
+    },
+    {
+      "task": "11.07",
+      "predecessor": "11.01"
+    },
+    {
+      "task": "11.08",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "11.08",
+      "predecessor": "11.02"
+    },
+    {
+      "task": "11.08",
+      "predecessor": "11.06"
+    },
+    {
+      "task": "11.09",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "11.09",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "11.09",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "11.09",
+      "predecessor": "11.04"
+    },
+    {
+      "task": "11.09",
+      "predecessor": "11.05"
+    },
+    {
+      "task": "11.09",
+      "predecessor": "11.06"
+    },
+    {
+      "task": "11.09",
+      "predecessor": "11.07"
+    },
+    {
+      "task": "11.09",
+      "predecessor": "11.08"
+    },
+    {
+      "task": "12.01",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "12.01",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "12.02",
+      "predecessor": "1.05"
+    },
+    {
+      "task": "12.02",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "12.02",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "12.03",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "12.03",
+      "predecessor": "1.22"
+    },
+    {
+      "task": "12.03",
+      "predecessor": "12.01"
+    },
+    {
+      "task": "12.04",
+      "predecessor": "1.12"
+    },
+    {
+      "task": "12.04",
+      "predecessor": "12.01"
+    },
+    {
+      "task": "12.05",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "12.05",
+      "predecessor": "3.13"
+    },
+    {
+      "task": "12.05",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "12.06",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "12.06",
+      "predecessor": "3.13"
+    },
+    {
+      "task": "12.06",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "12.07",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "12.07",
+      "predecessor": "4.13"
+    },
+    {
+      "task": "12.07",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "12.07",
+      "predecessor": "12.04"
+    },
+    {
+      "task": "12.08",
+      "predecessor": "1.05"
+    },
+    {
+      "task": "12.08",
+      "predecessor": "1.12"
+    },
+    {
+      "task": "12.08",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "12.08",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "12.09",
+      "predecessor": "1.05"
+    },
+    {
+      "task": "12.09",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "12.09",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "1.09"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "1.15"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "1.19"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "1.20"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "1.23"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "1.24"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "5.04"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "6.10"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "12.01"
+    },
+    {
+      "task": "12.10",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "12.11",
+      "predecessor": "1.05"
+    },
+    {
+      "task": "12.11",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "12.11",
+      "predecessor": "12.02"
+    },
+    {
+      "task": "12.11",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "12.11",
+      "predecessor": "12.04"
+    },
+    {
+      "task": "12.11",
+      "predecessor": "12.08"
+    },
+    {
+      "task": "12.11",
+      "predecessor": "12.09"
+    },
+    {
+      "task": "12.12",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "12.12",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "12.12",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "12.12",
+      "predecessor": "12.04"
+    },
+    {
+      "task": "12.12",
+      "predecessor": "12.05"
+    },
+    {
+      "task": "12.12",
+      "predecessor": "12.06"
+    },
+    {
+      "task": "12.12",
+      "predecessor": "12.08"
+    },
+    {
+      "task": "12.12",
+      "predecessor": "12.11"
+    },
+    {
+      "task": "12.13",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "12.13",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "12.13",
+      "predecessor": "1.06"
+    },
+    {
+      "task": "12.13",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "12.13",
+      "predecessor": "12.07"
+    },
+    {
+      "task": "12.13",
+      "predecessor": "12.09"
+    },
+    {
+      "task": "12.13",
+      "predecessor": "12.10"
+    },
+    {
+      "task": "12.13",
+      "predecessor": "12.11"
+    },
+    {
+      "task": "13.01",
+      "predecessor": "2.25"
+    },
+    {
+      "task": "13.02",
+      "predecessor": "3.07"
+    },
+    {
+      "task": "13.02",
+      "predecessor": "3.08"
+    },
+    {
+      "task": "13.03",
+      "predecessor": "2.22"
+    },
+    {
+      "task": "13.03",
+      "predecessor": "4.09"
+    },
+    {
+      "task": "13.03",
+      "predecessor": "4.10"
+    },
+    {
+      "task": "13.04",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "13.04",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "13.04",
+      "predecessor": "4.19"
+    },
+    {
+      "task": "13.04",
+      "predecessor": "13.01"
+    },
+    {
+      "task": "13.04",
+      "predecessor": "13.02"
+    },
+    {
+      "task": "13.04",
+      "predecessor": "13.03"
+    },
+    {
+      "task": "14.01",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "14.01",
+      "predecessor": "2.23"
+    },
+    {
+      "task": "14.01",
+      "predecessor": "3.02"
+    },
+    {
+      "task": "14.01",
+      "predecessor": "3.03"
+    },
+    {
+      "task": "14.01",
+      "predecessor": "3.06"
+    },
+    {
+      "task": "14.01",
+      "predecessor": "13.01"
+    },
+    {
+      "task": "14.02",
+      "predecessor": "2.20"
+    },
+    {
+      "task": "14.02",
+      "predecessor": "3.03"
+    },
+    {
+      "task": "14.03",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "14.04",
+      "predecessor": "1.22"
+    },
+    {
+      "task": "14.04",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "14.04",
+      "predecessor": "14.01"
+    },
+    {
+      "task": "14.04",
+      "predecessor": "14.02"
+    },
+    {
+      "task": "14.05",
+      "predecessor": "4.07"
+    },
+    {
+      "task": "14.05",
+      "predecessor": "4.09"
+    },
+    {
+      "task": "14.05",
+      "predecessor": "6.03"
+    },
+    {
+      "task": "14.05",
+      "predecessor": "6.05"
+    },
+    {
+      "task": "14.05",
+      "predecessor": "14.04"
+    },
+    {
+      "task": "14.06",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "14.06",
+      "predecessor": "14.05"
+    },
+    {
+      "task": "14.07",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "14.07",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "14.07",
+      "predecessor": "6.07"
+    },
+    {
+      "task": "14.07",
+      "predecessor": "14.03"
+    },
+    {
+      "task": "14.07",
+      "predecessor": "14.05"
+    },
+    {
+      "task": "14.07",
+      "predecessor": "14.06"
+    },
+    {
+      "task": "15.01",
+      "predecessor": "1.04"
+    },
+    {
+      "task": "15.01",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "15.01",
+      "predecessor": "1.18"
+    },
+    {
+      "task": "16.01",
+      "predecessor": "1.08"
+    },
+    {
+      "task": "16.01",
+      "predecessor": "3.14"
+    },
+    {
+      "task": "16.01",
+      "predecessor": "6.06"
+    },
+    {
+      "task": "16.01",
+      "predecessor": "11.06"
+    },
+    {
+      "task": "16.02",
+      "predecessor": "1.03"
+    },
+    {
+      "task": "16.02",
+      "predecessor": "1.22"
+    },
+    {
+      "task": "16.03",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "16.03",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "16.04",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "16.04",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "16.05",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "16.05",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "16.06",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "16.06",
+      "predecessor": "1.14"
+    },
+    {
+      "task": "16.07",
+      "predecessor": "1.12"
+    },
+    {
+      "task": "16.07",
+      "predecessor": "2.08"
+    },
+    {
+      "task": "16.08",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "16.08",
+      "predecessor": "3.13"
+    },
+    {
+      "task": "16.08",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "16.08",
+      "predecessor": "14.05"
+    },
+    {
+      "task": "16.09",
+      "predecessor": "4.18"
+    },
+    {
+      "task": "16.10",
+      "predecessor": "3.16"
+    },
+    {
+      "task": "16.10",
+      "predecessor": "16.09"
+    },
+    {
+      "task": "16.11",
+      "predecessor": "1.10"
+    },
+    {
+      "task": "16.11",
+      "predecessor": "1.17"
+    },
+    {
+      "task": "16.11",
+      "predecessor": "3.15"
+    },
+    {
+      "task": "16.11",
+      "predecessor": "12.03"
+    },
+    {
+      "task": "16.11",
+      "predecessor": "12.05"
+    },
+    {
+      "task": "16.11",
+      "predecessor": "16.08"
+    },
+    {
+      "task": "16.12",
+      "predecessor": "1.01"
+    },
+    {
+      "task": "16.12",
+      "predecessor": "1.02"
+    },
+    {
+      "task": "16.12",
+      "predecessor": "3.17"
+    },
+    {
+      "task": "16.12",
+      "predecessor": "16.01"
+    },
+    {
+      "task": "16.12",
+      "predecessor": "16.02"
+    },
+    {
+      "task": "16.12",
+      "predecessor": "16.08"
+    },
+    {
+      "task": "16.12",
+      "predecessor": "16.10"
+    },
+    {
+      "task": "16.12",
+      "predecessor": "16.11"
     }
   ]
 }

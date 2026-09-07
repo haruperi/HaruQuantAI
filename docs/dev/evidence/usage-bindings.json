@@ -1,1644 +1,2874 @@
 {
-  "manifest_version": "1.0",
-  "timestamp": "2026-09-07T18:45:00+03:00",
+  "manifest_version": "2.0",
   "bindings": [
     {
       "feature_id": "FEAT-UI-01",
       "task_id": "1.01",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/01",
+      "usage_target": "app/ui/src/widgets/workspaces/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/workspaces/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-14",
       "task_id": "1.02",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/14",
+      "usage_target": "app/ui/src/clients/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/clients/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/clients/__tests__/traceability.test.tsx",
+        "app/ui/src/clients/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-WS-MANAGE_WORKSPACES",
       "task_id": "1.03",
-      "domain": "Workspace",
-      "executable_recipe": "uv run python -m app.services.workspace.manage_workspaces._usage",
+      "usage_target": "app/services/workspace/manage_workspaces/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.workspace.manage_workspaces._usage",
+      "test_targets": [
+        "tests/services/workspace/manage_workspaces/test_traceability.py",
+        "tests/services/workspace/manage_workspaces/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_WORKSPACES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-WS-MANAGE_ACCOUNTS",
       "task_id": "1.04",
-      "domain": "Workspace",
-      "executable_recipe": "uv run python -m app.services.workspace.manage_accounts._usage",
+      "usage_target": "app/services/workspace/manage_accounts/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.workspace.manage_accounts._usage",
+      "test_targets": [
+        "tests/services/workspace/manage_accounts/test_traceability.py",
+        "tests/services/workspace/manage_accounts/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-PLUG-DECLARE_MANIFESTS",
       "task_id": "1.05",
-      "domain": "Plugins",
-      "executable_recipe": "uv run python -m app.services.plugins.declare_manifests._usage",
+      "usage_target": "app/services/plugins/declare_manifests/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.plugins.declare_manifests._usage",
+      "test_targets": [
+        "tests/services/plugins/declare_manifests/test_traceability.py",
+        "tests/services/plugins/declare_manifests/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
       "task_id": "1.06",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/view_collections",
+      "usage_target": "app/ui/src/widgets/collection-grid/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/collection-grid/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-REVIEW_DRAFTS",
       "task_id": "1.07",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/review_drafts",
+      "usage_target": "app/ui/src/widgets/draft-review/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/draft-review/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/draft-review/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-SERVE_API_EVENTS",
       "task_id": "1.08",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.serve_api_events._usage",
+      "usage_target": "app/services/interfaces/serve_api_events/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.serve_api_events._usage",
+      "test_targets": [
+        "tests/services/interfaces/serve_api_events/test_traceability.py",
+        "tests/services/interfaces/serve_api_events/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-WS-EXECUTE_PERSISTENCE",
       "task_id": "1.09",
-      "domain": "Workspace",
-      "executable_recipe": "uv run python -m app.services.workspace.execute_persistence._usage",
+      "usage_target": "app/services/workspace/execute_persistence/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.workspace.execute_persistence._usage",
+      "test_targets": [
+        "tests/services/workspace/execute_persistence/test_traceability.py",
+        "tests/services/workspace/execute_persistence/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-WS-EXECUTE_PERSISTENCE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-WS-SECURE_LOCAL_ACCESS",
       "task_id": "1.10",
-      "domain": "Workspace",
-      "executable_recipe": "uv run python -m app.services.workspace.secure_local_access._usage",
+      "usage_target": "app/services/workspace/secure_local_access/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.workspace.secure_local_access._usage",
+      "test_targets": [
+        "tests/services/workspace/secure_local_access/test_traceability.py",
+        "tests/services/workspace/secure_local_access/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-WS-SECURE_LOCAL_ACCESS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-WS-ADMINISTER_SETTINGS",
       "task_id": "1.11",
-      "domain": "Workspace",
-      "executable_recipe": "uv run python -m app.services.workspace.administer_settings._usage",
+      "usage_target": "app/services/workspace/administer_settings/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.workspace.administer_settings._usage",
+      "test_targets": [
+        "tests/services/workspace/administer_settings/test_traceability.py",
+        "tests/services/workspace/administer_settings/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-PLUG-REGISTER_CONTRIBUTIONS",
       "task_id": "1.12",
-      "domain": "Plugins",
-      "executable_recipe": "uv run python -m app.services.plugins.register_contributions._usage",
+      "usage_target": "app/services/plugins/register_contributions/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.plugins.register_contributions._usage",
+      "test_targets": [
+        "tests/services/plugins/register_contributions/test_traceability.py",
+        "tests/services/plugins/register_contributions/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-REGISTER_CONTRIBUTIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-OPERATE_IDENTITY",
       "task_id": "1.13",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.operate_identity._usage",
+      "usage_target": "app/services/interfaces/operate_identity/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.operate_identity._usage",
+      "test_targets": [
+        "tests/services/interfaces/operate_identity/test_traceability.py",
+        "tests/services/interfaces/operate_identity/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_IDENTITY/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ORCH-RESERVE_RESOURCES",
       "task_id": "1.14",
-      "domain": "Orchestration",
-      "executable_recipe": "uv run python -m app.services.orchestration.reserve_resources._usage",
+      "usage_target": "app/services/orchestration/reserve_resources/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.orchestration.reserve_resources._usage",
+      "test_targets": [
+        "tests/services/orchestration/reserve_resources/test_traceability.py",
+        "tests/services/orchestration/reserve_resources/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
       "task_id": "1.15",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.enforce_mandate._usage",
+      "usage_target": "app/services/agentic/enforce_mandate/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.enforce_mandate._usage",
+      "test_targets": [
+        "tests/services/agentic/enforce_mandate/test_traceability.py",
+        "tests/services/agentic/enforce_mandate/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-17",
       "task_id": "1.16",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/17",
+      "usage_target": "app/ui/src/app/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/app/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/app/__tests__/traceability.test.tsx",
+        "app/ui/src/app/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-17/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-WS-MANAGE_ARTIFACTS",
       "task_id": "1.17",
-      "domain": "Workspace",
-      "executable_recipe": "uv run python -m app.services.workspace.manage_artifacts._usage",
+      "usage_target": "app/services/workspace/manage_artifacts/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.workspace.manage_artifacts._usage",
+      "test_targets": [
+        "tests/services/workspace/manage_artifacts/test_traceability.py",
+        "tests/services/workspace/manage_artifacts/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ARTIFACTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ORCH-MANAGE_JOBS",
       "task_id": "1.18",
-      "domain": "Orchestration",
-      "executable_recipe": "uv run python -m app.services.orchestration.manage_jobs._usage",
+      "usage_target": "app/services/orchestration/manage_jobs/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.orchestration.manage_jobs._usage",
+      "test_targets": [
+        "tests/services/orchestration/manage_jobs/test_traceability.py",
+        "tests/services/orchestration/manage_jobs/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-MANAGE_JOBS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-OPERATE_RUNS",
       "task_id": "1.19",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.operate_runs._usage",
+      "usage_target": "app/services/agentic/operate_runs/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.operate_runs._usage",
+      "test_targets": [
+        "tests/services/agentic/operate_runs/test_traceability.py",
+        "tests/services/agentic/operate_runs/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-OPERATE_RUNS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-REGISTER_ROLES",
       "task_id": "1.20",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.register_roles._usage",
+      "usage_target": "app/services/agentic/register_roles/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.register_roles._usage",
+      "test_targets": [
+        "tests/services/agentic/register_roles/test_traceability.py",
+        "tests/services/agentic/register_roles/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-REGISTER_ROLES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-WS-BUILD_DIAGNOSTICS",
       "task_id": "1.21",
-      "domain": "Workspace",
-      "executable_recipe": "uv run python -m app.services.workspace.build_diagnostics._usage",
+      "usage_target": "app/services/workspace/build_diagnostics/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.workspace.build_diagnostics._usage",
+      "test_targets": [
+        "tests/services/workspace/build_diagnostics/test_traceability.py",
+        "tests/services/workspace/build_diagnostics/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-WS-BUILD_DIAGNOSTICS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ORCH-EXECUTE_LOCAL_WORK",
       "task_id": "1.22",
-      "domain": "Orchestration",
-      "executable_recipe": "uv run python -m app.services.orchestration.execute_local_work._usage",
+      "usage_target": "app/services/orchestration/execute_local_work/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.orchestration.execute_local_work._usage",
+      "test_targets": [
+        "tests/services/orchestration/execute_local_work/test_traceability.py",
+        "tests/services/orchestration/execute_local_work/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-EXECUTE_LOCAL_WORK/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-GOVERN_TOOL_CALLS",
       "task_id": "1.23",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.govern_tool_calls._usage",
+      "usage_target": "app/services/agentic/govern_tool_calls/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.govern_tool_calls._usage",
+      "test_targets": [
+        "tests/services/agentic/govern_tool_calls/test_traceability.py",
+        "tests/services/agentic/govern_tool_calls/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-GOVERN_TOOL_CALLS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-INVOKE_MODELS",
       "task_id": "1.24",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.invoke_models._usage",
+      "usage_target": "app/services/agentic/invoke_models/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.invoke_models._usage",
+      "test_targets": [
+        "tests/services/agentic/invoke_models/test_traceability.py",
+        "tests/services/agentic/invoke_models/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-INVOKE_MODELS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-OPERATE_SETTINGS",
       "task_id": "1.25",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.operate_settings._usage",
+      "usage_target": "app/services/interfaces/operate_settings/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.operate_settings._usage",
+      "test_targets": [
+        "tests/services/interfaces/operate_settings/test_traceability.py",
+        "tests/services/interfaces/operate_settings/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_SETTINGS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-OPERATE_JOBS",
       "task_id": "1.26",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.operate_jobs._usage",
+      "usage_target": "app/services/interfaces/operate_jobs/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.operate_jobs._usage",
+      "test_targets": [
+        "tests/services/interfaces/operate_jobs/test_traceability.py",
+        "tests/services/interfaces/operate_jobs/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_JOBS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-16",
       "task_id": "1.27",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/16",
+      "usage_target": "app/ui/src/components/layout/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/components/layout/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/components/layout/__tests__/traceability.test.tsx",
+        "app/ui/src/components/layout/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-16/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-13",
       "task_id": "1.28",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/13",
+      "usage_target": "app/ui/src/widgets/system-settings/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/system-settings/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/system-settings/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/system-settings/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-13/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-RUN_MONITOR",
       "task_id": "1.29",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/run_monitor",
+      "usage_target": "app/ui/src/widgets/run-monitor/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/run-monitor/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/run-monitor/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/run-monitor/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RUN_MONITOR/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-DEBUG_CONSOLE",
       "task_id": "1.30",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/debug_console",
+      "usage_target": "app/ui/src/widgets/debug-console/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/debug-console/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/debug-console/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/debug-console/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-DEBUG_CONSOLE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-CAT-CATALOG_INSTRUMENTS",
       "task_id": "2.01",
-      "domain": "Catalogue",
-      "executable_recipe": "uv run python -m app.services.catalogue.catalog_instruments._usage",
+      "usage_target": "app/services/catalogue/instrument_catalogue/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.catalogue.instrument_catalogue._usage",
+      "test_targets": [
+        "tests/services/catalogue/instrument_catalogue/test_traceability.py",
+        "tests/services/catalogue/instrument_catalogue/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-CAT-CATALOG_INSTRUMENTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-CAT-DEFINE_SESSIONS",
       "task_id": "2.02",
-      "domain": "Catalogue",
-      "executable_recipe": "uv run python -m app.services.catalogue.define_sessions._usage",
+      "usage_target": "app/services/catalogue/session_calendar/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.catalogue.session_calendar._usage",
+      "test_targets": [
+        "tests/services/catalogue/session_calendar/test_traceability.py",
+        "tests/services/catalogue/session_calendar/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-CAT-DEFINE_SESSIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-METATRADER",
       "task_id": "2.03",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.metatrader._usage",
+      "usage_target": "app/services/brokers/metatrader/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.metatrader._usage",
+      "test_targets": [
+        "tests/services/brokers/metatrader/test_traceability.py",
+        "tests/services/brokers/metatrader/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-METATRADER/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-CTRADER",
       "task_id": "2.04",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.ctrader._usage",
+      "usage_target": "app/services/brokers/ctrader/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.ctrader._usage",
+      "test_targets": [
+        "tests/services/brokers/ctrader/test_traceability.py",
+        "tests/services/brokers/ctrader/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-CTRADER/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-BINANCE",
       "task_id": "2.05",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.binance._usage",
+      "usage_target": "app/services/brokers/binance/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.binance._usage",
+      "test_targets": [
+        "tests/services/brokers/binance/test_traceability.py",
+        "tests/services/brokers/binance/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-BINANCE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-DUKASCOPY",
       "task_id": "2.06",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.dukascopy._usage",
+      "usage_target": "app/services/brokers/dukascopy/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.dukascopy._usage",
+      "test_targets": [
+        "tests/services/brokers/dukascopy/test_traceability.py",
+        "tests/services/brokers/dukascopy/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-DUKASCOPY/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-YAHOO",
       "task_id": "2.07",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.yahoo._usage",
+      "usage_target": "app/services/brokers/yahoo/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.yahoo._usage",
+      "test_targets": [
+        "tests/services/brokers/yahoo/test_traceability.py",
+        "tests/services/brokers/yahoo/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-YAHOO/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-RESOLVE",
       "task_id": "2.08",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.resolve._usage",
+      "usage_target": "app/services/brokers/resolve/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.resolve._usage",
+      "test_targets": [
+        "tests/services/brokers/resolve/test_traceability.py",
+        "tests/services/brokers/resolve/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-RESOLVE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-MARKET_DATA_STORE",
       "task_id": "2.09",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.market_data_store._usage",
+      "usage_target": "app/services/data/market_data_store/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.data.market_data_store._usage",
+      "test_targets": [
+        "tests/services/data/market_data_store/test_traceability.py",
+        "tests/services/data/market_data_store/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-MARKET_DATA_STORE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-CAT-MAP_PROVIDERS",
       "task_id": "2.10",
-      "domain": "Catalogue",
-      "executable_recipe": "uv run python -m app.services.catalogue.map_providers._usage",
+      "usage_target": "app/services/catalogue/provider_mapping/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.catalogue.provider_mapping._usage",
+      "test_targets": [
+        "tests/services/catalogue/provider_mapping/test_traceability.py",
+        "tests/services/catalogue/provider_mapping/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-CAT-MAP_PROVIDERS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-CAT-DEFINE_TRADING_RULES",
       "task_id": "2.11",
-      "domain": "Catalogue",
-      "executable_recipe": "uv run python -m app.services.catalogue.define_trading_rules._usage",
+      "usage_target": "app/services/catalogue/define_trading_rules/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.catalogue.define_trading_rules._usage",
+      "test_targets": [
+        "tests/services/catalogue/define_trading_rules/test_traceability.py",
+        "tests/services/catalogue/define_trading_rules/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-CAT-DEFINE_TRADING_RULES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-CAT-CONVERT_CURRENCIES",
       "task_id": "2.12",
-      "domain": "Catalogue",
-      "executable_recipe": "uv run python -m app.services.catalogue.convert_currencies._usage",
+      "usage_target": "app/services/catalogue/convert_currencies/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.catalogue.convert_currencies._usage",
+      "test_targets": [
+        "tests/services/catalogue/convert_currencies/test_traceability.py",
+        "tests/services/catalogue/convert_currencies/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-CAT-CONVERT_CURRENCIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-RESOLVE_QUALITY",
       "task_id": "2.13",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.resolve_quality._usage",
+      "usage_target": "app/services/data/data_quality_resolution/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.data_quality_resolution._usage",
+      "test_targets": [
+        "tests/services/data/data_quality_resolution/test_traceability.py",
+        "tests/services/data/data_quality_resolution/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-RESOLVE_QUALITY/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-AGGREGATE_BARS",
       "task_id": "2.14",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.aggregate_bars._usage",
+      "usage_target": "app/services/data/bar_aggregation/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.bar_aggregation._usage",
+      "test_targets": [
+        "tests/services/data/bar_aggregation/test_traceability.py",
+        "tests/services/data/bar_aggregation/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-AGGREGATE_BARS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-MANAGE_RETENTION",
       "task_id": "2.15",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.manage_retention._usage",
+      "usage_target": "app/services/data/data_inspection_retention/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.data_inspection_retention._usage",
+      "test_targets": [
+        "tests/services/data/data_inspection_retention/test_traceability.py",
+        "tests/services/data/data_inspection_retention/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-MANAGE_RETENTION/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-NORMALIZE_TICKS",
       "task_id": "2.16",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.normalize_ticks._usage",
+      "usage_target": "app/services/data/tick_normalization/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.tick_normalization._usage",
+      "test_targets": [
+        "tests/services/data/tick_normalization/test_traceability.py",
+        "tests/services/data/tick_normalization/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-NORMALIZE_TICKS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-GENERATE_SCENARIOS",
       "task_id": "2.17",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.generate_scenarios._usage",
+      "usage_target": "app/services/data/synthetic_scenario_series/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.synthetic_scenario_series._usage",
+      "test_targets": [
+        "tests/services/data/synthetic_scenario_series/test_traceability.py",
+        "tests/services/data/synthetic_scenario_series/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-GENERATE_SCENARIOS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-TRACK_MARKET_NEWS",
       "task_id": "2.18",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.track_market_news._usage",
+      "usage_target": "app/services/data/economic_news_evidence/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.economic_news_evidence._usage",
+      "test_targets": [
+        "tests/services/data/economic_news_evidence/test_traceability.py",
+        "tests/services/data/economic_news_evidence/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-TRACK_MARKET_NEWS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-INGEST_HISTORY",
       "task_id": "2.19",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.ingest_history._usage",
+      "usage_target": "app/services/data/historical_data_ingestion/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.historical_data_ingestion._usage",
+      "test_targets": [
+        "tests/services/data/historical_data_ingestion/test_traceability.py",
+        "tests/services/data/historical_data_ingestion/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-INGEST_HISTORY/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-BIND_RUN_DATA",
       "task_id": "2.20",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.bind_run_data._usage",
+      "usage_target": "app/services/data/run_data_binding/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.run_data_binding._usage",
+      "test_targets": [
+        "tests/services/data/run_data_binding/test_traceability.py",
+        "tests/services/data/run_data_binding/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-BIND_RUN_DATA/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-STREAM_MARKET_EVENTS",
       "task_id": "2.21",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.stream_market_events._usage",
+      "usage_target": "app/services/data/realtime_market_events/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.realtime_market_events._usage",
+      "test_targets": [
+        "tests/services/data/realtime_market_events/test_traceability.py",
+        "tests/services/data/realtime_market_events/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-STREAM_MARKET_EVENTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-CAT-MANAGE_UNIVERSES",
       "task_id": "2.22",
-      "domain": "Catalogue",
-      "executable_recipe": "uv run python -m app.services.catalogue.manage_universes._usage",
+      "usage_target": "app/services/catalogue/manage_universes/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.catalogue.manage_universes._usage",
+      "test_targets": [
+        "tests/services/catalogue/manage_universes/test_traceability.py",
+        "tests/services/catalogue/manage_universes/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-CAT-MANAGE_UNIVERSES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-ALIGN_SERIES",
       "task_id": "2.23",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.align_series._usage",
+      "usage_target": "app/services/data/external_series_alignment/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.external_series_alignment._usage",
+      "test_targets": [
+        "tests/services/data/external_series_alignment/test_traceability.py",
+        "tests/services/data/external_series_alignment/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-ALIGN_SERIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-SYNC_CONNECTORS",
       "task_id": "2.24",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.sync_connectors._usage",
+      "usage_target": "app/services/data/connector_synchronization/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.connector_synchronization._usage",
+      "test_targets": [
+        "tests/services/data/connector_synchronization/test_traceability.py",
+        "tests/services/data/connector_synchronization/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-SYNC_CONNECTORS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-PREPARE_PROFILES",
       "task_id": "2.25",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.prepare_profiles._usage",
+      "usage_target": "app/services/data/profile_source_preparation/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.profile_source_preparation._usage",
+      "test_targets": [
+        "tests/services/data/profile_source_preparation/test_traceability.py",
+        "tests/services/data/profile_source_preparation/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-PREPARE_PROFILES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-IMPORT_QUANTDATA",
       "task_id": "2.26",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.import_quantdata._usage",
+      "usage_target": "app/services/data/quantdata_manager_source/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.quantdata_manager_source._usage",
+      "test_targets": [
+        "tests/services/data/quantdata_manager_source/test_traceability.py",
+        "tests/services/data/quantdata_manager_source/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-IMPORT_QUANTDATA/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-CAT-EXCHANGE_CATALOGUE",
       "task_id": "2.27",
-      "domain": "Catalogue",
-      "executable_recipe": "uv run python -m app.services.catalogue.exchange_catalogue._usage",
+      "usage_target": "app/services/catalogue/exchange_catalogue/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.catalogue.exchange_catalogue._usage",
+      "test_targets": [
+        "tests/services/catalogue/exchange_catalogue/test_traceability.py",
+        "tests/services/catalogue/exchange_catalogue/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-CAT-EXCHANGE_CATALOGUE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-IMPORT_INDICATORS",
       "task_id": "2.28",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.import_indicators._usage",
+      "usage_target": "app/services/data/external_indicator_series/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.data.external_indicator_series._usage",
+      "test_targets": [
+        "tests/services/data/external_indicator_series/test_traceability.py",
+        "tests/services/data/external_indicator_series/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-IMPORT_INDICATORS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-DATA-BROWSE_REFERENCE",
       "task_id": "2.29",
-      "domain": "Data",
-      "executable_recipe": "uv run python -m app.services.data.browse_reference._usage",
+      "usage_target": "app/services/data/browse_reference/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.data.browse_reference._usage",
+      "test_targets": [
+        "tests/services/data/browse_reference/test_traceability.py",
+        "tests/services/data/browse_reference/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-DATA-BROWSE_REFERENCE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
       "task_id": "2.30",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.observe_market_reference._usage",
+      "usage_target": "app/services/interfaces/observe_market_reference/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.observe_market_reference._usage",
+      "test_targets": [
+        "tests/services/interfaces/observe_market_reference/test_traceability.py",
+        "tests/services/interfaces/observe_market_reference/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OBSERVE_MARKET_REFERENCE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-18",
       "task_id": "2.31",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/18",
+      "usage_target": "app/ui/src/components/workflow/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/components/workflow/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/components/workflow/__tests__/traceability.test.tsx",
+        "app/ui/src/components/workflow/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-18/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-04",
       "task_id": "2.32",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/04",
+      "usage_target": "app/ui/src/widgets/chart/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/chart/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/chart/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/chart/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-04/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IND-CALCULATE_TREND",
       "task_id": "3.01",
-      "domain": "Indicators",
-      "executable_recipe": "uv run python -m app.services.indicators.calculate_trend._usage",
+      "usage_target": "app/services/indicators/calculate_trend/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.indicators.calculate_trend._usage",
+      "test_targets": [
+        "tests/services/indicators/calculate_trend/test_traceability.py",
+        "tests/services/indicators/calculate_trend/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IND-CALCULATE_TREND/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IND-CALCULATE_MOMENTUM",
       "task_id": "3.02",
-      "domain": "Indicators",
-      "executable_recipe": "uv run python -m app.services.indicators.calculate_momentum._usage",
+      "usage_target": "app/services/indicators/calculate_momentum/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.indicators.calculate_momentum._usage",
+      "test_targets": [
+        "tests/services/indicators/calculate_momentum/test_traceability.py",
+        "tests/services/indicators/calculate_momentum/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IND-CALCULATE_MOMENTUM/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IND-CALCULATE_VOLATILITY",
       "task_id": "3.03",
-      "domain": "Indicators",
-      "executable_recipe": "uv run python -m app.services.indicators.calculate_volatility._usage",
+      "usage_target": "app/services/indicators/calculate_volatility/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.indicators.calculate_volatility._usage",
+      "test_targets": [
+        "tests/services/indicators/calculate_volatility/test_traceability.py",
+        "tests/services/indicators/calculate_volatility/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IND-CALCULATE_VOLATILITY/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IND-CALCULATE_VOLUME_FLOW",
       "task_id": "3.04",
-      "domain": "Indicators",
-      "executable_recipe": "uv run python -m app.services.indicators.calculate_volume_flow._usage",
+      "usage_target": "app/services/indicators/calculate_volume_flow/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.indicators.calculate_volume_flow._usage",
+      "test_targets": [
+        "tests/services/indicators/calculate_volume_flow/test_traceability.py",
+        "tests/services/indicators/calculate_volume_flow/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IND-CALCULATE_VOLUME_FLOW/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IND-DETECT_CANDLE_PATTERNS",
       "task_id": "3.05",
-      "domain": "Indicators",
-      "executable_recipe": "uv run python -m app.services.indicators.detect_candle_patterns._usage",
+      "usage_target": "app/services/indicators/detect_candle_patterns/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.indicators.detect_candle_patterns._usage",
+      "test_targets": [
+        "tests/services/indicators/detect_candle_patterns/test_traceability.py",
+        "tests/services/indicators/detect_candle_patterns/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IND-DETECT_CANDLE_PATTERNS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IND-TRANSFORM_SERIES",
       "task_id": "3.06",
-      "domain": "Indicators",
-      "executable_recipe": "uv run python -m app.services.indicators.transform_series._usage",
+      "usage_target": "app/services/indicators/transform_series/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.indicators.transform_series._usage",
+      "test_targets": [
+        "tests/services/indicators/transform_series/test_traceability.py",
+        "tests/services/indicators/transform_series/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IND-TRANSFORM_SERIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-DEFINE_AST",
       "task_id": "3.07",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.define_ast._usage",
+      "usage_target": "app/services/strategy/define_ast/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.define_ast._usage",
+      "test_targets": [
+        "tests/services/strategy/define_ast/test_traceability.py",
+        "tests/services/strategy/define_ast/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-DEFINE_AST/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-CATALOG_BLOCKS",
       "task_id": "3.08",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.catalog_blocks._usage",
+      "usage_target": "app/services/strategy/catalog_blocks/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.catalog_blocks._usage",
+      "test_targets": [
+        "tests/services/strategy/catalog_blocks/test_traceability.py",
+        "tests/services/strategy/catalog_blocks/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-CATALOG_BLOCKS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-CONFIGURE_CHARTS",
       "task_id": "3.09",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.configure_charts._usage",
+      "usage_target": "app/services/strategy/configure_charts/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.configure_charts._usage",
+      "test_targets": [
+        "tests/services/strategy/configure_charts/test_traceability.py",
+        "tests/services/strategy/configure_charts/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-CONFIGURE_CHARTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-MODEL_ATM_EXITS",
       "task_id": "3.10",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.model_atm_exits._usage",
+      "usage_target": "app/services/strategy/model_atm_exits/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.model_atm_exits._usage",
+      "test_targets": [
+        "tests/services/strategy/model_atm_exits/test_traceability.py",
+        "tests/services/strategy/model_atm_exits/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-MODEL_ATM_EXITS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-EDIT_TEMPLATES",
       "task_id": "3.11",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.edit_templates._usage",
+      "usage_target": "app/services/strategy/edit_templates/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.edit_templates._usage",
+      "test_targets": [
+        "tests/services/strategy/edit_templates/test_traceability.py",
+        "tests/services/strategy/edit_templates/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-EDIT_TEMPLATES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-DEFINE_INDICATORS",
       "task_id": "3.12",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.define_indicators._usage",
+      "usage_target": "app/services/strategy/define_indicators/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.define_indicators._usage",
+      "test_targets": [
+        "tests/services/strategy/define_indicators/test_traceability.py",
+        "tests/services/strategy/define_indicators/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-DEFINE_INDICATORS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-COMPILE_STRATEGIES",
       "task_id": "3.13",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.compile_strategies._usage",
+      "usage_target": "app/services/strategy/compile_strategies/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.compile_strategies._usage",
+      "test_targets": [
+        "tests/services/strategy/compile_strategies/test_traceability.py",
+        "tests/services/strategy/compile_strategies/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-COMPILE_STRATEGIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-VERSION_STRATEGIES",
       "task_id": "3.14",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.version_strategies._usage",
+      "usage_target": "app/services/strategy/version_strategies/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.version_strategies._usage",
+      "test_targets": [
+        "tests/services/strategy/version_strategies/test_traceability.py",
+        "tests/services/strategy/version_strategies/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-VERSION_STRATEGIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-GENERATE_CODE",
       "task_id": "3.15",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.generate_code._usage",
+      "usage_target": "app/services/strategy/generate_code/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.generate_code._usage",
+      "test_targets": [
+        "tests/services/strategy/generate_code/test_traceability.py",
+        "tests/services/strategy/generate_code/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-GENERATE_CODE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-EXCHANGE_STRATEGIES",
       "task_id": "3.16",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.exchange_strategies._usage",
+      "usage_target": "app/services/strategy/exchange_strategies/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.exchange_strategies._usage",
+      "test_targets": [
+        "tests/services/strategy/exchange_strategies/test_traceability.py",
+        "tests/services/strategy/exchange_strategies/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-EXCHANGE_STRATEGIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-OPERATE_STRATEGIES",
       "task_id": "3.17",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.operate_strategies._usage",
+      "usage_target": "app/services/interfaces/operate_strategies/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.operate_strategies._usage",
+      "test_targets": [
+        "tests/services/interfaces/operate_strategies/test_traceability.py",
+        "tests/services/interfaces/operate_strategies/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_STRATEGIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-STRATEGY_STUDIO",
       "task_id": "3.18",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/strategy_studio",
+      "usage_target": "app/ui/src/widgets/strategy-editor/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/strategy-editor/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/strategy-editor/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/strategy-editor/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-STRATEGY_STUDIO/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-PERFORMANCE_LAB",
       "task_id": "4.01",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/performance_lab",
+      "usage_target": "app/ui/src/widgets/performance-lab/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/performance-lab/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/performance-lab/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/performance-lab/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-PERFORMANCE_LAB/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RSK-SIZE_POSITIONS",
       "task_id": "4.02",
-      "domain": "Risk",
-      "executable_recipe": "uv run python -m app.services.risk.size_positions._usage",
+      "usage_target": "app/services/risk/size_positions/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.risk.size_positions._usage",
+      "test_targets": [
+        "tests/services/risk/size_positions/test_traceability.py",
+        "tests/services/risk/size_positions/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RSK-SIZE_POSITIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RSK-ASSESS_RESEARCH_RISK",
       "task_id": "4.03",
-      "domain": "Risk",
-      "executable_recipe": "uv run python -m app.services.risk.assess_research_risk._usage",
+      "usage_target": "app/services/risk/assess_research_risk/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.risk.assess_research_risk._usage",
+      "test_targets": [
+        "tests/services/risk/assess_research_risk/test_traceability.py",
+        "tests/services/risk/assess_research_risk/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RSK-ASSESS_RESEARCH_RISK/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-TRD-MANAGE_EXECUTION_SESSIONS",
       "task_id": "4.04",
-      "domain": "Trading",
-      "executable_recipe": "uv run python -m app.services.trading.manage_execution_sessions._usage",
+      "usage_target": "app/services/trading/manage_execution_sessions/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.trading.manage_execution_sessions._usage",
+      "test_targets": [
+        "tests/services/trading/manage_execution_sessions/test_traceability.py",
+        "tests/services/trading/manage_execution_sessions/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-TRD-MANAGE_EXECUTION_SESSIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-TRD-MODEL_EXECUTION_POLICIES",
       "task_id": "4.05",
-      "domain": "Trading",
-      "executable_recipe": "uv run python -m app.services.trading.model_execution_policies._usage",
+      "usage_target": "app/services/trading/model_execution_policies/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.trading.model_execution_policies._usage",
+      "test_targets": [
+        "tests/services/trading/model_execution_policies/test_traceability.py",
+        "tests/services/trading/model_execution_policies/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-TRD-MODEL_EXECUTION_POLICIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-SIM-MODEL_TICKS",
       "task_id": "4.06",
-      "domain": "Simulator",
-      "executable_recipe": "uv run python -m app.services.simulator.model_ticks._usage",
+      "usage_target": "app/services/simulator/model_ticks/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.simulator.model_ticks._usage",
+      "test_targets": [
+        "tests/services/simulator/model_ticks/test_traceability.py",
+        "tests/services/simulator/model_ticks/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-SIM-MODEL_TICKS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-COMPUTE_METRICS",
       "task_id": "4.07",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.compute_metrics._usage",
+      "usage_target": "app/services/analytics/compute_metrics/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.compute_metrics._usage",
+      "test_targets": [
+        "tests/services/analytics/compute_metrics/test_traceability.py",
+        "tests/services/analytics/compute_metrics/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-COMPUTE_METRICS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-SIM-CONFIGURE_ENGINE",
       "task_id": "4.08",
-      "domain": "Simulator",
-      "executable_recipe": "uv run python -m app.services.simulator.configure_engine._usage",
+      "usage_target": "app/services/simulator/configure_engine/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.simulator.configure_engine._usage",
+      "test_targets": [
+        "tests/services/simulator/configure_engine/test_traceability.py",
+        "tests/services/simulator/configure_engine/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-SIM-CONFIGURE_ENGINE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-SIM-EXECUTE_TICKS",
       "task_id": "4.09",
-      "domain": "Simulator",
-      "executable_recipe": "uv run python -m app.services.simulator.execute_ticks._usage",
+      "usage_target": "app/services/simulator/execute_ticks/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.simulator.execute_ticks._usage",
+      "test_targets": [
+        "tests/services/simulator/execute_ticks/test_traceability.py",
+        "tests/services/simulator/execute_ticks/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-SIM-EXECUTE_TICKS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-SIM-COMMIT_RESULTS",
       "task_id": "4.10",
-      "domain": "Simulator",
-      "executable_recipe": "uv run python -m app.services.simulator.commit_results._usage",
+      "usage_target": "app/services/simulator/commit_results/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.simulator.commit_results._usage",
+      "test_targets": [
+        "tests/services/simulator/commit_results/test_traceability.py",
+        "tests/services/simulator/commit_results/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-SIM-COMMIT_RESULTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-OPERATE_SIMULATIONS",
       "task_id": "4.11",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.operate_simulations._usage",
+      "usage_target": "app/services/interfaces/operate_simulations/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.operate_simulations._usage",
+      "test_targets": [
+        "tests/services/interfaces/operate_simulations/test_traceability.py",
+        "tests/services/interfaces/operate_simulations/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_SIMULATIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-SIM-CACHE_EVALUATIONS",
       "task_id": "4.12",
-      "domain": "Simulator",
-      "executable_recipe": "uv run python -m app.services.simulator.cache_evaluations._usage",
+      "usage_target": "app/services/simulator/cache_evaluations/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.simulator.cache_evaluations._usage",
+      "test_targets": [
+        "tests/services/simulator/cache_evaluations/test_traceability.py",
+        "tests/services/simulator/cache_evaluations/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-SIM-CACHE_EVALUATIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-QUERY_RESULTS",
       "task_id": "4.13",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.query_results._usage",
+      "usage_target": "app/services/analytics/query_results/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.query_results._usage",
+      "test_targets": [
+        "tests/services/analytics/query_results/test_traceability.py",
+        "tests/services/analytics/query_results/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-QUERY_RESULTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-DATABANK_MEMBERSHIP",
       "task_id": "4.14",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.databank_membership._usage",
+      "usage_target": "app/services/analytics/databank_membership/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.databank_membership._usage",
+      "test_targets": [
+        "tests/services/analytics/databank_membership/test_traceability.py",
+        "tests/services/analytics/databank_membership/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-DATABANK_MEMBERSHIP/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-ANALYZE_TRADES",
       "task_id": "4.15",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.analyze_trades._usage",
+      "usage_target": "app/services/analytics/analyze_trades/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.analyze_trades._usage",
+      "test_targets": [
+        "tests/services/analytics/analyze_trades/test_traceability.py",
+        "tests/services/analytics/analyze_trades/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-ANALYZE_TRADES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-PROJECT_SERIES",
       "task_id": "4.16",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.project_series._usage",
+      "usage_target": "app/services/analytics/project_series/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.project_series._usage",
+      "test_targets": [
+        "tests/services/analytics/project_series/test_traceability.py",
+        "tests/services/analytics/project_series/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-PROJECT_SERIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-COMPARE_RESULTS",
       "task_id": "4.17",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.compare_results._usage",
+      "usage_target": "app/services/analytics/compare_results/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.compare_results._usage",
+      "test_targets": [
+        "tests/services/analytics/compare_results/test_traceability.py",
+        "tests/services/analytics/compare_results/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-COMPARE_RESULTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-EXCHANGE_RESULTS",
       "task_id": "4.18",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.exchange_results._usage",
+      "usage_target": "app/services/analytics/exchange_results/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.exchange_results._usage",
+      "test_targets": [
+        "tests/services/analytics/exchange_results/test_traceability.py",
+        "tests/services/analytics/exchange_results/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-EXCHANGE_RESULTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-OPERATE_RESULTS",
       "task_id": "4.19",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.operate_results._usage",
+      "usage_target": "app/services/interfaces/operate_results/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.operate_results._usage",
+      "test_targets": [
+        "tests/services/interfaces/operate_results/test_traceability.py",
+        "tests/services/interfaces/operate_results/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_RESULTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-27",
       "task_id": "4.20",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/27",
+      "usage_target": "app/ui/src/widgets/simulator/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/simulator/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/simulator/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/simulator/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-27/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-32",
       "task_id": "4.21",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/32",
+      "usage_target": "app/ui/src/widgets/analytics/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/analytics/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/analytics/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/analytics/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-32/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-DATABANK_GRID",
       "task_id": "4.22",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/databank_grid",
+      "usage_target": "app/ui/src/widgets/databank-grid/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/databank-grid/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/databank-grid/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/databank-grid/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-DATABANK_GRID/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-RESULT_OVERVIEW",
       "task_id": "4.23",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/result_overview",
+      "usage_target": "app/ui/src/widgets/result-overview/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/result-overview/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/result-overview/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/result-overview/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RESULT_OVERVIEW/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-TRADE_LIST",
       "task_id": "4.24",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/trade_list",
+      "usage_target": "app/ui/src/widgets/trade-list/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/trade-list/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/trade-list/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/trade-list/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-TRADE_LIST/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-EQUITY_CHART",
       "task_id": "4.25",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/equity_chart",
+      "usage_target": "app/ui/src/widgets/equity-chart/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/equity-chart/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/equity-chart/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/equity-chart/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-EQUITY_CHART/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-TRADE_ANALYSIS",
       "task_id": "4.26",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/trade_analysis",
+      "usage_target": "app/ui/src/widgets/trade-analysis/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/trade-analysis/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/trade-analysis/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/trade-analysis/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-TRADE_ANALYSIS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-TRADES_ON_CHART",
       "task_id": "4.27",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/trades_on_chart",
+      "usage_target": "app/ui/src/widgets/trades-on-chart/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/trades-on-chart/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/trades-on-chart/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/trades-on-chart/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-TRADES_ON_CHART/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-15",
       "task_id": "5.01",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/15",
+      "usage_target": "app/ui/src/context/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/context/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/context/__tests__/traceability.test.tsx",
+        "app/ui/src/context/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-15/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-WS-MANAGE_CONVERSATIONS",
       "task_id": "5.02",
-      "domain": "Workspace",
-      "executable_recipe": "uv run python -m app.services.workspace.manage_conversations._usage",
+      "usage_target": "app/services/workspace/manage_conversations/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.workspace.manage_conversations._usage",
+      "test_targets": [
+        "tests/services/workspace/manage_conversations/test_traceability.py",
+        "tests/services/workspace/manage_conversations/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_CONVERSATIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-ASSEMBLE_CONTEXT",
       "task_id": "5.03",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.assemble_context._usage",
+      "usage_target": "app/services/agentic/assemble_context/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.assemble_context._usage",
+      "test_targets": [
+        "tests/services/agentic/assemble_context/test_traceability.py",
+        "tests/services/agentic/assemble_context/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ASSEMBLE_CONTEXT/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-RUN_WORKFLOWS",
       "task_id": "5.04",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.run_workflows._usage",
+      "usage_target": "app/services/agentic/run_workflows/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.run_workflows._usage",
+      "test_targets": [
+        "tests/services/agentic/run_workflows/test_traceability.py",
+        "tests/services/agentic/run_workflows/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-RUN_WORKFLOWS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-EVALUATE_PROFILES",
       "task_id": "5.05",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.evaluate_profiles._usage",
+      "usage_target": "app/services/agentic/evaluate_profiles/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.evaluate_profiles._usage",
+      "test_targets": [
+        "tests/services/agentic/evaluate_profiles/test_traceability.py",
+        "tests/services/agentic/evaluate_profiles/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-EVALUATE_PROFILES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-MANAGE_CLAIMS",
       "task_id": "5.06",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.manage_claims._usage",
+      "usage_target": "app/services/agentic/manage_claims/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.manage_claims._usage",
+      "test_targets": [
+        "tests/services/agentic/manage_claims/test_traceability.py",
+        "tests/services/agentic/manage_claims/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-MANAGE_CLAIMS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-SYNTHESIZE_RESEARCH",
       "task_id": "5.07",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.synthesize_research._usage",
+      "usage_target": "app/services/agentic/synthesize_research/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.synthesize_research._usage",
+      "test_targets": [
+        "tests/services/agentic/synthesize_research/test_traceability.py",
+        "tests/services/agentic/synthesize_research/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-SYNTHESIZE_RESEARCH/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-ASSIST_OPERATOR",
       "task_id": "5.08",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.assist_operator._usage",
+      "usage_target": "app/services/agentic/assist_operator/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.assist_operator._usage",
+      "test_targets": [
+        "tests/services/agentic/assist_operator/test_traceability.py",
+        "tests/services/agentic/assist_operator/test_lifecycle.py",
+        "tests/services/agentic/assist_operator/test_limits.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ASSIST_OPERATOR/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-AGENTIC_GATEWAY",
       "task_id": "5.09",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.agentic_gateway._usage",
+      "usage_target": "app/services/interfaces/agentic_gateway/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.agentic_gateway._usage",
+      "test_targets": [
+        "tests/services/interfaces/agentic_gateway/test_traceability.py",
+        "tests/services/interfaces/agentic_gateway/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-AGENTIC_GATEWAY/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-CHAT_BOT",
       "task_id": "5.10",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/chat_bot",
+      "usage_target": "app/ui/src/widgets/chat-bot/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/chat-bot/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/chat-bot/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/chat-bot/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-CHAT_BOT/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-AGENTIC_RUN_INSPECTOR",
       "task_id": "5.11",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/agentic_run_inspector",
+      "usage_target": "app/ui/src/widgets/agentic-run-inspector/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/agentic-run-inspector/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/agentic-run-inspector/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/agentic-run-inspector/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-AGENTIC_RUN_INSPECTOR/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-ACCEPT_PROPOSALS",
       "task_id": "6.01",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.accept_proposals._usage",
+      "usage_target": "app/services/strategy/accept_proposals/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.accept_proposals._usage",
+      "test_targets": [
+        "tests/services/strategy/accept_proposals/test_traceability.py",
+        "tests/services/strategy/accept_proposals/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-ACCEPT_PROPOSALS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-GOVERN_CAMPAIGNS",
       "task_id": "6.02",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.govern_campaigns._usage",
+      "usage_target": "app/services/research/govern_campaigns/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.govern_campaigns._usage",
+      "test_targets": [
+        "tests/services/research/govern_campaigns/test_traceability.py",
+        "tests/services/research/govern_campaigns/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-GOVERN_CAMPAIGNS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-DEFINE_PROTOCOLS",
       "task_id": "6.03",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.define_protocols._usage",
+      "usage_target": "app/services/research/define_protocols/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.define_protocols._usage",
+      "test_targets": [
+        "tests/services/research/define_protocols/test_traceability.py",
+        "tests/services/research/define_protocols/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-DEFINE_PROTOCOLS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
       "task_id": "6.04",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.compose_strategy_proposals._usage",
+      "usage_target": "app/services/agentic/compose_strategy_proposals/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.compose_strategy_proposals._usage",
+      "test_targets": [
+        "tests/services/agentic/compose_strategy_proposals/test_traceability.py",
+        "tests/services/agentic/compose_strategy_proposals/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-GOVERN_HOLDOUTS",
       "task_id": "6.05",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.govern_holdouts._usage",
+      "usage_target": "app/services/research/govern_holdouts/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.govern_holdouts._usage",
+      "test_targets": [
+        "tests/services/research/govern_holdouts/test_traceability.py",
+        "tests/services/research/govern_holdouts/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-GOVERN_HOLDOUTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-RUN_RESEARCH",
       "task_id": "6.06",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.run_research._usage",
+      "usage_target": "app/services/research/run_research/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.run_research._usage",
+      "test_targets": [
+        "tests/services/research/run_research/test_traceability.py",
+        "tests/services/research/run_research/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-RUN_RESEARCH/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-OPERATE_RESEARCH",
       "task_id": "6.07",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.operate_research._usage",
+      "usage_target": "app/services/interfaces/operate_research/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.operate_research._usage",
+      "test_targets": [
+        "tests/services/interfaces/operate_research/test_traceability.py",
+        "tests/services/interfaces/operate_research/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_RESEARCH/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
       "task_id": "6.08",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.govern_research_search._usage",
+      "usage_target": "app/services/agentic/govern_research_search/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.govern_research_search._usage",
+      "test_targets": [
+        "tests/services/agentic/govern_research_search/test_traceability.py",
+        "tests/services/agentic/govern_research_search/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-GOVERN_RESEARCH_SEARCH/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-DESIGN_RESEARCH",
       "task_id": "6.09",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.design_research._usage",
+      "usage_target": "app/services/agentic/design_research/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.design_research._usage",
+      "test_targets": [
+        "tests/services/agentic/design_research/test_traceability.py",
+        "tests/services/agentic/design_research/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-DESIGN_RESEARCH/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
       "task_id": "6.10",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.compose_strategy_specs._usage",
+      "usage_target": "app/services/agentic/compose_strategy_specs/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.compose_strategy_specs._usage",
+      "test_targets": [
+        "tests/services/agentic/compose_strategy_specs/test_traceability.py",
+        "tests/services/agentic/compose_strategy_specs/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_SPECS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-28",
       "task_id": "6.11",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/28",
+      "usage_target": "app/ui/src/widgets/research/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/research/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/research/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/research/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-28/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-SIM-PERTURB_INPUTS",
       "task_id": "7.01",
-      "domain": "Simulator",
-      "executable_recipe": "uv run python -m app.services.simulator.perturb_inputs._usage",
+      "usage_target": "app/services/simulator/perturb_inputs/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.simulator.perturb_inputs._usage",
+      "test_targets": [
+        "tests/services/simulator/perturb_inputs/test_traceability.py",
+        "tests/services/simulator/perturb_inputs/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-SIM-PERTURB_INPUTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-ANALYZE_DISTRIBUTIONS",
       "task_id": "7.02",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.analyze_distributions._usage",
+      "usage_target": "app/services/analytics/analyze_distributions/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.analyze_distributions._usage",
+      "test_targets": [
+        "tests/services/analytics/analyze_distributions/test_traceability.py",
+        "tests/services/analytics/analyze_distributions/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-ANALYZE_DISTRIBUTIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-DELIBERATE_RESEARCH",
       "task_id": "7.03",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.deliberate_research._usage",
+      "usage_target": "app/services/agentic/deliberate_research/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.deliberate_research._usage",
+      "test_targets": [
+        "tests/services/agentic/deliberate_research/test_traceability.py",
+        "tests/services/agentic/deliberate_research/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-DELIBERATE_RESEARCH/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-TEST_ROBUSTNESS",
       "task_id": "7.04",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.test_robustness._usage",
+      "usage_target": "app/services/research/test_robustness/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.test_robustness._usage",
+      "test_targets": [
+        "tests/services/research/test_robustness/test_traceability.py",
+        "tests/services/research/test_robustness/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-TEST_ROBUSTNESS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-ROBUSTNESS_RESULTS",
       "task_id": "7.05",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/robustness_results",
+      "usage_target": "app/ui/src/widgets/robustness-results/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/robustness-results/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/robustness-results/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/robustness-results/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-ROBUSTNESS_RESULTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-QUALIFY_RESEARCH",
       "task_id": "7.06",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.qualify_research._usage",
+      "usage_target": "app/services/research/qualify_research/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.qualify_research._usage",
+      "test_targets": [
+        "tests/services/research/qualify_research/test_traceability.py",
+        "tests/services/research/qualify_research/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-QUALIFY_RESEARCH/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-STRATEGY_RETESTER",
       "task_id": "7.07",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/strategy_retester",
+      "usage_target": "app/ui/src/widgets/research-settings/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/research-settings/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/research-settings/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/research-settings/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-STRATEGY_RETESTER/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-DEFINE_SEARCH_SPACES",
       "task_id": "8.01",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.define_search_spaces._usage",
+      "usage_target": "app/services/strategy/define_search_spaces/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.define_search_spaces._usage",
+      "test_targets": [
+        "tests/services/strategy/define_search_spaces/test_traceability.py",
+        "tests/services/strategy/define_search_spaces/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-DEFINE_SEARCH_SPACES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-RANK_CANDIDATES",
       "task_id": "8.02",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.rank_candidates._usage",
+      "usage_target": "app/services/research/rank_candidates/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.rank_candidates._usage",
+      "test_targets": [
+        "tests/services/research/rank_candidates/test_traceability.py",
+        "tests/services/research/rank_candidates/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-RANK_CANDIDATES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-GENERATE_STRATEGIES",
       "task_id": "8.03",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.generate_strategies._usage",
+      "usage_target": "app/services/research/generate_strategies/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.generate_strategies._usage",
+      "test_targets": [
+        "tests/services/research/generate_strategies/test_traceability.py",
+        "tests/services/research/generate_strategies/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-GENERATE_STRATEGIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-EVOLVE_STRATEGIES",
       "task_id": "8.04",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.evolve_strategies._usage",
+      "usage_target": "app/services/research/evolve_strategies/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.evolve_strategies._usage",
+      "test_targets": [
+        "tests/services/research/evolve_strategies/test_traceability.py",
+        "tests/services/research/evolve_strategies/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-EVOLVE_STRATEGIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-STRATEGY_BUILDER",
       "task_id": "8.05",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/strategy_builder",
+      "usage_target": "app/ui/src/widgets/strategy-search-space/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/strategy-search-space/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/strategy-search-space/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/strategy-search-space/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-STRATEGY_BUILDER/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-OPT-SEARCH_PARAMETERS",
       "task_id": "9.01",
-      "domain": "Optimization",
-      "executable_recipe": "uv run python -m app.services.optimization.search_parameters._usage",
+      "usage_target": "app/services/optimization/search_parameters/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.optimization.search_parameters._usage",
+      "test_targets": [
+        "tests/services/optimization/search_parameters/test_traceability.py",
+        "tests/services/optimization/search_parameters/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-OPT-SEARCH_PARAMETERS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-OPT-VALIDATE_WALK_FORWARD",
       "task_id": "9.02",
-      "domain": "Optimization",
-      "executable_recipe": "uv run python -m app.services.optimization.validate_walk_forward._usage",
+      "usage_target": "app/services/optimization/validate_walk_forward/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.optimization.validate_walk_forward._usage",
+      "test_targets": [
+        "tests/services/optimization/validate_walk_forward/test_traceability.py",
+        "tests/services/optimization/validate_walk_forward/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-OPT-VALIDATE_WALK_FORWARD/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-OPT-PERMUTE_PARAMETERS",
       "task_id": "9.03",
-      "domain": "Optimization",
-      "executable_recipe": "uv run python -m app.services.optimization.permute_parameters._usage",
+      "usage_target": "app/services/optimization/permute_parameters/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.optimization.permute_parameters._usage",
+      "test_targets": [
+        "tests/services/optimization/permute_parameters/test_traceability.py",
+        "tests/services/optimization/permute_parameters/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-OPT-PERMUTE_PARAMETERS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-OPERATE_OPTIMIZATION",
       "task_id": "9.04",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.operate_optimization._usage",
+      "usage_target": "app/services/interfaces/operate_optimization/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.operate_optimization._usage",
+      "test_targets": [
+        "tests/services/interfaces/operate_optimization/test_traceability.py",
+        "tests/services/interfaces/operate_optimization/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_OPTIMIZATION/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-PARAMETER_OPTIMIZER",
       "task_id": "9.05",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/parameter_optimizer",
+      "usage_target": "app/ui/src/widgets/optimization-settings/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/optimization-settings/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/optimization-settings/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/optimization-settings/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-PARAMETER_OPTIMIZER/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-OPTIMIZATION_RESULTS",
       "task_id": "9.06",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/optimization_results",
+      "usage_target": "app/ui/src/widgets/optimization-results/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/optimization-results/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/optimization-results/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/optimization-results/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-OPTIMIZATION_RESULTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-POR-COMPOSE_PORTFOLIOS",
       "task_id": "10.01",
-      "domain": "Portfolio",
-      "executable_recipe": "uv run python -m app.services.portfolio.compose_portfolios._usage",
+      "usage_target": "app/services/portfolio/compose_portfolios/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.portfolio.compose_portfolios._usage",
+      "test_targets": [
+        "tests/services/portfolio/compose_portfolios/test_traceability.py",
+        "tests/services/portfolio/compose_portfolios/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-POR-COMPOSE_PORTFOLIOS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-POR-ANALYZE_CORRELATION",
       "task_id": "10.02",
-      "domain": "Portfolio",
-      "executable_recipe": "uv run python -m app.services.portfolio.analyze_correlation._usage",
+      "usage_target": "app/services/portfolio/analyze_correlation/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.portfolio.analyze_correlation._usage",
+      "test_targets": [
+        "tests/services/portfolio/analyze_correlation/test_traceability.py",
+        "tests/services/portfolio/analyze_correlation/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-POR-ANALYZE_CORRELATION/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-FILTER_CORRELATION",
       "task_id": "10.03",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.filter_correlation._usage",
+      "usage_target": "app/services/analytics/filter_correlation/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.filter_correlation._usage",
+      "test_targets": [
+        "tests/services/analytics/filter_correlation/test_traceability.py",
+        "tests/services/analytics/filter_correlation/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-FILTER_CORRELATION/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-POR-OPTIMIZE_WEIGHTS",
       "task_id": "10.04",
-      "domain": "Portfolio",
-      "executable_recipe": "uv run python -m app.services.portfolio.optimize_weights._usage",
+      "usage_target": "app/services/portfolio/optimize_weights/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.portfolio.optimize_weights._usage",
+      "test_targets": [
+        "tests/services/portfolio/optimize_weights/test_traceability.py",
+        "tests/services/portfolio/optimize_weights/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-POR-OPTIMIZE_WEIGHTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-POR-SIMULATE_PORTFOLIOS",
       "task_id": "10.05",
-      "domain": "Portfolio",
-      "executable_recipe": "uv run python -m app.services.portfolio.simulate_portfolios._usage",
+      "usage_target": "app/services/portfolio/simulate_portfolios/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.portfolio.simulate_portfolios._usage",
+      "test_targets": [
+        "tests/services/portfolio/simulate_portfolios/test_traceability.py",
+        "tests/services/portfolio/simulate_portfolios/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-POR-SIMULATE_PORTFOLIOS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-POR-ANALYZE_PORTFOLIO_RISK",
       "task_id": "10.06",
-      "domain": "Portfolio",
-      "executable_recipe": "uv run python -m app.services.portfolio.analyze_portfolio_risk._usage",
+      "usage_target": "app/services/portfolio/analyze_portfolio_risk/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.portfolio.analyze_portfolio_risk._usage",
+      "test_targets": [
+        "tests/services/portfolio/analyze_portfolio_risk/test_traceability.py",
+        "tests/services/portfolio/analyze_portfolio_risk/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-POR-ANALYZE_PORTFOLIO_RISK/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-POR-MERGE_PORTFOLIOS",
       "task_id": "10.07",
-      "domain": "Portfolio",
-      "executable_recipe": "uv run python -m app.services.portfolio.merge_portfolios._usage",
+      "usage_target": "app/services/portfolio/merge_portfolios/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.portfolio.merge_portfolios._usage",
+      "test_targets": [
+        "tests/services/portfolio/merge_portfolios/test_traceability.py",
+        "tests/services/portfolio/merge_portfolios/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-POR-MERGE_PORTFOLIOS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-POR-SEARCH_PORTFOLIOS",
       "task_id": "10.08",
-      "domain": "Portfolio",
-      "executable_recipe": "uv run python -m app.services.portfolio.search_portfolios._usage",
+      "usage_target": "app/services/portfolio/search_portfolios/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.portfolio.search_portfolios._usage",
+      "test_targets": [
+        "tests/services/portfolio/search_portfolios/test_traceability.py",
+        "tests/services/portfolio/search_portfolios/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-POR-SEARCH_PORTFOLIOS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-ADVISE_PORTFOLIO",
       "task_id": "10.09",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.advise_portfolio._usage",
+      "usage_target": "app/services/agentic/advise_portfolio/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.advise_portfolio._usage",
+      "test_targets": [
+        "tests/services/agentic/advise_portfolio/test_traceability.py",
+        "tests/services/agentic/advise_portfolio/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ADVISE_PORTFOLIO/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-OPERATE_PORTFOLIOS",
       "task_id": "10.10",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.operate_portfolios._usage",
+      "usage_target": "app/services/interfaces/operate_portfolios/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.operate_portfolios._usage",
+      "test_targets": [
+        "tests/services/interfaces/operate_portfolios/test_traceability.py",
+        "tests/services/interfaces/operate_portfolios/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_PORTFOLIOS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-PORTFOLIO_COMPOSER",
       "task_id": "10.11",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/portfolio_composer",
+      "usage_target": "app/ui/src/widgets/portfolio-composer/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/portfolio-composer/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/portfolio-composer/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/portfolio-composer/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-PORTFOLIO_COMPOSER/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-PORTFOLIO_BUILDER",
       "task_id": "10.12",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/portfolio_builder",
+      "usage_target": "app/ui/src/widgets/portfolio-builder/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/portfolio-builder/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/portfolio-builder/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/portfolio-builder/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-PORTFOLIO_BUILDER/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-TRD-OBSERVE_OUTCOMES",
       "task_id": "11.01",
-      "domain": "Trading",
-      "executable_recipe": "uv run python -m app.services.trading.observe_outcomes._usage",
+      "usage_target": "app/services/trading/observe_outcomes/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.trading.observe_outcomes._usage",
+      "test_targets": [
+        "tests/services/trading/observe_outcomes/test_traceability.py",
+        "tests/services/trading/observe_outcomes/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-TRD-OBSERVE_OUTCOMES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ORCH-DEFINE_PROJECTS",
       "task_id": "11.02",
-      "domain": "Orchestration",
-      "executable_recipe": "uv run python -m app.services.orchestration.define_projects._usage",
+      "usage_target": "app/services/orchestration/define_projects/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.orchestration.define_projects._usage",
+      "test_targets": [
+        "tests/services/orchestration/define_projects/test_traceability.py",
+        "tests/services/orchestration/define_projects/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-DEFINE_PROJECTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ORCH-EXECUTE_UTILITIES",
       "task_id": "11.03",
-      "domain": "Orchestration",
-      "executable_recipe": "uv run python -m app.services.orchestration.execute_utilities._usage",
+      "usage_target": "app/services/orchestration/execute_utilities/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.orchestration.execute_utilities._usage",
+      "test_targets": [
+        "tests/services/orchestration/execute_utilities/test_traceability.py",
+        "tests/services/orchestration/execute_utilities/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-EXECUTE_UTILITIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ORCH-DELIVER_NOTIFICATIONS",
       "task_id": "11.04",
-      "domain": "Orchestration",
-      "executable_recipe": "uv run python -m app.services.orchestration.deliver_notifications._usage",
+      "usage_target": "app/services/orchestration/deliver_notifications/_usage.py",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "uv run --frozen python -m app.services.orchestration.deliver_notifications._usage",
+      "test_targets": [
+        "tests/services/orchestration/deliver_notifications/test_traceability.py",
+        "tests/services/orchestration/deliver_notifications/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-DELIVER_NOTIFICATIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-MANAGE_MEMORY",
       "task_id": "11.05",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.manage_memory._usage",
+      "usage_target": "app/services/agentic/manage_memory/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.manage_memory._usage",
+      "test_targets": [
+        "tests/services/agentic/manage_memory/test_traceability.py",
+        "tests/services/agentic/manage_memory/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-MANAGE_MEMORY/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ORCH-RUN_PROJECTS",
       "task_id": "11.06",
-      "domain": "Orchestration",
-      "executable_recipe": "uv run python -m app.services.orchestration.run_projects._usage",
+      "usage_target": "app/services/orchestration/run_projects/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.orchestration.run_projects._usage",
+      "test_targets": [
+        "tests/services/orchestration/run_projects/test_traceability.py",
+        "tests/services/orchestration/run_projects/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RUN_PROJECTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-CALIBRATE_OUTCOMES",
       "task_id": "11.07",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.calibrate_outcomes._usage",
+      "usage_target": "app/services/agentic/calibrate_outcomes/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.calibrate_outcomes._usage",
+      "test_targets": [
+        "tests/services/agentic/calibrate_outcomes/test_traceability.py",
+        "tests/services/agentic/calibrate_outcomes/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-CALIBRATE_OUTCOMES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-EDIT_PROJECTS",
       "task_id": "11.08",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.edit_projects._usage",
+      "usage_target": "app/services/interfaces/edit_projects/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.edit_projects._usage",
+      "test_targets": [
+        "tests/services/interfaces/edit_projects/test_traceability.py",
+        "tests/services/interfaces/edit_projects/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-EDIT_PROJECTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-PROJECT_EDITOR",
       "task_id": "11.09",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/project_editor",
+      "usage_target": "app/ui/src/widgets/project-editor/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/project-editor/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/project-editor/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/project-editor/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-PROJECT_EDITOR/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-PLUG-SANDBOX_PERMISSIONS",
       "task_id": "12.01",
-      "domain": "Plugins",
-      "executable_recipe": "uv run python -m app.services.plugins.sandbox_permissions._usage",
+      "usage_target": "app/services/plugins/sandbox_permissions/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.plugins.sandbox_permissions._usage",
+      "test_targets": [
+        "tests/services/plugins/sandbox_permissions/test_traceability.py",
+        "tests/services/plugins/sandbox_permissions/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-SANDBOX_PERMISSIONS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-PLUG-AUTHOR_PACKAGES",
       "task_id": "12.02",
-      "domain": "Plugins",
-      "executable_recipe": "uv run python -m app.services.plugins.author_packages._usage",
+      "usage_target": "app/services/plugins/author_packages/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.plugins.author_packages._usage",
+      "test_targets": [
+        "tests/services/plugins/author_packages/test_traceability.py",
+        "tests/services/plugins/author_packages/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-AUTHOR_PACKAGES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-PLUG-ISOLATE_ANALYSIS",
       "task_id": "12.03",
-      "domain": "Plugins",
-      "executable_recipe": "uv run python -m app.services.plugins.isolate_analysis._usage",
+      "usage_target": "app/services/plugins/isolate_analysis/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.plugins.isolate_analysis._usage",
+      "test_targets": [
+        "tests/services/plugins/isolate_analysis/test_traceability.py",
+        "tests/services/plugins/isolate_analysis/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-ISOLATE_ANALYSIS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-PLUG-RENDER_RESULT_PANELS",
       "task_id": "12.04",
-      "domain": "Plugins",
-      "executable_recipe": "uv run python -m app.services.plugins.render_result_panels._usage",
+      "usage_target": "app/services/plugins/render_result_panels/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.plugins.render_result_panels._usage",
+      "test_targets": [
+        "tests/services/plugins/render_result_panels/test_traceability.py",
+        "tests/services/plugins/render_result_panels/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-RENDER_RESULT_PANELS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-GENERATE_MQL5",
       "task_id": "12.05",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.generate_mql5._usage",
+      "usage_target": "app/services/strategy/generate_mql5/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.generate_mql5._usage",
+      "test_targets": [
+        "tests/services/strategy/generate_mql5/test_traceability.py",
+        "tests/services/strategy/generate_mql5/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-GENERATE_MQL5/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-GENERATE_PYTHON",
       "task_id": "12.06",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.generate_python._usage",
+      "usage_target": "app/services/strategy/generate_python/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.generate_python._usage",
+      "test_targets": [
+        "tests/services/strategy/generate_python/test_traceability.py",
+        "tests/services/strategy/generate_python/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-GENERATE_PYTHON/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS",
       "task_id": "12.07",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.provide_custom_analysis._usage",
+      "usage_target": "app/services/analytics/provide_custom_analysis/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.provide_custom_analysis._usage",
+      "test_targets": [
+        "tests/services/analytics/provide_custom_analysis/test_traceability.py",
+        "tests/services/analytics/provide_custom_analysis/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-PLUG-MANAGE_LIFECYCLE",
       "task_id": "12.08",
-      "domain": "Plugins",
-      "executable_recipe": "uv run python -m app.services.plugins.manage_lifecycle._usage",
+      "usage_target": "app/services/plugins/manage_lifecycle/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.plugins.manage_lifecycle._usage",
+      "test_targets": [
+        "tests/services/plugins/manage_lifecycle/test_traceability.py",
+        "tests/services/plugins/manage_lifecycle/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-MANAGE_LIFECYCLE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-PLUG-MAINTAIN_COMPATIBILITY",
       "task_id": "12.09",
-      "domain": "Plugins",
-      "executable_recipe": "uv run python -m app.services.plugins.maintain_compatibility._usage",
+      "usage_target": "app/services/plugins/maintain_compatibility/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.plugins.maintain_compatibility._usage",
+      "test_targets": [
+        "tests/services/plugins/maintain_compatibility/test_traceability.py",
+        "tests/services/plugins/maintain_compatibility/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-MAINTAIN_COMPATIBILITY/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
       "task_id": "12.10",
-      "domain": "Agentic",
-      "executable_recipe": "uv run python -m app.services.agentic.author_sandbox_artifacts._usage",
+      "usage_target": "app/services/agentic/author_sandbox_artifacts/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.agentic.author_sandbox_artifacts._usage",
+      "test_targets": [
+        "tests/services/agentic/author_sandbox_artifacts/test_traceability.py",
+        "tests/services/agentic/author_sandbox_artifacts/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-ADMINISTER_CAPABILITIES",
       "task_id": "12.11",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.administer_capabilities._usage",
+      "usage_target": "app/services/interfaces/administer_capabilities/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.administer_capabilities._usage",
+      "test_targets": [
+        "tests/services/interfaces/administer_capabilities/test_traceability.py",
+        "tests/services/interfaces/administer_capabilities/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-ADMINISTER_CAPABILITIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-CODE_EDITOR",
       "task_id": "12.12",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/code_editor",
+      "usage_target": "app/ui/src/widgets/code-editor/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/code-editor/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/code-editor/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/code-editor/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-CODE_EDITOR/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-INDICATOR_TESTER",
       "task_id": "12.13",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/indicator_tester",
+      "usage_target": "app/ui/src/widgets/indicator-tester/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/indicator-tester/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/indicator-tester/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/indicator-tester/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-INDICATOR_TESTER/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IND-CALCULATE_MARKET_PROFILES",
       "task_id": "13.01",
-      "domain": "Indicators",
-      "executable_recipe": "uv run python -m app.services.indicators.calculate_market_profiles._usage",
+      "usage_target": "app/services/indicators/calculate_market_profiles/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.indicators.calculate_market_profiles._usage",
+      "test_targets": [
+        "tests/services/indicators/calculate_market_profiles/test_traceability.py",
+        "tests/services/indicators/calculate_market_profiles/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IND-CALCULATE_MARKET_PROFILES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-DEFINE_ARCHITECTURES",
       "task_id": "13.02",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.define_architectures._usage",
+      "usage_target": "app/services/strategy/define_architectures/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.define_architectures._usage",
+      "test_targets": [
+        "tests/services/strategy/define_architectures/test_traceability.py",
+        "tests/services/strategy/define_architectures/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-DEFINE_ARCHITECTURES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-SIM-SIMULATE_STOCKPICKERS",
       "task_id": "13.03",
-      "domain": "Simulator",
-      "executable_recipe": "uv run python -m app.services.simulator.simulate_stockpickers._usage",
+      "usage_target": "app/services/simulator/simulate_stockpickers/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.simulator.simulate_stockpickers._usage",
+      "test_targets": [
+        "tests/services/simulator/simulate_stockpickers/test_traceability.py",
+        "tests/services/simulator/simulate_stockpickers/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-SIM-SIMULATE_STOCKPICKERS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-ADVANCED_ANALYSIS",
       "task_id": "13.04",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/advanced_analysis",
+      "usage_target": "app/ui/src/widgets/advanced-analysis/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/advanced-analysis/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/advanced-analysis/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/advanced-analysis/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-ADVANCED_ANALYSIS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-PREPARE_NEURAL_DATASETS",
       "task_id": "14.01",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.prepare_neural_datasets._usage",
+      "usage_target": "app/services/research/prepare_neural_datasets/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.prepare_neural_datasets._usage",
+      "test_targets": [
+        "tests/services/research/prepare_neural_datasets/test_traceability.py",
+        "tests/services/research/prepare_neural_datasets/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-PREPARE_NEURAL_DATASETS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-LABEL_NEURAL_DATA",
       "task_id": "14.02",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.label_neural_data._usage",
+      "usage_target": "app/services/research/label_neural_data/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.label_neural_data._usage",
+      "test_targets": [
+        "tests/services/research/label_neural_data/test_traceability.py",
+        "tests/services/research/label_neural_data/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-LABEL_NEURAL_DATA/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-INFER_MODELS",
       "task_id": "14.03",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.infer_models._usage",
+      "usage_target": "app/services/research/infer_models/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.infer_models._usage",
+      "test_targets": [
+        "tests/services/research/infer_models/test_traceability.py",
+        "tests/services/research/infer_models/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-INFER_MODELS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-TRAIN_MODELS",
       "task_id": "14.04",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.train_models._usage",
+      "usage_target": "app/services/research/train_models/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.train_models._usage",
+      "test_targets": [
+        "tests/services/research/train_models/test_traceability.py",
+        "tests/services/research/train_models/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-TRAIN_MODELS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-VALIDATE_MODELS",
       "task_id": "14.05",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.validate_models._usage",
+      "usage_target": "app/services/research/validate_models/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.validate_models._usage",
+      "test_targets": [
+        "tests/services/research/validate_models/test_traceability.py",
+        "tests/services/research/validate_models/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-VALIDATE_MODELS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-RES-EXPLAIN_MODELS",
       "task_id": "14.06",
-      "domain": "Research",
-      "executable_recipe": "uv run python -m app.services.research.explain_models._usage",
+      "usage_target": "app/services/research/explain_models/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.research.explain_models._usage",
+      "test_targets": [
+        "tests/services/research/explain_models/test_traceability.py",
+        "tests/services/research/explain_models/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-RES-EXPLAIN_MODELS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-NEURAL_RESEARCH",
       "task_id": "14.07",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/neural_research",
+      "usage_target": "app/ui/src/widgets/neural-research/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/neural-research/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/neural-research/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/neural-research/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-NEURAL_RESEARCH/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ORCH-MANAGE_REMOTE_WORKERS",
       "task_id": "15.01",
-      "domain": "Orchestration",
-      "executable_recipe": "uv run python -m app.services.orchestration.manage_remote_workers._usage",
+      "usage_target": "app/services/orchestration/manage_remote_workers/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.orchestration.manage_remote_workers._usage",
+      "test_targets": [
+        "tests/services/orchestration/manage_remote_workers/test_traceability.py",
+        "tests/services/orchestration/manage_remote_workers/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-MANAGE_REMOTE_WORKERS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-IFACE-AUTOMATE_COMMANDS",
       "task_id": "16.01",
-      "domain": "Interfaces",
-      "executable_recipe": "uv run python -m app.services.interfaces.automate_commands._usage",
+      "usage_target": "app/services/interfaces/automate_commands/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.interfaces.automate_commands._usage",
+      "test_targets": [
+        "tests/services/interfaces/automate_commands/test_traceability.py",
+        "tests/services/interfaces/automate_commands/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-AUTOMATE_COMMANDS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-WS-DISTRIBUTE_APPLICATION",
       "task_id": "16.02",
-      "domain": "Workspace",
-      "executable_recipe": "uv run python -m app.services.workspace.distribute_application._usage",
+      "usage_target": "app/services/workspace/distribute_application/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.workspace.distribute_application._usage",
+      "test_targets": [
+        "tests/services/workspace/distribute_application/test_traceability.py",
+        "tests/services/workspace/distribute_application/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-WS-DISTRIBUTE_APPLICATION/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-DARWINEX",
       "task_id": "16.03",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.darwinex._usage",
+      "usage_target": "app/services/brokers/darwinex/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.darwinex._usage",
+      "test_targets": [
+        "tests/services/brokers/darwinex/test_traceability.py",
+        "tests/services/brokers/darwinex/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-DARWINEX/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-COINBASE",
       "task_id": "16.04",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.coinbase._usage",
+      "usage_target": "app/services/brokers/coinbase/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.coinbase._usage",
+      "test_targets": [
+        "tests/services/brokers/coinbase/test_traceability.py",
+        "tests/services/brokers/coinbase/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-COINBASE/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-BITFINEX",
       "task_id": "16.05",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.bitfinex._usage",
+      "usage_target": "app/services/brokers/bitfinex/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.bitfinex._usage",
+      "test_targets": [
+        "tests/services/brokers/bitfinex/test_traceability.py",
+        "tests/services/brokers/bitfinex/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-BITFINEX/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-POLONIEX",
       "task_id": "16.06",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.poloniex._usage",
+      "usage_target": "app/services/brokers/poloniex/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.poloniex._usage",
+      "test_targets": [
+        "tests/services/brokers/poloniex/test_traceability.py",
+        "tests/services/brokers/poloniex/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-POLONIEX/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-BRK-CONNECT_MARKET_FEEDS",
       "task_id": "16.07",
-      "domain": "Brokers",
-      "executable_recipe": "uv run python -m app.services.brokers.connect_market_feeds._usage",
+      "usage_target": "app/services/brokers/connect_market_feeds/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.brokers.connect_market_feeds._usage",
+      "test_targets": [
+        "tests/services/brokers/connect_market_feeds/test_traceability.py",
+        "tests/services/brokers/connect_market_feeds/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-BRK-CONNECT_MARKET_FEEDS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-GENERATE_TARGETS",
       "task_id": "16.08",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.generate_targets._usage",
+      "usage_target": "app/services/strategy/generate_targets/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.generate_targets._usage",
+      "test_targets": [
+        "tests/services/strategy/generate_targets/test_traceability.py",
+        "tests/services/strategy/generate_targets/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-GENERATE_TARGETS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-ANA-IMPORT_EXTERNAL_LEDGERS",
       "task_id": "16.09",
-      "domain": "Analytics",
-      "executable_recipe": "uv run python -m app.services.analytics.import_external_ledgers._usage",
+      "usage_target": "app/services/analytics/import_external_ledgers/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.analytics.import_external_ledgers._usage",
+      "test_targets": [
+        "tests/services/analytics/import_external_ledgers/test_traceability.py",
+        "tests/services/analytics/import_external_ledgers/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-ANA-IMPORT_EXTERNAL_LEDGERS/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-IMPORT_SQX",
       "task_id": "16.10",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.import_sqx._usage",
+      "usage_target": "app/services/strategy/import_sqx/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.import_sqx._usage",
+      "test_targets": [
+        "tests/services/strategy/import_sqx/test_traceability.py",
+        "tests/services/strategy/import_sqx/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-IMPORT_SQX/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-STRAT-PACKAGE_STRATEGIES",
       "task_id": "16.11",
-      "domain": "Strategy",
-      "executable_recipe": "uv run python -m app.services.strategy.package_strategies._usage",
+      "usage_target": "app/services/strategy/package_strategies/_usage.py",
+      "usage_status": "PLANNED",
+      "executable_recipe": "uv run --frozen python -m app.services.strategy.package_strategies._usage",
+      "test_targets": [
+        "tests/services/strategy/package_strategies/test_traceability.py",
+        "tests/services/strategy/package_strategies/test_lifecycle.py"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-PACKAGE_STRATEGIES/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     },
     {
       "feature_id": "FEAT-UI-STRATEGY_PACKAGER",
       "task_id": "16.12",
-      "domain": "UI",
-      "executable_recipe": "npm run test -- app/ui/src/widgets/strategy_packager",
+      "usage_target": "app/ui/src/widgets/strategy-packager/_usage.tsx",
+      "usage_status": "PLANNED",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/strategy-packager/__tests__/traceability.test.tsx",
+      "test_targets": [
+        "app/ui/src/widgets/strategy-packager/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/strategy-packager/__tests__/lifecycle.test.tsx"
+      ],
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-STRATEGY_PACKAGER/acceptance.json",
       "offline_only": true,
       "external_credentials_required": false
     }

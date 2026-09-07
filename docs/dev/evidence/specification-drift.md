@@ -1,48 +1,47 @@
-# Specification Drift Reconciliation Report
+# Phase 0 specification drift reconciliation
 
-**Task:** Preparation 0.01 — Freeze the source and the 205-feature scope
-**Date:** 2026-09-07
-**Repository Baseline:** `4ba167564a4889fec0d5d52f2ce9072f536a2d05`
-**Plan Baseline:** `d8f23a51ada672d0f0d319df62ed857a66e08dd5`
+**Repository baseline:** `34edd2b3c8164b59ed9b2b2964c0d79f7c2d399a`
 
-## 1. Context & Scope Verification
+**Original historical blob:** `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd`
 
-This report documents the exact cryptographic and semantic reconciliation between the original specification blob:
-- **Original Blob:** `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd`
-- **Pinned Current Blob:** `d69bef59cb981350cd6f2ebdccc31b231a4e0950`
+**Inspected historical blob:** `d69bef59cb981350cd6f2ebdccc31b231a4e0950`
 
-The inspection compared the full normative feature-requirement traceability records across all 205 features and 18 domains.
+The live authoritative inputs are
+`docs/dev/Feature_Requirement_Traceability_Register.md` and
+`docs/dev/Phased_Feature_Implementation_Plan.md`. Their working-tree SHA-256 and
+Git blob identities are recorded by `baseline-manifest.json`. The normalized
+register and complete capability graph are retained under `evidence/source/`;
+the absent legacy `docs/dev/inputs/*` paths are not cited as if they existed.
 
-## 2. Git Diff Analysis
+## Historical blob comparison
 
-Executing:
-```bash
-git diff 7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd d69bef59cb981350cd6f2ebdccc31b231a4e0950
+The exact command was:
+
+```powershell
+git diff --no-ext-diff --unified=3 7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd d69bef59cb981350cd6f2ebdccc31b231a4e0950
 ```
 
-Yields the following exact changes:
-1. `parse_orders_bin`: Whitespace and indentation normalization in binary parsing snippet.
-2. `export_orders_parquet`: Whitespace cleanup in parquet export example.
+It reports six removed whitespace-only blank lines and six corresponding clean
+blank lines in the `SQXArchiveHandler.parse_orders_bin` and
+`SQXArchiveHandler.export_orders_parquet` code examples. No executable repository
+file, feature identity, requirement, capability edge, ownership boundary,
+catalogue entry, workflow or acceptance oracle changes between those blobs.
 
-**Result:**
-- Semantic differences: **0**
-- Added features: **0**
-- Removed features: **0**
-- Boundary modifications: **0**
-- Changed requirement semantics: **0**
+## Clause disposition
 
-## 3. Inventory Reconciliation
+| Changed clause | Disposition | Scope effect |
+| --- | --- | --- |
+| Blank lines in `parse_orders_bin` example | retained semantics; formatting normalized | none |
+| Blank line in `export_orders_parquet` example | retained semantics; formatting normalized | none |
 
-The 205-feature decomposition is conserved without modification:
-- **Total Features:** 205
-- **Total Domains:** 18
-- **Total Normalized FRs:** 575
-- **Total Local NFRs:** 276
-- **Total Shared NFRs:** 66
-- **Total Catalogue Entries:** 646
-- **Total Required Dependency Edges:** 476
-- **Total Operation-Gated Edges:** 233
+No clause is classified `changed` or `scope-impacting`. The feature set therefore
+remains exactly 205. Any future added/removed feature is a scope change requiring
+owner approval and regeneration; it cannot appear as an implicit 206th task.
 
-## 4. Conclusion & Disposition
+## Current-source reconciliation
 
-The baseline scope is ratified and pinned as `RECONCILED_NO_DRIFT`. No scope expansion, invented feature tasks, or altered contracts exist. Phase 0 proceeds with the verified 205-feature set.
+The source register contains 205 unique cards, 575 FRs, 276 local NFRs, 476
+required edges and 233 operation-gated edges. The phased plan contains the same
+205 feature IDs exactly once plus eight non-feature preparations. The generated
+Phase 0 validator checks those sets and counts directly; timestamps and narrative
+claims do not establish freshness.

@@ -428,7 +428,6 @@ def verify_target(
             (["uv", "run", "ruff", "format", "--check", "."], "Ruff format"),
             (["uv", "run", "ruff", "check", "."], "Ruff lint"),
             (["uv", "run", "mypy"], "Mypy"),
-            (["uv", "run", "lint-imports"], "Import Linter"),
             (
                 ["uv", "run", "python", "scripts/architecture_check.py"],
                 "Architecture AST",

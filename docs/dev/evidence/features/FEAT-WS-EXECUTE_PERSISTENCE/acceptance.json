@@ -3,8 +3,9 @@
   "feature_id": "FEAT-WS-EXECUTE_PERSISTENCE",
   "task_id": "1.09",
   "status": "ACCEPTED",
+  "owner_specification": "app/services/workspace/execute_persistence/README.md",
   "baseline_commit": "201815b1387e418648b5a8b6aead7adf85cb37b0",
-  "acceptance_commit": "PENDING_COMMIT",
+  "acceptance_commit": "34edd2b3c8164b59ed9b2b2964c0d79f7c2d399a",
   "requirements": [
     {
       "id": "FR-TRC-WS-EXECUTE_PERSISTENCE-001",
@@ -47,6 +48,38 @@
       "evidence_target": "No widget or UI surface is owned by this feature."
     }
   ],
+  "catalogue_entries": [
+    "LOCAL:namespace registration",
+    "LOCAL:ordered migration manifest",
+    "LOCAL:revision and idempotency receipt",
+    "LOCAL:append-only evidence record"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/workspace/persistence.py and contract tests"
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/execute_persistence/test_traceability.py"
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/integration/test_execute_persistence.py"
+    },
+    "interfaces": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "Kernel persistence capability; no Interfaces adapter is owned."
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "No widget or UI surface is owned by this feature."
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/integration/test_execute_persistence.py"
+    }
+  },
   "commands": [
     {
       "command": "uv run pytest --no-cov tests/services/workspace/execute_persistence tests/services/workspace/integration/test_execute_persistence.py",

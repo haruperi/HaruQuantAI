@@ -37,6 +37,9 @@ A Goal never creates a Goal branch or Goal commit. Each accepted child Task cont
 ## Goal specification
 
 Runtime input is `.agents/goal.toml` (gitignored). Start from `.agents/goal.example.toml` or generate it with `.agents/make_goal.py`.
+The generator defaults to `docs/dev/Phased_Feature_Implementation_Plan.md`, whose
+205 `Task N.NN` feature cards are the execution tracker. Phase 0 preparation
+headings are deliberately excluded from Goal child selection.
 
 Supported v1 selectors:
 
@@ -142,7 +145,7 @@ For a Goal whose children share a coordination plan:
 ```bash
 uv run .agents/make_goal.py \
   --entries 1.8 1.9 1.10 \
-  --file tracker.md \
+  --file docs/dev/Phased_Feature_Implementation_Plan.md \
   --listed-order \
   --child-additional-context "Read docs/dev/UI_MIGRATION_PLAN.md; follow sections 6-8 and update the matching section 6 row and section 9 checkbox with evidence."
 ```

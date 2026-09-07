@@ -9,7 +9,7 @@
 
 **Selected scope:** 38 features · 89 owned functional requirements · 64 feature-local non-functional requirements. All original feature and requirement IDs are retained. These selected workbench obligations do **not** delete unrelated existing domain behavior. This document must be merged with current evidence and any out-of-scope entries before replacing an existing domain registry.
 
-**Sources:** [Unified Specification](../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) · [Feature–Requirement Traceability Register](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) · [README template](../../docs/templates/README.md). Source fingerprints and unresolved bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
+**Sources:** [Unified Specification](../../docs/dev/evidence/specification-drift.md) · [Feature–Requirement Traceability Register](../../docs/dev/Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md) · [README template](../../docs/templates/README.md). Source fingerprints and Phase 0 bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
 
 ---
 
@@ -41,44 +41,44 @@ Market parsing, authoritative storage, indicator/metric calculations, training o
 
 | Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
 | --- | --- | --- | --- | --- |
-| NOT_REVALIDATED | `ui.workspace-layout@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/workspaces/contracts.ts`](src/widgets/workspaces/contracts.ts) | 1 | Compose and restore the research workspace |
-| NOT_REVALIDATED | `ui.typed-backend@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/clients/contracts.ts`](src/clients/contracts.ts) | 1 | Call the typed backend and resume observation |
-| NOT_REVALIDATED | `ui.chat-context@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/context/contracts.ts`](src/context/contracts.ts) | 1 | Capture current authorized widget context |
-| NOT_REVALIDATED | `ui.shell-navigation@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/components/layout/contracts.ts`](src/components/layout/contracts.ts) | 1 | Navigate capabilities and explain workspace controls |
-| NOT_REVALIDATED | `ui.access-gate@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/app/contracts.ts`](src/app/contracts.ts) | 1 | Present session access and scope changes |
-| NOT_REVALIDATED | `ui.system-settings@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/system-settings/contracts.ts`](src/widgets/system-settings/contracts.ts) | 1 | Review effective settings and safe configuration changes |
-| NOT_REVALIDATED | `ui.data-workflow@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/components/workflow/contracts.ts`](src/components/workflow/contracts.ts) | 1 | Operate the Data Manager workspace |
-| NOT_REVALIDATED | `ui.collection-grid@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/collection-grid/contracts.ts`](src/widgets/collection-grid/contracts.ts) | 1 | Navigate large typed collections accessibly |
-| NOT_REVALIDATED | `ui.draft-review@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/draft-review/contracts.ts`](src/widgets/draft-review/contracts.ts) | 1 | Review typed edits and consequential action scope |
-| NOT_REVALIDATED | `ui.market-chart@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/chart/contracts.ts`](src/widgets/chart/contracts.ts) | 1 | Inspect market charts and typed overlays |
-| NOT_REVALIDATED | `ui.canonical-backtest@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/simulator/contracts.ts`](src/widgets/simulator/contracts.ts) | 1 | Configure and observe a canonical backtest |
-| NOT_REVALIDATED | `ui.research-workbench@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/research/contracts.ts`](src/widgets/research/contracts.ts) | 1 | Inspect research campaigns, protocols and evidence |
-| NOT_REVALIDATED | `ui.results-workbench@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/analytics/contracts.ts`](src/widgets/analytics/contracts.ts) | 1 | Compose the result inspection workspace |
-| NOT_REVALIDATED | `ui.strategy-editor@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/strategy-editor/contracts.ts`](src/widgets/strategy-editor/contracts.ts) | 1 | Edit and review a strategy |
-| NOT_REVALIDATED | `ui.strategy-search-space@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/strategy-search-space/contracts.ts`](src/widgets/strategy-search-space/contracts.ts) | 1 | Configure and run strategy generation |
-| NOT_REVALIDATED | `ui.research-settings@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/research-settings/contracts.ts`](src/widgets/research-settings/contracts.ts) | 1 | Retest a fixed strategy population |
-| NOT_REVALIDATED | `ui.optimization-settings@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/optimization-settings/contracts.ts`](src/widgets/optimization-settings/contracts.ts) | 1 | Plan and inspect parameter optimization |
-| NOT_REVALIDATED | `ui.databank-grid@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/databank-grid/contracts.ts`](src/widgets/databank-grid/contracts.ts) | 1 | Organize and act on a databank |
-| NOT_REVALIDATED | `ui.result-overview@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/result-overview/contracts.ts`](src/widgets/result-overview/contracts.ts) | 1 | Read a provenance-rich result summary |
-| NOT_REVALIDATED | `ui.trade-list@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/trade-list/contracts.ts`](src/widgets/trade-list/contracts.ts) | 1 | Inspect and select individual trades |
-| NOT_REVALIDATED | `ui.equity-chart@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/equity-chart/contracts.ts`](src/widgets/equity-chart/contracts.ts) | 1 | Inspect equity, drawdown and benchmark paths |
-| NOT_REVALIDATED | `ui.trade-analysis@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/trade-analysis/contracts.ts`](src/widgets/trade-analysis/contracts.ts) | 1 | Compare trade behavior across dimensions |
-| NOT_REVALIDATED | `ui.trades-on-chart@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/trades-on-chart/contracts.ts`](src/widgets/trades-on-chart/contracts.ts) | 1 | Inspect fills against their actual market context |
-| NOT_REVALIDATED | `ui.robustness-results@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/robustness-results/contracts.ts`](src/widgets/robustness-results/contracts.ts) | 1 | Inspect robustness and scenario evidence |
-| NOT_REVALIDATED | `ui.optimization-results@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/optimization-results/contracts.ts`](src/widgets/optimization-results/contracts.ts) | 1 | Inspect parameter surfaces and walk-forward evidence |
-| NOT_REVALIDATED | `ui.portfolio-composer@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/portfolio-composer/contracts.ts`](src/widgets/portfolio-composer/contracts.ts) | 1 | Compose and compare a portfolio |
-| NOT_REVALIDATED | `ui.portfolio-builder@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/portfolio-builder/contracts.ts`](src/widgets/portfolio-builder/contracts.ts) | 1 | Search a bounded portfolio universe |
-| NOT_REVALIDATED | `ui.project-editor@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/project-editor/contracts.ts`](src/widgets/project-editor/contracts.ts) | 1 | Compose and control a research project |
-| NOT_REVALIDATED | `ui.code-editor@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/code-editor/contracts.ts`](src/widgets/code-editor/contracts.ts) | 1 | Edit scoped code and inspect build evidence |
-| NOT_REVALIDATED | `ui.indicator-tester@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/indicator-tester/contracts.ts`](src/widgets/indicator-tester/contracts.ts) | 1 | Compare indicator providers and previews |
-| NOT_REVALIDATED | `ui.run-monitor@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/run-monitor/contracts.ts`](src/widgets/run-monitor/contracts.ts) | 1 | Inspect and control jobs and workers |
-| NOT_REVALIDATED | `ui.debug-console@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/debug-console/contracts.ts`](src/widgets/debug-console/contracts.ts) | 1 | Inspect bounded redacted diagnostic logs |
-| NOT_REVALIDATED | `ui.chat-bot@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/chat-bot/contracts.ts`](src/widgets/chat-bot/contracts.ts) | 1 | Ask context-aware questions and review specialist output |
-| NOT_REVALIDATED | `ui.agentic-run-inspector@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/agentic-run-inspector/contracts.ts`](src/widgets/agentic-run-inspector/contracts.ts) | 1 | Inspect Agentic evidence and governed work |
-| NOT_REVALIDATED | `ui.neural-research@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/neural-research/contracts.ts`](src/widgets/neural-research/contracts.ts) | 1 | Design, train and validate neural research |
-| NOT_REVALIDATED | `ui.strategy-packager@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/strategy-packager/contracts.ts`](src/widgets/strategy-packager/contracts.ts) | 1 | Review and build strategy distribution packages |
-| NOT_REVALIDATED | `ui.advanced-analysis@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/advanced-analysis/contracts.ts`](src/widgets/advanced-analysis/contracts.ts) | 1 | Explore advanced statistical and profile visualizations |
-| NOT_REVALIDATED | `ui.performance-lab@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/performance-lab/contracts.ts`](src/widgets/performance-lab/contracts.ts) | 1 | Inspect reproducible performance and lifecycle evidence |
+| DOCUMENTARY_BOUND | `ui.workspace-layout@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/workspaces/contracts.ts`](src/widgets/workspaces/contracts.ts) | 1 | Compose and restore the research workspace |
+| DOCUMENTARY_BOUND | `ui.typed-backend@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/clients/contracts.ts`](src/clients/contracts.ts) | 1 | Call the typed backend and resume observation |
+| DOCUMENTARY_BOUND | `ui.chat-context@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/context/contracts.ts`](src/context/contracts.ts) | 1 | Capture current authorized widget context |
+| DOCUMENTARY_BOUND | `ui.shell-navigation@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/components/layout/contracts.ts`](src/components/layout/contracts.ts) | 1 | Navigate capabilities and explain workspace controls |
+| DOCUMENTARY_BOUND | `ui.access-gate@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/app/contracts.ts`](src/app/contracts.ts) | 1 | Present session access and scope changes |
+| DOCUMENTARY_BOUND | `ui.system-settings@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/system-settings/contracts.ts`](src/widgets/system-settings/contracts.ts) | 1 | Review effective settings and safe configuration changes |
+| DOCUMENTARY_BOUND | `ui.data-workflow@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/components/workflow/contracts.ts`](src/components/workflow/contracts.ts) | 1 | Operate the Data Manager workspace |
+| DOCUMENTARY_BOUND | `ui.collection-grid@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/collection-grid/contracts.ts`](src/widgets/collection-grid/contracts.ts) | 1 | Navigate large typed collections accessibly |
+| DOCUMENTARY_BOUND | `ui.draft-review@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/draft-review/contracts.ts`](src/widgets/draft-review/contracts.ts) | 1 | Review typed edits and consequential action scope |
+| DOCUMENTARY_BOUND | `ui.market-chart@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/chart/contracts.ts`](src/widgets/chart/contracts.ts) | 1 | Inspect market charts and typed overlays |
+| DOCUMENTARY_BOUND | `ui.canonical-backtest@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/simulator/contracts.ts`](src/widgets/simulator/contracts.ts) | 1 | Configure and observe a canonical backtest |
+| DOCUMENTARY_BOUND | `ui.research-workbench@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/research/contracts.ts`](src/widgets/research/contracts.ts) | 1 | Inspect research campaigns, protocols and evidence |
+| DOCUMENTARY_BOUND | `ui.results-workbench@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/analytics/contracts.ts`](src/widgets/analytics/contracts.ts) | 1 | Compose the result inspection workspace |
+| DOCUMENTARY_BOUND | `ui.strategy-editor@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/strategy-editor/contracts.ts`](src/widgets/strategy-editor/contracts.ts) | 1 | Edit and review a strategy |
+| DOCUMENTARY_BOUND | `ui.strategy-search-space@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/strategy-search-space/contracts.ts`](src/widgets/strategy-search-space/contracts.ts) | 1 | Configure and run strategy generation |
+| DOCUMENTARY_BOUND | `ui.research-settings@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/research-settings/contracts.ts`](src/widgets/research-settings/contracts.ts) | 1 | Retest a fixed strategy population |
+| DOCUMENTARY_BOUND | `ui.optimization-settings@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/optimization-settings/contracts.ts`](src/widgets/optimization-settings/contracts.ts) | 1 | Plan and inspect parameter optimization |
+| DOCUMENTARY_BOUND | `ui.databank-grid@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/databank-grid/contracts.ts`](src/widgets/databank-grid/contracts.ts) | 1 | Organize and act on a databank |
+| DOCUMENTARY_BOUND | `ui.result-overview@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/result-overview/contracts.ts`](src/widgets/result-overview/contracts.ts) | 1 | Read a provenance-rich result summary |
+| DOCUMENTARY_BOUND | `ui.trade-list@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/trade-list/contracts.ts`](src/widgets/trade-list/contracts.ts) | 1 | Inspect and select individual trades |
+| DOCUMENTARY_BOUND | `ui.equity-chart@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/equity-chart/contracts.ts`](src/widgets/equity-chart/contracts.ts) | 1 | Inspect equity, drawdown and benchmark paths |
+| DOCUMENTARY_BOUND | `ui.trade-analysis@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/trade-analysis/contracts.ts`](src/widgets/trade-analysis/contracts.ts) | 1 | Compare trade behavior across dimensions |
+| DOCUMENTARY_BOUND | `ui.trades-on-chart@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/trades-on-chart/contracts.ts`](src/widgets/trades-on-chart/contracts.ts) | 1 | Inspect fills against their actual market context |
+| DOCUMENTARY_BOUND | `ui.robustness-results@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/robustness-results/contracts.ts`](src/widgets/robustness-results/contracts.ts) | 1 | Inspect robustness and scenario evidence |
+| DOCUMENTARY_BOUND | `ui.optimization-results@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/optimization-results/contracts.ts`](src/widgets/optimization-results/contracts.ts) | 1 | Inspect parameter surfaces and walk-forward evidence |
+| DOCUMENTARY_BOUND | `ui.portfolio-composer@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/portfolio-composer/contracts.ts`](src/widgets/portfolio-composer/contracts.ts) | 1 | Compose and compare a portfolio |
+| DOCUMENTARY_BOUND | `ui.portfolio-builder@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/portfolio-builder/contracts.ts`](src/widgets/portfolio-builder/contracts.ts) | 1 | Search a bounded portfolio universe |
+| DOCUMENTARY_BOUND | `ui.project-editor@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/project-editor/contracts.ts`](src/widgets/project-editor/contracts.ts) | 1 | Compose and control a research project |
+| DOCUMENTARY_BOUND | `ui.code-editor@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/code-editor/contracts.ts`](src/widgets/code-editor/contracts.ts) | 1 | Edit scoped code and inspect build evidence |
+| DOCUMENTARY_BOUND | `ui.indicator-tester@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/indicator-tester/contracts.ts`](src/widgets/indicator-tester/contracts.ts) | 1 | Compare indicator providers and previews |
+| DOCUMENTARY_BOUND | `ui.run-monitor@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/run-monitor/contracts.ts`](src/widgets/run-monitor/contracts.ts) | 1 | Inspect and control jobs and workers |
+| DOCUMENTARY_BOUND | `ui.debug-console@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/debug-console/contracts.ts`](src/widgets/debug-console/contracts.ts) | 1 | Inspect bounded redacted diagnostic logs |
+| DOCUMENTARY_BOUND | `ui.chat-bot@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/chat-bot/contracts.ts`](src/widgets/chat-bot/contracts.ts) | 1 | Ask context-aware questions and review specialist output |
+| DOCUMENTARY_BOUND | `ui.agentic-run-inspector@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/agentic-run-inspector/contracts.ts`](src/widgets/agentic-run-inspector/contracts.ts) | 1 | Inspect Agentic evidence and governed work |
+| DOCUMENTARY_BOUND | `ui.neural-research@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/neural-research/contracts.ts`](src/widgets/neural-research/contracts.ts) | 1 | Design, train and validate neural research |
+| DOCUMENTARY_BOUND | `ui.strategy-packager@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/strategy-packager/contracts.ts`](src/widgets/strategy-packager/contracts.ts) | 1 | Review and build strategy distribution packages |
+| DOCUMENTARY_BOUND | `ui.advanced-analysis@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/advanced-analysis/contracts.ts`](src/widgets/advanced-analysis/contracts.ts) | 1 | Explore advanced statistical and profile visualizations |
+| DOCUMENTARY_BOUND | `ui.performance-lab@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/ui/src/widgets/performance-lab/contracts.ts`](src/widgets/performance-lab/contracts.ts) | 1 | Inspect reproducible performance and lifecycle evidence |
 
 **Consumed from other domains — required providers.** Runtime resolution is through the exact key; the provider’s implementation folder is not an import target. Same-domain edges are listed in the owning feature card.
 
@@ -285,7 +285,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-GENERATE_QUALIFY` — Pinned source/space/seed; one accepted research run; each candidate has actual simulation, filters and stage history; only qualified committed result references enter the destination databank.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-generate-qualify).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-generate-qualify).
 
 <a id="wf-wb-retest"></a>
 ### `WF-WB-RETEST` — Retest robustness
@@ -298,7 +298,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-RETEST` — Resolve immutable strategies and baseline; retain source hashes; ordered explicit scenarios, paired metric deltas and typed cancellation; atomic membership has complete passed/failed reasons.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-retest).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-retest).
 
 <a id="wf-wb-optimize-promote"></a>
 ### `WF-WB-OPTIMIZE_PROMOTE` — Optimize and explicitly promote
@@ -311,7 +311,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-OPTIMIZE_PROMOTE` — Finite legal parameter lattice/folds and all trial outcomes; untouched holdout protected; promotion creates a new revision only after exact review; base remains unchanged.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-optimize-promote).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-optimize-promote).
 
 <a id="wf-wb-portfolio"></a>
 ### `WF-WB-PORTFOLIO` — Compose and evaluate a portfolio
@@ -324,7 +324,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-PORTFOLIO` — Resolve cash/calendar/currency/sample/size compatibility; manual/qualified weights; shared-capital interactions use ordered ticks; save exact constituents, weights, result and benchmark provenance.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-portfolio).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-portfolio).
 
 <a id="wf-wb-project"></a>
 ### `WF-WB-PROJECT` — Automate a research project
@@ -337,7 +337,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-PROJECT` — Validate bounded typed graph; whole/from-here/only preview; crash after child commit reconciles one receipt; retries append attempts and lineage navigates both directions.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-project).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-project).
 
 <a id="wf-wb-extend-analysis"></a>
 ### `WF-WB-EXTEND_ANALYSIS` — Develop and install analysis safely
@@ -350,7 +350,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-EXTEND_ANALYSIS` — Fork/edit/build/test in isolation; compile success does not install; separate reviewed activation; hostile panel/uninstall removes only its contribution and preserves canonical results.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-extend-analysis).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-extend-analysis).
 
 <a id="wf-wb-chat-review"></a>
 ### `WF-WB-CHAT_REVIEW` — Review a real result through Chat Bot
@@ -363,7 +363,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-CHAT_REVIEW` — Change the browser-displayed metric to an incorrect value: answer refreshes owner truth and cites exact evidence, same-conversation specialist attribution; stale or denied evidence cannot produce a claimed fact.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-chat-review).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-chat-review).
 
 <a id="wf-wb-idea-to-strategy"></a>
 ### `WF-WB-IDEA_TO_STRATEGY` — Research idea to reviewed strategy
@@ -376,7 +376,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-IDEA_TO_STRATEGY` — Draft with explicit unvalidated assumptions; validate, bounded repair, exact patch closure review and CAS acceptance; separately authorize a bounded tick backtest; no save/holdout/live authority implied by prose.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-idea-to-strategy).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-idea-to-strategy).
 
 <a id="wf-agt-assist-operator"></a>
 ### `WF-AGT-ASSIST_OPERATOR` — Context-Aware Chat Bot
@@ -389,7 +389,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-AGT-ASSIST_OPERATOR` — Fresh verified scope and deterministic direct/specialist route; reply preserves attribution, refusals and evidence; no prose-triggered mutation.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-assist-operator).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-agt-assist-operator).
 
 ## 4. Composable Feature Specifications
 
@@ -402,7 +402,7 @@ Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expe
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/workspaces/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -416,9 +416,9 @@ Compose and restore the research workspace. Present and interact with authoritat
 
 None (root with respect to the register’s required-provider graph)..
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-01) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-01) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/workspaces/contracts.ts`](src/widgets/workspaces/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/workspaces/contracts.ts`](src/widgets/workspaces/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -426,7 +426,7 @@ None (root with respect to the register’s required-provider graph)..
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -484,7 +484,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-01): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-01): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -513,7 +513,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-01`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/clients/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -527,9 +527,9 @@ Call the typed backend and resume observation. Present and interact with authori
 
 None (root with respect to the register’s required-provider graph)..
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-14) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-14) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/clients/contracts.ts`](src/clients/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/clients/contracts.ts`](src/clients/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -537,7 +537,7 @@ None (root with respect to the register’s required-provider graph)..
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -593,7 +593,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-14): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-14): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -622,7 +622,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-14`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/context/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -636,9 +636,9 @@ Capture current authorized widget context. Present and interact with authoritati
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-15) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-15) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/context/contracts.ts`](src/context/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/context/contracts.ts`](src/context/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -646,7 +646,7 @@ Capture current authorized widget context. Present and interact with authoritati
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -703,7 +703,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-15): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-15): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -732,7 +732,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-15`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/components/layout/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -746,9 +746,9 @@ Navigate capabilities and explain workspace controls. Present and interact with 
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-16) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-16) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/components/layout/contracts.ts`](src/components/layout/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/components/layout/contracts.ts`](src/components/layout/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -756,7 +756,7 @@ Navigate capabilities and explain workspace controls. Present and interact with 
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -813,7 +813,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-16): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-16): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -842,7 +842,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-16`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/app/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -856,9 +856,9 @@ Present session access and scope changes. Present and interact with authoritativ
 
 `ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-17) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-17) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/app/contracts.ts`](src/app/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/app/contracts.ts`](src/app/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -866,7 +866,7 @@ Present session access and scope changes. Present and interact with authoritativ
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -920,7 +920,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-17): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-17): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -949,7 +949,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-17`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/system-settings/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -963,9 +963,9 @@ Review effective settings and safe configuration changes. Present and interact w
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-13) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-13) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/system-settings/contracts.ts`](src/widgets/system-settings/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/system-settings/contracts.ts`](src/widgets/system-settings/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -973,7 +973,7 @@ Review effective settings and safe configuration changes. Present and interact w
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1030,7 +1030,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-13): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-13): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1059,7 +1059,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-13`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/components/workflow/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1073,9 +1073,9 @@ Operate the Data Manager workspace. Present and interact with authoritative owne
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-18) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-18) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/components/workflow/contracts.ts`](src/components/workflow/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/components/workflow/contracts.ts`](src/components/workflow/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1083,7 +1083,7 @@ Operate the Data Manager workspace. Present and interact with authoritative owne
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1140,7 +1140,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-18): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-18): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1169,7 +1169,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-18`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/collection-grid/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1183,9 +1183,9 @@ Navigate large typed collections accessibly. Present and interact with authorita
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-view-collections) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-view-collections) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/collection-grid/contracts.ts`](src/widgets/collection-grid/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/collection-grid/contracts.ts`](src/widgets/collection-grid/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1193,7 +1193,7 @@ Navigate large typed collections accessibly. Present and interact with authorita
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1251,7 +1251,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-view-collections): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-view-collections): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1280,7 +1280,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-VIEW_COLLE
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/draft-review/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1294,9 +1294,9 @@ Review typed edits and consequential action scope. Present and interact with aut
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-review-drafts) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-review-drafts) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/draft-review/contracts.ts`](src/widgets/draft-review/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/draft-review/contracts.ts`](src/widgets/draft-review/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1304,7 +1304,7 @@ Review typed edits and consequential action scope. Present and interact with aut
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1359,7 +1359,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-review-drafts): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-review-drafts): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1388,7 +1388,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-REVIEW_DRA
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/chart/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1402,9 +1402,9 @@ Inspect market charts and typed overlays. Present and interact with authoritativ
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-04) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-04) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/chart/contracts.ts`](src/widgets/chart/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/chart/contracts.ts`](src/widgets/chart/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1412,7 +1412,7 @@ Inspect market charts and typed overlays. Present and interact with authoritativ
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1469,7 +1469,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-04): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-04): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1498,7 +1498,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-04`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/simulator/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1512,9 +1512,9 @@ Configure and observe a canonical backtest. Present and interact with authoritat
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.draft-review@1` — [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-27) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-27) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/simulator/contracts.ts`](src/widgets/simulator/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/simulator/contracts.ts`](src/widgets/simulator/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1522,7 +1522,7 @@ Configure and observe a canonical backtest. Present and interact with authoritat
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1579,7 +1579,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-27): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-27): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1608,7 +1608,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-27`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/research/`
-> **First release milestone:** `U3`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U3`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1622,9 +1622,9 @@ Inspect research campaigns, protocols and evidence. Present and interact with au
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-28) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-28) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/research/contracts.ts`](src/widgets/research/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/research/contracts.ts`](src/widgets/research/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1632,7 +1632,7 @@ Inspect research campaigns, protocols and evidence. Present and interact with au
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1689,7 +1689,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-28): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-28): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1718,7 +1718,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-28`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/analytics/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1732,9 +1732,9 @@ Compose the result inspection workspace. Present and interact with authoritative
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-32) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-32) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/analytics/contracts.ts`](src/widgets/analytics/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/analytics/contracts.ts`](src/widgets/analytics/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1742,7 +1742,7 @@ Compose the result inspection workspace. Present and interact with authoritative
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1799,7 +1799,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-32): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-32): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1828,7 +1828,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-32`. Withd
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/strategy-editor/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1842,9 +1842,9 @@ Edit and review a strategy. Present and interact with authoritative owner result
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-studio) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-studio) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/strategy-editor/contracts.ts`](src/widgets/strategy-editor/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/strategy-editor/contracts.ts`](src/widgets/strategy-editor/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1852,7 +1852,7 @@ Edit and review a strategy. Present and interact with authoritative owner result
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1909,7 +1909,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-studio): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-studio): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1938,7 +1938,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-STRATEGY_S
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/strategy-search-space/`
-> **First release milestone:** `U5`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U5`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1952,9 +1952,9 @@ Configure and run strategy generation. Present and interact with authoritative o
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-builder) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-builder) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/strategy-search-space/contracts.ts`](src/widgets/strategy-search-space/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/strategy-search-space/contracts.ts`](src/widgets/strategy-search-space/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1962,7 +1962,7 @@ Configure and run strategy generation. Present and interact with authoritative o
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -2019,7 +2019,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-builder): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-builder): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -2048,7 +2048,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-STRATEGY_B
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/research-settings/`
-> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -2062,9 +2062,9 @@ Retest a fixed strategy population. Present and interact with authoritative owne
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-retester) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-retester) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/research-settings/contracts.ts`](src/widgets/research-settings/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/research-settings/contracts.ts`](src/widgets/research-settings/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -2072,7 +2072,7 @@ Retest a fixed strategy population. Present and interact with authoritative owne
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -2129,7 +2129,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-retester): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-retester): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -2158,7 +2158,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-STRATEGY_R
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/optimization-settings/`
-> **First release milestone:** `U6`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U6`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -2172,9 +2172,9 @@ Plan and inspect parameter optimization. Present and interact with authoritative
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-parameter-optimizer) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-parameter-optimizer) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/optimization-settings/contracts.ts`](src/widgets/optimization-settings/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/optimization-settings/contracts.ts`](src/widgets/optimization-settings/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -2182,7 +2182,7 @@ Plan and inspect parameter optimization. Present and interact with authoritative
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -2239,7 +2239,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-parameter-optimizer): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-parameter-optimizer): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -2268,7 +2268,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-PARAMETER_
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/databank-grid/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -2282,9 +2282,9 @@ Organize and act on a databank. Present and interact with authoritative owner re
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-databank-grid) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-databank-grid) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/databank-grid/contracts.ts`](src/widgets/databank-grid/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/databank-grid/contracts.ts`](src/widgets/databank-grid/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -2292,7 +2292,7 @@ Organize and act on a databank. Present and interact with authoritative owner re
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -2349,7 +2349,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-databank-grid): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-databank-grid): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -2378,7 +2378,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-DATABANK_G
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/result-overview/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -2392,9 +2392,9 @@ Read a provenance-rich result summary. Present and interact with authoritative o
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-result-overview) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-result-overview) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/result-overview/contracts.ts`](src/widgets/result-overview/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/result-overview/contracts.ts`](src/widgets/result-overview/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -2402,7 +2402,7 @@ Read a provenance-rich result summary. Present and interact with authoritative o
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -2459,7 +2459,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-result-overview): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-result-overview): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -2488,7 +2488,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-RESULT_OVE
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/trade-list/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -2502,9 +2502,9 @@ Inspect and select individual trades. Present and interact with authoritative ow
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trade-list) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-trade-list) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/trade-list/contracts.ts`](src/widgets/trade-list/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/trade-list/contracts.ts`](src/widgets/trade-list/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -2512,7 +2512,7 @@ Inspect and select individual trades. Present and interact with authoritative ow
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -2569,7 +2569,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trade-list): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-trade-list): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -2598,7 +2598,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-TRADE_LIST
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/equity-chart/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -2612,9 +2612,9 @@ Inspect equity, drawdown and benchmark paths. Present and interact with authorit
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-equity-chart) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-equity-chart) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/equity-chart/contracts.ts`](src/widgets/equity-chart/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/equity-chart/contracts.ts`](src/widgets/equity-chart/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -2622,7 +2622,7 @@ Inspect equity, drawdown and benchmark paths. Present and interact with authorit
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -2679,7 +2679,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-equity-chart): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-equity-chart): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -2708,7 +2708,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-EQUITY_CHA
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/trade-analysis/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -2722,9 +2722,9 @@ Compare trade behavior across dimensions. Present and interact with authoritativ
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trade-analysis) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-trade-analysis) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/trade-analysis/contracts.ts`](src/widgets/trade-analysis/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/trade-analysis/contracts.ts`](src/widgets/trade-analysis/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -2732,7 +2732,7 @@ Compare trade behavior across dimensions. Present and interact with authoritativ
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -2789,7 +2789,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trade-analysis): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-trade-analysis): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -2818,7 +2818,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-TRADE_ANAL
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/trades-on-chart/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -2832,9 +2832,9 @@ Inspect fills against their actual market context. Present and interact with aut
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trades-on-chart) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-trades-on-chart) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/trades-on-chart/contracts.ts`](src/widgets/trades-on-chart/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/trades-on-chart/contracts.ts`](src/widgets/trades-on-chart/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -2842,7 +2842,7 @@ Inspect fills against their actual market context. Present and interact with aut
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -2899,7 +2899,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trades-on-chart): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-trades-on-chart): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -2928,7 +2928,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-TRADES_ON_
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/robustness-results/`
-> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -2942,9 +2942,9 @@ Inspect robustness and scenario evidence. Present and interact with authoritativ
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-robustness-results) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-robustness-results) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/robustness-results/contracts.ts`](src/widgets/robustness-results/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/robustness-results/contracts.ts`](src/widgets/robustness-results/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -2952,7 +2952,7 @@ Inspect robustness and scenario evidence. Present and interact with authoritativ
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -3009,7 +3009,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-robustness-results): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-robustness-results): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -3038,7 +3038,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-ROBUSTNESS
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/optimization-results/`
-> **First release milestone:** `U6`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U6`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -3052,9 +3052,9 @@ Inspect parameter surfaces and walk-forward evidence. Present and interact with 
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-optimization-results) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-optimization-results) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/optimization-results/contracts.ts`](src/widgets/optimization-results/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/optimization-results/contracts.ts`](src/widgets/optimization-results/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -3062,7 +3062,7 @@ Inspect parameter surfaces and walk-forward evidence. Present and interact with 
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -3119,7 +3119,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-optimization-results): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-optimization-results): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -3148,7 +3148,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-OPTIMIZATI
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/portfolio-composer/`
-> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -3162,9 +3162,9 @@ Compose and compare a portfolio. Present and interact with authoritative owner r
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-composer) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-composer) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/portfolio-composer/contracts.ts`](src/widgets/portfolio-composer/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/portfolio-composer/contracts.ts`](src/widgets/portfolio-composer/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -3172,7 +3172,7 @@ Compose and compare a portfolio. Present and interact with authoritative owner r
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -3229,7 +3229,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-composer): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-composer): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -3258,7 +3258,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-PORTFOLIO_
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/portfolio-builder/`
-> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -3272,9 +3272,9 @@ Search a bounded portfolio universe. Present and interact with authoritative own
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-builder) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-builder) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/portfolio-builder/contracts.ts`](src/widgets/portfolio-builder/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/portfolio-builder/contracts.ts`](src/widgets/portfolio-builder/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -3282,7 +3282,7 @@ Search a bounded portfolio universe. Present and interact with authoritative own
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -3339,7 +3339,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-builder): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-builder): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -3368,7 +3368,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-PORTFOLIO_
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/project-editor/`
-> **First release milestone:** `U8`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U8`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -3382,9 +3382,9 @@ Compose and control a research project. Present and interact with authoritative 
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-project-editor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-project-editor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/project-editor/contracts.ts`](src/widgets/project-editor/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/project-editor/contracts.ts`](src/widgets/project-editor/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -3392,7 +3392,7 @@ Compose and control a research project. Present and interact with authoritative 
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -3449,7 +3449,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-project-editor): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-project-editor): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -3478,7 +3478,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-PROJECT_ED
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/code-editor/`
-> **First release milestone:** `U9`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U9`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -3492,9 +3492,9 @@ Edit scoped code and inspect build evidence. Present and interact with authorita
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-code-editor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-code-editor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/code-editor/contracts.ts`](src/widgets/code-editor/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/code-editor/contracts.ts`](src/widgets/code-editor/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -3502,7 +3502,7 @@ Edit scoped code and inspect build evidence. Present and interact with authorita
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -3559,7 +3559,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-code-editor): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-code-editor): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -3588,7 +3588,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-CODE_EDITO
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/indicator-tester/`
-> **First release milestone:** `U9`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U9`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -3602,9 +3602,9 @@ Compare indicator providers and previews. Present and interact with authoritativ
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-indicator-tester) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-indicator-tester) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/indicator-tester/contracts.ts`](src/widgets/indicator-tester/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/indicator-tester/contracts.ts`](src/widgets/indicator-tester/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -3612,7 +3612,7 @@ Compare indicator providers and previews. Present and interact with authoritativ
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -3669,7 +3669,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-indicator-tester): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-indicator-tester): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -3698,7 +3698,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-INDICATOR_
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/run-monitor/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -3712,9 +3712,9 @@ Inspect and control jobs and workers. Present and interact with authoritative ow
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-run-monitor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-run-monitor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/run-monitor/contracts.ts`](src/widgets/run-monitor/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/run-monitor/contracts.ts`](src/widgets/run-monitor/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -3722,7 +3722,7 @@ Inspect and control jobs and workers. Present and interact with authoritative ow
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -3779,7 +3779,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-run-monitor): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-run-monitor): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -3808,7 +3808,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-RUN_MONITO
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/debug-console/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -3822,9 +3822,9 @@ Inspect bounded redacted diagnostic logs. Present and interact with authoritativ
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-debug-console) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-debug-console) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/debug-console/contracts.ts`](src/widgets/debug-console/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/debug-console/contracts.ts`](src/widgets/debug-console/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -3832,7 +3832,7 @@ Inspect bounded redacted diagnostic logs. Present and interact with authoritativ
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -3889,7 +3889,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-debug-console): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-debug-console): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -3918,7 +3918,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-DEBUG_CONS
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/chat-bot/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -3932,9 +3932,9 @@ Ask context-aware questions and review specialist output. Present and interact w
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.chat-context@1` — [`FEAT-UI-15`](#feat-ui-15)<br>`ui.draft-review@1` — [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-chat-bot) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-chat-bot) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/chat-bot/contracts.ts`](src/widgets/chat-bot/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/chat-bot/contracts.ts`](src/widgets/chat-bot/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -3942,7 +3942,7 @@ Ask context-aware questions and review specialist output. Present and interact w
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -4000,7 +4000,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-chat-bot): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-chat-bot): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -4029,7 +4029,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-CHAT_BOT`.
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/agentic-run-inspector/`
-> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -4043,9 +4043,9 @@ Inspect Agentic evidence and governed work. Present and interact with authoritat
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-agentic-run-inspector) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-agentic-run-inspector) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/agentic-run-inspector/contracts.ts`](src/widgets/agentic-run-inspector/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/agentic-run-inspector/contracts.ts`](src/widgets/agentic-run-inspector/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -4053,7 +4053,7 @@ Inspect Agentic evidence and governed work. Present and interact with authoritat
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -4110,7 +4110,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-agentic-run-inspector): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-agentic-run-inspector): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -4139,7 +4139,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-AGENTIC_RU
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/neural-research/`
-> **First release milestone:** `U11`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U11`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -4153,9 +4153,9 @@ Design, train and validate neural research. Present and interact with authoritat
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-neural-research) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-neural-research) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/neural-research/contracts.ts`](src/widgets/neural-research/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/neural-research/contracts.ts`](src/widgets/neural-research/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -4163,7 +4163,7 @@ Design, train and validate neural research. Present and interact with authoritat
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -4220,7 +4220,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-neural-research): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-neural-research): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -4249,7 +4249,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-NEURAL_RES
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/strategy-packager/`
-> **First release milestone:** `U13`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U13`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -4263,9 +4263,9 @@ Review and build strategy distribution packages. Present and interact with autho
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-packager) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-packager) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/strategy-packager/contracts.ts`](src/widgets/strategy-packager/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/strategy-packager/contracts.ts`](src/widgets/strategy-packager/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -4273,7 +4273,7 @@ Review and build strategy distribution packages. Present and interact with autho
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -4330,7 +4330,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-packager): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-packager): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -4359,7 +4359,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-STRATEGY_P
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/advanced-analysis/`
-> **First release milestone:** `U10`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U10`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -4373,9 +4373,9 @@ Explore advanced statistical and profile visualizations. Present and interact wi
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-advanced-analysis) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-advanced-analysis) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/advanced-analysis/contracts.ts`](src/widgets/advanced-analysis/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/advanced-analysis/contracts.ts`](src/widgets/advanced-analysis/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -4383,7 +4383,7 @@ Explore advanced statistical and profile visualizations. Present and interact wi
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -4440,7 +4440,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-advanced-analysis): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-advanced-analysis): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -4469,7 +4469,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-ADVANCED_A
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/performance-lab/`
-> **First release milestone:** `U10`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U10`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -4483,9 +4483,9 @@ Inspect reproducible performance and lifecycle evidence. Present and interact wi
 
 `ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-performance-lab) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-performance-lab) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/widgets/performance-lab/contracts.ts`](src/widgets/performance-lab/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/ui/src/widgets/performance-lab/contracts.ts`](src/widgets/performance-lab/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -4493,7 +4493,7 @@ Inspect reproducible performance and lifecycle evidence. Present and interact wi
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -4550,7 +4550,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-performance-lab): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-performance-lab): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -4579,9 +4579,9 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-PERFORMANC
 | ARCH-001 | Init purity | All backend __init__.py files contain only docstrings; no imports, registration or I/O. | Architecture check and AST review. |
 | ARCH-002 | Managed tasks | Spawn asynchronous service work through FeatureContext.spawn(); own all effects in FeatureScope. | Architecture check; lifecycle, failure and cancellation tests. |
 | ARCH-003 | Logging hygiene | No root logging.basicConfig() in service packages; preserve scoped structured redaction. | Static checks and secret/redaction fixtures. |
-| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | Import Linter and AST checks. |
+| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | The repository AST architecture check. |
 | ARCH-005 | Interfaces purity | Gateways use contracts and declared capabilities; no service imports, business computations or business persistence. | Import/architecture checks and real-owner parity tests. |
-| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | Import Linter, physical removal and startup tests. |
+| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | The repository AST architecture check, physical removal and startup tests. |
 
 | Policy | Binding requirement | Verification |
 | --- | --- | --- |
@@ -4732,12 +4732,12 @@ Each §4 source-card link incorporates only that feature’s shared NFR applicab
 
 | Source | Git blob identity | Role |
 | --- | --- | --- |
-| [`docs/dev/SQX/HaruQuantAI_Unified_Specification.md`](../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
-| [`docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md`](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) | `32d7ff8ea18784c66b479beae822f17744462044` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
-| [`docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md`](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) | `ffe9b7d3a3a29b32f7a6559122f32d73258709f8` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
+| [`docs/dev/evidence/specification-drift.md`](../../docs/dev/evidence/specification-drift.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
+| [`docs/dev/Feature_Requirement_Traceability_Register.md`](../../docs/dev/Feature_Requirement_Traceability_Register.md) | `402c3cfa45ee77146789b6136bbe713c74773e00` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
+| [`docs/dev/Phased_Feature_Implementation_Plan.md`](../../docs/dev/Phased_Feature_Implementation_Plan.md) | `03cd112418df0368003ed5fcd5f301d9fa2dd7c3` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
 | [`docs/templates/README.md`](../../docs/templates/README.md) | `8d6fb9075784113e95857555c17f7182996f7cc3` | README structure and code-aligned conventions. |
 
-The register records specification blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd` at commit `c06456fe2c03bc89f52edad1a0a8428118287377`. The phased plan records inspected specification blob `d69bef59cb981350cd6f2ebdccc31b231a4e0950` at commit `a3c81dff4e5b903e749259ff463b8d9280d6fc26`. The fetched specification identity above differs from both. This delivery records the mismatch but does not claim a clause-level reconciliation or authorize a silent change to the 205-feature scope.
+The historical specification blobs and their clause-level disposition are reconciled in `docs/dev/evidence/specification-drift.md`; the normalized 205-feature register and complete dependency graph are hash-pinned by `docs/dev/evidence/baseline-manifest.json`. Documentary binding does not claim runtime acceptance for an unimplemented feature.
 
 ### Delivery evidence boundary
 

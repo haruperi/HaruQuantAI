@@ -44,3 +44,48 @@ Expected-revision checks guarantee optimistic concurrency control.
 - `FR-TRC-WS-EXECUTE_PERSISTENCE-002` -> `AT-WS-EXECUTE_PERSISTENCE-002` in `tests/services/workspace/execute_persistence/test_traceability.py`
 - `FR-TRC-WS-EXECUTE_PERSISTENCE-003` -> `AT-WS-EXECUTE_PERSISTENCE-003` in `tests/services/workspace/execute_persistence/test_traceability.py`
 - `NFR-TRC-WS-EXECUTE_PERSISTENCE-001` -> `ATN-WS-EXECUTE_PERSISTENCE-001` in `tests/services/workspace/execute_persistence/test_lifecycle.py`
+
+## Domain
+
+`workspace`
+
+## Provides
+
+`workspace.persistence@1`
+
+## Required Capabilities
+
+`workspace.manage-workspaces@1`
+
+## Optional Capabilities
+
+None.
+
+## Purpose
+
+Execute namespace-fenced transactions, additive migrations, and append-only
+evidence operations through the public Workspace persistence contract.
+
+## Runtime Effects
+
+Mount registers `workspace.persistence@1` and one scope-owned close callback. The
+provider opens bounded SQLite resources only for admitted operations and closes them
+at the operation or scope boundary.
+
+## Failure Behavior
+
+Unknown namespaces, unauthorized tables, stale revisions, invalid statements,
+checksum drift, non-additive migrations, and append-only mutations fail closed with
+typed contract errors and no partial commit.
+
+## Removal Behavior
+
+Removal withdraws only `workspace.persistence@1`, closes provider-owned resources,
+and retains all committed feature tables, migration records, revisions, idempotency
+receipts, and evidence.
+
+## Persistent State
+
+Namespace `workspace_persistence`, schema version 1, retention policy `RETAIN`:
+registered feature namespaces, ordered migrations, revisions, idempotency receipts,
+and append-only evidence custody.

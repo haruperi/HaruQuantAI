@@ -9,7 +9,7 @@
 
 **Selected scope:** 7 features · 20 owned functional requirements · 7 feature-local non-functional requirements. All original feature and requirement IDs are retained. These selected workbench obligations do **not** delete unrelated existing domain behavior. This document must be merged with current evidence and any out-of-scope entries before replacing an existing domain registry.
 
-**Sources:** [Unified Specification](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) · [Feature–Requirement Traceability Register](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) · [README template](../../../docs/templates/README.md). Source fingerprints and unresolved bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
+**Sources:** [Unified Specification](../../../docs/dev/evidence/specification-drift.md) · [Feature–Requirement Traceability Register](../../../docs/dev/Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md) · [README template](../../../docs/templates/README.md). Source fingerprints and Phase 0 bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
 
 ---
 
@@ -43,13 +43,13 @@ Live allocation approval, broker execution, metric reimplementation, universe ow
 
 | Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
 | --- | --- | --- | --- | --- |
-| NOT_REVALIDATED | `portfolio.compose-portfolios@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/portfolio/compose_portfolios.py`](../../contracts/portfolio/compose_portfolios.py) | 1 | Version portfolio composition and capital policy |
-| NOT_REVALIDATED | `portfolio.analyze-correlation@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/portfolio/analyze_correlation.py`](../../contracts/portfolio/analyze_correlation.py) | 1 | Compute aligned correlation and covariance |
-| NOT_REVALIDATED | `portfolio.optimize-weights@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/portfolio/optimize_weights.py`](../../contracts/portfolio/optimize_weights.py) | 1 | Allocate portfolio weights with declared objectives |
-| NOT_REVALIDATED | `portfolio.search-portfolios@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/portfolio/search_portfolios.py`](../../contracts/portfolio/search_portfolios.py) | 1 | Search constrained portfolio combinations |
-| NOT_REVALIDATED | `portfolio.simulate-portfolios@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/portfolio/simulate_portfolios.py`](../../contracts/portfolio/simulate_portfolios.py) | 1 | Evaluate combined portfolio capital and execution |
-| NOT_REVALIDATED | `portfolio.analyze-portfolio-risk@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/portfolio/analyze_portfolio_risk.py`](../../contracts/portfolio/analyze_portfolio_risk.py) | 1 | Explain diversification, exposure and portfolio scenarios |
-| NOT_REVALIDATED | `portfolio.merge-portfolios@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/portfolio/merge_portfolios.py`](../../contracts/portfolio/merge_portfolios.py) | 1 | Merge and split portfolio definitions with lineage |
+| DOCUMENTARY_BOUND | `portfolio.compose-portfolios@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/portfolio/compose_portfolios.py`](../../contracts/portfolio/compose_portfolios.py) | 1 | Version portfolio composition and capital policy |
+| DOCUMENTARY_BOUND | `portfolio.analyze-correlation@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/portfolio/analyze_correlation.py`](../../contracts/portfolio/analyze_correlation.py) | 1 | Compute aligned correlation and covariance |
+| DOCUMENTARY_BOUND | `portfolio.optimize-weights@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/portfolio/optimize_weights.py`](../../contracts/portfolio/optimize_weights.py) | 1 | Allocate portfolio weights with declared objectives |
+| DOCUMENTARY_BOUND | `portfolio.search-portfolios@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/portfolio/search_portfolios.py`](../../contracts/portfolio/search_portfolios.py) | 1 | Search constrained portfolio combinations |
+| DOCUMENTARY_BOUND | `portfolio.simulate-portfolios@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/portfolio/simulate_portfolios.py`](../../contracts/portfolio/simulate_portfolios.py) | 1 | Evaluate combined portfolio capital and execution |
+| DOCUMENTARY_BOUND | `portfolio.analyze-portfolio-risk@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/portfolio/analyze_portfolio_risk.py`](../../contracts/portfolio/analyze_portfolio_risk.py) | 1 | Explain diversification, exposure and portfolio scenarios |
+| DOCUMENTARY_BOUND | `portfolio.merge-portfolios@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/portfolio/merge_portfolios.py`](../../contracts/portfolio/merge_portfolios.py) | 1 | Merge and split portfolio definitions with lineage |
 
 **Consumed from other domains — required providers.** Runtime resolution is through the exact key; the provider’s implementation folder is not an import target. Same-domain edges are listed in the owning feature card.
 
@@ -78,13 +78,13 @@ Immutable constituent/weight/capital compositions, compatibility decisions, corr
 
 | Evidence | Owning feature | Partition / ownership class | Driver binding | Retention / read boundary |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | [`FEAT-POR-COMPOSE_PORTFOLIOS`](#feat-por-compose-portfolios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-POR-ANALYZE_CORRELATION`](#feat-por-analyze-correlation) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-POR-OPTIMIZE_WEIGHTS`](#feat-por-optimize-weights) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-POR-SEARCH_PORTFOLIOS`](#feat-por-search-portfolios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-POR-SIMULATE_PORTFOLIOS`](#feat-por-simulate-portfolios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-POR-ANALYZE_PORTFOLIO_RISK`](#feat-por-analyze-portfolio-risk) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-POR-MERGE_PORTFOLIOS`](#feat-por-merge-portfolios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-POR-COMPOSE_PORTFOLIOS`](#feat-por-compose-portfolios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-POR-ANALYZE_CORRELATION`](#feat-por-analyze-correlation) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-POR-OPTIMIZE_WEIGHTS`](#feat-por-optimize-weights) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-POR-SEARCH_PORTFOLIOS`](#feat-por-search-portfolios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-POR-SIMULATE_PORTFOLIOS`](#feat-por-simulate-portfolios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-POR-ANALYZE_PORTFOLIO_RISK`](#feat-por-analyze-portfolio-risk) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-POR-MERGE_PORTFOLIOS`](#feat-por-merge-portfolios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
 
 A feature’s exact durable namespace, schema version and migrations are taken from its reconciled manifest and contract, not guessed from its folder name. External consumers access semantic state only through the owner capability. Workspace persistence/artifact custody never acquires that semantic ownership.
 
@@ -173,7 +173,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-PORTFOLIO` — Resolve cash/calendar/currency/sample/size compatibility; manual/qualified weights; shared-capital interactions use ordered ticks; save exact constituents, weights, result and benchmark provenance.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-portfolio).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-portfolio).
 
 <a id="wf-wb-project"></a>
 ### `WF-WB-PROJECT` — Automate a research project
@@ -186,7 +186,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-PROJECT` — Validate bounded typed graph; whole/from-here/only preview; crash after child commit reconciles one receipt; retries append attempts and lineage navigates both directions.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-project).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-project).
 
 <a id="wf-agt-advise-portfolio"></a>
 ### `WF-AGT-ADVISE_PORTFOLIO` — Portfolio and Risk Advisory
@@ -199,7 +199,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-AGT-ADVISE_PORTFOLIO` — Fresh account/portfolio evidence and independent risk challenge; strictly expiring non-binding output cannot encode executable quantities or Risk approval.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-advise-portfolio).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-agt-advise-portfolio).
 
 ## 4. Composable Feature Specifications
 
@@ -212,7 +212,7 @@ Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expe
 > **Domain:** `portfolio`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/portfolio/compose_portfolios/`
-> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -226,9 +226,9 @@ Version portfolio composition and capital policy. Deliver the bounded behaviors 
 
 `workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](../workspace/README.md#feat-ws-execute-persistence)<br>`catalogue.convert-currencies@1` — [`FEAT-CAT-CONVERT_CURRENCIES`](../catalogue/README.md#feat-cat-convert-currencies)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions)<br>`analytics.query-results@1` — [`FEAT-ANA-QUERY_RESULTS`](../analytics/README.md#feat-ana-query-results).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-compose-portfolios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-compose-portfolios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/portfolio/compose_portfolios.py`](../../contracts/portfolio/compose_portfolios.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/portfolio/compose_portfolios.py`](../../contracts/portfolio/compose_portfolios.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -236,7 +236,7 @@ Version portfolio composition and capital policy. Deliver the bounded behaviors 
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -295,7 +295,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-compose-portfolios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-compose-portfolios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -330,7 +330,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-POR-COMPOSE_P
 > **Domain:** `portfolio`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/portfolio/analyze_correlation/`
-> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -344,9 +344,9 @@ Compute aligned correlation and covariance. Deliver the bounded behaviors in the
 
 `analytics.project-series@1` — [`FEAT-ANA-PROJECT_SERIES`](../analytics/README.md#feat-ana-project-series)<br>`data.align-series@1` — [`FEAT-DATA-ALIGN_SERIES`](../data/README.md#feat-data-align-series)<br>`orchestration.resource-admission@1` — [`FEAT-ORCH-RESERVE_RESOURCES`](../orchestration/README.md#feat-orch-reserve-resources).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-analyze-correlation) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-analyze-correlation) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/portfolio/analyze_correlation.py`](../../contracts/portfolio/analyze_correlation.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/portfolio/analyze_correlation.py`](../../contracts/portfolio/analyze_correlation.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -354,7 +354,7 @@ Compute aligned correlation and covariance. Deliver the bounded behaviors in the
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -413,7 +413,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-analyze-correlation): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-analyze-correlation): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -448,7 +448,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-POR-ANALYZE_C
 > **Domain:** `portfolio`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/portfolio/optimize_weights/`
-> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -462,9 +462,9 @@ Allocate portfolio weights with declared objectives. Deliver the bounded behavio
 
 `portfolio.compose-portfolios@1` — [`FEAT-POR-COMPOSE_PORTFOLIOS`](#feat-por-compose-portfolios)<br>`portfolio.analyze-correlation@1` — [`FEAT-POR-ANALYZE_CORRELATION`](#feat-por-analyze-correlation)<br>`orchestration.manage-jobs@1` — [`FEAT-ORCH-MANAGE_JOBS`](../orchestration/README.md#feat-orch-manage-jobs).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-optimize-weights) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-optimize-weights) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/portfolio/optimize_weights.py`](../../contracts/portfolio/optimize_weights.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/portfolio/optimize_weights.py`](../../contracts/portfolio/optimize_weights.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -472,7 +472,7 @@ Allocate portfolio weights with declared objectives. Deliver the bounded behavio
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -531,7 +531,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-optimize-weights): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-optimize-weights): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -566,7 +566,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-POR-OPTIMIZE_
 > **Domain:** `portfolio`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/portfolio/search_portfolios/`
-> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -580,9 +580,9 @@ Search constrained portfolio combinations. Deliver the bounded behaviors in the 
 
 `portfolio.compose-portfolios@1` — [`FEAT-POR-COMPOSE_PORTFOLIOS`](#feat-por-compose-portfolios)<br>`portfolio.analyze-correlation@1` — [`FEAT-POR-ANALYZE_CORRELATION`](#feat-por-analyze-correlation)<br>`portfolio.optimize-weights@1` — [`FEAT-POR-OPTIMIZE_WEIGHTS`](#feat-por-optimize-weights)<br>`orchestration.manage-jobs@1` — [`FEAT-ORCH-MANAGE_JOBS`](../orchestration/README.md#feat-orch-manage-jobs)<br>`analytics.compute-metrics@1` — [`FEAT-ANA-COMPUTE_METRICS`](../analytics/README.md#feat-ana-compute-metrics).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-search-portfolios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-search-portfolios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/portfolio/search_portfolios.py`](../../contracts/portfolio/search_portfolios.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/portfolio/search_portfolios.py`](../../contracts/portfolio/search_portfolios.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -590,7 +590,7 @@ Search constrained portfolio combinations. Deliver the bounded behaviors in the 
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -649,7 +649,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-search-portfolios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-search-portfolios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -684,7 +684,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-POR-SEARCH_PO
 > **Domain:** `portfolio`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/portfolio/simulate_portfolios/`
-> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -698,9 +698,9 @@ Evaluate combined portfolio capital and execution. Deliver the bounded behaviors
 
 `portfolio.compose-portfolios@1` — [`FEAT-POR-COMPOSE_PORTFOLIOS`](#feat-por-compose-portfolios)<br>`simulator.execute-ticks@1` — [`FEAT-SIM-EXECUTE_TICKS`](../simulator/README.md#feat-sim-execute-ticks)<br>`simulator.commit-results@1` — [`FEAT-SIM-COMMIT_RESULTS`](../simulator/README.md#feat-sim-commit-results)<br>`analytics.compute-metrics@1` — [`FEAT-ANA-COMPUTE_METRICS`](../analytics/README.md#feat-ana-compute-metrics).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-simulate-portfolios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-simulate-portfolios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/portfolio/simulate_portfolios.py`](../../contracts/portfolio/simulate_portfolios.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/portfolio/simulate_portfolios.py`](../../contracts/portfolio/simulate_portfolios.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -708,7 +708,7 @@ Evaluate combined portfolio capital and execution. Deliver the bounded behaviors
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -767,7 +767,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-simulate-portfolios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-simulate-portfolios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -802,7 +802,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-POR-SIMULATE_
 > **Domain:** `portfolio`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/portfolio/analyze_portfolio_risk/`
-> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -816,9 +816,9 @@ Explain diversification, exposure and portfolio scenarios. Deliver the bounded b
 
 `portfolio.compose-portfolios@1` — [`FEAT-POR-COMPOSE_PORTFOLIOS`](#feat-por-compose-portfolios)<br>`portfolio.analyze-correlation@1` — [`FEAT-POR-ANALYZE_CORRELATION`](#feat-por-analyze-correlation)<br>`analytics.compute-metrics@1` — [`FEAT-ANA-COMPUTE_METRICS`](../analytics/README.md#feat-ana-compute-metrics).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-analyze-portfolio-risk) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-analyze-portfolio-risk) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/portfolio/analyze_portfolio_risk.py`](../../contracts/portfolio/analyze_portfolio_risk.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/portfolio/analyze_portfolio_risk.py`](../../contracts/portfolio/analyze_portfolio_risk.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -826,7 +826,7 @@ Explain diversification, exposure and portfolio scenarios. Deliver the bounded b
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -885,7 +885,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-analyze-portfolio-risk): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-analyze-portfolio-risk): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -920,7 +920,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-POR-ANALYZE_P
 > **Domain:** `portfolio`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/portfolio/merge_portfolios/`
-> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -934,9 +934,9 @@ Merge and split portfolio definitions with lineage. Deliver the bounded behavior
 
 `portfolio.compose-portfolios@1` — [`FEAT-POR-COMPOSE_PORTFOLIOS`](#feat-por-compose-portfolios).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-merge-portfolios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-merge-portfolios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/portfolio/merge_portfolios.py`](../../contracts/portfolio/merge_portfolios.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/portfolio/merge_portfolios.py`](../../contracts/portfolio/merge_portfolios.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -944,7 +944,7 @@ Merge and split portfolio definitions with lineage. Deliver the bounded behavior
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1002,7 +1002,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-por-merge-portfolios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-por-merge-portfolios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1037,9 +1037,9 @@ Disable and physically remove the actual reconciled owner of `FEAT-POR-MERGE_POR
 | ARCH-001 | Init purity | All backend __init__.py files contain only docstrings; no imports, registration or I/O. | Architecture check and AST review. |
 | ARCH-002 | Managed tasks | Spawn asynchronous service work through FeatureContext.spawn(); own all effects in FeatureScope. | Architecture check; lifecycle, failure and cancellation tests. |
 | ARCH-003 | Logging hygiene | No root logging.basicConfig() in service packages; preserve scoped structured redaction. | Static checks and secret/redaction fixtures. |
-| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | Import Linter and AST checks. |
+| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | The repository AST architecture check. |
 | ARCH-005 | Interfaces purity | Gateways use contracts and declared capabilities; no service imports, business computations or business persistence. | Import/architecture checks and real-owner parity tests. |
-| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | Import Linter, physical removal and startup tests. |
+| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | The repository AST architecture check, physical removal and startup tests. |
 
 | Policy | Binding requirement | Verification |
 | --- | --- | --- |
@@ -1080,7 +1080,6 @@ uv run --frozen pytest --no-cov tests/services/portfolio/compose_portfolios
 uv run --frozen ruff format --check .
 uv run --frozen ruff check .
 uv run --frozen mypy
-uv run --frozen lint-imports
 uv run --frozen python scripts/architecture_check.py
 uv run --frozen python scripts/validate_feature_docs.py
 uv run --frozen python scripts/verify_feature_removal.py --feature FEAT-POR-COMPOSE_PORTFOLIOS --report removal-report.json
@@ -1174,12 +1173,12 @@ Each §4 source-card link incorporates only that feature’s shared NFR applicab
 
 | Source | Git blob identity | Role |
 | --- | --- | --- |
-| [`docs/dev/SQX/HaruQuantAI_Unified_Specification.md`](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
-| [`docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md`](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) | `32d7ff8ea18784c66b479beae822f17744462044` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
-| [`docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md`](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) | `ffe9b7d3a3a29b32f7a6559122f32d73258709f8` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
+| [`docs/dev/evidence/specification-drift.md`](../../../docs/dev/evidence/specification-drift.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
+| [`docs/dev/Feature_Requirement_Traceability_Register.md`](../../../docs/dev/Feature_Requirement_Traceability_Register.md) | `402c3cfa45ee77146789b6136bbe713c74773e00` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
+| [`docs/dev/Phased_Feature_Implementation_Plan.md`](../../../docs/dev/Phased_Feature_Implementation_Plan.md) | `03cd112418df0368003ed5fcd5f301d9fa2dd7c3` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
 | [`docs/templates/README.md`](../../../docs/templates/README.md) | `8d6fb9075784113e95857555c17f7182996f7cc3` | README structure and code-aligned conventions. |
 
-The register records specification blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd` at commit `c06456fe2c03bc89f52edad1a0a8428118287377`. The phased plan records inspected specification blob `d69bef59cb981350cd6f2ebdccc31b231a4e0950` at commit `a3c81dff4e5b903e749259ff463b8d9280d6fc26`. The fetched specification identity above differs from both. This delivery records the mismatch but does not claim a clause-level reconciliation or authorize a silent change to the 205-feature scope.
+The historical specification blobs and their clause-level disposition are reconciled in `docs/dev/evidence/specification-drift.md`; the normalized 205-feature register and complete dependency graph are hash-pinned by `docs/dev/evidence/baseline-manifest.json`. Documentary binding does not claim runtime acceptance for an unimplemented feature.
 
 ### Delivery evidence boundary
 

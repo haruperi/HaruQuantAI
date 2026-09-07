@@ -1,62 +1,91 @@
 {
-  "manifest_version": "1.0",
-  "timestamp": "2026-09-07T18:45:00+03:00",
+  "manifest_version": "2.0",
+  "policy": "Missing external evidence blocks only the named production-qualification claim; offline core development remains available.",
   "evidence_items": [
     {
       "item_id": "EVD-TICKS-01",
-      "description": "Tick data golden sample for causal backtest matching",
+      "description": "Hash-pinned causal tick golden sample",
       "owner": "FEAT-DATA-NORMALIZE_TICKS",
-      "due_phase": 4,
-      "gate_status": "REQUIRED_BEFORE_TASK_4_01"
+      "owner_task": "2.16",
+      "due_before": "4.06",
+      "status": "CLOSED_OFFLINE_FIXTURE",
+      "evidence_path": "tests/fixtures/ticks/eurusd_ticks_20250102.parquet",
+      "blocked_claim": "Recorded/golden tick parity for simulator tick modelling"
     },
     {
       "item_id": "EVD-CONTRACT-01",
-      "description": "Broker protocol wire trace verification",
+      "description": "Broker protocol wire-trace verification for each production provider",
       "owner": "FEAT-BRK-RESOLVE",
-      "due_phase": 2,
-      "gate_status": "REQUIRED_BEFORE_TASK_2_01"
+      "owner_task": "2.08",
+      "due_before": "2.03",
+      "status": "OPEN_EXTERNAL",
+      "evidence_path": null,
+      "blocked_claim": "Production broker wire compatibility; offline provider contracts and fixtures remain available"
     },
     {
       "item_id": "EVD-MQL5-01",
-      "description": "MQL5 contract golden parity fixture",
-      "owner": "FEAT-STRAT-IMPORT_MQL5",
-      "due_phase": 16,
-      "gate_status": "REQUIRED_BEFORE_TASK_16_01"
+      "description": "MQL5 parser/compiler and golden-vector qualification",
+      "owner": "FEAT-STRAT-GENERATE_MQL5",
+      "owner_task": "12.05",
+      "due_before": "12.05",
+      "status": "OPEN_EXTERNAL",
+      "evidence_path": null,
+      "blocked_claim": "Verified MQL5 target output"
     },
     {
       "item_id": "EVD-SQX-01",
-      "description": "SQX strategy archive conversion verification",
+      "description": "Authorized SQX archive variants and conversion expectations",
       "owner": "FEAT-STRAT-IMPORT_SQX",
-      "due_phase": 16,
-      "gate_status": "REQUIRED_BEFORE_TASK_16_10"
+      "owner_task": "16.10",
+      "due_before": "16.10",
+      "status": "OPEN_EXTERNAL",
+      "evidence_path": null,
+      "blocked_claim": "SQX import parity"
     },
     {
       "item_id": "EVD-CTRADER-01",
-      "description": "cTrader OpenAPI wire parity proof",
+      "description": "cTrader OpenAPI wire-parity proof",
       "owner": "FEAT-BRK-CTRADER",
-      "due_phase": 16,
-      "gate_status": "REQUIRED_BEFORE_TASK_16_02"
+      "owner_task": "2.04",
+      "due_before": "PRODUCTION_QUALIFICATION_2.04",
+      "status": "OPEN_EXTERNAL",
+      "evidence_path": null,
+      "blocked_claim": "Production cTrader connectivity"
     },
     {
       "item_id": "EVD-BINANCE-01",
-      "description": "Binance WebSocket order book golden stream",
+      "description": "Binance WebSocket golden stream and permission matrix",
       "owner": "FEAT-BRK-BINANCE",
-      "due_phase": 16,
-      "gate_status": "REQUIRED_BEFORE_TASK_16_03"
+      "owner_task": "2.05",
+      "due_before": "PRODUCTION_QUALIFICATION_2.05",
+      "status": "OPEN_EXTERNAL",
+      "evidence_path": null,
+      "blocked_claim": "Production Binance connectivity"
     },
     {
       "item_id": "EVD-METATRADER-01",
-      "description": "MetaTrader terminal bridge golden trace",
+      "description": "MetaTrader terminal-bridge golden trace and toolchain identity",
       "owner": "FEAT-BRK-METATRADER",
-      "due_phase": 16,
-      "gate_status": "REQUIRED_BEFORE_TASK_16_04"
+      "owner_task": "2.03",
+      "due_before": "PRODUCTION_QUALIFICATION_2.03",
+      "status": "OPEN_EXTERNAL",
+      "evidence_path": null,
+      "blocked_claim": "Production MetaTrader connectivity"
     },
     {
       "item_id": "EVD-NEURAL-01",
-      "description": "ONNX runtime inference accuracy baseline",
-      "owner": "FEAT-RES-QUALIFY_MODELS",
-      "due_phase": 14,
-      "gate_status": "REQUIRED_BEFORE_TASK_14_01"
+      "description": "Pinned ONNX runtime vectors and accuracy baseline",
+      "owner": "FEAT-RES-VALIDATE_MODELS",
+      "owner_task": "14.05",
+      "due_before": "14.05",
+      "status": "OPEN_EXTERNAL",
+      "evidence_path": null,
+      "blocked_claim": "Qualified model and ONNX parity"
     }
-  ]
+  ],
+  "donor_parity": {
+    "status": "UNAVAILABLE",
+    "reason": "No complete authorized donor inventory has been reconciled.",
+    "effect": "No donor-parity claim is permitted; ratified V3 implementation may proceed from public contracts."
+  }
 }

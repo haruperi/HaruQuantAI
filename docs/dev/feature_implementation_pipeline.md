@@ -80,7 +80,7 @@ consumer feature
     X never imports app/services/<owner>/<provider>/
 ```
 
-When adding a registered in-repository feature, ensure `scripts/architecture_check.py` recognizes its feature-package boundary and rejects imports of other feature implementations. Import Linter continues to enforce the shared-module dependency direction.
+When adding a registered in-repository feature, ensure `scripts/architecture_check.py` recognizes its feature-package boundary and rejects imports of other feature implementations. The same repository-owned checker enforces shared-module dependency direction.
 
 ### 2.1 Legacy adaptation entry path
 
@@ -773,7 +773,7 @@ Run:
 uv run python scripts/verify_feature_removal.py --feature FEAT-<DOMAIN>-<ACTION>
 ```
 
-The script copies the repository to an isolated temporary workspace, deletes the feature package and its feature-local tests, removes its entry point and Import Linter module, synchronizes the environment, runs the quality/test suite, and verifies:
+The script copies the repository to an isolated temporary workspace, deletes the feature package and its feature-local tests, removes its entry point, synchronizes the environment, runs the quality/test suite, and verifies:
 
 - stale desired configuration reports the feature as `MISSING`;
 - required consumers become `BLOCKED`;
@@ -826,7 +826,6 @@ Never run bare `pytest`, an unfiltered `uv run pytest`, `scripts/ci_check.py`, o
 uv run ruff format --check .
 uv run ruff check .
 uv run mypy
-uv run lint-imports
 uv run python scripts/architecture_check.py
 uv run python scripts/validate_feature_docs.py
 uv run pytest --no-cov <affected_test_path> [<affected_test_path> ...]
@@ -840,7 +839,7 @@ Use `uv run ruff format .` and `uv run ruff check --fix .` only when intentional
 uv run python scripts/ci_check.py
 ```
 
-Do not invoke this command during feature implementation or iterative verification. The pre-commit hook runs the complete Pytest coverage gate for applicable code/test/configuration commits, and automated CI/release verification may invoke the repository gate. The gate runs Ruff format checking, Ruff linting, strict mypy, Import Linter, AST architecture checks, feature-documentation validation, and pytest with branch coverage and an 80 percent project floor. Coverage is final integration evidence, not a substitute for lifecycle, failure, dependency, replacement, durability, or removal assertions.
+Do not invoke this command during feature implementation or iterative verification. The pre-commit hook runs the complete Pytest coverage gate for applicable code/test/configuration commits, and automated CI/release verification may invoke the repository gate. The gate runs Ruff format checking, Ruff linting, strict mypy, repository-owned AST architecture checks, feature-documentation validation, and pytest with branch coverage and an 80 percent project floor. Coverage is final integration evidence, not a substitute for lifecycle, failure, dependency, replacement, durability, or removal assertions.
 
 ## 11. Definition of Done
 
@@ -962,7 +961,7 @@ For every new, migrated, or changed feature:
     `_usage.py` executable harness.
 12. Execute the usage harness and verify every mapped FR scenario.
 13. Implement `mount()` using only declared dependencies and scoped operations.
-14. Register the entry point and Import Linter feature package.
+14. Register the entry point and ensure the repository AST checker recognizes the feature package.
 15. Add or update capability-aware D-IFACE surfaces only when publicly required.
 16. Port applicable available-donor cases and add feature-local, generic, composition,
     lifecycle, failure, replacement, readiness, and Interfaces tests.

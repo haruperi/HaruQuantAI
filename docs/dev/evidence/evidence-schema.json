@@ -6,9 +6,12 @@
     "feature_id",
     "task_id",
     "status",
+    "owner_specification",
     "baseline_commit",
     "acceptance_commit",
     "requirements",
+    "catalogue_entries",
+    "stages",
     "commands",
     "review"
   ],
@@ -28,6 +31,10 @@
         "REJECTED",
         "IN_PROGRESS"
       ]
+    },
+    "owner_specification": {
+      "type": "string",
+      "pattern": "^(app|docs)/.+README\\.md$"
     },
     "baseline_commit": {
       "type": "string",
@@ -60,6 +67,34 @@
             "type": "string"
           }
         }
+      }
+    },
+    "catalogue_entries": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "stages": {
+      "type": "object",
+      "required": [
+        "contract",
+        "provider",
+        "composition",
+        "interfaces",
+        "ui",
+        "end_to_end"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "contract": { "$ref": "#/$defs/stage" },
+        "provider": { "$ref": "#/$defs/stage" },
+        "composition": { "$ref": "#/$defs/stage" },
+        "interfaces": { "$ref": "#/$defs/stage" },
+        "ui": { "$ref": "#/$defs/stage" },
+        "end_to_end": { "$ref": "#/$defs/stage" }
       }
     },
     "commands": {
@@ -96,6 +131,23 @@
         },
         "reviewer_notes": {
           "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "stage": {
+      "type": "object",
+      "required": ["status", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["PASS", "FAIL", "WAIVED", "NOT_APPLICABLE"]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
         }
       }
     }

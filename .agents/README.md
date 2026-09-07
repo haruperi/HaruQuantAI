@@ -101,7 +101,12 @@ Goal input and runtime state are separate from Task coordination:
 .agents/goals/<goal-run-id>/children/    # exact frozen child task specs
 ```
 
-Supported v1 selection types are explicit `entries`, numbered `phase`, and `all_open`. Both legacy heading/checklist trackers and the current implementation-order Markdown tables are parsed. Selection freezes at Goal activation so later tracker edits cannot silently enlarge scope.
+Supported v1 selection types are explicit `entries`, numbered `phase`, and `all_open`.
+The default tracker is `docs/dev/Phased_Feature_Implementation_Plan.md`; its
+`Task N.NN` feature cards are parsed without treating Phase 0 preparations as
+children. Legacy heading/checklist trackers and implementation-order Markdown
+tables remain supported. Selection freezes at Goal activation so later tracker
+edits cannot silently enlarge scope.
 
 An unattended Goal may set `stop_on_blocked=false` (or use `make_goal.py --continue-on-blocked`) for one bounded Planner assumption retry per child. This never skips a child or relaxes protected authority/safety boundaries. Accepted Reviewer assumption sections are hashed into the Goal state for later human review.
 

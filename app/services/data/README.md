@@ -9,7 +9,7 @@
 
 **Selected scope:** 16 features · 36 owned functional requirements · 16 feature-local non-functional requirements. All original feature and requirement IDs are retained. These selected workbench obligations do **not** delete unrelated existing domain behavior. This document must be merged with current evidence and any out-of-scope entries before replacing an existing domain registry.
 
-**Sources:** [Unified Specification](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) · [Feature–Requirement Traceability Register](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) · [README template](../../../docs/templates/README.md). Source fingerprints and unresolved bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
+**Sources:** [Unified Specification](../../../docs/dev/evidence/specification-drift.md) · [Feature–Requirement Traceability Register](../../../docs/dev/Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md) · [README template](../../../docs/templates/README.md). Source fingerprints and Phase 0 bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
 
 ---
 
@@ -43,22 +43,22 @@ Instrument and session definitions; broker transport internals; indicator mathem
 
 | Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
 | --- | --- | --- | --- | --- |
-| NOT_REVALIDATED | `data.ingest-history@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Import historical observations with a conserved receipt |
-| NOT_REVALIDATED | `data.market-data-store@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/market_data_store.py`](../../contracts/data/market_data_store.py) | 1 | Append and query immutable partitioned market data |
-| NOT_REVALIDATED | `data.resolve-quality@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Inspect and repair data through new versions |
-| NOT_REVALIDATED | `data.aggregate-bars@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Aggregate causal bars on declared clocks |
-| NOT_REVALIDATED | `data.manage-retention@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Inspect, export and retire market data safely |
-| NOT_REVALIDATED | `data.bind-run-data@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Bind exact eligible inputs to a run |
-| NOT_REVALIDATED | `data.align-series@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Align external series without look-ahead |
-| NOT_REVALIDATED | `data.sync-connectors@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Resume bounded source synchronization |
-| NOT_REVALIDATED | `data.normalize-ticks@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Normalize recorded ticks while retaining source evidence |
-| NOT_REVALIDATED | `data.prepare-profiles@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Prepare eligible inputs for market profiles |
-| NOT_REVALIDATED | `data.import-indicators@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Import non-executable external indicator series |
-| NOT_REVALIDATED | `data.generate-scenarios@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Publish synthetic market-data scenarios |
-| NOT_REVALIDATED | `data.track-market-news@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Supply governed point-in-time document evidence |
-| NOT_REVALIDATED | `data.stream-market-events@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Expose bounded normalized real-time observations |
-| NOT_REVALIDATED | `data.import-quantdata@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Import QuantDataManager source artifacts |
-| NOT_REVALIDATED | `data.browse-reference@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/browse_reference.py`](../../contracts/data/browse_reference.py) | 1 | Browse one coherent data/reference projection |
+| DOCUMENTARY_BOUND | `data.ingest-history@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Import historical observations with a conserved receipt |
+| DOCUMENTARY_BOUND | `data.market-data-store@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/market_data_store.py`](../../contracts/data/market_data_store.py) | 1 | Append and query immutable partitioned market data |
+| DOCUMENTARY_BOUND | `data.resolve-quality@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Inspect and repair data through new versions |
+| DOCUMENTARY_BOUND | `data.aggregate-bars@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Aggregate causal bars on declared clocks |
+| DOCUMENTARY_BOUND | `data.manage-retention@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Inspect, export and retire market data safely |
+| DOCUMENTARY_BOUND | `data.bind-run-data@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Bind exact eligible inputs to a run |
+| DOCUMENTARY_BOUND | `data.align-series@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Align external series without look-ahead |
+| DOCUMENTARY_BOUND | `data.sync-connectors@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Resume bounded source synchronization |
+| DOCUMENTARY_BOUND | `data.normalize-ticks@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Normalize recorded ticks while retaining source evidence |
+| DOCUMENTARY_BOUND | `data.prepare-profiles@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Prepare eligible inputs for market profiles |
+| DOCUMENTARY_BOUND | `data.import-indicators@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Import non-executable external indicator series |
+| DOCUMENTARY_BOUND | `data.generate-scenarios@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Publish synthetic market-data scenarios |
+| DOCUMENTARY_BOUND | `data.track-market-news@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Supply governed point-in-time document evidence |
+| DOCUMENTARY_BOUND | `data.stream-market-events@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Expose bounded normalized real-time observations |
+| DOCUMENTARY_BOUND | `data.import-quantdata@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Import QuantDataManager source artifacts |
+| DOCUMENTARY_BOUND | `data.browse-reference@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/data/browse_reference.py`](../../contracts/data/browse_reference.py) | 1 | Browse one coherent data/reference projection |
 
 **Consumed from other domains — required providers.** Runtime resolution is through the exact key; the provider’s implementation folder is not an import target. Same-domain edges are listed in the owning feature card.
 
@@ -89,22 +89,22 @@ Immutable raw and derived dataset versions and manifests; conserved ingestion/qu
 
 | Evidence | Owning feature | Partition / ownership class | Driver binding | Retention / read boundary |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-RESOLVE_QUALITY`](#feat-data-resolve-quality) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-AGGREGATE_BARS`](#feat-data-aggregate-bars) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-MANAGE_RETENTION`](#feat-data-manage-retention) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-ALIGN_SERIES`](#feat-data-align-series) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-SYNC_CONNECTORS`](#feat-data-sync-connectors) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-NORMALIZE_TICKS`](#feat-data-normalize-ticks) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-PREPARE_PROFILES`](#feat-data-prepare-profiles) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-IMPORT_INDICATORS`](#feat-data-import-indicators) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-GENERATE_SCENARIOS`](#feat-data-generate-scenarios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-TRACK_MARKET_NEWS`](#feat-data-track-market-news) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-STREAM_MARKET_EVENTS`](#feat-data-stream-market-events) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-IMPORT_QUANTDATA`](#feat-data-import-quantdata) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
-| BINDING_PENDING | [`FEAT-DATA-BROWSE_REFERENCE`](#feat-data-browse-reference) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-RESOLVE_QUALITY`](#feat-data-resolve-quality) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-AGGREGATE_BARS`](#feat-data-aggregate-bars) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-MANAGE_RETENTION`](#feat-data-manage-retention) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-ALIGN_SERIES`](#feat-data-align-series) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-SYNC_CONNECTORS`](#feat-data-sync-connectors) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-NORMALIZE_TICKS`](#feat-data-normalize-ticks) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-PREPARE_PROFILES`](#feat-data-prepare-profiles) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-IMPORT_INDICATORS`](#feat-data-import-indicators) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-GENERATE_SCENARIOS`](#feat-data-generate-scenarios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-TRACK_MARKET_NEWS`](#feat-data-track-market-news) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-STREAM_MARKET_EVENTS`](#feat-data-stream-market-events) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-IMPORT_QUANTDATA`](#feat-data-import-quantdata) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-DATA-BROWSE_REFERENCE`](#feat-data-browse-reference) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
 
 A feature’s exact durable namespace, schema version and migrations are taken from its reconciled manifest and contract, not guessed from its folder name. External consumers access semantic state only through the owner capability. Workspace persistence/artifact custody never acquires that semantic ownership.
 
@@ -209,7 +209,7 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Input/output and acceptance contract:** `ATW-WB-GENERATE_QUALIFY` — Pinned source/space/seed; one accepted research run; each candidate has actual simulation, filters and stage history; only qualified committed result references enter the destination databank.
 
-**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-generate-qualify).
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/Feature_Requirement_Traceability_Register.md#wf-wb-generate-qualify).
 
 ## 4. Composable Feature Specifications
 
@@ -222,7 +222,7 @@ Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expe
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/historical_data_ingestion/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -236,9 +236,9 @@ Import historical observations with a conserved receipt. Deliver the bounded beh
 
 `data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-ingest-history) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-ingest-history) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -246,7 +246,7 @@ Import historical observations with a conserved receipt. Deliver the bounded beh
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -305,7 +305,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-ingest-history): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-ingest-history): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -340,7 +340,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-INGEST_H
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/market_data_store/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -354,9 +354,9 @@ Append and query immutable partitioned market data. Deliver the bounded behavior
 
 `workspace.artifacts@1` — [`FEAT-WS-MANAGE_ARTIFACTS`](../workspace/README.md#feat-ws-manage-artifacts)<br>`orchestration.resource-admission@1` — [`FEAT-ORCH-RESERVE_RESOURCES`](../orchestration/README.md#feat-orch-reserve-resources).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-market-data-store) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-market-data-store) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/market_data_store.py`](../../contracts/data/market_data_store.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/market_data_store.py`](../../contracts/data/market_data_store.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -364,7 +364,7 @@ Append and query immutable partitioned market data. Deliver the bounded behavior
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -423,7 +423,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-market-data-store): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-market-data-store): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -458,7 +458,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-MARKET_D
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/data_quality_resolution/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -472,9 +472,9 @@ Inspect and repair data through new versions. Deliver the bounded behaviors in t
 
 `data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-resolve-quality) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-resolve-quality) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -482,7 +482,7 @@ Inspect and repair data through new versions. Deliver the bounded behaviors in t
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -541,7 +541,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-resolve-quality): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-resolve-quality): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -576,7 +576,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-RESOLVE_
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/bar_aggregation/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -590,9 +590,9 @@ Aggregate causal bars on declared clocks. Deliver the bounded behaviors in the F
 
 `data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-aggregate-bars) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-aggregate-bars) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -600,7 +600,7 @@ Aggregate causal bars on declared clocks. Deliver the bounded behaviors in the F
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -656,7 +656,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-aggregate-bars): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-aggregate-bars): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -691,7 +691,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-AGGREGAT
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/data_inspection_retention/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -705,9 +705,9 @@ Inspect, export and retire market data safely. Deliver the bounded behaviors in 
 
 `data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-manage-retention) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-manage-retention) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -715,7 +715,7 @@ Inspect, export and retire market data safely. Deliver the bounded behaviors in 
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -774,7 +774,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-manage-retention): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-manage-retention): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -809,7 +809,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-MANAGE_R
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/run_data_binding/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -823,9 +823,9 @@ Bind exact eligible inputs to a run. Deliver the bounded behaviors in the FR tab
 
 `data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store)<br>`catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](../catalogue/README.md#feat-cat-catalog-instruments)<br>`catalogue.map-providers@1` — [`FEAT-CAT-MAP_PROVIDERS`](../catalogue/README.md#feat-cat-map-providers)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-bind-run-data) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-bind-run-data) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -833,7 +833,7 @@ Bind exact eligible inputs to a run. Deliver the bounded behaviors in the FR tab
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -891,7 +891,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-bind-run-data): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-bind-run-data): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -926,7 +926,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-BIND_RUN
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/external_series_alignment/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -940,9 +940,9 @@ Align external series without look-ahead. Deliver the bounded behaviors in the F
 
 `data.bind-run-data@1` — [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-align-series) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-align-series) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -950,7 +950,7 @@ Align external series without look-ahead. Deliver the bounded behaviors in the F
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1008,7 +1008,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-align-series): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-align-series): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1043,7 +1043,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-ALIGN_SE
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/connector_synchronization/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1057,9 +1057,9 @@ Resume bounded source synchronization. Deliver the bounded behaviors in the FR t
 
 `data.ingest-history@1` — [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history)<br>`orchestration.manage-jobs@1` — [`FEAT-ORCH-MANAGE_JOBS`](../orchestration/README.md#feat-orch-manage-jobs)<br>`broker.resolver@1` — [`FEAT-BRK-RESOLVE`](../brokers/README.md#feat-brk-resolve).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-sync-connectors) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-sync-connectors) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1067,7 +1067,7 @@ Resume bounded source synchronization. Deliver the bounded behaviors in the FR t
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1125,7 +1125,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-sync-connectors): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-sync-connectors): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1160,7 +1160,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-SYNC_CON
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/tick_normalization/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1174,9 +1174,9 @@ Normalize recorded ticks while retaining source evidence. Deliver the bounded be
 
 `catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](../catalogue/README.md#feat-cat-catalog-instruments).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-normalize-ticks) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-normalize-ticks) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1184,7 +1184,7 @@ Normalize recorded ticks while retaining source evidence. Deliver the bounded be
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1240,7 +1240,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-normalize-ticks): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-normalize-ticks): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1275,7 +1275,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-NORMALIZ
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/profile_source_preparation/`
-> **First release milestone:** `U10`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U10`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1289,9 +1289,9 @@ Prepare eligible inputs for market profiles. Deliver the bounded behaviors in th
 
 `data.bind-run-data@1` — [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-prepare-profiles) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-prepare-profiles) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1299,7 +1299,7 @@ Prepare eligible inputs for market profiles. Deliver the bounded behaviors in th
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1357,7 +1357,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-prepare-profiles): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-prepare-profiles): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1392,7 +1392,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-PREPARE_
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/external_indicator_series/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1406,9 +1406,9 @@ Import non-executable external indicator series. Deliver the bounded behaviors i
 
 `data.ingest-history@1` — [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history)<br>`data.align-series@1` — [`FEAT-DATA-ALIGN_SERIES`](#feat-data-align-series).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-import-indicators) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-import-indicators) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1416,7 +1416,7 @@ Import non-executable external indicator series. Deliver the bounded behaviors i
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1474,7 +1474,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-import-indicators): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-import-indicators): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1509,7 +1509,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-IMPORT_I
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/synthetic_scenario_series/`
-> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1523,9 +1523,9 @@ Publish synthetic market-data scenarios. Deliver the bounded behaviors in the FR
 
 `data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-generate-scenarios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-generate-scenarios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1533,7 +1533,7 @@ Publish synthetic market-data scenarios. Deliver the bounded behaviors in the FR
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1591,7 +1591,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-generate-scenarios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-generate-scenarios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1626,7 +1626,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-GENERATE
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/economic_news_evidence/`
-> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1640,9 +1640,9 @@ Supply governed point-in-time document evidence. Deliver the bounded behaviors i
 
 `data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-track-market-news) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-track-market-news) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1650,7 +1650,7 @@ Supply governed point-in-time document evidence. Deliver the bounded behaviors i
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1708,7 +1708,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-track-market-news): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-track-market-news): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1743,7 +1743,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-TRACK_MA
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/realtime_market_events/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1757,9 +1757,9 @@ Expose bounded normalized real-time observations. Deliver the bounded behaviors 
 
 `broker.resolver@1` — [`FEAT-BRK-RESOLVE`](../brokers/README.md#feat-brk-resolve)<br>`data.normalize-ticks@1` — [`FEAT-DATA-NORMALIZE_TICKS`](#feat-data-normalize-ticks).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-stream-market-events) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-stream-market-events) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1767,7 +1767,7 @@ Expose bounded normalized real-time observations. Deliver the bounded behaviors 
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1825,7 +1825,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-stream-market-events): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-stream-market-events): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1860,7 +1860,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-STREAM_M
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/quantdata_manager_source/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1874,9 +1874,9 @@ Import QuantDataManager source artifacts. Deliver the bounded behaviors in the F
 
 `data.ingest-history@1` — [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history)<br>`data.normalize-ticks@1` — [`FEAT-DATA-NORMALIZE_TICKS`](#feat-data-normalize-ticks).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-import-quantdata) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-import-quantdata) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -1884,7 +1884,7 @@ Import QuantDataManager source artifacts. Deliver the bounded behaviors in the F
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -1942,7 +1942,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-import-quantdata): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-import-quantdata): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1977,7 +1977,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-IMPORT_Q
 > **Domain:** `data`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/services/data/browse_reference/`
-> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
 #### Purpose
 
@@ -1991,9 +1991,9 @@ Browse one coherent data/reference projection. Deliver the bounded behaviors in 
 
 `data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store)<br>`catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](../catalogue/README.md#feat-cat-catalog-instruments)<br>`catalogue.map-providers@1` — [`FEAT-CAT-MAP_PROVIDERS`](../catalogue/README.md#feat-cat-map-providers)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-browse-reference) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-browse-reference) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/contracts/data/browse_reference.py`](../../contracts/data/browse_reference.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+**Public contract target:** [`app/contracts/data/browse_reference.py`](../../contracts/data/browse_reference.py). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -2001,7 +2001,7 @@ Browse one coherent data/reference projection. Deliver the bounded behaviors in 
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -2059,7 +2059,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-browse-reference): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-data-browse-reference): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -2094,9 +2094,9 @@ Disable and physically remove the actual reconciled owner of `FEAT-DATA-BROWSE_R
 | ARCH-001 | Init purity | All backend __init__.py files contain only docstrings; no imports, registration or I/O. | Architecture check and AST review. |
 | ARCH-002 | Managed tasks | Spawn asynchronous service work through FeatureContext.spawn(); own all effects in FeatureScope. | Architecture check; lifecycle, failure and cancellation tests. |
 | ARCH-003 | Logging hygiene | No root logging.basicConfig() in service packages; preserve scoped structured redaction. | Static checks and secret/redaction fixtures. |
-| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | Import Linter and AST checks. |
+| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | The repository AST architecture check. |
 | ARCH-005 | Interfaces purity | Gateways use contracts and declared capabilities; no service imports, business computations or business persistence. | Import/architecture checks and real-owner parity tests. |
-| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | Import Linter, physical removal and startup tests. |
+| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | The repository AST architecture check, physical removal and startup tests. |
 
 | Policy | Binding requirement | Verification |
 | --- | --- | --- |
@@ -2137,7 +2137,6 @@ uv run --frozen pytest --no-cov tests/services/data/historical_data_ingestion
 uv run --frozen ruff format --check .
 uv run --frozen ruff check .
 uv run --frozen mypy
-uv run --frozen lint-imports
 uv run --frozen python scripts/architecture_check.py
 uv run --frozen python scripts/validate_feature_docs.py
 uv run --frozen python scripts/verify_feature_removal.py --feature FEAT-DATA-INGEST_HISTORY --report removal-report.json
@@ -2236,12 +2235,12 @@ Each §4 source-card link incorporates only that feature’s shared NFR applicab
 
 | Source | Git blob identity | Role |
 | --- | --- | --- |
-| [`docs/dev/SQX/HaruQuantAI_Unified_Specification.md`](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
-| [`docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md`](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) | `32d7ff8ea18784c66b479beae822f17744462044` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
-| [`docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md`](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) | `ffe9b7d3a3a29b32f7a6559122f32d73258709f8` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
+| [`docs/dev/evidence/specification-drift.md`](../../../docs/dev/evidence/specification-drift.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
+| [`docs/dev/Feature_Requirement_Traceability_Register.md`](../../../docs/dev/Feature_Requirement_Traceability_Register.md) | `402c3cfa45ee77146789b6136bbe713c74773e00` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
+| [`docs/dev/Phased_Feature_Implementation_Plan.md`](../../../docs/dev/Phased_Feature_Implementation_Plan.md) | `03cd112418df0368003ed5fcd5f301d9fa2dd7c3` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
 | [`docs/templates/README.md`](../../../docs/templates/README.md) | `8d6fb9075784113e95857555c17f7182996f7cc3` | README structure and code-aligned conventions. |
 
-The register records specification blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd` at commit `c06456fe2c03bc89f52edad1a0a8428118287377`. The phased plan records inspected specification blob `d69bef59cb981350cd6f2ebdccc31b231a4e0950` at commit `a3c81dff4e5b903e749259ff463b8d9280d6fc26`. The fetched specification identity above differs from both. This delivery records the mismatch but does not claim a clause-level reconciliation or authorize a silent change to the 205-feature scope.
+The historical specification blobs and their clause-level disposition are reconciled in `docs/dev/evidence/specification-drift.md`; the normalized 205-feature register and complete dependency graph are hash-pinned by `docs/dev/evidence/baseline-manifest.json`. Documentary binding does not claim runtime acceptance for an unimplemented feature.
 
 ### Delivery evidence boundary
 

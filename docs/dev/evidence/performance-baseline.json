@@ -1,12 +1,80 @@
 {
-  "manifest_version": "1.0",
-  "timestamp": "2026-09-07T18:45:00+03:00",
-  "measured_benchmarks": {
-    "parquet_scan_10k_bars_ms": 8.4,
-    "sqlite_metadata_query_ms": 1.2,
-    "asgi_event_dispatch_us": 140,
-    "architecture_check_seconds": 1.5,
-    "ruff_check_full_repo_seconds": 0.45,
-    "mypy_790_files_seconds": 1.85
+  "manifest_version": "2.0",
+  "reference_hardware_id": "SAMSUNG-960QHA-U7-256V-16GB-NVME",
+  "runtime": {
+    "os": "Microsoft Windows 11 Home Insider Preview 10.0.26220 build 26220",
+    "architecture": "x86_64-pc-windows-msvc",
+    "python": "3.14.3",
+    "uv": "0.12.3",
+    "node": "26.8.1",
+    "npm": "12.0.2",
+    "git": "2.55.0.windows.5",
+    "pyarrow": "24.0.0"
+  },
+  "method": {
+    "clock": "time.perf_counter_ns",
+    "warmups": 2,
+    "samples_per_workload": 7,
+    "aggregation": "median; raw samples retained; p95 nearest-rank over 7 samples",
+    "command": "uv run --frozen python scripts/measure_phase0_baseline.py --write"
+  },
+  "workloads": {
+    "parquet_scan_1440_bars": {
+      "fixture": "tests/fixtures/bars/eurusd_m1_202501.parquet",
+      "unit": "ms",
+      "samples": [
+        0.8292,
+        0.9105,
+        0.7795,
+        0.7088,
+        0.787,
+        0.8147,
+        0.8367
+      ],
+      "minimum": 0.7088,
+      "median": 0.8147,
+      "p95": 0.9105,
+      "budget": 100.0,
+      "budget_result": "PASS"
+    },
+    "sqlite_catalogue_point_lookup": {
+      "fixture": "tests/fixtures/catalogue/baseline_catalogue.db",
+      "unit": "ms",
+      "samples": [
+        0.2203,
+        0.1869,
+        0.2002,
+        0.1892,
+        0.1562,
+        0.1852,
+        0.138
+      ],
+      "minimum": 0.138,
+      "median": 0.1869,
+      "p95": 0.2203,
+      "budget": 20.0,
+      "budget_result": "PASS"
+    },
+    "phase0_evidence_projection": {
+      "sources": [
+        "docs/dev/Phased_Feature_Implementation_Plan.md",
+        "docs/dev/Feature_Requirement_Traceability_Register.md"
+      ],
+      "unit": "ms",
+      "samples": [
+        257.2209,
+        165.2669,
+        163.5708,
+        165.9851,
+        150.5273,
+        152.9741,
+        151.7853
+      ],
+      "minimum": 150.5273,
+      "median": 163.5708,
+      "p95": 257.2209,
+      "budget": 1000.0,
+      "budget_result": "PASS"
+    }
   }
 }

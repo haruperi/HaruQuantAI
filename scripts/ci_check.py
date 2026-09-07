@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """CI check script for HaruQuantAI.
 
-Runs Ruff format check, Ruff lint check, Mypy type check, Import Linter,
-Architectural AST Invariants, and Pytest with coverage.
+Runs Ruff format and lint checks, Mypy, architectural AST invariants, and
+Pytest with coverage.
 """
 
 import subprocess
@@ -53,7 +53,6 @@ def main() -> None:
             ["python", ".agents/orchestrator.py", "self-test"],
             "Workflow Controller Self Test",
         ),
-        (["lint-imports"], "Import Linter Check"),
         (
             ["python", "scripts/generate_contracts.py", "--check"],
             "Contract Generation Check",

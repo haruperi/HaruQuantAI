@@ -1,15 +1,20 @@
 {
-  "manifest_version": "1.0",
-  "timestamp": "2026-09-07T18:45:00+03:00",
+  "manifest_version": "2.0",
   "bindings": [
     {
       "feature_id": "FEAT-UI-01",
       "task_id": "1.01",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/workspaces",
-      "reuse_path": "app/ui/src/widgets/workspaces",
-      "usage_module": "app/ui/src/widgets/01",
+      "owner_path": "app/ui/src/widgets/workspaces",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/widgets/workspaces/contracts.ts",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
     },
     {
@@ -17,9 +22,15 @@
       "task_id": "1.02",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/clients",
-      "reuse_path": "app/ui/src/clients",
-      "usage_module": "app/ui/src/widgets/14",
+      "owner_path": "app/ui/src/clients",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/clients/contracts.ts",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "app/ui/src/clients/__tests__/traceability.test.tsx",
+        "app/ui/src/clients/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json"
     },
     {
@@ -27,9 +38,18 @@
       "task_id": "1.03",
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
-      "target_dir": "app/services/workspace/manage_workspaces",
-      "reuse_path": "app/services/workspace/manage_workspaces",
-      "usage_module": "app.services.workspace.manage_workspaces._usage",
+      "owner_path": "app/services/workspace/manage_workspaces",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/workspace/manage_workspaces.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/workspace/manage_workspaces/test_traceability.py",
+        "tests/services/workspace/manage_workspaces/test_lifecycle.py"
+      ],
+      "existing_test_targets": [
+        "tests/services/workspace/manage_workspaces/test_traceability.py",
+        "tests/services/workspace/manage_workspaces/test_lifecycle.py"
+      ],
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_WORKSPACES/acceptance.json"
     },
     {
@@ -37,9 +57,15 @@
       "task_id": "1.04",
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
-      "target_dir": "app/services/workspace/manage_accounts",
-      "reuse_path": "app/services/workspace/manage_accounts",
-      "usage_module": "app.services.workspace.manage_accounts._usage",
+      "owner_path": "app/services/workspace/manage_accounts",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/workspace/manage_accounts.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/workspace/manage_accounts/test_traceability.py",
+        "tests/services/workspace/manage_accounts/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json"
     },
     {
@@ -47,9 +73,15 @@
       "task_id": "1.05",
       "domain": "Plugins",
       "canonical_spec": "app/services/plugins/README.md",
-      "target_dir": "app/services/plugins/declare_manifests",
-      "reuse_path": "app/services/plugins/manifests",
-      "usage_module": "app.services.plugins.declare_manifests._usage",
+      "owner_path": "app/services/plugins/declare_manifests",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/plugins/declare_manifests.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/plugins/declare_manifests/test_traceability.py",
+        "tests/services/plugins/declare_manifests/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json"
     },
     {
@@ -57,9 +89,15 @@
       "task_id": "1.06",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/view_collections",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/view_collections",
+      "owner_path": "app/ui/src/widgets/collection-grid",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/collection-grid/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json"
     },
     {
@@ -67,9 +105,15 @@
       "task_id": "1.07",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/review_drafts",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/review_drafts",
+      "owner_path": "app/ui/src/widgets/draft-review",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/draft-review/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/draft-review/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json"
     },
     {
@@ -77,9 +121,15 @@
       "task_id": "1.08",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/serve_api_events",
-      "reuse_path": "app/services/interfaces/serve_api_events",
-      "usage_module": "app.services.interfaces.serve_api_events._usage",
+      "owner_path": "app/services/interfaces/serve_api_events",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/interfaces/serve_api_events.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/serve_api_events/test_traceability.py",
+        "tests/services/interfaces/serve_api_events/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json"
     },
     {
@@ -87,9 +137,18 @@
       "task_id": "1.09",
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
-      "target_dir": "app/services/workspace/execute_persistence",
-      "reuse_path": null,
-      "usage_module": "app.services.workspace.execute_persistence._usage",
+      "owner_path": "app/services/workspace/execute_persistence",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/workspace/persistence.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/workspace/execute_persistence/test_traceability.py",
+        "tests/services/workspace/execute_persistence/test_lifecycle.py"
+      ],
+      "existing_test_targets": [
+        "tests/services/workspace/execute_persistence/test_traceability.py",
+        "tests/services/workspace/execute_persistence/test_lifecycle.py"
+      ],
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-EXECUTE_PERSISTENCE/acceptance.json"
     },
     {
@@ -97,9 +156,15 @@
       "task_id": "1.10",
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
-      "target_dir": "app/services/workspace/secure_local_access",
-      "reuse_path": "app/services/workspace/local_access_health",
-      "usage_module": "app.services.workspace.secure_local_access._usage",
+      "owner_path": "app/services/workspace/secure_local_access",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/workspace/secure_local_access.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/workspace/secure_local_access/test_traceability.py",
+        "tests/services/workspace/secure_local_access/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-SECURE_LOCAL_ACCESS/acceptance.json"
     },
     {
@@ -107,9 +172,15 @@
       "task_id": "1.11",
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
-      "target_dir": "app/services/workspace/administer_settings",
-      "reuse_path": "app/services/workspace/administer_settings",
-      "usage_module": "app.services.workspace.administer_settings._usage",
+      "owner_path": "app/services/workspace/administer_settings",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/workspace/administer_settings.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/workspace/administer_settings/test_traceability.py",
+        "tests/services/workspace/administer_settings/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json"
     },
     {
@@ -117,9 +188,15 @@
       "task_id": "1.12",
       "domain": "Plugins",
       "canonical_spec": "app/services/plugins/README.md",
-      "target_dir": "app/services/plugins/register_contributions",
-      "reuse_path": "app/services/plugins/contributions",
-      "usage_module": "app.services.plugins.register_contributions._usage",
+      "owner_path": "app/services/plugins/register_contributions",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/plugins/register_contributions.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/plugins/register_contributions/test_traceability.py",
+        "tests/services/plugins/register_contributions/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-REGISTER_CONTRIBUTIONS/acceptance.json"
     },
     {
@@ -127,9 +204,15 @@
       "task_id": "1.13",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/operate_identity",
-      "reuse_path": "app/services/interfaces/operate_identity",
-      "usage_module": "app.services.interfaces.operate_identity._usage",
+      "owner_path": "app/services/interfaces/operate_identity",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/interfaces/operate_identity.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/operate_identity/test_traceability.py",
+        "tests/services/interfaces/operate_identity/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_IDENTITY/acceptance.json"
     },
     {
@@ -137,9 +220,15 @@
       "task_id": "1.14",
       "domain": "Orchestration",
       "canonical_spec": "app/services/orchestration/README.md",
-      "target_dir": "app/services/orchestration/reserve_resources",
-      "reuse_path": null,
-      "usage_module": "app.services.orchestration.reserve_resources._usage",
+      "owner_path": "app/services/orchestration/reserve_resources",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/orchestration/resources.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/orchestration/reserve_resources/test_traceability.py",
+        "tests/services/orchestration/reserve_resources/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json"
     },
     {
@@ -147,9 +236,15 @@
       "task_id": "1.15",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/enforce_mandate",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.enforce_mandate._usage",
+      "owner_path": "app/services/agentic/enforce_mandate",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/mandate.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/enforce_mandate/test_traceability.py",
+        "tests/services/agentic/enforce_mandate/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json"
     },
     {
@@ -157,9 +252,15 @@
       "task_id": "1.16",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/app",
-      "reuse_path": "app/ui/src/app",
-      "usage_module": "app/ui/src/widgets/17",
+      "owner_path": "app/ui/src/app",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/app/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/app/__tests__/traceability.test.tsx",
+        "app/ui/src/app/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-17/acceptance.json"
     },
     {
@@ -167,9 +268,15 @@
       "task_id": "1.17",
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
-      "target_dir": "app/services/workspace/manage_artifacts",
-      "reuse_path": null,
-      "usage_module": "app.services.workspace.manage_artifacts._usage",
+      "owner_path": "app/services/workspace/manage_artifacts",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/workspace/artifacts.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/workspace/manage_artifacts/test_traceability.py",
+        "tests/services/workspace/manage_artifacts/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ARTIFACTS/acceptance.json"
     },
     {
@@ -177,9 +284,15 @@
       "task_id": "1.18",
       "domain": "Orchestration",
       "canonical_spec": "app/services/orchestration/README.md",
-      "target_dir": "app/services/orchestration/manage_jobs",
-      "reuse_path": null,
-      "usage_module": "app.services.orchestration.manage_jobs._usage",
+      "owner_path": "app/services/orchestration/manage_jobs",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/orchestration/jobs.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/orchestration/manage_jobs/test_traceability.py",
+        "tests/services/orchestration/manage_jobs/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-MANAGE_JOBS/acceptance.json"
     },
     {
@@ -187,9 +300,15 @@
       "task_id": "1.19",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/operate_runs",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.operate_runs._usage",
+      "owner_path": "app/services/agentic/operate_runs",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/operations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/operate_runs/test_traceability.py",
+        "tests/services/agentic/operate_runs/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-OPERATE_RUNS/acceptance.json"
     },
     {
@@ -197,9 +316,15 @@
       "task_id": "1.20",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/register_roles",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.register_roles._usage",
+      "owner_path": "app/services/agentic/register_roles",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/roles.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/register_roles/test_traceability.py",
+        "tests/services/agentic/register_roles/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-REGISTER_ROLES/acceptance.json"
     },
     {
@@ -207,9 +332,15 @@
       "task_id": "1.21",
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
-      "target_dir": "app/services/workspace/build_diagnostics",
-      "reuse_path": "app/services/workspace/diagnostic_bundle",
-      "usage_module": "app.services.workspace.build_diagnostics._usage",
+      "owner_path": "app/services/workspace/build_diagnostics",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/workspace/build_diagnostics.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/workspace/build_diagnostics/test_traceability.py",
+        "tests/services/workspace/build_diagnostics/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-BUILD_DIAGNOSTICS/acceptance.json"
     },
     {
@@ -217,9 +348,15 @@
       "task_id": "1.22",
       "domain": "Orchestration",
       "canonical_spec": "app/services/orchestration/README.md",
-      "target_dir": "app/services/orchestration/execute_local_work",
-      "reuse_path": null,
-      "usage_module": "app.services.orchestration.execute_local_work._usage",
+      "owner_path": "app/services/orchestration/execute_local_work",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/orchestration/local_workers.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/orchestration/execute_local_work/test_traceability.py",
+        "tests/services/orchestration/execute_local_work/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-EXECUTE_LOCAL_WORK/acceptance.json"
     },
     {
@@ -227,9 +364,15 @@
       "task_id": "1.23",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/govern_tool_calls",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.govern_tool_calls._usage",
+      "owner_path": "app/services/agentic/govern_tool_calls",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/tool_governance.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/govern_tool_calls/test_traceability.py",
+        "tests/services/agentic/govern_tool_calls/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-GOVERN_TOOL_CALLS/acceptance.json"
     },
     {
@@ -237,9 +380,15 @@
       "task_id": "1.24",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/invoke_models",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.invoke_models._usage",
+      "owner_path": "app/services/agentic/invoke_models",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/model_inference.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/invoke_models/test_traceability.py",
+        "tests/services/agentic/invoke_models/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-INVOKE_MODELS/acceptance.json"
     },
     {
@@ -247,9 +396,15 @@
       "task_id": "1.25",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/operate_settings",
-      "reuse_path": "app/services/interfaces/operate_settings",
-      "usage_module": "app.services.interfaces.operate_settings._usage",
+      "owner_path": "app/services/interfaces/operate_settings",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/interfaces/operate_settings.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/operate_settings/test_traceability.py",
+        "tests/services/interfaces/operate_settings/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_SETTINGS/acceptance.json"
     },
     {
@@ -257,9 +412,15 @@
       "task_id": "1.26",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/operate_jobs",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.operate_jobs._usage",
+      "owner_path": "app/services/interfaces/operate_jobs",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/operate_jobs.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/operate_jobs/test_traceability.py",
+        "tests/services/interfaces/operate_jobs/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_JOBS/acceptance.json"
     },
     {
@@ -267,9 +428,15 @@
       "task_id": "1.27",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/components/layout",
-      "reuse_path": "app/ui/src/components/layout",
-      "usage_module": "app/ui/src/widgets/16",
+      "owner_path": "app/ui/src/components/layout",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/components/layout/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/components/layout/__tests__/traceability.test.tsx",
+        "app/ui/src/components/layout/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-16/acceptance.json"
     },
     {
@@ -277,9 +444,15 @@
       "task_id": "1.28",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/system-settings",
-      "reuse_path": "app/ui/src/widgets/system-settings",
-      "usage_module": "app/ui/src/widgets/13",
+      "owner_path": "app/ui/src/widgets/system-settings",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/widgets/system-settings/contracts.ts",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "app/ui/src/widgets/system-settings/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/system-settings/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-13/acceptance.json"
     },
     {
@@ -287,9 +460,15 @@
       "task_id": "1.29",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/run_monitor",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/run_monitor",
+      "owner_path": "app/ui/src/widgets/run-monitor",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/run-monitor/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/run-monitor/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/run-monitor/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-RUN_MONITOR/acceptance.json"
     },
     {
@@ -297,9 +476,15 @@
       "task_id": "1.30",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/debug_console",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/debug_console",
+      "owner_path": "app/ui/src/widgets/debug-console",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/debug-console/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/debug-console/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/debug-console/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-DEBUG_CONSOLE/acceptance.json"
     },
     {
@@ -307,9 +492,15 @@
       "task_id": "2.01",
       "domain": "Catalogue",
       "canonical_spec": "app/services/catalogue/README.md",
-      "target_dir": "app/services/catalogue/catalog_instruments",
-      "reuse_path": "app/services/catalogue/instrument_catalogue",
-      "usage_module": "app.services.catalogue.catalog_instruments._usage",
+      "owner_path": "app/services/catalogue/instrument_catalogue",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/catalogue/instruments.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/catalogue/instrument_catalogue/test_traceability.py",
+        "tests/services/catalogue/instrument_catalogue/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-CAT-CATALOG_INSTRUMENTS/acceptance.json"
     },
     {
@@ -317,9 +508,15 @@
       "task_id": "2.02",
       "domain": "Catalogue",
       "canonical_spec": "app/services/catalogue/README.md",
-      "target_dir": "app/services/catalogue/define_sessions",
-      "reuse_path": "app/services/catalogue/session_calendar",
-      "usage_module": "app.services.catalogue.define_sessions._usage",
+      "owner_path": "app/services/catalogue/session_calendar",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/catalogue/sessions.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/catalogue/session_calendar/test_traceability.py",
+        "tests/services/catalogue/session_calendar/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-CAT-DEFINE_SESSIONS/acceptance.json"
     },
     {
@@ -327,9 +524,15 @@
       "task_id": "2.03",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/metatrader",
-      "reuse_path": "app/services/brokers/metatrader",
-      "usage_module": "app.services.brokers.metatrader._usage",
+      "owner_path": "app/services/brokers/metatrader",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/broker/operations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/metatrader/test_traceability.py",
+        "tests/services/brokers/metatrader/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-METATRADER/acceptance.json"
     },
     {
@@ -337,9 +540,15 @@
       "task_id": "2.04",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/ctrader",
-      "reuse_path": "app/services/brokers/ctrader",
-      "usage_module": "app.services.brokers.ctrader._usage",
+      "owner_path": "app/services/brokers/ctrader",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/broker/operations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/ctrader/test_traceability.py",
+        "tests/services/brokers/ctrader/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-CTRADER/acceptance.json"
     },
     {
@@ -347,9 +556,15 @@
       "task_id": "2.05",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/binance",
-      "reuse_path": "app/services/brokers/binance",
-      "usage_module": "app.services.brokers.binance._usage",
+      "owner_path": "app/services/brokers/binance",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/broker/operations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/binance/test_traceability.py",
+        "tests/services/brokers/binance/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-BINANCE/acceptance.json"
     },
     {
@@ -357,9 +572,15 @@
       "task_id": "2.06",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/dukascopy",
-      "reuse_path": "app/services/brokers/dukascopy",
-      "usage_module": "app.services.brokers.dukascopy._usage",
+      "owner_path": "app/services/brokers/dukascopy",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/broker/operations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/dukascopy/test_traceability.py",
+        "tests/services/brokers/dukascopy/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-DUKASCOPY/acceptance.json"
     },
     {
@@ -367,9 +588,15 @@
       "task_id": "2.07",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/yahoo",
-      "reuse_path": "app/services/brokers/yahoo",
-      "usage_module": "app.services.brokers.yahoo._usage",
+      "owner_path": "app/services/brokers/yahoo",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/broker/operations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/yahoo/test_traceability.py",
+        "tests/services/brokers/yahoo/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-YAHOO/acceptance.json"
     },
     {
@@ -377,9 +604,15 @@
       "task_id": "2.08",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/resolve",
-      "reuse_path": "app/services/brokers/resolve",
-      "usage_module": "app.services.brokers.resolve._usage",
+      "owner_path": "app/services/brokers/resolve",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/broker/resolver.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/resolve/test_traceability.py",
+        "tests/services/brokers/resolve/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-RESOLVE/acceptance.json"
     },
     {
@@ -387,9 +620,15 @@
       "task_id": "2.09",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/market_data_store",
-      "reuse_path": "app/services/data/market_data_store",
-      "usage_module": "app.services.data.market_data_store._usage",
+      "owner_path": "app/services/data/market_data_store",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/market_data_store.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/market_data_store/test_traceability.py",
+        "tests/services/data/market_data_store/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-MARKET_DATA_STORE/acceptance.json"
     },
     {
@@ -397,9 +636,15 @@
       "task_id": "2.10",
       "domain": "Catalogue",
       "canonical_spec": "app/services/catalogue/README.md",
-      "target_dir": "app/services/catalogue/map_providers",
-      "reuse_path": "app/services/catalogue/provider_mapping",
-      "usage_module": "app.services.catalogue.map_providers._usage",
+      "owner_path": "app/services/catalogue/provider_mapping",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/catalogue/provider_mapping.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/catalogue/provider_mapping/test_traceability.py",
+        "tests/services/catalogue/provider_mapping/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-CAT-MAP_PROVIDERS/acceptance.json"
     },
     {
@@ -407,9 +652,15 @@
       "task_id": "2.11",
       "domain": "Catalogue",
       "canonical_spec": "app/services/catalogue/README.md",
-      "target_dir": "app/services/catalogue/define_trading_rules",
-      "reuse_path": null,
-      "usage_module": "app.services.catalogue.define_trading_rules._usage",
+      "owner_path": "app/services/catalogue/define_trading_rules",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/catalogue/define_trading_rules.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/catalogue/define_trading_rules/test_traceability.py",
+        "tests/services/catalogue/define_trading_rules/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-CAT-DEFINE_TRADING_RULES/acceptance.json"
     },
     {
@@ -417,9 +668,15 @@
       "task_id": "2.12",
       "domain": "Catalogue",
       "canonical_spec": "app/services/catalogue/README.md",
-      "target_dir": "app/services/catalogue/convert_currencies",
-      "reuse_path": null,
-      "usage_module": "app.services.catalogue.convert_currencies._usage",
+      "owner_path": "app/services/catalogue/convert_currencies",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/catalogue/convert_currencies.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/catalogue/convert_currencies/test_traceability.py",
+        "tests/services/catalogue/convert_currencies/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-CAT-CONVERT_CURRENCIES/acceptance.json"
     },
     {
@@ -427,9 +684,15 @@
       "task_id": "2.13",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/resolve_quality",
-      "reuse_path": "app/services/data/data_quality_resolution",
-      "usage_module": "app.services.data.resolve_quality._usage",
+      "owner_path": "app/services/data/data_quality_resolution",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/data_quality_resolution/test_traceability.py",
+        "tests/services/data/data_quality_resolution/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-RESOLVE_QUALITY/acceptance.json"
     },
     {
@@ -437,9 +700,15 @@
       "task_id": "2.14",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/aggregate_bars",
-      "reuse_path": "app/services/data/bar_aggregation",
-      "usage_module": "app.services.data.aggregate_bars._usage",
+      "owner_path": "app/services/data/bar_aggregation",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/bar_aggregation/test_traceability.py",
+        "tests/services/data/bar_aggregation/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-AGGREGATE_BARS/acceptance.json"
     },
     {
@@ -447,9 +716,15 @@
       "task_id": "2.15",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/manage_retention",
-      "reuse_path": "app/services/data/data_inspection_retention",
-      "usage_module": "app.services.data.manage_retention._usage",
+      "owner_path": "app/services/data/data_inspection_retention",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/data_inspection_retention/test_traceability.py",
+        "tests/services/data/data_inspection_retention/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-MANAGE_RETENTION/acceptance.json"
     },
     {
@@ -457,9 +732,15 @@
       "task_id": "2.16",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/normalize_ticks",
-      "reuse_path": "app/services/data/tick_normalization",
-      "usage_module": "app.services.data.normalize_ticks._usage",
+      "owner_path": "app/services/data/tick_normalization",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/tick_normalization/test_traceability.py",
+        "tests/services/data/tick_normalization/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-NORMALIZE_TICKS/acceptance.json"
     },
     {
@@ -467,9 +748,15 @@
       "task_id": "2.17",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/generate_scenarios",
-      "reuse_path": "app/services/data/synthetic_scenario_series",
-      "usage_module": "app.services.data.generate_scenarios._usage",
+      "owner_path": "app/services/data/synthetic_scenario_series",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/synthetic_scenario_series/test_traceability.py",
+        "tests/services/data/synthetic_scenario_series/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-GENERATE_SCENARIOS/acceptance.json"
     },
     {
@@ -477,9 +764,15 @@
       "task_id": "2.18",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/track_market_news",
-      "reuse_path": "app/services/data/economic_news_evidence",
-      "usage_module": "app.services.data.track_market_news._usage",
+      "owner_path": "app/services/data/economic_news_evidence",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/economic_news_evidence/test_traceability.py",
+        "tests/services/data/economic_news_evidence/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-TRACK_MARKET_NEWS/acceptance.json"
     },
     {
@@ -487,9 +780,15 @@
       "task_id": "2.19",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/ingest_history",
-      "reuse_path": "app/services/data/historical_data_ingestion",
-      "usage_module": "app.services.data.ingest_history._usage",
+      "owner_path": "app/services/data/historical_data_ingestion",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/historical_data_ingestion/test_traceability.py",
+        "tests/services/data/historical_data_ingestion/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-INGEST_HISTORY/acceptance.json"
     },
     {
@@ -497,9 +796,15 @@
       "task_id": "2.20",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/bind_run_data",
-      "reuse_path": "app/services/data/run_data_binding",
-      "usage_module": "app.services.data.bind_run_data._usage",
+      "owner_path": "app/services/data/run_data_binding",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/run_data_binding/test_traceability.py",
+        "tests/services/data/run_data_binding/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-BIND_RUN_DATA/acceptance.json"
     },
     {
@@ -507,9 +812,15 @@
       "task_id": "2.21",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/stream_market_events",
-      "reuse_path": "app/services/data/realtime_market_events",
-      "usage_module": "app.services.data.stream_market_events._usage",
+      "owner_path": "app/services/data/realtime_market_events",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/realtime_market_events/test_traceability.py",
+        "tests/services/data/realtime_market_events/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-STREAM_MARKET_EVENTS/acceptance.json"
     },
     {
@@ -517,9 +828,15 @@
       "task_id": "2.22",
       "domain": "Catalogue",
       "canonical_spec": "app/services/catalogue/README.md",
-      "target_dir": "app/services/catalogue/manage_universes",
-      "reuse_path": null,
-      "usage_module": "app.services.catalogue.manage_universes._usage",
+      "owner_path": "app/services/catalogue/manage_universes",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/catalogue/manage_universes.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/catalogue/manage_universes/test_traceability.py",
+        "tests/services/catalogue/manage_universes/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-CAT-MANAGE_UNIVERSES/acceptance.json"
     },
     {
@@ -527,9 +844,15 @@
       "task_id": "2.23",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/align_series",
-      "reuse_path": "app/services/data/external_series_alignment",
-      "usage_module": "app.services.data.align_series._usage",
+      "owner_path": "app/services/data/external_series_alignment",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/external_series_alignment/test_traceability.py",
+        "tests/services/data/external_series_alignment/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-ALIGN_SERIES/acceptance.json"
     },
     {
@@ -537,9 +860,15 @@
       "task_id": "2.24",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/sync_connectors",
-      "reuse_path": "app/services/data/connector_synchronization",
-      "usage_module": "app.services.data.sync_connectors._usage",
+      "owner_path": "app/services/data/connector_synchronization",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/connector_synchronization/test_traceability.py",
+        "tests/services/data/connector_synchronization/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-SYNC_CONNECTORS/acceptance.json"
     },
     {
@@ -547,9 +876,15 @@
       "task_id": "2.25",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/prepare_profiles",
-      "reuse_path": "app/services/data/profile_source_preparation",
-      "usage_module": "app.services.data.prepare_profiles._usage",
+      "owner_path": "app/services/data/profile_source_preparation",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/profile_source_preparation/test_traceability.py",
+        "tests/services/data/profile_source_preparation/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-PREPARE_PROFILES/acceptance.json"
     },
     {
@@ -557,9 +892,15 @@
       "task_id": "2.26",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/import_quantdata",
-      "reuse_path": "app/services/data/quantdata_manager_source",
-      "usage_module": "app.services.data.import_quantdata._usage",
+      "owner_path": "app/services/data/quantdata_manager_source",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/quantdata_manager_source/test_traceability.py",
+        "tests/services/data/quantdata_manager_source/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-IMPORT_QUANTDATA/acceptance.json"
     },
     {
@@ -567,9 +908,15 @@
       "task_id": "2.27",
       "domain": "Catalogue",
       "canonical_spec": "app/services/catalogue/README.md",
-      "target_dir": "app/services/catalogue/exchange_catalogue",
-      "reuse_path": null,
-      "usage_module": "app.services.catalogue.exchange_catalogue._usage",
+      "owner_path": "app/services/catalogue/exchange_catalogue",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/catalogue/exchange_catalogue.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/catalogue/exchange_catalogue/test_traceability.py",
+        "tests/services/catalogue/exchange_catalogue/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-CAT-EXCHANGE_CATALOGUE/acceptance.json"
     },
     {
@@ -577,9 +924,15 @@
       "task_id": "2.28",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/import_indicators",
-      "reuse_path": "app/services/data/external_indicator_series",
-      "usage_module": "app.services.data.import_indicators._usage",
+      "owner_path": "app/services/data/external_indicator_series",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/capabilities.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/data/external_indicator_series/test_traceability.py",
+        "tests/services/data/external_indicator_series/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-IMPORT_INDICATORS/acceptance.json"
     },
     {
@@ -587,9 +940,15 @@
       "task_id": "2.29",
       "domain": "Data",
       "canonical_spec": "app/services/data/README.md",
-      "target_dir": "app/services/data/browse_reference",
-      "reuse_path": "app/services/data/browse_reference",
-      "usage_module": "app.services.data.browse_reference._usage",
+      "owner_path": "app/services/data/browse_reference",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/data/browse_reference.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/data/browse_reference/test_traceability.py",
+        "tests/services/data/browse_reference/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-BROWSE_REFERENCE/acceptance.json"
     },
     {
@@ -597,9 +956,15 @@
       "task_id": "2.30",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/observe_market_reference",
-      "reuse_path": "app/services/interfaces/observe_market_reference",
-      "usage_module": "app.services.interfaces.observe_market_reference._usage",
+      "owner_path": "app/services/interfaces/observe_market_reference",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/interfaces/observe_market_reference.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/observe_market_reference/test_traceability.py",
+        "tests/services/interfaces/observe_market_reference/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OBSERVE_MARKET_REFERENCE/acceptance.json"
     },
     {
@@ -607,9 +972,15 @@
       "task_id": "2.31",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/components/workflow",
-      "reuse_path": "app/ui/src/components/workflow",
-      "usage_module": "app/ui/src/widgets/18",
+      "owner_path": "app/ui/src/components/workflow",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/components/workflow/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/components/workflow/__tests__/traceability.test.tsx",
+        "app/ui/src/components/workflow/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-18/acceptance.json"
     },
     {
@@ -617,9 +988,15 @@
       "task_id": "2.32",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/chart",
-      "reuse_path": "app/ui/src/widgets/chart",
-      "usage_module": "app/ui/src/widgets/04",
+      "owner_path": "app/ui/src/widgets/chart",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/widgets/chart/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/chart/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/chart/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-04/acceptance.json"
     },
     {
@@ -627,9 +1004,15 @@
       "task_id": "3.01",
       "domain": "Indicators",
       "canonical_spec": "app/services/indicators/README.md",
-      "target_dir": "app/services/indicators/calculate_trend",
-      "reuse_path": null,
-      "usage_module": "app.services.indicators.calculate_trend._usage",
+      "owner_path": "app/services/indicators/calculate_trend",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/indicators/calculate_trend.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/indicators/calculate_trend/test_traceability.py",
+        "tests/services/indicators/calculate_trend/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IND-CALCULATE_TREND/acceptance.json"
     },
     {
@@ -637,9 +1020,15 @@
       "task_id": "3.02",
       "domain": "Indicators",
       "canonical_spec": "app/services/indicators/README.md",
-      "target_dir": "app/services/indicators/calculate_momentum",
-      "reuse_path": null,
-      "usage_module": "app.services.indicators.calculate_momentum._usage",
+      "owner_path": "app/services/indicators/calculate_momentum",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/indicators/calculate_momentum.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/indicators/calculate_momentum/test_traceability.py",
+        "tests/services/indicators/calculate_momentum/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IND-CALCULATE_MOMENTUM/acceptance.json"
     },
     {
@@ -647,9 +1036,15 @@
       "task_id": "3.03",
       "domain": "Indicators",
       "canonical_spec": "app/services/indicators/README.md",
-      "target_dir": "app/services/indicators/calculate_volatility",
-      "reuse_path": null,
-      "usage_module": "app.services.indicators.calculate_volatility._usage",
+      "owner_path": "app/services/indicators/calculate_volatility",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/indicators/calculate_volatility.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/indicators/calculate_volatility/test_traceability.py",
+        "tests/services/indicators/calculate_volatility/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IND-CALCULATE_VOLATILITY/acceptance.json"
     },
     {
@@ -657,9 +1052,15 @@
       "task_id": "3.04",
       "domain": "Indicators",
       "canonical_spec": "app/services/indicators/README.md",
-      "target_dir": "app/services/indicators/calculate_volume_flow",
-      "reuse_path": null,
-      "usage_module": "app.services.indicators.calculate_volume_flow._usage",
+      "owner_path": "app/services/indicators/calculate_volume_flow",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/indicators/calculate_volume_flow.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/indicators/calculate_volume_flow/test_traceability.py",
+        "tests/services/indicators/calculate_volume_flow/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IND-CALCULATE_VOLUME_FLOW/acceptance.json"
     },
     {
@@ -667,9 +1068,15 @@
       "task_id": "3.05",
       "domain": "Indicators",
       "canonical_spec": "app/services/indicators/README.md",
-      "target_dir": "app/services/indicators/detect_candle_patterns",
-      "reuse_path": null,
-      "usage_module": "app.services.indicators.detect_candle_patterns._usage",
+      "owner_path": "app/services/indicators/detect_candle_patterns",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/indicators/detect_candle_patterns.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/indicators/detect_candle_patterns/test_traceability.py",
+        "tests/services/indicators/detect_candle_patterns/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IND-DETECT_CANDLE_PATTERNS/acceptance.json"
     },
     {
@@ -677,9 +1084,15 @@
       "task_id": "3.06",
       "domain": "Indicators",
       "canonical_spec": "app/services/indicators/README.md",
-      "target_dir": "app/services/indicators/transform_series",
-      "reuse_path": null,
-      "usage_module": "app.services.indicators.transform_series._usage",
+      "owner_path": "app/services/indicators/transform_series",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/indicators/transform_series.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/indicators/transform_series/test_traceability.py",
+        "tests/services/indicators/transform_series/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IND-TRANSFORM_SERIES/acceptance.json"
     },
     {
@@ -687,9 +1100,15 @@
       "task_id": "3.07",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/define_ast",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.define_ast._usage",
+      "owner_path": "app/services/strategy/define_ast",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/define_ast.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/define_ast/test_traceability.py",
+        "tests/services/strategy/define_ast/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-DEFINE_AST/acceptance.json"
     },
     {
@@ -697,9 +1116,15 @@
       "task_id": "3.08",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/catalog_blocks",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.catalog_blocks._usage",
+      "owner_path": "app/services/strategy/catalog_blocks",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/catalog_blocks.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/catalog_blocks/test_traceability.py",
+        "tests/services/strategy/catalog_blocks/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-CATALOG_BLOCKS/acceptance.json"
     },
     {
@@ -707,9 +1132,15 @@
       "task_id": "3.09",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/configure_charts",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.configure_charts._usage",
+      "owner_path": "app/services/strategy/configure_charts",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/configure_charts.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/configure_charts/test_traceability.py",
+        "tests/services/strategy/configure_charts/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-CONFIGURE_CHARTS/acceptance.json"
     },
     {
@@ -717,9 +1148,15 @@
       "task_id": "3.10",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/model_atm_exits",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.model_atm_exits._usage",
+      "owner_path": "app/services/strategy/model_atm_exits",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/model_atm_exits.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/model_atm_exits/test_traceability.py",
+        "tests/services/strategy/model_atm_exits/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-MODEL_ATM_EXITS/acceptance.json"
     },
     {
@@ -727,9 +1164,15 @@
       "task_id": "3.11",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/edit_templates",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.edit_templates._usage",
+      "owner_path": "app/services/strategy/edit_templates",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/edit_templates.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/edit_templates/test_traceability.py",
+        "tests/services/strategy/edit_templates/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-EDIT_TEMPLATES/acceptance.json"
     },
     {
@@ -737,9 +1180,15 @@
       "task_id": "3.12",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/define_indicators",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.define_indicators._usage",
+      "owner_path": "app/services/strategy/define_indicators",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/define_indicators.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/define_indicators/test_traceability.py",
+        "tests/services/strategy/define_indicators/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-DEFINE_INDICATORS/acceptance.json"
     },
     {
@@ -747,9 +1196,15 @@
       "task_id": "3.13",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/compile_strategies",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.compile_strategies._usage",
+      "owner_path": "app/services/strategy/compile_strategies",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/compile_strategies.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/compile_strategies/test_traceability.py",
+        "tests/services/strategy/compile_strategies/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-COMPILE_STRATEGIES/acceptance.json"
     },
     {
@@ -757,9 +1212,15 @@
       "task_id": "3.14",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/version_strategies",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.version_strategies._usage",
+      "owner_path": "app/services/strategy/version_strategies",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/version_strategies.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/version_strategies/test_traceability.py",
+        "tests/services/strategy/version_strategies/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-VERSION_STRATEGIES/acceptance.json"
     },
     {
@@ -767,9 +1228,15 @@
       "task_id": "3.15",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/generate_code",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.generate_code._usage",
+      "owner_path": "app/services/strategy/generate_code",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/generate_code.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/generate_code/test_traceability.py",
+        "tests/services/strategy/generate_code/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-GENERATE_CODE/acceptance.json"
     },
     {
@@ -777,9 +1244,15 @@
       "task_id": "3.16",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/exchange_strategies",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.exchange_strategies._usage",
+      "owner_path": "app/services/strategy/exchange_strategies",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/exchange_strategies.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/exchange_strategies/test_traceability.py",
+        "tests/services/strategy/exchange_strategies/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-EXCHANGE_STRATEGIES/acceptance.json"
     },
     {
@@ -787,9 +1260,15 @@
       "task_id": "3.17",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/operate_strategies",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.operate_strategies._usage",
+      "owner_path": "app/services/interfaces/operate_strategies",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/operate_strategies.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/operate_strategies/test_traceability.py",
+        "tests/services/interfaces/operate_strategies/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_STRATEGIES/acceptance.json"
     },
     {
@@ -797,9 +1276,15 @@
       "task_id": "3.18",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/strategy_studio",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/strategy_studio",
+      "owner_path": "app/ui/src/widgets/strategy-editor",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/strategy-editor/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/strategy-editor/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/strategy-editor/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-STRATEGY_STUDIO/acceptance.json"
     },
     {
@@ -807,9 +1292,15 @@
       "task_id": "4.01",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/performance_lab",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/performance_lab",
+      "owner_path": "app/ui/src/widgets/performance-lab",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/performance-lab/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/performance-lab/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/performance-lab/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-PERFORMANCE_LAB/acceptance.json"
     },
     {
@@ -817,9 +1308,15 @@
       "task_id": "4.02",
       "domain": "Risk",
       "canonical_spec": "app/services/risk/README.md",
-      "target_dir": "app/services/risk/size_positions",
-      "reuse_path": null,
-      "usage_module": "app.services.risk.size_positions._usage",
+      "owner_path": "app/services/risk/size_positions",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/risk/size_positions.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/risk/size_positions/test_traceability.py",
+        "tests/services/risk/size_positions/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RSK-SIZE_POSITIONS/acceptance.json"
     },
     {
@@ -827,9 +1324,15 @@
       "task_id": "4.03",
       "domain": "Risk",
       "canonical_spec": "app/services/risk/README.md",
-      "target_dir": "app/services/risk/assess_research_risk",
-      "reuse_path": null,
-      "usage_module": "app.services.risk.assess_research_risk._usage",
+      "owner_path": "app/services/risk/assess_research_risk",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/risk/research_evidence.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/risk/assess_research_risk/test_traceability.py",
+        "tests/services/risk/assess_research_risk/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RSK-ASSESS_RESEARCH_RISK/acceptance.json"
     },
     {
@@ -837,9 +1340,15 @@
       "task_id": "4.04",
       "domain": "Trading",
       "canonical_spec": "app/services/trading/README.md",
-      "target_dir": "app/services/trading/manage_execution_sessions",
-      "reuse_path": "app/services/trading/manage_execution_sessions",
-      "usage_module": "app.services.trading.manage_execution_sessions._usage",
+      "owner_path": "app/services/trading/manage_execution_sessions",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/trading/manage_execution_sessions.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/trading/manage_execution_sessions/test_traceability.py",
+        "tests/services/trading/manage_execution_sessions/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-TRD-MANAGE_EXECUTION_SESSIONS/acceptance.json"
     },
     {
@@ -847,9 +1356,15 @@
       "task_id": "4.05",
       "domain": "Trading",
       "canonical_spec": "app/services/trading/README.md",
-      "target_dir": "app/services/trading/model_execution_policies",
-      "reuse_path": null,
-      "usage_module": "app.services.trading.model_execution_policies._usage",
+      "owner_path": "app/services/trading/model_execution_policies",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/trading/execution_policies.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/trading/model_execution_policies/test_traceability.py",
+        "tests/services/trading/model_execution_policies/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-TRD-MODEL_EXECUTION_POLICIES/acceptance.json"
     },
     {
@@ -857,9 +1372,15 @@
       "task_id": "4.06",
       "domain": "Simulator",
       "canonical_spec": "app/services/simulator/README.md",
-      "target_dir": "app/services/simulator/model_ticks",
-      "reuse_path": null,
-      "usage_module": "app.services.simulator.model_ticks._usage",
+      "owner_path": "app/services/simulator/model_ticks",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/simulator/ticks.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/simulator/model_ticks/test_traceability.py",
+        "tests/services/simulator/model_ticks/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-SIM-MODEL_TICKS/acceptance.json"
     },
     {
@@ -867,9 +1388,15 @@
       "task_id": "4.07",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/compute_metrics",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.compute_metrics._usage",
+      "owner_path": "app/services/analytics/compute_metrics",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/metrics.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/compute_metrics/test_traceability.py",
+        "tests/services/analytics/compute_metrics/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-COMPUTE_METRICS/acceptance.json"
     },
     {
@@ -877,9 +1404,15 @@
       "task_id": "4.08",
       "domain": "Simulator",
       "canonical_spec": "app/services/simulator/README.md",
-      "target_dir": "app/services/simulator/configure_engine",
-      "reuse_path": null,
-      "usage_module": "app.services.simulator.configure_engine._usage",
+      "owner_path": "app/services/simulator/configure_engine",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/simulator/configure_engine.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/simulator/configure_engine/test_traceability.py",
+        "tests/services/simulator/configure_engine/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-SIM-CONFIGURE_ENGINE/acceptance.json"
     },
     {
@@ -887,9 +1420,15 @@
       "task_id": "4.09",
       "domain": "Simulator",
       "canonical_spec": "app/services/simulator/README.md",
-      "target_dir": "app/services/simulator/execute_ticks",
-      "reuse_path": null,
-      "usage_module": "app.services.simulator.execute_ticks._usage",
+      "owner_path": "app/services/simulator/execute_ticks",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/simulator/native_execution.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/simulator/execute_ticks/test_traceability.py",
+        "tests/services/simulator/execute_ticks/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-SIM-EXECUTE_TICKS/acceptance.json"
     },
     {
@@ -897,9 +1436,15 @@
       "task_id": "4.10",
       "domain": "Simulator",
       "canonical_spec": "app/services/simulator/README.md",
-      "target_dir": "app/services/simulator/commit_results",
-      "reuse_path": null,
-      "usage_module": "app.services.simulator.commit_results._usage",
+      "owner_path": "app/services/simulator/commit_results",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/simulator/commit_results.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/simulator/commit_results/test_traceability.py",
+        "tests/services/simulator/commit_results/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-SIM-COMMIT_RESULTS/acceptance.json"
     },
     {
@@ -907,9 +1452,15 @@
       "task_id": "4.11",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/operate_simulations",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.operate_simulations._usage",
+      "owner_path": "app/services/interfaces/operate_simulations",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/operate_simulations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/operate_simulations/test_traceability.py",
+        "tests/services/interfaces/operate_simulations/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_SIMULATIONS/acceptance.json"
     },
     {
@@ -917,9 +1468,15 @@
       "task_id": "4.12",
       "domain": "Simulator",
       "canonical_spec": "app/services/simulator/README.md",
-      "target_dir": "app/services/simulator/cache_evaluations",
-      "reuse_path": null,
-      "usage_module": "app.services.simulator.cache_evaluations._usage",
+      "owner_path": "app/services/simulator/cache_evaluations",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/simulator/cache_evaluations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/simulator/cache_evaluations/test_traceability.py",
+        "tests/services/simulator/cache_evaluations/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-SIM-CACHE_EVALUATIONS/acceptance.json"
     },
     {
@@ -927,9 +1484,15 @@
       "task_id": "4.13",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/query_results",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.query_results._usage",
+      "owner_path": "app/services/analytics/query_results",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/query_results.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/query_results/test_traceability.py",
+        "tests/services/analytics/query_results/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-QUERY_RESULTS/acceptance.json"
     },
     {
@@ -937,9 +1500,15 @@
       "task_id": "4.14",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/databank_membership",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.databank_membership._usage",
+      "owner_path": "app/services/analytics/databank_membership",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/databank.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/databank_membership/test_traceability.py",
+        "tests/services/analytics/databank_membership/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-DATABANK_MEMBERSHIP/acceptance.json"
     },
     {
@@ -947,9 +1516,15 @@
       "task_id": "4.15",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/analyze_trades",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.analyze_trades._usage",
+      "owner_path": "app/services/analytics/analyze_trades",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/analyze_trades.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/analyze_trades/test_traceability.py",
+        "tests/services/analytics/analyze_trades/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-ANALYZE_TRADES/acceptance.json"
     },
     {
@@ -957,9 +1532,15 @@
       "task_id": "4.16",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/project_series",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.project_series._usage",
+      "owner_path": "app/services/analytics/project_series",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/project_series.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/project_series/test_traceability.py",
+        "tests/services/analytics/project_series/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-PROJECT_SERIES/acceptance.json"
     },
     {
@@ -967,9 +1548,15 @@
       "task_id": "4.17",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/compare_results",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.compare_results._usage",
+      "owner_path": "app/services/analytics/compare_results",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/compare_results.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/compare_results/test_traceability.py",
+        "tests/services/analytics/compare_results/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-COMPARE_RESULTS/acceptance.json"
     },
     {
@@ -977,9 +1564,15 @@
       "task_id": "4.18",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/exchange_results",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.exchange_results._usage",
+      "owner_path": "app/services/analytics/exchange_results",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/exchange_results.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/exchange_results/test_traceability.py",
+        "tests/services/analytics/exchange_results/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-EXCHANGE_RESULTS/acceptance.json"
     },
     {
@@ -987,9 +1580,15 @@
       "task_id": "4.19",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/operate_results",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.operate_results._usage",
+      "owner_path": "app/services/interfaces/operate_results",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/operate_results.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/operate_results/test_traceability.py",
+        "tests/services/interfaces/operate_results/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_RESULTS/acceptance.json"
     },
     {
@@ -997,9 +1596,15 @@
       "task_id": "4.20",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/simulator",
-      "reuse_path": "app/ui/src/widgets/simulator",
-      "usage_module": "app/ui/src/widgets/27",
+      "owner_path": "app/ui/src/widgets/simulator",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/widgets/simulator/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/simulator/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/simulator/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-27/acceptance.json"
     },
     {
@@ -1007,9 +1612,15 @@
       "task_id": "4.21",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/analytics",
-      "reuse_path": "app/ui/src/widgets/analytics",
-      "usage_module": "app/ui/src/widgets/32",
+      "owner_path": "app/ui/src/widgets/analytics",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/widgets/analytics/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/analytics/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/analytics/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-32/acceptance.json"
     },
     {
@@ -1017,9 +1628,15 @@
       "task_id": "4.22",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/databank_grid",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/databank_grid",
+      "owner_path": "app/ui/src/widgets/databank-grid",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/databank-grid/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/databank-grid/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/databank-grid/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-DATABANK_GRID/acceptance.json"
     },
     {
@@ -1027,9 +1644,15 @@
       "task_id": "4.23",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/result_overview",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/result_overview",
+      "owner_path": "app/ui/src/widgets/result-overview",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/result-overview/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/result-overview/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/result-overview/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-RESULT_OVERVIEW/acceptance.json"
     },
     {
@@ -1037,9 +1660,15 @@
       "task_id": "4.24",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/trade_list",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/trade_list",
+      "owner_path": "app/ui/src/widgets/trade-list",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/trade-list/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/trade-list/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/trade-list/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-TRADE_LIST/acceptance.json"
     },
     {
@@ -1047,9 +1676,15 @@
       "task_id": "4.25",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/equity_chart",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/equity_chart",
+      "owner_path": "app/ui/src/widgets/equity-chart",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/equity-chart/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/equity-chart/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/equity-chart/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-EQUITY_CHART/acceptance.json"
     },
     {
@@ -1057,9 +1692,15 @@
       "task_id": "4.26",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/trade_analysis",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/trade_analysis",
+      "owner_path": "app/ui/src/widgets/trade-analysis",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/trade-analysis/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/trade-analysis/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/trade-analysis/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-TRADE_ANALYSIS/acceptance.json"
     },
     {
@@ -1067,9 +1708,15 @@
       "task_id": "4.27",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/trades_on_chart",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/trades_on_chart",
+      "owner_path": "app/ui/src/widgets/trades-on-chart",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/trades-on-chart/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/trades-on-chart/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/trades-on-chart/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-TRADES_ON_CHART/acceptance.json"
     },
     {
@@ -1077,9 +1724,15 @@
       "task_id": "5.01",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/context",
-      "reuse_path": "app/ui/src/context",
-      "usage_module": "app/ui/src/widgets/15",
+      "owner_path": "app/ui/src/context",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/context/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/context/__tests__/traceability.test.tsx",
+        "app/ui/src/context/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-15/acceptance.json"
     },
     {
@@ -1087,9 +1740,15 @@
       "task_id": "5.02",
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
-      "target_dir": "app/services/workspace/manage_conversations",
-      "reuse_path": null,
-      "usage_module": "app.services.workspace.manage_conversations._usage",
+      "owner_path": "app/services/workspace/manage_conversations",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/workspace/conversations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/workspace/manage_conversations/test_traceability.py",
+        "tests/services/workspace/manage_conversations/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_CONVERSATIONS/acceptance.json"
     },
     {
@@ -1097,9 +1756,15 @@
       "task_id": "5.03",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/assemble_context",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.assemble_context._usage",
+      "owner_path": "app/services/agentic/assemble_context",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/context.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/assemble_context/test_traceability.py",
+        "tests/services/agentic/assemble_context/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ASSEMBLE_CONTEXT/acceptance.json"
     },
     {
@@ -1107,9 +1772,15 @@
       "task_id": "5.04",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/run_workflows",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.run_workflows._usage",
+      "owner_path": "app/services/agentic/run_workflows",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/workflows.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/run_workflows/test_traceability.py",
+        "tests/services/agentic/run_workflows/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-RUN_WORKFLOWS/acceptance.json"
     },
     {
@@ -1117,9 +1788,15 @@
       "task_id": "5.05",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/evaluate_profiles",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.evaluate_profiles._usage",
+      "owner_path": "app/services/agentic/evaluate_profiles",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/profile_evaluation.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/evaluate_profiles/test_traceability.py",
+        "tests/services/agentic/evaluate_profiles/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-EVALUATE_PROFILES/acceptance.json"
     },
     {
@@ -1127,9 +1804,15 @@
       "task_id": "5.06",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/manage_claims",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.manage_claims._usage",
+      "owner_path": "app/services/agentic/manage_claims",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/claims.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/manage_claims/test_traceability.py",
+        "tests/services/agentic/manage_claims/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-MANAGE_CLAIMS/acceptance.json"
     },
     {
@@ -1137,9 +1820,15 @@
       "task_id": "5.07",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/synthesize_research",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.synthesize_research._usage",
+      "owner_path": "app/services/agentic/synthesize_research",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/synthesis.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/synthesize_research/test_traceability.py",
+        "tests/services/agentic/synthesize_research/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-SYNTHESIZE_RESEARCH/acceptance.json"
     },
     {
@@ -1147,9 +1836,16 @@
       "task_id": "5.08",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/assist_operator",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.assist_operator._usage",
+      "owner_path": "app/services/agentic/assist_operator",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/operator_assistance.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/assist_operator/test_traceability.py",
+        "tests/services/agentic/assist_operator/test_lifecycle.py",
+        "tests/services/agentic/assist_operator/test_limits.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ASSIST_OPERATOR/acceptance.json"
     },
     {
@@ -1157,9 +1853,15 @@
       "task_id": "5.09",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/agentic_gateway",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.agentic_gateway._usage",
+      "owner_path": "app/services/interfaces/agentic_gateway",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/operator_chat.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/agentic_gateway/test_traceability.py",
+        "tests/services/interfaces/agentic_gateway/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-AGENTIC_GATEWAY/acceptance.json"
     },
     {
@@ -1167,9 +1869,15 @@
       "task_id": "5.10",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/chat_bot",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/chat_bot",
+      "owner_path": "app/ui/src/widgets/chat-bot",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/chat-bot/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/chat-bot/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/chat-bot/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-CHAT_BOT/acceptance.json"
     },
     {
@@ -1177,9 +1885,15 @@
       "task_id": "5.11",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/agentic_run_inspector",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/agentic_run_inspector",
+      "owner_path": "app/ui/src/widgets/agentic-run-inspector",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/agentic-run-inspector/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/agentic-run-inspector/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/agentic-run-inspector/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-AGENTIC_RUN_INSPECTOR/acceptance.json"
     },
     {
@@ -1187,9 +1901,15 @@
       "task_id": "6.01",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/accept_proposals",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.accept_proposals._usage",
+      "owner_path": "app/services/strategy/accept_proposals",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/proposal_intake.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/accept_proposals/test_traceability.py",
+        "tests/services/strategy/accept_proposals/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-ACCEPT_PROPOSALS/acceptance.json"
     },
     {
@@ -1197,9 +1917,15 @@
       "task_id": "6.02",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/govern_campaigns",
-      "reuse_path": null,
-      "usage_module": "app.services.research.govern_campaigns._usage",
+      "owner_path": "app/services/research/govern_campaigns",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/campaigns.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/govern_campaigns/test_traceability.py",
+        "tests/services/research/govern_campaigns/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-GOVERN_CAMPAIGNS/acceptance.json"
     },
     {
@@ -1207,9 +1933,15 @@
       "task_id": "6.03",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/define_protocols",
-      "reuse_path": null,
-      "usage_module": "app.services.research.define_protocols._usage",
+      "owner_path": "app/services/research/define_protocols",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/protocols.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/define_protocols/test_traceability.py",
+        "tests/services/research/define_protocols/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-DEFINE_PROTOCOLS/acceptance.json"
     },
     {
@@ -1217,9 +1949,15 @@
       "task_id": "6.04",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/compose_strategy_proposals",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.compose_strategy_proposals._usage",
+      "owner_path": "app/services/agentic/compose_strategy_proposals",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/strategy_proposals.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/compose_strategy_proposals/test_traceability.py",
+        "tests/services/agentic/compose_strategy_proposals/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS/acceptance.json"
     },
     {
@@ -1227,9 +1965,15 @@
       "task_id": "6.05",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/govern_holdouts",
-      "reuse_path": null,
-      "usage_module": "app.services.research.govern_holdouts._usage",
+      "owner_path": "app/services/research/govern_holdouts",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/holdout.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/govern_holdouts/test_traceability.py",
+        "tests/services/research/govern_holdouts/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-GOVERN_HOLDOUTS/acceptance.json"
     },
     {
@@ -1237,9 +1981,15 @@
       "task_id": "6.06",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/run_research",
-      "reuse_path": null,
-      "usage_module": "app.services.research.run_research._usage",
+      "owner_path": "app/services/research/run_research",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/run_research.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/run_research/test_traceability.py",
+        "tests/services/research/run_research/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-RUN_RESEARCH/acceptance.json"
     },
     {
@@ -1247,9 +1997,15 @@
       "task_id": "6.07",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/operate_research",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.operate_research._usage",
+      "owner_path": "app/services/interfaces/operate_research",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/operate_research.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/operate_research/test_traceability.py",
+        "tests/services/interfaces/operate_research/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_RESEARCH/acceptance.json"
     },
     {
@@ -1257,9 +2013,15 @@
       "task_id": "6.08",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/govern_research_search",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.govern_research_search._usage",
+      "owner_path": "app/services/agentic/govern_research_search",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/research_search.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/govern_research_search/test_traceability.py",
+        "tests/services/agentic/govern_research_search/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-GOVERN_RESEARCH_SEARCH/acceptance.json"
     },
     {
@@ -1267,9 +2029,15 @@
       "task_id": "6.09",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/design_research",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.design_research._usage",
+      "owner_path": "app/services/agentic/design_research",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/research_design.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/design_research/test_traceability.py",
+        "tests/services/agentic/design_research/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-DESIGN_RESEARCH/acceptance.json"
     },
     {
@@ -1277,9 +2045,15 @@
       "task_id": "6.10",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/compose_strategy_specs",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.compose_strategy_specs._usage",
+      "owner_path": "app/services/agentic/compose_strategy_specs",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/strategy_specs.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/compose_strategy_specs/test_traceability.py",
+        "tests/services/agentic/compose_strategy_specs/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_SPECS/acceptance.json"
     },
     {
@@ -1287,9 +2061,15 @@
       "task_id": "6.11",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/research",
-      "reuse_path": "app/ui/src/widgets/research",
-      "usage_module": "app/ui/src/widgets/28",
+      "owner_path": "app/ui/src/widgets/research",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/ui/src/widgets/research/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/research/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/research/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-28/acceptance.json"
     },
     {
@@ -1297,9 +2077,15 @@
       "task_id": "7.01",
       "domain": "Simulator",
       "canonical_spec": "app/services/simulator/README.md",
-      "target_dir": "app/services/simulator/perturb_inputs",
-      "reuse_path": null,
-      "usage_module": "app.services.simulator.perturb_inputs._usage",
+      "owner_path": "app/services/simulator/perturb_inputs",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/simulator/perturb_inputs.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/simulator/perturb_inputs/test_traceability.py",
+        "tests/services/simulator/perturb_inputs/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-SIM-PERTURB_INPUTS/acceptance.json"
     },
     {
@@ -1307,9 +2093,15 @@
       "task_id": "7.02",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/analyze_distributions",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.analyze_distributions._usage",
+      "owner_path": "app/services/analytics/analyze_distributions",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/analyze_distributions.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/analyze_distributions/test_traceability.py",
+        "tests/services/analytics/analyze_distributions/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-ANALYZE_DISTRIBUTIONS/acceptance.json"
     },
     {
@@ -1317,9 +2109,15 @@
       "task_id": "7.03",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/deliberate_research",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.deliberate_research._usage",
+      "owner_path": "app/services/agentic/deliberate_research",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/deliberation.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/deliberate_research/test_traceability.py",
+        "tests/services/agentic/deliberate_research/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-DELIBERATE_RESEARCH/acceptance.json"
     },
     {
@@ -1327,9 +2125,15 @@
       "task_id": "7.04",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/test_robustness",
-      "reuse_path": null,
-      "usage_module": "app.services.research.test_robustness._usage",
+      "owner_path": "app/services/research/test_robustness",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/test_robustness.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/test_robustness/test_traceability.py",
+        "tests/services/research/test_robustness/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-TEST_ROBUSTNESS/acceptance.json"
     },
     {
@@ -1337,9 +2141,15 @@
       "task_id": "7.05",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/robustness_results",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/robustness_results",
+      "owner_path": "app/ui/src/widgets/robustness-results",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/robustness-results/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/robustness-results/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/robustness-results/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-ROBUSTNESS_RESULTS/acceptance.json"
     },
     {
@@ -1347,9 +2157,15 @@
       "task_id": "7.06",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/qualify_research",
-      "reuse_path": null,
-      "usage_module": "app.services.research.qualify_research._usage",
+      "owner_path": "app/services/research/qualify_research",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/qualification.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/qualify_research/test_traceability.py",
+        "tests/services/research/qualify_research/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-QUALIFY_RESEARCH/acceptance.json"
     },
     {
@@ -1357,9 +2173,15 @@
       "task_id": "7.07",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/strategy_retester",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/strategy_retester",
+      "owner_path": "app/ui/src/widgets/research-settings",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/research-settings/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/research-settings/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/research-settings/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-STRATEGY_RETESTER/acceptance.json"
     },
     {
@@ -1367,9 +2189,15 @@
       "task_id": "8.01",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/define_search_spaces",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.define_search_spaces._usage",
+      "owner_path": "app/services/strategy/define_search_spaces",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/define_search_spaces.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/define_search_spaces/test_traceability.py",
+        "tests/services/strategy/define_search_spaces/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-DEFINE_SEARCH_SPACES/acceptance.json"
     },
     {
@@ -1377,9 +2205,15 @@
       "task_id": "8.02",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/rank_candidates",
-      "reuse_path": null,
-      "usage_module": "app.services.research.rank_candidates._usage",
+      "owner_path": "app/services/research/rank_candidates",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/rank_candidates.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/rank_candidates/test_traceability.py",
+        "tests/services/research/rank_candidates/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-RANK_CANDIDATES/acceptance.json"
     },
     {
@@ -1387,9 +2221,15 @@
       "task_id": "8.03",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/generate_strategies",
-      "reuse_path": null,
-      "usage_module": "app.services.research.generate_strategies._usage",
+      "owner_path": "app/services/research/generate_strategies",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/generate_strategies.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/generate_strategies/test_traceability.py",
+        "tests/services/research/generate_strategies/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-GENERATE_STRATEGIES/acceptance.json"
     },
     {
@@ -1397,9 +2237,15 @@
       "task_id": "8.04",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/evolve_strategies",
-      "reuse_path": null,
-      "usage_module": "app.services.research.evolve_strategies._usage",
+      "owner_path": "app/services/research/evolve_strategies",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/evolve_strategies.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/evolve_strategies/test_traceability.py",
+        "tests/services/research/evolve_strategies/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-EVOLVE_STRATEGIES/acceptance.json"
     },
     {
@@ -1407,9 +2253,15 @@
       "task_id": "8.05",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/strategy_builder",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/strategy_builder",
+      "owner_path": "app/ui/src/widgets/strategy-search-space",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/strategy-search-space/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/strategy-search-space/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/strategy-search-space/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-STRATEGY_BUILDER/acceptance.json"
     },
     {
@@ -1417,9 +2269,15 @@
       "task_id": "9.01",
       "domain": "Optimization",
       "canonical_spec": "app/services/optimization/README.md",
-      "target_dir": "app/services/optimization/search_parameters",
-      "reuse_path": null,
-      "usage_module": "app.services.optimization.search_parameters._usage",
+      "owner_path": "app/services/optimization/search_parameters",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/optimization/search.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/optimization/search_parameters/test_traceability.py",
+        "tests/services/optimization/search_parameters/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-OPT-SEARCH_PARAMETERS/acceptance.json"
     },
     {
@@ -1427,9 +2285,15 @@
       "task_id": "9.02",
       "domain": "Optimization",
       "canonical_spec": "app/services/optimization/README.md",
-      "target_dir": "app/services/optimization/validate_walk_forward",
-      "reuse_path": null,
-      "usage_module": "app.services.optimization.validate_walk_forward._usage",
+      "owner_path": "app/services/optimization/validate_walk_forward",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/optimization/walk_forward.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/optimization/validate_walk_forward/test_traceability.py",
+        "tests/services/optimization/validate_walk_forward/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-OPT-VALIDATE_WALK_FORWARD/acceptance.json"
     },
     {
@@ -1437,9 +2301,15 @@
       "task_id": "9.03",
       "domain": "Optimization",
       "canonical_spec": "app/services/optimization/README.md",
-      "target_dir": "app/services/optimization/permute_parameters",
-      "reuse_path": null,
-      "usage_module": "app.services.optimization.permute_parameters._usage",
+      "owner_path": "app/services/optimization/permute_parameters",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/optimization/parameter_permutation.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/optimization/permute_parameters/test_traceability.py",
+        "tests/services/optimization/permute_parameters/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-OPT-PERMUTE_PARAMETERS/acceptance.json"
     },
     {
@@ -1447,9 +2317,15 @@
       "task_id": "9.04",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/operate_optimization",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.operate_optimization._usage",
+      "owner_path": "app/services/interfaces/operate_optimization",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/operate_optimization.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/operate_optimization/test_traceability.py",
+        "tests/services/interfaces/operate_optimization/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_OPTIMIZATION/acceptance.json"
     },
     {
@@ -1457,9 +2333,15 @@
       "task_id": "9.05",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/parameter_optimizer",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/parameter_optimizer",
+      "owner_path": "app/ui/src/widgets/optimization-settings",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/optimization-settings/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/optimization-settings/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/optimization-settings/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-PARAMETER_OPTIMIZER/acceptance.json"
     },
     {
@@ -1467,9 +2349,15 @@
       "task_id": "9.06",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/optimization_results",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/optimization_results",
+      "owner_path": "app/ui/src/widgets/optimization-results",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/optimization-results/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/optimization-results/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/optimization-results/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-OPTIMIZATION_RESULTS/acceptance.json"
     },
     {
@@ -1477,9 +2365,15 @@
       "task_id": "10.01",
       "domain": "Portfolio",
       "canonical_spec": "app/services/portfolio/README.md",
-      "target_dir": "app/services/portfolio/compose_portfolios",
-      "reuse_path": null,
-      "usage_module": "app.services.portfolio.compose_portfolios._usage",
+      "owner_path": "app/services/portfolio/compose_portfolios",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/portfolio/compose_portfolios.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/portfolio/compose_portfolios/test_traceability.py",
+        "tests/services/portfolio/compose_portfolios/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-POR-COMPOSE_PORTFOLIOS/acceptance.json"
     },
     {
@@ -1487,9 +2381,15 @@
       "task_id": "10.02",
       "domain": "Portfolio",
       "canonical_spec": "app/services/portfolio/README.md",
-      "target_dir": "app/services/portfolio/analyze_correlation",
-      "reuse_path": null,
-      "usage_module": "app.services.portfolio.analyze_correlation._usage",
+      "owner_path": "app/services/portfolio/analyze_correlation",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/portfolio/analyze_correlation.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/portfolio/analyze_correlation/test_traceability.py",
+        "tests/services/portfolio/analyze_correlation/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-POR-ANALYZE_CORRELATION/acceptance.json"
     },
     {
@@ -1497,9 +2397,15 @@
       "task_id": "10.03",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/filter_correlation",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.filter_correlation._usage",
+      "owner_path": "app/services/analytics/filter_correlation",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/match_results.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/filter_correlation/test_traceability.py",
+        "tests/services/analytics/filter_correlation/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-FILTER_CORRELATION/acceptance.json"
     },
     {
@@ -1507,9 +2413,15 @@
       "task_id": "10.04",
       "domain": "Portfolio",
       "canonical_spec": "app/services/portfolio/README.md",
-      "target_dir": "app/services/portfolio/optimize_weights",
-      "reuse_path": null,
-      "usage_module": "app.services.portfolio.optimize_weights._usage",
+      "owner_path": "app/services/portfolio/optimize_weights",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/portfolio/optimize_weights.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/portfolio/optimize_weights/test_traceability.py",
+        "tests/services/portfolio/optimize_weights/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-POR-OPTIMIZE_WEIGHTS/acceptance.json"
     },
     {
@@ -1517,9 +2429,15 @@
       "task_id": "10.05",
       "domain": "Portfolio",
       "canonical_spec": "app/services/portfolio/README.md",
-      "target_dir": "app/services/portfolio/simulate_portfolios",
-      "reuse_path": null,
-      "usage_module": "app.services.portfolio.simulate_portfolios._usage",
+      "owner_path": "app/services/portfolio/simulate_portfolios",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/portfolio/simulate_portfolios.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/portfolio/simulate_portfolios/test_traceability.py",
+        "tests/services/portfolio/simulate_portfolios/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-POR-SIMULATE_PORTFOLIOS/acceptance.json"
     },
     {
@@ -1527,9 +2445,15 @@
       "task_id": "10.06",
       "domain": "Portfolio",
       "canonical_spec": "app/services/portfolio/README.md",
-      "target_dir": "app/services/portfolio/analyze_portfolio_risk",
-      "reuse_path": null,
-      "usage_module": "app.services.portfolio.analyze_portfolio_risk._usage",
+      "owner_path": "app/services/portfolio/analyze_portfolio_risk",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/portfolio/analyze_portfolio_risk.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/portfolio/analyze_portfolio_risk/test_traceability.py",
+        "tests/services/portfolio/analyze_portfolio_risk/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-POR-ANALYZE_PORTFOLIO_RISK/acceptance.json"
     },
     {
@@ -1537,9 +2461,15 @@
       "task_id": "10.07",
       "domain": "Portfolio",
       "canonical_spec": "app/services/portfolio/README.md",
-      "target_dir": "app/services/portfolio/merge_portfolios",
-      "reuse_path": null,
-      "usage_module": "app.services.portfolio.merge_portfolios._usage",
+      "owner_path": "app/services/portfolio/merge_portfolios",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/portfolio/merge_portfolios.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/portfolio/merge_portfolios/test_traceability.py",
+        "tests/services/portfolio/merge_portfolios/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-POR-MERGE_PORTFOLIOS/acceptance.json"
     },
     {
@@ -1547,9 +2477,15 @@
       "task_id": "10.08",
       "domain": "Portfolio",
       "canonical_spec": "app/services/portfolio/README.md",
-      "target_dir": "app/services/portfolio/search_portfolios",
-      "reuse_path": null,
-      "usage_module": "app.services.portfolio.search_portfolios._usage",
+      "owner_path": "app/services/portfolio/search_portfolios",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/portfolio/search_portfolios.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/portfolio/search_portfolios/test_traceability.py",
+        "tests/services/portfolio/search_portfolios/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-POR-SEARCH_PORTFOLIOS/acceptance.json"
     },
     {
@@ -1557,9 +2493,15 @@
       "task_id": "10.09",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/advise_portfolio",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.advise_portfolio._usage",
+      "owner_path": "app/services/agentic/advise_portfolio",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/portfolio_advisory.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/advise_portfolio/test_traceability.py",
+        "tests/services/agentic/advise_portfolio/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ADVISE_PORTFOLIO/acceptance.json"
     },
     {
@@ -1567,9 +2509,15 @@
       "task_id": "10.10",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/operate_portfolios",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.operate_portfolios._usage",
+      "owner_path": "app/services/interfaces/operate_portfolios",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/operate_portfolios.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/operate_portfolios/test_traceability.py",
+        "tests/services/interfaces/operate_portfolios/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_PORTFOLIOS/acceptance.json"
     },
     {
@@ -1577,9 +2525,15 @@
       "task_id": "10.11",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/portfolio_composer",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/portfolio_composer",
+      "owner_path": "app/ui/src/widgets/portfolio-composer",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/portfolio-composer/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/portfolio-composer/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/portfolio-composer/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-PORTFOLIO_COMPOSER/acceptance.json"
     },
     {
@@ -1587,9 +2541,15 @@
       "task_id": "10.12",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/portfolio_builder",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/portfolio_builder",
+      "owner_path": "app/ui/src/widgets/portfolio-builder",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/portfolio-builder/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/portfolio-builder/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/portfolio-builder/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-PORTFOLIO_BUILDER/acceptance.json"
     },
     {
@@ -1597,9 +2557,15 @@
       "task_id": "11.01",
       "domain": "Trading",
       "canonical_spec": "app/services/trading/README.md",
-      "target_dir": "app/services/trading/observe_outcomes",
-      "reuse_path": null,
-      "usage_module": "app.services.trading.observe_outcomes._usage",
+      "owner_path": "app/services/trading/observe_outcomes",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/trading/outcome_evidence.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/trading/observe_outcomes/test_traceability.py",
+        "tests/services/trading/observe_outcomes/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-TRD-OBSERVE_OUTCOMES/acceptance.json"
     },
     {
@@ -1607,9 +2573,15 @@
       "task_id": "11.02",
       "domain": "Orchestration",
       "canonical_spec": "app/services/orchestration/README.md",
-      "target_dir": "app/services/orchestration/define_projects",
-      "reuse_path": null,
-      "usage_module": "app.services.orchestration.define_projects._usage",
+      "owner_path": "app/services/orchestration/define_projects",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/orchestration/define_projects.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/orchestration/define_projects/test_traceability.py",
+        "tests/services/orchestration/define_projects/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-DEFINE_PROJECTS/acceptance.json"
     },
     {
@@ -1617,9 +2589,15 @@
       "task_id": "11.03",
       "domain": "Orchestration",
       "canonical_spec": "app/services/orchestration/README.md",
-      "target_dir": "app/services/orchestration/execute_utilities",
-      "reuse_path": null,
-      "usage_module": "app.services.orchestration.execute_utilities._usage",
+      "owner_path": "app/services/orchestration/execute_utilities",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/orchestration/execute_utilities.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/orchestration/execute_utilities/test_traceability.py",
+        "tests/services/orchestration/execute_utilities/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-EXECUTE_UTILITIES/acceptance.json"
     },
     {
@@ -1627,9 +2605,15 @@
       "task_id": "11.04",
       "domain": "Orchestration",
       "canonical_spec": "app/services/orchestration/README.md",
-      "target_dir": "app/services/orchestration/deliver_notifications",
-      "reuse_path": null,
-      "usage_module": "app.services.orchestration.deliver_notifications._usage",
+      "owner_path": "app/services/orchestration/deliver_notifications",
+      "owner_path_status": "EXISTING",
+      "contract_target": "app/contracts/orchestration/deliver_notifications.py",
+      "contract_status": "EXISTING",
+      "test_targets": [
+        "tests/services/orchestration/deliver_notifications/test_traceability.py",
+        "tests/services/orchestration/deliver_notifications/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-DELIVER_NOTIFICATIONS/acceptance.json"
     },
     {
@@ -1637,9 +2621,15 @@
       "task_id": "11.05",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/manage_memory",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.manage_memory._usage",
+      "owner_path": "app/services/agentic/manage_memory",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/memory.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/manage_memory/test_traceability.py",
+        "tests/services/agentic/manage_memory/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-MANAGE_MEMORY/acceptance.json"
     },
     {
@@ -1647,9 +2637,15 @@
       "task_id": "11.06",
       "domain": "Orchestration",
       "canonical_spec": "app/services/orchestration/README.md",
-      "target_dir": "app/services/orchestration/run_projects",
-      "reuse_path": null,
-      "usage_module": "app.services.orchestration.run_projects._usage",
+      "owner_path": "app/services/orchestration/run_projects",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/orchestration/run_projects.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/orchestration/run_projects/test_traceability.py",
+        "tests/services/orchestration/run_projects/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RUN_PROJECTS/acceptance.json"
     },
     {
@@ -1657,9 +2653,15 @@
       "task_id": "11.07",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/calibrate_outcomes",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.calibrate_outcomes._usage",
+      "owner_path": "app/services/agentic/calibrate_outcomes",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/outcome_calibration.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/calibrate_outcomes/test_traceability.py",
+        "tests/services/agentic/calibrate_outcomes/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-CALIBRATE_OUTCOMES/acceptance.json"
     },
     {
@@ -1667,9 +2669,15 @@
       "task_id": "11.08",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/edit_projects",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.edit_projects._usage",
+      "owner_path": "app/services/interfaces/edit_projects",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/edit_projects.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/edit_projects/test_traceability.py",
+        "tests/services/interfaces/edit_projects/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-EDIT_PROJECTS/acceptance.json"
     },
     {
@@ -1677,9 +2685,15 @@
       "task_id": "11.09",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/project_editor",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/project_editor",
+      "owner_path": "app/ui/src/widgets/project-editor",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/project-editor/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/project-editor/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/project-editor/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-PROJECT_EDITOR/acceptance.json"
     },
     {
@@ -1687,9 +2701,15 @@
       "task_id": "12.01",
       "domain": "Plugins",
       "canonical_spec": "app/services/plugins/README.md",
-      "target_dir": "app/services/plugins/sandbox_permissions",
-      "reuse_path": "app/services/plugins/permissions_sandbox",
-      "usage_module": "app.services.plugins.sandbox_permissions._usage",
+      "owner_path": "app/services/plugins/sandbox_permissions",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/plugins/sandbox_permissions.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/plugins/sandbox_permissions/test_traceability.py",
+        "tests/services/plugins/sandbox_permissions/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-SANDBOX_PERMISSIONS/acceptance.json"
     },
     {
@@ -1697,9 +2717,15 @@
       "task_id": "12.02",
       "domain": "Plugins",
       "canonical_spec": "app/services/plugins/README.md",
-      "target_dir": "app/services/plugins/author_packages",
-      "reuse_path": null,
-      "usage_module": "app.services.plugins.author_packages._usage",
+      "owner_path": "app/services/plugins/author_packages",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/plugins/author_packages.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/plugins/author_packages/test_traceability.py",
+        "tests/services/plugins/author_packages/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-AUTHOR_PACKAGES/acceptance.json"
     },
     {
@@ -1707,9 +2733,15 @@
       "task_id": "12.03",
       "domain": "Plugins",
       "canonical_spec": "app/services/plugins/README.md",
-      "target_dir": "app/services/plugins/isolate_analysis",
-      "reuse_path": "app/services/plugins/analysis_boundary",
-      "usage_module": "app.services.plugins.isolate_analysis._usage",
+      "owner_path": "app/services/plugins/isolate_analysis",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/plugins/isolate_analysis.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/plugins/isolate_analysis/test_traceability.py",
+        "tests/services/plugins/isolate_analysis/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-ISOLATE_ANALYSIS/acceptance.json"
     },
     {
@@ -1717,9 +2749,15 @@
       "task_id": "12.04",
       "domain": "Plugins",
       "canonical_spec": "app/services/plugins/README.md",
-      "target_dir": "app/services/plugins/render_result_panels",
-      "reuse_path": "app/services/plugins/result_panels",
-      "usage_module": "app.services.plugins.render_result_panels._usage",
+      "owner_path": "app/services/plugins/render_result_panels",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/plugins/render_result_panels.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/plugins/render_result_panels/test_traceability.py",
+        "tests/services/plugins/render_result_panels/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-RENDER_RESULT_PANELS/acceptance.json"
     },
     {
@@ -1727,9 +2765,15 @@
       "task_id": "12.05",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/generate_mql5",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.generate_mql5._usage",
+      "owner_path": "app/services/strategy/generate_mql5",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/generate_mql5.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/generate_mql5/test_traceability.py",
+        "tests/services/strategy/generate_mql5/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-GENERATE_MQL5/acceptance.json"
     },
     {
@@ -1737,9 +2781,15 @@
       "task_id": "12.06",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/generate_python",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.generate_python._usage",
+      "owner_path": "app/services/strategy/generate_python",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/generate_python.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/generate_python/test_traceability.py",
+        "tests/services/strategy/generate_python/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-GENERATE_PYTHON/acceptance.json"
     },
     {
@@ -1747,9 +2797,15 @@
       "task_id": "12.07",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/provide_custom_analysis",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.provide_custom_analysis._usage",
+      "owner_path": "app/services/analytics/provide_custom_analysis",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/custom_analysis.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/provide_custom_analysis/test_traceability.py",
+        "tests/services/analytics/provide_custom_analysis/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS/acceptance.json"
     },
     {
@@ -1757,9 +2813,15 @@
       "task_id": "12.08",
       "domain": "Plugins",
       "canonical_spec": "app/services/plugins/README.md",
-      "target_dir": "app/services/plugins/manage_lifecycle",
-      "reuse_path": "app/services/plugins/lifecycle",
-      "usage_module": "app.services.plugins.manage_lifecycle._usage",
+      "owner_path": "app/services/plugins/manage_lifecycle",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/plugins/manage_lifecycle.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/plugins/manage_lifecycle/test_traceability.py",
+        "tests/services/plugins/manage_lifecycle/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-MANAGE_LIFECYCLE/acceptance.json"
     },
     {
@@ -1767,9 +2829,15 @@
       "task_id": "12.09",
       "domain": "Plugins",
       "canonical_spec": "app/services/plugins/README.md",
-      "target_dir": "app/services/plugins/maintain_compatibility",
-      "reuse_path": "app/services/plugins/development_compatibility",
-      "usage_module": "app.services.plugins.maintain_compatibility._usage",
+      "owner_path": "app/services/plugins/maintain_compatibility",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/plugins/maintain_compatibility.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/plugins/maintain_compatibility/test_traceability.py",
+        "tests/services/plugins/maintain_compatibility/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-MAINTAIN_COMPATIBILITY/acceptance.json"
     },
     {
@@ -1777,9 +2845,15 @@
       "task_id": "12.10",
       "domain": "Agentic",
       "canonical_spec": "app/services/agentic/README.md",
-      "target_dir": "app/services/agentic/author_sandbox_artifacts",
-      "reuse_path": null,
-      "usage_module": "app.services.agentic.author_sandbox_artifacts._usage",
+      "owner_path": "app/services/agentic/author_sandbox_artifacts",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/agentic/sandbox_artifacts.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/agentic/author_sandbox_artifacts/test_traceability.py",
+        "tests/services/agentic/author_sandbox_artifacts/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS/acceptance.json"
     },
     {
@@ -1787,9 +2861,15 @@
       "task_id": "12.11",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/administer_capabilities",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.administer_capabilities._usage",
+      "owner_path": "app/services/interfaces/administer_capabilities",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/administer_capabilities.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/administer_capabilities/test_traceability.py",
+        "tests/services/interfaces/administer_capabilities/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-ADMINISTER_CAPABILITIES/acceptance.json"
     },
     {
@@ -1797,9 +2877,15 @@
       "task_id": "12.12",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/code_editor",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/code_editor",
+      "owner_path": "app/ui/src/widgets/code-editor",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/code-editor/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/code-editor/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/code-editor/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-CODE_EDITOR/acceptance.json"
     },
     {
@@ -1807,9 +2893,15 @@
       "task_id": "12.13",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/indicator_tester",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/indicator_tester",
+      "owner_path": "app/ui/src/widgets/indicator-tester",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/indicator-tester/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/indicator-tester/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/indicator-tester/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-INDICATOR_TESTER/acceptance.json"
     },
     {
@@ -1817,9 +2909,15 @@
       "task_id": "13.01",
       "domain": "Indicators",
       "canonical_spec": "app/services/indicators/README.md",
-      "target_dir": "app/services/indicators/calculate_market_profiles",
-      "reuse_path": null,
-      "usage_module": "app.services.indicators.calculate_market_profiles._usage",
+      "owner_path": "app/services/indicators/calculate_market_profiles",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/indicators/calculate_market_profiles.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/indicators/calculate_market_profiles/test_traceability.py",
+        "tests/services/indicators/calculate_market_profiles/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IND-CALCULATE_MARKET_PROFILES/acceptance.json"
     },
     {
@@ -1827,9 +2925,15 @@
       "task_id": "13.02",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/define_architectures",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.define_architectures._usage",
+      "owner_path": "app/services/strategy/define_architectures",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/define_architectures.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/define_architectures/test_traceability.py",
+        "tests/services/strategy/define_architectures/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-DEFINE_ARCHITECTURES/acceptance.json"
     },
     {
@@ -1837,9 +2941,15 @@
       "task_id": "13.03",
       "domain": "Simulator",
       "canonical_spec": "app/services/simulator/README.md",
-      "target_dir": "app/services/simulator/simulate_stockpickers",
-      "reuse_path": null,
-      "usage_module": "app.services.simulator.simulate_stockpickers._usage",
+      "owner_path": "app/services/simulator/simulate_stockpickers",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/simulator/simulate_stockpickers.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/simulator/simulate_stockpickers/test_traceability.py",
+        "tests/services/simulator/simulate_stockpickers/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-SIM-SIMULATE_STOCKPICKERS/acceptance.json"
     },
     {
@@ -1847,9 +2957,15 @@
       "task_id": "13.04",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/advanced_analysis",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/advanced_analysis",
+      "owner_path": "app/ui/src/widgets/advanced-analysis",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/advanced-analysis/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/advanced-analysis/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/advanced-analysis/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-ADVANCED_ANALYSIS/acceptance.json"
     },
     {
@@ -1857,9 +2973,15 @@
       "task_id": "14.01",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/prepare_neural_datasets",
-      "reuse_path": null,
-      "usage_module": "app.services.research.prepare_neural_datasets._usage",
+      "owner_path": "app/services/research/prepare_neural_datasets",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/neural_datasets.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/prepare_neural_datasets/test_traceability.py",
+        "tests/services/research/prepare_neural_datasets/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-PREPARE_NEURAL_DATASETS/acceptance.json"
     },
     {
@@ -1867,9 +2989,15 @@
       "task_id": "14.02",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/label_neural_data",
-      "reuse_path": null,
-      "usage_module": "app.services.research.label_neural_data._usage",
+      "owner_path": "app/services/research/label_neural_data",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/neural_labels.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/label_neural_data/test_traceability.py",
+        "tests/services/research/label_neural_data/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-LABEL_NEURAL_DATA/acceptance.json"
     },
     {
@@ -1877,9 +3005,15 @@
       "task_id": "14.03",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/infer_models",
-      "reuse_path": null,
-      "usage_module": "app.services.research.infer_models._usage",
+      "owner_path": "app/services/research/infer_models",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/model_inference.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/infer_models/test_traceability.py",
+        "tests/services/research/infer_models/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-INFER_MODELS/acceptance.json"
     },
     {
@@ -1887,9 +3021,15 @@
       "task_id": "14.04",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/train_models",
-      "reuse_path": null,
-      "usage_module": "app.services.research.train_models._usage",
+      "owner_path": "app/services/research/train_models",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/model_training.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/train_models/test_traceability.py",
+        "tests/services/research/train_models/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-TRAIN_MODELS/acceptance.json"
     },
     {
@@ -1897,9 +3037,15 @@
       "task_id": "14.05",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/validate_models",
-      "reuse_path": null,
-      "usage_module": "app.services.research.validate_models._usage",
+      "owner_path": "app/services/research/validate_models",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/model_validation.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/validate_models/test_traceability.py",
+        "tests/services/research/validate_models/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-VALIDATE_MODELS/acceptance.json"
     },
     {
@@ -1907,9 +3053,15 @@
       "task_id": "14.06",
       "domain": "Research",
       "canonical_spec": "app/services/research/README.md",
-      "target_dir": "app/services/research/explain_models",
-      "reuse_path": null,
-      "usage_module": "app.services.research.explain_models._usage",
+      "owner_path": "app/services/research/explain_models",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/research/model_explanations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/research/explain_models/test_traceability.py",
+        "tests/services/research/explain_models/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-EXPLAIN_MODELS/acceptance.json"
     },
     {
@@ -1917,9 +3069,15 @@
       "task_id": "14.07",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/neural_research",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/neural_research",
+      "owner_path": "app/ui/src/widgets/neural-research",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/neural-research/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/neural-research/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/neural-research/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-NEURAL_RESEARCH/acceptance.json"
     },
     {
@@ -1927,9 +3085,15 @@
       "task_id": "15.01",
       "domain": "Orchestration",
       "canonical_spec": "app/services/orchestration/README.md",
-      "target_dir": "app/services/orchestration/manage_remote_workers",
-      "reuse_path": null,
-      "usage_module": "app.services.orchestration.manage_remote_workers._usage",
+      "owner_path": "app/services/orchestration/manage_remote_workers",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/orchestration/remote_workers.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/orchestration/manage_remote_workers/test_traceability.py",
+        "tests/services/orchestration/manage_remote_workers/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-MANAGE_REMOTE_WORKERS/acceptance.json"
     },
     {
@@ -1937,9 +3101,15 @@
       "task_id": "16.01",
       "domain": "Interfaces",
       "canonical_spec": "app/services/interfaces/README.md",
-      "target_dir": "app/services/interfaces/automate_commands",
-      "reuse_path": null,
-      "usage_module": "app.services.interfaces.automate_commands._usage",
+      "owner_path": "app/services/interfaces/automate_commands",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/interfaces/automate_commands.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/interfaces/automate_commands/test_traceability.py",
+        "tests/services/interfaces/automate_commands/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-AUTOMATE_COMMANDS/acceptance.json"
     },
     {
@@ -1947,9 +3117,15 @@
       "task_id": "16.02",
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
-      "target_dir": "app/services/workspace/distribute_application",
-      "reuse_path": null,
-      "usage_module": "app.services.workspace.distribute_application._usage",
+      "owner_path": "app/services/workspace/distribute_application",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/workspace/distribute_application.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/workspace/distribute_application/test_traceability.py",
+        "tests/services/workspace/distribute_application/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-DISTRIBUTE_APPLICATION/acceptance.json"
     },
     {
@@ -1957,9 +3133,15 @@
       "task_id": "16.03",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/darwinex",
-      "reuse_path": null,
-      "usage_module": "app.services.brokers.darwinex._usage",
+      "owner_path": "app/services/brokers/darwinex",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/broker/operations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/darwinex/test_traceability.py",
+        "tests/services/brokers/darwinex/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-DARWINEX/acceptance.json"
     },
     {
@@ -1967,9 +3149,15 @@
       "task_id": "16.04",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/coinbase",
-      "reuse_path": null,
-      "usage_module": "app.services.brokers.coinbase._usage",
+      "owner_path": "app/services/brokers/coinbase",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/broker/operations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/coinbase/test_traceability.py",
+        "tests/services/brokers/coinbase/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-COINBASE/acceptance.json"
     },
     {
@@ -1977,9 +3165,15 @@
       "task_id": "16.05",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/bitfinex",
-      "reuse_path": null,
-      "usage_module": "app.services.brokers.bitfinex._usage",
+      "owner_path": "app/services/brokers/bitfinex",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/broker/operations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/bitfinex/test_traceability.py",
+        "tests/services/brokers/bitfinex/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-BITFINEX/acceptance.json"
     },
     {
@@ -1987,9 +3181,15 @@
       "task_id": "16.06",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/poloniex",
-      "reuse_path": null,
-      "usage_module": "app.services.brokers.poloniex._usage",
+      "owner_path": "app/services/brokers/poloniex",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/broker/operations.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/poloniex/test_traceability.py",
+        "tests/services/brokers/poloniex/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-POLONIEX/acceptance.json"
     },
     {
@@ -1997,9 +3197,15 @@
       "task_id": "16.07",
       "domain": "Brokers",
       "canonical_spec": "app/services/brokers/README.md",
-      "target_dir": "app/services/brokers/connect_market_feeds",
-      "reuse_path": null,
-      "usage_module": "app.services.brokers.connect_market_feeds._usage",
+      "owner_path": "app/services/brokers/connect_market_feeds",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/brokers/connect_market_feeds.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/brokers/connect_market_feeds/test_traceability.py",
+        "tests/services/brokers/connect_market_feeds/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-BRK-CONNECT_MARKET_FEEDS/acceptance.json"
     },
     {
@@ -2007,9 +3213,15 @@
       "task_id": "16.08",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/generate_targets",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.generate_targets._usage",
+      "owner_path": "app/services/strategy/generate_targets",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/generate_targets.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/generate_targets/test_traceability.py",
+        "tests/services/strategy/generate_targets/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-GENERATE_TARGETS/acceptance.json"
     },
     {
@@ -2017,9 +3229,15 @@
       "task_id": "16.09",
       "domain": "Analytics",
       "canonical_spec": "app/services/analytics/README.md",
-      "target_dir": "app/services/analytics/import_external_ledgers",
-      "reuse_path": null,
-      "usage_module": "app.services.analytics.import_external_ledgers._usage",
+      "owner_path": "app/services/analytics/import_external_ledgers",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/analytics/import_external_ledgers.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/analytics/import_external_ledgers/test_traceability.py",
+        "tests/services/analytics/import_external_ledgers/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-IMPORT_EXTERNAL_LEDGERS/acceptance.json"
     },
     {
@@ -2027,9 +3245,15 @@
       "task_id": "16.10",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/import_sqx",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.import_sqx._usage",
+      "owner_path": "app/services/strategy/import_sqx",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/import_sqx.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/import_sqx/test_traceability.py",
+        "tests/services/strategy/import_sqx/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-IMPORT_SQX/acceptance.json"
     },
     {
@@ -2037,9 +3261,15 @@
       "task_id": "16.11",
       "domain": "Strategy",
       "canonical_spec": "app/services/strategy/README.md",
-      "target_dir": "app/services/strategy/package_strategies",
-      "reuse_path": null,
-      "usage_module": "app.services.strategy.package_strategies._usage",
+      "owner_path": "app/services/strategy/package_strategies",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/contracts/strategy/package_strategies.py",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "tests/services/strategy/package_strategies/test_traceability.py",
+        "tests/services/strategy/package_strategies/test_lifecycle.py"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-PACKAGE_STRATEGIES/acceptance.json"
     },
     {
@@ -2047,9 +3277,15 @@
       "task_id": "16.12",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
-      "target_dir": "app/ui/src/widgets/strategy_packager",
-      "reuse_path": null,
-      "usage_module": "app/ui/src/widgets/strategy_packager",
+      "owner_path": "app/ui/src/widgets/strategy-packager",
+      "owner_path_status": "PLANNED",
+      "contract_target": "app/ui/src/widgets/strategy-packager/contracts.ts",
+      "contract_status": "PLANNED",
+      "test_targets": [
+        "app/ui/src/widgets/strategy-packager/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/strategy-packager/__tests__/lifecycle.test.tsx"
+      ],
+      "existing_test_targets": [],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-STRATEGY_PACKAGER/acceptance.json"
     }
   ]

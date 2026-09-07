@@ -3,6 +3,7 @@
   "feature_id": "FEAT-WS-MANAGE_WORKSPACES",
   "task_id": "1.03",
   "status": "ACCEPTED",
+  "owner_specification": "app/services/workspace/manage_workspaces/README.md",
   "baseline_commit": "edcf358f69d80f383c8e840ed641f807c04259f5",
   "acceptance_commit": "83994e11156d1abb0fad8c151a59cf46071ba0a5",
   "requirements": [
@@ -47,6 +48,39 @@
       "evidence_target": "No widget or UI surface is owned by this feature."
     }
   ],
+  "catalogue_entries": [
+    "LOCAL:workspace revision",
+    "LOCAL:writer lease/fence",
+    "LOCAL:backup manifest",
+    "LOCAL:recovery report",
+    "LOCAL:migration checksums"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/workspace/manage_workspaces.py and contract tests"
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/manage_workspaces/test_traceability.py"
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/integration/test_manage_workspaces.py"
+    },
+    "interfaces": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "Local filesystem root capability; no Interfaces adapter is owned."
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "No widget or UI surface is owned by this feature."
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/integration/test_manage_workspaces.py"
+    }
+  },
   "commands": [
     {
       "command": "uv run pytest --no-cov tests/services/workspace/manage_workspaces tests/services/workspace/integration/test_manage_workspaces.py",

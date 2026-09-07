@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HaruQuantAI Phase 0 Baseline Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_version",
+    "baseline",
+    "feature_ids",
+    "inventory",
+    "domain_distribution",
+    "status_distribution",
+    "drift_disposition"
+  ],
+  "properties": {
+    "manifest_version": { "const": "2.0" },
+    "baseline": {
+      "type": "object",
+      "required": [
+        "repository_head",
+        "plan_path",
+        "plan_sha256",
+        "register_path",
+        "register_sha256",
+        "register_git_blob",
+        "original_spec_blob",
+        "pinned_spec_blob",
+        "normalized_register",
+        "normalized_dependency_graph"
+      ]
+    },
+    "feature_ids": {
+      "type": "array",
+      "minItems": 205,
+      "maxItems": 205,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^FEAT-[A-Z0-9_-]+$" }
+    },
+    "inventory": { "type": "object" },
+    "domain_distribution": { "type": "object" },
+    "status_distribution": { "type": "object" },
+    "drift_disposition": { "type": "object" }
+  }
+}

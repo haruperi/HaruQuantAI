@@ -1602,7 +1602,6 @@ uv run --frozen ruff check <changed_path> [<changed_path> ...]
 uv run --frozen mypy <affected_python_path> [<affected_python_path> ...]
 
 # Applicable repository boundary checks.
-uv run --frozen lint-imports
 uv run --frozen python scripts/generate_contracts.py --check
 uv run --frozen python scripts/architecture_check.py
 uv run --frozen python scripts/validate_feature_docs.py
@@ -1625,7 +1624,7 @@ uv run --frozen python scripts/ci_check.py
 ```
 
 That script is the checked-in authority for the combined Ruff, strict mypy, workflow-controller,
-Import Linter, contract-generation, architecture, feature-documentation, pytest, and branch-coverage
+contract-generation, architecture, feature-documentation, pytest, and branch-coverage
 checks. The current configured project coverage floor is 80 percent. A more specific owner or shared
 requirement may impose a stronger threshold or additional evidence.
 

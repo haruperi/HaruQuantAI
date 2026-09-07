@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Generate .agents/task.toml from an implementation-order entry.
+"""Generate .agents/task.toml from an implementation-plan entry.
 
 Parses tracker entries (both `FEAT-...` features and non-feature tasks)
 and their requirement checkboxes (`[ ]`, `[]`, `[x]`, `[X]`), then writes a
 ready-to-run task spec wired to the tracker entry.
 
 Usage:
-    python .agents/make_task.py --list      # show open entries
+    python .agents/make_task.py --list      # show open feature tasks
     python .agents/make_task.py 1.01        # write spec for foundation task
     python .agents/make_task.py 1.1         # write spec for feature
     python .agents/make_task.py 2.8 --out other.toml
@@ -27,6 +27,11 @@ REPO = AGENTS_DIR.parent
 ENTRY_RE = re.compile(
     r"^(?:#####|####)\s+(?:Foundation task\s+)?(?P<entry_id>\d+\.[\w.-]+|\d+)\s*"
     r"(?P<rest>.*)$"
+)
+PLAN_ENTRY_RE = re.compile(
+    r"^###\s+-\s+\[(?P<mark>[ xX]?)\]\s+Task\s+"
+    r"(?P<entry_id>\d+\.\d+)\s+[\u2014\u2013-]+\s+"
+    r"(?P<feature>FEAT-[A-Z0-9_-]+)\s+[\u2014\u2013-]+\s+(?P<title>.+?)\s*$"
 )
 TABLE_ENTRY_ID_RE = re.compile(r"^(?:P\.\d+|\d+(?:\.[A-Za-z0-9_-]+)*)$")
 TABLE_STATUSES = frozenset({"complete", "partial", "pending"})
@@ -69,11 +74,56 @@ def _parse_table_entry(line: str) -> dict[str, Any] | None:
     }
 
 
+def _plan_items(card_lines: list[str]) -> list[dict[str, Any]]:
+    """Extract requirement rows from one phased-plan feature card."""
+    items: list[dict[str, Any]] = []
+    for line in card_lines:
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) < 2 or not line.startswith("|"):
+            continue
+        requirement_id = cells[0].strip("` ")
+        if not (FR_RE.fullmatch(requirement_id) or requirement_id.startswith("NFR-")):
+            continue
+        items.append(
+            {
+                "text": " | ".join(cell.strip("` ") for cell in cells),
+                "fr_id": requirement_id,
+                "done": False,
+            }
+        )
+    return items
+
+
 def parse_entries(path: Path) -> dict[str, dict[str, Any]]:
     """Return {entry_id: {feature, title, done, partial, is_feature, items: [...]}}."""
     entries: dict[str, dict[str, Any]] = {}
     current: dict[str, Any] | None = None
-    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    for index, line in enumerate(lines):
+        plan_match = PLAN_ENTRY_RE.match(line)
+        if plan_match:
+            next_index = index + 1
+            while next_index < len(lines) and not lines[next_index].startswith(
+                "### - ["
+            ):
+                next_index += 1
+            card_lines = lines[index:next_index]
+            entry_id = plan_match.group("entry_id")
+            current = {
+                "entry_id": entry_id,
+                "feature": plan_match.group("feature"),
+                "title": plan_match.group("title").strip(),
+                "done": plan_match.group("mark").lower() == "x",
+                "partial": False,
+                "is_feature": True,
+                "items": _plan_items(card_lines),
+                "source_format": "phased_plan",
+                "tracker_summary": "\n".join(card_lines).strip(),
+            }
+            entries[entry_id] = current
+            continue
+        if current is not None and current.get("source_format") == "phased_plan":
+            continue
         table_entry = _parse_table_entry(line)
         if table_entry is not None:
             entry_id = str(table_entry["entry_id"])
@@ -253,8 +303,11 @@ def main() -> int:
     parser.add_argument("entry", nargs="?", help="entry id, e.g. 1.01 or 1.1")
     parser.add_argument(
         "--file",
-        default="tracker.md",
-        help="implementation tracker (default: tracker.md)",
+        default="docs/dev/Phased_Feature_Implementation_Plan.md",
+        help=(
+            "implementation tracker "
+            "(default: docs/dev/Phased_Feature_Implementation_Plan.md)"
+        ),
     )
     parser.add_argument(
         "--out",

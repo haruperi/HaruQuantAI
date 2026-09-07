@@ -220,6 +220,11 @@ cache/
 *.dat
 data/*.dat
 
+# Phase 0's bounded deterministic fixtures are repository evidence, not runtime data.
+!tests/fixtures/bars/eurusd_m1_202501.parquet
+!tests/fixtures/ticks/eurusd_ticks_20250102.parquet
+!tests/fixtures/catalogue/baseline_catalogue.db
+
 # Root data contains source/control files alongside ignored runtime-heavy stores.
 !/data/
 !/data/**/

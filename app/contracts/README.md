@@ -310,11 +310,11 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 ### 4.1 `app/contracts/workspace/`
 
-**Status:** `ManageWorkspacesCapability`, `ConfigureRuntimeCapability`, `SecureLocalAccessCapability`, and `BuildDiagnosticsCapability` implemented; remaining domain capability surfaces planned.
+**Status:** `ManageWorkspacesCapability`, `PersistenceCapability`, `ConfigureRuntimeCapability`, `SecureLocalAccessCapability`, and `BuildDiagnosticsCapability` implemented; remaining domain capability surfaces planned.
 
 **Public records:** `WorkspaceRef`, `WorkspaceVersion`, `WorkspaceConfiguration`, `RuntimeConfiguration`, `StorageGuardPolicy`, `WorkspaceWriterLease`, `WorkspaceWriterFence`, `WorkspaceBackupManifest`, `WorkspaceRestorePlan`, `SecretRef`, `PrincipalRef`, `LocalSession`, `SystemHealth`, `SystemReadiness`, `DiagnosticBundleRef`, `DiagnosticBundleManifest`, `WorkerCapabilityDescriptor`, `WorkerRegistration`, `WorkerLease`, `WorkerTaskEnvelope`, `ArtifactManifest`, `HostedWorkspaceContext`, `WorkspaceAuthorizationDecision`, `WatchlistItemRecord`, `WatchlistRecord`, `ManageWatchlistsRequest`, and `ManageWatchlistsSuccess`.
 
-**Capability bundles (9):** `ManageWorkspacesCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability` (implemented), `DistributeWorkersCapability`, `HostWorkspacesCapability`, `ManageWatchlistsCapability`, `ManageAccountsCapability`, and `AdministerSettingsCapability`.
+**Capability bundles (10):** `ManageWorkspacesCapability` (implemented), `PersistenceCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability` (implemented), `DistributeWorkersCapability`, `HostWorkspacesCapability`, `ManageWatchlistsCapability`, `ManageAccountsCapability`, and `AdministerSettingsCapability`.
 
 ### 4.2 `app/contracts/catalogue/`
 

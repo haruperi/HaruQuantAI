@@ -114,7 +114,7 @@ flowchart TD
 
 Feature modules inside a domain must be **completely independent and physically removable**:
 
-1. **No Inter-Feature Imports:** Feature A must never import Feature B directly (enforced by `ARCH-006` and Import Linter).
+1. **No Inter-Feature Imports:** Feature A must never import Feature B directly (enforced by `ARCH-006` and the repository AST checker).
 2. **Contract-Only Communication:** If Feature A needs capabilities from Feature B, it declares a dependency on `FeatureSpec.requires` and resolves it via `context.require(CAPABILITY_KEY)`.
 3. **Init Purity:** All `__init__.py` files contain docstrings only — no executable code or imports (`ARCH-001`).
 
@@ -326,9 +326,9 @@ Run it with `uv run python -m app.services.[domain].[feature]._usage`. Map every
 | Missing | `ARCH-001` | Init Purity | All `__init__.py` files contain docstrings only; no imports or code. | `scripts/architecture_check.py` |
 | Missing | `ARCH-002` | Managed Tasks | Coroutines are spawned exclusively via `FeatureContext.spawn()`. | `scripts/architecture_check.py` |
 | Missing | `ARCH-003` | Logging Hygiene | No root `logging.basicConfig()` calls in service packages. | `scripts/architecture_check.py` |
-| Missing | `ARCH-004` | Contract Purity | Contracts live exclusively in `app/contracts/` and have no service dependencies. | Import Linter & AST |
-| Missing | `ARCH-005` | Interfaces Purity | D-IFACE features use public contracts and declared capabilities without importing service implementations. | Import Linter & AST |
-| Missing | `ARCH-006` | Feature Independence | Features never import other features directly. | Import Linter & AST |
+| Missing | `ARCH-004` | Contract Purity | Contracts live exclusively in `app/contracts/` and have no service dependencies. | Repository AST check |
+| Missing | `ARCH-005` | Interfaces Purity | D-IFACE features use public contracts and declared capabilities without importing service implementations. | Repository AST check |
+| Missing | `ARCH-006` | Feature Independence | Features never import other features directly. | Repository AST check |
 | Missing | `NFR-[DOM]-001` | Maintainability | Every file has exactly one focused responsibility. | Code Review & AST |
 | Missing | `NFR-[DOM]-002` | Type Safety | Python 3.14 strict typing with zero `type: ignore` bypasses. | `mypy` |
 | Missing | `NFR-[DOM]-003` | Test Coverage | Comprehensive branch and line test coverage $\ge 80\%$. | `pytest --cov` |
@@ -372,7 +372,6 @@ uv run ruff check .
 uv run mypy
 
 # 3. Architecture & import contracts
-uv run lint-imports
 uv run python scripts/architecture_check.py
 
 # 4. Feature physical removability test (Category D)
@@ -405,7 +404,7 @@ A feature within this domain is not complete until all 20 criteria are verified:
 - [ ] 17. **README Complete:** README documents purpose, capability, dependencies, effects, state, and removal behavior.
 - [ ] 18. **Module Usage Documented:** Every core capability module documents purpose, key capabilities, and Python API usage and refers readers to `_usage.py`.
 - [ ] 19. **Usage Harness Green:** The required `_usage.py` owns a passing, bounded `if __name__ == "__main__":` harness covering every mapped FR scenario.
-- [ ] 20. **Quality Gates Green:** Ruff, Mypy, Import Linter, AST Invariants, and Pytest pass with $\ge 80\%$ coverage.
+- [ ] 20. **Quality Gates Green:** Ruff, Mypy, AST invariants, and Pytest pass with $\ge 80\%$ coverage.
 
 ---
 

@@ -1,17 +1,35 @@
 {
-  "manifest_version": "1.0",
-  "timestamp": "2026-09-07T18:45:00+03:00",
-  "reference_machine": {
-    "architecture": "x86_64",
-    "cpu_cores_minimum": 8,
-    "ram_gb_minimum": 16,
-    "disk_type": "NVMe SSD"
+  "manifest_version": "2.0",
+  "hardware_id": "SAMSUNG-960QHA-U7-256V-16GB-NVME",
+  "captured_by": "Windows CIM runtime probe on 2026-09-07",
+  "machine": {
+    "manufacturer": "SAMSUNG ELECTRONICS CO., LTD.",
+    "model": "960QHA",
+    "cpu": "Intel(R) Core(TM) Ultra 7 256V",
+    "physical_cores": 8,
+    "logical_processors": 8,
+    "physical_memory_bytes": 16687722496,
+    "storage_model": "SSSTC CL4-8D1024",
+    "storage_media": "SSD",
+    "storage_bus": "NVMe",
+    "storage_bytes": 1024209543168
   },
-  "budget_limits": {
+  "runtime": {
+    "os": "Microsoft Windows 11 Home Insider Preview 10.0.26220 build 26220",
+    "architecture": "x86_64-pc-windows-msvc",
+    "python": "3.14.3",
+    "uv": "0.12.3",
+    "node": "26.8.1",
+    "npm": "12.0.2",
+    "git": "2.55.0.windows.5",
+    "pyarrow": "24.0.0"
+  },
+  "target_budgets": {
     "unit_test_ms": 100,
     "component_test_ms": 1000,
     "feature_test_max_seconds": 5,
     "phase_e2e_max_seconds": 60,
     "memory_limit_per_worker_mb": 2048
-  }
+  },
+  "qualification": "Named measurement host, not a minimum hardware specification."
 }

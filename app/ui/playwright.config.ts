@@ -1,11 +1,9 @@
 /**
  * Playwright configuration for the Simulation and Analytics workbench journeys.
  *
- * The suite is deliberately narrow and deterministic: Chromium only, one fixed
- * viewport, a frozen clock, and fully stubbed API responses. A browser test
- * that reached a live provider would fail for reasons unrelated to the journey
- * it claims to prove, and a screenshot taken at a moving clock would never
- * compare twice.
+ * Chromium, viewport, locale and clock inputs are deterministic. Individual
+ * specs declare whether they use contract stubs or the real local ASGI harness;
+ * Phase 0 readiness always uses the latter and never reaches an external target.
  */
 
 import { defineConfig, devices } from "@playwright/test";
@@ -45,10 +43,24 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"], viewport: FIXED_VIEWPORT },
     },
   ],
-  webServer: {
-    command: "npm run start -- --port 3100",
-    url: "http://127.0.0.1:3100",
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  webServer: [
+    {
+      command:
+        "uv run --frozen python tests/harness/phase0_asgi.py --port 8765",
+      cwd: "../..",
+      url: "http://127.0.0.1:8765/api/v1/auth/me",
+      reuseExistingServer: false,
+      timeout: 60_000,
+    },
+    {
+      command: "npm run build && npm run start -- --port 3100",
+      env: {
+        ...process.env,
+        BACKEND_URL: "http://127.0.0.1:8765",
+      },
+      url: "http://127.0.0.1:3100",
+      reuseExistingServer: !process.env.CI,
+      timeout: 180_000,
+    },
+  ],
 });

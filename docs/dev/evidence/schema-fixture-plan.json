@@ -1,61 +1,54 @@
 {
-  "manifest_version": "1.0",
-  "timestamp": "2026-09-07T18:45:00+03:00",
-  "fixture_hierarchy": {
+  "manifest_version": "2.0",
+  "numeric_representation": "Signed int64 values scaled by the declared column unit.",
+  "hierarchy": {
     "small": {
-      "scope": "Feature-local unit and traceability tests",
-      "duration_budget_ms": 100,
-      "external_io": "NONE",
-      "dataset_sizes": {
-        "bars": 50,
-        "ticks": 200,
-        "accounts": 1
-      }
+      "purpose": "unit and contract checks",
+      "maximum_records": 200,
+      "budget_ms": 100
     },
     "medium": {
-      "scope": "Component and domain integration tests",
-      "duration_budget_ms": 1000,
-      "external_io": "IN_MEMORY_SQLITE_AND_TEMP_DIR",
-      "dataset_sizes": {
-        "bars": 5000,
-        "ticks": 20000,
-        "accounts": 5
-      }
+      "purpose": "domain integration and Phase 1 browser readiness",
+      "maximum_records": 5000,
+      "budget_ms": 1000
     },
     "large": {
-      "scope": "Phase-level E2E browser and backtest scale benchmarks",
-      "duration_budget_ms": 10000,
-      "external_io": "LOCAL_TEMP_WORKSPACES",
-      "dataset_sizes": {
-        "bars": 100000,
-        "ticks": 1000000,
-        "accounts": 20
-      }
+      "purpose": "explicit scale qualification generated in temporary storage",
+      "maximum_records": 1000000,
+      "budget_ms": 10000,
+      "checked_in": false
     }
   },
-  "deterministic_fixtures": [
+  "checked_in_fixtures": [
     {
-      "name": "fix_synthetic_bars_m1",
-      "type": "OHLCV",
-      "symbols": [
-        "EURUSD",
-        "GBPUSD"
-      ],
-      "bars": 1000
+      "fixture_id": "FIX-BARS-M1-EURUSD",
+      "path": "tests/fixtures/bars/eurusd_m1_202501.parquet",
+      "records": 1440,
+      "sha256": "5624d12924cd5f931bcdd7cad3df79a52c7b36731b00b11a2301b9572d4a7620",
+      "bytes": 12269,
+      "schema": "Parquet scaled OHLCV",
+      "generator": "scripts/generate_phase0_fixtures.py",
+      "offline_only": true
     },
     {
-      "name": "fix_synthetic_ticks",
-      "type": "TickBidAsk",
-      "symbols": [
-        "EURUSD"
-      ],
-      "ticks": 5000
+      "fixture_id": "FIX-TICKS-EURUSD",
+      "path": "tests/fixtures/ticks/eurusd_ticks_20250102.parquet",
+      "records": 3600,
+      "sha256": "ff3534aaf7880cc8c69be4333e31439443439135efcad871525e3b8b57639dd2",
+      "bytes": 21369,
+      "schema": "Parquet scaled bid/ask ticks",
+      "generator": "scripts/generate_phase0_fixtures.py",
+      "offline_only": true
     },
     {
-      "name": "fix_reference_catalogue",
-      "type": "SQLiteCatalog",
-      "symbols": 10,
-      "brokers": 4
+      "fixture_id": "FIX-CATALOGUE-SQLITE",
+      "path": "tests/fixtures/catalogue/baseline_catalogue.db",
+      "records": 12,
+      "sha256": "65bbe89f738e7ad2c3ba090e6fb35c3bf714c68a571701604fce8d6aca867c95",
+      "bytes": 20480,
+      "schema": "SQLite catalogue v1",
+      "generator": "scripts/generate_phase0_fixtures.py",
+      "offline_only": true
     }
   ]
 }

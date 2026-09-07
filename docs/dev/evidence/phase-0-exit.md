@@ -1,38 +1,79 @@
-# HaruQuantAI V3 — Phase 0 Exit Review and Ratification
+# HaruQuantAI V3 — Phase 0 exit review and ratification
 
-**Artifact:** Phase 0 Exit Review and Approval
+**Artifact:** Phase 0 exit review
+
 **Status:** `RATIFIED_READY_FOR_PHASE_1`
+
 **Date:** 2026-09-07
-**Commit:** `4ba167564a4889fec0d5d52f2ce9072f536a2d05`
 
-## 1. Executive Summary
+**Baseline HEAD:** `34edd2b3c8164b59ed9b2b2964c0d79f7c2d399a`
 
-Phase 0 preconditions, contracts, quality baselines, and evidence readiness are completely established. All 8 prerequisite preparation tasks (0.01 through 0.08) are satisfied. Zero product feature slots were consumed during Phase 0.
+**Implementation state:** approved Quick-Fix working tree on `main`; no commit was
+created or implied
 
-## 2. Gate Verification Summary
+## Verdict
 
-| Preparation Task | Delivered Evidence Artifacts | Status |
+All eight Phase 0 preparations are complete. The repository now has a
+deterministic, schema-validated projection of the 205-feature plan, concrete
+fixtures, measured performance evidence, authoritative domain bindings, and a
+real local browser-readiness slice. Phase 0 consumed no feature-task slot and
+does not claim that the remaining 203 feature tasks are implemented.
+
+The ratification command is:
+
+```powershell
+uv run --frozen python scripts/validate_phase0.py
+```
+
+It must remain green before Phase 1 begins. Generated evidence and fixture
+drift are separately reproducible with their documented `--check` commands.
+
+## Preparation gates
+
+| Preparation | Evidence | Result |
 | --- | --- | --- |
-| **0.01: Freeze Source & Scope** | `baseline-manifest.json`, `specification-drift.md` | **COMPLETE** |
-| **0.02: Feature Evidence & Baseline** | `feature-baseline.json`, `requirement-status.json`, `path-bindings.json` | **COMPLETE** |
-| **0.03: Authoritative Domain Bindings** | `contract-bindings.json`, `schema-fixture-plan.json` | **COMPLETE** |
-| **0.04: DAG & Agile Checkpoints** | `dependency-schedule.json`, `operation-readiness.json`, `phase-ui-acceptance-matrix.json` | **COMPLETE** |
-| **0.05: Numerical & Security Policy** | `fixture-manifest.json`, `numerical-security-policy.md`, `external-evidence-calendar.json` | **COMPLETE** |
-| **0.06: Quality & Performance Baseline**| `quality-baseline.md`, `reference-hardware.json`, `performance-baseline.json` | **COMPLETE** |
-| **0.07: Evidence & Test Harnesses** | `evidence-schema.json`, `usage-bindings.json`, `browser-harness-spec.md` | **COMPLETE** |
-| **0.08: Freeze Execution Tracker** | `phase-0-exit.md`, root `tracker.md` | **COMPLETE** |
+| 0.01 — source and scope | `baseline-manifest.json`, `specification-drift.md`, normalized source projection | COMPLETE |
+| 0.02 — feature audit | `feature-baseline.json`, `requirement-status.json`, `path-bindings.json` | COMPLETE |
+| 0.03 — domain bindings | 18 owning domain READMEs, `contract-bindings.json`, `schema-fixture-plan.json` | COMPLETE |
+| 0.04 — schedule and gates | `dependency-schedule.json`, `operation-readiness.json`, `phase-ui-acceptance-matrix.json` | COMPLETE |
+| 0.05 — numerical/external/security | deterministic fixture files, `fixture-manifest.json`, `numerical-security-policy.md`, `external-evidence-calendar.json` | COMPLETE |
+| 0.06 — quality/performance | `quality-baseline.md`, `reference-hardware.json`, measured `performance-baseline.json` | COMPLETE |
+| 0.07 — evidence and browser harness | `evidence-schema.json`, `usage-bindings.json`, real local ASGI/Playwright readiness test | COMPLETE |
+| 0.08 — entry and execution source | this review and `docs/dev/Phased_Feature_Implementation_Plan.md` | COMPLETE |
 
-## 3. Scope & Boundary Invariants
+## Verified invariants
 
-- **205 Feature Slots:** Exactly 205 implementation tasks are registered in `tracker.md`, distributed across 16 phases.
-- **Decoupled Capabilities:** `market_data_store` (`data.market-data-store@1`) and `browse_reference` (`data.browse-reference@1`) are cleanly separated with 0 architecture AST violations.
-- **Repository Hygiene:**
-  - Ruff Check: 0 errors
-  - Architecture Check: 0 violations
-  - Feature Docs: 39/39 passing (100%)
-  - Mypy Strict: 0 errors in 790 files
-  - Scoped Tests: 100% passing
+- The plan contains exactly 205 unique feature/task pairs: 2 accepted and 203
+  still open.
+- The normalized inventory contains 575 FRs, 276 local NFRs, 476 required
+  capability edges, and 233 operation-gated edges.
+- Every required provider precedes its consumer, and every deferred operation
+  has a provider, guard, test owner, and fail-closed readiness state.
+- All 18 domain READMEs cover the exact feature set once and no longer retain
+  unresolved Phase 0 contract-binding markers or stale source paths.
+- Three non-ignored repository fixture files reproduce byte-for-byte and are
+  hash-pinned.
+- The browser slice uses the real local identity/API stack. It proves account
+  registration, authenticated identity, blank-workspace creation, reload
+  recovery, keyboard reachability, and bounded navigation time. Missing Phase 1
+  providers remain explicit 503 unavailable responses.
+- The phased plan is the default Task/Goal selection source; Phase 0 preparation
+  headings are excluded from feature-task selection.
 
-## 4. Phase 1 Authorization
+## Evidence limits retained
 
-Phase 1 (Tasks 1.01 through 1.30, focusing on Workspace, access, resource control and visible operational shell) is authorized to begin execution under the Task/Goal workflow starting at Task 1.01 (`FEAT-UI-01`).
+- Open external evidence blocks only the named production claim at its recorded
+  due gate. No live provider, licence, broker fill, or donor parity is invented.
+- The generated-tick fixture closes the offline fixture prerequisite, not future
+  production-algorithm qualification.
+- Existing React test and build warnings are recorded in `quality-baseline.md`;
+  they are not hidden or converted into feature acceptance.
+- A Quick-Fix has no independent Reviewer or automatic commit. This record
+  ratifies the validated tree only; any later Git action requires separate owner
+  direction.
+
+## Phase 1 entry
+
+Phase 1 may begin with Task 1.01 (`FEAT-UI-01`) through the configured atomic
+Task/Goal workflow. Each feature still requires its own complete implementation,
+usage evidence, independent review, accepted feature commit, and merge record.

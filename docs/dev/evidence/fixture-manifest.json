@@ -1,27 +1,36 @@
 {
-  "manifest_version": "1.0",
-  "timestamp": "2026-09-07T18:45:00+03:00",
+  "manifest_version": "2.0",
+  "determinism": "Pinned pyarrow/sqlite runtime; exact bytes checked by SHA-256.",
   "fixtures": [
     {
       "fixture_id": "FIX-BARS-M1-EURUSD",
-      "description": "Deterministic EURUSD 1-minute OHLCV series for 2025-01",
-      "sha256": "4b27926b0a43063ecda0f3408a68fa962ef95bdfb39d7fc21c3faeeae32ff611",
       "path": "tests/fixtures/bars/eurusd_m1_202501.parquet",
-      "records": 31240
+      "records": 1440,
+      "sha256": "5624d12924cd5f931bcdd7cad3df79a52c7b36731b00b11a2301b9572d4a7620",
+      "bytes": 12269,
+      "schema": "Parquet scaled OHLCV",
+      "generator": "scripts/generate_phase0_fixtures.py",
+      "offline_only": true
     },
     {
       "fixture_id": "FIX-TICKS-EURUSD",
-      "description": "Deterministic EURUSD tick series with millisecond timestamps",
-      "sha256": "81f1816e093557e4945415712711d9f491c1dcda5402ec97bb2dc67a685f67b4",
       "path": "tests/fixtures/ticks/eurusd_ticks_20250102.parquet",
-      "records": 54200
+      "records": 3600,
+      "sha256": "ff3534aaf7880cc8c69be4333e31439443439135efcad871525e3b8b57639dd2",
+      "bytes": 21369,
+      "schema": "Parquet scaled bid/ask ticks",
+      "generator": "scripts/generate_phase0_fixtures.py",
+      "offline_only": true
     },
     {
       "fixture_id": "FIX-CATALOGUE-SQLITE",
-      "description": "Reference SQLite schema and baseline broker/symbol tables",
-      "sha256": "0dc2e9c1db18c4c7be4be6c97a5b3a88fc8eef2f3273eef0beae2a5c37851254",
       "path": "tests/fixtures/catalogue/baseline_catalogue.db",
-      "records": 12
+      "records": 12,
+      "sha256": "65bbe89f738e7ad2c3ba090e6fb35c3bf714c68a571701604fce8d6aca867c95",
+      "bytes": 20480,
+      "schema": "SQLite catalogue v1",
+      "generator": "scripts/generate_phase0_fixtures.py",
+      "offline_only": true
     }
   ]
 }

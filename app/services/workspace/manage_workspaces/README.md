@@ -92,3 +92,46 @@ Removing this package and its entry point withdraws only
 no substitute provider is selected. Existing workspace directories, databases,
 immutable artifacts, and acceptance evidence remain unchanged until a separately
 authorized retention/purge operation owns their disposition.
+
+## Domain
+
+`workspace`
+
+## Provides
+
+`workspace.manage-workspaces@1`
+
+## Required Capabilities
+
+None.
+
+## Optional Capabilities
+
+None.
+
+## Purpose
+
+Open, recover, back up, and restore one fenced local workspace while preserving
+committed metadata and immutable artifact references.
+
+## Runtime Effects
+
+Mount registers `workspace.manage-workspaces@1` and one scope-owned close callback.
+An admitted writer owns a bounded SQLite handle and writer fence until explicitly
+closed; read-only sessions never acquire that fence.
+
+## Failure Behavior
+
+Invalid paths, stale fences, corrupt manifests, incompatible migrations, partial
+publications, and failed restore verification return typed failures before an active
+workspace is replaced. Cleanup does not delete committed bytes.
+
+## Removal Behavior
+
+Removal withdraws only `workspace.manage-workspaces@1`, releases provider-owned
+resources, and retains workspace directories, databases, artifacts, and evidence.
+
+## Persistent State
+
+Namespace `workspace`, schema version 2, retention policy `RETAIN`: workspace
+metadata, ordered migrations, leases, publication recovery, and backup manifests.

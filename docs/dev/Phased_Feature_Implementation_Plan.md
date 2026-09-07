@@ -42,20 +42,20 @@ Phase 0 is preparation, not proof that the specification's U0 runtime gate has p
 | Cross-feature workflows retained | 20 |
 
 
-The source register was created from specification commit `c06456fe2c03bc89f52edad1a0a8428118287377`, blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd`. This plan inspected repository commit `a3c81dff4e5b903e749259ff463b8d9280d6fc26`; that checkout reports specification blob `d69bef59cb981350cd6f2ebdccc31b231a4e0950`. The header still says v2.1, so **the file hash, not the header date, establishes the drift**. Phase 0 must reconcile the clause-level difference while retaining the supplied 205-feature scope unless the owner explicitly changes it.
+The source register was created from specification commit `c06456fe2c03bc89f52edad1a0a8428118287377`, blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd`. This plan inspected repository commit `a3c81dff4e5b903e749259ff463b8d9280d6fc26`; that checkout reports specification blob `d69bef59cb981350cd6f2ebdccc31b231a4e0950`. The header still says v2.1, so **the file hash, not the header date, establishes the drift**. Phase 0 reconciled the clause-level difference while retaining the supplied 205-feature scope.
 
-The baseline review is read-only and does not certify production code. No application test suite, live connector, LLM evaluation, native benchmark or Playwright acceptance flow was run in this planning session. Source directory presence and historical “Completed” labels are not equivalent to full register-scope acceptance.
+The initial baseline review was read-only and did not certify production code. Phase 0 subsequently added reproducible evidence and validation without treating source-directory presence or historical “Completed” labels as full register-scope acceptance.
 
 
 | Plan status | Features | Meaning |
 | --- | --- | --- |
-| PARTIAL | 16 | Existing code with concrete registration, CI or documented incompleteness requiring closure. |
+| PARTIAL | 15 | Existing code with concrete registration, CI or documented incompleteness requiring closure. |
 | EXISTING_UNVERIFIED | 37 | Existing implementation found; full normalized requirement coverage still needs verification. |
-| NOT_STARTED_IN_TARGET | 152 | No matching target provider/registered feature was confirmed in the inspected current inventory; reuse candidates are not certified parity. |
-| COMPLETE | 0 | None was independently proven complete against all new register obligations during this planning pass. |
+| NOT_STARTED_IN_TARGET | 151 | No matching target provider/registered feature was confirmed in the inspected current inventory; reuse candidates are not certified parity. |
+| COMPLETE | 2 | Accepted implementation and evidence exist for the two completed Workspace features. |
 
 
-The complete per-feature baseline, current-path aliases and remaining-work notes are in `Baseline_Audit.md`. CI run `34051983427` at this pinned HEAD failed: Ruff reported 36 findings and stopped the pipeline before later checks. The source of that fact is the CI job log, not a local run. This does not prove all features are broken; it prevents a blanket acceptance claim. Phase 0 triages prerequisite hygiene, while semantic feature changes remain in their existing task slots.
+The complete per-feature baseline, current-path aliases and remaining-work notes are in `Baseline_Audit.md`. CI run `34051983427` at this pinned HEAD failed: Ruff reported 36 findings and stopped the pipeline before later checks. The source of that fact is the CI job log, not a local run. This does not prove all features are broken; it prevents a blanket acceptance claim. Phase 0 triaged prerequisite hygiene, while semantic feature changes remain in their existing task slots.
 
 ## 2. How to execute a feature task
 
@@ -92,7 +92,6 @@ uv run --frozen pytest --no-cov <affected_test_path>
 uv run --frozen ruff format --check .
 uv run --frozen ruff check .
 uv run --frozen mypy
-uv run --frozen lint-imports
 uv run --frozen python scripts/architecture_check.py
 uv run --frozen python scripts/validate_feature_docs.py
 uv run --frozen python scripts/verify_feature_removal.py --feature <FEAT-ID> --report <report.json>
@@ -133,7 +132,9 @@ Navigation: [Phase 1](#phase-1) · [Phase 2](#phase-2) · [Phase 3](#phase-3) ·
 
 ## 4. Phase 0 — Preconditions, contracts and evidence readiness
 
-**Eight prerequisite tasks; no feature task is consumed here.** All Phase 0 task statuses start `NOT_EXECUTED`.
+**Phase 0 status:** `COMPLETE` — all eight prerequisite tasks have deterministic evidence and pass `uv run --frozen python scripts/validate_phase0.py`.
+
+**Eight prerequisite tasks; no feature task is consumed here.** All Phase 0 tasks began as `NOT_EXECUTED`; their checked headings record the ratified completion state.
 
 ### - [x] Preparation 0.01 — Freeze the source and the 205-feature scope
 
@@ -727,7 +728,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `feat(workspace): complete FEAT-WS-EXECUTE_PERSISTENCE`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `34edd2b3c8164b59ed9b2b2964c0d79f7c2d399a` — accepted Quick-Fix implementation and validation on `main`.
 
 ---
 
