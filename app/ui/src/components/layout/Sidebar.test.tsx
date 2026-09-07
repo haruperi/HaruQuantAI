@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Sidebar, DOMAIN_GROUPS } from './Sidebar';
+import { Sidebar, getDomainGroups } from './Sidebar';
 
 const mockAddWidgetToWorkspace = vi.fn();
 const mockOpenSettings = vi.fn();
@@ -12,11 +12,15 @@ vi.mock('../../store/useTradingStore', () => ({
   }),
 }));
 
-vi.mock('../../widgets/workspaces', () => ({
-  useWorkspaceStore: () => ({
-    addWidgetToWorkspace: mockAddWidgetToWorkspace,
-  }),
-}));
+vi.mock('../../widgets/workspaces', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../widgets/workspaces')>();
+  return {
+    ...actual,
+    useWorkspaceStore: () => ({
+      addWidgetToWorkspace: mockAddWidgetToWorkspace,
+    }),
+  };
+});
 
 describe('Sidebar Component', () => {
   beforeEach(() => {
@@ -26,8 +30,9 @@ describe('Sidebar Component', () => {
   it('renders all 12 domain headers', () => {
     render(<Sidebar />);
 
-    expect(DOMAIN_GROUPS).toHaveLength(12);
-    DOMAIN_GROUPS.forEach((domain) => {
+    const domainGroups = getDomainGroups();
+    expect(domainGroups).toHaveLength(12);
+    domainGroups.forEach((domain) => {
       expect(screen.getByTestId(`domain-header-${domain.id}`)).toBeInTheDocument();
       expect(screen.getByText(domain.label.toUpperCase())).toBeInTheDocument();
     });
@@ -93,7 +98,7 @@ describe('Sidebar Component', () => {
     expect(screen.queryByText('HIDE MENU')).not.toBeInTheDocument();
 
     // Domain icon buttons are present
-    DOMAIN_GROUPS.forEach((domain) => {
+    getDomainGroups().forEach((domain) => {
       expect(screen.getByTestId(`domain-icon-${domain.id}`)).toBeInTheDocument();
     });
   });

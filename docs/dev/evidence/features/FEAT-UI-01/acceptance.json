@@ -1,0 +1,242 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-UI-01",
+  "task_id": "1.01",
+  "status": "ACCEPTED",
+  "owner_specification": "app/ui/README.md",
+  "baseline_commit": "08b2af9b096d3e460e8d0a5e07bd9183e2d52e62",
+  "acceptance_commit": "task-closeout:20260907-203821-559690-v3-phases-1-16-1.01-01",
+  "requirements": [
+    {
+      "id": "FR-TRC-UI-01-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx::test_trc_host_workspace_001"
+    },
+    {
+      "id": "FR-TRC-UI-01-002",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx::test_trc_host_workspace_002"
+    },
+    {
+      "id": "FR-TRC-UI-01-003",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx::test_trc_host_workspace_003"
+    },
+    {
+      "id": "FR-TRC-UI-01-004",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx::test_trc_host_workspace_004"
+    },
+    {
+      "id": "NFR-TRC-UI-01-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx::test_trc_host_workspace_nfr_001"
+    },
+    {
+      "id": "NFR-A-001",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-A-002",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-A-003",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-A-004",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-A-005",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-A-006",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-P-002",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-P-003",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-P-005",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-P-013",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-R-002",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-R-003",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-R-005",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-S-001",
+      "status": "PASS",
+      "evidence_target": "Dock persistence sanitizer, unavailable recovery, focused lifecycle tests, and secret-safe build validation recorded below"
+    },
+    {
+      "id": "NFR-S-002",
+      "status": "PASS",
+      "evidence_target": "Dock persistence sanitizer, unavailable recovery, focused lifecycle tests, and secret-safe build validation recorded below"
+    },
+    {
+      "id": "NFR-S-003",
+      "status": "PASS",
+      "evidence_target": "Dock persistence sanitizer, unavailable recovery, focused lifecycle tests, and secret-safe build validation recorded below"
+    },
+    {
+      "id": "NFR-S-004",
+      "status": "PASS",
+      "evidence_target": "Dock persistence sanitizer, unavailable recovery, focused lifecycle tests, and secret-safe build validation recorded below"
+    },
+    {
+      "id": "NFR-S-005",
+      "status": "PASS",
+      "evidence_target": "Dock persistence sanitizer, unavailable recovery, focused lifecycle tests, and secret-safe build validation recorded below"
+    },
+    {
+      "id": "NFR-S-006",
+      "status": "PASS",
+      "evidence_target": "Dock persistence sanitizer, unavailable recovery, focused lifecycle tests, and secret-safe build validation recorded below"
+    },
+    {
+      "id": "NFR-TRC-SHARED-BOUNDARIES",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-TRC-SHARED-CONFIG",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-TRC-SHARED-EVIDENCE",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-TRC-SHARED-INTEGRITY",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    },
+    {
+      "id": "NFR-TRC-SHARED-STORED-IDENTITY",
+      "status": "PASS",
+      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+    }
+  ],
+  "catalogue_entries": [
+    "All register section 22.3 widget types",
+    "Existing workspace type aliases and schema migrations",
+    "Dockview topology",
+    "WF-WB-GENERATE_QUALIFY participant surface"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/ui/src/widgets/workspaces/contracts.ts and traceability tests"
+    },
+    "provider": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-UI-01 is a presentation-only registry/layout owner and declares no backend provider."
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "Registry-backed Sidebar, WidgetContentHost, WorkspaceGrid, and DockingWorkspace integration tests"
+    },
+    "interfaces": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "This feature persists presentation-safe local layout only and owns no network Interfaces route."
+    },
+    "ui": {
+      "status": "PASS",
+      "evidence": "Ten focused Vitest files: 87 tests passed, including hostile Dockview persistence, contradictory geometry, off-window anchors, and registry-generation coverage; TypeScript typecheck and Next.js production build passed."
+    },
+    "end_to_end": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-UI-01 has no external provider or Interfaces route. Local component integration is recorded under composition/UI and is not labelled browser end-to-end; the phase-level real-provider browser checkpoint is owned by Task 1.30."
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run --frozen pytest --no-cov tests/scripts/test_validate_phase0.py tests/scripts/test_generate_phase0_evidence.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python scripts/validate_phase0.py",
+      "exit_code": 0
+    },
+    {
+      "command": "npm --prefix app/ui run test -- src/widgets/workspaces/dockPersistence.test.ts src/widgets/workspaces/__tests__/traceability.test.tsx src/widgets/workspaces/__tests__/lifecycle.test.tsx src/widgets/workspaces/store.test.ts src/widgets/workspaces/dockLayout.test.ts src/widgets/workspaces/TemplatePicker.test.tsx src/widgets/workspaces/WorkspaceEmptyState.test.tsx src/components/layout/WidgetContentHost.test.tsx src/components/layout/DockingWorkspace.test.tsx src/components/layout/Sidebar.test.tsx",
+      "exit_code": 0
+    },
+    {
+      "command": "npm --prefix app/ui run usage -- src/widgets/workspaces/_usage.tsx",
+      "exit_code": 0
+    },
+    {
+      "command": "npm --prefix app/ui run typecheck",
+      "exit_code": 0
+    },
+    {
+      "command": "npm --prefix app/ui run build",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python scripts/validate_feature_docs.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python scripts/architecture_check.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen ruff format --check .",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen ruff check .",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen mypy",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python scripts/ci_check.py",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "CHANGES_REQUESTED",
+    "reviewer_notes": "Review 4 (journal SHA-256 80de2d0cc47b1e49ef9d5c4227958dd99789ecc7dc37745615ad491116eb998c) independently accepted the retained implementation and requested two final frozen-boundary corrections. Those corrections and direct regressions are included in this terminal evidence package. Reviewer 5 remains the pending final commit-gate authority; no future approval is claimed here."
+  }
+}

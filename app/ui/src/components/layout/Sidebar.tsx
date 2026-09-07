@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTradingStore } from '../../store/useTradingStore';
-import { useWorkspaceStore, type WidgetType } from '../../widgets/workspaces';
+import {
+  listWidgetRegistrations,
+  useWorkspaceStore,
+  type WidgetType,
+} from '../../widgets/workspaces';
 import {
   ChevronLeft,
   ChevronRight,
@@ -49,121 +53,68 @@ export interface DomainGroupConfig {
   items: WidgetItemConfig[];
 }
 
-export const DOMAIN_GROUPS: DomainGroupConfig[] = [
-  {
-    id: 'data',
-    label: 'Data',
-    icon: Database,
-    items: [
-      { type: 'markets', label: 'Markets', title: 'Markets', icon: Globe },
-      { type: 'watchlist', label: 'Watchlists', title: 'Watchlists', icon: Bookmark },
-      { type: 'marketTicks', label: 'Market Ticks', title: 'Market Ticks', icon: Activity },
-      { type: 'market-hours', label: 'Market Hours', title: 'Market Hours', icon: Clock },
-      { type: 'news', label: 'News', title: 'News', icon: Newspaper },
-      { type: 'data', label: 'Data Explorer', title: 'Data Explorer', icon: Database },
-    ],
-  },
-  {
-    id: 'indicators',
-    label: 'Indicators',
-    icon: LineChart,
-    items: [
-      { type: 'chart', label: 'Chart', title: 'EURUSD Chart', symbol: 'EURUSD', icon: LineChart },
-      { type: 'indicators', label: 'Indicators Studio', title: 'Indicators', icon: TrendingUp },
-      { type: 'priceLadder', label: 'Price Ladder', title: 'ESU6 DOM', icon: AlignJustify },
-      { type: 'optionsGrid', label: 'Options Grid', title: 'Options Grid', icon: Layers },
-    ],
-  },
-  {
-    id: 'strategy',
-    label: 'Strategy',
-    icon: FileSpreadsheet,
-    items: [
-      { type: 'strategies', label: 'Strategies', title: 'Strategies', icon: FileSpreadsheet },
-    ],
-  },
-  {
-    id: 'risk',
-    label: 'Risk',
-    icon: AlertTriangle,
-    items: [
-      { type: 'risk', label: 'Risk Governance', title: 'Risk', icon: AlertTriangle },
-    ],
-  },
-  {
-    id: 'trading',
-    label: 'Trading',
-    icon: TrendingUp,
-    items: [
-      { type: 'trading', label: 'Trading Cockpit', title: 'Trading', icon: TrendingUp },
-      { type: 'positions', label: 'Positions & Orders', title: 'Positions & Orders', icon: ListOrdered },
-      { type: 'tradeLog', label: 'Trade Log', title: 'Trade Log', icon: History },
-      { type: 'sessions', label: 'Trading Sessions', title: 'Trading Sessions', icon: Clock },
-    ],
-  },
-  {
-    id: 'simulation',
-    label: 'Simulation',
-    icon: History,
-    items: [
-      { type: 'simulator', label: 'Simulator', title: 'Simulator', icon: History },
-    ],
-  },
-  {
-    id: 'analytics',
-    label: 'Analytics',
-    icon: BarChart2,
-    items: [
-      { type: 'analytics', label: 'Analytics', title: 'Analytics', icon: BarChart2 },
-    ],
-  },
-  {
-    id: 'optimization',
-    label: 'Optimization',
-    icon: Sliders,
-    items: [
-      { type: 'optimization', label: 'Optimization', title: 'Optimization', icon: Sliders },
-    ],
-  },
-  {
-    id: 'research',
-    label: 'Research',
-    icon: FlaskConical,
-    items: [
-      { type: 'research', label: 'Edge Lab', title: 'Edge Lab', icon: FlaskConical },
-    ],
-  },
-  {
-    id: 'portfolio',
-    label: 'Portfolio',
-    icon: PieChart,
-    items: [
-      { type: 'portfolio', label: 'Portfolio', title: 'Portfolio', icon: PieChart },
-    ],
-  },
-  {
-    id: 'agentic',
-    label: 'Agentic',
-    icon: Bot,
-    items: [
-      { type: 'agentic', label: 'Agentic Operator', title: 'Agentic Operator', icon: Bot },
-    ],
-  },
-  {
-    id: 'resources',
-    label: 'Resources',
-    icon: LayoutDashboard,
-    items: [
-      { type: 'dashboard', label: 'Dashboard', title: 'Dashboard', icon: LayoutDashboard },
-      { type: 'education', label: 'Education', title: 'Education Resources', icon: GraduationCap },
-      { type: 'challenges', label: 'Challenges', title: 'Challenges Dashboard', icon: Compass },
-      { type: 'tradePlan', label: 'Trade Plan', title: 'My Trade Plan', icon: FileSpreadsheet },
-      { action: 'settings', label: 'System Settings', icon: Settings },
-    ],
-  },
-];
+const ICONS: Readonly<Record<string, LucideIcon>> = {
+  globe: Globe,
+  bookmark: Bookmark,
+  activity: Activity,
+  'line-chart': LineChart,
+  'align-justify': AlignJustify,
+  layers: Layers,
+  'list-ordered': ListOrdered,
+  clock: Clock,
+  newspaper: Newspaper,
+  database: Database,
+  'file-spreadsheet': FileSpreadsheet,
+  'alert-triangle': AlertTriangle,
+  'trending-up': TrendingUp,
+  history: History,
+  'bar-chart-2': BarChart2,
+  sliders: Sliders,
+  'flask-conical': FlaskConical,
+  'pie-chart': PieChart,
+  bot: Bot,
+  'layout-dashboard': LayoutDashboard,
+  'graduation-cap': GraduationCap,
+  compass: Compass,
+};
+
+const DOMAIN_DEFINITIONS = [
+  { id: 'data', label: 'Data', icon: Database },
+  { id: 'indicators', label: 'Indicators', icon: LineChart },
+  { id: 'strategy', label: 'Strategy', icon: FileSpreadsheet },
+  { id: 'risk', label: 'Risk', icon: AlertTriangle },
+  { id: 'trading', label: 'Trading', icon: TrendingUp },
+  { id: 'simulation', label: 'Simulation', icon: History },
+  { id: 'analytics', label: 'Analytics', icon: BarChart2 },
+  { id: 'optimization', label: 'Optimization', icon: Sliders },
+  { id: 'research', label: 'Research', icon: FlaskConical },
+  { id: 'portfolio', label: 'Portfolio', icon: PieChart },
+  { id: 'agentic', label: 'Agentic', icon: Bot },
+  { id: 'resources', label: 'Resources', icon: LayoutDashboard },
+] as const;
+
+/** Build current navigation directly from the sole widget registry. */
+export function getDomainGroups(): DomainGroupConfig[] {
+  const registrations = listWidgetRegistrations();
+  return DOMAIN_DEFINITIONS.map((domain) => {
+    const items: WidgetItemConfig[] = registrations
+      .filter((value) => value.navigation.domain === domain.id)
+      .map((value) => ({
+        type: value.manifest.widgetType as WidgetType,
+        label: value.navigation.label,
+        title: value.navigation.title,
+        symbol: value.navigation.symbol,
+        icon: ICONS[value.navigation.icon] ?? LayoutDashboard,
+      }));
+    if (domain.id === 'resources') {
+      items.push({ action: 'settings', label: 'System Settings', icon: Settings });
+    }
+    return { ...domain, items };
+  });
+}
 
 export const Sidebar: React.FC = () => {
+  const domainGroups = getDomainGroups();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openDomains, setOpenDomains] = useState<Record<string, boolean>>({
     data: true,
@@ -232,7 +183,7 @@ export const Sidebar: React.FC = () => {
 
       {/* Domain Groups Container */}
       <div className="sidebar-domains-container" ref={flyoutRef}>
-        {DOMAIN_GROUPS.map((domain) => {
+        {domainGroups.map((domain) => {
           const DomainIcon = domain.icon;
           const isOpen = Boolean(openDomains[domain.id]);
           const isFlyoutOpen = activeFlyout === domain.id;

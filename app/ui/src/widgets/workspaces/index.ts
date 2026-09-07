@@ -9,8 +9,29 @@ export {
   ACCOUNT_MODE_SETTING_KEY,
   isSelectableAccountMode,
 } from './contracts';
+export { recoverPersistedLayout, widgetSchema, workspaceSchema } from './contracts';
 export { TemplatePicker } from './TemplatePicker';
 export { WorkspaceEmptyState } from './WorkspaceEmptyState';
 export { WORKSPACE_TEMPLATES, findWorkspaceTemplate } from './templates';
 export type { WorkspaceTemplate, WorkspaceTemplateId, WidgetPreset } from './templates';
 export { buildDockLayout, DOCK_WIDGET_COMPONENT } from './dockLayout';
+export { sanitizeDockLayout } from './dockPersistence';
+export {
+  RegisteredWidgetContent,
+  getWidgetRegistration,
+  isWidgetType,
+  listWidgetRegistrations,
+  registerWidget,
+  withdrawWidget,
+  type RegistryWidget,
+  type RegisteredWidgetProps,
+  type WorkspaceWidgetRegistration,
+} from './registry';
+export {
+  DEFAULT_WORKSPACE_LAYOUT_CONFIG,
+  WORKSPACE_LAYOUT_SCHEMA_VERSION,
+  parseWorkspaceLayoutConfig,
+  resolveWorkspaceLayoutConfig,
+} from './config';
+export { WORKSPACE_LAYOUT_MANIFEST } from './manifest';
+export { WorkspaceLayoutFeature } from './feature';

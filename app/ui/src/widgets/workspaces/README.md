@@ -1,63 +1,76 @@
-# Workspaces
+# Workspaces (`FEAT-UI-01`)
 
 ## Purpose
 
-Owns non-authoritative workspace layout preference, workspace templates, the
-docking layout trees behind them, order-confirmation mode, and account-mode
-presentation for `FEAT-UI-01`. See `app/ui/README.md` §4.1 for the full
-`FR-UI-001`–`FR-UI-029`, `FR-UI-195`–`FR-UI-199`, and `FR-UI-200`–`FR-UI-202`
-requirement tables, and §4.16 for the docking host components.
+Own `ui.workspace-layout@1`: the typed lazy widget registry, presentation-only
+workspace state, templates, Dockview topology, unavailable-panel recovery, and
+scoped observer cleanup. Domain jobs and business records remain owner-controlled.
 
 ## Public API
 
-- `useWorkspaceStore`, `selectOrderEntryDisabled`, `mapRuntimeProfileToAccountMode`
-  through `index.ts`.
-- `TemplatePicker` (new-workspace template picker screen), `WorkspaceEmptyState`
-  (explicit empty-workspace prompt), `WORKSPACE_TEMPLATES`,
-  `findWorkspaceTemplate`, `buildDockLayout`, `DOCK_WIDGET_COMPONENT`.
-- Types: `Workspace`, `Widget`, `WidgetType`, `GridRect`, `AccountMode`,
-  `ConfirmationMode`, `WorkspaceTemplate`, `WorkspaceTemplateId`,
-  `WidgetPreset`, `MAX_CUSTOM_WORKSPACES`, `WIDGET_TYPES`.
+- `listWidgetRegistrations`, `getWidgetRegistration`, `registerWidget`, and
+  `withdrawWidget` expose the single contribution registry. Exact disposers are
+  idempotent and restore only the registration they withdrew or replaced.
+  Component availability is separate from acceptance: legacy manifest/feature
+  IDs and later planned owners are explicitly `UNQUALIFIED` until their own
+  feature Tasks are independently accepted. Where a legacy manifest exists,
+  its real capability/effect declarations are exposed instead of synthesized
+  empty values.
+- `useWorkspaceStore` owns presentation state. Only `workspaces`,
+  `activeWorkspaceId`, and `defaultWorkspaceId` persist.
+- `sanitizeDockLayout` and `recoverPersistedLayout` reconstruct a bounded
+  allowlisted Dockview topology, strip arbitrary params/provider data, reject
+  popouts and invalid geometry, keep valid siblings, and retain unknown widget
+  types as explicit unavailable panels. Contradictory optional minimum/maximum
+  constraints are omitted; floating groups with negative or over-limit anchors
+  are dropped instead of being restored off-window.
+- `WORKSPACE_TEMPLATES`, `findWorkspaceTemplate`, and `buildDockLayout` create
+  Blank, Research, and existing workspace layouts from registered types only.
+- `WorkspaceLayoutFeature` validates the schema-version-4 layout configuration;
+  `allowCrossWindowPopout` is fixed to `false` because cross-window tear-off is
+  not supported. Docking, tabs, splits, in-workspace floating, resizing, and
+  keyboard repositioning remain supported. Layout saves use an internal 250 ms
+  debounce; it is not public configuration.
 
-## Notes
+## Interactive Usage
 
-- Only `workspaces`/`activeWorkspaceId`/`defaultWorkspaceId` persist to
-  `localStorage`; confirmation mode and account mode are session-only and are
-  never inherited across a reload.
-- `accountMode` is the app-wide trading context: `'sim'`, `'demo'`, `'live'`,
-  or `'unknown'`. The operator elects it from the profile dropdown and it is
-  persisted server-side as the `ACCOUNT_MODE` system setting, which is the
-  single authority for the execution route, the runtime profile stamped onto
-  every routed order, and the account state the dashboards read. The store
-  learns it two ways, both derived from that one setting: the authenticated
-  identity's `runtime_profile` (see `context/auth.tsx`) and the system-settings
-  read on mount. Until either resolves it, mode presents as `'unknown'` and
-  order entry stays disabled by design (fail closed), not as a placeholder bug.
-- `sim` executes virtually against the Simulator; `demo` and `live` both relay
-  to the connected MT5 terminal and differ only by the credentials the operator
-  configured, so the app-level distinction is registry marking rather than a
-  technical gate. Selecting `live` is what puts the application on the live
-  route; there is no separate live-enablement flag, and Risk remains the sole
-  authority on whether any individual order proceeds.
-- `accountModeVersion` is the system-settings record version the mode was read
-  from; a mode change writes the complete settings document back under that
-  version so a concurrent edit is refused rather than silently overwritten.
-- Workspace creation opens a pending workspace (`templateChoicePending`)
-  rendered as the template picker; applying a content template seeds its
-  widget preset and renames the workspace, while Blank keeps the
-  deterministic `New Workspace-N` name (FR-UI-195–FR-UI-197). Template
-  presets are EURUSD-bound by owner decision.
-- Live layout geometry is a serialized Dockview tree per workspace
-  (`dock`), produced by the docking host and rebuilt deterministically from
-  legacy grid rectangles when absent (FR-UI-201). The widget list is the
-  panel registry; panel ids equal widget ids.
+1. `FR-TRC-UI-01-001`: open the Sidebar and add a registered widget. Sidebar,
+   type validation, templates, and rendering resolve the same registry entry.
+2. `FR-TRC-UI-01-002`: save and reopen a Research workspace. A malformed or
+   removed panel becomes unavailable without removing valid siblings; secret,
+   strategy, raw-row, provider, and request objects are not persisted.
+3. `FR-TRC-UI-01-003`: select Research or another template, then dock, tab,
+   split, float, resize, and move panels with Alt+Arrow. Focus remains within
+   the workspace; cross-window popout is reported as unavailable.
+4. `FR-TRC-UI-01-004`: close an observing panel. Its scoped disposer releases
+   browser effects, but no accepted owner job is cancelled. Use the owning job
+   control when cancellation is intended.
+
+Run the bounded offline companion:
+
+```powershell
+npm --prefix app/ui run usage -- src/widgets/workspaces/_usage.tsx
+```
+
+Expected output states that 26 contributions were discovered, the Research
+layout was built, an unavailable panel was isolated, and observer disposal did
+not cancel owner work. It requires no credentials, network, or live action.
 
 ## Verification
 
-- `store.test.ts` provides FR-mapped unit evidence, including dock-layout
-  persistence.
-- `dockLayout.test.ts` covers the layout factory and legacy migration.
-- `TemplatePicker.test.tsx` covers picker rendering, template application,
-  and Blank behavior; `WorkspaceEmptyState.test.tsx` covers the empty prompt.
-- `src/components/layout/DockingWorkspace.test.tsx` covers the docking host
-  adapter (restore paths, reconciliation, persistence, keyboard moves).
+- `__tests__/traceability.test.tsx`: `AT-UI-01-001` through `AT-UI-01-004`.
+- `__tests__/lifecycle.test.tsx`: `ATN-UI-01-001`, including 100 registry
+  enable/disable cycles, generation-stable lazy components, and physical
+  contribution withdrawal.
+- `dockPersistence.test.ts`: safe split/tab/floating round-trip plus hostile,
+  excessive, contradictory-constraint, off-window, and non-finite rejection.
+- Existing store, Dockview, template, empty-state, host, and Sidebar suites
+  remain regression evidence.
+
+## Failure and Removal
+
+Invalid feature configuration renders an accessible error and is not partially
+applied. Invalid persisted roots fall back to defaults; invalid panels are
+isolated. Removing a contribution withdraws it from discovery, templates, and
+rendering together. Persisted references display the unavailable panel until
+removed or the contribution returns. Cleanup never issues a domain job cancel.

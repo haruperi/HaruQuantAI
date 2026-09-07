@@ -393,14 +393,14 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 ## 4. Composable Feature Specifications
 
-Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expected acceptance outcomes are reproduced below. All acceptance states are PENDING / NOT_REVALIDATED. Contract targets and intended tests do not prove runtime support. `Binding pending` prohibits executor invention: resolve the exact compatible contract, configuration, state and fixture before production use. The plan’s one-feature task rule includes all registered variants; future-provider qualification is not permission to leave owned adapter behavior unimplemented.
+Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expected acceptance outcomes are reproduced below. Acceptance states remain PENDING / NOT_REVALIDATED unless a card records newer evidence explicitly. Contract targets and intended tests do not prove runtime support. `Binding pending` prohibits executor invention: resolve the exact compatible contract, configuration, state and fixture before production use. The plan’s one-feature task rule includes all registered variants; future-provider qualification is not permission to leave owned adapter behavior unimplemented.
 
 <a id="feat-ui-01"></a>
 ### 4.1 `workspaces/` — `FEAT-UI-01`
 
 > **Feature ID:** `FEAT-UI-01`
 > **Domain:** `ui`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Implemented — terminal evidence ready for final review` — focused implementation, lifecycle, usage, typecheck, build, and prior independent-review evidence is recorded in `docs/dev/evidence/features/FEAT-UI-01/acceptance.json`; Reviewer 5 remains the final commit-gate authority.
 > **Selected owner:** `app/ui/src/widgets/workspaces/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -452,6 +452,15 @@ Teardown is idempotent. Failed mount unwinds partial effects. Dependency replace
 
 **Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
 
+The layout persistence boundary reconstructs only bounded Dockview
+split/tab/in-window-floating topology for widget IDs already owned by the
+workspace. It rejects popouts, arbitrary panel params, provider/credential
+objects, unknown nested fields, non-finite geometry and excessive depth/count;
+contradictory optional minimum/maximum constraints are omitted and floating
+groups with negative or over-limit anchors are dropped. One invalid panel does
+not discard valid siblings. Saves use an
+implementation-owned 250 ms debounce, not a configurable policy value.
+
 #### Feature Package Structure & Files
 
 | Target file within owner package | Responsibility | Exports / dependency boundary |
@@ -463,16 +472,24 @@ Teardown is idempotent. Failed mount unwinds partial effects. Dependency replace
 | Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
 | contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
 
+The workspace catalogue separates component availability from feature
+acceptance. Existing manifests whose numeric IDs are absent from the ratified
+V3 plan are retained as explicit legacy/unqualified provenance, later ratified
+owners remain planned/unqualified until their own Task closes, and surfaces
+without an owning manifest are labelled as such. The catalogue never
+synthesizes empty capabilities, commands, subscriptions or effects as if they
+were owner declarations.
+
 These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
 
 #### Functional Requirements (FR)
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-01-001` | Register widget type/version, feature/capabilities, placement/dimensions, commands, subscriptions, config migration and exact disposer in one lazy registry. | `AT-UI-01-001` | Host/sidebar/type validation/templates all consume the same registry; a removed widget cannot be rediscovered by a stale static mapping. |
-| PENDING | `FR-TRC-UI-01-002` | Serialize safe stable resource IDs and display preferences only; restore layout topology with per-panel unknown/unavailable recovery. | `AT-UI-01-002` | One invalid/missing widget does not discard valid siblings; secrets, strategies, raw rows and provider objects never enter saved layout. |
-| PENDING | `FR-TRC-UI-01-003` | Deliver research and existing workspace templates, tab/split/float/tear-off/reposition controls, empty state and keyboard focus recovery. | `AT-UI-01-003` | Persist/restore round-trips panel topology and stable identity; unsupported cross-window behavior is explicitly disabled rather than falsely advertised. |
-| PENDING | `FR-TRC-UI-01-004` | Keep closing an observer distinct from cancelling its accepted owner job. | `AT-UI-01-004` | Unmount releases timers/listeners/workers/requests but a running backtest continues unless the explicit owner cancellation command is issued. |
+| PROVED_COMPLETE | `FR-TRC-UI-01-001` | Register widget type/version, feature/capabilities, placement/dimensions, commands, subscriptions, config migration and exact disposer in one lazy registry. | `AT-UI-01-001` | Host/sidebar/type validation/templates all consume the same registry; a removed widget cannot be rediscovered by a stale static mapping. |
+| PROVED_COMPLETE | `FR-TRC-UI-01-002` | Serialize safe stable resource IDs and display preferences only; restore layout topology with per-panel unknown/unavailable recovery. | `AT-UI-01-002` | One invalid/missing widget does not discard valid siblings; secrets, strategies, raw rows and provider objects never enter saved layout. |
+| PROVED_COMPLETE | `FR-TRC-UI-01-003` | Deliver research and existing workspace templates, tab/split/float/tear-off/reposition controls, empty state and keyboard focus recovery. | `AT-UI-01-003` | Persist/restore round-trips panel topology and stable identity; unsupported cross-window behavior is explicitly disabled rather than falsely advertised. |
+| PROVED_COMPLETE | `FR-TRC-UI-01-004` | Keep closing an observer distinct from cancelling its accepted owner job. | `AT-UI-01-004` | Unmount releases timers/listeners/workers/requests but a running backtest continues unless the explicit owner cancellation command is issued. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -480,7 +497,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-01-001` | Each widget and registration proves exact cleanup and isolated layout failure. | `ATN-UI-01-001` | 100 enable/disable cycles, physical widget removal and partially corrupt persisted layouts leave no leaked effect or lost valid sibling. |
+| PROVED_COMPLETE | `NFR-TRC-UI-01-001` | Each widget and registration proves exact cleanup and isolated layout failure. | `ATN-UI-01-001` | 100 enable/disable cycles, physical widget removal and partially corrupt persisted layouts leave no leaked effect or lost valid sibling. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -490,9 +507,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/ui/widgets/workspaces/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/ui/widgets/workspaces/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-01/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx` | PROVED_COMPLETE: four named tests bind the four oracles. |
+| Every ATN ID in this card | `app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx` | PROVED_COMPLETE: 100-cycle, physical-removal, cleanup, and isolated-recovery evidence. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-UI-01/acceptance.json` | Pre-review results recorded; final independent verdict remains pending. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 

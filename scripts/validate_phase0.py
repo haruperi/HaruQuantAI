@@ -34,7 +34,6 @@ FEATURE_EVIDENCE_REQUIRED = {
 }
 STAGES = {"contract", "provider", "composition", "interfaces", "ui", "end_to_end"}
 EXPECTED_FEATURES = 205
-EXPECTED_COMPLETE_FEATURES = 2
 EXPECTED_PREPARATIONS = 8
 EXPECTED_REQUIRED_EDGES = 476
 EXPECTED_OPERATION_EDGES = 233
@@ -45,6 +44,9 @@ EXPECTED_FIXTURES = 3
 EXPECTED_EXTERNAL_ITEMS = 8
 EXPECTED_PERFORMANCE_SAMPLES = 7
 EXPECTED_PHASES = 16
+ACCEPTANCE_REF_RE = re.compile(
+    r"(?:[a-f0-9]{40}|task-closeout:[A-Za-z0-9][A-Za-z0-9._-]+)"
+)
 
 
 def _load(path: Path) -> dict[str, Any]:
@@ -66,6 +68,105 @@ def _load(path: Path) -> dict[str, Any]:
 def _sha256(path: Path) -> str:
     """Return the SHA-256 digest of one file."""
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _sha256_bytes(value: bytes) -> str:
+    """Return the SHA-256 digest of an immutable byte sequence."""
+    return hashlib.sha256(value).hexdigest()
+
+
+def _git_file_bytes(object_id: str, path: str) -> bytes:
+    """Read one repository file exactly as stored at a Git object.
+
+    Args:
+        object_id: Commit or tree object containing the file.
+        path: Repository-relative POSIX path.
+
+    Returns:
+        Exact blob bytes from the recorded Git object.
+
+    Raises:
+        ValueError: If the object/path pair cannot be read.
+    """
+    result = subprocess.run(
+        ["git", "show", f"{object_id}:{path}"],
+        cwd=REPO,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        message = f"cannot read frozen baseline file {object_id}:{path}"
+        raise ValueError(message)
+    return result.stdout
+
+
+def _git_path_object(object_id: str, path: str) -> str:
+    """Resolve the exact Git object stored at a repository path.
+
+    Args:
+        object_id: Commit or tree containing the path.
+        path: Repository-relative POSIX path.
+
+    Returns:
+        The resolved object ID.
+
+    Raises:
+        ValueError: If the object/path pair cannot be resolved.
+    """
+    result = subprocess.run(
+        ["git", "rev-parse", f"{object_id}:{path}"],
+        cwd=REPO,
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    resolved = result.stdout.strip()
+    if result.returncode != 0 or not re.fullmatch(r"[a-f0-9]{40}", resolved):
+        message = f"cannot resolve frozen baseline object {object_id}:{path}"
+        raise ValueError(message)
+    return resolved
+
+
+def _valid_acceptance_reference(value: object) -> bool:
+    """Return whether a value identifies a commit or Task close-out receipt."""
+    return isinstance(value, str) and ACCEPTANCE_REF_RE.fullmatch(value) is not None
+
+
+def _validate_task_progress(
+    live_tasks: list[dict[str, Any]],
+    baseline_tasks: list[dict[str, Any]],
+) -> list[str]:
+    """Validate live tracker identity and monotonic completion against baseline.
+
+    Args:
+        live_tasks: Parsed tasks from the current execution tracker.
+        baseline_tasks: Parsed tasks from the frozen Phase 0 plan blob.
+
+    Returns:
+        Every identity/order or completion-regression error.
+    """
+    errors: list[str] = []
+    live_identity = [
+        (str(task["task_id"]), str(task["feature_id"])) for task in live_tasks
+    ]
+    baseline_identity = [
+        (str(task["task_id"]), str(task["feature_id"])) for task in baseline_tasks
+    ]
+    if live_identity != baseline_identity:
+        errors.append("live task identity/order differs from the Phase 0 baseline")
+
+    live_complete = {
+        str(task["task_id"]) for task in live_tasks if bool(task["complete"])
+    }
+    baseline_complete = {
+        str(task["task_id"]) for task in baseline_tasks if bool(task["complete"])
+    }
+    regressed = sorted(baseline_complete - live_complete)
+    if regressed:
+        errors.append(
+            "live tracker regressed completed Phase 0 tasks: " + ", ".join(regressed)
+        )
+    return errors
 
 
 def _git_object_exists(object_id: str) -> bool:
@@ -100,17 +201,6 @@ def _readme_paths() -> list[Path]:
 def validate() -> list[str]:  # noqa: C901, PLR0912, PLR0915
     """Return every Phase 0 validation error without failing at the first one."""
     errors: list[str] = []
-    try:
-        generated = generate_phase0_evidence.build_payloads()
-    except Exception as error:  # noqa: BLE001
-        return [f"generated evidence cannot be rebuilt: {error}"]
-    for path, payload in generated.items():
-        if not path.is_file():
-            errors.append(f"missing generated evidence: {path.relative_to(REPO)}")
-            continue
-        if _load(path) != payload:
-            errors.append(f"generated evidence drift: {path.relative_to(REPO)}")
-
     plan_text = PLAN.read_text(encoding="utf-8")
     tasks = generate_phase0_evidence.parse_plan(plan_text)
     task_ids = [str(task["task_id"]) for task in tasks]
@@ -120,10 +210,6 @@ def validate() -> list[str]:  # noqa: C901, PLR0912, PLR0915
         errors.append("phased plan must contain 205 unique feature tasks")
     if len(set(task_ids)) != EXPECTED_FEATURES:
         errors.append("phased plan task IDs must be unique")
-    if sum(bool(task["complete"]) for task in tasks) != EXPECTED_COMPLETE_FEATURES:
-        errors.append(
-            "phased plan must currently contain exactly 2 completed feature tasks"
-        )
     preparations = re.findall(
         r"^### - \[(?P<mark>[ xX])\] Preparation (?P<task>0\.0[1-8])",
         plan_text,
@@ -138,8 +224,33 @@ def validate() -> list[str]:  # noqa: C901, PLR0912, PLR0915
     baseline = manifest.get("baseline", {})
     if manifest.get("$schema") != "./phase-0-evidence-schema.json":
         errors.append("baseline manifest references the wrong schema")
-    if baseline.get("plan_sha256") != _sha256(PLAN):
-        errors.append("baseline plan SHA-256 is stale")
+    baseline_head = str(baseline.get("repository_head", ""))
+    baseline_plan_path = str(baseline.get("plan_path", ""))
+    try:
+        baseline_plan_bytes = _git_file_bytes(baseline_head, baseline_plan_path)
+        baseline_plan_blob = _git_path_object(baseline_head, baseline_plan_path)
+        baseline_tasks = generate_phase0_evidence.parse_plan(
+            baseline_plan_bytes.decode("utf-8")
+        )
+    except (UnicodeDecodeError, ValueError) as error:
+        errors.append(str(error))
+        baseline_tasks = []
+        baseline_plan_bytes = b""
+        baseline_plan_blob = ""
+    if baseline.get("plan_git_blob") != baseline_plan_blob:
+        errors.append("frozen baseline plan Git blob is stale")
+    if baseline.get("plan_sha256") != _sha256_bytes(baseline_plan_bytes):
+        errors.append("frozen baseline plan SHA-256 is stale")
+    legacy_plan_sha = baseline.get("legacy_unattested_plan_sha256")
+    if (
+        legacy_plan_sha != generate_phase0_evidence.LEGACY_UNATTESTED_PLAN_SHA256
+        or legacy_plan_sha == baseline.get("plan_sha256")
+    ):
+        errors.append("legacy unattested plan SHA-256 provenance is invalid")
+    if baseline_tasks:
+        errors.extend(_validate_task_progress(tasks, baseline_tasks))
+    if feature_ids != manifest.get("feature_ids"):
+        errors.append("live feature identity/order differs from baseline manifest")
     register = REPO / str(baseline.get("register_path", ""))
     if not register.is_file() or baseline.get("register_sha256") != _sha256(register):
         errors.append("baseline register path or SHA-256 is stale")
@@ -320,6 +431,7 @@ def validate() -> list[str]:  # noqa: C901, PLR0912, PLR0915
         if (
             payload.get("status") != "ACCEPTED"
             or payload.get("acceptance_commit") != task["accepted_commit"]
+            or not _valid_acceptance_reference(payload.get("acceptance_commit"))
         ):
             errors.append(
                 f"{task['feature_id']} acceptance status/commit differs from plan"

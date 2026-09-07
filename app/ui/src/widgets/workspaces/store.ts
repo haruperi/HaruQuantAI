@@ -17,7 +17,7 @@ import { createJSONStorage, persist, type StateStorage } from "zustand/middlewar
 
 import {
   MAX_CUSTOM_WORKSPACES,
-  persistedLayoutSchema,
+  recoverPersistedLayout,
   type AccountMode,
   type PlatformAccountMode,
   type Widget,
@@ -25,6 +25,8 @@ import {
   type Workspace,
 } from "./contracts";
 import { buildDockLayout } from "./dockLayout";
+import { sanitizeDockLayout } from "./dockPersistence";
+import { isWidgetType } from "./registry";
 import { findWorkspaceTemplate, type WorkspaceTemplateId } from "./templates";
 
 /** Loose id comparison replaced with an explicit string coercion everywhere. */
@@ -316,10 +318,15 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         set((state) => {
           const target = state.workspaces.find((ws) => sameId(ws.id, workspaceId));
           if (!target) return state;
-          if (JSON.stringify(target.dock) === JSON.stringify(layout)) return state;
+          const dock = sanitizeDockLayout(
+            layout,
+            target.widgets.map((widget) => widget.id),
+          );
+          if (dock === null) return state;
+          if (JSON.stringify(target.dock) === JSON.stringify(dock)) return state;
           return {
             workspaces: state.workspaces.map((ws) =>
-              sameId(ws.id, workspaceId) ? { ...ws, dock: layout } : ws
+              sameId(ws.id, workspaceId) ? { ...ws, dock } : ws
             ),
           };
         }),
@@ -369,7 +376,8 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
         symbol = "EURUSD",
         accountId,
         runId,
-      ) =>
+      ) => {
+        if (!isWidgetType(widgetType)) return;
         set((state) => ({
           workspaces: state.workspaces.map((ws) => {
             if (!sameId(ws.id, state.activeWorkspaceId)) return ws;
@@ -383,7 +391,8 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
             };
             return { ...ws, widgets: [...ws.widgets, newWidget] };
           }),
-        })),
+        }));
+      },
 
       /**
        * Record the symbol a symbol-bound widget is currently showing.
@@ -460,11 +469,11 @@ export const useWorkspaceStore = create<WorkspaceStoreState>()(
       // Corrupt or wrong-shape persisted layout falls back to the in-code
       // default workspace rather than failing to render (FR-UI-010).
       merge: (persistedState, currentState) => {
-        const parsed = persistedLayoutSchema.safeParse(persistedState);
-        if (!parsed.success) return currentState;
-        return { ...currentState, ...parsed.data };
+        const recovered = recoverPersistedLayout(persistedState);
+        if (recovered === null) return currentState;
+        return { ...currentState, ...recovered };
       },
-      version: 3,
+      version: 4,
     }
   )
 );

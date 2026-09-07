@@ -6,8 +6,8 @@
     "disposition_counts": {
       "ADAPT": 55,
       "IMPLEMENT": 656,
-      "PROVED_COMPLETE": 8,
-      "VERIFY": 132
+      "PROVED_COMPLETE": 13,
+      "VERIFY": 127
     }
   },
   "requirements": [
@@ -16,7 +16,7 @@
       "feature_id": "FEAT-UI-01",
       "task_id": "1.01",
       "text": "Register widget type/version, feature/capabilities, placement/dimensions, commands, subscriptions, config migration and exact disposer in one lazy registry.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
     },
     {
@@ -24,7 +24,7 @@
       "feature_id": "FEAT-UI-01",
       "task_id": "1.01",
       "text": "Serialize safe stable resource IDs and display preferences only; restore layout topology with per-panel unknown/unavailable recovery.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
     },
     {
@@ -32,7 +32,7 @@
       "feature_id": "FEAT-UI-01",
       "task_id": "1.01",
       "text": "Deliver research and existing workspace templates, tab/split/float/tear-off/reposition controls, empty state and keyboard focus recovery.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
     },
     {
@@ -40,7 +40,7 @@
       "feature_id": "FEAT-UI-01",
       "task_id": "1.01",
       "text": "Keep closing an observer distinct from cancelling its accepted owner job.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
     },
     {
@@ -4618,7 +4618,7 @@
       "feature_id": "FEAT-UI-01",
       "task_id": "1.01",
       "text": "Each widget and registration proves exact cleanup and isolated layout failure.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
     },
     {

@@ -7,16 +7,16 @@
       "feature_id": "FEAT-UI-01",
       "title": "Compose and restore the research workspace",
       "domain": "UI",
-      "status": "EXISTING_UNVERIFIED",
-      "disposition": "VERIFY",
+      "status": "COMPLETE",
+      "disposition": "PROVED_COMPLETE",
       "first_slice": "U1",
       "owner_specification": "app/ui/README.md",
       "owner_path": "app/ui/src/widgets/workspaces",
       "owner_path_exists": true,
       "entry_point_registered": false,
-      "accepted_commit": null,
+      "accepted_commit": "task-closeout:20260907-203821-559690-v3-phases-1-16-1.01-01",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json",
-      "remaining_obligation": "Complete the exact plan card and acceptance evidence."
+      "remaining_obligation": null
     },
     {
       "task_id": "1.02",

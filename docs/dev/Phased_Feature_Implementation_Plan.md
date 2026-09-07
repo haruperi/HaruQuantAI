@@ -228,9 +228,9 @@ Review source reconciliation, 205 one-to-one task slots, canonical README entrie
 
 <a id="task-1-01"></a>
 
-### - [ ] Task 1.01 — FEAT-UI-01 — Compose and restore the research workspace
+### - [x] Task 1.01 — FEAT-UI-01 — Compose and restore the research workspace
 
-**Status:** `EXISTING_UNVERIFIED` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
+**Status:** `COMPLETE` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
 
 **Order prerequisites:** Phase 0 entry gate; no feature-task predecessor.
 
@@ -280,7 +280,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `feat(ui): complete FEAT-UI-01`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260907-203821-559690-v3-phases-1-16-1.01-01`.
 
 ---
 

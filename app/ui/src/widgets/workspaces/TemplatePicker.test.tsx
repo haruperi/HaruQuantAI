@@ -32,7 +32,7 @@ describe("FR-UI-195/198 template catalog rendering", () => {
   it("shows the owner-requested template set", () => {
     render(<TemplatePicker />);
     const labels = WORKSPACE_TEMPLATES.map((t) => t.name);
-    expect(labels).toEqual(["Blank", "HaruQuant", "Chart + Ladder", "MultiCharts + Ladder", "Options", "Charts"]);
+    expect(labels).toEqual(["Blank", "Research", "HaruQuant", "Chart + Ladder", "MultiCharts + Ladder", "Options", "Charts"]);
   });
 });
 
