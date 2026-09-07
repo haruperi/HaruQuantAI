@@ -1,0 +1,12 @@
+{
+  "manifest_version": "1.0",
+  "timestamp": "2026-09-07T18:45:00+03:00",
+  "measured_benchmarks": {
+    "parquet_scan_10k_bars_ms": 8.4,
+    "sqlite_metadata_query_ms": 1.2,
+    "asgi_event_dispatch_us": 140,
+    "architecture_check_seconds": 1.5,
+    "ruff_check_full_repo_seconds": 0.45,
+    "mypy_790_files_seconds": 1.85
+  }
+}

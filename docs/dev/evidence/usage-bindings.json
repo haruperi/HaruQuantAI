@@ -1,0 +1,1646 @@
+{
+  "manifest_version": "1.0",
+  "timestamp": "2026-09-07T18:45:00+03:00",
+  "bindings": [
+    {
+      "feature_id": "FEAT-UI-01",
+      "task_id": "1.01",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/01",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-14",
+      "task_id": "1.02",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/14",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-WS-MANAGE_WORKSPACES",
+      "task_id": "1.03",
+      "domain": "Workspace",
+      "executable_recipe": "uv run python -m app.services.workspace.manage_workspaces._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-WS-MANAGE_ACCOUNTS",
+      "task_id": "1.04",
+      "domain": "Workspace",
+      "executable_recipe": "uv run python -m app.services.workspace.manage_accounts._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-PLUG-DECLARE_MANIFESTS",
+      "task_id": "1.05",
+      "domain": "Plugins",
+      "executable_recipe": "uv run python -m app.services.plugins.declare_manifests._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
+      "task_id": "1.06",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/view_collections",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-REVIEW_DRAFTS",
+      "task_id": "1.07",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/review_drafts",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-SERVE_API_EVENTS",
+      "task_id": "1.08",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.serve_api_events._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "task_id": "1.09",
+      "domain": "Workspace",
+      "executable_recipe": "uv run python -m app.services.workspace.execute_persistence._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-WS-SECURE_LOCAL_ACCESS",
+      "task_id": "1.10",
+      "domain": "Workspace",
+      "executable_recipe": "uv run python -m app.services.workspace.secure_local_access._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-WS-ADMINISTER_SETTINGS",
+      "task_id": "1.11",
+      "domain": "Workspace",
+      "executable_recipe": "uv run python -m app.services.workspace.administer_settings._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-PLUG-REGISTER_CONTRIBUTIONS",
+      "task_id": "1.12",
+      "domain": "Plugins",
+      "executable_recipe": "uv run python -m app.services.plugins.register_contributions._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-OPERATE_IDENTITY",
+      "task_id": "1.13",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.operate_identity._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ORCH-RESERVE_RESOURCES",
+      "task_id": "1.14",
+      "domain": "Orchestration",
+      "executable_recipe": "uv run python -m app.services.orchestration.reserve_resources._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
+      "task_id": "1.15",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.enforce_mandate._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-17",
+      "task_id": "1.16",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/17",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-WS-MANAGE_ARTIFACTS",
+      "task_id": "1.17",
+      "domain": "Workspace",
+      "executable_recipe": "uv run python -m app.services.workspace.manage_artifacts._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ORCH-MANAGE_JOBS",
+      "task_id": "1.18",
+      "domain": "Orchestration",
+      "executable_recipe": "uv run python -m app.services.orchestration.manage_jobs._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-OPERATE_RUNS",
+      "task_id": "1.19",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.operate_runs._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-REGISTER_ROLES",
+      "task_id": "1.20",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.register_roles._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-WS-BUILD_DIAGNOSTICS",
+      "task_id": "1.21",
+      "domain": "Workspace",
+      "executable_recipe": "uv run python -m app.services.workspace.build_diagnostics._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ORCH-EXECUTE_LOCAL_WORK",
+      "task_id": "1.22",
+      "domain": "Orchestration",
+      "executable_recipe": "uv run python -m app.services.orchestration.execute_local_work._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-GOVERN_TOOL_CALLS",
+      "task_id": "1.23",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.govern_tool_calls._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-INVOKE_MODELS",
+      "task_id": "1.24",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.invoke_models._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-OPERATE_SETTINGS",
+      "task_id": "1.25",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.operate_settings._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-OPERATE_JOBS",
+      "task_id": "1.26",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.operate_jobs._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-16",
+      "task_id": "1.27",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/16",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-13",
+      "task_id": "1.28",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/13",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-RUN_MONITOR",
+      "task_id": "1.29",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/run_monitor",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-DEBUG_CONSOLE",
+      "task_id": "1.30",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/debug_console",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-CAT-CATALOG_INSTRUMENTS",
+      "task_id": "2.01",
+      "domain": "Catalogue",
+      "executable_recipe": "uv run python -m app.services.catalogue.catalog_instruments._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-CAT-DEFINE_SESSIONS",
+      "task_id": "2.02",
+      "domain": "Catalogue",
+      "executable_recipe": "uv run python -m app.services.catalogue.define_sessions._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-METATRADER",
+      "task_id": "2.03",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.metatrader._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-CTRADER",
+      "task_id": "2.04",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.ctrader._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-BINANCE",
+      "task_id": "2.05",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.binance._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-DUKASCOPY",
+      "task_id": "2.06",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.dukascopy._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-YAHOO",
+      "task_id": "2.07",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.yahoo._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-RESOLVE",
+      "task_id": "2.08",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.resolve._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-MARKET_DATA_STORE",
+      "task_id": "2.09",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.market_data_store._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-CAT-MAP_PROVIDERS",
+      "task_id": "2.10",
+      "domain": "Catalogue",
+      "executable_recipe": "uv run python -m app.services.catalogue.map_providers._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-CAT-DEFINE_TRADING_RULES",
+      "task_id": "2.11",
+      "domain": "Catalogue",
+      "executable_recipe": "uv run python -m app.services.catalogue.define_trading_rules._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-CAT-CONVERT_CURRENCIES",
+      "task_id": "2.12",
+      "domain": "Catalogue",
+      "executable_recipe": "uv run python -m app.services.catalogue.convert_currencies._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-RESOLVE_QUALITY",
+      "task_id": "2.13",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.resolve_quality._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-AGGREGATE_BARS",
+      "task_id": "2.14",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.aggregate_bars._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-MANAGE_RETENTION",
+      "task_id": "2.15",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.manage_retention._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-NORMALIZE_TICKS",
+      "task_id": "2.16",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.normalize_ticks._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-GENERATE_SCENARIOS",
+      "task_id": "2.17",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.generate_scenarios._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-TRACK_MARKET_NEWS",
+      "task_id": "2.18",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.track_market_news._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-INGEST_HISTORY",
+      "task_id": "2.19",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.ingest_history._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-BIND_RUN_DATA",
+      "task_id": "2.20",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.bind_run_data._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-STREAM_MARKET_EVENTS",
+      "task_id": "2.21",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.stream_market_events._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-CAT-MANAGE_UNIVERSES",
+      "task_id": "2.22",
+      "domain": "Catalogue",
+      "executable_recipe": "uv run python -m app.services.catalogue.manage_universes._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-ALIGN_SERIES",
+      "task_id": "2.23",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.align_series._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-SYNC_CONNECTORS",
+      "task_id": "2.24",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.sync_connectors._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-PREPARE_PROFILES",
+      "task_id": "2.25",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.prepare_profiles._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-IMPORT_QUANTDATA",
+      "task_id": "2.26",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.import_quantdata._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-CAT-EXCHANGE_CATALOGUE",
+      "task_id": "2.27",
+      "domain": "Catalogue",
+      "executable_recipe": "uv run python -m app.services.catalogue.exchange_catalogue._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-IMPORT_INDICATORS",
+      "task_id": "2.28",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.import_indicators._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-DATA-BROWSE_REFERENCE",
+      "task_id": "2.29",
+      "domain": "Data",
+      "executable_recipe": "uv run python -m app.services.data.browse_reference._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
+      "task_id": "2.30",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.observe_market_reference._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-18",
+      "task_id": "2.31",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/18",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-04",
+      "task_id": "2.32",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/04",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IND-CALCULATE_TREND",
+      "task_id": "3.01",
+      "domain": "Indicators",
+      "executable_recipe": "uv run python -m app.services.indicators.calculate_trend._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IND-CALCULATE_MOMENTUM",
+      "task_id": "3.02",
+      "domain": "Indicators",
+      "executable_recipe": "uv run python -m app.services.indicators.calculate_momentum._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IND-CALCULATE_VOLATILITY",
+      "task_id": "3.03",
+      "domain": "Indicators",
+      "executable_recipe": "uv run python -m app.services.indicators.calculate_volatility._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IND-CALCULATE_VOLUME_FLOW",
+      "task_id": "3.04",
+      "domain": "Indicators",
+      "executable_recipe": "uv run python -m app.services.indicators.calculate_volume_flow._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IND-DETECT_CANDLE_PATTERNS",
+      "task_id": "3.05",
+      "domain": "Indicators",
+      "executable_recipe": "uv run python -m app.services.indicators.detect_candle_patterns._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IND-TRANSFORM_SERIES",
+      "task_id": "3.06",
+      "domain": "Indicators",
+      "executable_recipe": "uv run python -m app.services.indicators.transform_series._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-DEFINE_AST",
+      "task_id": "3.07",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.define_ast._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-CATALOG_BLOCKS",
+      "task_id": "3.08",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.catalog_blocks._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-CONFIGURE_CHARTS",
+      "task_id": "3.09",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.configure_charts._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-MODEL_ATM_EXITS",
+      "task_id": "3.10",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.model_atm_exits._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-EDIT_TEMPLATES",
+      "task_id": "3.11",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.edit_templates._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-DEFINE_INDICATORS",
+      "task_id": "3.12",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.define_indicators._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-COMPILE_STRATEGIES",
+      "task_id": "3.13",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.compile_strategies._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-VERSION_STRATEGIES",
+      "task_id": "3.14",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.version_strategies._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-GENERATE_CODE",
+      "task_id": "3.15",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.generate_code._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-EXCHANGE_STRATEGIES",
+      "task_id": "3.16",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.exchange_strategies._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-OPERATE_STRATEGIES",
+      "task_id": "3.17",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.operate_strategies._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-STRATEGY_STUDIO",
+      "task_id": "3.18",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/strategy_studio",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-PERFORMANCE_LAB",
+      "task_id": "4.01",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/performance_lab",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RSK-SIZE_POSITIONS",
+      "task_id": "4.02",
+      "domain": "Risk",
+      "executable_recipe": "uv run python -m app.services.risk.size_positions._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RSK-ASSESS_RESEARCH_RISK",
+      "task_id": "4.03",
+      "domain": "Risk",
+      "executable_recipe": "uv run python -m app.services.risk.assess_research_risk._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-TRD-MANAGE_EXECUTION_SESSIONS",
+      "task_id": "4.04",
+      "domain": "Trading",
+      "executable_recipe": "uv run python -m app.services.trading.manage_execution_sessions._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-TRD-MODEL_EXECUTION_POLICIES",
+      "task_id": "4.05",
+      "domain": "Trading",
+      "executable_recipe": "uv run python -m app.services.trading.model_execution_policies._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-SIM-MODEL_TICKS",
+      "task_id": "4.06",
+      "domain": "Simulator",
+      "executable_recipe": "uv run python -m app.services.simulator.model_ticks._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-COMPUTE_METRICS",
+      "task_id": "4.07",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.compute_metrics._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-SIM-CONFIGURE_ENGINE",
+      "task_id": "4.08",
+      "domain": "Simulator",
+      "executable_recipe": "uv run python -m app.services.simulator.configure_engine._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-SIM-EXECUTE_TICKS",
+      "task_id": "4.09",
+      "domain": "Simulator",
+      "executable_recipe": "uv run python -m app.services.simulator.execute_ticks._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-SIM-COMMIT_RESULTS",
+      "task_id": "4.10",
+      "domain": "Simulator",
+      "executable_recipe": "uv run python -m app.services.simulator.commit_results._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-OPERATE_SIMULATIONS",
+      "task_id": "4.11",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.operate_simulations._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-SIM-CACHE_EVALUATIONS",
+      "task_id": "4.12",
+      "domain": "Simulator",
+      "executable_recipe": "uv run python -m app.services.simulator.cache_evaluations._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-QUERY_RESULTS",
+      "task_id": "4.13",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.query_results._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-DATABANK_MEMBERSHIP",
+      "task_id": "4.14",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.databank_membership._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-ANALYZE_TRADES",
+      "task_id": "4.15",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.analyze_trades._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-PROJECT_SERIES",
+      "task_id": "4.16",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.project_series._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-COMPARE_RESULTS",
+      "task_id": "4.17",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.compare_results._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-EXCHANGE_RESULTS",
+      "task_id": "4.18",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.exchange_results._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-OPERATE_RESULTS",
+      "task_id": "4.19",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.operate_results._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-27",
+      "task_id": "4.20",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/27",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-32",
+      "task_id": "4.21",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/32",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-DATABANK_GRID",
+      "task_id": "4.22",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/databank_grid",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-RESULT_OVERVIEW",
+      "task_id": "4.23",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/result_overview",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-TRADE_LIST",
+      "task_id": "4.24",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/trade_list",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-EQUITY_CHART",
+      "task_id": "4.25",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/equity_chart",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-TRADE_ANALYSIS",
+      "task_id": "4.26",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/trade_analysis",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-TRADES_ON_CHART",
+      "task_id": "4.27",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/trades_on_chart",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-15",
+      "task_id": "5.01",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/15",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-WS-MANAGE_CONVERSATIONS",
+      "task_id": "5.02",
+      "domain": "Workspace",
+      "executable_recipe": "uv run python -m app.services.workspace.manage_conversations._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-ASSEMBLE_CONTEXT",
+      "task_id": "5.03",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.assemble_context._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-RUN_WORKFLOWS",
+      "task_id": "5.04",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.run_workflows._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-EVALUATE_PROFILES",
+      "task_id": "5.05",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.evaluate_profiles._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-MANAGE_CLAIMS",
+      "task_id": "5.06",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.manage_claims._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-SYNTHESIZE_RESEARCH",
+      "task_id": "5.07",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.synthesize_research._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-ASSIST_OPERATOR",
+      "task_id": "5.08",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.assist_operator._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-AGENTIC_GATEWAY",
+      "task_id": "5.09",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.agentic_gateway._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-CHAT_BOT",
+      "task_id": "5.10",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/chat_bot",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-AGENTIC_RUN_INSPECTOR",
+      "task_id": "5.11",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/agentic_run_inspector",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-ACCEPT_PROPOSALS",
+      "task_id": "6.01",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.accept_proposals._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-GOVERN_CAMPAIGNS",
+      "task_id": "6.02",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.govern_campaigns._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-DEFINE_PROTOCOLS",
+      "task_id": "6.03",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.define_protocols._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+      "task_id": "6.04",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.compose_strategy_proposals._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-GOVERN_HOLDOUTS",
+      "task_id": "6.05",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.govern_holdouts._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-RUN_RESEARCH",
+      "task_id": "6.06",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.run_research._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-OPERATE_RESEARCH",
+      "task_id": "6.07",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.operate_research._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+      "task_id": "6.08",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.govern_research_search._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-DESIGN_RESEARCH",
+      "task_id": "6.09",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.design_research._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+      "task_id": "6.10",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.compose_strategy_specs._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-28",
+      "task_id": "6.11",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/28",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-SIM-PERTURB_INPUTS",
+      "task_id": "7.01",
+      "domain": "Simulator",
+      "executable_recipe": "uv run python -m app.services.simulator.perturb_inputs._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-ANALYZE_DISTRIBUTIONS",
+      "task_id": "7.02",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.analyze_distributions._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-DELIBERATE_RESEARCH",
+      "task_id": "7.03",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.deliberate_research._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-TEST_ROBUSTNESS",
+      "task_id": "7.04",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.test_robustness._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-ROBUSTNESS_RESULTS",
+      "task_id": "7.05",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/robustness_results",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-QUALIFY_RESEARCH",
+      "task_id": "7.06",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.qualify_research._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-STRATEGY_RETESTER",
+      "task_id": "7.07",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/strategy_retester",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-DEFINE_SEARCH_SPACES",
+      "task_id": "8.01",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.define_search_spaces._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-RANK_CANDIDATES",
+      "task_id": "8.02",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.rank_candidates._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-GENERATE_STRATEGIES",
+      "task_id": "8.03",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.generate_strategies._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-EVOLVE_STRATEGIES",
+      "task_id": "8.04",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.evolve_strategies._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-STRATEGY_BUILDER",
+      "task_id": "8.05",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/strategy_builder",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-OPT-SEARCH_PARAMETERS",
+      "task_id": "9.01",
+      "domain": "Optimization",
+      "executable_recipe": "uv run python -m app.services.optimization.search_parameters._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-OPT-VALIDATE_WALK_FORWARD",
+      "task_id": "9.02",
+      "domain": "Optimization",
+      "executable_recipe": "uv run python -m app.services.optimization.validate_walk_forward._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-OPT-PERMUTE_PARAMETERS",
+      "task_id": "9.03",
+      "domain": "Optimization",
+      "executable_recipe": "uv run python -m app.services.optimization.permute_parameters._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-OPERATE_OPTIMIZATION",
+      "task_id": "9.04",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.operate_optimization._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-PARAMETER_OPTIMIZER",
+      "task_id": "9.05",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/parameter_optimizer",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-OPTIMIZATION_RESULTS",
+      "task_id": "9.06",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/optimization_results",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-POR-COMPOSE_PORTFOLIOS",
+      "task_id": "10.01",
+      "domain": "Portfolio",
+      "executable_recipe": "uv run python -m app.services.portfolio.compose_portfolios._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-POR-ANALYZE_CORRELATION",
+      "task_id": "10.02",
+      "domain": "Portfolio",
+      "executable_recipe": "uv run python -m app.services.portfolio.analyze_correlation._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-FILTER_CORRELATION",
+      "task_id": "10.03",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.filter_correlation._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-POR-OPTIMIZE_WEIGHTS",
+      "task_id": "10.04",
+      "domain": "Portfolio",
+      "executable_recipe": "uv run python -m app.services.portfolio.optimize_weights._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-POR-SIMULATE_PORTFOLIOS",
+      "task_id": "10.05",
+      "domain": "Portfolio",
+      "executable_recipe": "uv run python -m app.services.portfolio.simulate_portfolios._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-POR-ANALYZE_PORTFOLIO_RISK",
+      "task_id": "10.06",
+      "domain": "Portfolio",
+      "executable_recipe": "uv run python -m app.services.portfolio.analyze_portfolio_risk._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-POR-MERGE_PORTFOLIOS",
+      "task_id": "10.07",
+      "domain": "Portfolio",
+      "executable_recipe": "uv run python -m app.services.portfolio.merge_portfolios._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-POR-SEARCH_PORTFOLIOS",
+      "task_id": "10.08",
+      "domain": "Portfolio",
+      "executable_recipe": "uv run python -m app.services.portfolio.search_portfolios._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-ADVISE_PORTFOLIO",
+      "task_id": "10.09",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.advise_portfolio._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-OPERATE_PORTFOLIOS",
+      "task_id": "10.10",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.operate_portfolios._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-PORTFOLIO_COMPOSER",
+      "task_id": "10.11",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/portfolio_composer",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-PORTFOLIO_BUILDER",
+      "task_id": "10.12",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/portfolio_builder",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-TRD-OBSERVE_OUTCOMES",
+      "task_id": "11.01",
+      "domain": "Trading",
+      "executable_recipe": "uv run python -m app.services.trading.observe_outcomes._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ORCH-DEFINE_PROJECTS",
+      "task_id": "11.02",
+      "domain": "Orchestration",
+      "executable_recipe": "uv run python -m app.services.orchestration.define_projects._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ORCH-EXECUTE_UTILITIES",
+      "task_id": "11.03",
+      "domain": "Orchestration",
+      "executable_recipe": "uv run python -m app.services.orchestration.execute_utilities._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ORCH-DELIVER_NOTIFICATIONS",
+      "task_id": "11.04",
+      "domain": "Orchestration",
+      "executable_recipe": "uv run python -m app.services.orchestration.deliver_notifications._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-MANAGE_MEMORY",
+      "task_id": "11.05",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.manage_memory._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ORCH-RUN_PROJECTS",
+      "task_id": "11.06",
+      "domain": "Orchestration",
+      "executable_recipe": "uv run python -m app.services.orchestration.run_projects._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-CALIBRATE_OUTCOMES",
+      "task_id": "11.07",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.calibrate_outcomes._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-EDIT_PROJECTS",
+      "task_id": "11.08",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.edit_projects._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-PROJECT_EDITOR",
+      "task_id": "11.09",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/project_editor",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-PLUG-SANDBOX_PERMISSIONS",
+      "task_id": "12.01",
+      "domain": "Plugins",
+      "executable_recipe": "uv run python -m app.services.plugins.sandbox_permissions._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-PLUG-AUTHOR_PACKAGES",
+      "task_id": "12.02",
+      "domain": "Plugins",
+      "executable_recipe": "uv run python -m app.services.plugins.author_packages._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-PLUG-ISOLATE_ANALYSIS",
+      "task_id": "12.03",
+      "domain": "Plugins",
+      "executable_recipe": "uv run python -m app.services.plugins.isolate_analysis._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-PLUG-RENDER_RESULT_PANELS",
+      "task_id": "12.04",
+      "domain": "Plugins",
+      "executable_recipe": "uv run python -m app.services.plugins.render_result_panels._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-GENERATE_MQL5",
+      "task_id": "12.05",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.generate_mql5._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-GENERATE_PYTHON",
+      "task_id": "12.06",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.generate_python._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS",
+      "task_id": "12.07",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.provide_custom_analysis._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-PLUG-MANAGE_LIFECYCLE",
+      "task_id": "12.08",
+      "domain": "Plugins",
+      "executable_recipe": "uv run python -m app.services.plugins.manage_lifecycle._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-PLUG-MAINTAIN_COMPATIBILITY",
+      "task_id": "12.09",
+      "domain": "Plugins",
+      "executable_recipe": "uv run python -m app.services.plugins.maintain_compatibility._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
+      "task_id": "12.10",
+      "domain": "Agentic",
+      "executable_recipe": "uv run python -m app.services.agentic.author_sandbox_artifacts._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-ADMINISTER_CAPABILITIES",
+      "task_id": "12.11",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.administer_capabilities._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-CODE_EDITOR",
+      "task_id": "12.12",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/code_editor",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-INDICATOR_TESTER",
+      "task_id": "12.13",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/indicator_tester",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IND-CALCULATE_MARKET_PROFILES",
+      "task_id": "13.01",
+      "domain": "Indicators",
+      "executable_recipe": "uv run python -m app.services.indicators.calculate_market_profiles._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-DEFINE_ARCHITECTURES",
+      "task_id": "13.02",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.define_architectures._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-SIM-SIMULATE_STOCKPICKERS",
+      "task_id": "13.03",
+      "domain": "Simulator",
+      "executable_recipe": "uv run python -m app.services.simulator.simulate_stockpickers._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-ADVANCED_ANALYSIS",
+      "task_id": "13.04",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/advanced_analysis",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-PREPARE_NEURAL_DATASETS",
+      "task_id": "14.01",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.prepare_neural_datasets._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-LABEL_NEURAL_DATA",
+      "task_id": "14.02",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.label_neural_data._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-INFER_MODELS",
+      "task_id": "14.03",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.infer_models._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-TRAIN_MODELS",
+      "task_id": "14.04",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.train_models._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-VALIDATE_MODELS",
+      "task_id": "14.05",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.validate_models._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-RES-EXPLAIN_MODELS",
+      "task_id": "14.06",
+      "domain": "Research",
+      "executable_recipe": "uv run python -m app.services.research.explain_models._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-NEURAL_RESEARCH",
+      "task_id": "14.07",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/neural_research",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ORCH-MANAGE_REMOTE_WORKERS",
+      "task_id": "15.01",
+      "domain": "Orchestration",
+      "executable_recipe": "uv run python -m app.services.orchestration.manage_remote_workers._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-IFACE-AUTOMATE_COMMANDS",
+      "task_id": "16.01",
+      "domain": "Interfaces",
+      "executable_recipe": "uv run python -m app.services.interfaces.automate_commands._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-WS-DISTRIBUTE_APPLICATION",
+      "task_id": "16.02",
+      "domain": "Workspace",
+      "executable_recipe": "uv run python -m app.services.workspace.distribute_application._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-DARWINEX",
+      "task_id": "16.03",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.darwinex._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-COINBASE",
+      "task_id": "16.04",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.coinbase._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-BITFINEX",
+      "task_id": "16.05",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.bitfinex._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-POLONIEX",
+      "task_id": "16.06",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.poloniex._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-BRK-CONNECT_MARKET_FEEDS",
+      "task_id": "16.07",
+      "domain": "Brokers",
+      "executable_recipe": "uv run python -m app.services.brokers.connect_market_feeds._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-GENERATE_TARGETS",
+      "task_id": "16.08",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.generate_targets._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-ANA-IMPORT_EXTERNAL_LEDGERS",
+      "task_id": "16.09",
+      "domain": "Analytics",
+      "executable_recipe": "uv run python -m app.services.analytics.import_external_ledgers._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-IMPORT_SQX",
+      "task_id": "16.10",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.import_sqx._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-STRAT-PACKAGE_STRATEGIES",
+      "task_id": "16.11",
+      "domain": "Strategy",
+      "executable_recipe": "uv run python -m app.services.strategy.package_strategies._usage",
+      "offline_only": true,
+      "external_credentials_required": false
+    },
+    {
+      "feature_id": "FEAT-UI-STRATEGY_PACKAGER",
+      "task_id": "16.12",
+      "domain": "UI",
+      "executable_recipe": "npm run test -- app/ui/src/widgets/strategy_packager",
+      "offline_only": true,
+      "external_credentials_required": false
+    }
+  ]
+}

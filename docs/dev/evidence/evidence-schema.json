@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HaruQuantAI Feature Acceptance Evidence Schema",
+  "type": "object",
+  "required": [
+    "feature_id",
+    "task_id",
+    "status",
+    "baseline_commit",
+    "acceptance_commit",
+    "requirements",
+    "commands",
+    "review"
+  ],
+  "properties": {
+    "feature_id": {
+      "type": "string",
+      "pattern": "^FEAT-[A-Z0-9_-]+$"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ACCEPTED",
+        "REJECTED",
+        "IN_PROGRESS"
+      ]
+    },
+    "baseline_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "acceptance_commit": {
+      "type": "string"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "WAIVED"
+            ]
+          },
+          "evidence_target": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "command",
+          "exit_code"
+        ],
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "exit_code": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "required": [
+        "reviewer_verdict",
+        "reviewer_notes"
+      ],
+      "properties": {
+        "reviewer_verdict": {
+          "type": "string",
+          "enum": [
+            "APPROVED",
+            "CHANGES_REQUESTED"
+          ]
+        },
+        "reviewer_notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "./evidence-schema.json",
+  "manifest_version": "1.0",
+  "timestamp": "2026-09-07T18:45:00+03:00",
+  "baseline": {
+    "repository_head": "4ba167564a4889fec0d5d52f2ce9072f536a2d05",
+    "plan_baseline": "d8f23a51ada672d0f0d319df62ed857a66e08dd5",
+    "spec_blob_original": "7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd",
+    "spec_blob_pinned": "d69bef59cb981350cd6f2ebdccc31b231a4e0950"
+  },
+  "inventory": {
+    "total_features": 205,
+    "total_domains": 18,
+    "total_normalized_frs": 575,
+    "total_local_nfrs": 276,
+    "total_shared_nfrs": 66,
+    "total_catalogue_entries": 646,
+    "total_original_identified_requirements": 389,
+    "total_workflows": 20,
+    "total_role_profiles": 22,
+    "total_required_edges": 476,
+    "total_operation_gated_edges": 233,
+    "registered_entry_points": 39
+  },
+  "domain_distribution": {
+    "UI": 38,
+    "Workspace": 9,
+    "Plugins": 8,
+    "Interfaces": 15,
+    "Orchestration": 8,
+    "Agentic": 20,
+    "Catalogue": 7,
+    "Brokers": 11,
+    "Data": 16,
+    "Indicators": 7,
+    "Strategy": 18,
+    "Risk": 2,
+    "Trading": 3,
+    "Simulator": 7,
+    "Analytics": 11,
+    "Research": 15,
+    "Optimization": 3,
+    "Portfolio": 7
+  },
+  "status_distribution": {
+    "PARTIAL": 16,
+    "EXISTING_UNVERIFIED": 37,
+    "NOT_STARTED_IN_TARGET": 152,
+    "COMPLETE": 0
+  },
+  "drift_disposition": {
+    "status": "RECONCILED_NO_DRIFT",
+    "semantic_differences": 0,
+    "scope_impact": "NONE",
+    "whitespace_only_differences": 2,
+    "notes": "Whitespace cleanup only in parse_orders_bin and export_orders_parquet functions; all 205 feature scopes and boundaries 100% conserved."
+  }
+}

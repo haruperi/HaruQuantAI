@@ -1,0 +1,8 @@
+{
+  "manifest_version": "1.0",
+  "timestamp": "2026-09-07T18:45:00+03:00",
+  "policy": "FAIL_CLOSED",
+  "description": "Operation-gated dependencies fail closed deterministically with ProblemDetails when provider is not mounted; no fabricated fallback responses allowed.",
+  "operation_edges_count": 233,
+  "status": "RATIFIED"
+}

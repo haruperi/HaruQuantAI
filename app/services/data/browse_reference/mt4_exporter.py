@@ -26,7 +26,8 @@ def export_hst_file(
         symbol: Market symbol name (e.g. 'EURUSD').
         period: Timeframe period in minutes (1, 5, 15, 30, 60, 240, 1440).
         digits: Price decimal precision (e.g. 5).
-        bars: Sequence of dicts with keys: 'time' (epoch seconds), 'open', 'high', 'low', 'close', 'volume'.
+        bars: Sequence of dicts with keys: 'time' (epoch seconds),
+            'open', 'high', 'low', 'close', 'volume'.
 
     Returns:
         Number of bars written.
@@ -62,7 +63,7 @@ def export_hst_file(
             t = int(bar["time"])
             o = float(bar["open"])
             h = float(bar["high"])
-            l = float(bar["low"])
+            low_val = float(bar["low"])
             c = float(bar["close"])
             v = int(bar.get("volume", 1))
             spread = int(bar.get("spread", 0))
@@ -76,8 +77,7 @@ def export_hst_file(
             # d: double close
             # q: int64 volume
             # i: int32 spread
-            # q: int64 real_volume
-            record = struct.pack("<qddddqiq", t, o, h, l, c, v, spread, real_vol)
+            record = struct.pack("<qddddqiq", t, o, h, low_val, c, v, spread, real_vol)
             f.write(record)
 
     return len(bars)
@@ -144,7 +144,7 @@ def export_fxt_file(
             t = int(bar["time"])
             o = float(bar["open"])
             h = float(bar["high"])
-            l = float(bar["low"])
+            low_val = float(bar["low"])
             c = float(bar["close"])
             v = int(bar.get("volume", 1))
 
@@ -155,7 +155,7 @@ def export_fxt_file(
             # d: low
             # d: close
             # q: volume
-            rec = struct.pack("<iddddq", t, o, h, l, c, v)
+            rec = struct.pack("<iddddq", t, o, h, low_val, c, v)
             f.write(rec)
 
     return len(bars)

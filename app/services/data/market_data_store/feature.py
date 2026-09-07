@@ -5,16 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from app.contracts.data.capabilities import (
-    BROWSE_REFERENCE_CAPABILITY,
-    MARKET_DATA_STORE_CAPABILITY,
-)
+from app.contracts.data.capabilities import MARKET_DATA_STORE_CAPABILITY
 from app.services.data.market_data_store.config import MarketDataStoreConfig
 from app.services.data.market_data_store.manifest import SPEC
 from app.services.data.market_data_store.market_data_store import MarketDataStoreService
-from app.services.data.market_data_store.reference_repository import (
-    MarketDataReferenceRepository,
-)
 
 if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
@@ -32,17 +26,11 @@ class MarketDataStoreFeature:
         """
         self.spec = spec
         self._service: MarketDataStoreService | None = None
-        self._reference_repository: MarketDataReferenceRepository | None = None
 
     @property
     def service(self) -> MarketDataStoreService | None:
         """Return the underlying market data store service instance."""
         return self._service
-
-    @property
-    def reference_repository(self) -> MarketDataReferenceRepository | None:
-        """Return the underlying reference repository instance."""
-        return self._reference_repository
 
     async def mount(self, context: FeatureContext, config: object) -> None:
         """Mount the feature and provide the market data store capability.
@@ -71,16 +59,13 @@ class MarketDataStoreFeature:
             cfg = config
 
         self._service = MarketDataStoreService(config=cfg)
-        self._reference_repository = MarketDataReferenceRepository()
         context.provide(MARKET_DATA_STORE_CAPABILITY, self._service)
-        context.provide(BROWSE_REFERENCE_CAPABILITY, self._reference_repository)
 
     async def unmount(self, _context: FeatureContext) -> None:
         """Unmount the feature and release catalog connections."""
         if self._service is not None:
             self._service.close()
             self._service = None
-        self._reference_repository = None
 
 
 def feature() -> MarketDataStoreFeature:

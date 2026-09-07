@@ -1,0 +1,27 @@
+{
+  "manifest_version": "1.0",
+  "timestamp": "2026-09-07T18:45:00+03:00",
+  "fixtures": [
+    {
+      "fixture_id": "FIX-BARS-M1-EURUSD",
+      "description": "Deterministic EURUSD 1-minute OHLCV series for 2025-01",
+      "sha256": "4b27926b0a43063ecda0f3408a68fa962ef95bdfb39d7fc21c3faeeae32ff611",
+      "path": "tests/fixtures/bars/eurusd_m1_202501.parquet",
+      "records": 31240
+    },
+    {
+      "fixture_id": "FIX-TICKS-EURUSD",
+      "description": "Deterministic EURUSD tick series with millisecond timestamps",
+      "sha256": "81f1816e093557e4945415712711d9f491c1dcda5402ec97bb2dc67a685f67b4",
+      "path": "tests/fixtures/ticks/eurusd_ticks_20250102.parquet",
+      "records": 54200
+    },
+    {
+      "fixture_id": "FIX-CATALOGUE-SQLITE",
+      "description": "Reference SQLite schema and baseline broker/symbol tables",
+      "sha256": "0dc2e9c1db18c4c7be4be6c97a5b3a88fc8eef2f3273eef0beae2a5c37851254",
+      "path": "tests/fixtures/catalogue/baseline_catalogue.db",
+      "records": 12
+    }
+  ]
+}

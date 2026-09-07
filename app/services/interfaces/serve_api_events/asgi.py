@@ -2113,6 +2113,70 @@ async def _serve_data(
         )
 
 
+async def _dispatch_data_reference_reads(
+    gateway: ObserveMarketReferenceCapability,
+    path: str,
+    method: str,
+    params: dict[str, str],
+    scope: Scope,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> bool:
+    """Dispatch GET data reference routes.
+
+    Returns:
+        True if handled, False otherwise.
+    """
+    if path == _DATA_BARS_ROUTE and method == "GET":
+        await _serve_bars(gateway, scope, send, request_id, trace_id)
+        return True
+    if path == _DATA_QUALITY_ROUTE and method == "GET":
+        await _serve_data_quality(gateway, params, send, request_id, trace_id)
+        return True
+    if path == _DATA_DOWNLOAD_CONFIG_ROUTE and method == "GET":
+        await _serve_data_download_config(gateway, send, request_id, trace_id)
+        return True
+    return bool(
+        await _serve_data_catalogue_read(
+            gateway, path, method, params, send, request_id, trace_id
+        )
+        or await _serve_data_discovery_read(
+            gateway, path, method, params, send, request_id, trace_id
+        )
+    )
+
+
+async def _dispatch_data_reference_posts(
+    gateway: ObserveMarketReferenceCapability,
+    path: str,
+    method: str,
+    receive: Receive,
+    send: Send,
+    request_id: str,
+    trace_id: str | None,
+) -> bool:
+    """Dispatch POST data reference routes.
+
+    Returns:
+        True if handled, False otherwise.
+    """
+    if method != "POST":
+        return False
+    handlers = {
+        _DATA_CLONE_ROUTE: _serve_data_clone,
+        _DATA_EXPORT_ROUTE: _serve_data_export,
+        _DATA_DOWNLOAD_ROUTE: _serve_data_download,
+        _DATA_BATCH_ROUTE: _serve_data_batch,
+        _DATA_IMPORT_ROUTE: _serve_data_import,
+    }
+    handler = handlers.get(path)
+    if handler is not None:
+        await handler(gateway, receive, send, request_id, trace_id)
+        return True
+    return False
+
+
 async def _dispatch_data_reference(
     gateway: ObserveMarketReferenceCapability,
     path: str,
@@ -2129,37 +2193,13 @@ async def _dispatch_data_reference(
     Returns:
         True if route was handled, False otherwise.
     """
-    if path == _DATA_BARS_ROUTE and method == "GET":
-        await _serve_bars(gateway, scope, send, request_id, trace_id)
-        return True
-    if path == _DATA_QUALITY_ROUTE and method == "GET":
-        await _serve_data_quality(gateway, params, send, request_id, trace_id)
-        return True
-    if path == _DATA_DOWNLOAD_CONFIG_ROUTE and method == "GET":
-        await _serve_data_download_config(gateway, send, request_id, trace_id)
-        return True
-    if await _serve_data_catalogue_read(
-        gateway, path, method, params, send, request_id, trace_id
+    if await _dispatch_data_reference_reads(
+        gateway, path, method, params, scope, send, request_id, trace_id
     ):
         return True
-    if await _serve_data_discovery_read(
-        gateway, path, method, params, send, request_id, trace_id
+    if await _dispatch_data_reference_posts(
+        gateway, path, method, receive, send, request_id, trace_id
     ):
-        return True
-    if path == _DATA_CLONE_ROUTE and method == "POST":
-        await _serve_data_clone(gateway, receive, send, request_id, trace_id)
-        return True
-    if path == _DATA_EXPORT_ROUTE and method == "POST":
-        await _serve_data_export(gateway, receive, send, request_id, trace_id)
-        return True
-    if path == _DATA_DOWNLOAD_ROUTE and method == "POST":
-        await _serve_data_download(gateway, receive, send, request_id, trace_id)
-        return True
-    if path == _DATA_BATCH_ROUTE and method == "POST":
-        await _serve_data_batch(gateway, receive, send, request_id, trace_id)
-        return True
-    if path == _DATA_IMPORT_ROUTE and method == "POST":
-        await _serve_data_import(gateway, receive, send, request_id, trace_id)
         return True
     return await _serve_data_write_routes(
         gateway, receive, send, path, method, params, request_id, trace_id

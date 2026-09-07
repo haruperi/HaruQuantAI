@@ -1,0 +1,17 @@
+{
+  "manifest_version": "1.0",
+  "timestamp": "2026-09-07T18:45:00+03:00",
+  "reference_machine": {
+    "architecture": "x86_64",
+    "cpu_cores_minimum": 8,
+    "ram_gb_minimum": 16,
+    "disk_type": "NVMe SSD"
+  },
+  "budget_limits": {
+    "unit_test_ms": 100,
+    "component_test_ms": 1000,
+    "feature_test_max_seconds": 5,
+    "phase_e2e_max_seconds": 60,
+    "memory_limit_per_worker_mb": 2048
+  }
+}

@@ -1,0 +1,331 @@
+{
+  "manifest_version": "1.0",
+  "timestamp": "2026-09-07T18:45:00+03:00",
+  "boundary_clarifications": {
+    "FEAT-DATA-MARKET_DATA_STORE": {
+      "provided_capability": "data.market-data-store@1",
+      "owns": "Parquet historical bar/tick storage, partition directories, and raw file writing.",
+      "path": "app/services/data/market_data_store"
+    },
+    "FEAT-DATA-BROWSE_REFERENCE": {
+      "provided_capability": "data.browse-reference@1",
+      "owns": "Reference catalogue queries, SQLite metadata, MT4 HST/FXT exports, and quality anomaly checks.",
+      "path": "app/services/data/browse_reference"
+    }
+  },
+  "domain_contracts": {
+    "UI": {
+      "owner_readme": "app/ui/README.md",
+      "feature_count": 38,
+      "features": [
+        "FEAT-UI-01",
+        "FEAT-UI-14",
+        "FEAT-UI-VIEW_COLLECTIONS",
+        "FEAT-UI-REVIEW_DRAFTS",
+        "FEAT-UI-17",
+        "FEAT-UI-16",
+        "FEAT-UI-13",
+        "FEAT-UI-RUN_MONITOR",
+        "FEAT-UI-DEBUG_CONSOLE",
+        "FEAT-UI-18",
+        "FEAT-UI-04",
+        "FEAT-UI-STRATEGY_STUDIO",
+        "FEAT-UI-PERFORMANCE_LAB",
+        "FEAT-UI-27",
+        "FEAT-UI-32",
+        "FEAT-UI-DATABANK_GRID",
+        "FEAT-UI-RESULT_OVERVIEW",
+        "FEAT-UI-TRADE_LIST",
+        "FEAT-UI-EQUITY_CHART",
+        "FEAT-UI-TRADE_ANALYSIS",
+        "FEAT-UI-TRADES_ON_CHART",
+        "FEAT-UI-15",
+        "FEAT-UI-CHAT_BOT",
+        "FEAT-UI-AGENTIC_RUN_INSPECTOR",
+        "FEAT-UI-28",
+        "FEAT-UI-ROBUSTNESS_RESULTS",
+        "FEAT-UI-STRATEGY_RETESTER",
+        "FEAT-UI-STRATEGY_BUILDER",
+        "FEAT-UI-PARAMETER_OPTIMIZER",
+        "FEAT-UI-OPTIMIZATION_RESULTS",
+        "FEAT-UI-PORTFOLIO_COMPOSER",
+        "FEAT-UI-PORTFOLIO_BUILDER",
+        "FEAT-UI-PROJECT_EDITOR",
+        "FEAT-UI-CODE_EDITOR",
+        "FEAT-UI-INDICATOR_TESTER",
+        "FEAT-UI-ADVANCED_ANALYSIS",
+        "FEAT-UI-NEURAL_RESEARCH",
+        "FEAT-UI-STRATEGY_PACKAGER"
+      ]
+    },
+    "Workspace": {
+      "owner_readme": "app/services/workspace/README.md",
+      "feature_count": 9,
+      "features": [
+        "FEAT-WS-MANAGE_WORKSPACES",
+        "FEAT-WS-MANAGE_ACCOUNTS",
+        "FEAT-WS-EXECUTE_PERSISTENCE",
+        "FEAT-WS-SECURE_LOCAL_ACCESS",
+        "FEAT-WS-ADMINISTER_SETTINGS",
+        "FEAT-WS-MANAGE_ARTIFACTS",
+        "FEAT-WS-BUILD_DIAGNOSTICS",
+        "FEAT-WS-MANAGE_CONVERSATIONS",
+        "FEAT-WS-DISTRIBUTE_APPLICATION"
+      ]
+    },
+    "Plugins": {
+      "owner_readme": "app/services/plugins/README.md",
+      "feature_count": 8,
+      "features": [
+        "FEAT-PLUG-DECLARE_MANIFESTS",
+        "FEAT-PLUG-REGISTER_CONTRIBUTIONS",
+        "FEAT-PLUG-SANDBOX_PERMISSIONS",
+        "FEAT-PLUG-AUTHOR_PACKAGES",
+        "FEAT-PLUG-ISOLATE_ANALYSIS",
+        "FEAT-PLUG-RENDER_RESULT_PANELS",
+        "FEAT-PLUG-MANAGE_LIFECYCLE",
+        "FEAT-PLUG-MAINTAIN_COMPATIBILITY"
+      ]
+    },
+    "Interfaces": {
+      "owner_readme": "app/services/interfaces/README.md",
+      "feature_count": 15,
+      "features": [
+        "FEAT-IFACE-SERVE_API_EVENTS",
+        "FEAT-IFACE-OPERATE_IDENTITY",
+        "FEAT-IFACE-OPERATE_SETTINGS",
+        "FEAT-IFACE-OPERATE_JOBS",
+        "FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
+        "FEAT-IFACE-OPERATE_STRATEGIES",
+        "FEAT-IFACE-OPERATE_SIMULATIONS",
+        "FEAT-IFACE-OPERATE_RESULTS",
+        "FEAT-IFACE-AGENTIC_GATEWAY",
+        "FEAT-IFACE-OPERATE_RESEARCH",
+        "FEAT-IFACE-OPERATE_OPTIMIZATION",
+        "FEAT-IFACE-OPERATE_PORTFOLIOS",
+        "FEAT-IFACE-EDIT_PROJECTS",
+        "FEAT-IFACE-ADMINISTER_CAPABILITIES",
+        "FEAT-IFACE-AUTOMATE_COMMANDS"
+      ]
+    },
+    "Orchestration": {
+      "owner_readme": "app/services/orchestration/README.md",
+      "feature_count": 8,
+      "features": [
+        "FEAT-ORCH-RESERVE_RESOURCES",
+        "FEAT-ORCH-MANAGE_JOBS",
+        "FEAT-ORCH-EXECUTE_LOCAL_WORK",
+        "FEAT-ORCH-DEFINE_PROJECTS",
+        "FEAT-ORCH-EXECUTE_UTILITIES",
+        "FEAT-ORCH-DELIVER_NOTIFICATIONS",
+        "FEAT-ORCH-RUN_PROJECTS",
+        "FEAT-ORCH-MANAGE_REMOTE_WORKERS"
+      ]
+    },
+    "Agentic": {
+      "owner_readme": "app/services/agentic/README.md",
+      "feature_count": 20,
+      "features": [
+        "FEAT-AGT-ENFORCE_MANDATE",
+        "FEAT-AGT-OPERATE_RUNS",
+        "FEAT-AGT-REGISTER_ROLES",
+        "FEAT-AGT-GOVERN_TOOL_CALLS",
+        "FEAT-AGT-INVOKE_MODELS",
+        "FEAT-AGT-ASSEMBLE_CONTEXT",
+        "FEAT-AGT-RUN_WORKFLOWS",
+        "FEAT-AGT-EVALUATE_PROFILES",
+        "FEAT-AGT-MANAGE_CLAIMS",
+        "FEAT-AGT-SYNTHESIZE_RESEARCH",
+        "FEAT-AGT-ASSIST_OPERATOR",
+        "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
+        "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
+        "FEAT-AGT-DESIGN_RESEARCH",
+        "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
+        "FEAT-AGT-DELIBERATE_RESEARCH",
+        "FEAT-AGT-ADVISE_PORTFOLIO",
+        "FEAT-AGT-MANAGE_MEMORY",
+        "FEAT-AGT-CALIBRATE_OUTCOMES",
+        "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS"
+      ]
+    },
+    "Catalogue": {
+      "owner_readme": "app/services/catalogue/README.md",
+      "feature_count": 7,
+      "features": [
+        "FEAT-CAT-CATALOG_INSTRUMENTS",
+        "FEAT-CAT-DEFINE_SESSIONS",
+        "FEAT-CAT-MAP_PROVIDERS",
+        "FEAT-CAT-DEFINE_TRADING_RULES",
+        "FEAT-CAT-CONVERT_CURRENCIES",
+        "FEAT-CAT-MANAGE_UNIVERSES",
+        "FEAT-CAT-EXCHANGE_CATALOGUE"
+      ]
+    },
+    "Brokers": {
+      "owner_readme": "app/services/brokers/README.md",
+      "feature_count": 11,
+      "features": [
+        "FEAT-BRK-METATRADER",
+        "FEAT-BRK-CTRADER",
+        "FEAT-BRK-BINANCE",
+        "FEAT-BRK-DUKASCOPY",
+        "FEAT-BRK-YAHOO",
+        "FEAT-BRK-RESOLVE",
+        "FEAT-BRK-DARWINEX",
+        "FEAT-BRK-COINBASE",
+        "FEAT-BRK-BITFINEX",
+        "FEAT-BRK-POLONIEX",
+        "FEAT-BRK-CONNECT_MARKET_FEEDS"
+      ]
+    },
+    "Data": {
+      "owner_readme": "app/services/data/README.md",
+      "feature_count": 16,
+      "features": [
+        "FEAT-DATA-MARKET_DATA_STORE",
+        "FEAT-DATA-RESOLVE_QUALITY",
+        "FEAT-DATA-AGGREGATE_BARS",
+        "FEAT-DATA-MANAGE_RETENTION",
+        "FEAT-DATA-NORMALIZE_TICKS",
+        "FEAT-DATA-GENERATE_SCENARIOS",
+        "FEAT-DATA-TRACK_MARKET_NEWS",
+        "FEAT-DATA-INGEST_HISTORY",
+        "FEAT-DATA-BIND_RUN_DATA",
+        "FEAT-DATA-STREAM_MARKET_EVENTS",
+        "FEAT-DATA-ALIGN_SERIES",
+        "FEAT-DATA-SYNC_CONNECTORS",
+        "FEAT-DATA-PREPARE_PROFILES",
+        "FEAT-DATA-IMPORT_QUANTDATA",
+        "FEAT-DATA-IMPORT_INDICATORS",
+        "FEAT-DATA-BROWSE_REFERENCE"
+      ]
+    },
+    "Indicators": {
+      "owner_readme": "app/services/indicators/README.md",
+      "feature_count": 7,
+      "features": [
+        "FEAT-IND-CALCULATE_TREND",
+        "FEAT-IND-CALCULATE_MOMENTUM",
+        "FEAT-IND-CALCULATE_VOLATILITY",
+        "FEAT-IND-CALCULATE_VOLUME_FLOW",
+        "FEAT-IND-DETECT_CANDLE_PATTERNS",
+        "FEAT-IND-TRANSFORM_SERIES",
+        "FEAT-IND-CALCULATE_MARKET_PROFILES"
+      ]
+    },
+    "Strategy": {
+      "owner_readme": "app/services/strategy/README.md",
+      "feature_count": 18,
+      "features": [
+        "FEAT-STRAT-DEFINE_AST",
+        "FEAT-STRAT-CATALOG_BLOCKS",
+        "FEAT-STRAT-CONFIGURE_CHARTS",
+        "FEAT-STRAT-MODEL_ATM_EXITS",
+        "FEAT-STRAT-EDIT_TEMPLATES",
+        "FEAT-STRAT-DEFINE_INDICATORS",
+        "FEAT-STRAT-COMPILE_STRATEGIES",
+        "FEAT-STRAT-VERSION_STRATEGIES",
+        "FEAT-STRAT-GENERATE_CODE",
+        "FEAT-STRAT-EXCHANGE_STRATEGIES",
+        "FEAT-STRAT-ACCEPT_PROPOSALS",
+        "FEAT-STRAT-DEFINE_SEARCH_SPACES",
+        "FEAT-STRAT-GENERATE_MQL5",
+        "FEAT-STRAT-GENERATE_PYTHON",
+        "FEAT-STRAT-DEFINE_ARCHITECTURES",
+        "FEAT-STRAT-GENERATE_TARGETS",
+        "FEAT-STRAT-IMPORT_SQX",
+        "FEAT-STRAT-PACKAGE_STRATEGIES"
+      ]
+    },
+    "Risk": {
+      "owner_readme": "app/services/risk/README.md",
+      "feature_count": 2,
+      "features": [
+        "FEAT-RSK-SIZE_POSITIONS",
+        "FEAT-RSK-ASSESS_RESEARCH_RISK"
+      ]
+    },
+    "Trading": {
+      "owner_readme": "app/services/trading/README.md",
+      "feature_count": 3,
+      "features": [
+        "FEAT-TRD-MANAGE_EXECUTION_SESSIONS",
+        "FEAT-TRD-MODEL_EXECUTION_POLICIES",
+        "FEAT-TRD-OBSERVE_OUTCOMES"
+      ]
+    },
+    "Simulator": {
+      "owner_readme": "app/services/simulator/README.md",
+      "feature_count": 7,
+      "features": [
+        "FEAT-SIM-MODEL_TICKS",
+        "FEAT-SIM-CONFIGURE_ENGINE",
+        "FEAT-SIM-EXECUTE_TICKS",
+        "FEAT-SIM-COMMIT_RESULTS",
+        "FEAT-SIM-CACHE_EVALUATIONS",
+        "FEAT-SIM-PERTURB_INPUTS",
+        "FEAT-SIM-SIMULATE_STOCKPICKERS"
+      ]
+    },
+    "Analytics": {
+      "owner_readme": "app/services/analytics/README.md",
+      "feature_count": 11,
+      "features": [
+        "FEAT-ANA-COMPUTE_METRICS",
+        "FEAT-ANA-QUERY_RESULTS",
+        "FEAT-ANA-DATABANK_MEMBERSHIP",
+        "FEAT-ANA-ANALYZE_TRADES",
+        "FEAT-ANA-PROJECT_SERIES",
+        "FEAT-ANA-COMPARE_RESULTS",
+        "FEAT-ANA-EXCHANGE_RESULTS",
+        "FEAT-ANA-ANALYZE_DISTRIBUTIONS",
+        "FEAT-ANA-FILTER_CORRELATION",
+        "FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS",
+        "FEAT-ANA-IMPORT_EXTERNAL_LEDGERS"
+      ]
+    },
+    "Research": {
+      "owner_readme": "app/services/research/README.md",
+      "feature_count": 15,
+      "features": [
+        "FEAT-RES-GOVERN_CAMPAIGNS",
+        "FEAT-RES-DEFINE_PROTOCOLS",
+        "FEAT-RES-GOVERN_HOLDOUTS",
+        "FEAT-RES-RUN_RESEARCH",
+        "FEAT-RES-TEST_ROBUSTNESS",
+        "FEAT-RES-QUALIFY_RESEARCH",
+        "FEAT-RES-RANK_CANDIDATES",
+        "FEAT-RES-GENERATE_STRATEGIES",
+        "FEAT-RES-EVOLVE_STRATEGIES",
+        "FEAT-RES-PREPARE_NEURAL_DATASETS",
+        "FEAT-RES-LABEL_NEURAL_DATA",
+        "FEAT-RES-INFER_MODELS",
+        "FEAT-RES-TRAIN_MODELS",
+        "FEAT-RES-VALIDATE_MODELS",
+        "FEAT-RES-EXPLAIN_MODELS"
+      ]
+    },
+    "Optimization": {
+      "owner_readme": "app/services/optimization/README.md",
+      "feature_count": 3,
+      "features": [
+        "FEAT-OPT-SEARCH_PARAMETERS",
+        "FEAT-OPT-VALIDATE_WALK_FORWARD",
+        "FEAT-OPT-PERMUTE_PARAMETERS"
+      ]
+    },
+    "Portfolio": {
+      "owner_readme": "app/services/portfolio/README.md",
+      "feature_count": 7,
+      "features": [
+        "FEAT-POR-COMPOSE_PORTFOLIOS",
+        "FEAT-POR-ANALYZE_CORRELATION",
+        "FEAT-POR-OPTIMIZE_WEIGHTS",
+        "FEAT-POR-SIMULATE_PORTFOLIOS",
+        "FEAT-POR-ANALYZE_PORTFOLIO_RISK",
+        "FEAT-POR-MERGE_PORTFOLIOS",
+        "FEAT-POR-SEARCH_PORTFOLIOS"
+      ]
+    }
+  }
+}

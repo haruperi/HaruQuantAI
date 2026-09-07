@@ -1,0 +1,62 @@
+{
+  "manifest_version": "1.0",
+  "timestamp": "2026-09-07T18:45:00+03:00",
+  "evidence_items": [
+    {
+      "item_id": "EVD-TICKS-01",
+      "description": "Tick data golden sample for causal backtest matching",
+      "owner": "FEAT-DATA-NORMALIZE_TICKS",
+      "due_phase": 4,
+      "gate_status": "REQUIRED_BEFORE_TASK_4_01"
+    },
+    {
+      "item_id": "EVD-CONTRACT-01",
+      "description": "Broker protocol wire trace verification",
+      "owner": "FEAT-BRK-RESOLVE",
+      "due_phase": 2,
+      "gate_status": "REQUIRED_BEFORE_TASK_2_01"
+    },
+    {
+      "item_id": "EVD-MQL5-01",
+      "description": "MQL5 contract golden parity fixture",
+      "owner": "FEAT-STRAT-IMPORT_MQL5",
+      "due_phase": 16,
+      "gate_status": "REQUIRED_BEFORE_TASK_16_01"
+    },
+    {
+      "item_id": "EVD-SQX-01",
+      "description": "SQX strategy archive conversion verification",
+      "owner": "FEAT-STRAT-IMPORT_SQX",
+      "due_phase": 16,
+      "gate_status": "REQUIRED_BEFORE_TASK_16_10"
+    },
+    {
+      "item_id": "EVD-CTRADER-01",
+      "description": "cTrader OpenAPI wire parity proof",
+      "owner": "FEAT-BRK-CTRADER",
+      "due_phase": 16,
+      "gate_status": "REQUIRED_BEFORE_TASK_16_02"
+    },
+    {
+      "item_id": "EVD-BINANCE-01",
+      "description": "Binance WebSocket order book golden stream",
+      "owner": "FEAT-BRK-BINANCE",
+      "due_phase": 16,
+      "gate_status": "REQUIRED_BEFORE_TASK_16_03"
+    },
+    {
+      "item_id": "EVD-METATRADER-01",
+      "description": "MetaTrader terminal bridge golden trace",
+      "owner": "FEAT-BRK-METATRADER",
+      "due_phase": 16,
+      "gate_status": "REQUIRED_BEFORE_TASK_16_04"
+    },
+    {
+      "item_id": "EVD-NEURAL-01",
+      "description": "ONNX runtime inference accuracy baseline",
+      "owner": "FEAT-RES-QUALIFY_MODELS",
+      "due_phase": 14,
+      "gate_status": "REQUIRED_BEFORE_TASK_14_01"
+    }
+  ]
+}

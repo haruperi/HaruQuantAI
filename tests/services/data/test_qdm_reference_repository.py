@@ -6,7 +6,7 @@ from uuid import uuid7
 
 import pytest
 from app.contracts.data.models import BrowseReferenceRequest, BrowseReferenceSuccess
-from app.services.data.market_data_store.reference_repository import (
+from app.services.data.browse_reference.reference_repository import (
     MarketDataReferenceRepository,
 )
 

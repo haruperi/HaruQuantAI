@@ -1,0 +1,61 @@
+{
+  "manifest_version": "1.0",
+  "timestamp": "2026-09-07T18:45:00+03:00",
+  "fixture_hierarchy": {
+    "small": {
+      "scope": "Feature-local unit and traceability tests",
+      "duration_budget_ms": 100,
+      "external_io": "NONE",
+      "dataset_sizes": {
+        "bars": 50,
+        "ticks": 200,
+        "accounts": 1
+      }
+    },
+    "medium": {
+      "scope": "Component and domain integration tests",
+      "duration_budget_ms": 1000,
+      "external_io": "IN_MEMORY_SQLITE_AND_TEMP_DIR",
+      "dataset_sizes": {
+        "bars": 5000,
+        "ticks": 20000,
+        "accounts": 5
+      }
+    },
+    "large": {
+      "scope": "Phase-level E2E browser and backtest scale benchmarks",
+      "duration_budget_ms": 10000,
+      "external_io": "LOCAL_TEMP_WORKSPACES",
+      "dataset_sizes": {
+        "bars": 100000,
+        "ticks": 1000000,
+        "accounts": 20
+      }
+    }
+  },
+  "deterministic_fixtures": [
+    {
+      "name": "fix_synthetic_bars_m1",
+      "type": "OHLCV",
+      "symbols": [
+        "EURUSD",
+        "GBPUSD"
+      ],
+      "bars": 1000
+    },
+    {
+      "name": "fix_synthetic_ticks",
+      "type": "TickBidAsk",
+      "symbols": [
+        "EURUSD"
+      ],
+      "ticks": 5000
+    },
+    {
+      "name": "fix_reference_catalogue",
+      "type": "SQLiteCatalog",
+      "symbols": 10,
+      "brokers": 4
+    }
+  ]
+}

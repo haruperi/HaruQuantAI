@@ -135,7 +135,7 @@ Navigation: [Phase 1](#phase-1) · [Phase 2](#phase-2) · [Phase 3](#phase-3) ·
 
 **Eight prerequisite tasks; no feature task is consumed here.** All Phase 0 task statuses start `NOT_EXECUTED`.
 
-### - [ ] Preparation 0.01 — Freeze the source and the 205-feature scope
+### - [x] Preparation 0.01 — Freeze the source and the 205-feature scope
 
 Record immutable copies/hashes of the supplied register Markdown/JSON, the earlier capability DAG and the live repository baseline. Compare the register source blob 7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd against the current specification blob d69bef59cb981350cd6f2ebdccc31b231a4e0950. Inspect the exact diff; classify every changed clause as retained, already covered, changed, or scope-impacting. Do not infer freshness from timestamps or silently change the 205-feature set.
 
@@ -145,7 +145,7 @@ Record immutable copies/hashes of the supplied register Markdown/JSON, the earli
 
 **Commit message:** `docs(sqx): pin the feature-plan baseline and source reconciliation`
 
-### - [ ] Preparation 0.02 — Audit existing feature evidence and current paths
+### - [x] Preparation 0.02 — Audit existing feature evidence and current paths
 
 Inspect all 205 target owners and their public contracts. Reconcile the target spellings with existing paths, including workspace_lifecycle, local_access_health, diagnostic_bundle and the Plugins semantic folders. Record current contracts, code, entry points, UI registries, tests, usage, dependencies and known gaps separately. Check the exact current entry-point set directly; do not use stale master counts. Confirm exact current baseline findings rather than assuming a missing target spelling means missing behaviour.
 
@@ -155,7 +155,7 @@ Inspect all 205 target owners and their public contracts. Reconcile the target s
 
 **Commit message:** `docs(sqx): record feature reuse status and evidence gaps`
 
-### - [ ] Preparation 0.03 — Publish the authoritative domain README bindings
+### - [x] Preparation 0.03 — Publish the authoritative domain README bindings
 
 Merge all selected boundaries, exact identities, FR/local-NFR lists, shared NFR applicability, catalogue entries, contract signatures/DTOs/errors, state, paths, source aliases, fixtures and removal rules into the 18 owning domain READMEs. Preserve unrelated domain scope and permanent numeric UI IDs. Existing public contracts win where compatible; resolve mismatches explicitly, including Data storage/browse overlap, Workspace versus Orchestration authority and public schema examples. Provide feature-local README content required by the pipeline as each feature is implemented; domain READMEs do not replace those files.
 
@@ -165,7 +165,7 @@ Merge all selected boundaries, exact identities, FR/local-NFR lists, shared NFR 
 
 **Commit message:** `docs(sqx): bind all 205 features to authoritative domain specifications`
 
-### - [ ] Preparation 0.04 — Freeze the DAG, operation gates and Agile checkpoints
+### - [x] Preparation 0.04 — Freeze the DAG, operation gates and Agile checkpoints
 
 Ratify the required graph, operation-time readiness matrix and added real-provider sequencing constraints in the supplied schedule. Preserve the original DAG as a capability-acceptance graph, not a one-node/one-feature task list. Approve every later-operation gate and assign its real integration evidence to the later provider task. Freeze the capability, route and widget contribution interfaces so future providers do not require a second implementation task for an earlier owner.
 
@@ -175,7 +175,7 @@ Ratify the required graph, operation-time readiness matrix and added real-provid
 
 **Commit message:** `docs(sqx): freeze the bottom-up Agile feature schedule`
 
-### - [ ] Preparation 0.05 — Specify the numerical, external-evidence and security prerequisites
+### - [x] Preparation 0.05 — Specify the numerical, external-evidence and security prerequisites
 
 Resolve the numerical policy, production generated-tick algorithm, scaled arithmetic/overflow, native state and checkpoint contracts. Create hash-pinned small/medium/large fixtures, security/isolation policies and source/provider/target compatibility matrices. Address the register’s eight EVD dependencies with named evidence owners and due gates. Never invent unavailable donor classes, source licences, binary offsets or toolchain success. Missing optional external evidence blocks that affected claim, not unrelated core development.
 
@@ -185,7 +185,7 @@ Resolve the numerical policy, production generated-tick algorithm, scaled arithm
 
 **Commit message:** `docs(sqx): pin numerical fixtures and external qualification gates`
 
-### - [ ] Preparation 0.06 — Establish a reproducible quality and performance baseline
+### - [x] Preparation 0.06 — Establish a reproducible quality and performance baseline
 
 Record Windows/Python/Node/package/toolchain versions from the lockfiles and runtime probes; record reference hardware and finite workload budgets before scale qualification. Triage CI run 34051983427/job 101537114162 at a3c81df: Ruff reports 36 findings, then the gate stops. Repair only prerequisite baseline hygiene through this Phase 0 readiness task with owner-scoped changes; substantive feature gaps remain in their existing feature task. Run the full gate only at the approved commit/CI baseline boundary, not during iterative implementation.
 
@@ -195,7 +195,7 @@ Record Windows/Python/Node/package/toolchain versions from the lockfiles and run
 
 **Commit message:** `chore(sqx): establish the reproducible implementation baseline`
 
-### - [ ] Preparation 0.07 — Prepare evidence, usage and browser-test harnesses
+### - [x] Preparation 0.07 — Prepare evidence, usage and browser-test harnesses
 
 Prepare the common evidence schema and locations used below. Define synthetic, deterministic no-live-order fixtures and per-feature primary usage-module bindings. Add schema checks for feature/FR/NFR/catalogue/acceptance/commit links and the browser slice harness. Ensure real-provider browser tests are distinguishable from contract stubs and screenshots. Reuse existing repository runners rather than introduce another framework.
 
@@ -205,7 +205,7 @@ Prepare the common evidence schema and locations used below. Define synthetic, d
 
 **Commit message:** `test(sqx): prepare feature and UI acceptance evidence harnesses`
 
-### - [ ] Preparation 0.08 — Ratify Phase 1 entry and freeze the execution tracker
+### - [x] Preparation 0.08 — Ratify Phase 1 entry and freeze the execution tracker
 
 Review source reconciliation, 205 one-to-one task slots, canonical README entries, baseline findings, generated schedule and external gates. Freeze the tracker used by the Task/Goal workflow. Preserve one active feature Task at a time and one feature implementation commit plus its normal merge record. Phase 0 preparation is not the specification U0 runtime acceptance milestone; the six U0-labelled product features are still implemented or reused in Phase 1.
 

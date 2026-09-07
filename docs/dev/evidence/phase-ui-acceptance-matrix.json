@@ -1,0 +1,150 @@
+{
+  "manifest_version": "1.0",
+  "timestamp": "2026-09-07T18:45:00+03:00",
+  "matrix": [
+    {
+      "phase": 1,
+      "name": "Phase 1",
+      "checkpoint_task": "1.30",
+      "checkpoint_feature": "FEAT-UI-DEBUG_CONSOLE",
+      "test_target": "tests/ui/e2e/phase_01.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-01.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 2,
+      "name": "Phase 2",
+      "checkpoint_task": "2.32",
+      "checkpoint_feature": "FEAT-UI-04",
+      "test_target": "tests/ui/e2e/phase_02.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-02.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 3,
+      "name": "Phase 3",
+      "checkpoint_task": "3.18",
+      "checkpoint_feature": "FEAT-UI-STRATEGY_STUDIO",
+      "test_target": "tests/ui/e2e/phase_03.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-03.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 4,
+      "name": "Phase 4",
+      "checkpoint_task": "4.27",
+      "checkpoint_feature": "FEAT-UI-TRADES_ON_CHART",
+      "test_target": "tests/ui/e2e/phase_04.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-04.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 5,
+      "name": "Phase 5",
+      "checkpoint_task": "5.11",
+      "checkpoint_feature": "FEAT-UI-AGENTIC_RUN_INSPECTOR",
+      "test_target": "tests/ui/e2e/phase_05.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-05.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 6,
+      "name": "Phase 6",
+      "checkpoint_task": "6.11",
+      "checkpoint_feature": "FEAT-UI-28",
+      "test_target": "tests/ui/e2e/phase_06.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-06.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 7,
+      "name": "Phase 7",
+      "checkpoint_task": "7.07",
+      "checkpoint_feature": "FEAT-UI-STRATEGY_RETESTER",
+      "test_target": "tests/ui/e2e/phase_07.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-07.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 8,
+      "name": "Phase 8",
+      "checkpoint_task": "8.05",
+      "checkpoint_feature": "FEAT-UI-STRATEGY_BUILDER",
+      "test_target": "tests/ui/e2e/phase_08.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-08.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 9,
+      "name": "Phase 9",
+      "checkpoint_task": "9.06",
+      "checkpoint_feature": "FEAT-UI-OPTIMIZATION_RESULTS",
+      "test_target": "tests/ui/e2e/phase_09.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-09.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 10,
+      "name": "Phase 10",
+      "checkpoint_task": "10.12",
+      "checkpoint_feature": "FEAT-UI-PORTFOLIO_BUILDER",
+      "test_target": "tests/ui/e2e/phase_10.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-10.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 11,
+      "name": "Phase 11",
+      "checkpoint_task": "11.09",
+      "checkpoint_feature": "FEAT-UI-PROJECT_EDITOR",
+      "test_target": "tests/ui/e2e/phase_11.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-11.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 12,
+      "name": "Phase 12",
+      "checkpoint_task": "12.13",
+      "checkpoint_feature": "FEAT-UI-INDICATOR_TESTER",
+      "test_target": "tests/ui/e2e/phase_12.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-12.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 13,
+      "name": "Phase 13",
+      "checkpoint_task": "13.04",
+      "checkpoint_feature": "FEAT-UI-ADVANCED_ANALYSIS",
+      "test_target": "tests/ui/e2e/phase_13.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-13.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 14,
+      "name": "Phase 14",
+      "checkpoint_task": "14.07",
+      "checkpoint_feature": "FEAT-UI-NEURAL_RESEARCH",
+      "test_target": "tests/ui/e2e/phase_14.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-14.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 15,
+      "name": "Phase 15",
+      "checkpoint_task": "15.01",
+      "checkpoint_feature": "FEAT-ORCH-MANAGE_REMOTE_WORKERS",
+      "test_target": "tests/ui/e2e/phase_15.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-15.json",
+      "status": "PLANNED"
+    },
+    {
+      "phase": 16,
+      "name": "Phase 16",
+      "checkpoint_task": "16.12",
+      "checkpoint_feature": "FEAT-UI-STRATEGY_PACKAGER",
+      "test_target": "tests/ui/e2e/phase_16.spec.ts",
+      "evidence_path": "docs/dev/evidence/phases/phase-16.json",
+      "status": "PLANNED"
+    }
+  ]
+}

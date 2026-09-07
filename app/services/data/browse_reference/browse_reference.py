@@ -22,7 +22,7 @@ from app.contracts.data.models import (
     BrowseReferenceSuccess,
 )
 from app.services.data.browse_reference.config import BrowseReferenceConfig
-from app.services.data.market_data_store.reference_repository import (
+from app.services.data.browse_reference.reference_repository import (
     MarketDataReferenceRepository,
 )
 
@@ -779,7 +779,10 @@ class BrowseReferenceService:
         if existing is None:
             with self._conn:
                 self._conn.execute(
-                    "INSERT INTO instruments (name, description, point, trade_contract_size, trade_tick_size, spread, path, volume_min, volume_step) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO instruments ("
+                    "name, description, point, trade_contract_size, "
+                    "trade_tick_size, spread, path, volume_min, volume_step"
+                    ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (
                         instrument,
                         instrument,
