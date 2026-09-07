@@ -4,7 +4,9 @@
   "baseline": {
     "repository_head": "34edd2b3c8164b59ed9b2b2964c0d79f7c2d399a",
     "plan_path": "docs/dev/Phased_Feature_Implementation_Plan.md",
-    "plan_sha256": "7fba3b8aa82ad94652c353ca997051067caa5fce650f39f389e9e9e705a5b5f6",
+    "plan_git_blob": "a6a8754170c5ff1a0ba853f8b3d91f43a68aa2a3",
+    "plan_sha256": "421120edda333378eed98f39e9e0a8c0870f50308cd5b96828175be33bbb328f",
+    "legacy_unattested_plan_sha256": "7fba3b8aa82ad94652c353ca997051067caa5fce650f39f389e9e9e705a5b5f6",
     "register_path": "docs/dev/Feature_Requirement_Traceability_Register.md",
     "register_sha256": "e2b7fae2c76c2cfead8dece02d50058e6283618bbe396dc74c209de7df5d81ef",
     "register_git_blob": "402c3cfa45ee77146789b6136bbe713c74773e00",

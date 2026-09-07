@@ -17,6 +17,30 @@ const widget = (over: Partial<Widget> & Pick<Widget, "id" | "type" | "title">): 
   ...over,
 });
 
+const dockFor = (ids: string[], title = "Markets") => ({
+  grid: {
+    root: {
+      type: "leaf",
+      data: { id: "main", views: ids, activeView: ids[0] },
+    },
+    height: 800,
+    width: 1200,
+    orientation: "VERTICAL",
+  },
+  panels: Object.fromEntries(
+    ids.map((id) => [
+      id,
+      {
+        id,
+        title,
+        contentComponent: "widget",
+        params: { widgetId: id },
+      },
+    ]),
+  ),
+  activeGroup: "main",
+});
+
 const mockedTabGroup = {};
 
 const makeApi = () => {
@@ -57,7 +81,7 @@ const makeApi = () => {
     getPanel: (id: string) => panels.find((panel) => panel.id === id),
     onDidRemovePanel: vi.fn(),
     onDidLayoutChange: vi.fn(),
-    toJSON: vi.fn(() => ({ saved: true })),
+    toJSON: vi.fn(() => dockFor(["a"])),
   };
   return api;
 };
@@ -136,7 +160,7 @@ const workspaceWith = (widgets: Widget[], dock?: unknown): Workspace => ({
 
 describe("FR-UI-201 restore path", () => {
   it("restores a persisted serialized layout instead of rebuilding", () => {
-    const dock = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: { a: { id: "a" } } };
+    const dock = dockFor(["a"]);
     render(<DockingWorkspace workspace={workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], dock)} />);
     expect(fakeApi.fromJSON).toHaveBeenCalledWith(dock);
     expect(fakeApi.addPanel).not.toHaveBeenCalled();
@@ -160,7 +184,7 @@ describe("FR-UI-201 restore path", () => {
           activeWorkspaceId: 77,
         }));
       });
-      const dock = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: { a: { id: "a", title: "Markets" } } };
+      const dock = dockFor(["a"]);
       render(<DockingWorkspace workspace={workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], dock)} />);
       expect(fakeApi.onDidLayoutChange).toHaveBeenCalledTimes(1);
       const emitChange = fakeApi.onDidLayoutChange.mock.calls[0][0] as () => void;
@@ -175,7 +199,7 @@ describe("FR-UI-201 restore path", () => {
         vi.advanceTimersByTime(300);
       });
       const ws = useWorkspaceStore.getState().workspaces.find((w) => w.id === 77);
-      expect(ws?.dock).toEqual({ saved: true });
+      expect(ws?.dock).toEqual(dockFor(["a"]));
     } finally {
       vi.useRealTimers();
     }
@@ -184,7 +208,7 @@ describe("FR-UI-201 restore path", () => {
 
 describe("registry reconciliation", () => {
   it("docks a newly added widget as a tab in the active group", () => {
-    const dock = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: { a: { id: "a" } } };
+    const dock = dockFor(["a"]);
     const { rerender } = render(
       <DockingWorkspace workspace={workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], dock)} />
     );
@@ -207,7 +231,7 @@ describe("registry reconciliation", () => {
   });
 
   it("closes the panel of a widget removed from the registry", () => {
-    const dock = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: { a: { id: "a", title: "Markets" } } };
+    const dock = dockFor(["a"]);
     const { rerender } = render(
       <DockingWorkspace workspace={workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], dock)} />
     );
@@ -218,7 +242,7 @@ describe("registry reconciliation", () => {
   });
 
   it("retitles a panel when the registry title changes", () => {
-    const dock = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: { a: { id: "a", title: "Markets" } } };
+    const dock = dockFor(["a"]);
     const { rerender } = render(
       <DockingWorkspace workspace={workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], dock)} />
     );
@@ -233,7 +257,7 @@ describe("registry reconciliation", () => {
 
 describe("FR-UI-007 keyboard panel moves", () => {
   it("moves the active panel with Alt+Arrow and ignores plain arrows", () => {
-    const dock = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: { a: { id: "a" } } };
+    const dock = dockFor(["a"]);
     render(<DockingWorkspace workspace={workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], dock)} />);
     const moveTo = vi.fn();
     fakeApi.activePanel = {
@@ -253,7 +277,7 @@ describe("FR-UI-007 keyboard panel moves", () => {
 
 describe("FR-UI-006/008 widget header drag handle and expansion control", () => {
   it("renders panel tabs with only the explicit Expand control", () => {
-    const dock = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: { a: { id: "a" } } };
+    const dock = dockFor(["a"]);
     render(<DockingWorkspace workspace={workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], dock)} />);
     const tab = document.querySelector(".workspace-dock-tab");
     expect(tab).not.toBeNull();
@@ -269,10 +293,10 @@ describe("FR-UI-006/008 widget header drag handle and expansion control", () => 
   });
 
   it("expands a floating container from the title-bar control and restores its prior bounds", () => {
-    const workspace = workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], {
-      grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" },
-      panels: { a: { id: "a" } },
-    });
+    const workspace = workspaceWith(
+      [widget({ id: "a", type: "markets", title: "Markets" })],
+      dockFor(["a"]),
+    );
     act(() => {
       useWorkspaceStore.setState((state) => ({
         workspaces: [...state.workspaces, workspace],
@@ -301,14 +325,7 @@ describe("FR-UI-006/008 widget header drag handle and expansion control", () => 
         widget({ id: "b", type: "chart", title: "EURUSD Chart" }),
         widget({ id: "c", type: "positions", title: "Positions" }),
       ],
-      {
-        grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" },
-        panels: {
-          a: { id: "a", title: "Markets" },
-          b: { id: "b", title: "EURUSD Chart" },
-          c: { id: "c", title: "Positions" },
-        },
-      },
+      dockFor(["a", "b", "c"]),
     );
     act(() => {
       useWorkspaceStore.setState((state) => ({
@@ -332,10 +349,10 @@ describe("FR-UI-006/008 widget header drag handle and expansion control", () => 
   });
 
   it("keeps Dockview native maximize for docked groups", () => {
-    const workspace = workspaceWith([widget({ id: "a", type: "markets", title: "Markets" })], {
-      grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" },
-      panels: { a: { id: "a" } },
-    });
+    const workspace = workspaceWith(
+      [widget({ id: "a", type: "markets", title: "Markets" })],
+      dockFor(["a"]),
+    );
     act(() => {
       useWorkspaceStore.setState((state) => ({
         workspaces: [...state.workspaces, workspace],

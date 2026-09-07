@@ -10,13 +10,13 @@ vi.mock("../../widgets/research", () => ({
 import { WidgetContentHost } from "./WidgetContentHost";
 
 describe("WidgetContentHost Research compatibility", () => {
-  it("renders the V2 dashboard for a persisted Research widget", () => {
+  it("renders the V2 dashboard for a persisted Research widget", async () => {
     render(
       <WidgetContentHost
         widget={{ id: "research-legacy", type: "research", title: "Edge Lab" }}
       />
     );
 
-    expect(screen.getByText("V2 Research Dashboard")).toBeInTheDocument();
+    expect(await screen.findByText("V2 Research Dashboard")).toBeInTheDocument();
   });
 });

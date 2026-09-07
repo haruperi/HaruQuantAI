@@ -12,6 +12,28 @@ import { WORKSPACE_TEMPLATES, type WorkspaceTemplateId } from "./templates";
 
 const initialState = useWorkspaceStore.getState();
 
+const dockFor = (id: string, extra: Record<string, unknown> = {}) => ({
+  ...extra,
+  grid: {
+    root: {
+      type: "leaf",
+      data: { id: "main", views: [id], activeView: id },
+    },
+    height: 800,
+    width: 1200,
+    orientation: "VERTICAL",
+  },
+  panels: {
+    [id]: {
+      id,
+      title: "Markets",
+      contentComponent: "widget",
+      params: { widgetId: id },
+    },
+  },
+  activeGroup: "main",
+});
+
 beforeEach(() => {
   useWorkspaceStore.setState(initialState, true);
   // This jsdom environment doesn't always expose window.localStorage; the
@@ -407,9 +429,11 @@ describe("FR-UI-199 unknown template ids are rejected", () => {
 
 describe("FR-UI-201 docking layout persistence", () => {
   it("records a serialized dock layout for the addressed workspace only", () => {
+    useWorkspaceStore.getState().addWidgetToWorkspace("markets");
+    const widgetId = useWorkspaceStore.getState().workspaces[0].widgets[0].id;
     useWorkspaceStore.getState().addWorkspace();
     const secondWsId = useWorkspaceStore.getState().workspaces[1].id;
-    const layout = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: {} };
+    const layout = dockFor(widgetId);
     useWorkspaceStore.getState().setWorkspaceDockLayout(1, layout);
     const state = useWorkspaceStore.getState();
     expect(state.workspaces.find((w) => w.id === 1)!.dock).toEqual(layout);
@@ -417,11 +441,26 @@ describe("FR-UI-201 docking layout persistence", () => {
   });
 
   it("ignores an identical serialized layout so restore events cannot loop", () => {
-    const layout = { grid: { root: { type: "leaf" }, height: 1, width: 1, orientation: "VERTICAL" }, panels: {} };
+    useWorkspaceStore.getState().addWidgetToWorkspace("markets");
+    const widgetId = useWorkspaceStore.getState().workspaces[0].widgets[0].id;
+    const layout = dockFor(widgetId);
     useWorkspaceStore.getState().setWorkspaceDockLayout(1, layout);
     const before = useWorkspaceStore.getState();
     useWorkspaceStore.getState().setWorkspaceDockLayout(1, JSON.parse(JSON.stringify(layout)));
     expect(useWorkspaceStore.getState()).toBe(before);
+  });
+
+  it("strips unknown nested data before a dock layout reaches persistence", () => {
+    useWorkspaceStore.getState().addWidgetToWorkspace("markets");
+    const widgetId = useWorkspaceStore.getState().workspaces[0].widgets[0].id;
+    const layout = dockFor(widgetId, {
+      provider: { token: "SECRET" },
+      popoutGroups: [{ url: "https://example.invalid/?token=SECRET" }],
+    });
+    useWorkspaceStore.getState().setWorkspaceDockLayout(1, layout);
+    expect(JSON.stringify(useWorkspaceStore.getState().workspaces[0].dock)).not.toContain(
+      "SECRET",
+    );
   });
 
   it("ignores layout writes for an unknown workspace", () => {

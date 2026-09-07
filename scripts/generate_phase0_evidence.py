@@ -33,7 +33,13 @@ TASK_ID_RE = re.compile(r"\b\d+\.\d+\b")
 REQUIREMENT_RE = re.compile(r"^(?:FR|NFR)-[A-Z0-9_-]+$")
 PATH_RE = re.compile(r"`((?:app|tests|docs)/[^`]+)`")
 SHA1_RE = re.compile(r"\b[a-f0-9]{40}\b")
+ACCEPTANCE_REF_RE = re.compile(
+    r"(?:\b[a-f0-9]{40}\b|task-closeout:[A-Za-z0-9][A-Za-z0-9._-]+)"
+)
 BASELINE_HEAD = "34edd2b3c8164b59ed9b2b2964c0d79f7c2d399a"
+LEGACY_UNATTESTED_PLAN_SHA256 = (
+    "7fba3b8aa82ad94652c353ca997051067caa5fce650f39f389e9e9e705a5b5f6"
+)
 ORIGINAL_SPEC_BLOB = "7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd"
 PINNED_SPEC_BLOB = "d69bef59cb981350cd6f2ebdccc31b231a4e0950"
 MINIMUM_TABLE_COLUMNS = 2
@@ -58,6 +64,21 @@ def _git(*args: str) -> str:
         text=True,
     )
     return result.stdout.strip()
+
+
+def _git_bytes(*args: str) -> bytes:
+    """Run a bounded read-only Git query and preserve exact output bytes.
+
+    Returns:
+        Git standard output without text or line-ending conversion.
+    """
+    result = subprocess.run(
+        ["git", *args],
+        cwd=REPO,
+        check=True,
+        capture_output=True,
+    )
+    return result.stdout
 
 
 def _sections(text: str, pattern: re.Pattern[str]) -> list[tuple[re.Match[str], str]]:
@@ -121,7 +142,7 @@ def parse_plan(text: str) -> list[dict[str, Any]]:
         first_slice = (_field(section, "Register first slice") or "").strip("` .")
         prerequisites = _field(section, "Order prerequisites") or ""
         accepted_line = _field(section, "Accepted commit") or ""
-        accepted_match = SHA1_RE.search(accepted_line)
+        accepted_match = ACCEPTANCE_REF_RE.search(accepted_line)
         evidence_match = re.search(r"\*\*Evidence manifest:\*\*\s*`([^`]+)`", section)
         test_line = _field(section, "Acceptance test targets") or ""
         tasks.append(
@@ -263,8 +284,11 @@ def parse_register(text: str) -> list[dict[str, Any]]:
     return features
 
 
-def _entry_point_targets() -> tuple[int, set[str]]:
-    """Read the registered feature entry-point table.
+def _entry_point_targets(pyproject_bytes: bytes) -> tuple[int, set[str]]:
+    """Read the registered feature entry-point table from exact TOML bytes.
+
+    Args:
+        pyproject_bytes: The baseline or live ``pyproject.toml`` bytes to parse.
 
     Returns:
         The exact entry-point count and normalized module roots.
@@ -272,8 +296,7 @@ def _entry_point_targets() -> tuple[int, set[str]]:
     Raises:
         TypeError: If the feature entry-point configuration is not a TOML table.
     """
-    with (REPO / "pyproject.toml").open("rb") as handle:
-        data = tomllib.load(handle)
+    data = tomllib.loads(pyproject_bytes.decode("utf-8"))
     table = (
         data.get("project", {}).get("entry-points", {}).get("haruquantai.features", {})
     )
@@ -319,17 +342,23 @@ def build_payloads() -> dict[Path, dict[str, Any]]:  # noqa: PLR0915
     plan_text = PLAN_PATH.read_text(encoding="utf-8")
     register_text = REGISTER_PATH.read_text(encoding="utf-8")
     tasks = parse_plan(plan_text)
+    baseline_plan_path = PLAN_PATH.relative_to(REPO).as_posix()
+    baseline_plan_bytes = _git_bytes("show", f"{BASELINE_HEAD}:{baseline_plan_path}")
+    baseline_tasks = parse_plan(baseline_plan_bytes.decode("utf-8"))
+    baseline_plan_blob = _git("rev-parse", f"{BASELINE_HEAD}:{baseline_plan_path}")
     contracts = parse_register(register_text)
-    task_by_feature = {task["feature_id"]: task for task in tasks}
+    baseline_task_by_feature = {task["feature_id"]: task for task in baseline_tasks}
     contract_by_feature = {item["feature_id"]: item for item in contracts}
-    entry_point_count, entry_modules = _entry_point_targets()
+    baseline_pyproject_bytes = _git_bytes("show", f"{BASELINE_HEAD}:pyproject.toml")
+    baseline_entry_point_count, _ = _entry_point_targets(baseline_pyproject_bytes)
+    _, entry_modules = _entry_point_targets((REPO / "pyproject.toml").read_bytes())
 
     required_edges: list[dict[str, Any]] = []
     operation_edges: list[dict[str, Any]] = []
     for consumer in contracts:
-        consumer_task = task_by_feature[consumer["feature_id"]]
+        consumer_task = baseline_task_by_feature[consumer["feature_id"]]
         for provider in consumer["required_providers"]:
-            provider_task = task_by_feature[provider]
+            provider_task = baseline_task_by_feature[provider]
             required_edges.append(
                 {
                     "consumer": consumer["feature_id"],
@@ -342,9 +371,9 @@ def build_payloads() -> dict[Path, dict[str, Any]]:  # noqa: PLR0915
                 }
             )
         for edge in consumer["operation_gates"]:
-            provider_task = task_by_feature[edge["provider"]]
-            consumer_index = tasks.index(consumer_task)
-            provider_index = tasks.index(provider_task)
+            provider_task = baseline_task_by_feature[edge["provider"]]
+            consumer_index = baseline_tasks.index(consumer_task)
+            provider_index = baseline_tasks.index(provider_task)
             owner_task = (
                 provider_task if provider_index >= consumer_index else consumer_task
             )
@@ -362,21 +391,21 @@ def build_payloads() -> dict[Path, dict[str, Any]]:  # noqa: PLR0915
                 }
             )
 
-    status_counts = Counter(str(task["status"]) for task in tasks)
-    feature_ids = [str(task["feature_id"]) for task in tasks]
-    domain_counts = Counter(str(task["domain"]) for task in tasks)
+    status_counts = Counter(str(task["status"]) for task in baseline_tasks)
+    feature_ids = [str(task["feature_id"]) for task in baseline_tasks]
+    domain_counts = Counter(str(task["domain"]) for task in baseline_tasks)
     inventory = {
-        "total_features": len(tasks),
+        "total_features": len(baseline_tasks),
         "total_domains": len(domain_counts),
         "total_normalized_frs": sum(
             1
-            for task in tasks
+            for task in baseline_tasks
             for item in task["requirements"]
             if item["id"].startswith("FR-")
         ),
         "total_local_nfrs": sum(
             1
-            for task in tasks
+            for task in baseline_tasks
             for item in task["requirements"]
             if item["id"].startswith("NFR-")
         ),
@@ -386,15 +415,17 @@ def build_payloads() -> dict[Path, dict[str, Any]]:  # noqa: PLR0915
         "total_workflows": 20,
         "total_required_edges": len(required_edges),
         "total_operation_gated_edges": len(operation_edges),
-        "registered_entry_points": entry_point_count,
+        "registered_entry_points": baseline_entry_point_count,
     }
     baseline_manifest: dict[str, Any] = {
         "$schema": "./phase-0-evidence-schema.json",
         "manifest_version": "2.0",
         "baseline": {
             "repository_head": BASELINE_HEAD,
-            "plan_path": PLAN_PATH.relative_to(REPO).as_posix(),
-            "plan_sha256": _sha256(PLAN_PATH),
+            "plan_path": baseline_plan_path,
+            "plan_git_blob": baseline_plan_blob,
+            "plan_sha256": hashlib.sha256(baseline_plan_bytes).hexdigest(),
+            "legacy_unattested_plan_sha256": LEGACY_UNATTESTED_PLAN_SHA256,
             "register_path": REGISTER_PATH.relative_to(REPO).as_posix(),
             "register_sha256": _sha256(REGISTER_PATH),
             "register_git_blob": _git("hash-object", str(REGISTER_PATH)),
@@ -521,7 +552,7 @@ def build_payloads() -> dict[Path, dict[str, Any]]:  # noqa: PLR0915
     schedule_phases: list[dict[str, Any]] = []
     for phase in range(1, 17):
         phase_tasks = [
-            task for task in tasks if task["task_id"].startswith(f"{phase}.")
+            task for task in baseline_tasks if task["task_id"].startswith(f"{phase}.")
         ]
         schedule_phases.append(
             {
@@ -535,7 +566,7 @@ def build_payloads() -> dict[Path, dict[str, Any]]:  # noqa: PLR0915
         )
     schedule_constraints = [
         {"task": task["task_id"], "predecessor": predecessor}
-        for task in tasks
+        for task in baseline_tasks
         for predecessor in task["order_prerequisites"]
     ]
 
@@ -614,7 +645,7 @@ def build_payloads() -> dict[Path, dict[str, Any]]:  # noqa: PLR0915
             "manifest_version": "2.0",
             "dag_properties": {
                 "is_acyclic": True,
-                "total_nodes": len(tasks),
+                "total_nodes": len(baseline_tasks),
                 "total_required_edges": len(required_edges),
                 "total_operation_edges": len(operation_edges),
                 "total_schedule_constraints": len(schedule_constraints),
@@ -632,7 +663,7 @@ def build_payloads() -> dict[Path, dict[str, Any]]:  # noqa: PLR0915
         EVIDENCE_DIR / "phase-ui-acceptance-matrix.json": {
             "manifest_version": "2.0",
             "phase_0_harness": "app/ui/e2e/research/phase_00_readiness.spec.ts",
-            "matrix": _phase_matrix(tasks),
+            "matrix": _phase_matrix(baseline_tasks),
         },
     }
     return payloads

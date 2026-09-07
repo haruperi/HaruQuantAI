@@ -14189,12 +14189,11 @@
         "PlatformAccountMode",
         "SELECTABLE_ACCOUNT_MODES",
         "SelectableAccountMode",
-        "WIDGET_TYPES",
         "Widget",
-        "WidgetType",
         "Workspace",
         "isSelectableAccountMode",
         "persistedLayoutSchema",
+        "recoverPersistedLayout",
         "widgetSchema",
         "workspaceSchema"
       ],

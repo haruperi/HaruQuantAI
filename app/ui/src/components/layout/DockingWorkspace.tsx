@@ -9,8 +9,9 @@
  * refill of vacated regions, workspace-wide tab grouping on maximize
  * (double-click a tab), and Alt+Arrow keyboard panel moves. The store's widget list is the panel
  * registry; the serialized layout tree persists through the store and is
- * rebuilt deterministically for legacy grid layouts and template presets
- * (FR-UI-201).
+ * rebuilt deterministically for legacy grid layouts and template presets.
+ * Cross-window popout is intentionally unsupported; in-workspace floating,
+ * tabbing, splitting and repositioning remain available (FR-TRC-UI-01-003).
  */
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
@@ -29,11 +30,15 @@ import {
   useWorkspaceStore,
   buildDockLayout,
   DOCK_WIDGET_COMPONENT,
+  sanitizeDockLayout,
   type Widget,
   type Workspace,
   type WorkspaceStoreState,
 } from '../../widgets/workspaces';
 import { WidgetContentHost } from './WidgetContentHost';
+
+/** Implementation-owned persistence debounce; not a public configuration knob. */
+const SAVE_DEBOUNCE_MS = 250;
 
 /** Stable selector for one widget of the active workspace (registry lookup). */
 const selectDockWidget =
@@ -77,7 +82,8 @@ const DockWidgetTab: React.FC<IDockviewPanelHeaderProps> = (props) => {
       // Maximizing is a workspace-wide focus mode. Consolidate every local
       // panel into the selected panel's group so Dockview supplies one native,
       // keyboard-accessible tab bar instead of hiding sibling widgets behind
-      // the expanded floating container. Popouts remain in their own windows.
+      // the expanded floating container. Cross-window popouts are disabled by
+      // the workspace feature configuration and never advertised here.
       for (const panel of props.containerApi.panels) {
         if (
           panel.id !== props.api.id &&
@@ -145,7 +151,7 @@ export const DockingWorkspace: React.FC<{ workspace: Workspace }> = ({ workspace
       } catch {
         // A failed serialization must never break the live workspace.
       }
-    }, 250);
+    }, SAVE_DEBOUNCE_MS);
   }, [setWorkspaceDockLayout]);
 
   const onReady = useCallback(
@@ -159,7 +165,12 @@ export const DockingWorkspace: React.FC<{ workspace: Workspace }> = ({ workspace
       let restored = false;
       if (ws.dock) {
         try {
-          api.fromJSON(ws.dock as SerializedDockview);
+          const safeDock = sanitizeDockLayout(
+            ws.dock,
+            ws.widgets.map((widget) => widget.id)
+          );
+          if (safeDock === null) throw new Error('Unsafe persisted dock layout');
+          api.fromJSON(safeDock as SerializedDockview);
           restored = api.panels.length > 0;
         } catch {
           restored = false;
@@ -278,7 +289,12 @@ export const DockingWorkspace: React.FC<{ workspace: Workspace }> = ({ workspace
   );
 
   return (
-    <div className="workspace-dock-shell dockview-theme-dark" onKeyDown={handleKeyDown}>
+    <div
+      className="workspace-dock-shell dockview-theme-dark"
+      onKeyDown={handleKeyDown}
+      data-cross-window-popout="unsupported"
+      aria-label="Workspace panels; cross-window popout is unavailable"
+    >
       <DockviewReact
         className="workspace-dockview"
         onReady={onReady}

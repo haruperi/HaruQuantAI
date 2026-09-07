@@ -5,7 +5,7 @@
       "feature_id": "FEAT-UI-01",
       "task_id": "1.01",
       "usage_target": "app/ui/src/widgets/workspaces/_usage.tsx",
-      "usage_status": "PLANNED",
+      "usage_status": "RUNNABLE",
       "executable_recipe": "npm --prefix app/ui run test -- src/widgets/workspaces/__tests__/traceability.test.tsx",
       "test_targets": [
         "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx",

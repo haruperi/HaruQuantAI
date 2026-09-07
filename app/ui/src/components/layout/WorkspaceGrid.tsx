@@ -10,7 +10,12 @@
  */
 import React from 'react';
 
-import { useWorkspaceStore, TemplatePicker, WorkspaceEmptyState } from '../../widgets/workspaces';
+import {
+  useWorkspaceStore,
+  TemplatePicker,
+  WorkspaceEmptyState,
+  WorkspaceLayoutFeature,
+} from '../../widgets/workspaces';
 import { DockingWorkspace } from './DockingWorkspace';
 
 export const WorkspaceGrid: React.FC = () => {
@@ -36,5 +41,9 @@ export const WorkspaceGrid: React.FC = () => {
 
   // A fresh docking host per workspace keeps serialized layouts from leaking
   // across workspaces on switch.
-  return <DockingWorkspace key={currentWorkspace.id} workspace={currentWorkspace} />;
+  return (
+    <WorkspaceLayoutFeature>
+      <DockingWorkspace key={currentWorkspace.id} workspace={currentWorkspace} />
+    </WorkspaceLayoutFeature>
+  );
 };

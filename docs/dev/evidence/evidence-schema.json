@@ -41,7 +41,11 @@
       "pattern": "^[a-f0-9]{40}$"
     },
     "acceptance_commit": {
-      "type": "string"
+      "type": "string",
+      "oneOf": [
+        { "pattern": "^[a-f0-9]{40}$" },
+        { "pattern": "^task-closeout:[A-Za-z0-9][A-Za-z0-9._-]+$" }
+      ]
     },
     "requirements": {
       "type": "array",
@@ -126,7 +130,8 @@
           "type": "string",
           "enum": [
             "APPROVED",
-            "CHANGES_REQUESTED"
+            "CHANGES_REQUESTED",
+            "PENDING"
           ]
         },
         "reviewer_notes": {

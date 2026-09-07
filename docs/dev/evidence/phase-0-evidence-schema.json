@@ -19,7 +19,9 @@
       "required": [
         "repository_head",
         "plan_path",
+        "plan_git_blob",
         "plan_sha256",
+        "legacy_unattested_plan_sha256",
         "register_path",
         "register_sha256",
         "register_git_blob",
@@ -27,7 +29,14 @@
         "pinned_spec_blob",
         "normalized_register",
         "normalized_dependency_graph"
-      ]
+      ],
+      "properties": {
+        "repository_head": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "plan_path": { "const": "docs/dev/Phased_Feature_Implementation_Plan.md" },
+        "plan_git_blob": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "plan_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "legacy_unattested_plan_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
     },
     "feature_ids": {
       "type": "array",

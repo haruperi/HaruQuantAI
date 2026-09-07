@@ -16,6 +16,7 @@
  * (e.g. five equal ladders need a 20-column grid).
  */
 import type { WidgetType } from "./contracts";
+import { isWidgetType } from "./registry";
 
 /** Everything a template needs to stamp out one widget in a new workspace. */
 export interface WidgetPreset {
@@ -38,13 +39,23 @@ export interface WorkspaceTemplate {
   widgets: WidgetPreset[];
 }
 
-export type WorkspaceTemplateId = "blank" | "haruquant" | "chart-ladder" | "multicharts-ladder" | "options" | "charts";
+export type WorkspaceTemplateId = "blank" | "research" | "haruquant" | "chart-ladder" | "multicharts-ladder" | "options" | "charts";
 
 export const WORKSPACE_TEMPLATES: readonly WorkspaceTemplate[] = [
   {
     id: "blank",
     name: "Blank",
     widgets: [],
+  },
+  {
+    id: "research",
+    name: "Research",
+    workspaceName: "Research",
+    widgets: [
+      { type: "research", title: "Edge Lab", col: 1, row: 1, colSpan: 8, rowSpan: 12 },
+      { type: "data", title: "Data Explorer", col: 9, row: 1, colSpan: 4, rowSpan: 6 },
+      { type: "chart", title: "EURUSD Chart", symbol: "EURUSD", col: 9, row: 7, colSpan: 4, rowSpan: 6 },
+    ],
   },
   {
     id: "haruquant",
@@ -139,5 +150,11 @@ export const WORKSPACE_TEMPLATES: readonly WorkspaceTemplate[] = [
  * @returns The registered template, or undefined for an unknown id (FR-UI-199 rejects those).
  */
 export function findWorkspaceTemplate(id: string): WorkspaceTemplate | undefined {
-  return WORKSPACE_TEMPLATES.find((template) => template.id === id);
+  const template = WORKSPACE_TEMPLATES.find((candidate) => candidate.id === id);
+  if (template === undefined) return undefined;
+  return {
+    ...template,
+    // Physical contribution removal cannot be defeated by a stale preset.
+    widgets: template.widgets.filter((widget) => isWidgetType(widget.type)),
+  };
 }

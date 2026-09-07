@@ -9,36 +9,14 @@
 
 import { z } from "zod";
 
-export const WIDGET_TYPES = [
-  "markets",
-  "marketTicks",
-  "watchlist",
-  "chart",
-  "priceLadder",
-  "optionsGrid",
-  "positions",
-  "tradeLog",
-  "tradePlan",
-  "education",
-  "challenges",
-  "dashboard",
-  "data",
-  "strategies",
-  "research",
-  "optimization",
-  "portfolio",
-  "agentic",
-  "simulator",
-  "risk",
-  "trading",
-  "sessions",
-  "indicators",
-  "news",
-  "market-hours",
-  "analytics",
-] as const;
+import {
+  isWidgetType,
+  WIDGET_TYPES,
+  type WidgetType,
+} from "./registry";
+import { sanitizeDockLayout } from "./dockPersistence";
 
-export type WidgetType = (typeof WIDGET_TYPES)[number];
+export { WIDGET_TYPES, type WidgetType };
 
 export interface Widget {
   id: string;
@@ -49,6 +27,8 @@ export interface Widget {
   accountId?: string;
   /** Simulation / backtest run identifier for analytics inspection. */
   runId?: string;
+  /** Original persisted type when its contribution is unavailable. */
+  unavailableType?: string;
   /**
    * Legacy grid-rectangle coordinates. Used only to seed docking layout
    * proportions (FR-UI-201); live layout geometry is owned by the serialized
@@ -127,9 +107,9 @@ export type ConfirmationMode = boolean;
 /** Bounded custom workspace count (FR-UI-002). */
 export const MAX_CUSTOM_WORKSPACES = 10;
 
-export const widgetSchema: z.ZodType<Widget> = z.object({
+const registeredWidgetSchema: z.ZodType<Widget> = z.object({
   id: z.string().min(1),
-  type: z.enum(WIDGET_TYPES),
+  type: z.custom<WidgetType>(isWidgetType, "widget type is not registered"),
   title: z.string(),
   symbol: z.string().optional(),
   accountId: z.string().optional(),
@@ -138,6 +118,22 @@ export const widgetSchema: z.ZodType<Widget> = z.object({
   row: z.number().optional(),
   colSpan: z.number().optional(),
   rowSpan: z.number().optional(),
+});
+
+/** Public strict schema for newly created or currently available widgets. */
+export const widgetSchema = registeredWidgetSchema;
+
+const persistedWidgetSchema = z.object({
+  id: z.string().min(1),
+  type: z.string().min(1),
+  title: z.string(),
+  symbol: z.string().optional(),
+  accountId: z.string().optional(),
+  runId: z.string().optional(),
+  col: z.number().finite().optional(),
+  row: z.number().finite().optional(),
+  colSpan: z.number().positive().finite().optional(),
+  rowSpan: z.number().positive().finite().optional(),
 });
 
 export const workspaceSchema: z.ZodType<Workspace> = z.object({
@@ -157,3 +153,68 @@ export const persistedLayoutSchema = z.object({
 });
 
 export type PersistedLayout = z.infer<typeof persistedLayoutSchema>;
+
+/**
+ * Recover one persisted presentation slice without letting a bad panel discard
+ * valid siblings. Unknown widget types are retained as explicit unavailable
+ * panels and all unlisted fields are stripped by Zod.
+ */
+export function recoverPersistedLayout(value: unknown): PersistedLayout | null {
+  if (typeof value !== "object" || value === null) return null;
+  const candidate = value as Record<string, unknown>;
+  if (!Array.isArray(candidate.workspaces)) return null;
+
+  const workspaces: Workspace[] = [];
+  for (const rawWorkspace of candidate.workspaces) {
+    if (typeof rawWorkspace !== "object" || rawWorkspace === null) continue;
+    const raw = rawWorkspace as Record<string, unknown>;
+    const header = z
+      .object({
+        id: z.number(),
+        name: z.string().min(1),
+        expandedWidgetId: z.string().nullable(),
+        dock: z.unknown().optional(),
+        templateChoicePending: z.boolean().optional(),
+      })
+      .safeParse(raw);
+    if (!header.success || !Array.isArray(raw.widgets)) continue;
+
+    const widgets = raw.widgets.flatMap((rawWidget): Widget[] => {
+      const parsed = persistedWidgetSchema.safeParse(rawWidget);
+      if (!parsed.success) return [];
+      if (isWidgetType(parsed.data.type)) {
+        return [{ ...parsed.data, type: parsed.data.type }];
+      }
+      return [
+        {
+          ...parsed.data,
+          // The cast is local to recovery: runtime rendering always resolves
+          // through the registry and therefore produces the unavailable panel.
+          type: parsed.data.type as WidgetType,
+          unavailableType: parsed.data.type,
+        },
+      ];
+    });
+    const dock = sanitizeDockLayout(
+      header.data.dock,
+      widgets.map((widget) => widget.id),
+    );
+    workspaces.push({
+      ...header.data,
+      widgets,
+      ...(dock === null ? {} : { dock }),
+    });
+  }
+
+  if (workspaces.length === 0) return null;
+  const ids = new Set(workspaces.map((workspace) => workspace.id));
+  const activeWorkspaceId =
+    typeof candidate.activeWorkspaceId === "number" && ids.has(candidate.activeWorkspaceId)
+      ? candidate.activeWorkspaceId
+      : workspaces[0].id;
+  const defaultWorkspaceId =
+    typeof candidate.defaultWorkspaceId === "number" && ids.has(candidate.defaultWorkspaceId)
+      ? candidate.defaultWorkspaceId
+      : workspaces[0].id;
+  return { workspaces, activeWorkspaceId, defaultWorkspaceId };
+}

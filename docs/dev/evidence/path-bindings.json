@@ -14,7 +14,10 @@
         "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx",
         "app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx"
       ],
-      "existing_test_targets": [],
+      "existing_test_targets": [
+        "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx"
+      ],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
     },
     {
