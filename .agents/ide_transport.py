@@ -19,7 +19,7 @@ from workflow_protocol import (
     validate_role_mutations,
 )
 
-IDE_MODES = frozenset({"solo", "delegate", "quick-fix"})
+IDE_MODES = frozenset({"solo", "delegate"})
 APP_HANDLE_SCHEMA_VERSION = 1
 
 

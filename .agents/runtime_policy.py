@@ -25,7 +25,7 @@ SUPPORTED_MODES = frozenset(
     }
 )
 HEADLESS_MODES = frozenset({"solo-headless", "delegate-headless", "delegate-multi"})
-IDE_MODES = frozenset({"solo", "delegate", "quick-fix"})
+IDE_MODES = frozenset({"solo", "delegate"})
 SCHEMA_V2_MODE_MAP = {
     "solo": "solo-headless",
     "delegate": "delegate-headless",

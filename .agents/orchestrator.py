@@ -809,7 +809,10 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     if mode == "solo":
         print("[ok] IDE solo transport: current chat performs each prepared role")
     elif mode == "quick-fix":
-        print("[ok] Quick-Fix: current chat plans and executes directly on clean main")
+        print(
+            "[ok] Quick-Fix: chat-direct comprehensive Dry Run and exact "
+            "APPROVED: EXECUTE; Task/Goal activation is disabled"
+        )
     elif mode == "delegate":
         print(
             "[ok] IDE delegate transport: controlling chat must expose app-native "

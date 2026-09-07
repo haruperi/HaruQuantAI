@@ -34,10 +34,12 @@ ORCHESTRATOR READY / TASK NONE
 
 ## 3. Goal lifecycle
 
-Quick-Fix is the explicit exception: it stays on clean `main`, uses dedicated
-same-chat Planner/Executor prompts, requires exact interactive
-`APPROVED: EXECUTE`, then archives evidence without review, branch, commit, or
-merge. It cannot activate a Goal.
+Quick-Fix is the explicit chat-direct exception: it stays on clean `main`,
+creates no Task/Goal state or role prompt, and is not routed by the orchestrator.
+The current chat presents a comprehensive Dry Run, requires exact interactive
+`APPROVED: EXECUTE`, then implements the approved scope on `main` without review,
+branch, commit, or merge. Task and Goal activation fail closed while it is
+selected.
 
 A Goal wraps the Task lifecycle; it does not duplicate it:
 

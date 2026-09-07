@@ -451,14 +451,14 @@ def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     """Create/verify the task branch and materialize the initial Planner artifact."""
     repo: Path = cfg["repo"]
     baseline = str(state["baseline"])
-    quick_fix = state.get("runtime_mode") == "quick-fix"
+    if state.get("runtime_mode") == "quick-fix":
+        raise OrchestratorError(
+            "Quick-Fix is chat-direct and must not activate Task state, write "
+            ".agents/task artifacts, or instantiate role prompts."
+        )
     branch = str(
         state.get("branch")
-        or (
-            cfg["main_branch"]
-            if quick_fix
-            else _derive_task_branch(cast("dict[str, Any]", state["task"]))
-        )
+        or _derive_task_branch(cast("dict[str, Any]", state["task"]))
     )
     current_branch = _git_ok(repo, "branch", "--show-current")
     current_head = _git_ok(repo, "rev-parse", "HEAD")
@@ -472,14 +472,6 @@ def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
             raise OrchestratorError(
                 "Task branch HEAD changed before initial Planner activation."
             )
-    elif quick_fix:
-        if current_branch != cfg["main_branch"] or current_head != baseline:
-            raise OrchestratorError(
-                "Quick-Fix activation requires the recorded clean main baseline."
-            )
-        state["branch"] = branch
-        _record(state, "quick_fix_main_selected", branch=branch)
-        _save_state(cfg, state)
     else:
         if current_branch != cfg["main_branch"] or current_head != baseline:
             raise OrchestratorError(
@@ -497,8 +489,8 @@ def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         _record(state, "task_branch_created", branch=branch)
         _save_state(cfg, state)
 
-    activation = "QUICK_FIX_ACTIVATED" if quick_fix else "TASK_ACTIVATED"
-    template_key = "quick_fix_planner" if quick_fix else "planner"
+    activation = "TASK_ACTIVATED"
+    template_key = "planner"
     body = compose_prompt(cfg["templates"][template_key], _build_fields(state, cfg))
     transition = _transition_for(cfg["transitions"], "ORCHESTRATOR", activation)
     metadata = {
@@ -580,9 +572,7 @@ def _write_orchestrator_planner_prompt(
     cfg: dict[str, Any], state: dict[str, Any], source_handoff: str
 ) -> None:
     fields = _build_fields(state, cfg)
-    quick_fix = state.get("runtime_mode") == "quick-fix"
-    template_key = "quick_fix_planner" if quick_fix else "planner"
-    body = compose_prompt(cfg["templates"][template_key], fields)
+    body = compose_prompt(cfg["templates"]["planner"], fields)
     transition = _transition_for(cfg["transitions"], "ORCHESTRATOR", source_handoff)
     metadata = {
         "prompt_schema_version": SCHEMA_VERSION,
@@ -674,10 +664,6 @@ def _gate_authorization(
     _ensure_runtime_policy_unchanged(cfg, state)
     if rejection is not None:
         return False, rejection, ""
-    if state.get("runtime_mode") == "quick-fix" and not owner_message:
-        raise OrchestratorError(
-            "Quick-Fix execution requires the exact interactive owner message."
-        )
     if owner_message:
         decision, feedback = _request_gate(gate, "Owner authorization", True, None)
         return decision, feedback, "OWNER_MESSAGE"

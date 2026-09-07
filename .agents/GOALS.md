@@ -199,10 +199,11 @@ uv run .agents/orchestrator.py goal-cancel --reason "..."
 - **Delegate-multi:** each child gets a fresh Task run ID and therefore a fresh independently configured native P/E/R session ledger automatically.
 - **Manual:** keep the same Goal Orchestrator chat, but open a new dedicated Planner/Executor/Reviewer chat set for each child. Reuse those three chats only for iterations of that child.
 
-Modes change transport only; Goal and Task semantics remain identical.
+The six normal modes change transport only; Goal and Task semantics remain identical.
 
 `quick-fix` is not a Goal mode. Goal activation fails closed while it is
-selected because Quick-Fix omits the branch, independent review, Task commit,
-and no-ff merge required for Goal children.
+selected because chat-direct Quick-Fix never activates Task/Goal state and omits
+the branch, independent review, Task commit, and no-ff merge required for Goal
+children.
 
 The schema-v3 runtime-policy and frozen Goal scope fingerprints are recorded at activation and checked before progress. Unattended headless children may receive one fresh `codex/gpt-5.6-sol/high` recovery generation for exactly one additional correction iteration. If that generation fails, the child reaches `MAX_ITERATIONS` and the Goal blocks; the next independently started Goal/Task always begins with its configured normal identities.

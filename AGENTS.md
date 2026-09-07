@@ -209,28 +209,45 @@ Transport symmetry:
 
 ### 2.10 Quick-Fix mode
 
-`quick-fix` is an explicit schema-v3 exception for a small, coherent,
-reversible change safe without an independent Reviewer. It cannot run a Goal.
+`quick-fix` is an explicit schema-v3, interactive, chat-direct exception for an
+owner who does not want to activate the atomic Task workflow. Its name does not
+limit task size: broad or multi-file work is permitted when the approved dry run
+fully scopes it. It cannot run or become a Goal child.
 
 ```text
-clean main → Quick-Fix Planner → APPROVED: EXECUTE
-           → Quick-Fix Executor → QUICK_FIX_COMPLETE
+clean main → comprehensive Dry Run in the current chat
+           → exact APPROVED: EXECUTE
+           → direct implementation and validation on main
 ```
 
-- Planner and Executor run sequentially in the same IDE chat from complete,
-  validated dedicated prompts.
-- Activation requires clean `main`, records its HEAD as baseline, keeps
-  `branch = "main"`, and creates or switches no branch.
-- Execution requires the entire trimmed owner message to be exactly
-  `APPROVED: EXECUTE`; unattended policy and recovery are invalid.
-- Executor modifies only approved paths, runs bounded validation, and never
-  reviews, commits, merges, pushes, or performs destructive rollback.
-- Success verifies unchanged HEAD and exact paths, archives evidence, clears
-  active Task files, and leaves the approved diff uncommitted on `main`.
-- Broad, security-sensitive, external/live, migration, dependency, or
-  independently reviewed work uses the normal atomic Task workflow.
+- When `.agents/run-config.toml` selects `mode = "quick-fix"` and
+  `approval_policy = "interactive"`, do not create/activate `.agents/task.toml`,
+  call Task/Goal activation, create or switch a branch, instantiate role prompts,
+  write `.agents/task/*`, create run/session state, or adopt protocol
+  Planner/Executor/Reviewer roles.
+- Before implementation, inspect repository truth and present a full
+  comprehensive Dry Run in the current chat. It must state the task and
+  requirements, files read, exact files to create/edit/delete and order,
+  contracts/dependencies, blockers/risks/trade-offs, inclusions/exclusions,
+  exact validation, and safe path-specific rollback.
+- Stop after the Dry Run. Execution is authorized only when the entire trimmed
+  next owner message is exactly `APPROVED: EXECUTE`. Any other response is
+  feedback or rejection and requires a revised Dry Run before another gate.
+- After authorization, implement the approved scope directly on a clean `main`
+  regardless of task size. Preserve unrelated user changes, modify only the
+  approved scope, run change-scoped validation, and report actual results.
+- Quick-Fix has no independent Reviewer, commit gate, automatic commit, merge,
+  push, Task archive, or automatic rollback. The validated diff remains
+  uncommitted on `main` unless the owner separately authorizes another Git action.
+- Quick-Fix changes only workflow ceremony. It never grants credentials,
+  external/live-action authority, destructive authority, secret access, scope
+  expansion, or permission to weaken security, quality, architecture, evidence,
+  and acceptance requirements.
+- The deterministic Task and Goal APIs fail closed before mutation while
+  Quick-Fix is selected and direct the operator back to this chat-only procedure.
 
-Normal Task branch, Reviewer, commit, and no-ff merge rules remain unchanged.
+Normal Task branch, Reviewer, commit, and no-ff merge rules remain unchanged for
+every non-Quick-Fix mode.
 
 ## 3. Coding style and verification
 

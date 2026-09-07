@@ -23,7 +23,10 @@ MODES = (
     ("delegate-headless", "One CLI vendor with a dedicated conversation per role"),
     ("delegate-multi", "Independently configured CLI conversation per role"),
     ("manual", "Prepare validated artifacts for operator-managed role chats"),
-    ("quick-fix", "Current IDE chat plans and implements a bounded fix on main"),
+    (
+        "quick-fix",
+        "Current chat plans and implements approved scope on main without Task activation",
+    ),
 )
 VENDORS = ("zai", "codex", "agy", "cline")
 MODELS: dict[str, tuple[str, ...]] = {

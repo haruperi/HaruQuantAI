@@ -112,18 +112,11 @@ def prepare_task_run(
             ".agents/configure.py before starting a new Task or Goal."
         )
     if isinstance(policy, RuntimePolicy) and policy.effective_mode == "quick-fix":
-        goals_dir = Path(cfg["repo"]) / ".agents" / "goals"
-        for path in goals_dir.glob("*/state.json") if goals_dir.exists() else ():
-            try:
-                goal_state = json.loads(path.read_text(encoding="utf-8"))
-            except (OSError, json.JSONDecodeError) as exc:
-                raise OrchestratorError(
-                    f"Invalid Goal state blocks Quick-Fix: {exc}"
-                ) from exc
-            if isinstance(goal_state, dict) and goal_state.get("status") == "RUNNING":
-                raise OrchestratorError(
-                    "Quick-Fix cannot start while a Goal is RUNNING."
-                )
+        raise OrchestratorError(
+            "Quick-Fix is chat-direct and cannot activate .agents Task state. "
+            "Create a comprehensive Dry Run in the current chat, wait for the "
+            "exact owner message APPROVED: EXECUTE, then implement on clean main."
+        )
     baseline = _entry_gate(cfg)
     state = create_task_state(task, baseline, run_id=run_id)
     if isinstance(policy, RuntimePolicy):

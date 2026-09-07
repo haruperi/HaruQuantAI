@@ -50,10 +50,11 @@ See `.agents/GOALS.md` for the complete Goal contract.
 
 ## Modes
 
-`quick-fix` is the sole shortened mode: one IDE chat performs a dedicated
-Planner dry run and, after exact interactive `APPROVED: EXECUTE`, a dedicated
-Executor on clean `main`. It has no Reviewer, commit gate, automatic commit,
-merge, or Goal support and leaves the validated diff uncommitted.
+`quick-fix` is the chat-direct bypass for owners who do not want Task
+activation. The current chat produces a comprehensive Dry Run, waits for exact
+interactive `APPROVED: EXECUTE`, then implements the approved scope on clean
+`main` regardless of task size. It does not create Task/run state, role prompts,
+branches, a Reviewer, a commit gate, commits, merges, or Goal children.
 
 | Mode | Task same-role continuity | Goal child boundary |
 | --- | --- | --- |
@@ -63,9 +64,9 @@ merge, or Goal support and leaves the validated diff uncommitted.
 | `delegate-headless` | one CLI vendor, distinct persistent session per role | fresh same-vendor P/E/R session set per child |
 | `delegate-multi` | separate role vendor/model and exact native session ID per role/run | new Task run ID and session ledger per child |
 | `manual` | return to same P/E/R chat within Task | new P/E/R chat set per child; same Goal Orchestrator chat |
-| `quick-fix` | current IDE chat performs Planner + Executor on clean `main` | not supported |
+| `quick-fix` | current chat plans and implements on clean `main`; no Task lifecycle is activated | not supported |
 
-Schema-v3 `.agents/run-config.toml` is authoritative for mode, headless role models/effort/providers, approval policy, normal iteration limit, unattended local permissions, and bounded recovery. The deterministic CLI drives Task/Goal state in every mode. Only `solo-headless`, `delegate-headless`, and `delegate-multi` use `.agents/session_runner.py` to launch reasoning-role CLI sessions. IDE `solo` performs the prepared role in the current chat; IDE `delegate` invokes/resumes app-native inspectable agents; `manual` waits for operator-managed chats.
+Schema-v3 `.agents/run-config.toml` is authoritative for mode, headless role models/effort/providers, approval policy, normal iteration limit, unattended local permissions, and bounded recovery. The deterministic CLI drives Task/Goal state in every mode except chat-direct `quick-fix`, for which Task/Goal activation fails before mutation. Only `solo-headless`, `delegate-headless`, and `delegate-multi` use `.agents/session_runner.py` to launch reasoning-role CLI sessions. IDE `solo` performs the prepared role in the current chat; IDE `delegate` invokes/resumes app-native inspectable agents; `manual` waits for operator-managed chats.
 
 Schema-v2 configurations remain resume-compatible with their old transport meaning and unchanged policy fingerprint. A missing-schema legacy file may continue an already-active legacy Task only. New Tasks and Goals fail closed until `.agents/configure.py` writes a complete schema-v3 policy.
 
@@ -128,9 +129,12 @@ uv run .agents/make_task.py 1.1
 uv run .agents/orchestrator.py start --task-file .agents/task.toml
 ```
 
-For Quick-Fix, configure `mode = "quick-fix"`, start normally, complete
-Planner, relay the exact owner message with `resume --approved`, and complete
-Executor. Evidence is archived and the approved diff remains on `main`.
+For Quick-Fix, configure `mode = "quick-fix"` with interactive approval and do
+not run `make_task.py`, `orchestrator.py start`, or any Goal command. Ask in the
+current chat for the work. The chat presents a comprehensive Dry Run and stops;
+after the entire next owner message is exactly `APPROVED: EXECUTE`, it implements
+and validates the approved scope directly on clean `main`. The resulting diff
+remains uncommitted unless a separate Git action is authorized.
 
 Task resume/gates:
 

@@ -237,7 +237,7 @@ effort = "high"
     )
     policy = load_runtime_policy(path, legacy_roles={}, default_max_iterations=5)
     assert policy.effective_mode == "quick-fix"
-    assert policy.is_ide
+    assert not policy.is_ide
     assert not policy.can_preauthorize_execute()
 
     path.write_text(
