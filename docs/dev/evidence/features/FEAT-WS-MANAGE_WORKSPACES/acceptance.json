@@ -4,7 +4,7 @@
   "task_id": "1.03",
   "status": "ACCEPTED",
   "baseline_commit": "edcf358f69d80f383c8e840ed641f807c04259f5",
-  "acceptance_commit": "UNCOMMITTED_QUICK_FIX_ON_MAIN",
+  "acceptance_commit": "83994e11156d1abb0fad8c151a59cf46071ba0a5",
   "requirements": [
     {
       "id": "FR-TRC-WS-MANAGE_WORKSPACES-001",
@@ -75,6 +75,6 @@
   ],
   "review": {
     "reviewer_verdict": "APPROVED",
-    "reviewer_notes": "Owner-approved interactive quick-fix verification in the same chat; independent Reviewer is intentionally not part of quick-fix mode. The baseline HEAD remains unchanged and no commit, merge, or push was performed."
+    "reviewer_notes": "Owner-approved interactive quick-fix verification in the same chat; independent Reviewer is intentionally not part of quick-fix mode. Implementation commit 83994e11156d1abb0fad8c151a59cf46071ba0a5 was created on main only after the owner's separate commit request; no merge or push was performed."
   }
 }

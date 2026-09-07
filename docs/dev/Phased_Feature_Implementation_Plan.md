@@ -389,7 +389,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `fix(workspace): complete FEAT-WS-MANAGE_WORKSPACES`
 
-**Accepted state:** Quick-fix implementation and validation completed directly on `main`; the worktree remains uncommitted until a separate owner commit request, as required by quick-fix mode.
+**Accepted commit:** `83994e11156d1abb0fad8c151a59cf46071ba0a5` — owner-requested local commit after quick-fix implementation and validation on `main`.
 
 ---
 
