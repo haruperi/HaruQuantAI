@@ -677,9 +677,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-09"></a>
 
-### - [ ] Task 1.09 — FEAT-WS-EXECUTE_PERSISTENCE — Execute bounded feature-owned transactions
+### - [x] Task 1.09 — FEAT-WS-EXECUTE_PERSISTENCE — Execute bounded feature-owned transactions
 
-**Status:** `NOT_STARTED_IN_TARGET` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U0.
+**Status:** `COMPLETE` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U0.
 
 **Order prerequisites:** 1.03.
 

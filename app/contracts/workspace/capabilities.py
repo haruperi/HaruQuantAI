@@ -6,6 +6,7 @@ from app.kernel.capability import CapabilityKey
 
 if TYPE_CHECKING:
     from app.contracts.workspace.manage_workspaces import ManageWorkspacesCapability
+    from app.contracts.workspace.persistence import PersistenceCapability
     from app.contracts.workspace.ports import (
         AdministerSettingsCapability,
         BuildDiagnosticsCapability,
@@ -19,6 +20,11 @@ if TYPE_CHECKING:
 
 MANAGE_WORKSPACES_CAPABILITY: CapabilityKey[ManageWorkspacesCapability] = CapabilityKey(
     name="workspace.manage-workspaces",
+    major=1,
+)
+
+PERSISTENCE_CAPABILITY: CapabilityKey[PersistenceCapability] = CapabilityKey(
+    name="workspace.persistence",
     major=1,
 )
 

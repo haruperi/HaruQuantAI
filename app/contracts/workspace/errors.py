@@ -112,6 +112,96 @@ class WorkspaceStorageError(WorkspaceError):
         super().__init__(message, error_code="WORKSPACE_STORAGE_ERROR")
 
 
+class PersistenceError(WorkspaceError):
+    """Base exception for bounded persistence operations."""
+
+    def __init__(self, message: str, error_code: str = "PERSISTENCE_ERROR") -> None:
+        """Initialize persistence error."""
+        super().__init__(message, error_code=error_code)
+
+
+class NamespaceAccessDeniedError(PersistenceError):
+    """Raised when an operation attempts undeclared table or namespace access."""
+
+    def __init__(
+        self,
+        namespace: str,
+        table: str | None = None,
+        message: str = "Access to table or namespace is denied",
+    ) -> None:
+        """Initialize namespace access denied error."""
+        self.namespace = namespace
+        self.table = table
+        detail = (
+            f" (namespace={namespace}, table={table})"
+            if table
+            else f" (namespace={namespace})"
+        )
+        super().__init__(f"{message}{detail}", error_code="NAMESPACE_ACCESS_DENIED")
+
+
+class RevisionConflictError(PersistenceError):
+    """Raised when expected revision does not match the current revision."""
+
+    def __init__(
+        self,
+        namespace: str,
+        expected: int,
+        actual: int,
+        message: str = "Optimistic revision conflict",
+    ) -> None:
+        """Initialize revision conflict error."""
+        self.namespace = namespace
+        self.expected = expected
+        self.actual = actual
+        super().__init__(
+            f"{message}: namespace={namespace}, expected={expected}, actual={actual}",
+            error_code="REVISION_CONFLICT",
+        )
+
+
+class MigrationChecksumError(PersistenceError):
+    """Raised when an already applied migration has a changed checksum."""
+
+    def __init__(
+        self,
+        namespace: str,
+        version: int,
+        recorded_checksum: str,
+        provided_checksum: str,
+        message: str = "Migration checksum mismatch",
+    ) -> None:
+        """Initialize migration checksum error."""
+        self.namespace = namespace
+        self.version = version
+        self.recorded_checksum = recorded_checksum
+        self.provided_checksum = provided_checksum
+        super().__init__(
+            f"{message}: namespace={namespace}, version={version}, "
+            f"recorded={recorded_checksum}, provided={provided_checksum}",
+            error_code="MIGRATION_CHECKSUM_MISMATCH",
+        )
+
+
+class EvidenceImmutableError(PersistenceError):
+    """Raised when an operation attempts to update or delete append-only evidence."""
+
+    def __init__(
+        self,
+        namespace: str,
+        evidence_id: str | None = None,
+        message: str = (
+            "Retained append-only evidence is immutable and "
+            "cannot be updated or deleted"
+        ),
+    ) -> None:
+        """Initialize evidence immutable error."""
+        self.namespace = namespace
+        self.evidence_id = evidence_id
+        detail = f" (evidence_id={evidence_id})" if evidence_id else ""
+        super().__init__(f"{message}{detail}", error_code="EVIDENCE_IMMUTABLE")
+
+
 class SettingsValidationError(WorkspaceError):
     """Raised when workspace settings fail field validation.
 

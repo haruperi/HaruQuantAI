@@ -202,7 +202,7 @@
       "task_id": "1.09",
       "text": "Execute registered namespace-bound transactions with idempotency and expected revision; reject undeclared table/namespace access.",
       "disposition": "implement",
-      "current_status": "PENDING_EXECUTION"
+      "current_status": "VERIFIED"
     },
     {
       "fr_id": "FR-TRC-WS-EXECUTE_PERSISTENCE-002",
@@ -210,7 +210,7 @@
       "task_id": "1.09",
       "text": "Apply ordered additive feature migration manifests with checksum verification and transactional rollback.",
       "disposition": "implement",
-      "current_status": "PENDING_EXECUTION"
+      "current_status": "VERIFIED"
     },
     {
       "fr_id": "FR-TRC-WS-EXECUTE_PERSISTENCE-003",
@@ -218,7 +218,7 @@
       "task_id": "1.09",
       "text": "Keep append-only evidence immutable and provide bounded owner-scoped reads/export operations.",
       "disposition": "implement",
-      "current_status": "PENDING_EXECUTION"
+      "current_status": "VERIFIED"
     },
     {
       "fr_id": "FR-TRC-WS-SECURE_LOCAL_ACCESS-001",
@@ -4689,7 +4689,7 @@
       "feature_id": "FEAT-WS-EXECUTE_PERSISTENCE",
       "task_id": "1.09",
       "text": "Removing FEAT-WS-EXECUTE_PERSISTENCE withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "current_status": "PENDING_EXECUTION"
+      "current_status": "VERIFIED"
     },
     {
       "nfr_id": "NFR-TRC-WS-SECURE_LOCAL_ACCESS-001",

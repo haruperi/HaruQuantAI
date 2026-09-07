@@ -1,0 +1,76 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-WS-EXECUTE_PERSISTENCE",
+  "task_id": "1.09",
+  "status": "ACCEPTED",
+  "baseline_commit": "201815b1387e418648b5a8b6aead7adf85cb37b0",
+  "acceptance_commit": "PENDING_COMMIT",
+  "requirements": [
+    {
+      "id": "FR-TRC-WS-EXECUTE_PERSISTENCE-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/execute_persistence/test_traceability.py::test_trc_execute_persistence_001_table_fencing_and_idempotency"
+    },
+    {
+      "id": "FR-TRC-WS-EXECUTE_PERSISTENCE-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/execute_persistence/test_traceability.py::test_trc_execute_persistence_002_migrations"
+    },
+    {
+      "id": "FR-TRC-WS-EXECUTE_PERSISTENCE-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/execute_persistence/test_traceability.py::test_trc_execute_persistence_003_evidence_custody"
+    },
+    {
+      "id": "NFR-TRC-WS-EXECUTE_PERSISTENCE-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/execute_persistence/test_lifecycle.py::test_trc_execute_persistence_nfr_001_lifecycle"
+    },
+    {
+      "id": "CONTRACT_PROVIDER_COMPOSITION_E2E",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/integration/test_execute_persistence.py::test_execute_persistence_composition_e2e"
+    },
+    {
+      "id": "ARCH-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/execute_persistence/test_logging.py"
+    },
+    {
+      "id": "INTERFACES_STAGE",
+      "status": "WAIVED",
+      "evidence_target": "Kernel Workspace persistence capability; no Interfaces adapter is owned by this feature."
+    },
+    {
+      "id": "UI_STAGE",
+      "status": "WAIVED",
+      "evidence_target": "No widget or UI surface is owned by this feature."
+    }
+  ],
+  "commands": [
+    {
+      "command": "uv run pytest --no-cov tests/services/workspace/execute_persistence tests/services/workspace/integration/test_execute_persistence.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run mypy app/contracts/workspace/persistence.py app/services/workspace/execute_persistence tests/services/workspace/execute_persistence",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff check app/contracts/workspace/ app/services/workspace/execute_persistence/ tests/services/workspace/execute_persistence/ tests/services/workspace/integration/test_execute_persistence.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff format --check app/contracts/workspace/ app/services/workspace/execute_persistence/ tests/services/workspace/execute_persistence/ tests/services/workspace/integration/test_execute_persistence.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run python -m app.services.workspace.execute_persistence._usage",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "APPROVED",
+    "reviewer_notes": "Owner-approved interactive quick-fix verification in the same chat; independent Reviewer is intentionally not part of quick-fix mode. Changes remain uncommitted on main per quick-fix rules."
+  }
+}

@@ -105,7 +105,7 @@ Feature owners are independent and physically removable. The selected package is
 | Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
 | [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces) | Open, recover and back up a workspace | `app/services/workspace/manage_workspaces/` | U0 | 3 | 1 | VERIFIED |
-| [`FEAT-WS-EXECUTE_PERSISTENCE`](#feat-ws-execute-persistence) | Execute bounded feature-owned transactions | `app/services/workspace/execute_persistence/` | U0 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-EXECUTE_PERSISTENCE`](#feat-ws-execute-persistence) | Execute bounded feature-owned transactions | `app/services/workspace/execute_persistence/` | U0 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts) | Publish and retain immutable artifact bytes | `app/services/workspace/manage_artifacts/` | U1 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts) | Verify accounts, principals and sessions | `app/services/workspace/manage_accounts/` | U0 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-WS-SECURE_LOCAL_ACCESS`](#feat-ws-secure-local-access) | Resolve secrets and protect host access | `app/services/workspace/secure_local_access/` | U0 | 3 | 1 | NOT_REVALIDATED |
@@ -319,7 +319,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-WS-MANAGE_WOR
 
 > **Feature ID:** `FEAT-WS-EXECUTE_PERSISTENCE`
 > **Domain:** `workspace`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Complete` — full-scope implementation evidence **VERIFIED**.
 > **Selected owner:** `app/services/workspace/execute_persistence/`
 > **First release milestone:** `U0`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
@@ -390,9 +390,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-WS-EXECUTE_PERSISTENCE-001` | Execute registered namespace-bound transactions with idempotency and expected revision; reject undeclared table/namespace access. | `AT-WS-EXECUTE_PERSISTENCE-001` | A workflow writer cannot update claim tables; two competing expected-revision writes accept exactly one. |
-| PENDING | `FR-TRC-WS-EXECUTE_PERSISTENCE-002` | Apply ordered additive feature migration manifests with checksum verification and transactional rollback. | `AT-WS-EXECUTE_PERSISTENCE-002` | Reapplying the same manifest changes nothing; changed checksum fails; a failed migration does not partially advance the schema version. |
-| PENDING | `FR-TRC-WS-EXECUTE_PERSISTENCE-003` | Keep append-only evidence immutable and provide bounded owner-scoped reads/export operations. | `AT-WS-EXECUTE_PERSISTENCE-003` | An attempted overwrite/delete of retained evidence is denied; paged export has stable order and cannot cross workspace scope. |
+| VERIFIED | `FR-TRC-WS-EXECUTE_PERSISTENCE-001` | Execute registered namespace-bound transactions with idempotency and expected revision; reject undeclared table/namespace access. | `AT-WS-EXECUTE_PERSISTENCE-001` | A workflow writer cannot update claim tables; two competing expected-revision writes accept exactly one. |
+| VERIFIED | `FR-TRC-WS-EXECUTE_PERSISTENCE-002` | Apply ordered additive feature migration manifests with checksum verification and transactional rollback. | `AT-WS-EXECUTE_PERSISTENCE-002` | Reapplying the same manifest changes nothing; changed checksum fails; a failed migration does not partially advance the schema version. |
+| VERIFIED | `FR-TRC-WS-EXECUTE_PERSISTENCE-003` | Keep append-only evidence immutable and provide bounded owner-scoped reads/export operations. | `AT-WS-EXECUTE_PERSISTENCE-003` | An attempted overwrite/delete of retained evidence is denied; paged export has stable order and cannot cross workspace scope. |
 
 **Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -400,7 +400,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-WS-EXECUTE_PERSISTENCE-001` | Removing FEAT-WS-EXECUTE_PERSISTENCE withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-EXECUTE_PERSISTENCE-001` | Disable and physically remove execute_persistence; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| VERIFIED | `NFR-TRC-WS-EXECUTE_PERSISTENCE-001` | Removing FEAT-WS-EXECUTE_PERSISTENCE withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-EXECUTE_PERSISTENCE-001` | Disable and physically remove execute_persistence; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -410,15 +410,15 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/services/workspace/execute_persistence/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/services/workspace/execute_persistence/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-EXECUTE_PERSISTENCE/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `tests/services/workspace/execute_persistence/test_traceability.py` | VERIFIED: exact named tests bind all three acceptance oracles. |
+| Every ATN ID in this card | `tests/services/workspace/execute_persistence/test_lifecycle.py` | VERIFIED: withdrawal, unrelated capability survival, retained data and idempotent cleanup. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-WS-EXECUTE_PERSISTENCE/acceptance.json` | VERIFIED for contract/provider/composition/end-to-end; Interfaces and UI are inapplicable to this kernel persistence capability. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
 #### Feature Usage Examples
 
-**Required `_usage.py` command - planned, not executed:**
+**Verified `_usage.py` command:**
 
 ```powershell
 uv run --frozen python -m app.services.workspace.execute_persistence._usage
